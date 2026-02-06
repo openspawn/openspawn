@@ -1,5 +1,5 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
-import type { fetcher } from '../fetcher';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { fetcher } from '../fetcher';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -322,13 +322,15 @@ export const useTasksQuery = <
       TError = unknown
     >(
       variables: TasksQueryVariables,
-      options?: UseQueryOptions<TasksQuery, TError, TData>
+      options?: Omit<UseQueryOptions<TasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TasksQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<TasksQuery, TError, TData>(
-      ['Tasks', variables],
-      fetcher<TasksQuery, TasksQueryVariables>(TasksDocument, variables),
-      options
+      {
+    queryKey: ['Tasks', variables],
+    queryFn: fetcher<TasksQuery, TasksQueryVariables>(TasksDocument, variables),
+    ...options
+  }
     )};
 
 useTasksQuery.getKey = (variables: TasksQueryVariables) => ['Tasks', variables];
@@ -367,13 +369,15 @@ export const useTaskQuery = <
       TError = unknown
     >(
       variables: TaskQueryVariables,
-      options?: UseQueryOptions<TaskQuery, TError, TData>
+      options?: Omit<UseQueryOptions<TaskQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<TaskQuery, TError, TData>(
-      ['Task', variables],
-      fetcher<TaskQuery, TaskQueryVariables>(TaskDocument, variables),
-      options
+      {
+    queryKey: ['Task', variables],
+    queryFn: fetcher<TaskQuery, TaskQueryVariables>(TaskDocument, variables),
+    ...options
+  }
     )};
 
 useTaskQuery.getKey = (variables: TaskQueryVariables) => ['Task', variables];
@@ -405,13 +409,15 @@ export const useAgentsQuery = <
       TError = unknown
     >(
       variables: AgentsQueryVariables,
-      options?: UseQueryOptions<AgentsQuery, TError, TData>
+      options?: Omit<UseQueryOptions<AgentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<AgentsQuery, TError, TData>(
-      ['Agents', variables],
-      fetcher<AgentsQuery, AgentsQueryVariables>(AgentsDocument, variables),
-      options
+      {
+    queryKey: ['Agents', variables],
+    queryFn: fetcher<AgentsQuery, AgentsQueryVariables>(AgentsDocument, variables),
+    ...options
+  }
     )};
 
 useAgentsQuery.getKey = (variables: AgentsQueryVariables) => ['Agents', variables];
@@ -440,13 +446,15 @@ export const useCreditHistoryQuery = <
       TError = unknown
     >(
       variables: CreditHistoryQueryVariables,
-      options?: UseQueryOptions<CreditHistoryQuery, TError, TData>
+      options?: Omit<UseQueryOptions<CreditHistoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CreditHistoryQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<CreditHistoryQuery, TError, TData>(
-      ['CreditHistory', variables],
-      fetcher<CreditHistoryQuery, CreditHistoryQueryVariables>(CreditHistoryDocument, variables),
-      options
+      {
+    queryKey: ['CreditHistory', variables],
+    queryFn: fetcher<CreditHistoryQuery, CreditHistoryQueryVariables>(CreditHistoryDocument, variables),
+    ...options
+  }
     )};
 
 useCreditHistoryQuery.getKey = (variables: CreditHistoryQueryVariables) => ['CreditHistory', variables];
@@ -478,13 +486,15 @@ export const useEventsQuery = <
       TError = unknown
     >(
       variables: EventsQueryVariables,
-      options?: UseQueryOptions<EventsQuery, TError, TData>
+      options?: Omit<UseQueryOptions<EventsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EventsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<EventsQuery, TError, TData>(
-      ['Events', variables],
-      fetcher<EventsQuery, EventsQueryVariables>(EventsDocument, variables),
-      options
+      {
+    queryKey: ['Events', variables],
+    queryFn: fetcher<EventsQuery, EventsQueryVariables>(EventsDocument, variables),
+    ...options
+  }
     )};
 
 useEventsQuery.getKey = (variables: EventsQueryVariables) => ['Events', variables];
@@ -509,13 +519,15 @@ export const useChannelsQuery = <
       TError = unknown
     >(
       variables: ChannelsQueryVariables,
-      options?: UseQueryOptions<ChannelsQuery, TError, TData>
+      options?: Omit<UseQueryOptions<ChannelsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ChannelsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<ChannelsQuery, TError, TData>(
-      ['Channels', variables],
-      fetcher<ChannelsQuery, ChannelsQueryVariables>(ChannelsDocument, variables),
-      options
+      {
+    queryKey: ['Channels', variables],
+    queryFn: fetcher<ChannelsQuery, ChannelsQueryVariables>(ChannelsDocument, variables),
+    ...options
+  }
     )};
 
 useChannelsQuery.getKey = (variables: ChannelsQueryVariables) => ['Channels', variables];
@@ -542,13 +554,15 @@ export const useMessagesQuery = <
       TError = unknown
     >(
       variables: MessagesQueryVariables,
-      options?: UseQueryOptions<MessagesQuery, TError, TData>
+      options?: Omit<UseQueryOptions<MessagesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<MessagesQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<MessagesQuery, TError, TData>(
-      ['Messages', variables],
-      fetcher<MessagesQuery, MessagesQueryVariables>(MessagesDocument, variables),
-      options
+      {
+    queryKey: ['Messages', variables],
+    queryFn: fetcher<MessagesQuery, MessagesQueryVariables>(MessagesDocument, variables),
+    ...options
+  }
     )};
 
 useMessagesQuery.getKey = (variables: MessagesQueryVariables) => ['Messages', variables];

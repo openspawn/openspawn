@@ -27,7 +27,7 @@ const config: CodegenConfig = {
           func: "../fetcher#fetcher",
           isReactHook: false,
         },
-        useTypeImports: true,
+        reactQueryVersion: 5,
         skipTypename: true,
         enumsAsTypes: true,
         exposeQueryKeys: true,
