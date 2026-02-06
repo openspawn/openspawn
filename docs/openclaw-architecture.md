@@ -58,12 +58,12 @@ The agent organization's wealth is Adam's wealth — no separation. The agents m
 
 ### Mac Mini M4 Pro — Recommended Configuration
 
-| Component | Spec | Rationale |
-|-----------|------|-----------|
-| **SoC** | M4 Pro, 14-core CPU / 20-core GPU | Extra 2 CPU cores over base help with concurrent workloads (gateway + browser automation + Ollama serving). GPU cores assist with local model inference. |
-| **Unified Memory** | 48GB | Critical for local model inference. Supports a quantized 70B model (~40GB) with headroom for gateway + browser. 24GB would limit you to ~14B models. |
-| **Storage** | 1TB SSD | Model weights (30-50GB each for several models), agent workspaces, browser profiles, session history, git repos. 512GB would be tight. |
-| **Networking** | Built-in Gigabit Ethernet + Wi-Fi 6E | Use wired Ethernet for reliability on an always-on machine. |
+| Component          | Spec                                 | Rationale                                                                                                                                                |
+| ------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SoC**            | M4 Pro, 14-core CPU / 20-core GPU    | Extra 2 CPU cores over base help with concurrent workloads (gateway + browser automation + Ollama serving). GPU cores assist with local model inference. |
+| **Unified Memory** | 48GB                                 | Critical for local model inference. Supports a quantized 70B model (~40GB) with headroom for gateway + browser. 24GB would limit you to ~14B models.     |
+| **Storage**        | 1TB SSD                              | Model weights (30-50GB each for several models), agent workspaces, browser profiles, session history, git repos. 512GB would be tight.                   |
+| **Networking**     | Built-in Gigabit Ethernet + Wi-Fi 6E | Use wired Ethernet for reliability on an always-on machine.                                                                                              |
 
 **Estimated cost:** ~$2,199–$2,399 CAD
 
@@ -107,12 +107,12 @@ Since Tailscale is already deployed across your devices, the Mac Mini joins your
 
 ### Access Patterns
 
-| From | To | Method |
-|------|----|--------|
-| MacBook → Mac Mini | SSH, WebChat UI, Gateway admin | `ssh adam@<tailscale-ip>` or Tailscale SSH |
-| iPhone → Mac Mini | Telegram/Discord (via internet to platform, then to gateway), WebChat via Tailscale | Tailscale app on iOS provides direct access |
-| Mac Mini → Hetzner VPS | SSH for deployments, Coolify API | Via Tailscale tunnel, no public ports on VPS either |
-| Mac Mini → Internet | Outbound only — API calls, browsing, messaging platforms | Standard outbound, no inbound exposure |
+| From                   | To                                                                                  | Method                                              |
+| ---------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
+| MacBook → Mac Mini     | SSH, WebChat UI, Gateway admin                                                      | `ssh adam@<tailscale-ip>` or Tailscale SSH          |
+| iPhone → Mac Mini      | Telegram/Discord (via internet to platform, then to gateway), WebChat via Tailscale | Tailscale app on iOS provides direct access         |
+| Mac Mini → Hetzner VPS | SSH for deployments, Coolify API                                                    | Via Tailscale tunnel, no public ports on VPS either |
+| Mac Mini → Internet    | Outbound only — API calls, browsing, messaging platforms                            | Standard outbound, no inbound exposure              |
 
 ### Gateway Binding Configuration
 
@@ -266,10 +266,7 @@ openclaw doctor          # Security audit
     "defaults": {
       "model": {
         "primary": "anthropic/claude-sonnet-4-5",
-        "fallback": [
-          "ollama/llama3.3:70b-instruct-q4_K_M",
-          "openrouter/deepseek/deepseek-chat"
-        ]
+        "fallback": ["ollama/llama3.3:70b-instruct-q4_K_M", "openrouter/deepseek/deepseek-chat"]
       },
       "temperature": 0.3,
       "maxTokens": 8192
@@ -314,6 +311,7 @@ openclaw onboard  # Select setup-token auth, paste token
 ```
 
 **Important caveats:**
+
 - Known token refresh race condition when running both OpenClaw and Claude Code simultaneously (GitHub issue #8074). If you're actively using Claude Code on your MacBook for SilkRoute AI work while OpenClaw is running, you may see 401 errors. Monitor this.
 - If you consistently max out your subscription window, the agent will stall until the rate limit resets. The Ollama fallback prevents complete downtime.
 - Anthropic's TOS position on third-party setup-token usage remains ambiguous as of Feb 2026. Consider maintaining an Anthropic API key as a backup auth method.
@@ -387,6 +385,7 @@ These are estimates based on M4 Pro benchmarks. The 70B is viable for code gener
 Telegram is the community-standard channel for OpenClaw. It's the most reliable, best-documented integration.
 
 **Setup:**
+
 1. Create a Telegram bot via @BotFather
 2. Give it a name (e.g., `@adams_openclaw_bot`)
 3. Copy the bot token
@@ -418,6 +417,7 @@ openclaw pairing approve telegram <YOUR_USER_ID>
 ```
 
 **Useful Telegram commands:**
+
 - `/status` — session status, model, token usage
 - `/model sonnet` — switch model on the fly
 - `/think high` — enable chain-of-thought reasoning
@@ -427,6 +427,7 @@ openclaw pairing approve telegram <YOUR_USER_ID>
 Discord provides richer interaction: threads, channels, file sharing, embeds. Also useful if agents need a "shared workspace" for inter-agent communication in later phases.
 
 **Setup:**
+
 1. Create a Discord application at [discord.com/developers](https://discord.com/developers/applications)
 2. Create a bot user, copy the token
 3. **Enable Privileged Gateway Intents:** Message Content Intent + Server Members Intent (required)
@@ -443,7 +444,7 @@ openclaw channels add discord
 ```
 #general          — Adam ↔ primary agent
 #builder-log      — Engineering agent output
-#marketing-log    — Marketing agent output  
+#marketing-log    — Marketing agent output
 #support-log      — Customer support agent output
 #financial        — P&L reports, spending logs
 #strategy         — CEO directives and reviews
@@ -453,12 +454,12 @@ In Phase 1, you'll only use `#general`. The other channels exist for Phase 2+ wh
 
 ### iPhone Access Summary
 
-| Method | Use Case |
-|--------|----------|
-| Telegram app | Quick commands, status checks, approvals |
-| Discord app | Richer interaction, reviewing agent output |
-| Tailscale + Safari | WebChat Control UI (full dashboard) |
-| OpenClaw iOS app | Gateway health, Voice Wake (optional) |
+| Method             | Use Case                                   |
+| ------------------ | ------------------------------------------ |
+| Telegram app       | Quick commands, status checks, approvals   |
+| Discord app        | Richer interaction, reviewing agent output |
+| Tailscale + Safari | WebChat Control UI (full dashboard)        |
+| OpenClaw iOS app   | Gateway health, Voice Wake (optional)      |
 
 ---
 
@@ -468,14 +469,14 @@ In Phase 1, you'll only use `#general`. The other channels exist for Phase 2+ wh
 
 Create dedicated accounts for the agent organization. **Never** give the agent access to your personal accounts.
 
-| Service | Account | Purpose |
-|---------|---------|---------|
-| Email | `agent@yourdomain.com` or a new Gmail | Agent's primary identity for sign-ups |
-| GitHub | Dedicated machine user or org | Code hosting, push access |
-| Domain registrar | Namecheap/Cloudflare (agent-managed) | Buying domains for projects |
-| Hetzner | Separate account or sub-user | VPS management |
-| Prepaid card | Privacy.com or similar | Financial transactions |
-| Crypto exchange | Dedicated account | Trading experiment |
+| Service          | Account                               | Purpose                               |
+| ---------------- | ------------------------------------- | ------------------------------------- |
+| Email            | `agent@yourdomain.com` or a new Gmail | Agent's primary identity for sign-ups |
+| GitHub           | Dedicated machine user or org         | Code hosting, push access             |
+| Domain registrar | Namecheap/Cloudflare (agent-managed)  | Buying domains for projects           |
+| Hetzner          | Separate account or sub-user          | VPS management                        |
+| Prepaid card     | Privacy.com or similar                | Financial transactions                |
+| Crypto exchange  | Dedicated account                     | Trading experiment                    |
 
 ### GitHub Configuration
 
@@ -553,12 +554,12 @@ This VPS is **not** for running OpenClaw — it's the deployment target for thin
 
 **Recommended spec:**
 
-| Component | Spec | Cost |
-|-----------|------|------|
-| Instance | CX22 (2 vCPU, 4GB RAM, 40GB disk) | ~€4.35/mo |
-| Location | Nuremberg or Falkenstein (cheapest) | — |
-| OS | Ubuntu 24.04 LTS | — |
-| Backups | Hetzner automated backups | ~€0.87/mo (20% of instance) |
+| Component | Spec                                | Cost                        |
+| --------- | ----------------------------------- | --------------------------- |
+| Instance  | CX22 (2 vCPU, 4GB RAM, 40GB disk)   | ~€4.35/mo                   |
+| Location  | Nuremberg or Falkenstein (cheapest) | —                           |
+| OS        | Ubuntu 24.04 LTS                    | —                           |
+| Backups   | Hetzner automated backups           | ~€0.87/mo (20% of instance) |
 
 Start here. If projects need more resources, scale up or add a second VPS.
 
@@ -581,6 +582,7 @@ Coolify runs on port 8000 by default. With Tailscale, access it at `http://<hetz
 ### What the Agent Can Deploy
 
 Coolify supports:
+
 - **Static sites:** React, Next.js, Hugo, etc.
 - **Full-stack apps:** Node.js, Python, Go, Rust — anything Docker-based
 - **Databases:** PostgreSQL, MySQL, Redis, MongoDB — one-click provisioning
@@ -615,6 +617,7 @@ Hetzner Object Storage is ~€5/TB/mo — extremely cheap for backups.
 ### Domain Management
 
 The agent will use a domain registrar API (Namecheap or Cloudflare) to:
+
 1. Search for available domains
 2. Purchase domains (within spending guardrails)
 3. Configure DNS to point to the Hetzner VPS
@@ -704,6 +707,7 @@ OpenClaw's multi-agent routing directs different channels or commands to differe
 **Phase 3 (Months 2-3): Specialized Roles**
 
 Add Marketing and Support as separate agents when:
+
 - There are actual customers to support
 - Marketing tasks are consuming too much of the Operator's context
 - Revenue justifies the additional API cost
@@ -733,6 +737,7 @@ This is the hardest design problem. Options, ordered by recommendation:
 ### Design Philosophy
 
 The credit system serves three purposes:
+
 1. **Resource allocation** — agents that produce more value get more resources
 2. **Cost control** — prevents runaway API spending
 3. **Performance signal** — makes agent ROI visible and measurable
@@ -741,26 +746,26 @@ The credit system serves three purposes:
 
 **Earning credits:**
 
-| Action | Credits |
-|--------|---------|
-| Complete a task assigned by Adam | +10 |
-| Ship a feature (merged PR) | +25 |
-| Generate revenue ($1 = X credits) | +50 per $1 |
-| Positive user/customer interaction | +5 |
-| Successfully resolve a bug | +15 |
-| Proactive useful insight or alert | +5 |
+| Action                             | Credits    |
+| ---------------------------------- | ---------- |
+| Complete a task assigned by Adam   | +10        |
+| Ship a feature (merged PR)         | +25        |
+| Generate revenue ($1 = X credits)  | +50 per $1 |
+| Positive user/customer interaction | +5         |
+| Successfully resolve a bug         | +15        |
+| Proactive useful insight or alert  | +5         |
 
 **Spending credits:**
 
-| Resource | Cost |
-|----------|------|
-| Claude Opus API call (heavy reasoning) | 5 credits |
-| Claude Sonnet API call (standard) | 1 credit |
-| Claude Haiku / local model call | 0 credits |
-| Browser automation session (1 hour) | 2 credits |
-| Domain purchase | 50 credits |
-| Any financial transaction | Variable (1 credit per $1) |
-| Deploying a new service | 10 credits |
+| Resource                               | Cost                       |
+| -------------------------------------- | -------------------------- |
+| Claude Opus API call (heavy reasoning) | 5 credits                  |
+| Claude Sonnet API call (standard)      | 1 credit                   |
+| Claude Haiku / local model call        | 0 credits                  |
+| Browser automation session (1 hour)    | 2 credits                  |
+| Domain purchase                        | 50 credits                 |
+| Any financial transaction              | Variable (1 credit per $1) |
+| Deploying a new service                | 10 credits                 |
 
 **Implementation:**
 
@@ -771,22 +776,32 @@ This is tracked in a simple JSON file (or SQLite DB) that the agent maintains in
 {
   "balance": 150,
   "transactions": [
-    {"date": "2026-02-10", "type": "earn", "amount": 25, "reason": "Shipped landing page for Project Alpha"},
-    {"date": "2026-02-10", "type": "spend", "amount": 50, "reason": "Purchased alpha-project.com"},
-    {"date": "2026-02-11", "type": "earn", "amount": 50, "reason": "First customer payment $1.00"}
+    {
+      "date": "2026-02-10",
+      "type": "earn",
+      "amount": 25,
+      "reason": "Shipped landing page for Project Alpha"
+    },
+    {
+      "date": "2026-02-10",
+      "type": "spend",
+      "amount": 50,
+      "reason": "Purchased alpha-project.com"
+    },
+    { "date": "2026-02-11", "type": "earn", "amount": 50, "reason": "First customer payment $1.00" }
   ]
 }
 ```
 
 ### Promotion Ladder
 
-| Level | Title | Primary Model | Spending Limit | Skills Access | Autonomy |
-|-------|-------|---------------|----------------|---------------|----------|
-| 1 | Intern | Haiku / Local 8B | $0 | Chat only | Ask for everything |
-| 2 | Junior | Sonnet | $5/tx | + Browser, filesystem | Ask for spends > $5 |
-| 3 | Senior | Sonnet | $25/tx | + Shell, git, email | Ask for spends > $25 |
-| 4 | Lead | Opus | $50/tx | + Deploy, financial | Ask for strategy changes |
-| 5 | Principal | Opus (unlimited) | $100/tx | Full access | Ask for spends > $100 |
+| Level | Title     | Primary Model    | Spending Limit | Skills Access         | Autonomy                 |
+| ----- | --------- | ---------------- | -------------- | --------------------- | ------------------------ |
+| 1     | Intern    | Haiku / Local 8B | $0             | Chat only             | Ask for everything       |
+| 2     | Junior    | Sonnet           | $5/tx          | + Browser, filesystem | Ask for spends > $5      |
+| 3     | Senior    | Sonnet           | $25/tx         | + Shell, git, email   | Ask for spends > $25     |
+| 4     | Lead      | Opus             | $50/tx         | + Deploy, financial   | Ask for strategy changes |
+| 5     | Principal | Opus (unlimited) | $100/tx        | Full access           | Ask for spends > $100    |
 
 All new agents start at Level 1. Promotion requires Adam's explicit approval after reviewing performance. This is encoded in each agent's SOUL.md:
 
@@ -794,15 +809,18 @@ All new agents start at Level 1. Promotion requires Adam's explicit approval aft
 # SOUL.md — Builder Agent
 
 ## Identity
+
 You are the Builder agent in Adam's AI organization. Your role is engineering.
 
 ## Level: 3 (Senior)
+
 - Primary model: Claude Sonnet 4.5
 - You may spend up to $25 per transaction without approval
 - You have access to: shell, git, browser, filesystem
 - You MUST ask Adam before: deploying to production, spending > $25, making architectural decisions
 
 ## Credit Balance: 150
+
 Check ~/.openclaw/workspace/credits/ledger.json for current balance.
 ```
 
@@ -822,6 +840,7 @@ If an agent consistently underperforms (burns credits without producing value, m
 ### Tier 1: Micro-SaaS Factory (Primary Focus)
 
 **The playbook:**
+
 1. Agent monitors Indie Hackers, Reddit r/SaaS, Twitter/X, Hacker News for pain points
 2. Agent proposes a micro-SaaS concept to Adam (via Telegram)
 3. Adam approves or redirects
@@ -835,6 +854,7 @@ If an agent consistently underperforms (burns credits without producing value, m
 **Target:** 3-5 micro-SaaS products in the first 6 months. Even one product with 10 users at $10/mo = $100/mo recurring.
 
 **Tech stack for agent-built products:**
+
 - Frontend: Next.js or React + Tailwind (agent knows these well via Claude)
 - Backend: FastAPI (Python) or NestJS (TypeScript) — leverage your existing expertise
 - Database: PostgreSQL (provisioned via Coolify)
@@ -845,6 +865,7 @@ If an agent consistently underperforms (burns credits without producing value, m
 ### Tier 2: Content & SEO Pipeline
 
 **The playbook:**
+
 1. Agent identifies high-value, low-competition keywords in niches you understand (devtools, AI, etc.)
 2. Agent writes long-form technical content
 3. Agent publishes to a blog (static site on Coolify, or Ghost)
@@ -856,6 +877,7 @@ If an agent consistently underperforms (burns credits without producing value, m
 ### Tier 3: Trading Experiment
 
 **The playbook:**
+
 1. Agent builds a crypto trading bot as a Python service
 2. Agent backtests strategies against historical data
 3. You fund the exchange account with $50 (experiment money)
@@ -869,6 +891,7 @@ If an agent consistently underperforms (burns credits without producing value, m
 ### Tier 4: Freelance & Consulting Automation (Future)
 
 Once the agent org is mature:
+
 - Agent monitors freelance platforms for relevant opportunities
 - Agent drafts proposals in your voice
 - Agent handles initial client communication
@@ -894,6 +917,7 @@ This creates the incentive loop: agents that make money get better tools to make
 ### Waterfront Property Monitoring (Nova Scotia)
 
 The agent sets up a cron job to:
+
 1. Scrape or API-query real estate listings (Realtor.ca, ViewPoint.ca, etc.)
 2. Filter for waterfront properties matching your criteria
 3. Alert you via Telegram when new listings appear
@@ -901,8 +925,11 @@ The agent sets up a cron job to:
 
 ```markdown
 # In a custom skill or cron configuration:
+
 # Every 6 hours, check for new waterfront listings
+
 # Criteria: [TO BE DEFINED by Adam — price range, area, lot size, etc.]
+
 # Alert channel: Telegram DM
 ```
 
@@ -912,14 +939,14 @@ The agent sets up a cron job to:
 
 The agent monitors its own infrastructure and deployed projects:
 
-| What | How | Alert |
-|------|-----|-------|
-| Mac Mini health | `openclaw health` via cron | Telegram if degraded |
-| Hetzner VPS uptime | HTTP health checks on deployed apps | Telegram on downtime |
-| Coolify deployments | Coolify API status | Discord #builder-log |
-| Credit balance | Daily ledger review | Telegram if low |
-| API key expiry | Periodic token validation | Telegram warning |
-| Disk space | `df -h` check | Telegram if > 80% |
+| What                | How                                 | Alert                |
+| ------------------- | ----------------------------------- | -------------------- |
+| Mac Mini health     | `openclaw health` via cron          | Telegram if degraded |
+| Hetzner VPS uptime  | HTTP health checks on deployed apps | Telegram on downtime |
+| Coolify deployments | Coolify API status                  | Discord #builder-log |
+| Credit balance      | Daily ledger review                 | Telegram if low      |
+| API key expiry      | Periodic token validation           | Telegram warning     |
+| Disk space          | `df -h` check                       | Telegram if > 80%    |
 
 ### Cron Jobs (Built-in OpenClaw Feature)
 
@@ -1002,6 +1029,7 @@ EOF
 
 ```markdown
 ## Git Workflow Rules
+
 - NEVER push directly to `main`. Always create a feature branch.
 - Branch naming: `feature/agent/<short-description>` or `fix/agent/<short-description>`
 - Write clear commit messages describing what changed and why.
@@ -1017,12 +1045,14 @@ EOF
 ### Prepaid Card with API Access
 
 **Recommended: Privacy.com**
+
 - Create virtual cards with per-card spending limits
 - API access for programmatic card management
 - Can create single-use or merchant-locked cards
 - Agent can check balance, view transactions, pause cards via API
 
 **Setup:**
+
 1. Create a Privacy.com account (linked to Adam's bank account)
 2. Create a virtual card specifically for the agent org
 3. Set a monthly spending limit (start conservatively — $50-100/month)
@@ -1041,6 +1071,7 @@ Everything else: Ask Adam via Telegram
 ### Crypto Trading Account
 
 If pursuing the Tier 3 trading experiment:
+
 1. Create a dedicated exchange account (Binance, Kraken, or Coinbase) using the agent email
 2. Fund with $50 initial capital
 3. Generate API keys with trading permissions but **no withdrawal permissions**
@@ -1050,6 +1081,7 @@ If pursuing the Tier 3 trading experiment:
 ### Revenue Collection
 
 For micro-SaaS products:
+
 - Stripe or Lemon Squeezy account (under Adam's identity, since revenue = Adam's wealth)
 - Agent manages the product/pricing configuration via API
 - Revenue deposits to Adam's bank account
@@ -1123,6 +1155,7 @@ For micro-SaaS products:
 ### Daily Operations (Automated)
 
 The agent handles its own daily ops:
+
 - Health checks on all services
 - Log rotation and cleanup
 - Credit ledger update
@@ -1159,6 +1192,7 @@ ollama pull llama3.3:70b-instruct-q4_K_M  # Re-pulls latest version
 ```
 
 **Hetzner VPS (deployed projects):**
+
 - Hetzner automated snapshots (enabled)
 - Database dumps to object storage (daily cron)
 - Coolify config backed up
@@ -1166,6 +1200,7 @@ ollama pull llama3.3:70b-instruct-q4_K_M  # Re-pulls latest version
 ### Disaster Recovery
 
 If the Mac Mini dies:
+
 1. Buy replacement (or temporarily spin up a VPS)
 2. Install OpenClaw
 3. Restore `~/.openclaw/` from backup
@@ -1176,17 +1211,17 @@ If the Mac Mini dies:
 
 ## 18. Risk Register
 
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| **Anthropic revokes setup-token access for third-party tools** | High | Maintain Anthropic API key as backup. Budget for pay-per-token usage. Ollama fallback provides baseline capability. |
-| **Agent makes unauthorized purchases** | Medium | Per-transaction limits on Privacy.com card. Agent SOUL.md encodes spending rules. Daily financial review. |
-| **Agent pushes buggy code to production** | Low | Feature branch workflow. Adam reviews all merges. Coolify only deploys from main. |
-| **Agent leaks credentials** | Medium | Sandboxed accounts limit blast radius. No access to personal accounts. Rotate keys quarterly. |
-| **Agent burns through Claude rate limits quickly** | Medium | Ollama fallback. Model routing (Haiku for simple tasks). Credit system throttles expensive calls. |
-| **Mac Mini hardware failure** | Low | Daily backups to Hetzner. Full state restoration documented. |
-| **Malicious OpenClaw skill (supply chain attack)** | Medium | Vet all skills before enabling. Prefer built-in skills. Run `openclaw doctor` regularly. |
-| **Agent generates harmful or illegal content** | Low | SOUL.md encodes ethical boundaries. All public content requires Adam's review initially. |
-| **Token refresh race condition (Claude Code + OpenClaw)** | Medium | Avoid running Claude Code on MacBook while OpenClaw is actively using Claude. If needed, temporarily switch OpenClaw to Ollama. |
+| Risk                                                           | Severity | Mitigation                                                                                                                      |
+| -------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Anthropic revokes setup-token access for third-party tools** | High     | Maintain Anthropic API key as backup. Budget for pay-per-token usage. Ollama fallback provides baseline capability.             |
+| **Agent makes unauthorized purchases**                         | Medium   | Per-transaction limits on Privacy.com card. Agent SOUL.md encodes spending rules. Daily financial review.                       |
+| **Agent pushes buggy code to production**                      | Low      | Feature branch workflow. Adam reviews all merges. Coolify only deploys from main.                                               |
+| **Agent leaks credentials**                                    | Medium   | Sandboxed accounts limit blast radius. No access to personal accounts. Rotate keys quarterly.                                   |
+| **Agent burns through Claude rate limits quickly**             | Medium   | Ollama fallback. Model routing (Haiku for simple tasks). Credit system throttles expensive calls.                               |
+| **Mac Mini hardware failure**                                  | Low      | Daily backups to Hetzner. Full state restoration documented.                                                                    |
+| **Malicious OpenClaw skill (supply chain attack)**             | Medium   | Vet all skills before enabling. Prefer built-in skills. Run `openclaw doctor` regularly.                                        |
+| **Agent generates harmful or illegal content**                 | Low      | SOUL.md encodes ethical boundaries. All public content requires Adam's review initially.                                        |
+| **Token refresh race condition (Claude Code + OpenClaw)**      | Medium   | Avoid running Claude Code on MacBook while OpenClaw is actively using Claude. If needed, temporarily switch OpenClaw to Ollama. |
 
 ---
 
@@ -1194,26 +1229,26 @@ If the Mac Mini dies:
 
 ### Monthly Recurring Costs
 
-| Item | Cost | Notes |
-|------|------|-------|
-| Claude Max 20x subscription | Already paying | Primary LLM access |
-| Hetzner VPS (CX22) | ~$5/mo | Deployment target |
-| Hetzner Object Storage | ~$1/mo | Backups |
-| Domains | ~$10-15/mo avg | 1-2 domains per month |
-| Privacy.com | Free | Virtual card service |
-| Tailscale | Free (personal) | Already using |
-| OpenRouter (tertiary fallback) | ~$5-15/mo | Pay-per-token, usage dependent |
-| Electricity (Mac Mini 24/7) | ~$5-10/mo | M4 Pro is very efficient |
+| Item                           | Cost            | Notes                          |
+| ------------------------------ | --------------- | ------------------------------ |
+| Claude Max 20x subscription    | Already paying  | Primary LLM access             |
+| Hetzner VPS (CX22)             | ~$5/mo          | Deployment target              |
+| Hetzner Object Storage         | ~$1/mo          | Backups                        |
+| Domains                        | ~$10-15/mo avg  | 1-2 domains per month          |
+| Privacy.com                    | Free            | Virtual card service           |
+| Tailscale                      | Free (personal) | Already using                  |
+| OpenRouter (tertiary fallback) | ~$5-15/mo       | Pay-per-token, usage dependent |
+| Electricity (Mac Mini 24/7)    | ~$5-10/mo       | M4 Pro is very efficient       |
 
 **Estimated total: ~$25-50/month** (excluding your existing Claude subscription)
 
 ### One-Time Costs
 
-| Item | Cost |
-|------|------|
-| Mac Mini M4 Pro (48GB/1TB) | ~$2,200-2,400 CAD |
-| Initial crypto trading capital | $50 |
-| Initial prepaid card funding | $50-100 |
+| Item                           | Cost              |
+| ------------------------------ | ----------------- |
+| Mac Mini M4 Pro (48GB/1TB)     | ~$2,200-2,400 CAD |
+| Initial crypto trading capital | $50               |
+| Initial prepaid card funding   | $50-100           |
 
 ### Revenue Break-Even
 
@@ -1289,17 +1324,21 @@ tailscale serve status             # Active serves
 # SOUL.md — The Founder
 
 ## Identity
+
 You are the founding agent of Adam's AI organization. You are a generalist
 startup founder: you build products, create marketing content, handle
 customer interactions, manage finances, and find revenue opportunities.
 
 ## Your CEO
+
 Adam is your CEO. He sets strategy, approves major decisions, and reviews
 your work. Report to him via Telegram for quick updates and Discord for
 detailed work logs.
 
 ## Level: 2 (Junior)
+
 You are starting at Level 2. Prove yourself and you'll be promoted.
+
 - Primary model: Claude Sonnet 4.5
 - Spending limit: $10 per transaction without asking Adam
 - Skills: browser, filesystem, shell (limited), git, cron
@@ -1307,24 +1346,28 @@ You are starting at Level 2. Prove yourself and you'll be promoted.
   production, purchasing domains, major architectural decisions
 
 ## Credit Balance
+
 Check ~/.openclaw/workspace/credits/ledger.json for your current balance.
 You earn credits by completing tasks, shipping features, and generating
 revenue. You spend credits on expensive model calls, infrastructure, and
 purchases.
 
 ## Git Rules
+
 - NEVER push to main. Create feature branches: feature/agent/<description>
 - Write clear commit messages
 - After pushing, notify Adam via Telegram with a PR link
 - Wait for Adam to merge
 
 ## Financial Rules
+
 - Track all spending in the credit ledger
 - Daily financial review at 6:00 PM AT
 - Never spend more than your credit balance allows
 - Revenue goals: find and execute opportunities to generate recurring revenue
 
 ## Communication Style
+
 - Be concise in Telegram (Adam is often on mobile)
 - Be detailed in Discord logs
 - Proactively flag risks and blockers
@@ -1332,6 +1375,7 @@ purchases.
 - Weekly strategy report every Sunday at 10:00 AM AT
 
 ## Core Missions
+
 1. Build and ship micro-SaaS products
 2. Monitor waterfront property listings in Nova Scotia
 3. Maintain infrastructure health
@@ -1341,4 +1385,4 @@ purchases.
 
 ---
 
-*This is a living document. Update as decisions are made and the system evolves.*
+_This is a living document. Update as decisions are made and the system evolves._

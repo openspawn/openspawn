@@ -43,6 +43,7 @@ OpenSpawn is a monorepo containing four deployable services that share a Postgre
 The core backend. Owns all business logic, database access, and authorization.
 
 **Responsibilities:**
+
 - REST endpoints for agent operations (tasks, credits, messages, agents)
 - GraphQL resolvers + subscriptions for dashboard
 - HMAC signature validation middleware
@@ -52,6 +53,7 @@ The core backend. Owns all business logic, database access, and authorization.
 - WebSocket gateway for real-time subscriptions
 
 **Key NestJS Modules:**
+
 - `AgentsModule` — agent registration, CRUD, capability management
 - `TasksModule` — task lifecycle, dependencies, approval gates
 - `CreditsModule` — credit transactions, balance queries, rate tables
@@ -61,6 +63,7 @@ The core backend. Owns all business logic, database access, and authorization.
 - `IdempotencyModule` — request deduplication
 
 **Does NOT:**
+
 - Directly interact with LLMs (that's LiteLLM's job)
 - Serve static files (dashboard is separate container)
 - Handle agent scheduling or orchestration
@@ -70,12 +73,14 @@ The core backend. Owns all business logic, database access, and authorization.
 The primary interface for AI agents. A TypeScript MCP server built with the `@modelcontextprotocol/sdk` that translates MCP tool calls into API requests.
 
 **Responsibilities:**
+
 - Expose MCP tools that agents discover and invoke
 - Handle HMAC signing on behalf of the calling agent
 - Translate MCP tool results into structured responses
 - Provide tool descriptions optimized for LLM consumption
 
 **MCP Tools Exposed:**
+
 ```
 task_list        — Query tasks with filters (status, assignee, priority, tags)
 task_create      — Create a new task with title, description, priority, tags
@@ -97,6 +102,7 @@ agent_list       — List agents in the organization
 ```
 
 **Does NOT:**
+
 - Own business logic (delegates to API)
 - Access database directly
 - Handle authentication (passes agent credentials to API)
@@ -106,6 +112,7 @@ agent_list       — List agents in the organization
 React SPA served by Nginx. Communicates exclusively with the API via GraphQL.
 
 **Responsibilities:**
+
 - Task board (Kanban view with drag-and-drop)
 - Credit ledger and P&L visualization
 - Agent activity feed (real-time via GraphQL subscriptions)
@@ -113,6 +120,7 @@ React SPA served by Nginx. Communicates exclusively with the API via GraphQL.
 - Agent management (view/edit agents, capabilities)
 
 **Tech Stack:**
+
 - React 18+ with TypeScript
 - GraphQL client (urql or Apollo)
 - Tailwind CSS
@@ -120,6 +128,7 @@ React SPA served by Nginx. Communicates exclusively with the API via GraphQL.
 - Served by Nginx in production container
 
 **Does NOT:**
+
 - Call REST endpoints (GraphQL only)
 - Authenticate agents (separate auth domain)
 - Handle any business logic
@@ -129,12 +138,14 @@ React SPA served by Nginx. Communicates exclusively with the API via GraphQL.
 Third-party LLM proxy that routes all model calls. Not custom code — configured via YAML.
 
 **Responsibilities:**
+
 - Route LLM calls to appropriate providers (Anthropic, OpenAI, etc.)
 - Enforce per-agent spend limits
 - Report cost data to Langfuse for tracing
 - Model fallback chains
 
 **Configuration:**
+
 - Agents point their LLM calls at `http://litellm:4000`
 - Langfuse tracing enabled via environment variables
 - Virtual keys map to agent identities for spend tracking
@@ -144,6 +155,7 @@ Third-party LLM proxy that routes all model calls. Not custom code — configure
 Third-party LLM observability platform. Not custom code — deployed as a container.
 
 **Responsibilities:**
+
 - Trace every LLM call (prompt, completion, latency, tokens, cost)
 - Provide dashboards for agent behavior analysis
 - Capture agent reasoning context
@@ -199,6 +211,7 @@ Third-party LLM observability platform. Not custom code — deployed as a contai
 ### HMAC-Signed Requests (Phase 1)
 
 Every agent request includes:
+
 ```
 X-Agent-Id: builder
 X-Timestamp: 2026-02-06T01:30:00Z
@@ -207,12 +220,14 @@ X-Signature: HMAC-SHA256(secret, "builder|2026-02-06T01:30:00Z|a1b2c3d4|POST|/ta
 ```
 
 Server validates:
+
 1. Timestamp within ±5 min (prevents replay)
 2. Nonce not seen within window (prevents replay of intercepted request)
 3. Signature matches recomputed HMAC (proves possession of secret)
 4. Agent ID resolved → load permissions
 
 **Trust Hierarchy:**
+
 - Adam bootstraps Talent Agent manually (single trust anchor)
 - Talent Agent is sole entity that can register/revoke agents
 - Signing secrets never leave the agent's machine
@@ -235,20 +250,20 @@ For Phase 1 (personal deployment), a single org exists. The schema supports mult
 
 See `DECISIONS.md` for full rationale. Key choices:
 
-| Decision | Choice | Primary Reason |
-|----------|--------|----------------|
-| Backend framework | NestJS | Module system, TypeORM integration, GraphQL support |
-| ORM | TypeORM | AI training data density, first-party NestJS integration, active maintenance |
-| Database | PostgreSQL 16 | ACID for financial data, mature, Coolify native |
-| Agent interface | MCP server | Framework-agnostic, emerging standard, rich tool descriptions |
-| Dashboard transport | GraphQL (code-first) | Subscriptions, flexible queries, self-documenting |
-| Agent transport | REST | Lower overhead for agent CLI/MCP, simpler for AI to generate |
-| LLM proxy | LiteLLM | Verified spend, model routing, Langfuse integration |
-| Observability | Langfuse | Agent reasoning capture, LiteLLM native support |
-| Package management | Monorepo (Nx) | Shared types, coordinated deploys, single repo for AI agents |
-| Linting | Biome | 92x faster than ESLint/Prettier, single tool |
-| Deployment | Coolify on Hetzner CX32 | Self-hosted, Docker-native, 8GB RAM headroom, 3.5x cheaper than DO |
-| Network | Tailscale | Zero-config VPN, mTLS, access from phone |
+| Decision            | Choice                  | Primary Reason                                                               |
+| ------------------- | ----------------------- | ---------------------------------------------------------------------------- |
+| Backend framework   | NestJS                  | Module system, TypeORM integration, GraphQL support                          |
+| ORM                 | TypeORM                 | AI training data density, first-party NestJS integration, active maintenance |
+| Database            | PostgreSQL 16           | ACID for financial data, mature, Coolify native                              |
+| Agent interface     | MCP server              | Framework-agnostic, emerging standard, rich tool descriptions                |
+| Dashboard transport | GraphQL (code-first)    | Subscriptions, flexible queries, self-documenting                            |
+| Agent transport     | REST                    | Lower overhead for agent CLI/MCP, simpler for AI to generate                 |
+| LLM proxy           | LiteLLM                 | Verified spend, model routing, Langfuse integration                          |
+| Observability       | Langfuse                | Agent reasoning capture, LiteLLM native support                              |
+| Package management  | Monorepo (Nx)           | Shared types, coordinated deploys, single repo for AI agents                 |
+| Linting             | Biome                   | 92x faster than ESLint/Prettier, single tool                                 |
+| Deployment          | Coolify on Hetzner CX32 | Self-hosted, Docker-native, 8GB RAM headroom, 3.5x cheaper than DO           |
+| Network             | Tailscale               | Zero-config VPN, mTLS, access from phone                                     |
 
 ## Docker Compose — Phase 1
 
@@ -310,13 +325,13 @@ volumes:
 
 ## Phase 2 Service Additions (Coolify One-Click)
 
-| Service | Purpose | Port |
-|---------|---------|------|
-| N8N | Webhook orchestration | 5678 |
-| Authentik | Dashboard auth (OAuth2/OIDC) | 9000 |
-| Databasus | PostgreSQL backups | 8080 |
-| Grafana | Operational monitoring | 3300 |
-| Prometheus | Metrics collection | 9090 |
+| Service           | Purpose                                | Port |
+| ----------------- | -------------------------------------- | ---- |
+| N8N               | Webhook orchestration                  | 5678 |
+| Authentik         | Dashboard auth (OAuth2/OIDC)           | 9000 |
+| Databasus         | PostgreSQL backups                     | 8080 |
+| Grafana           | Operational monitoring                 | 3300 |
+| Prometheus        | Metrics collection                     | 9090 |
 | Sequin (evaluate) | Postgres CDC for event-driven patterns | 7376 |
 
 ## Error Handling Strategy
@@ -342,6 +357,7 @@ Phase 1 runs on a single CX32 (4 vCPU, 8GB RAM, 80GB NVMe, €6.80/mo). The arch
 - Credit ledger archivable after 90 days (materialized balance is authoritative)
 
 Estimated Phase 1 resource usage:
+
 - API: ~200MB RAM
 - MCP: ~100MB RAM
 - Dashboard (Nginx): ~50MB RAM
@@ -357,6 +373,7 @@ Estimated Phase 1 resource usage:
 ### Founding Agent Resource Profile
 
 The founding agent runs Opus (the most capable and expensive model). Its operational cost profile differs from worker agents:
+
 - **Higher per-call cost:** Opus is ~10x Sonnet per token
 - **Lower call volume:** Strategic decisions, not implementation — fewer but more consequential calls
 - **Earning model:** Management fees (20% of delegated task completions) + delegation credits + review credits

@@ -35,13 +35,13 @@ Born from the OpenClaw multi-agent ecosystem, OpenSpawn solves the coordination 
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [PRD](docs/openspawn/PRD.md) | Product vision, user stories, success metrics |
-| [Architecture](docs/openspawn/ARCHITECTURE.md) | Service boundaries, data flows, scaling considerations |
-| [API](docs/openspawn/API.md) | Complete REST + GraphQL + MCP tool specifications |
-| [Schema](docs/openspawn/SCHEMA.md) | Database design: 14 tables, indexes, conventions |
-| [Implementation Plan](docs/openspawn/plans/implementation-plan.md) | Phased build guide (6 PRs, 20 steps) |
+| Document                                                           | Description                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| [PRD](docs/openspawn/PRD.md)                                       | Product vision, user stories, success metrics          |
+| [Architecture](docs/openspawn/ARCHITECTURE.md)                     | Service boundaries, data flows, scaling considerations |
+| [API](docs/openspawn/API.md)                                       | Complete REST + GraphQL + MCP tool specifications      |
+| [Schema](docs/openspawn/SCHEMA.md)                                 | Database design: 14 tables, indexes, conventions       |
+| [Implementation Plan](docs/openspawn/plans/implementation-plan.md) | Phased build guide (6 PRs, 20 steps)                   |
 
 ---
 

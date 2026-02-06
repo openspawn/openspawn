@@ -18,6 +18,7 @@ Born from the OpenClaw multi-agent ecosystem, OpenSpawn solves the coordination 
 OpenClaw users running multi-agent setups currently rely on ad-hoc coordination: shared markdown files, Discord channels, and manual oversight. There is no structured way for agents to discover tasks, claim work, report progress, manage budgets, or communicate with each other.
 
 Specific gaps:
+
 - No task management with dependencies, priorities, or approval gates
 - No credit/budget system tracking agent spending (LLM costs) vs. earning (completed work)
 - No structured inter-agent messaging beyond chat platform threads
@@ -60,6 +61,7 @@ Specific gaps:
 ## Core Features — Phase 1
 
 ### 1. Agent Registry & Identity
+
 - Agent registration with level, model, capabilities, and org membership
 - **Founding agent defaults:** Opus model, 20% management fee, Level 10
 - HMAC-signed request authentication (AWS Signature V4 pattern)
@@ -67,6 +69,7 @@ Specific gaps:
 - Per-agent credential isolation via OpenClaw sandbox
 
 ### 2. Task Management
+
 - Task CRUD with status workflow: `backlog` → `todo` → `in_progress` → `review` → `done` (+ `blocked`, `cancelled`)
 - Assignment to agents with priority levels (urgent, high, normal, low)
 - Task dependencies (task A blocks task B)
@@ -74,6 +77,7 @@ Specific gaps:
 - Tags and capability-based filtering
 
 ### 3. Credit Economy
+
 - Event-driven credit earning (triggered by task completions, verified webhooks — not self-reported)
 - **Founding agent incentives:** management fee (% of delegated task completions), delegation credits, review credits
 - **Dynamic pricing:** model spend debits computed from actual LiteLLM costs × configurable USD-to-credits rate
@@ -86,26 +90,31 @@ Specific gaps:
 - Ledger archival after 90 days (materialized balance is authoritative)
 
 ### 4. Messaging
+
 - Structured message channels (per-task, per-agent, broadcast)
 - Message types: text, handoff, status_update, request
 - Threaded conversations with parent references
 
 ### 5. Event Log
+
 - Append-only event store capturing all state changes
 - Actor attribution on every event (verified by HMAC)
 - Event types: task.created, task.transitioned, credit.earned, credit.spent, agent.registered, message.sent
 
 ### 6. Real-Time Dashboard
+
 - React SPA with GraphQL subscriptions
 - Task board (Kanban), credit ledger, agent activity feed
 - Mobile-responsive (iPhone via Tailscale)
 
 ### 7. MCP Server (Primary Agent Interface)
+
 - TypeScript MCP server exposing OpenSpawn tools
 - Tools: task_list, task_create, task_transition, credits_balance, credits_spend, message_send, message_read
 - Compatible with any MCP-enabled agent framework
 
 ### 8. LLM Observability
+
 - Langfuse integration for tracing LLM calls via LiteLLM
 - Per-agent, per-task cost tracking
 - Decision reasoning capture
@@ -132,6 +141,7 @@ Specific gaps:
 ## Success Metrics
 
 ### Phase 1 (MVP — personal deployment)
+
 - All agent communication flows through MCP server (zero ad-hoc coordination)
 - Credit ledger balances within ±0 tolerance (debits = credits per org)
 - Task lifecycle tracked end-to-end with full event attribution
@@ -139,6 +149,7 @@ Specific gaps:
 - Zero unattributed events in audit log
 
 ### Phase 2 (Product — multi-tenant)
+
 - Deploy via Coolify/Docker Compose in <30 minutes
 - At least one non-OpenClaw framework integrated via SDK
 - Webhook delivery reliability >99.5%
@@ -161,9 +172,9 @@ Specific gaps:
 
 ## Competitive Landscape
 
-| Solution | Relationship |
-|----------|-------------|
-| Linear.app | Inspiration for task model and AIG patterns. OpenSpawn adopts Linear's concepts but owns data and adds credit economy. |
-| CrewAI / LangGraph | Orchestration frameworks. OpenSpawn is the backend they coordinate through. |
-| OpenClaw multi-agent routing | Message routing layer. OpenSpawn adds task management, credits, and dashboard. |
-| N8N | Workflow automation. Phase 2 integration for outbound webhooks. |
+| Solution                     | Relationship                                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Linear.app                   | Inspiration for task model and AIG patterns. OpenSpawn adopts Linear's concepts but owns data and adds credit economy. |
+| CrewAI / LangGraph           | Orchestration frameworks. OpenSpawn is the backend they coordinate through.                                            |
+| OpenClaw multi-agent routing | Message routing layer. OpenSpawn adds task management, credits, and dashboard.                                         |
+| N8N                          | Workflow automation. Phase 2 integration for outbound webhooks.                                                        |

@@ -8,12 +8,12 @@
 
 ## Transport Overview
 
-| Consumer | Transport | Port | Auth |
-|----------|-----------|------|------|
-| AI Agents (via MCP) | MCP over stdio/SSE | 3102 | HMAC-signed requests |
-| AI Agents (direct) | REST/JSON | 3100 | HMAC-signed requests |
-| Dashboard | GraphQL + Subscriptions | 3100 | Phase 1: Tailscale implicit / Phase 2: OAuth2 |
-| Webhooks (Phase 2) | Outbound POST | — | HMAC-signed payloads |
+| Consumer            | Transport               | Port | Auth                                          |
+| ------------------- | ----------------------- | ---- | --------------------------------------------- |
+| AI Agents (via MCP) | MCP over stdio/SSE      | 3102 | HMAC-signed requests                          |
+| AI Agents (direct)  | REST/JSON               | 3100 | HMAC-signed requests                          |
+| Dashboard           | GraphQL + Subscriptions | 3100 | Phase 1: Tailscale implicit / Phase 2: OAuth2 |
+| Webhooks (Phase 2)  | Outbound POST           | —    | HMAC-signed payloads                          |
 
 ## Authentication Headers
 
@@ -28,18 +28,21 @@ X-Signature: {HMAC-SHA256 hex digest}
 ```
 
 **Signature computation:**
+
 ```
 message = "{agent_id}|{timestamp}|{nonce}|{HTTP_METHOD}|{path}|{body_or_empty}"
 signature = HMAC-SHA256(agent_secret, message).hexdigest()
 ```
 
 **Validation rules:**
+
 - Timestamp must be within ±300 seconds of server time
 - Nonce must not have been used by this agent in the last 600 seconds
 - Signature must match server-side computation
 - Agent must have `status: active`
 
 **Error responses:**
+
 - 401 Unauthorized — signature invalid, agent not found, or agent revoked (no detail exposed)
 - 409 Conflict — idempotency key already used (returns original cached response)
 
@@ -50,6 +53,7 @@ signature = HMAC-SHA256(agent_secret, message).hexdigest()
 ### Agents
 
 #### `POST /agents/register`
+
 **Auth:** Talent Agent only (role: 'hr')
 
 ```json
@@ -75,6 +79,7 @@ signature = HMAC-SHA256(agent_secret, message).hexdigest()
 **Note:** `signing_secret` is returned exactly once. It must be stored by the Talent Agent in the new agent's credential directory. It cannot be retrieved again.
 
 #### `GET /agents`
+
 **Auth:** Any active agent
 
 ```
@@ -104,8 +109,11 @@ GET /agents?status=active&role=worker
 ```
 
 #### `GET /agents/:id`
+
 #### `PATCH /agents/:id` — Talent Agent only
+
 #### `POST /agents/:id/revoke` — Talent Agent only
+
 #### `GET /agents/:id/credits/balance`
 
 ---
@@ -113,6 +121,7 @@ GET /agents?status=active&role=worker
 ### Tasks
 
 #### `POST /tasks`
+
 **Auth:** Any active agent (level ≥ 2 or role in [founder, hr])
 
 ```json
@@ -205,6 +214,7 @@ Returns full task with dependencies, comments, and event history.
 ```
 
 #### `POST /tasks/:id/approve`
+
 **Auth:** Level ≥ 5 or role in [founder, admin]
 
 #### `POST /tasks/:id/assign`
@@ -368,7 +378,10 @@ The MCP server at port 3102 exposes these tools. Each tool description is optimi
   "inputSchema": {
     "type": "object",
     "properties": {
-      "status": { "type": "string", "description": "Comma-separated status filter: backlog,todo,in_progress,review,done,blocked,cancelled" },
+      "status": {
+        "type": "string",
+        "description": "Comma-separated status filter: backlog,todo,in_progress,review,done,blocked,cancelled"
+      },
       "assignee": { "type": "string", "description": "Filter by assignee agent_id" },
       "priority": { "type": "string", "description": "Comma-separated: urgent,high,normal,low" },
       "tag": { "type": "string", "description": "Filter by tag" },
@@ -392,8 +405,15 @@ The MCP server at port 3102 exposes these tools. Each tool description is optimi
       "priority": { "type": "string", "enum": ["urgent", "high", "normal", "low"] },
       "assignee": { "type": "string", "description": "agent_id to assign to" },
       "tags": { "type": "array", "items": { "type": "string" } },
-      "approval_required": { "type": "boolean", "description": "Require human approval before completion" },
-      "blocked_by": { "type": "array", "items": { "type": "string" }, "description": "Task IDs this is blocked by" }
+      "approval_required": {
+        "type": "boolean",
+        "description": "Require human approval before completion"
+      },
+      "blocked_by": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Task IDs this is blocked by"
+      }
     },
     "required": ["title"]
   }
@@ -410,7 +430,10 @@ The MCP server at port 3102 exposes these tools. Each tool description is optimi
     "type": "object",
     "properties": {
       "task_id": { "type": "string", "description": "Task UUID or identifier (e.g., TASK-42)" },
-      "status": { "type": "string", "enum": ["backlog", "todo", "in_progress", "review", "done", "blocked", "cancelled"] }
+      "status": {
+        "type": "string",
+        "enum": ["backlog", "todo", "in_progress", "review", "done", "blocked", "cancelled"]
+      }
     },
     "required": ["task_id", "status"]
   }
@@ -483,7 +506,10 @@ type Query {
   agents(filter: AgentFilterInput): [Agent!]!
   agent(id: ID!): Agent!
   creditBalance(agentId: ID): CreditBalance!
-  creditHistory(filter: CreditFilterInput, pagination: PaginationInput): CreditTransactionConnection!
+  creditHistory(
+    filter: CreditFilterInput
+    pagination: PaginationInput
+  ): CreditTransactionConnection!
   events(filter: EventFilterInput, pagination: PaginationInput): EventConnection!
   channels: [Channel!]!
   messages(channelId: ID!, pagination: PaginationInput): MessageConnection!
@@ -583,13 +609,14 @@ type Event {
 Per-agent rate limits enforced at the API level:
 
 | Agent Level | Requests/min | Mutations/min |
-|-------------|-------------|---------------|
-| 1–2 | 60 | 20 |
-| 3–4 | 120 | 40 |
-| 5–6 | 300 | 100 |
-| 7+ | 600 | 200 |
+| ----------- | ------------ | ------------- |
+| 1–2         | 60           | 20            |
+| 3–4         | 120          | 40            |
+| 5–6         | 300          | 100           |
+| 7+          | 600          | 200           |
 
 Rate limit headers returned on all responses:
+
 ```
 X-RateLimit-Limit: 60
 X-RateLimit-Remaining: 45

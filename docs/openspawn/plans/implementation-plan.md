@@ -10,6 +10,7 @@
 ## Reference Docs
 
 This is a concise implementation guide. For full context, see:
+
 - **PRD**: `../PRD.md` — product vision, user stories, success metrics
 - **Architecture**: `../ARCHITECTURE.md` — service boundaries, data flows, scaling
 - **API**: `../API.md` — complete REST + GraphQL + MCP tool specs
@@ -26,31 +27,34 @@ npx create-nx-workspace@latest openspawn --preset=ts --packageManager=pnpm --nxC
 ```
 
 **Create apps:**
+
 - `apps/api/` — NestJS (`nx g @nx/nest:app api`)
 - `apps/mcp/` — Manual Express + MCP SDK
 - `apps/dashboard/` — React (`nx g @nx/react:app dashboard --bundler=vite`)
 
 **Create libs:**
+
 - `libs/shared-types/` — Enums, DTOs, interfaces, crypto utils
 - `libs/database/` — TypeORM entities, migrations, DataSource config
 
 **Root configs:**
+
 - `biome.json`, `tsconfig.base.json`, `.gitignore`, `.env.example`, `docker-compose.yml`, `docker-compose.dev.yml`
 
 ### Step 2 — String Enums (`libs/shared-types/src/enums/`)
 
-| File | Values |
-|------|--------|
-| `agent-role.enum.ts` | WORKER, HR, FOUNDER, ADMIN |
-| `agent-status.enum.ts` | ACTIVE, SUSPENDED, REVOKED |
-| `task-status.enum.ts` | BACKLOG, TODO, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED |
-| `task-priority.enum.ts` | URGENT, HIGH, NORMAL, LOW |
-| `credit-type.enum.ts` | CREDIT, DEBIT |
-| `message-type.enum.ts` | TEXT, HANDOFF, STATUS_UPDATE, REQUEST |
-| `channel-type.enum.ts` | TASK, AGENT, BROADCAST, GENERAL |
-| `event-severity.enum.ts` | INFO, WARNING, ERROR |
-| `amount-mode.enum.ts` | FIXED, DYNAMIC |
-| `proficiency.enum.ts` | BASIC, STANDARD, EXPERT |
+| File                     | Values                                                       |
+| ------------------------ | ------------------------------------------------------------ |
+| `agent-role.enum.ts`     | WORKER, HR, FOUNDER, ADMIN                                   |
+| `agent-status.enum.ts`   | ACTIVE, SUSPENDED, REVOKED                                   |
+| `task-status.enum.ts`    | BACKLOG, TODO, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED |
+| `task-priority.enum.ts`  | URGENT, HIGH, NORMAL, LOW                                    |
+| `credit-type.enum.ts`    | CREDIT, DEBIT                                                |
+| `message-type.enum.ts`   | TEXT, HANDOFF, STATUS_UPDATE, REQUEST                        |
+| `channel-type.enum.ts`   | TASK, AGENT, BROADCAST, GENERAL                              |
+| `event-severity.enum.ts` | INFO, WARNING, ERROR                                         |
+| `amount-mode.enum.ts`    | FIXED, DYNAMIC                                               |
+| `proficiency.enum.ts`    | BASIC, STANDARD, EXPERT                                      |
 
 ### Step 3 — TypeORM Entities (`libs/database/src/entities/`)
 
@@ -58,6 +62,7 @@ npx create-nx-workspace@latest openspawn --preset=ts --packageManager=pnpm --nxC
 `organization`, `agent`, `agent-capability`, `task`, `task-dependency`, `task-tag`, `task-comment`, `credit-transaction`, `credit-rate-config`, `channel`, `message`, `event`, `idempotency-key`, `nonce`
 
 Key details:
+
 - All UUIDs via `@PrimaryGeneratedColumn('uuid')` except `nonce` (varchar PK)
 - All tables have `org_id` FK except `organizations`
 - `agent.hmac_secret_enc` → `bytea` (Buffer)
@@ -107,6 +112,7 @@ Key details:
 Files: `auth.module.ts`, `auth.guard.ts`, `auth.service.ts`, `decorators/current-agent.decorator.ts`, `decorators/roles.decorator.ts`, `decorators/public.decorator.ts`
 
 Guard flow (global via APP_GUARD):
+
 1. Extract `X-Agent-Id`, `X-Timestamp`, `X-Nonce`, `X-Signature`
 2. Reject if timestamp outside ±300s
 3. Lookup agent by agent_id, reject if not active
@@ -147,6 +153,7 @@ Files: `events.module.ts`, `events.service.ts`, `events.controller.ts`, DTOs
 Files: `agents.module.ts`, `agents.service.ts`, `agents.controller.ts`, DTOs
 
 Endpoints:
+
 - `POST /agents/register` — `@Roles(AgentRole.HR)` only (Talent Agent exclusive)
 - `GET /agents`, `GET /agents/:id` — any active agent
 - `PATCH /agents/:id` — Talent Agent only
@@ -160,6 +167,7 @@ Key: `register()` generates secret, encrypts, stores, emits event, returns secre
 Files: `tasks.module.ts`, `tasks.service.ts`, `tasks.controller.ts`, `task-transition.service.ts`, `task-identifier.service.ts`, DTOs
 
 **Transition map** (enforced in `task-transition.service.ts`):
+
 ```
 backlog    → todo, cancelled
 todo       → in_progress, blocked, cancelled
@@ -173,6 +181,7 @@ cancelled  → (terminal)
 **Identifier service**: reads `organizations.next_task_number`, increments atomically, formats as `{prefix}-{number}`.
 
 **Transition validation**:
+
 1. Check transition map → 422
 2. Check blocking dependencies all `done` → 409
 3. Check approval gate if `review → done` and `approval_required` → 403
@@ -193,6 +202,7 @@ Endpoints: `POST /tasks`, `GET /tasks`, `GET /tasks/:id`, `POST /tasks/:id/trans
 Files: `credits.module.ts`, `credits.service.ts`, `credits.controller.ts`, `credit-earning.service.ts`, `budget-reset.task.ts`, DTOs
 
 **Core atomic transaction** (`credits.service.ts`):
+
 ```
 BEGIN → SELECT ... FOR UPDATE on agent row → check balance/budget → INSERT credit_transaction → UPDATE agent.current_balance → COMMIT
 ```
@@ -200,6 +210,7 @@ BEGIN → SELECT ... FOR UPDATE on agent row → check balance/budget → INSERT
 Strict enforcement: balance can never go negative.
 
 **Credit earning** (`credit-earning.service.ts`):
+
 - `@OnEvent('task.transitioned')`: if → done, award `task.done` credits to assignee
 - Management fee: if task creator has `management_fee_pct > 0`, award `floor(amount * pct / 100)` to creator
 - Delegation credits: if creator !== assignee, award `task.delegated` credits
@@ -264,12 +275,12 @@ Agent identity via env vars or per-session headers. Stateless per-request for Ph
 
 ## Testing Strategy
 
-| Layer | Tool | Focus | Location |
-|-------|------|-------|----------|
-| Unit | Vitest | Services: transition map, credit math, HMAC validation, mgmt fee calc | `*.spec.ts` co-located |
+| Layer       | Tool                    | Focus                                                                                   | Location                     |
+| ----------- | ----------------------- | --------------------------------------------------------------------------------------- | ---------------------------- |
+| Unit        | Vitest                  | Services: transition map, credit math, HMAC validation, mgmt fee calc                   | `*.spec.ts` co-located       |
 | Integration | Vitest + testcontainers | Credit atomicity (concurrent spends), idempotency replay, nonce replay, cycle detection | `apps/api/test/integration/` |
-| E2E | Vitest + Supertest | Full task lifecycle, agent registration, auth rejection | `apps/api/test/e2e/` |
-| MCP | Vitest | Tool calls → API → DB round-trip | `apps/mcp/test/` |
+| E2E         | Vitest + Supertest      | Full task lifecycle, agent registration, auth rejection                                 | `apps/api/test/e2e/`         |
+| MCP         | Vitest                  | Tool calls → API → DB round-trip                                                        | `apps/mcp/test/`             |
 
 Test utilities: `libs/database/src/test-utils/` — org/agent factories, request signer helper.
 
@@ -278,6 +289,7 @@ Test utilities: `libs/database/src/test-utils/` — org/agent factories, request
 ## Verification
 
 After each PR, verify:
+
 1. `pnpm nx run-many --target=build --all` — all apps build
 2. `pnpm nx run-many --target=lint --all` — Biome passes
 3. `pnpm nx run-many --target=test --all` — tests pass
