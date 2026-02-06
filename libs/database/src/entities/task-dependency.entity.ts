@@ -12,9 +12,9 @@ import type { Organization } from "./organization.entity";
 import type { Task } from "./task.entity";
 
 @Entity("task_dependencies")
-@Index(["blockingTaskId", "blockedTaskId"], { unique: true })
-@Index(["blockedTaskId"])
-@Index(["blockingTaskId"])
+@Index(["taskId", "dependsOnId"], { unique: true })
+@Index(["taskId"])
+@Index(["dependsOnId"])
 export class TaskDependency {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -22,11 +22,14 @@ export class TaskDependency {
   @Column({ name: "org_id", type: "uuid" })
   orgId!: string;
 
-  @Column({ name: "blocking_task_id", type: "uuid" })
-  blockingTaskId!: string;
+  @Column({ name: "task_id", type: "uuid" })
+  taskId!: string;
 
-  @Column({ name: "blocked_task_id", type: "uuid" })
-  blockedTaskId!: string;
+  @Column({ name: "depends_on_id", type: "uuid" })
+  dependsOnId!: string;
+
+  @Column({ name: "blocking", type: "boolean", default: true })
+  blocking!: boolean;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
@@ -36,11 +39,11 @@ export class TaskDependency {
   @JoinColumn({ name: "org_id" })
   organization?: Organization;
 
-  @ManyToOne("Task", "blockedDependencies")
-  @JoinColumn({ name: "blocking_task_id" })
-  blockingTask?: Task;
+  @ManyToOne("Task", "dependencies")
+  @JoinColumn({ name: "task_id" })
+  task?: Task;
 
-  @ManyToOne("Task", "blockingDependencies")
-  @JoinColumn({ name: "blocked_task_id" })
-  blockedTask?: Task;
+  @ManyToOne("Task", "dependents")
+  @JoinColumn({ name: "depends_on_id" })
+  dependsOn?: Task;
 }
