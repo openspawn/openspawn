@@ -8,7 +8,9 @@ import { AgentsModule } from "../agents";
 import { AuthModule } from "../auth";
 import { CommonModule } from "../common/common.module";
 import { OrgScopeMiddleware } from "../common/middleware/org-scope.middleware";
+import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
+import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
 
 import { AppController } from "./app.controller";
@@ -36,6 +38,8 @@ import { AppService } from "./app.service";
     // Domain modules
     AgentsModule,
     TasksModule,
+    CreditsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
