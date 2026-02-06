@@ -6,6 +6,7 @@ import { Agent, Nonce } from "@openspawn/database";
 
 import { AuthGuard } from "./auth.guard";
 import { AuthService } from "./auth.service";
+import { RolesGuard } from "./roles.guard";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Agent, Nonce])],
@@ -14,6 +15,10 @@ import { AuthService } from "./auth.service";
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
   exports: [AuthService],

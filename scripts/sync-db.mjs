@@ -101,10 +101,11 @@ try {
     CREATE TABLE IF NOT EXISTS task_dependencies (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       org_id UUID NOT NULL REFERENCES organizations(id),
-      blocking_task_id UUID NOT NULL REFERENCES tasks(id),
-      blocked_task_id UUID NOT NULL REFERENCES tasks(id),
+      task_id UUID NOT NULL REFERENCES tasks(id),
+      depends_on_id UUID NOT NULL REFERENCES tasks(id),
+      blocking BOOLEAN NOT NULL DEFAULT true,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      UNIQUE(blocking_task_id, blocked_task_id)
+      UNIQUE(task_id, depends_on_id)
     );
 
     -- Task Tags

@@ -109,9 +109,9 @@ export class Task {
   @OneToMany("TaskComment", "task")
   comments?: TaskComment[];
 
-  @OneToMany("TaskDependency", "blockedTask")
-  blockingDependencies?: TaskDependency[];
+  @OneToMany("TaskDependency", "task")
+  dependencies?: TaskDependency[];
 
-  @OneToMany("TaskDependency", "blockingTask")
-  blockedDependencies?: TaskDependency[];
+  @OneToMany("TaskDependency", "dependsOn")
+  dependents?: TaskDependency[];
 }
