@@ -10,6 +10,7 @@ import { CommonModule } from "../common/common.module";
 import { OrgScopeMiddleware } from "../common/middleware/org-scope.middleware";
 import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
+import { GraphqlModule } from "../graphql";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
 
@@ -40,6 +41,9 @@ import { AppService } from "./app.service";
     TasksModule,
     CreditsModule,
     MessagesModule,
+
+    // GraphQL
+    GraphqlModule,
   ],
   controllers: [AppController],
   providers: [AppService],
