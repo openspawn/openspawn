@@ -1,0 +1,109 @@
+services:
+  # PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: openspawn-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openspawn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openspawn}
+      POSTGRES_DB: ${POSTGRES_DB:-openspawn}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-openspawn}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - openspawn
+
+  # NestJS API
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: openspawn-api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openspawn}:${POSTGRES_PASSWORD:-openspawn}@postgres:5432/${POSTGRES_DB:-openspawn}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openspawn
+
+  # MCP Server
+  mcp:
+    build:
+      context: .
+      dockerfile: apps/mcp/Dockerfile
+    container_name: openspawn-mcp
+    environment:
+      API_URL: http://api:3000
+      PORT: 3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      - api
+    networks:
+      - openspawn
+
+  # React Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    container_name: openspawn-dashboard
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+    networks:
+      - openspawn
+
+  # LiteLLM Proxy (LLM Gateway)
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: openspawn-litellm
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-openspawn-dev}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./config/litellm.yaml:/app/config.yaml:ro
+    command: ['--config', '/app/config.yaml', '--port', '4000']
+    networks:
+      - openspawn
+
+  # Langfuse (LLM Observability)
+  langfuse:
+    image: langfuse/langfuse:latest
+    container_name: openspawn-langfuse
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openspawn}:${POSTGRES_PASSWORD:-openspawn}@postgres:5432/langfuse
+      NEXTAUTH_SECRET: ${LANGFUSE_SECRET_KEY:-sk-lf-openspawn}
+      NEXTAUTH_URL: http://localhost:3002
+      SALT: openspawn-salt
+    ports:
+      - '3002:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openspawn
+
+volumes:
+  postgres_data:
+
+networks:
+  openspawn:
+    driver: bridge
