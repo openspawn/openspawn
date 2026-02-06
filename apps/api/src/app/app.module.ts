@@ -1,10 +1,41 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { TypeOrmModule } from "@nestjs/typeorm";
+
+import { entities } from "@openspawn/database";
+
+import { AuthModule } from "../auth";
+import { CommonModule } from "../common/common.module";
+import { OrgScopeMiddleware } from "../common/middleware/org-scope.middleware";
+import { EventsModule } from "../events";
+
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
 @Module({
-  imports: [],
+  imports: [
+    // Database
+    TypeOrmModule.forRoot({
+      type: "postgres",
+      url: process.env["DATABASE_URL"],
+      entities,
+      synchronize: false,
+      logging: process.env["NODE_ENV"] === "development",
+    }),
+
+    // Event Emitter for real-time events
+    EventEmitterModule.forRoot(),
+
+    // Core modules
+    CommonModule,
+    AuthModule,
+    EventsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(OrgScopeMiddleware).forRoutes("*");
+  }
+}
