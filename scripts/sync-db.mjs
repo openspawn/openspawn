@@ -2,29 +2,29 @@
 /**
  * Standalone DB sync script (no workspace imports)
  */
-import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import "reflect-metadata";
+import { DataSource } from "typeorm";
 
 const url = process.env.DATABASE_URL;
 if (!url) {
-  console.error('DATABASE_URL required');
+  console.error("DATABASE_URL required");
   process.exit(1);
 }
 
 // Inline entity definitions for sync only
 const ds = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   url,
   synchronize: true,
   logging: true,
-  entities: [],  // Empty - will use schema:sync to discover
+  entities: [], // Empty - will use schema:sync to discover
 });
 
-console.log('🔄 Connecting to database...');
+console.log("🔄 Connecting to database...");
 
 try {
   await ds.initialize();
-  
+
   // Run raw SQL to create tables based on our schema
   await ds.query(`
     -- Organizations
@@ -235,10 +235,10 @@ try {
       WHEN duplicate_object THEN NULL;
     END $$;
   `);
-  
-  console.log('✅ Schema created successfully!');
+
+  console.log("✅ Schema created successfully!");
   await ds.destroy();
 } catch (err) {
-  console.error('❌ Failed:', err.message);
+  console.error("❌ Failed:", err.message);
   process.exit(1);
 }
