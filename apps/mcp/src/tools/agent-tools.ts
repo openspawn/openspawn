@@ -1,25 +1,15 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import type { ApiClient } from "../api-client";
+import type { ApiClient } from "../api-client.js";
 
-export function registerAgentTools(
-  server: {
-    tool: (
-      name: string,
-      description: string,
-      schema: z.ZodObject<z.ZodRawShape>,
-      handler: (params: Record<string, unknown>) => Promise<unknown>,
-    ) => void;
-  },
-  client: ApiClient,
-) {
-  server.tool("agent_list", "List all agents in the organization", z.object({}), async () => {
+export function registerAgentTools(server: McpServer, client: ApiClient) {
+  server.tool("agent_list", "List all agents in the organization", {}, async () => {
     const result = await client.listAgents();
     return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
   });
 
-  server.tool("agent_whoami", "Get information about the current agent", z.object({}), async () => {
-    // For now, return the agent ID from config
+  server.tool("agent_whoami", "Get information about the current agent", {}, async () => {
     return {
       content: [
         {
@@ -30,7 +20,7 @@ export function registerAgentTools(
               message: "Use agent_list to see full details",
             },
             null,
-            2,
+            2
           ),
         },
       ],

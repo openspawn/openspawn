@@ -1,13 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { z } from "zod";
 
-import { ApiClient } from "./api-client";
+import { ApiClient } from "./api-client.js";
 import {
   registerAgentTools,
   registerCreditTools,
   registerMessageTools,
   registerTaskTools,
-} from "./tools";
+} from "./tools/index.js";
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({
@@ -22,23 +21,11 @@ export function createMcpServer(): McpServer {
     secret: process.env["AGENT_SECRET"] || "",
   });
 
-  // Create a wrapper that matches the expected interface
-  const toolRegistry = {
-    tool: (
-      name: string,
-      description: string,
-      schema: z.ZodObject<z.ZodRawShape>,
-      handler: (params: Record<string, unknown>) => Promise<unknown>,
-    ) => {
-      server.tool(name, description, schema.shape, handler);
-    },
-  };
-
   // Register all tools
-  registerTaskTools(toolRegistry, apiClient);
-  registerCreditTools(toolRegistry, apiClient);
-  registerMessageTools(toolRegistry, apiClient);
-  registerAgentTools(toolRegistry, apiClient);
+  registerTaskTools(server, apiClient);
+  registerCreditTools(server, apiClient);
+  registerMessageTools(server, apiClient);
+  registerAgentTools(server, apiClient);
 
   return server;
 }

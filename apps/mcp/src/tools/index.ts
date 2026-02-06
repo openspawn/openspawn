@@ -1,4 +1,4 @@
-export { registerTaskTools } from "./task-tools";
-export { registerCreditTools } from "./credit-tools";
-export { registerMessageTools } from "./message-tools";
-export { registerAgentTools } from "./agent-tools";
+export { registerTaskTools } from "./task-tools.js";
+export { registerCreditTools } from "./credit-tools.js";
+export { registerMessageTools } from "./message-tools.js";
+export { registerAgentTools } from "./agent-tools.js";
