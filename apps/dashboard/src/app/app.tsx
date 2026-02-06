@@ -1,15 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Provider as UrqlProvider } from "urql";
-import { client } from "../graphql/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Layout } from "../components/layout";
 import { ThemeProvider } from "../components/theme-provider";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1 minute
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 export function App() {
   return (
     <ThemeProvider defaultTheme="dark">
-      <UrqlProvider value={client}>
+      <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Layout>
             <Routes>
@@ -21,7 +29,7 @@ export function App() {
             </Routes>
           </Layout>
         </BrowserRouter>
-      </UrqlProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

@@ -19,6 +19,14 @@ vi.mock("recharts", () => ({
   Tooltip: () => null,
 }));
 
+// Mock TanStack Query hooks
+vi.mock("../graphql/generated/hooks", () => ({
+  useAgentsQuery: () => ({ data: { agents: [] }, isLoading: false, error: null }),
+  useTasksQuery: () => ({ data: { tasks: [] }, isLoading: false, error: null }),
+  useCreditHistoryQuery: () => ({ data: { creditHistory: [] }, isLoading: false, error: null }),
+  useEventsQuery: () => ({ data: { events: [] }, isLoading: false, error: null }),
+}));
+
 describe("App", () => {
   it("renders the dashboard with OpenSpawn branding", () => {
     render(<App />);

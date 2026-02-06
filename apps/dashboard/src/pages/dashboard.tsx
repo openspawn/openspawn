@@ -99,7 +99,7 @@ export function DashboardPage() {
   const inProgressTasks = tasks.filter((t) => t.status === "in_progress").length;
 
   const totalCreditsEarned = transactions
-    .filter((t) => t.type === "earn")
+    .filter((t) => t.type === "CREDIT")
     .reduce((sum, t) => sum + t.amount, 0);
 
   return (

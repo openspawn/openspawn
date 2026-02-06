@@ -1,0 +1,44 @@
+import type { CodegenConfig } from "@graphql-codegen/cli";
+
+const config: CodegenConfig = {
+  schema: "./schema.gql",
+  documents: ["apps/dashboard/src/**/*.tsx", "apps/dashboard/src/**/*.ts"],
+  ignoreNoDocuments: true,
+  generates: {
+    "apps/dashboard/src/graphql/generated/": {
+      preset: "client",
+      presetConfig: {
+        fragmentMasking: false,
+      },
+      config: {
+        useTypeImports: true,
+        skipTypename: true,
+        enumsAsTypes: true,
+        scalars: {
+          DateTime: "string",
+          Date: "string",
+        },
+      },
+    },
+    "apps/dashboard/src/graphql/generated/hooks.ts": {
+      plugins: ["typescript", "typescript-operations", "typescript-react-query"],
+      config: {
+        fetcher: {
+          func: "../fetcher#fetcher",
+          isReactHook: false,
+        },
+        useTypeImports: true,
+        skipTypename: true,
+        enumsAsTypes: true,
+        exposeQueryKeys: true,
+        exposeFetcher: true,
+        scalars: {
+          DateTime: "string",
+          Date: "string",
+        },
+      },
+    },
+  },
+};
+
+export default config;

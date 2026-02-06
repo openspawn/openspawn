@@ -38,11 +38,11 @@ export function CreditsPage() {
   const { transactions, loading, error } = useCredits();
 
   const totalEarned = transactions
-    .filter((t) => t.type === "earn")
+    .filter((t) => t.type === "CREDIT")
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalSpent = transactions
-    .filter((t) => t.type === "spend")
+    .filter((t) => t.type === "DEBIT")
     .reduce((sum, t) => sum + t.amount, 0);
 
   const netBalance = totalEarned - totalSpent;
@@ -178,7 +178,7 @@ export function CreditsPage() {
                     className="flex items-center justify-between rounded-lg border border-border p-3"
                   >
                     <div className="flex items-center gap-3">
-                      {tx.type === "earn" ? (
+                      {tx.type === "CREDIT" ? (
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
                           <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                         </div>
@@ -197,12 +197,12 @@ export function CreditsPage() {
                     <div className="text-right">
                       <p
                         className={`font-medium ${
-                          tx.type === "earn"
+                          tx.type === "CREDIT"
                             ? "text-emerald-500"
                             : "text-amber-500"
                         }`}
                       >
-                        {tx.type === "earn" ? "+" : "-"}
+                        {tx.type === "CREDIT" ? "+" : "-"}
                         {tx.amount.toLocaleString()}
                       </p>
                       <p className="text-xs text-muted-foreground">
