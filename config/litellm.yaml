@@ -31,8 +31,8 @@ model_list:
 
 litellm_settings:
   # Enable cost tracking
-  success_callback: ['langfuse']
-  failure_callback: ['langfuse']
+  success_callback: ["langfuse"]
+  failure_callback: ["langfuse"]
 
   # Langfuse integration
   langfuse_public_key: os.environ/LANGFUSE_PUBLIC_KEY

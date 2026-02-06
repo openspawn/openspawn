@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
 import {
   Agent,
@@ -15,10 +15,10 @@ import {
   TaskComment,
   TaskDependency,
   TaskTag,
-} from './index';
+} from "./index";
 
-describe('Entity exports', () => {
-  it('should export all entities', () => {
+describe("Entity exports", () => {
+  it("should export all entities", () => {
     expect(Organization).toBeDefined();
     expect(Agent).toBeDefined();
     expect(AgentCapability).toBeDefined();

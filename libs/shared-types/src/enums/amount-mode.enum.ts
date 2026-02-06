@@ -1,4 +1,4 @@
 export enum AmountMode {
-  FIXED = 'fixed',
-  DYNAMIC = 'dynamic',
+  FIXED = "fixed",
+  DYNAMIC = "dynamic",
 }

@@ -4,23 +4,23 @@ services:
   # API, MCP, and dashboard run on host via pnpm nx serve
 
   api:
-    profiles: ['full']
+    profiles: ["full"]
 
   mcp:
-    profiles: ['full']
+    profiles: ["full"]
 
   dashboard:
-    profiles: ['full']
+    profiles: ["full"]
 
   langfuse:
-    profiles: ['full', 'observability']
+    profiles: ["full", "observability"]
 
   postgres:
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
   litellm:
     ports:
-      - '4000:4000'
+      - "4000:4000"
     environment:
       LITELLM_LOG: DEBUG

@@ -1,4 +1,4 @@
-import { DataSource, type DataSourceOptions } from 'typeorm';
+import { DataSource, type DataSourceOptions } from "typeorm";
 
 import {
   Agent,
@@ -15,7 +15,7 @@ import {
   TaskComment,
   TaskDependency,
   TaskTag,
-} from './entities';
+} from "./entities";
 
 export const entities = [
   Organization,
@@ -35,20 +35,20 @@ export const entities = [
 ];
 
 export function createDataSourceOptions(
-  overrides: Partial<DataSourceOptions> = {}
+  overrides: Partial<DataSourceOptions> = {},
 ): DataSourceOptions {
-  const url = process.env['DATABASE_URL'];
+  const url = process.env["DATABASE_URL"];
   if (!url) {
-    throw new Error('DATABASE_URL environment variable is required');
+    throw new Error("DATABASE_URL environment variable is required");
   }
 
   return {
-    type: 'postgres',
+    type: "postgres",
     url,
     entities,
-    migrations: ['dist/libs/database/src/migrations/*.js'],
+    migrations: ["dist/libs/database/src/migrations/*.js"],
     synchronize: false,
-    logging: process.env['NODE_ENV'] === 'development',
+    logging: process.env["NODE_ENV"] === "development",
     ...overrides,
   } as DataSourceOptions;
 }

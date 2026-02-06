@@ -1,4 +1,4 @@
-import { Proficiency } from '@openspawn/shared-types';
+import { Proficiency } from "@openspawn/shared-types";
 import {
   Column,
   CreateDateColumn,
@@ -7,39 +7,39 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
-import type { Agent } from './agent.entity';
-import type { Organization } from './organization.entity';
+import type { Agent } from "./agent.entity";
+import type { Organization } from "./organization.entity";
 
-@Entity('agent_capabilities')
-@Index(['agentId', 'capability'], { unique: true })
-@Index(['orgId', 'capability'])
+@Entity("agent_capabilities")
+@Index(["agentId", "capability"], { unique: true })
+@Index(["orgId", "capability"])
 export class AgentCapability {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: 'org_id', type: 'uuid' })
+  @Column({ name: "org_id", type: "uuid" })
   orgId!: string;
 
-  @Column({ name: 'agent_id', type: 'uuid' })
+  @Column({ name: "agent_id", type: "uuid" })
   agentId!: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: "varchar", length: 100 })
   capability!: string;
 
-  @Column({ type: 'varchar', length: 20, default: Proficiency.STANDARD })
+  @Column({ type: "varchar", length: 20, default: Proficiency.STANDARD })
   proficiency!: Proficiency;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   // Relations
-  @ManyToOne('Organization')
-  @JoinColumn({ name: 'org_id' })
+  @ManyToOne("Organization")
+  @JoinColumn({ name: "org_id" })
   organization?: Organization;
 
-  @ManyToOne('Agent', 'capabilities')
-  @JoinColumn({ name: 'agent_id' })
+  @ManyToOne("Agent", "capabilities")
+  @JoinColumn({ name: "agent_id" })
   agent?: Agent;
 }

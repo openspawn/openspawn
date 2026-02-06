@@ -1,4 +1,4 @@
-import { MessageType } from '@openspawn/shared-types';
+import { MessageType } from "@openspawn/shared-types";
 import {
   Column,
   CreateDateColumn,
@@ -8,61 +8,61 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
-import type { Agent } from './agent.entity';
-import type { Channel } from './channel.entity';
-import type { Organization } from './organization.entity';
+import type { Agent } from "./agent.entity";
+import type { Channel } from "./channel.entity";
+import type { Organization } from "./organization.entity";
 
-@Entity('messages')
-@Index(['channelId', 'createdAt'])
-@Index(['orgId', 'senderId'])
-@Index(['parentMessageId'])
+@Entity("messages")
+@Index(["channelId", "createdAt"])
+@Index(["orgId", "senderId"])
+@Index(["parentMessageId"])
 export class Message {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ name: 'org_id', type: 'uuid' })
+  @Column({ name: "org_id", type: "uuid" })
   orgId!: string;
 
-  @Column({ name: 'channel_id', type: 'uuid' })
+  @Column({ name: "channel_id", type: "uuid" })
   channelId!: string;
 
-  @Column({ name: 'sender_id', type: 'uuid' })
+  @Column({ name: "sender_id", type: "uuid" })
   senderId!: string;
 
-  @Column({ type: 'varchar', length: 20, default: MessageType.TEXT })
+  @Column({ type: "varchar", length: 20, default: MessageType.TEXT })
   type!: MessageType;
 
-  @Column({ type: 'text' })
+  @Column({ type: "text" })
   body!: string;
 
-  @Column({ name: 'parent_message_id', type: 'uuid', nullable: true })
+  @Column({ name: "parent_message_id", type: "uuid", nullable: true })
   parentMessageId!: string | null;
 
-  @Column({ type: 'jsonb', default: {} })
+  @Column({ type: "jsonb", default: {} })
   metadata!: Record<string, unknown>;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   // Relations
-  @ManyToOne('Organization')
-  @JoinColumn({ name: 'org_id' })
+  @ManyToOne("Organization")
+  @JoinColumn({ name: "org_id" })
   organization?: Organization;
 
-  @ManyToOne('Channel', 'messages')
-  @JoinColumn({ name: 'channel_id' })
+  @ManyToOne("Channel", "messages")
+  @JoinColumn({ name: "channel_id" })
   channel?: Channel;
 
-  @ManyToOne('Agent')
-  @JoinColumn({ name: 'sender_id' })
+  @ManyToOne("Agent")
+  @JoinColumn({ name: "sender_id" })
   sender?: Agent;
 
-  @ManyToOne('Message', 'replies')
-  @JoinColumn({ name: 'parent_message_id' })
+  @ManyToOne("Message", "replies")
+  @JoinColumn({ name: "parent_message_id" })
   parentMessage?: Message;
 
-  @OneToMany('Message', 'parentMessage')
+  @OneToMany("Message", "parentMessage")
   replies?: Message[];
 }

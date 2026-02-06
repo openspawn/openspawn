@@ -1,5 +1,5 @@
 export enum Proficiency {
-  BASIC = 'basic',
-  STANDARD = 'standard',
-  EXPERT = 'expert',
+  BASIC = "basic",
+  STANDARD = "standard",
+  EXPERT = "expert",
 }

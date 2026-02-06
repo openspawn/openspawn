@@ -5,41 +5,41 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
+} from "typeorm";
 
-import type { Agent } from './agent.entity';
-import type { Task } from './task.entity';
+import type { Agent } from "./agent.entity";
+import type { Task } from "./task.entity";
 
-@Entity('organizations')
+@Entity("organizations")
 export class Organization {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: "varchar", length: 255 })
   name!: string;
 
-  @Column({ type: 'varchar', length: 100, unique: true })
+  @Column({ type: "varchar", length: 100, unique: true })
   slug!: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'TASK' })
+  @Column({ type: "varchar", length: 20, default: "TASK" })
   taskPrefix!: string;
 
-  @Column({ type: 'int', default: 1 })
+  @Column({ type: "int", default: 1 })
   nextTaskNumber!: number;
 
-  @Column({ type: 'jsonb', default: {} })
+  @Column({ type: "jsonb", default: {} })
   settings!: Record<string, unknown>;
 
-  @CreateDateColumn({ type: 'timestamptz' })
+  @CreateDateColumn({ type: "timestamptz" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz' })
+  @UpdateDateColumn({ type: "timestamptz" })
   updatedAt!: Date;
 
   // Relations (lazy to avoid circular imports)
-  @OneToMany('Agent', 'organization')
+  @OneToMany("Agent", "organization")
   agents?: Agent[];
 
-  @OneToMany('Task', 'organization')
+  @OneToMany("Task", "organization")
   tasks?: Task[];
 }

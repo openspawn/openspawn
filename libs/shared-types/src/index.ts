@@ -1,5 +1,5 @@
 // Enums
-export * from './enums';
+export * from "./enums";
 
 // DTOs (to be added in PR 2+)
 // export * from './dtos';
