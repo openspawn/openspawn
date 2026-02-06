@@ -1,6 +1,7 @@
 import { useQuery } from "urql";
 
 import { AGENTS_QUERY } from "../graphql/queries";
+import { DEFAULT_ORG_ID } from "../lib/constants";
 
 export interface Agent {
   id: string;
@@ -17,7 +18,7 @@ export interface Agent {
   createdAt: string;
 }
 
-export function useAgents(orgId: string) {
+export function useAgents(orgId: string = DEFAULT_ORG_ID) {
   const [result, reexecute] = useQuery<{ agents: Agent[] }>({
     query: AGENTS_QUERY,
     variables: { orgId },

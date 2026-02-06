@@ -12,6 +12,6 @@ import { AgentsService } from "./agents.service";
   imports: [TypeOrmModule.forFeature([Agent, AgentCapability]), EventsModule],
   controllers: [AgentsController],
   providers: [AgentsService],
-  exports: [AgentsService],
+  exports: [AgentsService, TypeOrmModule],
 })
 export class AgentsModule {}

@@ -2,11 +2,12 @@ import { useQuery, useSubscription } from "urql";
 
 import { CREDIT_HISTORY_QUERY } from "../graphql/queries";
 import { CREDIT_TRANSACTION_SUBSCRIPTION } from "../graphql/subscriptions";
+import { DEFAULT_ORG_ID } from "../lib/constants";
 
 export interface CreditTransaction {
   id: string;
   agentId: string;
-  type: "credit" | "debit";
+  type: "earn" | "spend";
   amount: number;
   balanceAfter: number;
   reason: string;
@@ -15,10 +16,15 @@ export interface CreditTransaction {
   createdAt: string;
 }
 
-export function useCredits(orgId: string, agentId: string, limit = 50) {
+export function useCredits(
+  orgId: string = DEFAULT_ORG_ID,
+  agentId?: string,
+  limit = 50
+) {
   const [result, reexecute] = useQuery<{ creditHistory: CreditTransaction[] }>({
     query: CREDIT_HISTORY_QUERY,
     variables: { orgId, agentId, limit, offset: 0 },
+    pause: false, // Always run, even without agentId
   });
 
   // Subscribe to new transactions

@@ -2,6 +2,7 @@ import { useQuery, useSubscription } from "urql";
 
 import { TASKS_QUERY } from "../graphql/queries";
 import { TASK_UPDATED_SUBSCRIPTION } from "../graphql/subscriptions";
+import { DEFAULT_ORG_ID } from "../lib/constants";
 
 export interface Task {
   id: string;
@@ -10,6 +11,7 @@ export interface Task {
   description?: string;
   status: string;
   priority: string;
+  assignee?: { id: string; name: string } | null;
   assigneeId?: string;
   creatorId: string;
   approvalRequired: boolean;
@@ -18,7 +20,7 @@ export interface Task {
   createdAt: string;
 }
 
-export function useTasks(orgId: string, status?: string) {
+export function useTasks(orgId: string = DEFAULT_ORG_ID, status?: string) {
   const [result, reexecute] = useQuery<{ tasks: Task[] }>({
     query: TASKS_QUERY,
     variables: { orgId, status },

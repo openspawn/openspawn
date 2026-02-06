@@ -10,6 +10,10 @@ export const TASKS_QUERY = gql`
       status
       priority
       assigneeId
+      assignee {
+        id
+        name
+      }
       creatorId
       approvalRequired
       dueDate
@@ -61,7 +65,7 @@ export const AGENTS_QUERY = gql`
 `;
 
 export const CREDIT_HISTORY_QUERY = gql`
-  query CreditHistory($orgId: ID!, $agentId: ID!, $limit: Int, $offset: Int) {
+  query CreditHistory($orgId: ID!, $agentId: ID, $limit: Int, $offset: Int) {
     creditHistory(orgId: $orgId, agentId: $agentId, limit: $limit, offset: $offset) {
       id
       agentId
@@ -82,6 +86,10 @@ export const EVENTS_QUERY = gql`
       id
       type
       actorId
+      actor {
+        id
+        name
+      }
       entityType
       entityId
       severity
