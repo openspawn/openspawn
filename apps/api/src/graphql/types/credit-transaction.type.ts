@@ -21,15 +21,15 @@ export class CreditTransactionType {
   @Field(() => Int)
   balanceAfter!: number;
 
-  @Field()
+  @Field(() => String)
   reason!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   triggerType?: string | null;
 
   @Field(() => ID, { nullable: true })
   sourceTaskId?: string | null;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 }

@@ -1,0 +1,157 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+enum AgentRole {
+  ADMIN
+  FOUNDER
+  HR
+  WORKER
+}
+
+enum AgentStatus {
+  ACTIVE
+  REVOKED
+  SUSPENDED
+}
+
+type AgentType {
+  agentId: String!
+  budgetPeriodLimit: Int
+  budgetPeriodSpent: Int!
+  createdAt: DateTime!
+  currentBalance: Int!
+  id: ID!
+  level: Int!
+  managementFeePct: Int!
+  model: String!
+  name: String!
+  role: AgentRole!
+  status: AgentStatus!
+  updatedAt: DateTime!
+}
+
+type ChannelGqlType {
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  taskId: ID
+  type: ChannelType!
+  updatedAt: DateTime!
+}
+
+enum ChannelType {
+  AGENT
+  BROADCAST
+  GENERAL
+  TASK
+}
+
+type CreditTransactionType {
+  agentId: ID!
+  amount: Int!
+  balanceAfter: Int!
+  createdAt: DateTime!
+  id: ID!
+  reason: String!
+  sourceTaskId: ID
+  triggerType: String
+  type: CreditType!
+}
+
+enum CreditType {
+  CREDIT
+  DEBIT
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum EventSeverity {
+  ERROR
+  INFO
+  WARNING
+}
+
+type EventType {
+  actorId: ID!
+  createdAt: DateTime!
+  entityId: ID!
+  entityType: String!
+  id: ID!
+  reasoning: String
+  severity: EventSeverity!
+  type: String!
+}
+
+type MessageGqlType {
+  body: String!
+  channelId: ID!
+  createdAt: DateTime!
+  id: ID!
+  parentMessageId: ID
+  senderId: ID!
+  type: MessageType!
+}
+
+enum MessageType {
+  HANDOFF
+  REQUEST
+  STATUS_UPDATE
+  TEXT
+}
+
+type Query {
+  agent(id: ID!, orgId: ID!): AgentType
+  agents(orgId: ID!): [AgentType!]!
+  channels(orgId: ID!): [ChannelGqlType!]!
+  creditHistory(agentId: ID!, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
+  events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
+  messages(before: ID, channelId: ID!, limit: Int! = 50, orgId: ID!): [MessageGqlType!]!
+  task(id: ID!, orgId: ID!): TaskType
+  tasks(assigneeId: ID, orgId: ID!, status: TaskStatus): [TaskType!]!
+}
+
+type Subscription {
+  creditTransactionCreated(orgId: ID!): CreditTransactionType!
+  eventCreated(orgId: ID!): EventType!
+  messageCreated(channelId: ID, orgId: ID!): MessageGqlType!
+  taskUpdated(orgId: ID!): TaskType!
+}
+
+enum TaskPriority {
+  HIGH
+  LOW
+  NORMAL
+  URGENT
+}
+
+enum TaskStatus {
+  BACKLOG
+  BLOCKED
+  CANCELLED
+  DONE
+  IN_PROGRESS
+  REVIEW
+  TODO
+}
+
+type TaskType {
+  approvalRequired: Boolean!
+  approvedAt: DateTime
+  assigneeId: ID
+  completedAt: DateTime
+  createdAt: DateTime!
+  creatorId: ID!
+  description: String
+  dueDate: DateTime
+  id: ID!
+  identifier: String!
+  parentTaskId: ID
+  priority: TaskPriority!
+  status: TaskStatus!
+  title: String!
+  updatedAt: DateTime!
+}

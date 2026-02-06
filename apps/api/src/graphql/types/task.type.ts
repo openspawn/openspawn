@@ -11,13 +11,13 @@ export class TaskType {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  @Field(() => String)
   identifier!: string;
 
-  @Field()
+  @Field(() => String)
   title!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   description?: string | null;
 
   @Field(() => TaskStatus)
@@ -35,21 +35,21 @@ export class TaskType {
   @Field(() => ID, { nullable: true })
   parentTaskId?: string | null;
 
-  @Field()
+  @Field(() => Boolean)
   approvalRequired!: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   approvedAt?: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   dueDate?: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   completedAt?: Date | null;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 
-  @Field()
+  @Field(() => Date)
   updatedAt!: Date;
 }

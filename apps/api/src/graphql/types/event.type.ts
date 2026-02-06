@@ -9,13 +9,13 @@ export class EventType {
   @Field(() => ID)
   id!: string;
 
-  @Field()
+  @Field(() => String)
   type!: string;
 
   @Field(() => ID)
   actorId!: string;
 
-  @Field()
+  @Field(() => String)
   entityType!: string;
 
   @Field(() => ID)
@@ -24,9 +24,9 @@ export class EventType {
   @Field(() => EventSeverity)
   severity!: EventSeverity;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   reasoning?: string | null;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 }
