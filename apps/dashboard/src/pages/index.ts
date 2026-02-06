@@ -1,4 +1,5 @@
-export { TasksPage } from "./tasks";
-export { AgentsPage } from "./agents";
-export { CreditsPage } from "./credits";
-export { EventsPage } from "./events";
+export * from "./agents";
+export * from "./credits";
+export * from "./dashboard";
+export * from "./events";
+export * from "./tasks";

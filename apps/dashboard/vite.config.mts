@@ -9,11 +9,11 @@ export default defineConfig(() => ({
   cacheDir: "../../node_modules/.vite/apps/dashboard",
   server: {
     port: 4200,
-    host: "localhost",
+    host: "0.0.0.0",
   },
   preview: {
     port: 4200,
-    host: "localhost",
+    host: "0.0.0.0",
   },
   plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"])],
   // Uncomment this if you are using workers.
@@ -34,6 +34,7 @@ export default defineConfig(() => ({
     globals: true,
     environment: "jsdom",
     include: ["{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    setupFiles: ["./src/test-setup.ts"],
     reporters: ["default"],
     coverage: {
       reportsDirectory: "../../coverage/apps/dashboard",
