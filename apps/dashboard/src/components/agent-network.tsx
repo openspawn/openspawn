@@ -23,7 +23,7 @@ import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
 
-// Context to share active delegations with edge components
+// Context to share active delegations and speed with edge components
 interface TaskDelegation {
   id: string;
   fromId: string;
@@ -31,7 +31,11 @@ interface TaskDelegation {
   taskTitle: string;
   startTime: number;
 }
-const DelegationContext = createContext<TaskDelegation[]>([]);
+interface DelegationContextValue {
+  delegations: TaskDelegation[];
+  speed: number;
+}
+const DelegationContext = createContext<DelegationContextValue>({ delegations: [], speed: 1 });
 
 // ELK instance for layout
 const elk = new ELK();
@@ -245,7 +249,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   );
 }
 
-// Custom edge with flowing task packets
+// Custom edge with flowing task packets - clean, minimal dots
 function TaskFlowEdge({
   id,
   sourceX,
@@ -259,7 +263,7 @@ function TaskFlowEdge({
   source,
   target,
 }: EdgeProps) {
-  const delegations = useContext(DelegationContext);
+  const { delegations, speed } = useContext(DelegationContext);
   
   // Get the edge path
   const [edgePath] = getSmoothStepPath({
@@ -276,67 +280,39 @@ function TaskFlowEdge({
     (d) => d.fromId === source && d.toId === target
   );
 
+  // Animation duration scales with speed (faster = shorter duration)
+  const baseDuration = 1.2;
+  const duration = baseDuration / Math.sqrt(speed); // sqrt for smoother scaling
+
   return (
     <>
       {/* Base edge line */}
       <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
       
-      {/* Animated task packets flowing along the edge */}
-      {activeDelegations.map((delegation) => (
-        <g key={delegation.id}>
-          {/* Task packet - animated circle with label */}
-          <motion.circle
-            r={8}
-            fill="#22c55e"
-            stroke="#16a34a"
-            strokeWidth={2}
-            filter="drop-shadow(0 0 6px rgba(34, 197, 94, 0.6))"
-            initial={{ offsetDistance: "0%" }}
-            animate={{ offsetDistance: "100%" }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            style={{ offsetPath: `path("${edgePath}")` }}
-          />
-          {/* Task icon inside the packet */}
-          <motion.text
-            fontSize={10}
-            fill="white"
-            textAnchor="middle"
-            dominantBaseline="central"
-            initial={{ offsetDistance: "0%" }}
-            animate={{ offsetDistance: "100%" }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            style={{ offsetPath: `path("${edgePath}")` }}
-          >
-            📋
-          </motion.text>
-          {/* Task label following the packet */}
-          <motion.g
-            initial={{ offsetDistance: "0%" }}
-            animate={{ offsetDistance: "100%" }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            style={{ offsetPath: `path("${edgePath}")` }}
-          >
-            <rect
-              x={12}
-              y={-10}
-              width={Math.min(delegation.taskTitle.length * 6 + 8, 100)}
-              height={20}
-              rx={4}
-              fill="rgba(0,0,0,0.8)"
-              stroke="#22c55e"
-              strokeWidth={1}
-            />
-            <text
-              x={16}
-              y={4}
-              fontSize={10}
-              fill="white"
-              className="font-medium"
-            >
-              {delegation.taskTitle.slice(0, 14)}{delegation.taskTitle.length > 14 ? '…' : ''}
-            </text>
-          </motion.g>
-        </g>
+      {/* Animated task packets - simple glowing dots */}
+      {activeDelegations.map((delegation, index) => (
+        <motion.circle
+          key={delegation.id}
+          r={6}
+          fill="#22c55e"
+          filter="drop-shadow(0 0 8px rgba(34, 197, 94, 0.8))"
+          initial={{ offsetDistance: "0%", scale: 0, opacity: 0 }}
+          animate={{ 
+            offsetDistance: "100%", 
+            scale: [0, 1.2, 1, 1, 0.8],
+            opacity: [0, 1, 1, 1, 0],
+          }}
+          transition={{ 
+            duration,
+            ease: "easeInOut",
+            times: [0, 0.1, 0.3, 0.9, 1],
+          }}
+          style={{ 
+            offsetPath: `path("${edgePath}")`,
+            // Stagger multiple packets on same edge
+            offsetDistance: `${index * 15}%`,
+          }}
+        />
       ))}
     </>
   );
@@ -552,12 +528,13 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
         };
         setActiveDelegations((prev) => [...prev, delegation]);
 
-        // Remove delegation after animation completes (2 seconds)
+        // Remove delegation after animation completes (matches edge animation duration)
+        const animDuration = 1200 / Math.sqrt(demo.speed);
         setTimeout(() => {
           setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id));
-        }, 2000 / demo.speed);
+        }, animDuration);
       }
-    }, 1500 / demo.speed);
+    }, 800 / demo.speed); // Create delegations more frequently
     
     return () => clearInterval(interval);
   }, [demo.isPlaying, demo.speed, setNodes]);
@@ -566,8 +543,14 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     setSelectedNode(node as Node<AgentNodeData>);
   }
 
+  // Context value includes speed so edges can adapt animation duration
+  const contextValue = useMemo(() => ({
+    delegations: activeDelegations,
+    speed: demo.speed,
+  }), [activeDelegations, demo.speed]);
+
   return (
-    <DelegationContext.Provider value={activeDelegations}>
+    <DelegationContext.Provider value={contextValue}>
       <div className={`relative ${className}`}>
         <ReactFlow
           nodes={nodes}
@@ -691,6 +674,35 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Task Flow Feed - shows recent delegations in a compact stack */}
+      {demo.isDemo && (
+        <div className="absolute bottom-20 right-4 sm:bottom-6 sm:right-4 z-10">
+          <AnimatePresence mode="popLayout">
+            {activeDelegations.slice(-5).map((del, idx) => {
+              const fromNode = nodes.find((n) => n.id === del.fromId);
+              const toNode = nodes.find((n) => n.id === del.toId);
+              return (
+                <motion.div
+                  key={del.id}
+                  initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                  animate={{ opacity: 1 - idx * 0.15, x: 0, scale: 1 - idx * 0.03, y: idx * -4 }}
+                  exit={{ opacity: 0, x: 30, scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className="bg-zinc-900/95 backdrop-blur border border-green-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-green-500/10"
+                  style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+                  <span className="text-zinc-400 truncate max-w-[60px]">{fromNode?.data?.label || del.fromId}</span>
+                  <span className="text-green-500">→</span>
+                  <span className="text-zinc-400 truncate max-w-[60px]">{toNode?.data?.label || del.toId}</span>
+                  <span className="text-zinc-500 hidden sm:inline truncate max-w-[80px]">"{del.taskTitle}"</span>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      )}
 
       </div>
     </DelegationContext.Provider>
