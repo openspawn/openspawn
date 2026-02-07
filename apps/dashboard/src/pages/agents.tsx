@@ -157,7 +157,6 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
 
   function handleSave() {
     // TODO: Implement mutation
-    console.log("Save agent:", { name, model, status });
     onClose();
   }
 
@@ -229,7 +228,6 @@ function AdjustCreditsDialog({ agent, onClose }: { agent: Agent; onClose: () => 
 
   function handleSubmit() {
     // TODO: Implement mutation
-    console.log("Adjust credits:", { amount: Number(amount), type, reason });
     onClose();
   }
 
