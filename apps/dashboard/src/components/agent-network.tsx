@@ -391,6 +391,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
+  const [isLayouted, setIsLayouted] = useState(false);
   const prevAgentCountRef = useRef(0);
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
@@ -400,12 +401,14 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   useEffect(() => {
     if (loading) return;
     
+    setIsLayouted(false);
     const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents, compact);
     
     // Apply layout whenever agent count or compact mode changes
     getLayoutedElements(newNodes, newEdges, { compact }).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
+      setIsLayouted(true);
       
       // Fit view when nodes are added/removed or compact mode toggles
       const agentCountChanged = agents.length !== prevAgentCountRef.current;
@@ -472,7 +475,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
       <div className={`relative ${className}`}>
         <ReactFlow
           nodes={nodes}
-          edges={edges}
+          edges={isLayouted ? edges : []}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
@@ -483,7 +486,9 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           maxZoom={1.5}
           proOptions={{ hideAttribution: true }}
           defaultEdgeOptions={{
-            type: "smoothstep",
+            type: "taskFlow",
+            sourceHandle: "bottom",
+            targetHandle: "top",
             animated: true,
             markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
             style: { stroke: "#6366f1", strokeWidth: 2 },
