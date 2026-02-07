@@ -137,7 +137,13 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className="relative"
     >
-      <Handle type="target" position={Position.Top} className="!bg-transparent !border-0" />
+      {/* Handles positioned at top/bottom edges - visible with level color */}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        className="!w-3 !h-3 !-top-1.5 !rounded-full !border-2 !border-zinc-800"
+        style={{ backgroundColor: color }}
+      />
       
       {isSpawning && (
         <motion.div
@@ -214,7 +220,12 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
         )}
       </motion.div>
 
-      <Handle type="source" position={Position.Bottom} className="!bg-transparent !border-0" />
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        className="!w-3 !h-3 !-bottom-1.5 !rounded-full !border-2 !border-zinc-800"
+        style={{ backgroundColor: color }}
+      />
     </motion.div>
   );
 }
