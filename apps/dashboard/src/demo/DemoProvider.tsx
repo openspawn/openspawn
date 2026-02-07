@@ -134,10 +134,12 @@ export function DemoProvider({
 
     // Invalidate queries once per tick (not per event)
     const unsubscribeTick = engine.onTick((events, tick) => {
+      console.log('[Demo] Tick', tick, '- events:', events.length, events.map(e => e.type));
       setCurrentTick(tick);
       
       // Invalidate all queries - MSW handlers will fetch fresh data from engine
       if (events.length > 0) {
+        console.log('[Demo] Invalidating queries...');
         queryClient.invalidateQueries();
       }
     });

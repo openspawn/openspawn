@@ -90,6 +90,17 @@ export class SimulationEngine {
       startTime: new Date(),
       simulatedTime: new Date(),
     };
+    
+    // Add initial "system started" event if scenario has no events
+    if (this.state.scenario.events.length === 0) {
+      const startEvent = generateEvent(
+        'system.started',
+        'info',
+        `Simulation started with ${this.state.scenario.agents.length} agent(s)`,
+        { metadata: { scenarioName: scenario.name } }
+      );
+      this.state.scenario.events.push(startEvent);
+    }
   }
   
   private deepClone<T>(obj: T): T {
@@ -500,6 +511,15 @@ export class SimulationEngine {
     );
     this.state.scenario.credits.push(transaction);
     
+    // Also create a DemoEvent for the Events feed
+    const systemEvent = generateEvent(
+      'credits.earned',
+      'info',
+      `${agent.name} earned ${amount} credits`,
+      { agentId: agent.id, metadata: { amount, reason: 'Task completion reward' } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
     return {
       type: 'credit_earned',
       payload: { agent, amount, transaction },
@@ -525,6 +545,15 @@ export class SimulationEngine {
       'Model usage'
     );
     this.state.scenario.credits.push(transaction);
+    
+    // Also create a DemoEvent for the Events feed
+    const systemEvent = generateEvent(
+      'credits.spent',
+      'debug',
+      `${agent.name} spent ${amount} credits on model usage`,
+      { agentId: agent.id, metadata: { amount, model: agent.model } }
+    );
+    this.state.scenario.events.push(systemEvent);
     
     return {
       type: 'credit_spent',

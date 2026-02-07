@@ -189,7 +189,16 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
     // ─────────────── Events ───────────────
     graphql.query('Events', ({ variables }) => {
       const { limit = 50, page = 1 } = variables || {};
-      const events = engine().getEvents();
+      const e = engine();
+      const events = e.getEvents();
+      const state = e.getState();
+      
+      console.log('[MSW] Events query:', {
+        totalEvents: events.length,
+        tick: state.currentTick,
+        isPlaying: state.isPlaying,
+        scenarioEvents: state.scenario.events.length,
+      });
       
       // Sort by createdAt descending (newest first)
       const sorted = [...events].sort(
@@ -199,7 +208,10 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
       const offset = (page - 1) * limit;
       const paginated = sorted.slice(offset, offset + limit);
       
-      console.log('[MSW] Events query → returning', paginated.length, 'events');
+      if (paginated.length > 0) {
+        console.log('[MSW] First event:', paginated[0]);
+      }
+      
       return HttpResponse.json({
         data: {
           events: paginated.map(mapEvent),
