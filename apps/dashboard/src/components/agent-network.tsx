@@ -364,8 +364,8 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
         <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
       </ReactFlow>
 
-      {/* Legend - collapsible on mobile */}
-      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none">
+      {/* Legend - hidden in landscape mobile, compact on portrait mobile, shown on larger screens */}
+      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
         <div className="font-semibold mb-2 text-white text-xs sm:text-sm">Levels</div>
         <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
           {[

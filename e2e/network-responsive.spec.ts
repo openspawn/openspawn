@@ -4,8 +4,10 @@ const viewports = [
   { name: "Mobile S", width: 320, height: 568 },
   { name: "Mobile M", width: 375, height: 667 },
   { name: "Mobile L", width: 425, height: 812 },
+  { name: "Mobile Landscape", width: 667, height: 375 },
   { name: "Tablet", width: 768, height: 1024 },
-  { name: "Laptop", width: 1024, height: 768 },
+  { name: "Tablet Landscape", width: 1024, height: 768 },
+  { name: "Laptop", width: 1366, height: 768 },
   { name: "Desktop", width: 1440, height: 900 },
 ];
 
@@ -18,8 +20,13 @@ test.describe("Network page responsive tests", () => {
       // Wait for the React Flow canvas to load
       await expect(page.locator(".react-flow")).toBeVisible({ timeout: 10000 });
       
-      // Verify the legend is visible
-      await expect(page.getByText("Levels")).toBeVisible();
+      // Check if landscape mobile (legend hidden for better space)
+      const isLandscapeMobile = viewport.height < 500 && viewport.width > viewport.height;
+      
+      if (!isLandscapeMobile) {
+        // Verify the legend is visible (hidden in landscape mobile)
+        await expect(page.getByText("Levels")).toBeVisible();
+      }
       
       // Verify the graph canvas rendered
       await expect(page.locator(".react-flow__viewport")).toBeVisible();
