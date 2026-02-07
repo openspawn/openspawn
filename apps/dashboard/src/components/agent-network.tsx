@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, createContext, useContext } from "react";
 import {
   ReactFlow,
   Controls,
@@ -11,14 +11,27 @@ import {
   Handle,
   Position,
   BackgroundVariant,
+  BaseEdge,
+  getSmoothStepPath,
   type Node,
   type Edge,
   type NodeProps,
+  type EdgeProps,
 } from "@xyflow/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Dagre from "@dagrejs/dagre";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
+
+// Context to share active delegations with edge components
+interface TaskDelegation {
+  id: string;
+  fromId: string;
+  toId: string;
+  taskTitle: string;
+  startTime: number;
+}
+const DelegationContext = createContext<TaskDelegation[]>([]);
 
 // Auto-layout using dagre
 function getLayoutedElements(nodes: Node[], edges: Edge[], direction = "TB") {
@@ -218,64 +231,108 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   );
 }
 
-// Animated edge with credit flow
-function AnimatedEdge({
+// Custom edge with flowing task packets
+function TaskFlowEdge({
   id,
   sourceX,
   sourceY,
   targetX,
   targetY,
+  sourcePosition,
+  targetPosition,
   style,
-  data,
-}: {
-  id: string;
-  sourceX: number;
-  sourceY: number;
-  targetX: number;
-  targetY: number;
-  style?: React.CSSProperties;
-  data?: { creditFlow?: number };
-}) {
-  const edgePath = `M ${sourceX} ${sourceY} C ${sourceX} ${(sourceY + targetY) / 2}, ${targetX} ${(sourceY + targetY) / 2}, ${targetX} ${targetY}`;
+  markerEnd,
+  source,
+  target,
+}: EdgeProps) {
+  const delegations = useContext(DelegationContext);
   
+  // Get the edge path
+  const [edgePath] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  // Find active delegations for this edge
+  const activeDelegations = delegations.filter(
+    (d) => d.fromId === source && d.toId === target
+  );
+
   return (
-    <g>
-      <path
-        id={id}
-        d={edgePath}
-        fill="none"
-        stroke="#3f3f46"
-        strokeWidth={2}
-        style={style}
-      />
-      {/* Animated credit flow particles */}
-      {data?.creditFlow && (
-        <motion.circle
-          r={4}
-          fill="#fbbf24"
-          initial={{ offsetDistance: "0%" }}
-          animate={{ offsetDistance: "100%" }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          style={{ offsetPath: `path("${edgePath}")` }}
-        />
-      )}
-    </g>
+    <>
+      {/* Base edge line */}
+      <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
+      
+      {/* Animated task packets flowing along the edge */}
+      {activeDelegations.map((delegation) => (
+        <g key={delegation.id}>
+          {/* Task packet - animated circle with label */}
+          <motion.circle
+            r={8}
+            fill="#22c55e"
+            stroke="#16a34a"
+            strokeWidth={2}
+            filter="drop-shadow(0 0 6px rgba(34, 197, 94, 0.6))"
+            initial={{ offsetDistance: "0%" }}
+            animate={{ offsetDistance: "100%" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            style={{ offsetPath: `path("${edgePath}")` }}
+          />
+          {/* Task icon inside the packet */}
+          <motion.text
+            fontSize={10}
+            fill="white"
+            textAnchor="middle"
+            dominantBaseline="central"
+            initial={{ offsetDistance: "0%" }}
+            animate={{ offsetDistance: "100%" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            style={{ offsetPath: `path("${edgePath}")` }}
+          >
+            📋
+          </motion.text>
+          {/* Task label following the packet */}
+          <motion.g
+            initial={{ offsetDistance: "0%" }}
+            animate={{ offsetDistance: "100%" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            style={{ offsetPath: `path("${edgePath}")` }}
+          >
+            <rect
+              x={12}
+              y={-10}
+              width={Math.min(delegation.taskTitle.length * 6 + 8, 100)}
+              height={20}
+              rx={4}
+              fill="rgba(0,0,0,0.8)"
+              stroke="#22c55e"
+              strokeWidth={1}
+            />
+            <text
+              x={16}
+              y={4}
+              fontSize={10}
+              fill="white"
+              className="font-medium"
+            >
+              {delegation.taskTitle.slice(0, 14)}{delegation.taskTitle.length > 14 ? '…' : ''}
+            </text>
+          </motion.g>
+        </g>
+      ))}
+    </>
   );
 }
 
 const nodeTypes = { agent: AgentNode };
+const edgeTypes = { taskFlow: TaskFlowEdge };
 
 interface AgentNetworkProps {
   className?: string;
-}
-
-// Track active task delegations for animation
-interface TaskDelegation {
-  id: string;
-  fromId: string;
-  toId: string;
-  taskTitle: string;
-  startTime: number;
 }
 
 // Inner component that uses useReactFlow (must be inside ReactFlowProvider)
@@ -345,14 +402,14 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
       },
     ];
     const rawEdges: Edge[] = [
-      { id: "e-human-coo", source: "human", target: "coo", type: "smoothstep", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
-      { id: "e-coo-talent", source: "coo", target: "talent", type: "smoothstep", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
-      { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "smoothstep", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-      { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "smoothstep", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-      { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "smoothstep", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-      { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "smoothstep", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-      { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "smoothstep", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
-      { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "smoothstep", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
+      { id: "e-human-coo", source: "human", target: "coo", type: "taskFlow", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
+      { id: "e-coo-talent", source: "coo", target: "talent", type: "taskFlow", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
+      { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+      { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+      { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+      { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+      { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
+      { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
     ];
     // Apply dagre layout
     return getLayoutedElements(rawNodes, rawEdges);
@@ -533,13 +590,15 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   }
 
   return (
-    <div className={`relative ${className}`}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={handleNodeClick}
+    <DelegationContext.Provider value={activeDelegations}>
+      <div className={`relative ${className}`}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onNodeClick={handleNodeClick}
+          edgeTypes={edgeTypes}
         nodeTypes={nodeTypes}
         fitView
         minZoom={0.5}
@@ -656,45 +715,8 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
         )}
       </AnimatePresence>
 
-      {/* Task Delegation Feed - shows live task assignments */}
-      {demo.isDemo && activeDelegations.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="absolute top-4 right-4 sm:right-4 sm:top-20 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-3 w-48 sm:w-56 max-h-48 overflow-hidden"
-        >
-          <div className="text-xs font-semibold text-zinc-400 mb-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Task Delegations
-          </div>
-          <div className="space-y-1.5">
-            <AnimatePresence mode="popLayout">
-              {activeDelegations.slice(-4).map((del) => {
-                const fromNode = nodes.find((n) => n.id === del.fromId);
-                const toNode = nodes.find((n) => n.id === del.toId);
-                return (
-                  <motion.div
-                    key={del.id}
-                    initial={{ opacity: 0, y: -10, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 20, scale: 0.9 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className="text-[10px] sm:text-xs bg-zinc-800/50 rounded px-2 py-1.5"
-                  >
-                    <div className="text-white font-medium truncate">{del.taskTitle}</div>
-                    <div className="text-zinc-500 flex items-center gap-1">
-                      <span className="truncate">{fromNode?.data?.label || del.fromId}</span>
-                      <span className="text-green-500">→</span>
-                      <span className="truncate">{toNode?.data?.label || del.toId}</span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
-    </div>
+      </div>
+    </DelegationContext.Provider>
   );
 }
 
