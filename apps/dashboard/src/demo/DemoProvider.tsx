@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { setupWorker, type SetupWorker } from 'msw/browser';
 import {
@@ -11,19 +11,7 @@ import {
   type SimulationEvent,
   type DemoScenario,
 } from '@openspawn/demo-data';
-import {
-  handlers,
-  setAgents,
-  setTasks,
-  setCredits,
-  setEvents,
-  addAgent,
-  addTask,
-  addCredit,
-  addEvent,
-  updateAgent,
-  updateTask,
-} from './handlers';
+import { createHandlers } from './handlers';
 
 export type ScenarioName = 'fresh' | 'startup' | 'growth' | 'enterprise';
 
@@ -35,8 +23,6 @@ interface DemoContextValue {
   currentTick: number;
   scenario: ScenarioName;
   recentEvents: SimulationEvent[];
-  agentSpawns: string[]; // Recently spawned agent IDs for animations
-  agentDespawns: string[]; // Recently despawned agent IDs for animations
   play: () => void;
   pause: () => void;
   setSpeed: (speed: number) => void;
@@ -58,8 +44,6 @@ export function useDemo(): DemoContextValue {
       currentTick: 0,
       scenario: 'fresh',
       recentEvents: [],
-      agentSpawns: [],
-      agentDespawns: [],
       play: () => {},
       pause: () => {},
       setSpeed: () => {},
@@ -96,113 +80,63 @@ export function DemoProvider({
   initialSpeed = 1,
 }: DemoProviderProps) {
   const queryClient = useQueryClient();
-  const [worker, setWorker] = useState<SetupWorker | null>(null);
-  const [engine, setEngine] = useState<SimulationEngine | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [speed, setSpeedState] = useState(initialSpeed);
   const [currentTick, setCurrentTick] = useState(0);
   const [scenario, setScenarioState] = useState<ScenarioName>(parseScenario(initialScenarioName));
   const [recentEvents, setRecentEvents] = useState<SimulationEvent[]>([]);
-  const [agentSpawns, setAgentSpawns] = useState<string[]>([]);
-  const [agentDespawns, setAgentDespawns] = useState<string[]>([]);
+  
+  // Refs for stable access in handlers
+  const engineRef = useRef<SimulationEngine | null>(null);
+  const workerRef = useRef<SetupWorker | null>(null);
 
   // Initialize MSW and simulation
   useEffect(() => {
     async function init() {
-      // Setup MSW
+      // Create simulation engine
+      const initialScenario = SCENARIOS[scenario];
+      const sim = createSimulation(initialScenario);
+      engineRef.current = sim;
+
+      // Create handlers that query engine directly (stateless!)
+      const handlers = createHandlers(() => engineRef.current);
+
+      // Setup MSW with our handlers
       const mswWorker = setupWorker(...handlers);
       await mswWorker.start({
-        onUnhandledRequest: 'bypass', // Let real requests through
+        onUnhandledRequest: 'bypass',
         quiet: true,
       });
-      setWorker(mswWorker);
-
-      // Load initial scenario
-      const initialScenario = SCENARIOS[scenario];
-      setAgents(initialScenario.agents);
-      setTasks(initialScenario.tasks);
-      setCredits(initialScenario.credits);
-      setEvents(initialScenario.events);
-
-      // Create simulation engine
-      const sim = createSimulation(initialScenario);
-      setEngine(sim);
+      workerRef.current = mswWorker;
 
       setIsReady(true);
+      console.log('[Demo] Initialized with scenario:', scenario);
     }
 
     init();
 
     return () => {
-      worker?.stop();
+      workerRef.current?.stop();
+      engineRef.current?.pause();
     };
-  }, []);
+  }, []); // Only run once on mount
 
-  // Subscribe to simulation events (for MSW state updates)
+  // Subscribe to simulation events (for UI updates only - no MSW sync needed!)
   useEffect(() => {
-    if (!engine) return;
+    const engine = engineRef.current;
+    if (!engine || !isReady) return;
 
+    // Track recent events for UI display
     const unsubscribeEvent = engine.onEvent((event) => {
-      // Update MSW state based on event type
-      switch (event.type) {
-        case 'agent_created': {
-          const newAgent = event.payload as any;
-          addAgent(newAgent);
-          // Track spawn for animation
-          setAgentSpawns((prev) => [...prev, newAgent.id]);
-          // Clear spawn after animation
-          setTimeout(() => {
-            setAgentSpawns((prev) => prev.filter((id) => id !== newAgent.id));
-          }, 2000);
-          break;
-        }
-        case 'agent_activated': {
-          // Parent activated a pending child
-          const activatedPayload = event.payload as { agent: any; activatedBy: any };
-          updateAgent(activatedPayload.agent.id, activatedPayload.agent);
-          break;
-        }
-        case 'agent_promoted':
-        case 'agent_terminated': {
-          const agentPayload = event.payload as { agent: any; newStatus?: string };
-          updateAgent(agentPayload.agent.id, agentPayload.agent);
-          // Track despawn (status change to inactive states)
-          if (agentPayload.newStatus === 'paused' || agentPayload.newStatus === 'suspended' || agentPayload.newStatus === 'revoked') {
-            setAgentDespawns((prev) => [...prev, agentPayload.agent.id]);
-            setTimeout(() => {
-              setAgentDespawns((prev) => prev.filter((id) => id !== agentPayload.agent.id));
-            }, 2000);
-          }
-          break;
-        }
-        case 'task_created':
-          addTask(event.payload as any);
-          break;
-        case 'task_assigned':
-        case 'task_completed': {
-          const taskPayload = event.payload as { task: any };
-          updateTask(taskPayload.task.id, taskPayload.task);
-          break;
-        }
-        case 'credit_earned':
-        case 'credit_spent': {
-          const creditPayload = event.payload as { transaction: any; agent: any };
-          addCredit(creditPayload.transaction);
-          updateAgent(creditPayload.agent.id, creditPayload.agent);
-          break;
-        }
-      }
-
-      // Keep last 20 events for UI
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
     });
 
-    // Subscribe to tick events (for query invalidation - once per tick, not per event)
+    // Invalidate queries once per tick (not per event)
     const unsubscribeTick = engine.onTick((events, tick) => {
       setCurrentTick(tick);
       
-      // Invalidate all queries once per tick - elegant and efficient
+      // Invalidate all queries - MSW handlers will fetch fresh data from engine
       if (events.length > 0) {
         queryClient.invalidateQueries();
       }
@@ -212,48 +146,47 @@ export function DemoProvider({
       unsubscribeEvent();
       unsubscribeTick();
     };
-  }, [engine, queryClient]);
+  }, [isReady, queryClient]);
 
   // Auto-play if requested
   useEffect(() => {
-    if (isReady && autoPlay && engine && !isPlaying) {
-      engine.play();
+    if (isReady && autoPlay && engineRef.current && !isPlaying) {
+      engineRef.current.play();
       setIsPlaying(true);
     }
-  }, [isReady, autoPlay, engine]);
+  }, [isReady, autoPlay, isPlaying]);
 
   const play = useCallback(() => {
-    engine?.play();
+    engineRef.current?.play();
     setIsPlaying(true);
-  }, [engine]);
+  }, []);
 
   const pause = useCallback(() => {
-    engine?.pause();
+    engineRef.current?.pause();
     setIsPlaying(false);
-  }, [engine]);
+  }, []);
 
   const setSpeed = useCallback((newSpeed: number) => {
-    engine?.setSpeed(newSpeed);
+    engineRef.current?.setSpeed(newSpeed);
     setSpeedState(newSpeed);
-  }, [engine]);
+  }, []);
 
   const setScenario = useCallback((name: ScenarioName) => {
     pause();
     
+    // Create new engine with new scenario
     const newScenario = SCENARIOS[name];
-    setAgents(newScenario.agents);
-    setTasks(newScenario.tasks);
-    setCredits(newScenario.credits);
-    setEvents(newScenario.events);
-    
     const newEngine = createSimulation(newScenario);
-    setEngine(newEngine);
+    engineRef.current = newEngine;
+    
     setScenarioState(name);
+    setCurrentTick(0);
+    setRecentEvents([]);
     
     // Invalidate all queries to force refetch with new scenario data
     queryClient.invalidateQueries();
-    setCurrentTick(0);
-    setRecentEvents([]);
+    
+    console.log('[Demo] Switched to scenario:', name);
   }, [pause, queryClient]);
 
   const reset = useCallback(() => {
@@ -268,8 +201,6 @@ export function DemoProvider({
     currentTick,
     scenario,
     recentEvents,
-    agentSpawns,
-    agentDespawns,
     play,
     pause,
     setSpeed,
