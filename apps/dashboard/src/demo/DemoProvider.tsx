@@ -4,6 +4,7 @@ import { setupWorker, type SetupWorker } from 'msw/browser';
 import {
   SimulationEngine,
   createSimulation,
+  freshScenario,
   growthScenario,
   startupScenario,
   enterpriseScenario,
@@ -24,7 +25,7 @@ import {
   updateTask,
 } from './handlers';
 
-export type ScenarioName = 'startup' | 'growth' | 'enterprise';
+export type ScenarioName = 'fresh' | 'startup' | 'growth' | 'enterprise';
 
 interface DemoContextValue {
   isDemo: boolean;
@@ -55,7 +56,7 @@ export function useDemo(): DemoContextValue {
       isPlaying: false,
       speed: 1,
       currentTick: 0,
-      scenario: 'growth',
+      scenario: 'fresh',
       recentEvents: [],
       agentSpawns: [],
       agentDespawns: [],
@@ -70,14 +71,15 @@ export function useDemo(): DemoContextValue {
 }
 
 const SCENARIOS: Record<ScenarioName, DemoScenario> = {
+  fresh: freshScenario,
   startup: startupScenario,
   growth: growthScenario,
   enterprise: enterpriseScenario,
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (s === 'startup' || s === 'growth' || s === 'enterprise') return s;
-  return 'growth';
+  if (s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
+  return 'fresh'; // Default to fresh start
 }
 
 interface DemoProviderProps {

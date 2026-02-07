@@ -14,17 +14,17 @@ import { generateRandomAgent, generateRandomTask, generateCreditTransaction, gen
 // Probability distributions for different events (per tick)
 const PROBABILITIES = {
   // Agent events
-  agentCreated: 0.05,      // 5% chance per tick
-  agentPromoted: 0.02,     // 2% chance per tick
+  agentCreated: 0.15,      // 15% chance per tick (higher for dynamic growth)
+  agentPromoted: 0.05,     // 5% chance per tick
   agentStatusChange: 0.03, // 3% chance per tick
   
   // Task events
-  taskCreated: 0.1,        // 10% chance per tick
-  taskStatusChange: 0.15,  // 15% chance per tick
+  taskCreated: 0.2,        // 20% chance per tick
+  taskStatusChange: 0.2,   // 20% chance per tick
   
   // Credit events
-  creditEarned: 0.08,      // 8% chance per tick
-  creditSpent: 0.12,       // 12% chance per tick
+  creditEarned: 0.15,      // 15% chance per tick
+  creditSpent: 0.18,       // 18% chance per tick
   
   // System events
   systemEvent: 0.05,       // 5% chance per tick
@@ -220,14 +220,19 @@ export class SimulationEngine {
   
   // Event generators
   private createAgent(): SimulationEvent | null {
+    // Higher level agents can spawn new agents (L7+ can spawn, L9+ preferred)
     const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active' && a.level >= 7);
     if (activeAgents.length === 0) return null;
     
     const parent = randomFrom(activeAgents);
+    
+    // New agents start at level 1-3 depending on parent level
+    const startLevel = parent.level >= 9 ? Math.floor(Math.random() * 3) + 1 : 1;
+    
     const newAgent = generateRandomAgent({
       parentId: parent.id,
       domain: parent.domain,
-      level: 1,
+      level: startLevel,
       status: 'pending',
     });
     

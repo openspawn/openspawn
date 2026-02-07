@@ -12,6 +12,7 @@ const SPEED_OPTIONS = [
 ];
 
 const SCENARIO_OPTIONS = [
+  { value: 'fresh' as const, label: 'Fresh', icon: Zap, agents: 1 },
   { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5 },
   { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14 },
   { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50 },
