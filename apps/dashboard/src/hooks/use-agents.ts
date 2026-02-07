@@ -1,32 +1,15 @@
-import { useQuery } from "urql";
+import { useAgentsQuery } from "../graphql/generated/hooks";
+import { DEFAULT_ORG_ID } from "../lib/constants";
 
-import { AGENTS_QUERY } from "../graphql/queries";
+export type { AgentType as Agent } from "../graphql/generated/hooks";
 
-export interface Agent {
-  id: string;
-  agentId: string;
-  name: string;
-  role: string;
-  status: string;
-  level: number;
-  model: string;
-  currentBalance: number;
-  budgetPeriodLimit?: number;
-  budgetPeriodSpent: number;
-  managementFeePct: number;
-  createdAt: string;
-}
-
-export function useAgents(orgId: string) {
-  const [result, reexecute] = useQuery<{ agents: Agent[] }>({
-    query: AGENTS_QUERY,
-    variables: { orgId },
-  });
+export function useAgents(orgId: string = DEFAULT_ORG_ID) {
+  const { data, isLoading, error, refetch } = useAgentsQuery({ orgId });
 
   return {
-    agents: result.data?.agents || [],
-    loading: result.fetching,
-    error: result.error,
-    refetch: () => reexecute({ requestPolicy: "network-only" }),
+    agents: data?.agents ?? [],
+    loading: isLoading,
+    error: error ?? null,
+    refetch,
   };
 }

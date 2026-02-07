@@ -239,19 +239,25 @@ export class CreditsService {
   }
 
   /**
-   * Get transaction history
+   * Get transaction history (optionally filtered by agentId)
    */
   async getHistory(
     orgId: string,
-    agentId: string,
+    agentId?: string,
     limit = 50,
     offset = 0,
   ): Promise<{ transactions: CreditTransaction[]; total: number }> {
+    const where: { orgId: string; agentId?: string } = { orgId };
+    if (agentId) {
+      where.agentId = agentId;
+    }
+
     const [transactions, total] = await this.transactionRepository.findAndCount({
-      where: { orgId, agentId },
+      where,
       order: { createdAt: "DESC" },
       take: limit,
       skip: offset,
+      relations: ["agent"],
     });
 
     return { transactions, total };

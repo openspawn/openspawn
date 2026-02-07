@@ -19,9 +19,10 @@ async function bootstrap() {
   app.enableCors();
 
   const port = process.env["PORT"] || 3000;
-  await app.listen(port);
+  const host = process.env["HOST"] || "0.0.0.0";
+  await app.listen(port, host);
 
-  Logger.log(`🚀 OpenSpawn API running on http://localhost:${port}`);
+  Logger.log(`🚀 OpenSpawn API running on http://${host}:${port}`);
 }
 
 bootstrap();

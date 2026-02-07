@@ -1,6 +1,7 @@
-import { gql } from "@urql/core";
+import { graphql } from "./generated";
 
-export const TASKS_QUERY = gql`
+// Queries
+export const TasksQueryDocument = graphql(`
   query Tasks($orgId: ID!, $status: TaskStatus) {
     tasks(orgId: $orgId, status: $status) {
       id
@@ -10,6 +11,10 @@ export const TASKS_QUERY = gql`
       status
       priority
       assigneeId
+      assignee {
+        id
+        name
+      }
       creatorId
       approvalRequired
       dueDate
@@ -17,9 +22,9 @@ export const TASKS_QUERY = gql`
       createdAt
     }
   }
-`;
+`);
 
-export const TASK_QUERY = gql`
+export const TaskQueryDocument = graphql(`
   query Task($orgId: ID!, $id: ID!) {
     task(orgId: $orgId, id: $id) {
       id
@@ -29,6 +34,10 @@ export const TASK_QUERY = gql`
       status
       priority
       assigneeId
+      assignee {
+        id
+        name
+      }
       creatorId
       parentTaskId
       approvalRequired
@@ -39,9 +48,9 @@ export const TASK_QUERY = gql`
       updatedAt
     }
   }
-`;
+`);
 
-export const AGENTS_QUERY = gql`
+export const AgentsQueryDocument = graphql(`
   query Agents($orgId: ID!) {
     agents(orgId: $orgId) {
       id
@@ -56,12 +65,14 @@ export const AGENTS_QUERY = gql`
       budgetPeriodSpent
       managementFeePct
       createdAt
+      parentId
+      domain
     }
   }
-`;
+`);
 
-export const CREDIT_HISTORY_QUERY = gql`
-  query CreditHistory($orgId: ID!, $agentId: ID!, $limit: Int, $offset: Int) {
+export const CreditHistoryQueryDocument = graphql(`
+  query CreditHistory($orgId: ID!, $agentId: ID, $limit: Int, $offset: Int) {
     creditHistory(orgId: $orgId, agentId: $agentId, limit: $limit, offset: $offset) {
       id
       agentId
@@ -74,14 +85,18 @@ export const CREDIT_HISTORY_QUERY = gql`
       createdAt
     }
   }
-`;
+`);
 
-export const EVENTS_QUERY = gql`
+export const EventsQueryDocument = graphql(`
   query Events($orgId: ID!, $limit: Int, $page: Int) {
     events(orgId: $orgId, limit: $limit, page: $page) {
       id
       type
       actorId
+      actor {
+        id
+        name
+      }
       entityType
       entityId
       severity
@@ -89,9 +104,9 @@ export const EVENTS_QUERY = gql`
       createdAt
     }
   }
-`;
+`);
 
-export const CHANNELS_QUERY = gql`
+export const ChannelsQueryDocument = graphql(`
   query Channels($orgId: ID!) {
     channels(orgId: $orgId) {
       id
@@ -101,9 +116,9 @@ export const CHANNELS_QUERY = gql`
       createdAt
     }
   }
-`;
+`);
 
-export const MESSAGES_QUERY = gql`
+export const MessagesQueryDocument = graphql(`
   query Messages($orgId: ID!, $channelId: ID!, $limit: Int) {
     messages(orgId: $orgId, channelId: $channelId, limit: $limit) {
       id
@@ -115,4 +130,4 @@ export const MESSAGES_QUERY = gql`
       createdAt
     }
   }
-`;
+`);

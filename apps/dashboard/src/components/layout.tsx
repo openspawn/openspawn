@@ -1,66 +1,158 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Users,
+  CheckSquare,
+  Coins,
+  Activity,
+  Bot,
+  Network,
+  Play,
+  Square,
+} from "lucide-react";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { ThemeToggle } from "./theme-toggle";
+import { TooltipProvider } from "./ui/tooltip";
+import { useDemo } from "../demo";
+import { DemoControls } from "../demo/DemoControls";
+import type { ReactNode } from "react";
+
+interface LayoutProps {
+  children: ReactNode;
+}
 
 const navigation = [
-  { name: "Tasks", href: "/tasks", icon: "📋" },
-  { name: "Agents", href: "/agents", icon: "🤖" },
-  { name: "Credits", href: "/credits", icon: "💰" },
-  { name: "Events", href: "/events", icon: "📜" },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Network", href: "/network", icon: Network },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare },
+  { name: "Agents", href: "/agents", icon: Users },
+  { name: "Credits", href: "/credits", icon: Coins },
+  { name: "Events", href: "/events", icon: Activity },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: LayoutProps) {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const demo = useDemo();
+  const isDemo = searchParams.get("demo") === "true";
+
+  function handleToggleDemo() {
+    if (isDemo) {
+      searchParams.delete("demo");
+    } else {
+      searchParams.set("demo", "true");
+    }
+    setSearchParams(searchParams);
+    window.location.reload();
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar for desktop */}
-      <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-        <div className="flex min-h-0 flex-1 flex-col bg-gray-800">
-          <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-            <div className="flex flex-shrink-0 items-center px-4">
-              <span className="text-2xl font-bold text-white">🚀 OpenSpawn</span>
-            </div>
-            <nav className="mt-8 flex-1 space-y-1 px-2">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`${
-                    location.pathname === item.href
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+    <TooltipProvider>
+      <div className="flex h-screen bg-background">
+        {/* Sidebar */}
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex">
+          {/* Logo */}
+          <div className="flex h-16 items-center gap-2 border-b border-border px-6">
+            <Bot className="h-6 w-6 text-primary" />
+            <span className="text-lg font-semibold">OpenSpawn</span>
           </div>
+
+          {/* Navigation */}
+          <ScrollArea className="flex-1 px-3 py-4">
+            <nav className="flex flex-col gap-1">
+              {navigation.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link key={item.name} to={item.href}>
+                    <Button
+                      variant={isActive ? "secondary" : "ghost"}
+                      className={cn(
+                        "w-full justify-start gap-3",
+                        isActive && "bg-secondary"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.name}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </nav>
+          </ScrollArea>
+
+          {/* Demo Toggle */}
+          <div className="border-t border-border p-3">
+            <Button
+              onClick={handleToggleDemo}
+              variant={isDemo ? "default" : "outline"}
+              size="sm"
+              className="w-full gap-2"
+            >
+              {isDemo ? (
+                <>
+                  <Square className="h-3 w-3" />
+                  Exit Demo
+                </>
+              ) : (
+                <>
+                  <Play className="h-3 w-3" />
+                  Demo Mode
+                </>
+              )}
+            </Button>
+            {isDemo && (
+              <div className="mt-2">
+                <DemoControls compact />
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-border p-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>v0.1.0</span>
+              <ThemeToggle />
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile header */}
+        <div className="flex flex-1 flex-col min-w-0">
+          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden">
+            <div className="flex items-center gap-2">
+              <Bot className="h-6 w-6 text-primary" />
+              <span className="text-lg font-semibold">OpenSpawn</span>
+            </div>
+            <ThemeToggle />
+          </header>
+
+          {/* Mobile navigation */}
+          <nav className="flex gap-1 overflow-x-auto border-b border-border px-4 py-2 lg:hidden">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link key={item.name} to={item.href}>
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{item.name}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Main content */}
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-6">{children}</div>
+          </main>
         </div>
       </div>
-
-      {/* Mobile header */}
-      <div className="sticky top-0 z-10 md:hidden bg-gray-800 pl-1 pt-1 sm:pl-3 sm:pt-3">
-        <button
-          type="button"
-          className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-300 hover:text-white focus:outline-none"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          <span className="sr-only">Open sidebar</span>☰
-        </button>
-        <span className="ml-2 text-xl font-bold text-white">OpenSpawn</span>
-      </div>
-
-      {/* Main content */}
-      <div className="md:pl-64 flex flex-col flex-1">
-        <main className="flex-1">
-          <div className="py-6">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">{children}</div>
-          </div>
-        </main>
-      </div>
-    </div>
+    </TooltipProvider>
   );
 }

@@ -2,6 +2,8 @@ import { Field, ID, ObjectType, registerEnumType } from "@nestjs/graphql";
 
 import { TaskPriority, TaskStatus } from "@openspawn/shared-types";
 
+import { AgentType } from "./agent.type";
+
 // Register enums
 registerEnumType(TaskStatus, { name: "TaskStatus" });
 registerEnumType(TaskPriority, { name: "TaskPriority" });
@@ -28,6 +30,9 @@ export class TaskType {
 
   @Field(() => ID, { nullable: true })
   assigneeId?: string | null;
+
+  @Field(() => AgentType, { nullable: true })
+  assignee?: AgentType | null;
 
   @Field(() => ID)
   creatorId!: string;

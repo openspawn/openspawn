@@ -26,7 +26,8 @@
     "baseUrl": ".",
     "paths": {
       "@openspawn/shared-types": ["libs/shared-types/src/index.ts"],
-      "@openspawn/database": ["libs/database/src/index.ts"]
+      "@openspawn/database": ["libs/database/src/index.ts"],
+      "@openspawn/demo-data": ["libs/demo-data/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

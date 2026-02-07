@@ -14,7 +14,7 @@ export class CreditResolver {
   @Query(() => [CreditTransactionType])
   async creditHistory(
     @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("agentId", { type: () => ID }) agentId: string,
+    @Args("agentId", { type: () => ID, nullable: true }) agentId: string | undefined,
     @Args("limit", { type: () => Int, defaultValue: 50 }) limit: number,
     @Args("offset", { type: () => Int, defaultValue: 0 }) offset: number,
   ): Promise<CreditTransactionType[]> {

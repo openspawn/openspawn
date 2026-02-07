@@ -76,6 +76,7 @@ enum EventSeverity {
 }
 
 type EventType {
+  actor: AgentType
   actorId: ID!
   createdAt: DateTime!
   entityId: ID!
@@ -107,7 +108,7 @@ type Query {
   agent(id: ID!, orgId: ID!): AgentType
   agents(orgId: ID!): [AgentType!]!
   channels(orgId: ID!): [ChannelGqlType!]!
-  creditHistory(agentId: ID!, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
+  creditHistory(agentId: ID, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
   events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
   messages(before: ID, channelId: ID!, limit: Int! = 50, orgId: ID!): [MessageGqlType!]!
   task(id: ID!, orgId: ID!): TaskType
@@ -141,6 +142,7 @@ enum TaskStatus {
 type TaskType {
   approvalRequired: Boolean!
   approvedAt: DateTime
+  assignee: AgentType
   assigneeId: ID
   completedAt: DateTime
   createdAt: DateTime!

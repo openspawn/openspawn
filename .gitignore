@@ -51,3 +51,4 @@ temp/
 # Lock files from other package managers (we use pnpm)
 package-lock.json
 yarn.lock
+e2e/screenshots/

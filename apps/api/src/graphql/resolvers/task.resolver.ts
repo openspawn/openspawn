@@ -1,16 +1,21 @@
-import { Args, ID, Query, Resolver, Subscription } from "@nestjs/graphql";
+import { Args, ID, Parent, Query, ResolveField, Resolver, Subscription } from "@nestjs/graphql";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
+import { Agent } from "@openspawn/database";
 import { TaskStatus } from "@openspawn/shared-types";
 
 import { TasksService } from "../../tasks";
 import { PubSubProvider, TASK_UPDATED } from "../pubsub.provider";
-import { TaskType } from "../types";
+import { AgentType, TaskType } from "../types";
 
 @Resolver(() => TaskType)
 export class TaskResolver {
   constructor(
     private readonly tasksService: TasksService,
     private readonly pubSub: PubSubProvider,
+    @InjectRepository(Agent)
+    private readonly agentRepository: Repository<Agent>,
   ) {}
 
   @Query(() => [TaskType])
@@ -32,6 +37,12 @@ export class TaskResolver {
     } catch {
       return null;
     }
+  }
+
+  @ResolveField(() => AgentType, { nullable: true })
+  async assignee(@Parent() task: TaskType): Promise<AgentType | null> {
+    if (!task.assigneeId) return null;
+    return this.agentRepository.findOne({ where: { id: task.assigneeId } });
   }
 
   @Subscription(() => TaskType, {
