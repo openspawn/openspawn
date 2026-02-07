@@ -70,10 +70,11 @@ function mapCredit(tx: any, runningBalance: number) {
     agentId: tx.agentId,
     type: tx.type,
     amount: tx.amount,
-    reason: tx.description,
+    reason: tx.description || 'Transaction',
     balanceAfter: runningBalance,
     createdAt: tx.createdAt,
-    taskId: tx.taskId || null,
+    sourceTaskId: tx.taskId || null,
+    triggerType: tx.type === 'DEBIT' ? 'model_usage' : 'task_completion',
   };
 }
 
@@ -130,17 +131,22 @@ function handleOperation(operationName: string, variables: any): any {
 
     case 'Credits':
     case 'CreditHistory':
-      const { limit = 50, page = 1 } = variables || {};
+      const { limit = 50, offset: creditOffset = 0 } = variables || {};
       const sorted = [...credits].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      let balance = 1000;
-      const withBalances = sorted.map(tx => {
-        balance += tx.type === 'CREDIT' ? tx.amount : -tx.amount;
-        return mapCredit(tx, balance);
+      // Calculate running balance (start from a base and apply transactions in chronological order)
+      const chronological = [...credits].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+      const balanceMap = new Map<string, number>();
+      let runningBalance = 1000;
+      chronological.forEach(tx => {
+        runningBalance += tx.type === 'CREDIT' ? tx.amount : -tx.amount;
+        balanceMap.set(tx.id, runningBalance);
       });
-      const offset = (page - 1) * limit;
-      return { credits: withBalances.slice(offset, offset + limit) };
+      const withBalances = sorted.map(tx => mapCredit(tx, balanceMap.get(tx.id) || 0));
+      return { creditHistory: withBalances.slice(creditOffset, creditOffset + limit) };
 
     case 'Events':
       const evtLimit = variables?.limit || 50;
