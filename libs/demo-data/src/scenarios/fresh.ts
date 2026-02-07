@@ -3,18 +3,19 @@ import { agents, AGENT_IDS } from '../fixtures/agents.js';
 
 /**
  * Fresh Scenario: Brand new tenant
- * - 1 agent (COO only - Agent Dennis)
+ * - 2 agents (COO + Talent Agent)
  * - No tasks yet
  * - No credit history
  * - Agents spawn dynamically as simulation runs
  */
 export const freshScenario: DemoScenario = {
   name: 'fresh',
-  description: 'Fresh start - just the COO, agents spawn dynamically',
+  description: 'Fresh start - COO + Talent Agent, agents spawn dynamically',
   
-  // Start with only Agent Dennis (COO)
+  // Start with Agent Dennis (COO) and Tech Talent Agent
   agents: [
     agents.find(a => a.id === AGENT_IDS.agentDennis)!,
+    agents.find(a => a.id === AGENT_IDS.techTalent)!,
   ],
   
   // No initial tasks - they'll be created during simulation

@@ -41,25 +41,39 @@ const DelegationContext = createContext<DelegationContextValue>({ delegations: [
 // ELK instance for layout
 const elk = new ELK();
 
-// Auto-layout using ELK (async) - compact spacing
-async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ nodes: Node[]; edges: Edge[] }> {
+// Layout options for normal and compact modes
+interface LayoutOptions {
+  compact: boolean;
+}
+
+// Auto-layout using ELK (async)
+async function getLayoutedElements(
+  nodes: Node[], 
+  edges: Edge[],
+  options: LayoutOptions = { compact: false }
+): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
+  
+  const nodeWidth = options.compact ? 100 : 140;
+  const nodeHeight = options.compact ? 56 : 80;
+  const horizontalSpacing = options.compact ? 30 : 50;
+  const verticalSpacing = options.compact ? 80 : 120;
   
   const elkGraph = {
     id: "root",
     layoutOptions: {
       "elk.algorithm": "layered",
       "elk.direction": "DOWN",
-      "elk.spacing.nodeNode": "40",                      // Horizontal spacing between siblings
-      "elk.layered.spacing.nodeNodeBetweenLayers": "60", // Vertical spacing between levels
-      "elk.layered.spacing.edgeNodeBetweenLayers": "20",
-      "elk.spacing.componentComponent": "40",
+      "elk.spacing.nodeNode": String(horizontalSpacing),
+      "elk.layered.spacing.nodeNodeBetweenLayers": String(verticalSpacing),
+      "elk.layered.spacing.edgeNodeBetweenLayers": "25",
+      "elk.spacing.componentComponent": String(horizontalSpacing),
       "elk.layered.nodePlacement.strategy": "SIMPLE",
     },
     children: nodes.map((node) => ({
       id: node.id,
-      width: 140,
-      height: 80,
+      width: nodeWidth,
+      height: nodeHeight,
     })),
     edges: edges.map((edge) => ({
       id: edge.id,
@@ -117,6 +131,7 @@ interface AgentNodeData {
   tasksCompleted?: number;
   isSpawning?: boolean;
   isDespawning?: boolean;
+  compact?: boolean;
 }
 
 // Custom node component
@@ -125,6 +140,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
   const isSpawning = nodeData.isSpawning;
   const isDespawning = nodeData.isDespawning;
+  const compact = nodeData.compact;
   
   return (
     <motion.div
@@ -141,7 +157,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="!w-3 !h-3 !-top-1.5 !rounded-full !border-2 !border-zinc-800"
+        className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-top-1' : '!w-3 !h-3 !-top-1.5'}`}
         style={{ backgroundColor: color }}
       />
       
@@ -159,7 +175,8 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         className={`
-          relative px-3 py-2 sm:px-4 sm:py-3 rounded-xl border-2 min-w-[100px] sm:min-w-[140px]
+          relative rounded-xl border-2
+          ${compact ? 'px-2 py-1 min-w-[80px]' : 'px-3 py-2 sm:px-4 sm:py-3 min-w-[100px] sm:min-w-[140px]'}
           ${selected ? "shadow-lg shadow-purple-500/30" : ""}
           ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
         `}
@@ -173,7 +190,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="absolute -top-2 -right-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white"
+            className={`absolute rounded-full font-bold text-white ${compact ? '-top-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-top-2 -right-2 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs'}`}
             style={{ backgroundColor: color }}
           >
             L{nodeData.level}
@@ -186,7 +203,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             opacity: nodeData.status === "active" ? 1 : 0.5,
           }}
           transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
-          className="absolute -top-1 -left-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full"
+          className={`absolute rounded-full ${compact ? '-top-0.5 -left-0.5 w-2 h-2' : '-top-1 -left-1 w-2.5 h-2.5 sm:w-3 sm:h-3'}`}
           style={{
             backgroundColor:
               nodeData.status === "active" ? "#22c55e" :
@@ -195,20 +212,24 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
           }}
         />
 
-        <motion.div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
-          {nodeData.isHuman ? "👤" : "🤖"}
-        </motion.div>
+        {!compact && (
+          <motion.div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
+            {nodeData.isHuman ? "👤" : "🤖"}
+          </motion.div>
+        )}
 
-        <div className="text-xs sm:text-sm font-semibold text-white text-center truncate max-w-[80px] sm:max-w-none">
-          {nodeData.label}
+        <div className={`font-semibold text-white text-center truncate ${compact ? 'text-[10px] max-w-[70px]' : 'text-xs sm:text-sm max-w-[80px] sm:max-w-none'}`}>
+          {compact ? (nodeData.isHuman ? "👤" : "") + nodeData.label.split(' ')[0] : nodeData.label}
         </div>
 
-        <div className="text-[10px] sm:text-xs text-center" style={{ color }}>
-          {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
-          {nodeData.domain && <span className="hidden sm:inline"> • {nodeData.domain}</span>}
-        </div>
+        {!compact && (
+          <div className="text-[10px] sm:text-xs text-center" style={{ color }}>
+            {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
+            {nodeData.domain && <span className="hidden sm:inline"> • {nodeData.domain}</span>}
+          </div>
+        )}
 
-        {!nodeData.isHuman && (
+        {!nodeData.isHuman && !compact && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
@@ -223,7 +244,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        className="!w-3 !h-3 !-bottom-1.5 !rounded-full !border-2 !border-zinc-800"
+        className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-bottom-1' : '!w-3 !h-3 !-bottom-1.5'}`}
         style={{ backgroundColor: color }}
       />
     </motion.div>
@@ -301,7 +322,7 @@ interface AgentNetworkProps {
 }
 
 // Convert API agents to ReactFlow nodes and edges
-function buildNodesAndEdges(agents: Agent[]): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
+function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
   // Add human node at the top
   const nodes: Node<AgentNodeData>[] = [
     {
@@ -315,6 +336,7 @@ function buildNodesAndEdges(agents: Agent[]): { nodes: Node<AgentNodeData>[]; ed
         status: "active",
         credits: 0,
         isHuman: true,
+        compact,
       },
     },
   ];
@@ -335,6 +357,7 @@ function buildNodesAndEdges(agents: Agent[]): { nodes: Node<AgentNodeData>[]; ed
         credits: agent.currentBalance,
         domain: agent.domain || undefined,
         tasksCompleted: 0,
+        compact,
       },
     });
 
@@ -363,31 +386,30 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const { fitView } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
+  const [compact, setCompact] = useState(false);
   const prevAgentCountRef = useRef(0);
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Auto-layout: runs whenever agents change
+  // Auto-layout: runs whenever agents or compact mode changes
   useEffect(() => {
     if (loading) return;
     
-    const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents);
+    const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents, compact);
     
-    // Apply layout whenever agent count changes
-    getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+    // Apply layout whenever agent count or compact mode changes
+    getLayoutedElements(newNodes, newEdges, { compact }).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
       
-      // Fit view when nodes are added/removed
+      // Fit view when nodes are added/removed or compact mode toggles
       const agentCountChanged = agents.length !== prevAgentCountRef.current;
       prevAgentCountRef.current = agents.length;
       
-      if (agentCountChanged) {
-        setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 50);
-      }
+      setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 50);
     });
-  }, [agents, loading, setNodes, setEdges, fitView]);
+  }, [agents, loading, compact, setNodes, setEdges, fitView]);
 
   // Task delegation simulation
   useEffect(() => {
@@ -469,7 +491,20 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
 
         {/* Legend */}
         <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
-          <div className="font-semibold mb-2 text-white text-xs sm:text-sm">Levels</div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-white text-xs sm:text-sm">Levels</span>
+            <button
+              onClick={() => setCompact(!compact)}
+              className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                compact 
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                  : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700'
+              }`}
+              title={compact ? "Expand nodes" : "Compact nodes"}
+            >
+              {compact ? "▪" : "▫"}
+            </button>
+          </div>
           <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
             {[
               { level: "L10", label: "COO", color: "#f472b6" },
