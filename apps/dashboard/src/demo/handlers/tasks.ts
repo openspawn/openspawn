@@ -23,38 +23,35 @@ export function addTask(task: DemoTask) {
   tasks.push(task);
 }
 
-// GraphQL type mapping
+// GraphQL type mapping - must match Tasks query fields
 function mapTask(task: DemoTask) {
   const agents = getAgents();
   const assignee = task.assigneeId ? agents.find(a => a.id === task.assigneeId) : null;
-  const creator = agents.find(a => a.id === task.creatorId);
 
   return {
     id: task.id,
     identifier: task.identifier,
     title: task.title,
     description: task.description || null,
-    status: task.status,
-    priority: task.priority,
+    status: task.status.toUpperCase(), // GraphQL expects uppercase
+    priority: task.priority.toUpperCase(),
+    assigneeId: task.assigneeId || null,
     assignee: assignee ? {
       id: assignee.id,
       name: assignee.name,
-      agentId: assignee.agentId,
     } : null,
-    creator: creator ? {
-      id: creator.id,
-      name: creator.name,
-      agentId: creator.agentId,
-    } : null,
-    createdAt: task.createdAt,
-    updatedAt: task.updatedAt,
+    creatorId: task.creatorId,
+    approvalRequired: false,
+    dueDate: null,
     completedAt: task.completedAt || null,
+    createdAt: task.createdAt,
   };
 }
 
 export const taskHandlers = [
-  // GetTasks query
-  graphql.query('GetTasks', () => {
+  // Tasks query
+  graphql.query('Tasks', () => {
+    console.log('[MSW] Tasks query intercepted, returning', tasks.length, 'tasks');
     return HttpResponse.json({
       data: {
         tasks: tasks.map(mapTask),
@@ -62,8 +59,8 @@ export const taskHandlers = [
     });
   }),
 
-  // GetTask query
-  graphql.query('GetTask', ({ variables }) => {
+  // Task query (single)
+  graphql.query('Task', ({ variables }) => {
     const task = tasks.find(t => t.id === variables.id);
     return HttpResponse.json({
       data: {

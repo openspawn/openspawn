@@ -22,25 +22,28 @@ export function addAgent(agent: DemoAgent) {
   agents.push(agent);
 }
 
-// GraphQL type mapping
+// GraphQL type mapping - must match Agents query fields
 function mapAgent(agent: DemoAgent) {
   return {
     id: agent.id,
     agentId: agent.agentId,
     name: agent.name,
-    role: agent.role,
+    role: agent.role.toUpperCase(), // GraphQL expects uppercase
+    status: agent.status.toUpperCase(),
     level: agent.level,
-    status: agent.status,
     model: agent.model,
     currentBalance: agent.currentBalance,
-    lifetimeEarnings: agent.lifetimeEarnings,
+    budgetPeriodLimit: 10000,
+    budgetPeriodSpent: Math.floor(agent.lifetimeEarnings * 0.3),
+    managementFeePct: agent.level >= 9 ? 5 : 10,
     createdAt: agent.createdAt,
   };
 }
 
 export const agentHandlers = [
-  // GetAgents query
-  graphql.query('GetAgents', () => {
+  // Agents query
+  graphql.query('Agents', () => {
+    console.log('[MSW] Agents query intercepted, returning', agents.length, 'agents');
     return HttpResponse.json({
       data: {
         agents: agents.map(mapAgent),
@@ -48,8 +51,8 @@ export const agentHandlers = [
     });
   }),
 
-  // GetAgent query
-  graphql.query('GetAgent', ({ variables }) => {
+  // Agent query (single)
+  graphql.query('Agent', ({ variables }) => {
     const agent = agents.find(a => a.id === variables.id);
     return HttpResponse.json({
       data: {

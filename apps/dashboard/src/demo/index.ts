@@ -1,4 +1,6 @@
-export { worker } from './browser';
-export { handlers, demoState } from './handlers';
-export { DemoProvider, useDemoContext, useDemo } from './DemoProvider';
+export { DemoProvider, useDemo, type ScenarioName } from './DemoProvider';
+// Alias for backward compatibility
+export { useDemo as useDemoContext } from './DemoProvider';
 export { DemoControls } from './DemoControls';
+export { handlers } from './handlers';
+export * from './handlers';

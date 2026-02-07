@@ -15,8 +15,10 @@ import {
 } from "@xyflow/react";
 import { motion, AnimatePresence } from "framer-motion";
 import "@xyflow/react/dist/style.css";
-import { useDemoContext } from "../demo";
+import { useDemo } from "../demo";
+import { useAgents } from "../hooks/use-agents";
 import { transformAgentsToGraph, generateStaticDemoData } from "./agent-network-utils";
+import type { DemoAgent } from "@openspawn/demo-data";
 
 // Level colors
 const levelColors: Record<number, string> = {
@@ -49,28 +51,66 @@ interface AgentNodeData {
   isHuman?: boolean;
   domain?: string;
   tasksCompleted?: number;
+  isSpawning?: boolean;
+  isDespawning?: boolean;
 }
 
-// Custom node component
+// Custom node component with spawn/despawn animations
 function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const nodeData = data as AgentNodeData;
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
   
+  // Determine if this node is spawning or despawning
+  const isSpawning = nodeData.isSpawning;
+  const isDespawning = nodeData.isDespawning;
+  
   return (
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      animate={{ 
+        scale: isDespawning ? 0 : 1, 
+        opacity: isDespawning ? 0 : 1,
+      }}
+      exit={{ scale: 0, opacity: 0 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className="relative"
     >
       <Handle type="target" position={Position.Top} className="!bg-transparent !border-0" />
       
+      {/* Spawn glow effect */}
+      {isSpawning && (
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 2, opacity: [0, 0.5, 0] }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute inset-0 rounded-xl"
+          style={{ backgroundColor: "#22c55e", filter: "blur(20px)" }}
+        />
+      )}
+      
+      {/* Despawn fade effect */}
+      {isDespawning && (
+        <motion.div
+          initial={{ scale: 1, opacity: 0 }}
+          animate={{ scale: 1.5, opacity: [0, 0.5, 0] }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="absolute inset-0 rounded-xl"
+          style={{ backgroundColor: "#ef4444", filter: "blur(20px)" }}
+        />
+      )}
+      
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
+        animate={{
+          borderColor: isSpawning ? ["#22c55e", color] : color,
+        }}
+        transition={{ duration: 0.5 }}
         className={`
           relative px-3 py-2 sm:px-4 sm:py-3 rounded-xl border-2 min-w-[100px] sm:min-w-[140px]
           ${selected ? "shadow-lg shadow-purple-500/30" : ""}
+          ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
+          ${isDespawning ? "shadow-lg shadow-red-500/30 opacity-60" : ""}
         `}
         style={{
           borderColor: color,
@@ -106,10 +146,14 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
           }}
         />
 
-        {/* Icon */}
-        <div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
+        {/* Icon with spawn animation */}
+        <motion.div 
+          className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1"
+          animate={isSpawning ? { rotate: [0, 10, -10, 0] } : {}}
+          transition={{ duration: 0.5, repeat: isSpawning ? 2 : 0 }}
+        >
           {nodeData.isHuman ? "👤" : "🤖"}
-        </div>
+        </motion.div>
 
         {/* Name */}
         <div className="text-xs sm:text-sm font-semibold text-white text-center truncate max-w-[80px] sm:max-w-none">
@@ -199,21 +243,57 @@ interface AgentNetworkProps {
 }
 
 export function AgentNetwork({ className }: AgentNetworkProps) {
-  const demo = useDemoContext();
+  const demo = useDemo();
+  const { agents, loading } = useAgents();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
 
-  // Get graph data from demo context or use static data
+  // Transform agents to graph data, applying spawn/despawn states
   const graphData = useMemo(() => {
-    if (demo?.isDemo && demo.scenarioData) {
-      return transformAgentsToGraph(demo.scenarioData.agents);
+    if (demo.isDemo && agents.length > 0) {
+      // Convert API agents to DemoAgent format for the transformer
+      const demoAgents: DemoAgent[] = agents.map((a) => ({
+        id: a.id,
+        agentId: a.agentId,
+        name: a.name,
+        role: a.role.toLowerCase() as DemoAgent["role"],
+        level: a.level,
+        status: a.status.toLowerCase() as DemoAgent["status"],
+        model: a.model,
+        currentBalance: a.currentBalance,
+        lifetimeEarnings: a.currentBalance * 2, // Estimate
+        createdAt: a.createdAt,
+      }));
+      
+      const { nodes, edges } = transformAgentsToGraph(demoAgents);
+      
+      // Apply spawn/despawn animation states
+      const animatedNodes = nodes.map((node) => {
+        if (node.data.isHuman) return node;
+        
+        const isSpawning = demo.agentSpawns.includes(node.id);
+        const isDespawning = demo.agentDespawns.includes(node.id);
+        
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            isSpawning,
+            isDespawning,
+          },
+        };
+      });
+      
+      return { nodes: animatedNodes, edges };
     }
+    
+    // Fallback to static demo data when not in demo mode or loading
     return generateStaticDemoData();
-  }, [demo?.isDemo, demo?.scenarioData, demo?.tick]); // Re-compute when tick changes
+  }, [agents, demo.isDemo, demo.agentSpawns, demo.agentDespawns, demo.currentTick]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(graphData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(graphData.edges);
 
-  // Update nodes when graph data changes (demo mode updates)
+  // Update nodes when graph data changes
   useEffect(() => {
     setNodes(graphData.nodes);
     setEdges(graphData.edges);
@@ -221,7 +301,7 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
 
   // Simulate real-time updates only when NOT in demo mode
   useEffect(() => {
-    if (demo?.isDemo) return; // Demo mode handles its own updates
+    if (demo.isDemo) return; // Demo mode handles its own updates via TanStack Query
 
     const interval = setInterval(() => {
       setNodes((nds) =>
@@ -242,7 +322,7 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
       );
     }, 3000);
     return () => clearInterval(interval);
-  }, [setNodes, demo?.isDemo]);
+  }, [setNodes, demo.isDemo]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);

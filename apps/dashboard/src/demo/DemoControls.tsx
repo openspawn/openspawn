@@ -1,179 +1,179 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  ChevronUp, 
-  ChevronDown,
-  Zap,
-  Clock,
-  Users,
-  CheckSquare,
-} from 'lucide-react';
-import { useDemoContext } from './DemoProvider';
+import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket } from 'lucide-react';
+import { useDemo } from './DemoProvider';
+import { Button } from '../components/ui/button';
+import { cn } from '../lib/utils';
 
-const SPEED_OPTIONS = [1, 2, 5, 10, 50];
+const SPEED_OPTIONS = [
+  { value: 1, label: '1×' },
+  { value: 2, label: '2×' },
+  { value: 5, label: '5×' },
+  { value: 10, label: '10×' },
+  { value: 50, label: '50×' },
+];
 
-const PRESETS = [
-  { name: 'Hiring Spree', tick: 50, icon: Users, description: 'Watch agents get spawned' },
-  { name: 'Task Flow', tick: 100, icon: CheckSquare, description: 'See tasks move through stages' },
-  { name: 'Payday', tick: 150, icon: Zap, description: 'Credits flowing everywhere' },
+const SCENARIO_OPTIONS = [
+  { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5 },
+  { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14 },
+  { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50 },
 ];
 
 export function DemoControls() {
-  const demo = useDemoContext();
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [showPresets, setShowPresets] = useState(false);
-  
-  if (!demo?.isDemo) return null;
-  
-  const { isPlaying, speed, tick, play, pause, setSpeed, reset, jumpToTick } = demo;
-  
-  // Calculate simulated time (1 tick = 1 hour)
-  const hours = tick % 24;
-  const days = Math.floor(tick / 24);
-  const timeString = `Day ${days + 1}, ${hours.toString().padStart(2, '0')}:00`;
-  
+  const {
+    isDemo,
+    isPlaying,
+    speed,
+    currentTick,
+    scenario,
+    recentEvents,
+    play,
+    pause,
+    setSpeed,
+    setScenario,
+    reset,
+  } = useDemo();
+
+  if (!isDemo) return null;
+
+  const lastEvent = recentEvents[0];
+
   return (
-    <motion.div
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="fixed bottom-4 right-4 z-50"
-    >
-      <div className="bg-zinc-900/95 backdrop-blur-lg border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header - always visible */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-zinc-800/50 transition-colors"
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+      <div className="bg-card border rounded-2xl shadow-xl p-2 flex items-center gap-2">
+        {/* Play/Pause */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={isPlaying ? pause : play}
+          className="h-10 w-10"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-            <span className="text-sm font-semibold text-white">DEMO MODE</span>
-            <span className="text-xs text-zinc-400">{timeString}</span>
-          </div>
-          {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-zinc-400" />
+          {isPlaying ? (
+            <Pause className="h-5 w-5" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-zinc-400" />
+            <Play className="h-5 w-5" />
           )}
-        </button>
-        
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+        </Button>
+
+        {/* Speed selector */}
+        <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
+          {SPEED_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setSpeed(opt.value)}
+              className={cn(
+                'px-2 py-1 text-xs font-medium rounded-md transition-colors',
+                speed === opt.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
-              <div className="px-4 pb-4 space-y-4">
-                {/* Playback controls */}
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={reset}
-                    className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
-                    title="Reset"
-                  >
-                    <RotateCcw className="w-4 h-4 text-zinc-300" />
-                  </button>
-                  
-                  <button
-                    onClick={isPlaying ? pause : play}
-                    className="p-3 rounded-xl bg-pink-600 hover:bg-pink-500 transition-colors"
-                    title={isPlaying ? 'Pause' : 'Play'}
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-5 h-5 text-white" />
-                    ) : (
-                      <Play className="w-5 h-5 text-white" />
-                    )}
-                  </button>
-                </div>
-                
-                {/* Speed selector */}
-                <div className="flex items-center justify-center gap-1">
-                  {SPEED_OPTIONS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSpeed(s)}
-                      className={`
-                        px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
-                        ${speed === s 
-                          ? 'bg-pink-600 text-white' 
-                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
-                        }
-                      `}
-                    >
-                      {s}x
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Timeline scrubber */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-zinc-500" />
-                    <input
-                      type="range"
-                      min={0}
-                      max={720}
-                      value={tick}
-                      onChange={(e) => jumpToTick(parseInt(e.target.value))}
-                      className="flex-1 h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer
-                        [&::-webkit-slider-thumb]:appearance-none 
-                        [&::-webkit-slider-thumb]:w-3 
-                        [&::-webkit-slider-thumb]:h-3 
-                        [&::-webkit-slider-thumb]:rounded-full 
-                        [&::-webkit-slider-thumb]:bg-pink-500
-                        [&::-webkit-slider-thumb]:cursor-pointer"
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] text-zinc-500">
-                    <span>Day 1</span>
-                    <span>Day 30</span>
-                  </div>
-                </div>
-                
-                {/* Presets toggle */}
-                <button
-                  onClick={() => setShowPresets(!showPresets)}
-                  className="w-full text-xs text-zinc-400 hover:text-white transition-colors"
-                >
-                  {showPresets ? 'Hide' : 'Show'} quick jumps
-                </button>
-                
-                {/* Presets */}
-                <AnimatePresence>
-                  {showPresets && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="space-y-2 overflow-hidden"
-                    >
-                      {PRESETS.map((preset) => (
-                        <button
-                          key={preset.name}
-                          onClick={() => jumpToTick(preset.tick)}
-                          className="w-full flex items-center gap-3 p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors text-left"
-                        >
-                          <preset.icon className="w-4 h-4 text-pink-400" />
-                          <div>
-                            <div className="text-xs font-medium text-white">{preset.name}</div>
-                            <div className="text-[10px] text-zinc-500">{preset.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
+        {/* Scenario selector */}
+        <div className="flex items-center gap-1">
+          {SCENARIO_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setScenario(opt.value)}
+              title={`${opt.label} (${opt.agents} agents)`}
+              className={cn(
+                'p-2 rounded-lg transition-colors flex items-center gap-1.5',
+                scenario === opt.value
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              )}
+            >
+              <opt.icon className="h-4 w-4" />
+              <span className="text-xs font-medium hidden sm:inline">
+                {opt.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
+        {/* Tick counter */}
+        <div className="flex items-center gap-1.5 px-2">
+          <Zap className="h-3.5 w-3.5 text-yellow-500" />
+          <span className="text-sm font-mono tabular-nums min-w-[3ch]">
+            {currentTick}
+          </span>
+        </div>
+
+        {/* Reset */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={reset}
+          className="h-8 w-8"
+          title="Reset simulation"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </Button>
       </div>
-    </motion.div>
+
+      {/* Event toast */}
+      {lastEvent && isPlaying && (
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="bg-card/95 backdrop-blur border rounded-lg px-3 py-1.5 text-sm shadow-lg">
+            <EventLabel event={lastEvent} />
+          </div>
+        </div>
+      )}
+    </div>
   );
+}
+
+function EventLabel({ event }: { event: { type: string; payload: any } }) {
+  switch (event.type) {
+    case 'agent_created':
+      return (
+        <span className="text-green-500">
+          🤖 <strong>{event.payload.name}</strong> spawned
+        </span>
+      );
+    case 'agent_promoted':
+      return (
+        <span className="text-blue-500">
+          ⬆️ <strong>{event.payload.agent.name}</strong> promoted to L{event.payload.newLevel}
+        </span>
+      );
+    case 'agent_terminated':
+      return (
+        <span className="text-orange-500">
+          ⏸️ <strong>{event.payload.agent.name}</strong> → {event.payload.newStatus}
+        </span>
+      );
+    case 'task_created':
+      return (
+        <span className="text-purple-500">
+          📋 Task created: <strong>{event.payload.title}</strong>
+        </span>
+      );
+    case 'task_completed':
+      return (
+        <span className="text-emerald-500">
+          ✅ Task done: <strong>{event.payload.task.title}</strong>
+        </span>
+      );
+    case 'credit_earned':
+      return (
+        <span className="text-yellow-500">
+          💰 <strong>{event.payload.agent.name}</strong> earned {event.payload.amount} credits
+        </span>
+      );
+    case 'credit_spent':
+      return (
+        <span className="text-red-400">
+          💸 <strong>{event.payload.agent.name}</strong> spent {event.payload.amount} credits
+        </span>
+      );
+    default:
+      return <span>📡 {event.type}</span>;
+  }
 }
