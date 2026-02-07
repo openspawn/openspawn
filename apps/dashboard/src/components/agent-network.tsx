@@ -244,15 +244,41 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
   const demo = useDemo();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
 
-  // Use static demo data - simpler and avoids ReactFlow store conflicts
+  // Use static demo data as base
   const initialData = useMemo(() => generateStaticDemoData(), []);
   
   const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
 
-  // Simulate real-time updates only when NOT in demo mode
+  // Apply spawn/despawn animations based on demo events
   useEffect(() => {
-    if (demo.isDemo) return; // Demo mode handles its own updates via TanStack Query
+    if (!demo.isDemo) return;
+    
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.data?.isHuman) return node;
+        
+        const isSpawning = demo.agentSpawns.includes(node.id);
+        const isDespawning = demo.agentDespawns.includes(node.id);
+        
+        if (isSpawning !== node.data?.isSpawning || isDespawning !== node.data?.isDespawning) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isSpawning,
+              isDespawning,
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, [demo.agentSpawns, demo.agentDespawns, demo.isDemo, setNodes]);
+
+  // Simulate real-time credit/task updates
+  useEffect(() => {
+    if (!demo.isPlaying) return;
 
     const interval = setInterval(() => {
       setNodes((nds) =>
@@ -263,7 +289,7 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
               ...node,
               data: {
                 ...newData,
-                credits: newData.credits + Math.floor(Math.random() * 50),
+                credits: newData.credits + Math.floor(Math.random() * 50) - 20,
                 tasksCompleted: (newData.tasksCompleted || 0) + (Math.random() > 0.8 ? 1 : 0),
               },
             };
@@ -271,9 +297,10 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
           return node;
         })
       );
-    }, 3000);
+    }, 1000 / demo.speed); // Faster updates at higher speeds
+    
     return () => clearInterval(interval);
-  }, [setNodes, demo.isDemo]);
+  }, [demo.isPlaying, demo.speed, setNodes]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);
@@ -293,8 +320,9 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
         maxZoom={1.5}
         defaultEdgeOptions={{
           type: "smoothstep",
-          markerEnd: { type: MarkerType.ArrowClosed, color: "#3f3f46" },
-          style: { stroke: "#3f3f46", strokeWidth: 2 },
+          animated: true,
+          markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
+          style: { stroke: "#6366f1", strokeWidth: 2 },
         }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
