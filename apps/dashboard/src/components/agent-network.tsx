@@ -375,10 +375,16 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const runLayout = useCallback(async () => {
     const currentNodes = getNodes();
     const currentEdges = getEdges();
-    const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(currentNodes, currentEdges);
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-    setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 50);
+    if (currentNodes.length === 0) return; // Nothing to layout
+    
+    try {
+      const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(currentNodes, currentEdges);
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+      setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 50);
+    } catch (err) {
+      console.error('Layout failed:', err);
+    }
   }, [getNodes, getEdges, setNodes, setEdges, fitView]);
 
   // Process simulation events to spawn/despawn agents
@@ -422,25 +428,28 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
             id: `e-${newAgent.parentId}-${newAgent.id}`,
             source: newAgent.parentId,
             target: newAgent.id,
-            type: "smoothstep",
+            type: "taskFlow",
             animated: true,
             style: { stroke: "#22c55e", strokeWidth: 2 },
           },
         ]);
       }
       
-      // Re-layout after spawn
-      setTimeout(() => {
-        runLayout();
-        // Clear spawning state after animation
-        setTimeout(() => {
-          setNodes((current) =>
-            current.map((n) =>
-              n.id === newAgent.id ? { ...n, data: { ...n.data, isSpawning: false } } : n
-            )
-          );
-        }, 1500);
-      }, 100);
+      // Re-layout after spawn (wait for React state to commit, then layout)
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        setTimeout(async () => {
+          await runLayout();
+          // Clear spawning state after animation
+          setTimeout(() => {
+            setNodes((current) =>
+              current.map((n) =>
+                n.id === newAgent.id ? { ...n, data: { ...n.data, isSpawning: false } } : n
+              )
+            );
+          }, 1500);
+        }, 100);
+      });
     }
     
     // Handle agent status change (despawn)
