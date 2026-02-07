@@ -19,6 +19,7 @@
     "@apollo/server": "^5.4.0",
     "@as-integrations/express5": "^1.1.2",
     "@base-ui/react": "^1.1.0",
+    "@dagrejs/dagre": "^2.0.3",
     "@headlessui/react": "^2.2.9",
     "@nestjs/apollo": "^13.2.4",
     "@nestjs/common": "^11.0.0",
