@@ -19,7 +19,7 @@ import {
   type EdgeProps,
 } from "@xyflow/react";
 import { motion, AnimatePresence } from "framer-motion";
-import Dagre from "@dagrejs/dagre";
+import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
 
@@ -33,28 +33,42 @@ interface TaskDelegation {
 }
 const DelegationContext = createContext<TaskDelegation[]>([]);
 
-// Auto-layout using dagre
-function getLayoutedElements(nodes: Node[], edges: Edge[], direction = "TB") {
-  const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-  g.setGraph({ rankdir: direction, nodesep: 80, ranksep: 100 });
+// ELK instance for layout
+const elk = new ELK();
 
-  nodes.forEach((node) => {
-    // Estimate node size based on content
-    g.setNode(node.id, { width: 160, height: 100 });
-  });
+// Auto-layout using ELK (async)
+async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ nodes: Node[]; edges: Edge[] }> {
+  const elkGraph = {
+    id: "root",
+    layoutOptions: {
+      "elk.algorithm": "layered",
+      "elk.direction": "DOWN",
+      "elk.spacing.nodeNode": "80",
+      "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+    },
+    children: nodes.map((node) => ({
+      id: node.id,
+      width: 160,
+      height: 100,
+    })),
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      sources: [edge.source],
+      targets: [edge.target],
+    })),
+  };
 
-  edges.forEach((edge) => {
-    g.setEdge(edge.source, edge.target);
-  });
-
-  Dagre.layout(g);
+  const layoutedGraph = await elk.layout(elkGraph);
 
   const layoutedNodes = nodes.map((node) => {
-    const position = g.node(node.id);
-    // Center the node on the dagre position
-    const x = position.x - 80;
-    const y = position.y - 50;
-    return { ...node, position: { x, y } };
+    const elkNode = layoutedGraph.children?.find((n) => n.id === node.id);
+    return {
+      ...node,
+      position: {
+        x: elkNode?.x ?? 0,
+        y: elkNode?.y ?? 0,
+      },
+    };
   });
 
   return { nodes: layoutedNodes, edges };
@@ -335,6 +349,30 @@ interface AgentNetworkProps {
   className?: string;
 }
 
+// Initial raw data (before layout)
+const initialNodes: Node<AgentNodeData>[] = [
+  { id: "human", type: "agent", position: { x: 400, y: 0 }, data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true } },
+  { id: "coo", type: "agent", position: { x: 400, y: 120 }, data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 12 } },
+  { id: "talent", type: "agent", position: { x: 400, y: 240 }, data: { label: "Talent Agent", role: "hr", level: 9, status: "active", credits: 25000, domain: "HR", tasksCompleted: 8 } },
+  { id: "dev-lead", type: "agent", position: { x: 200, y: 360 }, data: { label: "Dev Lead", role: "manager", level: 8, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 24 } },
+  { id: "qa-lead", type: "agent", position: { x: 600, y: 360 }, data: { label: "QA Lead", role: "manager", level: 8, status: "active", credits: 12000, domain: "Quality", tasksCompleted: 18 } },
+  { id: "dev-1", type: "agent", position: { x: 100, y: 480 }, data: { label: "Dev Agent 1", role: "senior", level: 6, status: "active", credits: 8000, domain: "Backend", tasksCompleted: 45 } },
+  { id: "dev-2", type: "agent", position: { x: 300, y: 480 }, data: { label: "Dev Agent 2", role: "senior", level: 5, status: "active", credits: 6000, domain: "Frontend", tasksCompleted: 38 } },
+  { id: "qa-1", type: "agent", position: { x: 500, y: 480 }, data: { label: "QA Agent 1", role: "worker", level: 4, status: "active", credits: 4000, domain: "Testing", tasksCompleted: 67 } },
+  { id: "qa-2", type: "agent", position: { x: 700, y: 480 }, data: { label: "QA Agent 2", role: "worker", level: 3, status: "pending", credits: 2000, domain: "Testing", tasksCompleted: 12 } },
+];
+
+const initialEdges: Edge[] = [
+  { id: "e-human-coo", source: "human", target: "coo", type: "taskFlow", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
+  { id: "e-coo-talent", source: "coo", target: "talent", type: "taskFlow", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
+  { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+  { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+  { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+  { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+  { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
+  { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
+];
+
 // Inner component that uses useReactFlow (must be inside ReactFlowProvider)
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
@@ -342,85 +380,24 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [spawnedIds, setSpawnedIds] = useState<Set<string>>(new Set());
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
-
-  // Start with core hierarchy - Human → COO → Talent Agent + initial workers
-  const initialData = useMemo(() => {
-    const rawNodes: Node<AgentNodeData>[] = [
-      {
-        id: "human",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true },
-      },
-      {
-        id: "coo",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 12 },
-      },
-      {
-        id: "talent",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Talent Agent", role: "hr", level: 9, status: "active", credits: 25000, domain: "HR", tasksCompleted: 8 },
-      },
-      {
-        id: "dev-lead",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Dev Lead", role: "manager", level: 8, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 24 },
-      },
-      {
-        id: "qa-lead",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "QA Lead", role: "manager", level: 8, status: "active", credits: 12000, domain: "Quality", tasksCompleted: 18 },
-      },
-      {
-        id: "dev-1",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Dev Agent 1", role: "senior", level: 6, status: "active", credits: 8000, domain: "Backend", tasksCompleted: 45 },
-      },
-      {
-        id: "dev-2",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "Dev Agent 2", role: "senior", level: 5, status: "active", credits: 6000, domain: "Frontend", tasksCompleted: 38 },
-      },
-      {
-        id: "qa-1",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "QA Agent 1", role: "worker", level: 4, status: "active", credits: 4000, domain: "Testing", tasksCompleted: 67 },
-      },
-      {
-        id: "qa-2",
-        type: "agent",
-        position: { x: 0, y: 0 },
-        data: { label: "QA Agent 2", role: "worker", level: 3, status: "pending", credits: 2000, domain: "Testing", tasksCompleted: 12 },
-      },
-    ];
-    const rawEdges: Edge[] = [
-      { id: "e-human-coo", source: "human", target: "coo", type: "taskFlow", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
-      { id: "e-coo-talent", source: "coo", target: "talent", type: "taskFlow", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
-      { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-      { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-      { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-      { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-      { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
-      { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
-    ];
-    // Apply dagre layout
-    return getLayoutedElements(rawNodes, rawEdges);
-  }, []);
+  const [layoutReady, setLayoutReady] = useState(false);
   
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Run initial layout on mount
+  useEffect(() => {
+    getLayoutedElements(initialNodes, initialEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+      setLayoutReady(true);
+      setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 50);
+    });
+  }, []);
 
   // Re-layout and fit view when nodes/edges change significantly
-  const runLayout = useCallback(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
+  const runLayout = useCallback(async () => {
+    const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(nodes, edges);
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
     // Fit view after layout with a small delay for animation
