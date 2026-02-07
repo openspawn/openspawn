@@ -1,5 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { GqlContextType } from "@nestjs/graphql";
 import { Repository } from "typeorm";
 
 import type { Request, Response } from "express";
@@ -17,8 +18,18 @@ export class IdempotencyInterceptor implements NestInterceptor {
   ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
+    // Skip for GraphQL - mutations should handle idempotency differently
+    if (context.getType<GqlContextType>() === "graphql") {
+      return next.handle();
+    }
+
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
+
+    // Safety check
+    if (!request || !response) {
+      return next.handle();
+    }
 
     // Only apply to mutation methods
     if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {

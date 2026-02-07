@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
+import { GqlArgumentsHost, GqlContextType } from "@nestjs/graphql";
 
 import type { Response } from "express";
 
@@ -20,8 +21,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
+    // For GraphQL contexts, just rethrow - Apollo handles errors
+    if (host.getType<GqlContextType>() === "graphql") {
+      GqlArgumentsHost.create(host);
+      throw exception;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+
+    // Safety check - if no response object, rethrow
+    if (!response || typeof response.status !== "function") {
+      throw exception;
+    }
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorResponse: ErrorResponse = {
