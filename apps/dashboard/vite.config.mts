@@ -11,9 +11,6 @@ export default defineConfig(() => ({
     port: 4200,
     host: "0.0.0.0",
   },
-  optimizeDeps: {
-    include: ["@dagrejs/dagre"],
-  },
   preview: {
     port: 4200,
     host: "0.0.0.0",
