@@ -6,6 +6,7 @@ import {
   Coins,
   Activity,
   Bot,
+  Network,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -20,6 +21,7 @@ interface LayoutProps {
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Network", href: "/network", icon: Network },
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Agents", href: "/agents", icon: Users },
   { name: "Credits", href: "/credits", icon: Coins },

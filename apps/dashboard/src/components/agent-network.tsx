@@ -1,0 +1,456 @@
+import { useCallback, useEffect, useState } from "react";
+import {
+  ReactFlow,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  MarkerType,
+  Handle,
+  Position,
+  BackgroundVariant,
+  type Node,
+  type Edge,
+  type NodeProps,
+} from "@xyflow/react";
+import { motion, AnimatePresence } from "framer-motion";
+import "@xyflow/react/dist/style.css";
+
+// Level colors
+const levelColors: Record<number, string> = {
+  10: "#f472b6", // COO - pink
+  9: "#a78bfa", // HR - purple
+  8: "#22c55e", // Manager - green
+  7: "#22c55e",
+  6: "#06b6d4", // Senior - cyan
+  5: "#06b6d4",
+  4: "#fbbf24", // Worker - yellow
+  3: "#fbbf24",
+  2: "#71717a", // Probation - gray
+  1: "#71717a",
+};
+
+const roleLabels: Record<string, string> = {
+  coo: "COO",
+  hr: "HR",
+  manager: "Manager",
+  senior: "Senior",
+  worker: "Worker",
+};
+
+interface AgentNodeData {
+  label: string;
+  role: string;
+  level: number;
+  status: "active" | "pending" | "paused" | "suspended";
+  credits: number;
+  isHuman?: boolean;
+  domain?: string;
+  tasksCompleted?: number;
+}
+
+// Custom node component
+function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
+  const nodeData = data as AgentNodeData;
+  const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
+  
+  return (
+    <motion.div
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className="relative"
+    >
+      <Handle type="target" position={Position.Top} className="!bg-transparent !border-0" />
+      
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        className={`
+          relative px-4 py-3 rounded-xl border-2 min-w-[140px]
+          ${selected ? "shadow-lg shadow-purple-500/30" : ""}
+        `}
+        style={{
+          borderColor: color,
+          backgroundColor: `${color}15`,
+        }}
+      >
+        {/* Level badge */}
+        {!nodeData.isHuman && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+            style={{ backgroundColor: color }}
+          >
+            L{nodeData.level}
+          </motion.div>
+        )}
+
+        {/* Status indicator */}
+        <motion.div
+          animate={{
+            scale: nodeData.status === "active" ? [1, 1.2, 1] : 1,
+            opacity: nodeData.status === "active" ? 1 : 0.5,
+          }}
+          transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
+          className="absolute -top-1 -left-1 w-3 h-3 rounded-full"
+          style={{
+            backgroundColor:
+              nodeData.status === "active" ? "#22c55e" :
+              nodeData.status === "pending" ? "#fbbf24" :
+              nodeData.status === "paused" ? "#a78bfa" : "#ef4444",
+          }}
+        />
+
+        {/* Icon */}
+        <div className="text-2xl text-center mb-1">
+          {nodeData.isHuman ? "👤" : "🤖"}
+        </div>
+
+        {/* Name */}
+        <div className="text-sm font-semibold text-white text-center truncate">
+          {nodeData.label}
+        </div>
+
+        {/* Role */}
+        <div className="text-xs text-center" style={{ color }}>
+          {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
+          {nodeData.domain && ` • ${nodeData.domain}`}
+        </div>
+
+        {/* Credits */}
+        {!nodeData.isHuman && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-2 text-xs text-center text-zinc-400"
+          >
+            💰 {nodeData.credits.toLocaleString()}
+          </motion.div>
+        )}
+
+        {/* Task count */}
+        {nodeData.tasksCompleted !== undefined && (
+          <div className="text-xs text-center text-zinc-500">
+            ✓ {nodeData.tasksCompleted} tasks
+          </div>
+        )}
+      </motion.div>
+
+      <Handle type="source" position={Position.Bottom} className="!bg-transparent !border-0" />
+    </motion.div>
+  );
+}
+
+// Animated edge with credit flow
+function AnimatedEdge({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  style,
+  data,
+}: {
+  id: string;
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+  style?: React.CSSProperties;
+  data?: { creditFlow?: number };
+}) {
+  const edgePath = `M ${sourceX} ${sourceY} C ${sourceX} ${(sourceY + targetY) / 2}, ${targetX} ${(sourceY + targetY) / 2}, ${targetX} ${targetY}`;
+  
+  return (
+    <g>
+      <path
+        id={id}
+        d={edgePath}
+        fill="none"
+        stroke="#3f3f46"
+        strokeWidth={2}
+        style={style}
+      />
+      {/* Animated credit flow particles */}
+      {data?.creditFlow && (
+        <motion.circle
+          r={4}
+          fill="#fbbf24"
+          initial={{ offsetDistance: "0%" }}
+          animate={{ offsetDistance: "100%" }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          style={{ offsetPath: `path("${edgePath}")` }}
+        />
+      )}
+    </g>
+  );
+}
+
+const nodeTypes = { agent: AgentNode };
+
+// Demo data generator
+function generateDemoData(): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
+  const nodes: Node<AgentNodeData>[] = [
+    {
+      id: "human",
+      type: "agent",
+      position: { x: 400, y: 0 },
+      data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true },
+    },
+    {
+      id: "coo",
+      type: "agent",
+      position: { x: 400, y: 120 },
+      data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 142 },
+    },
+    // Talent Agents (HR level)
+    {
+      id: "tech-ta",
+      type: "agent",
+      position: { x: 100, y: 260 },
+      data: { label: "Tech Talent", role: "hr", level: 9, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 89 },
+    },
+    {
+      id: "finance-ta",
+      type: "agent",
+      position: { x: 300, y: 260 },
+      data: { label: "Finance Talent", role: "hr", level: 9, status: "active", credits: 12000, domain: "Finance", tasksCompleted: 67 },
+    },
+    {
+      id: "marketing-ta",
+      type: "agent",
+      position: { x: 500, y: 260 },
+      data: { label: "Marketing Talent", role: "hr", level: 9, status: "active", credits: 11000, domain: "Marketing", tasksCompleted: 54 },
+    },
+    {
+      id: "sales-ta",
+      type: "agent",
+      position: { x: 700, y: 260 },
+      data: { label: "Sales Talent", role: "hr", level: 9, status: "pending", credits: 8000, domain: "Sales", tasksCompleted: 23 },
+    },
+    // Workers under Tech
+    {
+      id: "dev-1",
+      type: "agent",
+      position: { x: 0, y: 400 },
+      data: { label: "Code Reviewer", role: "senior", level: 6, status: "active", credits: 3200, tasksCompleted: 156 },
+    },
+    {
+      id: "dev-2",
+      type: "agent",
+      position: { x: 150, y: 400 },
+      data: { label: "Bug Hunter", role: "worker", level: 4, status: "active", credits: 1800, tasksCompleted: 89 },
+    },
+    {
+      id: "dev-3",
+      type: "agent",
+      position: { x: 50, y: 520 },
+      data: { label: "New Intern", role: "worker", level: 1, status: "pending", credits: 100, tasksCompleted: 3 },
+    },
+    // Workers under Finance
+    {
+      id: "fin-1",
+      type: "agent",
+      position: { x: 280, y: 400 },
+      data: { label: "Analyst", role: "senior", level: 5, status: "active", credits: 2400, tasksCompleted: 78 },
+    },
+    {
+      id: "fin-2",
+      type: "agent",
+      position: { x: 360, y: 400 },
+      data: { label: "Bookkeeper", role: "worker", level: 3, status: "paused", credits: 900, tasksCompleted: 34 },
+    },
+    // Workers under Marketing
+    {
+      id: "mkt-1",
+      type: "agent",
+      position: { x: 480, y: 400 },
+      data: { label: "Copywriter", role: "senior", level: 6, status: "active", credits: 2800, tasksCompleted: 112 },
+    },
+    {
+      id: "mkt-2",
+      type: "agent",
+      position: { x: 560, y: 400 },
+      data: { label: "SEO Bot", role: "worker", level: 4, status: "active", credits: 1500, tasksCompleted: 67 },
+    },
+    // Workers under Sales
+    {
+      id: "sales-1",
+      type: "agent",
+      position: { x: 680, y: 400 },
+      data: { label: "Prospector", role: "worker", level: 3, status: "active", credits: 1100, tasksCompleted: 45 },
+    },
+  ];
+
+  const edges: Edge[] = [
+    { id: "e-human-coo", source: "human", target: "coo", animated: true },
+    { id: "e-coo-tech", source: "coo", target: "tech-ta", data: { creditFlow: 100 } },
+    { id: "e-coo-finance", source: "coo", target: "finance-ta", data: { creditFlow: 80 } },
+    { id: "e-coo-marketing", source: "coo", target: "marketing-ta", data: { creditFlow: 70 } },
+    { id: "e-coo-sales", source: "coo", target: "sales-ta", data: { creditFlow: 50 } },
+    { id: "e-tech-dev1", source: "tech-ta", target: "dev-1" },
+    { id: "e-tech-dev2", source: "tech-ta", target: "dev-2" },
+    { id: "e-dev1-dev3", source: "dev-1", target: "dev-3" },
+    { id: "e-finance-fin1", source: "finance-ta", target: "fin-1" },
+    { id: "e-finance-fin2", source: "finance-ta", target: "fin-2" },
+    { id: "e-marketing-mkt1", source: "marketing-ta", target: "mkt-1" },
+    { id: "e-marketing-mkt2", source: "marketing-ta", target: "mkt-2" },
+    { id: "e-sales-sales1", source: "sales-ta", target: "sales-1" },
+  ];
+
+  return { nodes, edges };
+}
+
+interface AgentNetworkProps {
+  className?: string;
+}
+
+export function AgentNetwork({ className }: AgentNetworkProps) {
+  const { nodes: initialNodes, edges: initialEdges } = generateDemoData();
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
+
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.data && !node.data.isHuman && Math.random() > 0.7) {
+            const newData = node.data as AgentNodeData;
+            return {
+              ...node,
+              data: {
+                ...newData,
+                credits: newData.credits + Math.floor(Math.random() * 50),
+                tasksCompleted: (newData.tasksCompleted || 0) + (Math.random() > 0.8 ? 1 : 0),
+              },
+            };
+          }
+          return node;
+        })
+      );
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [setNodes]);
+
+  function handleNodeClick(_event: React.MouseEvent, node: Node) {
+    setSelectedNode(node as Node<AgentNodeData>);
+  }
+
+  return (
+    <div className={`relative ${className}`}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={handleNodeClick}
+        nodeTypes={nodeTypes}
+        fitView
+        minZoom={0.5}
+        maxZoom={1.5}
+        defaultEdgeOptions={{
+          type: "smoothstep",
+          markerEnd: { type: MarkerType.ArrowClosed, color: "#3f3f46" },
+          style: { stroke: "#3f3f46", strokeWidth: 2 },
+        }}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
+        <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+      </ReactFlow>
+
+      {/* Legend */}
+      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-4 text-sm">
+        <div className="font-semibold mb-2 text-white">Agent Levels</div>
+        <div className="space-y-1 text-xs">
+          {[
+            { level: "L10", label: "COO", color: "#f472b6" },
+            { level: "L9", label: "HR", color: "#a78bfa" },
+            { level: "L7-8", label: "Manager", color: "#22c55e" },
+            { level: "L5-6", label: "Senior", color: "#06b6d4" },
+            { level: "L3-4", label: "Worker", color: "#fbbf24" },
+            { level: "L1-2", label: "Probation", color: "#71717a" },
+          ].map((item) => (
+            <div key={item.level} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+              <span className="text-zinc-400">{item.level}</span>
+              <span className="text-zinc-500">{item.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 pt-3 border-t border-zinc-800 space-y-1 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-zinc-400">Active</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <span className="text-zinc-400">Pending</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-purple-500" />
+            <span className="text-zinc-400">Paused</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Selected node details */}
+      <AnimatePresence>
+        {selectedNode && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="absolute top-4 right-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-4 w-64"
+          >
+            <button
+              onClick={() => setSelectedNode(null)}
+              className="absolute top-2 right-2 text-zinc-500 hover:text-white"
+            >
+              ✕
+            </button>
+            <div className="text-lg font-semibold text-white mb-1">
+              {(selectedNode.data as AgentNodeData).label}
+            </div>
+            <div className="text-sm text-zinc-400 mb-3">
+              {(selectedNode.data as AgentNodeData).isHuman
+                ? "Human Operator"
+                : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
+            </div>
+            {!(selectedNode.data as AgentNodeData).isHuman && (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Credits</span>
+                  <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Tasks</span>
+                  <span className="text-white">{(selectedNode.data as AgentNodeData).tasksCompleted || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Status</span>
+                  <span className={
+                    (selectedNode.data as AgentNodeData).status === "active" ? "text-green-500" :
+                    (selectedNode.data as AgentNodeData).status === "pending" ? "text-yellow-500" : "text-purple-500"
+                  }>
+                    {(selectedNode.data as AgentNodeData).status}
+                  </span>
+                </div>
+                {(selectedNode.data as AgentNodeData).domain && (
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Domain</span>
+                    <span className="text-white">{(selectedNode.data as AgentNodeData).domain}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
