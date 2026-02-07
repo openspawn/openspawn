@@ -4,7 +4,23 @@ import { cn } from "../../lib/utils";
 
 const Dialog = BaseDialog.Root;
 const DialogTrigger = BaseDialog.Trigger;
-const DialogClose = BaseDialog.Close;
+// DialogClose with render prop support for custom elements
+const DialogClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseDialog.Close> & { asChild?: boolean }
+>(({ asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <BaseDialog.Close ref={ref} render={children} {...props} />
+    );
+  }
+  return (
+    <BaseDialog.Close ref={ref} {...props}>
+      {children}
+    </BaseDialog.Close>
+  );
+});
+DialogClose.displayName = "DialogClose";
 const DialogPortal = BaseDialog.Portal;
 
 const DialogBackdrop = React.forwardRef<

@@ -111,7 +111,7 @@ function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => v
           </div>
         </div>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant="outline">Close</Button>
           </DialogClose>
         </DialogFooter>
@@ -190,7 +190,7 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
           </div>
         </div>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button onClick={handleSave}>Save Changes</Button>
@@ -285,7 +285,7 @@ function AdjustCreditsDialog({ agent, onClose }: { agent: Agent; onClose: () => 
           )}
         </div>
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button onClick={handleSubmit} disabled={!amount || !reason}>
