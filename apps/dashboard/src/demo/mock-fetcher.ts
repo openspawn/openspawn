@@ -34,10 +34,12 @@ function mapAgent(agent: any) {
     level: agent.level,
     model: agent.model,
     currentBalance: agent.currentBalance,
+    lifetimeEarnings: agent.lifetimeEarnings || agent.currentBalance * 2, // Demo field
     budgetPeriodLimit: 10000,
-    budgetPeriodSpent: Math.floor(agent.lifetimeEarnings * 0.3),
+    budgetPeriodSpent: Math.floor((agent.lifetimeEarnings || 0) * 0.3),
     managementFeePct: agent.level >= 9 ? 5 : 10,
     createdAt: agent.createdAt,
+    updatedAt: agent.createdAt, // Required field
     parentId: agent.parentId || null,
     domain: agent.domain || null,
   };

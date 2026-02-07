@@ -66,15 +66,15 @@ function getLevelLabel(level: number): string {
 }
 
 function getStatusVariant(status: string) {
-  switch (status.toLowerCase()) {
-    case "active":
+  switch (status?.toUpperCase()) {
+    case "ACTIVE":
       return "success";
-    case "pending":
+    case "PENDING":
       return "warning";
-    case "paused":
+    case "PAUSED":
       return "warning";
-    case "suspended":
-    case "revoked":
+    case "SUSPENDED":
+    case "REVOKED":
       return "destructive";
     default:
       return "secondary";
@@ -338,9 +338,9 @@ export function AgentsPage() {
       );
     }
     
-    // Status filter
+    // Status filter (normalize to uppercase for comparison)
     if (statusFilter !== "all") {
-      result = result.filter(a => a.status.toLowerCase() === statusFilter);
+      result = result.filter(a => a.status?.toUpperCase() === statusFilter.toUpperCase());
     }
     
     // Level filter
