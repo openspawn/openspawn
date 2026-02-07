@@ -33,7 +33,7 @@ export function Layout({ children }: LayoutProps) {
     <TooltipProvider>
       <div className="flex h-screen bg-background">
         {/* Sidebar */}
-        <aside className="hidden w-64 flex-col border-r border-border lg:flex">
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b border-border px-6">
             <Bot className="h-6 w-6 text-primary" />
@@ -73,7 +73,7 @@ export function Layout({ children }: LayoutProps) {
         </aside>
 
         {/* Mobile header */}
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col min-w-0">
           <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden">
             <div className="flex items-center gap-2">
               <Bot className="h-6 w-6 text-primary" />
