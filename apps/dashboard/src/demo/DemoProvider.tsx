@@ -105,13 +105,25 @@ export function DemoProvider({
       // Setup MSW with our handlers
       console.log('[Demo] Setting up MSW with', handlers.length, 'handlers');
       const mswWorker = setupWorker(...handlers);
-      await mswWorker.start({
-        onUnhandledRequest: (request) => {
-          console.log('[MSW] Unhandled request:', request.method, request.url);
-        },
-        quiet: false, // Show MSW logs
-      });
-      console.log('[Demo] MSW started successfully');
+      
+      try {
+        await mswWorker.start({
+          serviceWorker: {
+            url: '/mockServiceWorker.js',
+            options: {
+              scope: '/',
+            },
+          },
+          onUnhandledRequest: (request) => {
+            console.log('[MSW] Unhandled request:', request.method, request.url);
+          },
+          quiet: false, // Show MSW logs
+        });
+        console.log('[Demo] MSW started successfully with service worker');
+      } catch (error) {
+        console.error('[Demo] MSW service worker failed, using fallback:', error);
+      }
+      
       workerRef.current = mswWorker;
 
       setIsReady(true);
