@@ -11,8 +11,9 @@ vi.mock("recharts", () => ({
   Area: () => null,
   LineChart: () => <div data-testid="line-chart" />,
   Line: () => null,
-  BarChart: () => <div data-testid="bar-chart" />,
-  Bar: () => null,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
+  Bar: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Cell: () => null,
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
@@ -49,7 +50,8 @@ describe("App", () => {
     render(<App />);
     expect(screen.getByText("Active Agents")).toBeInTheDocument();
     expect(screen.getByText("Tasks In Progress")).toBeInTheDocument();
-    expect(screen.getByText("Completed This Week")).toBeInTheDocument();
-    expect(screen.getByText("Credits Earned")).toBeInTheDocument();
+    expect(screen.getByText("Completed Tasks")).toBeInTheDocument();
+    // Credit Flow appears in both stat card and chart title
+    expect(screen.getAllByText("Credit Flow").length).toBeGreaterThan(0);
   });
 });
