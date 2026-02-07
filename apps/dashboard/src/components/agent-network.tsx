@@ -269,13 +269,18 @@ function TaskFlowEdge({
 }: EdgeProps) {
   const { delegations, speed } = useContext(DelegationContext);
   
+  // ReactFlow gives us center positions - offset to handle positions
+  // Node height is ~80px, handles are at edges, so offset by ~40px
+  const nodeHeight = 80;
+  const handleOffset = nodeHeight / 2;
+  
   const [edgePath] = getSmoothStepPath({
     sourceX,
-    sourceY,
-    sourcePosition,
+    sourceY: sourceY + handleOffset, // Bottom of source node
+    sourcePosition: sourcePosition || Position.Bottom,
     targetX,
-    targetY,
-    targetPosition,
+    targetY: targetY - handleOffset, // Top of target node  
+    targetPosition: targetPosition || Position.Top,
   });
 
   const activeDelegations = delegations.filter(
