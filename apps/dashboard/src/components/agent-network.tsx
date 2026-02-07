@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   ReactFlow,
   Controls,
@@ -16,9 +16,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
-import { useAgents } from "../hooks/use-agents";
-import { transformAgentsToGraph, generateStaticDemoData } from "./agent-network-utils";
-import type { DemoAgent } from "@openspawn/demo-data";
+import { generateStaticDemoData } from "./agent-network-utils";
 
 // Level colors
 const levelColors: Record<number, string> = {
@@ -244,60 +242,13 @@ interface AgentNetworkProps {
 
 export function AgentNetwork({ className }: AgentNetworkProps) {
   const demo = useDemo();
-  const { agents, loading } = useAgents();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
 
-  // Transform agents to graph data, applying spawn/despawn states
-  const graphData = useMemo(() => {
-    if (demo.isDemo && agents.length > 0) {
-      // Convert API agents to DemoAgent format for the transformer
-      const demoAgents: DemoAgent[] = agents.map((a) => ({
-        id: a.id,
-        agentId: a.agentId,
-        name: a.name,
-        role: a.role.toLowerCase() as DemoAgent["role"],
-        level: a.level,
-        status: a.status.toLowerCase() as DemoAgent["status"],
-        model: a.model,
-        currentBalance: a.currentBalance,
-        lifetimeEarnings: a.currentBalance * 2, // Estimate
-        createdAt: a.createdAt,
-      }));
-      
-      const { nodes, edges } = transformAgentsToGraph(demoAgents);
-      
-      // Apply spawn/despawn animation states
-      const animatedNodes = nodes.map((node) => {
-        if (node.data.isHuman) return node;
-        
-        const isSpawning = demo.agentSpawns.includes(node.id);
-        const isDespawning = demo.agentDespawns.includes(node.id);
-        
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            isSpawning,
-            isDespawning,
-          },
-        };
-      });
-      
-      return { nodes: animatedNodes, edges };
-    }
-    
-    // Fallback to static demo data when not in demo mode or loading
-    return generateStaticDemoData();
-  }, [agents, demo.isDemo, demo.agentSpawns, demo.agentDespawns, demo.currentTick]);
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(graphData.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(graphData.edges);
-
-  // Update nodes when graph data changes
-  useEffect(() => {
-    setNodes(graphData.nodes);
-    setEdges(graphData.edges);
-  }, [graphData, setNodes, setEdges]);
+  // Use static demo data - simpler and avoids ReactFlow store conflicts
+  const initialData = useMemo(() => generateStaticDemoData(), []);
+  
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
 
   // Simulate real-time updates only when NOT in demo mode
   useEffect(() => {
