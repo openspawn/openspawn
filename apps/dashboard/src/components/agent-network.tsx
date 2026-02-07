@@ -352,7 +352,7 @@ const initialEdges: Edge[] = [
 // Inner component that uses useReactFlow (must be inside ReactFlowProvider)
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
-  const { fitView } = useReactFlow();
+  const { fitView, getNodes, getEdges } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [spawnedIds, setSpawnedIds] = useState<Set<string>>(new Set());
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
@@ -371,14 +371,15 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     });
   }, []);
 
-  // Re-layout and fit view when nodes/edges change significantly
+  // Re-layout using current nodes/edges from ReactFlow store (avoids dependency cycle)
   const runLayout = useCallback(async () => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(nodes, edges);
+    const currentNodes = getNodes();
+    const currentEdges = getEdges();
+    const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(currentNodes, currentEdges);
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-    // Fit view after layout with a small delay for animation
     setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 50);
-  }, [nodes, edges, setNodes, setEdges, fitView]);
+  }, [getNodes, getEdges, setNodes, setEdges, fitView]);
 
   // Process simulation events to spawn/despawn agents
   useEffect(() => {
