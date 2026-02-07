@@ -1,19 +1,17 @@
 import { GraphQLClient } from "graphql-request";
+import { demoFetcher } from "../demo/mock-fetcher";
 
 // Check if we're in demo mode
 const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-const isDemoMode = urlParams?.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
+export const isDemoMode = urlParams?.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
+
+if (isDemoMode) {
+  console.log("[GraphQL] Demo mode enabled - using mock fetcher (no network requests)");
+}
 
 // Use the same host as the dashboard, but port 3000 for the API
 // This allows LAN access without hardcoding IPs
 function getApiUrl(): string {
-  // In demo mode, use relative URL so MSW can intercept
-  // MSW can only intercept same-origin requests
-  if (isDemoMode) {
-    console.log("[GraphQL] Demo mode - using relative URL for MSW interception");
-    return "/graphql";
-  }
-
   // Always derive from current location in browser for LAN compatibility
   // This ensures accessing from 192.168.x.x uses that IP, not localhost
   if (typeof window !== "undefined" && window.location?.hostname) {
@@ -42,10 +40,21 @@ function getClient(): GraphQLClient {
   return _client;
 }
 
+/**
+ * GraphQL fetcher
+ * In demo mode: Returns mock data from SimulationEngine (no network)
+ * In prod mode: Makes real GraphQL requests to API
+ */
 export function fetcher<TData, TVariables extends Record<string, unknown>>(
   query: string,
   variables?: TVariables
 ): () => Promise<TData> {
+  // Use mock fetcher in demo mode (no network requests!)
+  if (isDemoMode) {
+    return demoFetcher<TData, TVariables>(query, variables);
+  }
+  
+  // Real API request
   return async () => {
     return getClient().request<TData>(query, variables);
   };

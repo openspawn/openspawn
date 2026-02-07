@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { setupWorker, type SetupWorker } from 'msw/browser';
 import {
   SimulationEngine,
   createSimulation,
@@ -11,7 +10,7 @@ import {
   type SimulationEvent,
   type DemoScenario,
 } from '@openspawn/demo-data';
-import { createHandlers } from './handlers';
+import { setDemoEngine } from './mock-fetcher';
 
 export type ScenarioName = 'fresh' | 'startup' | 'growth' | 'enterprise';
 
@@ -87,58 +86,30 @@ export function DemoProvider({
   const [scenario, setScenarioState] = useState<ScenarioName>(parseScenario(initialScenarioName));
   const [recentEvents, setRecentEvents] = useState<SimulationEvent[]>([]);
   
-  // Refs for stable access in handlers
+  // Ref for stable access
   const engineRef = useRef<SimulationEngine | null>(null);
-  const workerRef = useRef<SetupWorker | null>(null);
 
-  // Initialize MSW and simulation
+  // Initialize simulation (no MSW needed!)
   useEffect(() => {
-    async function init() {
-      // Create simulation engine
-      const initialScenario = SCENARIOS[scenario];
-      const sim = createSimulation(initialScenario);
-      engineRef.current = sim;
+    console.log('[Demo] Initializing simulation...');
+    
+    // Create simulation engine
+    const initialScenario = SCENARIOS[scenario];
+    const sim = createSimulation(initialScenario);
+    engineRef.current = sim;
 
-      // Create handlers that query engine directly (stateless!)
-      const handlers = createHandlers(() => engineRef.current);
-
-      // Setup MSW with our handlers
-      console.log('[Demo] Setting up MSW with', handlers.length, 'handlers');
-      const mswWorker = setupWorker(...handlers);
-      
-      try {
-        await mswWorker.start({
-          serviceWorker: {
-            url: '/mockServiceWorker.js',
-            options: {
-              scope: '/',
-            },
-          },
-          onUnhandledRequest: (request) => {
-            console.log('[MSW] Unhandled request:', request.method, request.url);
-          },
-          quiet: false, // Show MSW logs
-        });
-        console.log('[Demo] MSW started successfully with service worker');
-      } catch (error) {
-        console.error('[Demo] MSW service worker failed, using fallback:', error);
-      }
-      
-      workerRef.current = mswWorker;
-
-      setIsReady(true);
-      console.log('[Demo] Initialized with scenario:', scenario);
-    }
-
-    init();
+    // Connect engine to mock fetcher (this is the key!)
+    setDemoEngine(() => engineRef.current);
+    
+    console.log('[Demo] Ready with scenario:', scenario);
+    setIsReady(true);
 
     return () => {
-      workerRef.current?.stop();
       engineRef.current?.pause();
     };
   }, []); // Only run once on mount
 
-  // Subscribe to simulation events (for UI updates only - no MSW sync needed!)
+  // Subscribe to simulation events
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine || !isReady) return;
@@ -148,15 +119,13 @@ export function DemoProvider({
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
     });
 
-    // Invalidate and refetch queries once per tick (not per event)
+    // Refetch queries once per tick
     const unsubscribeTick = engine.onTick((events, tick) => {
-      console.log('[Demo] Tick', tick, '- events:', events.length, events.map(e => e.type));
+      console.log('[Demo] Tick', tick, '→', events.length, 'events');
       setCurrentTick(tick);
       
-      // Force refetch all queries - MSW handlers will fetch fresh data from engine
+      // Force refetch all active queries (they'll hit mock fetcher)
       if (events.length > 0) {
-        console.log('[Demo] Refetching all queries...');
-        // Use refetchQueries instead of invalidateQueries for immediate refetch
         queryClient.refetchQueries({ type: 'active' });
       }
     });
@@ -198,12 +167,15 @@ export function DemoProvider({
     const newEngine = createSimulation(newScenario);
     engineRef.current = newEngine;
     
+    // Update mock fetcher reference
+    setDemoEngine(() => engineRef.current);
+    
     setScenarioState(name);
     setCurrentTick(0);
     setRecentEvents([]);
     
-    // Invalidate all queries to force refetch with new scenario data
-    queryClient.invalidateQueries();
+    // Refetch all queries with new scenario data
+    queryClient.refetchQueries();
     
     console.log('[Demo] Switched to scenario:', name);
   }, [pause, queryClient]);
