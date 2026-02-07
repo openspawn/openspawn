@@ -7,7 +7,6 @@ import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { useTasks, type Task } from "../hooks/use-tasks";
-import { useAgents } from "../hooks/use-agents";
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
