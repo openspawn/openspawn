@@ -155,6 +155,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
     >
       {/* Handles positioned at top/bottom edges - visible with level color */}
       <Handle 
+        id="top"
         type="target" 
         position={Position.Top} 
         className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-top-1' : '!w-3 !h-3 !-top-1.5'}`}
@@ -242,6 +243,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
       </motion.div>
 
       <Handle 
+        id="bottom"
         type="source" 
         position={Position.Bottom} 
         className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-bottom-1' : '!w-3 !h-3 !-bottom-1.5'}`}
@@ -369,6 +371,8 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
         id: `e-${parentId}-${agent.id}`,
         source: parentId,
         target: agent.id,
+        sourceHandle: "bottom",
+        targetHandle: "top",
         type: "taskFlow",
         animated: true,
         style: { stroke: color, strokeWidth: 2 },
