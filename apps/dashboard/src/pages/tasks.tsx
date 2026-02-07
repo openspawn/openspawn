@@ -14,6 +14,7 @@ const statusColumns = [
   { id: "IN_PROGRESS", label: "In Progress", color: "bg-purple-500" },
   { id: "REVIEW", label: "Review", color: "bg-orange-500" },
   { id: "DONE", label: "Done", color: "bg-emerald-500" },
+  { id: "BLOCKED", label: "Blocked", color: "bg-red-500" },
 ];
 
 function getPriorityVariant(priority: string) {

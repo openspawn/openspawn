@@ -43,6 +43,17 @@ function mapAgent(agent: any) {
   };
 }
 
+// Map demo task status to GraphQL status
+const taskStatusMap: Record<string, string> = {
+  backlog: 'BACKLOG',
+  pending: 'TODO',
+  assigned: 'TODO',
+  in_progress: 'IN_PROGRESS',
+  review: 'REVIEW',
+  done: 'DONE',
+  cancelled: 'CANCELLED',
+};
+
 function mapTask(task: any, agents: any[]) {
   const assignee = task.assigneeId 
     ? agents.find((a: any) => a.id === task.assigneeId) 
@@ -53,11 +64,13 @@ function mapTask(task: any, agents: any[]) {
     identifier: task.identifier,
     title: task.title,
     description: task.description || null,
-    status: task.status,
-    priority: task.priority,
+    status: taskStatusMap[task.status] || task.status.toUpperCase(),
+    priority: task.priority.toUpperCase(),
     assigneeId: task.assigneeId || null,
     assignee: assignee ? { id: assignee.id, name: assignee.name } : null,
     creatorId: task.creatorId,
+    approvalRequired: false,
+    dueDate: null,
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
     completedAt: task.completedAt || null,

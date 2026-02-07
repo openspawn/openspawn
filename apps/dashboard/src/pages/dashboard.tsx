@@ -7,6 +7,9 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
+  Activity,
+  Bot,
+  Zap,
 } from "lucide-react";
 import {
   AreaChart,
@@ -25,6 +28,7 @@ import { Badge } from "../components/ui/badge";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
+import { useEvents } from "../hooks/use-events";
 
 interface StatCardProps {
   title: string;
@@ -82,15 +86,44 @@ function StatCard({ title, value, change, icon: Icon, description }: StatCardPro
   );
 }
 
+function getEventIcon(type: string) {
+  if (type.includes('agent')) return <Bot className="h-4 w-4 text-purple-500" />;
+  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-blue-500" />;
+  if (type.includes('credit')) return <Coins className="h-4 w-4 text-amber-500" />;
+  return <Activity className="h-4 w-4 text-muted-foreground" />;
+}
+
+function getEventBadgeVariant(type: string) {
+  if (type.includes('created') || type.includes('activated')) return "success";
+  if (type.includes('completed')) return "info";
+  if (type.includes('earned')) return "success";
+  if (type.includes('spent')) return "warning";
+  return "secondary";
+}
+
+function formatEventTime(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
 export function DashboardPage() {
   const { agents } = useAgents();
   const { tasks } = useTasks();
   const { transactions } = useCredits();
+  const { events } = useEvents();
 
-  const activeAgents = agents.filter((a) => a.status === "active").length;
-  const pendingAgents = agents.filter((a) => a.status === "pending").length;
-  const completedTasks = tasks.filter((t) => t.status === "done").length;
-  const inProgressTasks = tasks.filter((t) => t.status === "in_progress").length;
+  const activeAgents = agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length;
+  const pendingAgents = agents.filter((a) => a.status?.toUpperCase() === "PENDING").length;
+  const completedTasks = tasks.filter((t) => t.status?.toUpperCase() === "DONE").length;
+  const inProgressTasks = tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length;
 
   const totalCreditsEarned = transactions
     .filter((t) => t.type === "CREDIT")
@@ -100,14 +133,13 @@ export function DashboardPage() {
     .filter((t) => t.type === "DEBIT")
     .reduce((sum, t) => sum + t.amount, 0);
 
-  // Real task status counts from simulation
+  // Real task status counts from simulation (normalized to uppercase)
   const tasksByStatus = useMemo(() => [
-    { status: "Backlog", count: tasks.filter(t => t.status === "backlog").length, fill: "#64748b" },
-    { status: "Pending", count: tasks.filter(t => t.status === "pending").length, fill: "#fbbf24" },
-    { status: "Assigned", count: tasks.filter(t => t.status === "assigned").length, fill: "#3b82f6" },
-    { status: "In Progress", count: tasks.filter(t => t.status === "in_progress").length, fill: "#a855f7" },
-    { status: "Review", count: tasks.filter(t => t.status === "review").length, fill: "#f97316" },
-    { status: "Done", count: tasks.filter(t => t.status === "done").length, fill: "#22c55e" },
+    { status: "Backlog", count: tasks.filter(t => t.status?.toUpperCase() === "BACKLOG").length, fill: "#64748b" },
+    { status: "To Do", count: tasks.filter(t => t.status?.toUpperCase() === "TODO").length, fill: "#fbbf24" },
+    { status: "In Progress", count: tasks.filter(t => t.status?.toUpperCase() === "IN_PROGRESS").length, fill: "#a855f7" },
+    { status: "Review", count: tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, fill: "#f97316" },
+    { status: "Done", count: tasks.filter(t => t.status?.toUpperCase() === "DONE").length, fill: "#22c55e" },
   ], [tasks]);
 
   // Real credit flow - aggregate last N transactions into buckets
@@ -294,54 +326,66 @@ export function DashboardPage() {
 
       {/* Recent activity */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Recent Activity</CardTitle>
+          <Badge variant="outline" className="text-xs">
+            <Zap className="h-3 w-3 mr-1" />
+            Live
+          </Badge>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <AnimatePresence mode="popLayout">
-              {tasks.slice(0, 5).map((task, index) => (
+              {events.slice(0, 8).map((event, index) => (
                 <motion.div
-                  key={task.id}
+                  key={event.id}
                   layout
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 20, scale: 0.95 }}
                   transition={{ 
                     type: "spring", 
                     stiffness: 400, 
                     damping: 30,
-                    delay: index * 0.05
+                    delay: index * 0.03
                   }}
-                  className="flex items-center justify-between rounded-lg border border-border p-3"
+                  className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <CheckSquare className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{task.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {task.identifier}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", delay: 0.1 }}
+                    >
+                      {getEventIcon(event.type)}
+                    </motion.div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {event.actor?.name || "System"}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        {event.reasoning || event.type.replace(/\./g, ' → ')}
                       </p>
                     </div>
                   </div>
-                  <Badge
-                    variant={
-                      task.status === "done"
-                        ? "success"
-                        : task.status === "in_progress"
-                          ? "info"
-                          : "secondary"
-                    }
-                  >
-                    {task.status.replace("_", " ")}
-                  </Badge>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Badge variant={getEventBadgeVariant(event.type)} className="text-xs">
+                      {event.type.split('.').pop()}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {formatEventTime(event.createdAt)}
+                    </span>
+                  </div>
                 </motion.div>
               ))}
             </AnimatePresence>
-            {tasks.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-8">
-                No tasks yet. Create your first task to get started.
-              </p>
+            {events.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Activity className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No activity yet. Start the simulation to see events.
+                </p>
+              </div>
             )}
           </div>
         </CardContent>
