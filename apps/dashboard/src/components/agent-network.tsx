@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, createContext, useContext } from "react";
+import { useEffect, useState, useMemo, useCallback, createContext, useContext, useRef } from "react";
 import {
   ReactFlow,
   Controls,
@@ -41,7 +41,7 @@ const DelegationContext = createContext<DelegationContextValue>({ delegations: [
 // ELK instance for layout
 const elk = new ELK();
 
-// Auto-layout using ELK (async)
+// Auto-layout using ELK (async) - compact spacing
 async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
   
@@ -50,13 +50,16 @@ async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ node
     layoutOptions: {
       "elk.algorithm": "layered",
       "elk.direction": "DOWN",
-      "elk.spacing.nodeNode": "80",
-      "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+      "elk.spacing.nodeNode": "40",                      // Horizontal spacing between siblings
+      "elk.layered.spacing.nodeNodeBetweenLayers": "60", // Vertical spacing between levels
+      "elk.layered.spacing.edgeNodeBetweenLayers": "20",
+      "elk.spacing.componentComponent": "40",
+      "elk.layered.nodePlacement.strategy": "SIMPLE",
     },
     children: nodes.map((node) => ({
       id: node.id,
-      width: 160,
-      height: 100,
+      width: 140,
+      height: 80,
     })),
     edges: edges.map((edge) => ({
       id: edge.id,
@@ -346,46 +349,34 @@ function buildNodesAndEdges(agents: Agent[]): { nodes: Node<AgentNodeData>[]; ed
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
   const { agents, loading } = useAgents();
-  const { fitView, getNodes, getEdges } = useReactFlow();
+  const { fitView } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
-  const [hasInitialLayout, setHasInitialLayout] = useState(false);
+  const prevAgentCountRef = useRef(0);
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Build nodes/edges from agents data
+  // Auto-layout: runs whenever agents change
   useEffect(() => {
-    if (loading || agents.length === 0) return;
+    if (loading) return;
     
     const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents);
     
-    // Apply layout
+    // Apply layout whenever agent count changes
     getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
-      if (!hasInitialLayout) {
-        setHasInitialLayout(true);
-        setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 100);
+      
+      // Fit view when nodes are added/removed
+      const agentCountChanged = agents.length !== prevAgentCountRef.current;
+      prevAgentCountRef.current = agents.length;
+      
+      if (agentCountChanged) {
+        setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 50);
       }
     });
-  }, [agents, loading, hasInitialLayout, setNodes, setEdges, fitView]);
-
-  // Re-layout
-  const runLayout = useCallback(async () => {
-    const currentNodes = getNodes();
-    const currentEdges = getEdges();
-    if (currentNodes.length === 0) return;
-    
-    try {
-      const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(currentNodes, currentEdges);
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
-      setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 50);
-    } catch (err) {
-      console.error('Layout failed:', err);
-    }
-  }, [getNodes, getEdges, setNodes, setEdges, fitView]);
+  }, [agents, loading, setNodes, setEdges, fitView]);
 
   // Task delegation simulation
   useEffect(() => {
