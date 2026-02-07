@@ -157,6 +157,12 @@ export function DemoProvider({
           }, 2000);
           break;
         }
+        case 'agent_activated': {
+          // Parent activated a pending child
+          const activatedPayload = event.payload as { agent: any; activatedBy: any };
+          updateAgent(activatedPayload.agent.id, activatedPayload.agent);
+          break;
+        }
         case 'agent_promoted':
         case 'agent_terminated': {
           const agentPayload = event.payload as { agent: any; newStatus?: string };

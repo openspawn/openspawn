@@ -5,7 +5,7 @@ export type AgentStatus = 'pending' | 'active' | 'paused' | 'suspended' | 'revok
 export type TaskStatus = 'backlog' | 'pending' | 'assigned' | 'in_progress' | 'review' | 'done' | 'cancelled';
 export type TaskPriority = 'low' | 'normal' | 'high' | 'critical';
 export type CreditType = 'CREDIT' | 'DEBIT';
-export type EventSeverity = 'debug' | 'info' | 'warning' | 'error' | 'critical';
+export type EventSeverity = 'debug' | 'info' | 'success' | 'warning' | 'error' | 'critical';
 
 export interface DemoAgent {
   id: string;
@@ -76,7 +76,7 @@ export interface SimulationState {
 }
 
 export interface SimulationEvent {
-  type: 'agent_created' | 'agent_promoted' | 'agent_terminated' |
+  type: 'agent_created' | 'agent_activated' | 'agent_promoted' | 'agent_terminated' |
         'task_created' | 'task_assigned' | 'task_completed' |
         'credit_earned' | 'credit_spent' |
         'system_event';

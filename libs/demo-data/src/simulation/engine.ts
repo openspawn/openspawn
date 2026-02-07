@@ -15,8 +15,9 @@ import { generateRandomAgent, generateRandomTask, generateCreditTransaction, gen
 const PROBABILITIES = {
   // Agent events
   agentCreated: 0.15,      // 15% chance per tick (higher for dynamic growth)
+  agentActivated: 0.35,    // 35% chance parent activates a pending child
   agentPromoted: 0.05,     // 5% chance per tick
-  agentStatusChange: 0.03, // 3% chance per tick
+  agentStatusChange: 0.02, // 2% chance per tick (paused/suspended - rare)
   
   // Task events
   taskCreated: 0.2,        // 20% chance per tick
@@ -28,6 +29,20 @@ const PROBABILITIES = {
   
   // System events
   systemEvent: 0.05,       // 5% chance per tick
+};
+
+// Capacity limits by level (how many active children a parent can manage)
+const CAPACITY_BY_LEVEL: Record<number, number> = {
+  10: 5,   // COO - manages up to 5 direct reports
+  9: 8,    // HR - manages up to 8 agents
+  8: 6,    // Senior Manager
+  7: 5,    // Manager
+  6: 3,    // Senior - limited management
+  5: 2,    // Can mentor 1-2
+  4: 1,    // Worker - rarely manages
+  3: 0,
+  2: 0,
+  1: 0,
 };
 
 // Task status flow
@@ -187,13 +202,19 @@ export class SimulationEngine {
       if (event) events.push(event);
     }
     
+    // Parent activates pending child (realistic onboarding flow)
+    if (shouldFire(PROBABILITIES.agentActivated)) {
+      const event = this.activatePendingAgent();
+      if (event) events.push(event);
+    }
+    
     // Agent promoted
     if (shouldFire(PROBABILITIES.agentPromoted)) {
       const event = this.promoteAgent();
       if (event) events.push(event);
     }
     
-    // Agent status change
+    // Agent status change (pause/suspend - rare)
     if (shouldFire(PROBABILITIES.agentStatusChange)) {
       const event = this.changeAgentStatus();
       if (event) events.push(event);
@@ -264,6 +285,61 @@ export class SimulationEngine {
     return {
       type: 'agent_created',
       payload: newAgent,
+      timestamp: new Date(),
+    };
+  }
+  
+  private activatePendingAgent(): SimulationEvent | null {
+    // Find active parents who have pending children and capacity
+    const parentsWithCapacity = this.state.scenario.agents.filter(parent => {
+      if (parent.status !== 'active') return false;
+      
+      const maxCapacity = CAPACITY_BY_LEVEL[parent.level] || 0;
+      if (maxCapacity === 0) return false;
+      
+      // Count active children
+      const activeChildren = this.state.scenario.agents.filter(
+        a => a.parentId === parent.id && a.status === 'active'
+      ).length;
+      
+      // Check if parent has pending children
+      const pendingChildren = this.state.scenario.agents.filter(
+        a => a.parentId === parent.id && a.status === 'pending'
+      );
+      
+      return activeChildren < maxCapacity && pendingChildren.length > 0;
+    });
+    
+    if (parentsWithCapacity.length === 0) return null;
+    
+    // Pick a parent (prefer higher level - they're more decisive)
+    const sortedParents = parentsWithCapacity.sort((a, b) => b.level - a.level);
+    const parent = sortedParents[0];
+    
+    // Get their pending children (activate oldest first - FIFO)
+    const pendingChildren = this.state.scenario.agents
+      .filter(a => a.parentId === parent.id && a.status === 'pending')
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    
+    const child = pendingChildren[0];
+    child.status = 'active';
+    
+    // Activation bonus credits from parent
+    const activationBonus = 50;
+    child.currentBalance += activationBonus;
+    child.lifetimeEarnings += activationBonus;
+    
+    const systemEvent = generateEvent(
+      'agent.activated',
+      'success',
+      `${parent.name} activated ${child.name}`,
+      { agentId: child.id, metadata: { activatedBy: parent.id } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'agent_activated',
+      payload: { agent: child, activatedBy: parent },
       timestamp: new Date(),
     };
   }
