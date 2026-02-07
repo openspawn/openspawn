@@ -65,8 +65,9 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
       
       <motion.div
         whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
         className={`
-          relative px-4 py-3 rounded-xl border-2 min-w-[140px]
+          relative px-3 py-2 sm:px-4 sm:py-3 rounded-xl border-2 min-w-[100px] sm:min-w-[140px]
           ${selected ? "shadow-lg shadow-purple-500/30" : ""}
         `}
         style={{
@@ -80,7 +81,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+            className="absolute -top-2 -right-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white"
             style={{ backgroundColor: color }}
           >
             L{nodeData.level}
@@ -94,7 +95,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             opacity: nodeData.status === "active" ? 1 : 0.5,
           }}
           transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
-          className="absolute -top-1 -left-1 w-3 h-3 rounded-full"
+          className="absolute -top-1 -left-1 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full"
           style={{
             backgroundColor:
               nodeData.status === "active" ? "#22c55e" :
@@ -104,36 +105,36 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
         />
 
         {/* Icon */}
-        <div className="text-2xl text-center mb-1">
+        <div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
           {nodeData.isHuman ? "👤" : "🤖"}
         </div>
 
         {/* Name */}
-        <div className="text-sm font-semibold text-white text-center truncate">
+        <div className="text-xs sm:text-sm font-semibold text-white text-center truncate max-w-[80px] sm:max-w-none">
           {nodeData.label}
         </div>
 
         {/* Role */}
-        <div className="text-xs text-center" style={{ color }}>
+        <div className="text-[10px] sm:text-xs text-center" style={{ color }}>
           {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
-          {nodeData.domain && ` • ${nodeData.domain}`}
+          {nodeData.domain && <span className="hidden sm:inline"> • {nodeData.domain}</span>}
         </div>
 
-        {/* Credits */}
+        {/* Credits - hidden on mobile */}
         {!nodeData.isHuman && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-2 text-xs text-center text-zinc-400"
+            className="hidden sm:block mt-2 text-xs text-center text-zinc-400"
           >
             💰 {nodeData.credits.toLocaleString()}
           </motion.div>
         )}
 
-        {/* Task count */}
+        {/* Task count - hidden on mobile */}
         {nodeData.tasksCompleted !== undefined && (
-          <div className="text-xs text-center text-zinc-500">
+          <div className="hidden sm:block text-xs text-center text-zinc-500">
             ✓ {nodeData.tasksCompleted} tasks
           </div>
         )}
@@ -363,26 +364,26 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
         <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
       </ReactFlow>
 
-      {/* Legend */}
-      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-4 text-sm">
-        <div className="font-semibold mb-2 text-white">Agent Levels</div>
-        <div className="space-y-1 text-xs">
+      {/* Legend - collapsible on mobile */}
+      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none">
+        <div className="font-semibold mb-2 text-white text-xs sm:text-sm">Levels</div>
+        <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
           {[
             { level: "L10", label: "COO", color: "#f472b6" },
             { level: "L9", label: "HR", color: "#a78bfa" },
-            { level: "L7-8", label: "Manager", color: "#22c55e" },
-            { level: "L5-6", label: "Senior", color: "#06b6d4" },
-            { level: "L3-4", label: "Worker", color: "#fbbf24" },
-            { level: "L1-2", label: "Probation", color: "#71717a" },
+            { level: "L7-8", label: "Mgr", color: "#22c55e" },
+            { level: "L5-6", label: "Sr", color: "#06b6d4" },
+            { level: "L3-4", label: "Wkr", color: "#fbbf24" },
+            { level: "L1-2", label: "New", color: "#71717a" },
           ].map((item) => (
-            <div key={item.level} className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+            <div key={item.level} className="flex items-center gap-1 sm:gap-2">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
               <span className="text-zinc-400">{item.level}</span>
-              <span className="text-zinc-500">{item.label}</span>
+              <span className="text-zinc-500 hidden sm:inline">{item.label}</span>
             </div>
           ))}
         </div>
-        <div className="mt-3 pt-3 border-t border-zinc-800 space-y-1 text-xs">
+        <div className="hidden sm:block mt-3 pt-3 border-t border-zinc-800 space-y-1 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
             <span className="text-zinc-400">Active</span>
@@ -398,31 +399,42 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
         </div>
       </div>
 
-      {/* Selected node details */}
+      {/* Selected node details - bottom sheet on mobile, side panel on desktop */}
       <AnimatePresence>
         {selectedNode && (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="absolute top-4 right-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-4 w-64"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="absolute 
+              bottom-20 sm:bottom-auto sm:top-4 
+              left-4 right-4 sm:left-auto sm:right-4 
+              bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-4 
+              sm:w-64"
           >
             <button
               onClick={() => setSelectedNode(null)}
-              className="absolute top-2 right-2 text-zinc-500 hover:text-white"
+              className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
             >
               ✕
             </button>
-            <div className="text-lg font-semibold text-white mb-1">
-              {(selectedNode.data as AgentNodeData).label}
-            </div>
-            <div className="text-sm text-zinc-400 mb-3">
-              {(selectedNode.data as AgentNodeData).isHuman
-                ? "Human Operator"
-                : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
+            <div className="flex sm:block items-center gap-3">
+              <div className="text-2xl sm:hidden">
+                {(selectedNode.data as AgentNodeData).isHuman ? "👤" : "🤖"}
+              </div>
+              <div>
+                <div className="text-base sm:text-lg font-semibold text-white mb-0.5 sm:mb-1">
+                  {(selectedNode.data as AgentNodeData).label}
+                </div>
+                <div className="text-xs sm:text-sm text-zinc-400 mb-2 sm:mb-3">
+                  {(selectedNode.data as AgentNodeData).isHuman
+                    ? "Human Operator"
+                    : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
+                </div>
+              </div>
             </div>
             {!(selectedNode.data as AgentNodeData).isHuman && (
-              <div className="space-y-2 text-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-1 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Credits</span>
                   <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
