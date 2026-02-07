@@ -270,12 +270,22 @@ function calculateSpawnPosition(
   };
 }
 
+// Track active task delegations for animation
+interface TaskDelegation {
+  id: string;
+  fromId: string;
+  toId: string;
+  taskTitle: string;
+  startTime: number;
+}
+
 export function AgentNetwork({ className }: AgentNetworkProps) {
   const demo = useDemo();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
   const [spawnedIds, setSpawnedIds] = useState<Set<string>>(new Set());
+  const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
 
-  // Start with minimal hierarchy - just human + COO
+  // Start with core hierarchy - Human → COO → Talent Agent + initial workers
   const initialData = useMemo(() => {
     const nodes: Node<AgentNodeData>[] = [
       {
@@ -288,11 +298,60 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
         id: "coo",
         type: "agent",
         position: { x: 400, y: 140 },
-        data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 0 },
+        data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 12 },
+      },
+      {
+        id: "talent",
+        type: "agent",
+        position: { x: 400, y: 280 },
+        data: { label: "Talent Agent", role: "hr", level: 9, status: "active", credits: 25000, domain: "HR", tasksCompleted: 8 },
+      },
+      {
+        id: "dev-lead",
+        type: "agent",
+        position: { x: 200, y: 420 },
+        data: { label: "Dev Lead", role: "manager", level: 8, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 24 },
+      },
+      {
+        id: "qa-lead",
+        type: "agent",
+        position: { x: 600, y: 420 },
+        data: { label: "QA Lead", role: "manager", level: 8, status: "active", credits: 12000, domain: "Quality", tasksCompleted: 18 },
+      },
+      {
+        id: "dev-1",
+        type: "agent",
+        position: { x: 100, y: 560 },
+        data: { label: "Dev Agent 1", role: "senior", level: 6, status: "active", credits: 8000, domain: "Backend", tasksCompleted: 45 },
+      },
+      {
+        id: "dev-2",
+        type: "agent",
+        position: { x: 300, y: 560 },
+        data: { label: "Dev Agent 2", role: "senior", level: 5, status: "active", credits: 6000, domain: "Frontend", tasksCompleted: 38 },
+      },
+      {
+        id: "qa-1",
+        type: "agent",
+        position: { x: 500, y: 560 },
+        data: { label: "QA Agent 1", role: "worker", level: 4, status: "active", credits: 4000, domain: "Testing", tasksCompleted: 67 },
+      },
+      {
+        id: "qa-2",
+        type: "agent",
+        position: { x: 700, y: 560 },
+        data: { label: "QA Agent 2", role: "worker", level: 3, status: "pending", credits: 2000, domain: "Testing", tasksCompleted: 12 },
       },
     ];
     const edges: Edge[] = [
-      { id: "e-human-coo", source: "human", target: "coo", animated: true },
+      { id: "e-human-coo", source: "human", target: "coo", type: "smoothstep", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
+      { id: "e-coo-talent", source: "coo", target: "talent", type: "smoothstep", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
+      { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "smoothstep", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+      { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "smoothstep", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
+      { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "smoothstep", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+      { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "smoothstep", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
+      { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "smoothstep", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
+      { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "smoothstep", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
     ];
     return { nodes, edges };
   }, []);
@@ -381,11 +440,35 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
     }
   }, [demo.recentEvents, demo.isDemo, setNodes, setEdges, spawnedIds]);
 
-  // Simulate real-time credit/task updates
+  // Simulate real-time credit/task updates and task delegations
   useEffect(() => {
     if (!demo.isPlaying) return;
 
+    // Task delegation paths (parent → child relationships)
+    const delegationPaths = [
+      { from: "human", to: "coo" },
+      { from: "coo", to: "talent" },
+      { from: "talent", to: "dev-lead" },
+      { from: "talent", to: "qa-lead" },
+      { from: "dev-lead", to: "dev-1" },
+      { from: "dev-lead", to: "dev-2" },
+      { from: "qa-lead", to: "qa-1" },
+      { from: "qa-lead", to: "qa-2" },
+    ];
+
+    const taskTitles = [
+      "Review PR #42",
+      "Deploy v2.1",
+      "Fix auth bug",
+      "Update docs",
+      "Run tests",
+      "Code review",
+      "Setup CI/CD",
+      "Refactor API",
+    ];
+
     const interval = setInterval(() => {
+      // Credit/task updates
       setNodes((nds) =>
         nds.map((node) => {
           if (node.data && !node.data.isHuman && Math.random() > 0.6) {
@@ -403,7 +486,26 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
           return node;
         })
       );
-    }, 1000 / demo.speed);
+
+      // Randomly create task delegations
+      if (Math.random() > 0.5) {
+        const path = delegationPaths[Math.floor(Math.random() * delegationPaths.length)];
+        const taskTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)];
+        const delegation: TaskDelegation = {
+          id: `del-${Date.now()}-${Math.random()}`,
+          fromId: path.from,
+          toId: path.to,
+          taskTitle,
+          startTime: Date.now(),
+        };
+        setActiveDelegations((prev) => [...prev, delegation]);
+
+        // Remove delegation after animation completes (2 seconds)
+        setTimeout(() => {
+          setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id));
+        }, 2000 / demo.speed);
+      }
+    }, 1500 / demo.speed);
     
     return () => clearInterval(interval);
   }, [demo.isPlaying, demo.speed, setNodes]);
@@ -535,6 +637,45 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Task Delegation Feed - shows live task assignments */}
+      {demo.isDemo && activeDelegations.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="absolute top-4 right-4 sm:right-4 sm:top-20 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-3 w-48 sm:w-56 max-h-48 overflow-hidden"
+        >
+          <div className="text-xs font-semibold text-zinc-400 mb-2 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Task Delegations
+          </div>
+          <div className="space-y-1.5">
+            <AnimatePresence mode="popLayout">
+              {activeDelegations.slice(-4).map((del) => {
+                const fromNode = nodes.find((n) => n.id === del.fromId);
+                const toNode = nodes.find((n) => n.id === del.toId);
+                return (
+                  <motion.div
+                    key={del.id}
+                    initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 20, scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="text-[10px] sm:text-xs bg-zinc-800/50 rounded px-2 py-1.5"
+                  >
+                    <div className="text-white font-medium truncate">{del.taskTitle}</div>
+                    <div className="text-zinc-500 flex items-center gap-1">
+                      <span className="truncate">{fromNode?.data?.label || del.fromId}</span>
+                      <span className="text-green-500">→</span>
+                      <span className="truncate">{toNode?.data?.label || del.toId}</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
