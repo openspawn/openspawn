@@ -17,7 +17,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the application
-ARG VITE_API_URL=http://localhost:3000
+ARG VITE_API_URL=http://localhost:3000/graphql
 ARG VITE_WS_URL=ws://localhost:3000/graphql
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_WS_URL=$VITE_WS_URL
