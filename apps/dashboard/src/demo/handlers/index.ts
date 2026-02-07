@@ -1,4 +1,4 @@
-import { graphql, HttpResponse } from 'msw';
+import { graphql, HttpResponse, http } from 'msw';
 import type { SimulationEngine, DemoAgent, DemoTask, DemoCreditTransaction, DemoEvent } from '@openspawn/demo-data';
 
 /**
@@ -122,6 +122,18 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
   // ─────────────────────────────────────────────────────────────
   
   return [
+    // ─────────────── Debug: Log all GraphQL requests ───────────────
+    http.post('*/graphql', async ({ request }) => {
+      const body = await request.clone().json();
+      console.log('[MSW] Intercepted GraphQL request:', {
+        url: request.url,
+        operationName: body?.operationName,
+        query: body?.query?.substring(0, 100),
+      });
+      // Don't return anything - let it fall through to specific handlers
+      return undefined;
+    }),
+
     // ─────────────── Agents ───────────────
     graphql.query('Agents', () => {
       const e = engine();

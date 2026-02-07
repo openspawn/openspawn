@@ -103,11 +103,15 @@ export function DemoProvider({
       const handlers = createHandlers(() => engineRef.current);
 
       // Setup MSW with our handlers
+      console.log('[Demo] Setting up MSW with', handlers.length, 'handlers');
       const mswWorker = setupWorker(...handlers);
       await mswWorker.start({
-        onUnhandledRequest: 'bypass',
-        quiet: true,
+        onUnhandledRequest: (request) => {
+          console.log('[MSW] Unhandled request:', request.method, request.url);
+        },
+        quiet: false, // Show MSW logs
       });
+      console.log('[Demo] MSW started successfully');
       workerRef.current = mswWorker;
 
       setIsReady(true);
