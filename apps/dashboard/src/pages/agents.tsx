@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Bot, MoreVertical, Plus, X, Coins, Edit, Eye, Ban } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -37,10 +37,39 @@ interface Agent {
 
 type DialogMode = "view" | "edit" | "credits" | null;
 
+// Level colors matching network page
+const levelColors: Record<number, string> = {
+  10: "#f472b6", // COO - pink
+  9: "#a78bfa",  // HR - purple
+  8: "#22c55e",  // Manager - green
+  7: "#22c55e",
+  6: "#06b6d4",  // Senior - cyan
+  5: "#06b6d4",
+  4: "#fbbf24",  // Worker - yellow
+  3: "#fbbf24",
+  2: "#71717a",  // Probation - gray
+  1: "#71717a",
+};
+
+function getLevelColor(level: number): string {
+  return levelColors[level] || "#71717a";
+}
+
+function getLevelLabel(level: number): string {
+  if (level >= 10) return "COO";
+  if (level >= 9) return "HR";
+  if (level >= 7) return "Manager";
+  if (level >= 5) return "Senior";
+  if (level >= 3) return "Worker";
+  return "Probation";
+}
+
 function getStatusVariant(status: string) {
-  switch (status) {
+  switch (status.toLowerCase()) {
     case "active":
       return "success";
+    case "pending":
+      return "warning";
     case "paused":
       return "warning";
     case "suspended":
@@ -51,20 +80,8 @@ function getStatusVariant(status: string) {
   }
 }
 
-function getRoleColor(role: string) {
-  switch (role) {
-    case "hr":
-      return "bg-purple-500";
-    case "manager":
-      return "bg-blue-500";
-    case "senior":
-      return "bg-teal-500";
-    case "worker":
-      return "bg-slate-500";
-    default:
-      return "bg-gray-500";
-  }
-}
+type SortField = "name" | "level" | "balance" | "status" | "created";
+type SortDirection = "asc" | "desc";
 
 function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
   return (
@@ -297,6 +314,74 @@ export function AgentsPage() {
   const { agents, loading, error } = useAgents();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
+  
+  // Filtering state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
+  
+  // Sorting state
+  const [sortField, setSortField] = useState<SortField>("level");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  // Filter and sort agents
+  const filteredAgents = useMemo(() => {
+    let result = [...agents];
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(a => 
+        a.name.toLowerCase().includes(query) || 
+        a.agentId.toLowerCase().includes(query)
+      );
+    }
+    
+    // Status filter
+    if (statusFilter !== "all") {
+      result = result.filter(a => a.status.toLowerCase() === statusFilter);
+    }
+    
+    // Level filter
+    if (levelFilter !== "all") {
+      const [min, max] = levelFilter.split("-").map(Number);
+      result = result.filter(a => a.level >= min && a.level <= max);
+    }
+    
+    // Sort
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "level":
+          comparison = a.level - b.level;
+          break;
+        case "balance":
+          comparison = a.currentBalance - b.currentBalance;
+          break;
+        case "status":
+          comparison = a.status.localeCompare(b.status);
+          break;
+        case "created":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+      }
+      return sortDirection === "desc" ? -comparison : comparison;
+    });
+    
+    return result;
+  }, [agents, searchQuery, statusFilter, levelFilter, sortField, sortDirection]);
+
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDirection(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  }
 
   function handleAction(agent: Agent, mode: DialogMode) {
     setSelectedAgent(agent);
@@ -338,6 +423,67 @@ export function AgentsPage() {
           <Plus className="mr-2 h-4 w-4" />
           Register Agent
         </Button>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="flex flex-wrap gap-3 items-center">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search agents..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+        
+        {/* Status Filter */}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="paused">Paused</option>
+          <option value="suspended">Suspended</option>
+        </select>
+        
+        {/* Level Filter */}
+        <select
+          value={levelFilter}
+          onChange={(e) => setLevelFilter(e.target.value)}
+          className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <option value="all">All Levels</option>
+          <option value="9-10">L9-10 (Leadership)</option>
+          <option value="7-8">L7-8 (Manager)</option>
+          <option value="5-6">L5-6 (Senior)</option>
+          <option value="3-4">L3-4 (Worker)</option>
+          <option value="1-2">L1-2 (Probation)</option>
+        </select>
+        
+        {/* Sort */}
+        <div className="flex items-center gap-1 ml-auto">
+          <span className="text-sm text-muted-foreground">Sort:</span>
+          {(["level", "name", "balance", "created"] as SortField[]).map((field) => (
+            <Button
+              key={field}
+              variant={sortField === field ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleSort(field)}
+              className="capitalize"
+            >
+              {field}
+              {sortField === field && (
+                <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+              )}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Stats */}
@@ -392,70 +538,114 @@ export function AgentsPage() {
         </Card>
       </div>
 
+      {/* Results count */}
+      <div className="text-sm text-muted-foreground">
+        Showing {filteredAgents.length} of {agents.length} agents
+      </div>
+
       {/* Agents grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {agents.map((agent) => (
-          <Card key={agent.id} className="relative overflow-hidden">
-            <div className={`absolute left-0 top-0 h-1 w-full ${getRoleColor(agent.role)}`} />
-            <CardHeader className="flex flex-row items-start justify-between pb-2">
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarFallback className="bg-secondary">
-                    <Bot className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-base">{agent.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
-                </div>
+        {filteredAgents.map((agent) => {
+          const levelColor = getLevelColor(agent.level);
+          return (
+            <Card key={agent.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+              {/* Level color bar */}
+              <div 
+                className="absolute left-0 top-0 h-1 w-full" 
+                style={{ backgroundColor: levelColor }}
+              />
+              {/* Level indicator */}
+              <div 
+                className="absolute top-3 right-12 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                style={{ backgroundColor: levelColor }}
+              >
+                L{agent.level}
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleAction(agent, "view")}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAction(agent, "edit")}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAction(agent, "credits")}>
-                    <Coins className="mr-2 h-4 w-4" />
-                    Adjust Credits
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
-                    <Ban className="mr-2 h-4 w-4" />
-                    Revoke Access
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
-                <Badge variant="outline">{agent.role}</Badge>
-                <Badge variant="secondary">Lv. {agent.level}</Badge>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Balance</p>
-                  <p className="font-medium">{agent.currentBalance.toLocaleString()}</p>
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div className="flex items-center gap-3">
+                  <Avatar className="ring-2" style={{ ringColor: levelColor }}>
+                    <AvatarFallback 
+                      className="text-white"
+                      style={{ backgroundColor: `${levelColor}30` }}
+                    >
+                      <Bot className="h-4 w-4" style={{ color: levelColor }} />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-base">{agent.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {getLevelLabel(agent.level)} • @{agent.agentId}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">Model</p>
-                  <p className="font-medium">{agent.model}</p>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleAction(agent, "view")}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAction(agent, "edit")}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAction(agent, "credits")}>
+                      <Coins className="mr-2 h-4 w-4" />
+                      Adjust Credits
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive">
+                      <Ban className="mr-2 h-4 w-4" />
+                      Revoke Access
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Balance</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <span style={{ color: levelColor }}>💰</span>
+                      {agent.currentBalance.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Model</p>
+                    <p className="font-medium truncate text-xs">{agent.model}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
+
+      {filteredAgents.length === 0 && agents.length > 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Filter className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No matching agents</h3>
+            <p className="text-muted-foreground text-center mb-4">
+              Try adjusting your filters or search query.
+            </p>
+            <Button variant="outline" onClick={() => {
+              setSearchQuery("");
+              setStatusFilter("all");
+              setLevelFilter("all");
+            }}>
+              Clear Filters
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {agents.length === 0 && (
         <Card>
