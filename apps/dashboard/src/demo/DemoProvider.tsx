@@ -132,15 +132,16 @@ export function DemoProvider({
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
     });
 
-    // Invalidate queries once per tick (not per event)
+    // Invalidate and refetch queries once per tick (not per event)
     const unsubscribeTick = engine.onTick((events, tick) => {
       console.log('[Demo] Tick', tick, '- events:', events.length, events.map(e => e.type));
       setCurrentTick(tick);
       
-      // Invalidate all queries - MSW handlers will fetch fresh data from engine
+      // Force refetch all queries - MSW handlers will fetch fresh data from engine
       if (events.length > 0) {
-        console.log('[Demo] Invalidating queries...');
-        queryClient.invalidateQueries();
+        console.log('[Demo] Refetching all queries...');
+        // Use refetchQueries instead of invalidateQueries for immediate refetch
+        queryClient.refetchQueries({ type: 'active' });
       }
     });
 

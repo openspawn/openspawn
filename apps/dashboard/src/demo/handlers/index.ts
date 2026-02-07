@@ -124,8 +124,11 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
   return [
     // ─────────────── Agents ───────────────
     graphql.query('Agents', () => {
-      const agents = engine().getAgents();
-      console.log('[MSW] Agents query → returning', agents.length, 'agents');
+      const e = engine();
+      const agents = e.getAgents();
+      const state = e.getState();
+      console.log('[MSW] Agents query → tick:', state.currentTick, 'agents:', agents.length, 
+        'names:', agents.slice(0, 3).map(a => a.name));
       return HttpResponse.json({
         data: {
           agents: agents.map(mapAgent),

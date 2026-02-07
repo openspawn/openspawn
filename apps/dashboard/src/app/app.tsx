@@ -17,7 +17,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: isDemoMode ? 0 : 1000 * 60, // No cache in demo mode
+      gcTime: isDemoMode ? 0 : 1000 * 60 * 5, // No garbage collection delay in demo
       refetchOnWindowFocus: false,
+      refetchOnMount: isDemoMode ? 'always' : true, // Always refetch in demo mode
     },
   },
 });
