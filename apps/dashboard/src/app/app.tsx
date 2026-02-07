@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 // Check for demo mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
-const scenarioParam = urlParams.get('scenario') || 'growth';
+const scenarioParam = urlParams.get('scenario') || 'fresh';
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -16,14 +16,15 @@ import { useEvents } from "../hooks/use-events";
 import { useState } from "react";
 
 function getSeverityIcon(severity: string) {
-  switch (severity) {
-    case "critical":
+  switch (severity.toUpperCase()) {
+    case "ERROR":
+    case "CRITICAL":
       return <AlertCircle className="h-4 w-4 text-red-500" />;
-    case "warning":
+    case "WARNING":
       return <AlertTriangle className="h-4 w-4 text-amber-500" />;
-    case "info":
+    case "INFO":
       return <Info className="h-4 w-4 text-blue-500" />;
-    case "success":
+    case "SUCCESS":
       return <CheckCircle className="h-4 w-4 text-emerald-500" />;
     default:
       return <Activity className="h-4 w-4 text-muted-foreground" />;
@@ -31,14 +32,15 @@ function getSeverityIcon(severity: string) {
 }
 
 function getSeverityVariant(severity: string) {
-  switch (severity) {
-    case "critical":
+  switch (severity.toUpperCase()) {
+    case "ERROR":
+    case "CRITICAL":
       return "destructive";
-    case "warning":
+    case "WARNING":
       return "warning";
-    case "info":
+    case "INFO":
       return "info";
-    case "success":
+    case "SUCCESS":
       return "success";
     default:
       return "secondary";
@@ -65,13 +67,15 @@ export function EventsPage() {
   const { events, loading, error } = useEvents();
   const [filter, setFilter] = useState<string>("all");
 
+  // Normalize filter for comparison (GraphQL uses uppercase)
+  const normalizedFilter = filter.toUpperCase();
   const filteredEvents =
-    filter === "all" ? events : events.filter((e) => e.severity === filter);
+    filter === "all" ? events : events.filter((e) => e.severity === normalizedFilter);
 
   const severityCounts = {
-    critical: events.filter((e) => e.severity === "critical").length,
-    warning: events.filter((e) => e.severity === "warning").length,
-    info: events.filter((e) => e.severity === "info").length,
+    critical: events.filter((e) => e.severity === "ERROR").length,
+    warning: events.filter((e) => e.severity === "WARNING").length,
+    info: events.filter((e) => e.severity === "INFO").length,
   };
 
   if (loading) {
@@ -164,7 +168,7 @@ export function EventsPage() {
       <Tabs value={filter} onValueChange={setFilter}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="critical" className="text-red-500">
+          <TabsTrigger value="error" className="text-red-500">
             Critical
           </TabsTrigger>
           <TabsTrigger value="warning" className="text-amber-500">

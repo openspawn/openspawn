@@ -91,6 +91,16 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
     const agents = engine().getAgents();
     const actor = event.agentId ? agents.find(a => a.id === event.agentId) : null;
 
+    // Map severity to uppercase (GraphQL enum format)
+    const severityMap: Record<string, string> = {
+      debug: 'INFO',
+      info: 'INFO',
+      success: 'INFO',
+      warning: 'WARNING',
+      error: 'ERROR',
+      critical: 'ERROR',
+    };
+
     return {
       id: event.id,
       type: event.type,
@@ -101,7 +111,7 @@ export function createHandlers(getEngine: () => SimulationEngine | null) {
       } : null,
       entityType: event.taskId ? 'task' : (event.agentId ? 'agent' : 'system'),
       entityId: event.taskId || event.agentId || 'system',
-      severity: event.severity,
+      severity: severityMap[event.severity] || 'INFO',
       reasoning: event.message,
       createdAt: event.createdAt,
     };
