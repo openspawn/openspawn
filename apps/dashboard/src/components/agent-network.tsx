@@ -54,7 +54,8 @@ async function getLayoutedElements(
 ): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
   
-  const nodeWidth = options.compact ? 100 : 140;
+  // Must match dimensions in AgentNode component
+  const nodeWidth = options.compact ? 80 : 140;
   const nodeHeight = options.compact ? 56 : 80;
   const horizontalSpacing = options.compact ? 30 : 50;
   const verticalSpacing = options.compact ? 80 : 120;
@@ -134,7 +135,7 @@ interface AgentNodeData {
   compact?: boolean;
 }
 
-// Custom node component
+// Custom node component - stable outer div for ReactFlow, animation on inner content
 function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const nodeData = data as AgentNodeData;
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
@@ -142,114 +143,135 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const isDespawning = nodeData.isDespawning;
   const compact = nodeData.compact;
   
+  // Fixed dimensions for consistent handle positioning
+  const nodeWidth = compact ? 80 : 140;
+  const nodeHeight = compact ? 56 : 80;
+  
   return (
-    <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ 
-        scale: isDespawning ? 0 : 1, 
-        opacity: isDespawning ? 0 : 1,
-      }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    // Stable outer container - ReactFlow measures this for handle positions
+    <div 
       className="relative"
+      style={{ width: nodeWidth, height: nodeHeight }}
     >
-      {/* Handles positioned at top/bottom edges - visible with level color */}
+      {/* Handles at exact top/bottom center - no CSS offsets */}
       <Handle 
         id="top"
         type="target" 
-        position={Position.Top} 
-        className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-top-1' : '!w-3 !h-3 !-top-1.5'}`}
-        style={{ backgroundColor: color }}
+        position={Position.Top}
+        style={{ 
+          background: color,
+          width: compact ? 8 : 12,
+          height: compact ? 8 : 12,
+          border: '2px solid #27272a',
+          borderRadius: '50%',
+        }}
       />
       
-      {isSpawning && (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 2, opacity: [0, 0.5, 0] }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute inset-0 rounded-xl"
-          style={{ backgroundColor: "#22c55e", filter: "blur(20px)" }}
-        />
-      )}
-      
+      {/* Animated content wrapper */}
       <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.98 }}
-        className={`
-          relative rounded-xl border-2
-          ${compact ? 'px-2 py-1 min-w-[80px]' : 'px-3 py-2 sm:px-4 sm:py-3 min-w-[100px] sm:min-w-[140px]'}
-          ${selected ? "shadow-lg shadow-purple-500/30" : ""}
-          ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
-        `}
-        style={{
-          borderColor: color,
-          backgroundColor: `${color}15`,
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ 
+          scale: isDespawning ? 0 : 1, 
+          opacity: isDespawning ? 0 : 1,
         }}
+        exit={{ scale: 0, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="absolute inset-0"
       >
-        {!nodeData.isHuman && (
+        {isSpawning && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className={`absolute rounded-full font-bold text-white ${compact ? '-top-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-top-2 -right-2 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs'}`}
-            style={{ backgroundColor: color }}
-          >
-            L{nodeData.level}
-          </motion.div>
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 2, opacity: [0, 0.5, 0] }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute inset-0 rounded-xl"
+            style={{ backgroundColor: "#22c55e", filter: "blur(20px)" }}
+          />
         )}
-
+        
         <motion.div
-          animate={{
-            scale: nodeData.status === "active" ? [1, 1.2, 1] : 1,
-            opacity: nodeData.status === "active" ? 1 : 0.5,
-          }}
-          transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
-          className={`absolute rounded-full ${compact ? '-top-0.5 -left-0.5 w-2 h-2' : '-top-1 -left-1 w-2.5 h-2.5 sm:w-3 sm:h-3'}`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className={`
+            w-full h-full flex flex-col items-center justify-center
+            rounded-xl border-2 px-2 py-1
+            ${selected ? "shadow-lg shadow-purple-500/30" : ""}
+            ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
+          `}
           style={{
-            backgroundColor:
-              nodeData.status === "active" ? "#22c55e" :
-              nodeData.status === "pending" ? "#fbbf24" :
-              nodeData.status === "paused" ? "#a78bfa" : "#ef4444",
+            borderColor: color,
+            backgroundColor: `${color}15`,
           }}
-        />
+        >
+          {/* Level badge */}
+          {!nodeData.isHuman && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className={`absolute rounded-full font-bold text-white ${compact ? '-top-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-top-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
+              style={{ backgroundColor: color }}
+            >
+              L{nodeData.level}
+            </motion.div>
+          )}
 
-        {!compact && (
-          <motion.div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
-            {nodeData.isHuman ? "👤" : "🤖"}
-          </motion.div>
-        )}
-
-        <div className={`font-semibold text-white text-center truncate ${compact ? 'text-[10px] max-w-[70px]' : 'text-xs sm:text-sm max-w-[80px] sm:max-w-none'}`}>
-          {compact ? (nodeData.isHuman ? "👤" : "") + nodeData.label.split(' ')[0] : nodeData.label}
-        </div>
-
-        {!compact && (
-          <div className="text-[10px] sm:text-xs text-center" style={{ color }}>
-            {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
-            {nodeData.domain && <span className="hidden sm:inline"> • {nodeData.domain}</span>}
-          </div>
-        )}
-
-        {!nodeData.isHuman && !compact && (
+          {/* Status indicator */}
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="hidden sm:block mt-2 text-xs text-center text-zinc-400"
-          >
-            💰 {nodeData.credits.toLocaleString()}
-          </motion.div>
-        )}
+            animate={{
+              scale: nodeData.status === "active" ? [1, 1.2, 1] : 1,
+              opacity: nodeData.status === "active" ? 1 : 0.5,
+            }}
+            transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
+            className={`absolute rounded-full ${compact ? '-top-0.5 -left-0.5 w-2 h-2' : '-top-1 -left-1 w-2.5 h-2.5'}`}
+            style={{
+              backgroundColor:
+                nodeData.status === "active" ? "#22c55e" :
+                nodeData.status === "pending" ? "#fbbf24" :
+                nodeData.status === "paused" ? "#a78bfa" : "#ef4444",
+            }}
+          />
+
+          {/* Icon */}
+          {!compact && (
+            <div className="text-lg leading-none mb-0.5">
+              {nodeData.isHuman ? "👤" : "🤖"}
+            </div>
+          )}
+
+          {/* Name */}
+          <div className={`font-semibold text-white text-center truncate w-full ${compact ? 'text-[9px]' : 'text-xs'}`}>
+            {compact ? (nodeData.isHuman ? "👤 " : "") + nodeData.label.split(' ')[0] : nodeData.label}
+          </div>
+
+          {/* Role */}
+          {!compact && (
+            <div className="text-[9px] text-center truncate w-full" style={{ color }}>
+              {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
+            </div>
+          )}
+
+          {/* Credits */}
+          {!nodeData.isHuman && !compact && (
+            <div className="text-[9px] text-center text-zinc-400 mt-0.5">
+              💰 {nodeData.credits.toLocaleString()}
+            </div>
+          )}
+        </motion.div>
       </motion.div>
 
       <Handle 
         id="bottom"
         type="source" 
-        position={Position.Bottom} 
-        className={`!rounded-full !border-2 !border-zinc-800 ${compact ? '!w-2 !h-2 !-bottom-1' : '!w-3 !h-3 !-bottom-1.5'}`}
-        style={{ backgroundColor: color }}
+        position={Position.Bottom}
+        style={{ 
+          background: color,
+          width: compact ? 8 : 12,
+          height: compact ? 8 : 12,
+          border: '2px solid #27272a',
+          borderRadius: '50%',
+        }}
       />
-    </motion.div>
+    </div>
   );
 }
 
@@ -269,18 +291,14 @@ function TaskFlowEdge({
 }: EdgeProps) {
   const { delegations, speed } = useContext(DelegationContext);
   
-  // ReactFlow gives us center positions - offset to handle positions
-  // Node height is ~80px, handles are at edges, so offset by ~40px
-  const nodeHeight = 80;
-  const handleOffset = nodeHeight / 2;
-  
+  // ReactFlow now provides correct handle positions (no manual offset needed)
   const [edgePath] = getSmoothStepPath({
     sourceX,
-    sourceY: sourceY + handleOffset, // Bottom of source node
-    sourcePosition: sourcePosition || Position.Bottom,
+    sourceY,
+    sourcePosition,
     targetX,
-    targetY: targetY - handleOffset, // Top of target node  
-    targetPosition: targetPosition || Position.Top,
+    targetY,
+    targetPosition,
   });
 
   const activeDelegations = delegations.filter(
