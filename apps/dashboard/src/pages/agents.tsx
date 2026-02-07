@@ -164,17 +164,13 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Model</label>
-            <select
+            <input
+              type="text"
               value={model}
-              onChange={handleModelChange}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g., gpt-4o, claude-sonnet-4"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="gpt-4o">gpt-4o</option>
-              <option value="gpt-4o-mini">gpt-4o-mini</option>
-              <option value="claude-3-opus">claude-3-opus</option>
-              <option value="claude-3-sonnet">claude-3-sonnet</option>
-              <option value="claude-3-haiku">claude-3-haiku</option>
-            </select>
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Status</label>
