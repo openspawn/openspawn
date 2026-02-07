@@ -17,7 +17,11 @@ const SCENARIO_OPTIONS = [
   { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50 },
 ];
 
-export function DemoControls() {
+interface DemoControlsProps {
+  compact?: boolean;
+}
+
+export function DemoControls({ compact = false }: DemoControlsProps) {
   const {
     isDemo,
     isPlaying,
@@ -35,6 +39,55 @@ export function DemoControls() {
   if (!isDemo) return null;
 
   const lastEvent = recentEvents[0];
+
+  // Compact mode for sidebar
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        {/* Play/Pause + Speed */}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={isPlaying ? pause : play}
+            className="h-7 w-7"
+          >
+            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          </Button>
+          <div className="flex items-center gap-0.5 bg-muted rounded p-0.5 flex-1">
+            {SPEED_OPTIONS.slice(0, 4).map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setSpeed(opt.value)}
+                className={cn(
+                  'flex-1 px-1 py-0.5 text-[10px] font-medium rounded transition-colors',
+                  speed === opt.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={reset}
+            className="h-7 w-7"
+          >
+            <RotateCcw className="h-3 w-3" />
+          </Button>
+        </div>
+        {/* Tick counter */}
+        <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+          <Zap className="h-3 w-3 text-yellow-500" />
+          <span className="font-mono">{currentTick}</span>
+          <span>ticks</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-2 sm:bottom-4 left-2 right-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50">

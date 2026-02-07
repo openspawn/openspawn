@@ -1,23 +1,6 @@
-import { useSearchParams } from "react-router-dom";
 import { AgentNetwork } from "../components/agent-network";
-import { Button } from "../components/ui/button";
-import { Play, Square } from "lucide-react";
 
 export function NetworkPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const isDemo = searchParams.get("demo") === "true";
-
-  function handleToggleDemo() {
-    if (isDemo) {
-      searchParams.delete("demo");
-    } else {
-      searchParams.set("demo", "true");
-    }
-    setSearchParams(searchParams);
-    // Reload to re-init MSW handlers
-    window.location.reload();
-  }
-
   return (
     <div className="h-[calc(100vh-theme(spacing.16))] -m-6 lg:-m-6 -mx-4 sm:-mx-6">
       {/* Header overlay - hidden on mobile/landscape, shown on larger screens */}
@@ -27,26 +10,6 @@ export function NetworkPage() {
           Real-time agent hierarchy
         </p>
       </div>
-
-      {/* Demo toggle button */}
-      <Button
-        onClick={handleToggleDemo}
-        variant={isDemo ? "default" : "outline"}
-        size="sm"
-        className="absolute top-4 right-4 z-10 gap-2"
-      >
-        {isDemo ? (
-          <>
-            <Square className="h-3 w-3" />
-            <span className="hidden sm:inline">Exit Demo</span>
-          </>
-        ) : (
-          <>
-            <Play className="h-3 w-3" />
-            <span className="hidden sm:inline">Demo</span>
-          </>
-        )}
-      </Button>
 
       {/* Stats bar - compact horizontal strip on landscape, grid on portrait mobile */}
       <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 

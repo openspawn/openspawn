@@ -189,10 +189,17 @@ export function DemoProvider({
       // Keep last 20 events for UI
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
       setCurrentTick(engine.getState().currentTick);
+      
+      // Invalidate relevant queries so other tabs update live
+      // Debounce to avoid too many invalidations
+      queryClient.invalidateQueries({ queryKey: ['Agents'] });
+      queryClient.invalidateQueries({ queryKey: ['Tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['Credits'] });
+      queryClient.invalidateQueries({ queryKey: ['Events'] });
     });
 
     return unsubscribe;
-  }, [engine]);
+  }, [engine, queryClient]);
 
   // Auto-play if requested
   useEffect(() => {

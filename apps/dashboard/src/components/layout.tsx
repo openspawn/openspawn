@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -7,12 +7,16 @@ import {
   Activity,
   Bot,
   Network,
+  Play,
+  Square,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { ThemeToggle } from "./theme-toggle";
 import { TooltipProvider } from "./ui/tooltip";
+import { useDemo } from "../demo";
+import { DemoControls } from "../demo/DemoControls";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -30,6 +34,19 @@ const navigation = [
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const demo = useDemo();
+  const isDemo = searchParams.get("demo") === "true";
+
+  function handleToggleDemo() {
+    if (isDemo) {
+      searchParams.delete("demo");
+    } else {
+      searchParams.set("demo", "true");
+    }
+    setSearchParams(searchParams);
+    window.location.reload();
+  }
 
   return (
     <TooltipProvider>
@@ -64,6 +81,33 @@ export function Layout({ children }: LayoutProps) {
               })}
             </nav>
           </ScrollArea>
+
+          {/* Demo Toggle */}
+          <div className="border-t border-border p-3">
+            <Button
+              onClick={handleToggleDemo}
+              variant={isDemo ? "default" : "outline"}
+              size="sm"
+              className="w-full gap-2"
+            >
+              {isDemo ? (
+                <>
+                  <Square className="h-3 w-3" />
+                  Exit Demo
+                </>
+              ) : (
+                <>
+                  <Play className="h-3 w-3" />
+                  Demo Mode
+                </>
+              )}
+            </Button>
+            {isDemo && (
+              <div className="mt-2">
+                <DemoControls compact />
+              </div>
+            )}
+          </div>
 
           {/* Footer */}
           <div className="border-t border-border p-4">
