@@ -37,90 +37,147 @@ export function DemoControls() {
   const lastEvent = recentEvents[0];
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <div className="bg-card border rounded-2xl shadow-xl p-2 flex items-center gap-2">
-        {/* Play/Pause */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={isPlaying ? pause : play}
-          className="h-10 w-10"
-        >
-          {isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5" />
-          )}
-        </Button>
-
-        {/* Speed selector */}
-        <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
-          {SPEED_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setSpeed(opt.value)}
-              className={cn(
-                'px-2 py-1 text-xs font-medium rounded-md transition-colors',
-                speed === opt.value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+    <div className="fixed bottom-2 sm:bottom-4 left-2 right-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50">
+      {/* Mobile: stacked layout, Desktop: horizontal */}
+      <div className="bg-card border rounded-xl sm:rounded-2xl shadow-xl p-1.5 sm:p-2">
+        {/* Mobile layout: two rows */}
+        <div className="flex sm:hidden flex-col gap-1.5">
+          {/* Row 1: Play, Speed, Tick */}
+          <div className="flex items-center justify-between gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={isPlaying ? pause : play}
+              className="h-9 w-9"
             >
-              {opt.label}
-            </button>
-          ))}
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+            
+            <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5 flex-1 justify-center">
+              {SPEED_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setSpeed(opt.value)}
+                  className={cn(
+                    'px-2 py-1 text-xs font-medium rounded-md transition-colors',
+                    speed === opt.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 px-2">
+              <Zap className="h-3 w-3 text-yellow-500" />
+              <span className="text-xs font-mono tabular-nums">{currentTick}</span>
+            </div>
+          </div>
+          
+          {/* Row 2: Scenarios + Reset */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1 flex-1">
+              {SCENARIO_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setScenario(opt.value)}
+                  className={cn(
+                    'flex-1 py-1.5 px-2 rounded-lg transition-colors flex items-center justify-center gap-1',
+                    scenario === opt.value
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground bg-muted/50'
+                  )}
+                >
+                  <opt.icon className="h-3.5 w-3.5" />
+                  <span className="text-xs font-medium">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={reset}
+              className="h-8 w-8"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="w-px h-6 bg-border" />
+        {/* Desktop layout: single row */}
+        <div className="hidden sm:flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={isPlaying ? pause : play}
+            className="h-10 w-10"
+          >
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          </Button>
 
-        {/* Scenario selector */}
-        <div className="flex items-center gap-1">
-          {SCENARIO_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setScenario(opt.value)}
-              title={`${opt.label} (${opt.agents} agents)`}
-              className={cn(
-                'p-2 rounded-lg transition-colors flex items-center gap-1.5',
-                scenario === opt.value
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              )}
-            >
-              <opt.icon className="h-4 w-4" />
-              <span className="text-xs font-medium hidden sm:inline">
+          <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
+            {SPEED_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setSpeed(opt.value)}
+                className={cn(
+                  'px-2 py-1 text-xs font-medium rounded-md transition-colors',
+                  speed === opt.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
                 {opt.label}
-              </span>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
+
+          <div className="w-px h-6 bg-border" />
+
+          <div className="flex items-center gap-1">
+            {SCENARIO_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setScenario(opt.value)}
+                title={`${opt.label} (${opt.agents} agents)`}
+                className={cn(
+                  'p-2 rounded-lg transition-colors flex items-center gap-1.5',
+                  scenario === opt.value
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+              >
+                <opt.icon className="h-4 w-4" />
+                <span className="text-xs font-medium">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="w-px h-6 bg-border" />
+
+          <div className="flex items-center gap-1.5 px-2">
+            <Zap className="h-3.5 w-3.5 text-yellow-500" />
+            <span className="text-sm font-mono tabular-nums min-w-[3ch]">{currentTick}</span>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={reset}
+            className="h-8 w-8"
+            title="Reset simulation"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
         </div>
-
-        <div className="w-px h-6 bg-border" />
-
-        {/* Tick counter */}
-        <div className="flex items-center gap-1.5 px-2">
-          <Zap className="h-3.5 w-3.5 text-yellow-500" />
-          <span className="text-sm font-mono tabular-nums min-w-[3ch]">
-            {currentTick}
-          </span>
-        </div>
-
-        {/* Reset */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={reset}
-          className="h-8 w-8"
-          title="Reset simulation"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
       </div>
 
-      {/* Event toast */}
+      {/* Event toast - positioned above on mobile, hidden on very small screens */}
       {lastEvent && isPlaying && (
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="bg-card/95 backdrop-blur border rounded-lg px-3 py-1.5 text-sm shadow-lg">
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 max-w-[90vw] animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="bg-card/95 backdrop-blur border rounded-lg px-2 py-1 text-xs sm:text-sm shadow-lg truncate">
             <EventLabel event={lastEvent} />
           </div>
         </div>
