@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Layout } from "../components/layout";
+import { Layout, ProtectedRoute } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage } from "../pages";
+import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { DemoProvider, DemoControls } from "../demo";
+import { AuthProvider } from "../contexts";
 import type { ReactNode } from "react";
 
 // Check for demo mode via URL param or env
@@ -38,25 +39,49 @@ function DemoWrapper({ children }: { children: ReactNode }) {
   );
 }
 
+// In demo mode, skip auth protection
+function MaybeProtectedRoute({ children }: { children: ReactNode }) {
+  if (isDemoMode) {
+    return <>{children}</>;
+  }
+  return <ProtectedRoute>{children}</ProtectedRoute>;
+}
+
 export function App() {
   return (
     <ThemeProvider defaultTheme="dark">
-      <QueryClientProvider client={queryClient}>
-        <DemoWrapper>
-          <BrowserRouter>
-            <Layout>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <DemoWrapper>
+            <BrowserRouter>
               <Routes>
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/tasks" element={<TasksPage />} />
-                <Route path="/agents" element={<AgentsPage />} />
-                <Route path="/credits" element={<CreditsPage />} />
-                <Route path="/events" element={<EventsPage />} />
-                <Route path="/network" element={<NetworkPage />} />
+                {/* Public routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                
+                {/* Protected routes */}
+                <Route
+                  path="/*"
+                  element={
+                    <MaybeProtectedRoute>
+                      <Layout>
+                        <Routes>
+                          <Route path="/" element={<DashboardPage />} />
+                          <Route path="/tasks" element={<TasksPage />} />
+                          <Route path="/agents" element={<AgentsPage />} />
+                          <Route path="/credits" element={<CreditsPage />} />
+                          <Route path="/events" element={<EventsPage />} />
+                          <Route path="/network" element={<NetworkPage />} />
+                        </Routes>
+                      </Layout>
+                    </MaybeProtectedRoute>
+                  }
+                />
               </Routes>
-            </Layout>
-          </BrowserRouter>
-        </DemoWrapper>
-      </QueryClientProvider>
+            </BrowserRouter>
+          </DemoWrapper>
+        </QueryClientProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
