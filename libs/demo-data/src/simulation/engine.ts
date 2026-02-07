@@ -1,0 +1,443 @@
+import type { 
+  DemoScenario, 
+  SimulationState, 
+  SimulationEvent,
+  DemoAgent,
+  DemoTask,
+  DemoCreditTransaction,
+  DemoEvent,
+  TaskStatus,
+  AgentStatus,
+} from '../types.js';
+import { generateRandomAgent, generateRandomTask, generateCreditTransaction, generateEvent } from '../fixtures/index.js';
+
+// Probability distributions for different events (per tick)
+const PROBABILITIES = {
+  // Agent events
+  agentCreated: 0.05,      // 5% chance per tick
+  agentPromoted: 0.02,     // 2% chance per tick
+  agentStatusChange: 0.03, // 3% chance per tick
+  
+  // Task events
+  taskCreated: 0.1,        // 10% chance per tick
+  taskStatusChange: 0.15,  // 15% chance per tick
+  
+  // Credit events
+  creditEarned: 0.08,      // 8% chance per tick
+  creditSpent: 0.12,       // 12% chance per tick
+  
+  // System events
+  systemEvent: 0.05,       // 5% chance per tick
+};
+
+// Task status flow
+const TASK_STATUS_FLOW: Record<TaskStatus, TaskStatus | null> = {
+  backlog: 'pending',
+  pending: 'assigned',
+  assigned: 'in_progress',
+  in_progress: 'review',
+  review: 'done',
+  done: null,
+  cancelled: null,
+};
+
+// Helper to generate UUIDs
+function uuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+// Random element from array
+function randomFrom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Check if event should fire based on probability
+function shouldFire(probability: number): boolean {
+  return Math.random() < probability;
+}
+
+export class SimulationEngine {
+  private state: SimulationState;
+  private listeners: ((event: SimulationEvent) => void)[] = [];
+  private tickInterval: ReturnType<typeof setInterval> | null = null;
+  
+  constructor(scenario: DemoScenario) {
+    this.state = {
+      currentTick: 0,
+      speed: 1,
+      isPlaying: false,
+      scenario: this.deepClone(scenario),
+      startTime: new Date(),
+      simulatedTime: new Date(),
+    };
+  }
+  
+  private deepClone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
+  
+  // Event listener management
+  onEvent(callback: (event: SimulationEvent) => void): () => void {
+    this.listeners.push(callback);
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== callback);
+    };
+  }
+  
+  private emit(event: SimulationEvent): void {
+    this.listeners.forEach(l => l(event));
+  }
+  
+  // State getters
+  getState(): SimulationState {
+    return this.deepClone(this.state);
+  }
+  
+  getAgents(): DemoAgent[] {
+    return this.deepClone(this.state.scenario.agents);
+  }
+  
+  getTasks(): DemoTask[] {
+    return this.deepClone(this.state.scenario.tasks);
+  }
+  
+  getCredits(): DemoCreditTransaction[] {
+    return this.deepClone(this.state.scenario.credits);
+  }
+  
+  getEvents(): DemoEvent[] {
+    return this.deepClone(this.state.scenario.events);
+  }
+  
+  // Playback controls
+  play(): void {
+    if (this.state.isPlaying) return;
+    
+    this.state.isPlaying = true;
+    this.tickInterval = setInterval(() => {
+      this.tick();
+    }, 1000 / this.state.speed);
+  }
+  
+  pause(): void {
+    this.state.isPlaying = false;
+    if (this.tickInterval) {
+      clearInterval(this.tickInterval);
+      this.tickInterval = null;
+    }
+  }
+  
+  setSpeed(speed: number): void {
+    this.state.speed = speed;
+    if (this.state.isPlaying) {
+      this.pause();
+      this.play();
+    }
+  }
+  
+  jumpToTick(tick: number): void {
+    const currentTick = this.state.currentTick;
+    if (tick > currentTick) {
+      // Fast forward
+      for (let i = currentTick; i < tick; i++) {
+        this.tick(false); // Don't emit events during fast forward
+      }
+    }
+    // Note: Rewinding would require state snapshots - not implemented
+  }
+  
+  reset(): void {
+    this.pause();
+    this.state.currentTick = 0;
+    this.state.simulatedTime = new Date();
+  }
+  
+  // Main simulation tick
+  tick(emitEvents: boolean = true): SimulationEvent[] {
+    const events: SimulationEvent[] = [];
+    const now = new Date();
+    
+    this.state.currentTick++;
+    this.state.simulatedTime = new Date(
+      this.state.startTime.getTime() + this.state.currentTick * 60 * 60 * 1000 // 1 tick = 1 simulated hour
+    );
+    
+    // Process random events based on probabilities
+    
+    // Agent created
+    if (shouldFire(PROBABILITIES.agentCreated)) {
+      const event = this.createAgent();
+      if (event) events.push(event);
+    }
+    
+    // Agent promoted
+    if (shouldFire(PROBABILITIES.agentPromoted)) {
+      const event = this.promoteAgent();
+      if (event) events.push(event);
+    }
+    
+    // Agent status change
+    if (shouldFire(PROBABILITIES.agentStatusChange)) {
+      const event = this.changeAgentStatus();
+      if (event) events.push(event);
+    }
+    
+    // Task created
+    if (shouldFire(PROBABILITIES.taskCreated)) {
+      const event = this.createTask();
+      if (event) events.push(event);
+    }
+    
+    // Task status change
+    if (shouldFire(PROBABILITIES.taskStatusChange)) {
+      const event = this.advanceTask();
+      if (event) events.push(event);
+    }
+    
+    // Credit earned
+    if (shouldFire(PROBABILITIES.creditEarned)) {
+      const event = this.earnCredits();
+      if (event) events.push(event);
+    }
+    
+    // Credit spent
+    if (shouldFire(PROBABILITIES.creditSpent)) {
+      const event = this.spendCredits();
+      if (event) events.push(event);
+    }
+    
+    // Emit all events
+    if (emitEvents) {
+      events.forEach(e => this.emit(e));
+    }
+    
+    return events;
+  }
+  
+  // Event generators
+  private createAgent(): SimulationEvent | null {
+    const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active' && a.level >= 7);
+    if (activeAgents.length === 0) return null;
+    
+    const parent = randomFrom(activeAgents);
+    const newAgent = generateRandomAgent({
+      parentId: parent.id,
+      domain: parent.domain,
+      level: 1,
+      status: 'pending',
+    });
+    
+    this.state.scenario.agents.push(newAgent);
+    
+    const systemEvent = generateEvent(
+      'agent.created',
+      'info',
+      `${newAgent.name} spawned by ${parent.name}`,
+      { agentId: newAgent.id, metadata: { parentId: parent.id } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'agent_created',
+      payload: newAgent,
+      timestamp: new Date(),
+    };
+  }
+  
+  private promoteAgent(): SimulationEvent | null {
+    const eligibleAgents = this.state.scenario.agents.filter(
+      a => a.status === 'active' && a.level < 9
+    );
+    if (eligibleAgents.length === 0) return null;
+    
+    const agent = randomFrom(eligibleAgents);
+    const oldLevel = agent.level;
+    agent.level++;
+    
+    // Bonus credits for promotion
+    const bonus = agent.level * 100;
+    agent.currentBalance += bonus;
+    agent.lifetimeEarnings += bonus;
+    
+    const systemEvent = generateEvent(
+      'agent.promoted',
+      'info',
+      `${agent.name} promoted to Level ${agent.level}`,
+      { agentId: agent.id, metadata: { previousLevel: oldLevel, newLevel: agent.level } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'agent_promoted',
+      payload: { agent, oldLevel, newLevel: agent.level },
+      timestamp: new Date(),
+    };
+  }
+  
+  private changeAgentStatus(): SimulationEvent | null {
+    const agents = this.state.scenario.agents.filter(a => a.level < 10); // Don't change COO status
+    if (agents.length === 0) return null;
+    
+    const agent = randomFrom(agents);
+    const oldStatus = agent.status;
+    
+    // Status transitions
+    const transitions: Record<AgentStatus, AgentStatus[]> = {
+      pending: ['active'],
+      active: ['paused'],
+      paused: ['active'],
+      suspended: ['active', 'revoked'],
+      revoked: [],
+    };
+    
+    const possibleStatuses = transitions[agent.status];
+    if (possibleStatuses.length === 0) return null;
+    
+    agent.status = randomFrom(possibleStatuses);
+    
+    const systemEvent = generateEvent(
+      'agent.status_changed',
+      agent.status === 'revoked' ? 'warning' : 'info',
+      `${agent.name} status changed to ${agent.status}`,
+      { agentId: agent.id, metadata: { previousStatus: oldStatus, newStatus: agent.status } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'agent_terminated', // Generic status change event
+      payload: { agent, oldStatus, newStatus: agent.status },
+      timestamp: new Date(),
+    };
+  }
+  
+  private createTask(): SimulationEvent | null {
+    const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active');
+    if (activeAgents.length === 0) return null;
+    
+    const creator = randomFrom(activeAgents);
+    const task = generateRandomTask({
+      creatorId: creator.id,
+      status: 'backlog',
+    });
+    
+    this.state.scenario.tasks.push(task);
+    
+    const systemEvent = generateEvent(
+      'task.created',
+      'info',
+      `Task created: ${task.title}`,
+      { taskId: task.id, agentId: creator.id }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'task_created',
+      payload: task,
+      timestamp: new Date(),
+    };
+  }
+  
+  private advanceTask(): SimulationEvent | null {
+    const activeTasks = this.state.scenario.tasks.filter(
+      t => t.status !== 'done' && t.status !== 'cancelled'
+    );
+    if (activeTasks.length === 0) return null;
+    
+    const task = randomFrom(activeTasks);
+    const oldStatus = task.status;
+    const newStatus = TASK_STATUS_FLOW[task.status];
+    
+    if (!newStatus) return null;
+    
+    task.status = newStatus;
+    task.updatedAt = new Date().toISOString();
+    
+    // Assign to an agent if moving to assigned
+    if (newStatus === 'assigned' && !task.assigneeId) {
+      const workers = this.state.scenario.agents.filter(
+        a => a.status === 'active' && a.level <= 6
+      );
+      if (workers.length > 0) {
+        task.assigneeId = randomFrom(workers).id;
+      }
+    }
+    
+    // Mark completed if done
+    if (newStatus === 'done') {
+      task.completedAt = new Date().toISOString();
+    }
+    
+    const systemEvent = generateEvent(
+      `task.${newStatus === 'done' ? 'completed' : 'status_changed'}`,
+      'info',
+      `${task.title} moved to ${newStatus}`,
+      { taskId: task.id, agentId: task.assigneeId }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: newStatus === 'done' ? 'task_completed' : 'task_assigned',
+      payload: { task, oldStatus, newStatus },
+      timestamp: new Date(),
+    };
+  }
+  
+  private earnCredits(): SimulationEvent | null {
+    const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active');
+    if (activeAgents.length === 0) return null;
+    
+    const agent = randomFrom(activeAgents);
+    const amount = 20 + Math.floor(Math.random() * 80);
+    
+    agent.currentBalance += amount;
+    agent.lifetimeEarnings += amount;
+    
+    const transaction = generateCreditTransaction(
+      agent.id,
+      'CREDIT',
+      amount,
+      'Task completion reward'
+    );
+    this.state.scenario.credits.push(transaction);
+    
+    return {
+      type: 'credit_earned',
+      payload: { agent, amount, transaction },
+      timestamp: new Date(),
+    };
+  }
+  
+  private spendCredits(): SimulationEvent | null {
+    const activeAgents = this.state.scenario.agents.filter(
+      a => a.status === 'active' && a.currentBalance > 50
+    );
+    if (activeAgents.length === 0) return null;
+    
+    const agent = randomFrom(activeAgents);
+    const amount = 5 + Math.floor(Math.random() * 40);
+    
+    agent.currentBalance -= amount;
+    
+    const transaction = generateCreditTransaction(
+      agent.id,
+      'DEBIT',
+      amount,
+      'Model usage'
+    );
+    this.state.scenario.credits.push(transaction);
+    
+    return {
+      type: 'credit_spent',
+      payload: { agent, amount, transaction },
+      timestamp: new Date(),
+    };
+  }
+}
+
+export function createSimulation(scenario: DemoScenario): SimulationEngine {
+  return new SimulationEngine(scenario);
+}
