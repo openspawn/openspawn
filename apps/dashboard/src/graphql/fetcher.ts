@@ -3,15 +3,19 @@ import { GraphQLClient } from "graphql-request";
 // Use the same host as the dashboard, but port 3000 for the API
 // This allows LAN access without hardcoding IPs
 function getApiUrl(): string {
-  // Use configured endpoint if set
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  // In development, derive from current location
+  // Always derive from current location in browser for LAN compatibility
+  // This ensures accessing from 192.168.x.x uses that IP, not localhost
   if (typeof window !== "undefined" && window.location?.hostname) {
     const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:3000/graphql`;
+    const url = `${protocol}//${hostname}:3000/graphql`;
+    console.log("[GraphQL] Auto-detected API URL:", url);
+    return url;
+  }
+
+  // Fallback for SSR or non-browser environments
+  if (import.meta.env.VITE_API_URL) {
+    console.log("[GraphQL] Using VITE_API_URL:", import.meta.env.VITE_API_URL);
+    return import.meta.env.VITE_API_URL;
   }
 
   return "http://localhost:3000/graphql";
