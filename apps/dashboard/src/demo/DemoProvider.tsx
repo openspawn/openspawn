@@ -10,6 +10,7 @@ interface DemoContextValue {
   speed: number;
   tick: number;
   scenario: string;
+  scenarioData: DemoScenario | null;
   play: () => void;
   pause: () => void;
   setSpeed: (speed: number) => void;
@@ -170,12 +171,19 @@ export function DemoProvider({
     }
   }, [queryClient]);
   
+  // Get current scenario data from engine
+  const getScenarioData = useCallback((): DemoScenario | null => {
+    if (!engineRef.current) return null;
+    return engineRef.current.getState().scenario;
+  }, []);
+
   const value: DemoContextValue = {
     isDemo: true,
     isPlaying,
     speed,
     tick,
     scenario,
+    scenarioData: getScenarioData(),
     play,
     pause,
     setSpeed,

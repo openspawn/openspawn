@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import {
   ReactFlow,
   Controls,
@@ -15,6 +15,8 @@ import {
 } from "@xyflow/react";
 import { motion, AnimatePresence } from "framer-motion";
 import "@xyflow/react/dist/style.css";
+import { useDemoContext } from "../demo";
+import { transformAgentsToGraph, generateStaticDemoData } from "./agent-network-utils";
 
 // Level colors
 const levelColors: Record<number, string> = {
@@ -192,131 +194,35 @@ function AnimatedEdge({
 
 const nodeTypes = { agent: AgentNode };
 
-// Demo data generator
-function generateDemoData(): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
-  const nodes: Node<AgentNodeData>[] = [
-    {
-      id: "human",
-      type: "agent",
-      position: { x: 400, y: 0 },
-      data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true },
-    },
-    {
-      id: "coo",
-      type: "agent",
-      position: { x: 400, y: 120 },
-      data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 142 },
-    },
-    // Talent Agents (HR level)
-    {
-      id: "tech-ta",
-      type: "agent",
-      position: { x: 100, y: 260 },
-      data: { label: "Tech Talent", role: "hr", level: 9, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 89 },
-    },
-    {
-      id: "finance-ta",
-      type: "agent",
-      position: { x: 300, y: 260 },
-      data: { label: "Finance Talent", role: "hr", level: 9, status: "active", credits: 12000, domain: "Finance", tasksCompleted: 67 },
-    },
-    {
-      id: "marketing-ta",
-      type: "agent",
-      position: { x: 500, y: 260 },
-      data: { label: "Marketing Talent", role: "hr", level: 9, status: "active", credits: 11000, domain: "Marketing", tasksCompleted: 54 },
-    },
-    {
-      id: "sales-ta",
-      type: "agent",
-      position: { x: 700, y: 260 },
-      data: { label: "Sales Talent", role: "hr", level: 9, status: "pending", credits: 8000, domain: "Sales", tasksCompleted: 23 },
-    },
-    // Workers under Tech
-    {
-      id: "dev-1",
-      type: "agent",
-      position: { x: 0, y: 400 },
-      data: { label: "Code Reviewer", role: "senior", level: 6, status: "active", credits: 3200, tasksCompleted: 156 },
-    },
-    {
-      id: "dev-2",
-      type: "agent",
-      position: { x: 150, y: 400 },
-      data: { label: "Bug Hunter", role: "worker", level: 4, status: "active", credits: 1800, tasksCompleted: 89 },
-    },
-    {
-      id: "dev-3",
-      type: "agent",
-      position: { x: 50, y: 520 },
-      data: { label: "New Intern", role: "worker", level: 1, status: "pending", credits: 100, tasksCompleted: 3 },
-    },
-    // Workers under Finance
-    {
-      id: "fin-1",
-      type: "agent",
-      position: { x: 280, y: 400 },
-      data: { label: "Analyst", role: "senior", level: 5, status: "active", credits: 2400, tasksCompleted: 78 },
-    },
-    {
-      id: "fin-2",
-      type: "agent",
-      position: { x: 360, y: 400 },
-      data: { label: "Bookkeeper", role: "worker", level: 3, status: "paused", credits: 900, tasksCompleted: 34 },
-    },
-    // Workers under Marketing
-    {
-      id: "mkt-1",
-      type: "agent",
-      position: { x: 480, y: 400 },
-      data: { label: "Copywriter", role: "senior", level: 6, status: "active", credits: 2800, tasksCompleted: 112 },
-    },
-    {
-      id: "mkt-2",
-      type: "agent",
-      position: { x: 560, y: 400 },
-      data: { label: "SEO Bot", role: "worker", level: 4, status: "active", credits: 1500, tasksCompleted: 67 },
-    },
-    // Workers under Sales
-    {
-      id: "sales-1",
-      type: "agent",
-      position: { x: 680, y: 400 },
-      data: { label: "Prospector", role: "worker", level: 3, status: "active", credits: 1100, tasksCompleted: 45 },
-    },
-  ];
-
-  const edges: Edge[] = [
-    { id: "e-human-coo", source: "human", target: "coo", animated: true },
-    { id: "e-coo-tech", source: "coo", target: "tech-ta", data: { creditFlow: 100 } },
-    { id: "e-coo-finance", source: "coo", target: "finance-ta", data: { creditFlow: 80 } },
-    { id: "e-coo-marketing", source: "coo", target: "marketing-ta", data: { creditFlow: 70 } },
-    { id: "e-coo-sales", source: "coo", target: "sales-ta", data: { creditFlow: 50 } },
-    { id: "e-tech-dev1", source: "tech-ta", target: "dev-1" },
-    { id: "e-tech-dev2", source: "tech-ta", target: "dev-2" },
-    { id: "e-dev1-dev3", source: "dev-1", target: "dev-3" },
-    { id: "e-finance-fin1", source: "finance-ta", target: "fin-1" },
-    { id: "e-finance-fin2", source: "finance-ta", target: "fin-2" },
-    { id: "e-marketing-mkt1", source: "marketing-ta", target: "mkt-1" },
-    { id: "e-marketing-mkt2", source: "marketing-ta", target: "mkt-2" },
-    { id: "e-sales-sales1", source: "sales-ta", target: "sales-1" },
-  ];
-
-  return { nodes, edges };
-}
-
 interface AgentNetworkProps {
   className?: string;
 }
 
 export function AgentNetwork({ className }: AgentNetworkProps) {
-  const { nodes: initialNodes, edges: initialEdges } = generateDemoData();
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const demo = useDemoContext();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
 
-  // Simulate real-time updates
+  // Get graph data from demo context or use static data
+  const graphData = useMemo(() => {
+    if (demo?.isDemo && demo.scenarioData) {
+      return transformAgentsToGraph(demo.scenarioData.agents);
+    }
+    return generateStaticDemoData();
+  }, [demo?.isDemo, demo?.scenarioData, demo?.tick]); // Re-compute when tick changes
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(graphData.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(graphData.edges);
+
+  // Update nodes when graph data changes (demo mode updates)
   useEffect(() => {
+    setNodes(graphData.nodes);
+    setEdges(graphData.edges);
+  }, [graphData, setNodes, setEdges]);
+
+  // Simulate real-time updates only when NOT in demo mode
+  useEffect(() => {
+    if (demo?.isDemo) return; // Demo mode handles its own updates
+
     const interval = setInterval(() => {
       setNodes((nds) =>
         nds.map((node) => {
@@ -336,7 +242,7 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
       );
     }, 3000);
     return () => clearInterval(interval);
-  }, [setNodes]);
+  }, [setNodes, demo?.isDemo]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);
