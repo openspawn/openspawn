@@ -240,41 +240,146 @@ interface AgentNetworkProps {
   className?: string;
 }
 
+// Track spawn counts per parent for positioning
+const spawnCountByParent = new Map<string, number>();
+
+// Calculate position for a new node based on its parent
+function calculateSpawnPosition(
+  parentId: string | undefined, 
+  parentNode: Node<AgentNodeData> | undefined,
+  level: number
+): { x: number; y: number } {
+  if (!parentNode || !parentId) {
+    // Default position for top-level agents
+    const count = spawnCountByParent.get('root') || 0;
+    spawnCountByParent.set('root', count + 1);
+    return { x: 200 + (count % 5) * 180, y: 280 };
+  }
+  
+  // Get count of children already spawned by this parent
+  const childCount = spawnCountByParent.get(parentId) || 0;
+  spawnCountByParent.set(parentId, childCount + 1);
+  
+  // Spread children horizontally, offset based on child count
+  const offsetX = (childCount - 1) * 180;
+  const yOffset = level <= 7 ? 160 : 140; // More space for managers
+  
+  return {
+    x: parentNode.position.x + offsetX - 180,
+    y: parentNode.position.y + yOffset,
+  };
+}
+
 export function AgentNetwork({ className }: AgentNetworkProps) {
   const demo = useDemo();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
+  const [spawnedIds, setSpawnedIds] = useState<Set<string>>(new Set());
 
-  // Use static demo data as base
-  const initialData = useMemo(() => generateStaticDemoData(), []);
+  // Start with minimal hierarchy - just human + COO
+  const initialData = useMemo(() => {
+    const nodes: Node<AgentNodeData>[] = [
+      {
+        id: "human",
+        type: "agent",
+        position: { x: 400, y: 0 },
+        data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true },
+      },
+      {
+        id: "coo",
+        type: "agent",
+        position: { x: 400, y: 140 },
+        data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 0 },
+      },
+    ];
+    const edges: Edge[] = [
+      { id: "e-human-coo", source: "human", target: "coo", animated: true },
+    ];
+    return { nodes, edges };
+  }, []);
   
   const [nodes, setNodes, onNodesChange] = useNodesState(initialData.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
 
-  // Apply spawn/despawn animations based on demo events
+  // Process simulation events to spawn/despawn agents
   useEffect(() => {
-    if (!demo.isDemo) return;
+    if (!demo.isDemo || demo.recentEvents.length === 0) return;
     
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.data?.isHuman) return node;
+    const latestEvent = demo.recentEvents[0];
+    if (!latestEvent) return;
+    
+    // Handle agent spawn
+    if (latestEvent.type === 'agent_created') {
+      const newAgent = latestEvent.payload as any;
+      if (spawnedIds.has(newAgent.id)) return; // Already added
+      
+      setSpawnedIds(prev => new Set(prev).add(newAgent.id));
+      
+      setNodes((nds) => {
+        const parentNode = nds.find(n => n.id === newAgent.parentId);
+        const pos = calculateSpawnPosition(newAgent.parentId, parentNode, newAgent.level);
         
-        const isSpawning = demo.agentSpawns.includes(node.id);
-        const isDespawning = demo.agentDespawns.includes(node.id);
+        const newNode: Node<AgentNodeData> = {
+          id: newAgent.id,
+          type: "agent",
+          position: pos,
+          data: {
+            label: newAgent.name,
+            role: newAgent.role,
+            level: newAgent.level,
+            status: newAgent.status,
+            credits: newAgent.currentBalance,
+            domain: newAgent.domain,
+            tasksCompleted: 0,
+            isSpawning: true, // Trigger spawn animation
+          },
+        };
         
-        if (isSpawning !== node.data?.isSpawning || isDespawning !== node.data?.isDespawning) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              isSpawning,
-              isDespawning,
-            },
-          };
-        }
-        return node;
-      })
-    );
-  }, [demo.agentSpawns, demo.agentDespawns, demo.isDemo, setNodes]);
+        // Clear spawning state after animation
+        setTimeout(() => {
+          setNodes((current) =>
+            current.map((n) =>
+              n.id === newAgent.id ? { ...n, data: { ...n.data, isSpawning: false } } : n
+            )
+          );
+        }, 2000);
+        
+        return [...nds, newNode];
+      });
+      
+      // Add edge from parent
+      if (newAgent.parentId) {
+        setEdges((eds) => [
+          ...eds,
+          {
+            id: `e-${newAgent.parentId}-${newAgent.id}`,
+            source: newAgent.parentId,
+            target: newAgent.id,
+            animated: true,
+          },
+        ]);
+      }
+    }
+    
+    // Handle agent status change (despawn)
+    if (latestEvent.type === 'agent_terminated') {
+      const { agent, newStatus } = latestEvent.payload as any;
+      
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === agent.id
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  status: newStatus,
+                  isDespawning: newStatus === 'revoked',
+                },
+              }
+            : n
+        )
+      );
+    }
+  }, [demo.recentEvents, demo.isDemo, setNodes, setEdges, spawnedIds]);
 
   // Simulate real-time credit/task updates
   useEffect(() => {
@@ -283,21 +388,22 @@ export function AgentNetwork({ className }: AgentNetworkProps) {
     const interval = setInterval(() => {
       setNodes((nds) =>
         nds.map((node) => {
-          if (node.data && !node.data.isHuman && Math.random() > 0.7) {
+          if (node.data && !node.data.isHuman && Math.random() > 0.6) {
             const newData = node.data as AgentNodeData;
+            const creditDelta = Math.floor(Math.random() * 100) - 30;
             return {
               ...node,
               data: {
                 ...newData,
-                credits: newData.credits + Math.floor(Math.random() * 50) - 20,
-                tasksCompleted: (newData.tasksCompleted || 0) + (Math.random() > 0.8 ? 1 : 0),
+                credits: Math.max(0, newData.credits + creditDelta),
+                tasksCompleted: (newData.tasksCompleted || 0) + (Math.random() > 0.7 ? 1 : 0),
               },
             };
           }
           return node;
         })
       );
-    }, 1000 / demo.speed); // Faster updates at higher speeds
+    }, 1000 / demo.speed);
     
     return () => clearInterval(interval);
   }, [demo.isPlaying, demo.speed, setNodes]);
