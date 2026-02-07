@@ -3,6 +3,7 @@ import { DataSource, type DataSourceOptions } from "typeorm";
 import {
   Agent,
   AgentCapability,
+  ApiKey,
   Channel,
   CreditRateConfig,
   CreditTransaction,
@@ -11,14 +12,19 @@ import {
   Message,
   Nonce,
   Organization,
+  RefreshToken,
   Task,
   TaskComment,
   TaskDependency,
   TaskTag,
+  User,
 } from "./entities";
 
 export const entities = [
   Organization,
+  User,
+  RefreshToken,
+  ApiKey,
   Agent,
   AgentCapability,
   Task,
