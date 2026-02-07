@@ -37,6 +37,8 @@ function mapAgent(agent: DemoAgent) {
     budgetPeriodSpent: Math.floor(agent.lifetimeEarnings * 0.3),
     managementFeePct: agent.level >= 9 ? 5 : 10,
     createdAt: agent.createdAt,
+    parentId: agent.parentId || null,
+    domain: agent.domain || null,
   };
 }
 

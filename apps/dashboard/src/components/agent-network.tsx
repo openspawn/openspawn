@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
+import { useAgents, type Agent } from "../hooks/use-agents";
 
 // Context to share active delegations and speed with edge components
 interface TaskDelegation {
@@ -42,6 +43,8 @@ const elk = new ELK();
 
 // Auto-layout using ELK (async)
 async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ nodes: Node[]; edges: Edge[] }> {
+  if (nodes.length === 0) return { nodes: [], edges: [] };
+  
   const elkGraph = {
     id: "root",
     layoutOptions: {
@@ -113,12 +116,10 @@ interface AgentNodeData {
   isDespawning?: boolean;
 }
 
-// Custom node component with spawn/despawn animations
+// Custom node component
 function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const nodeData = data as AgentNodeData;
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
-  
-  // Determine if this node is spawning or despawning
   const isSpawning = nodeData.isSpawning;
   const isDespawning = nodeData.isDespawning;
   
@@ -135,7 +136,6 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
     >
       <Handle type="target" position={Position.Top} className="!bg-transparent !border-0" />
       
-      {/* Spawn glow effect */}
       {isSpawning && (
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -146,36 +146,19 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
         />
       )}
       
-      {/* Despawn fade effect */}
-      {isDespawning && (
-        <motion.div
-          initial={{ scale: 1, opacity: 0 }}
-          animate={{ scale: 1.5, opacity: [0, 0.5, 0] }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="absolute inset-0 rounded-xl"
-          style={{ backgroundColor: "#ef4444", filter: "blur(20px)" }}
-        />
-      )}
-      
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
-        animate={{
-          borderColor: isSpawning ? ["#22c55e", color] : color,
-        }}
-        transition={{ duration: 0.5 }}
         className={`
           relative px-3 py-2 sm:px-4 sm:py-3 rounded-xl border-2 min-w-[100px] sm:min-w-[140px]
           ${selected ? "shadow-lg shadow-purple-500/30" : ""}
           ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
-          ${isDespawning ? "shadow-lg shadow-red-500/30 opacity-60" : ""}
         `}
         style={{
           borderColor: color,
           backgroundColor: `${color}15`,
         }}
       >
-        {/* Level badge */}
         {!nodeData.isHuman && (
           <motion.div
             initial={{ scale: 0 }}
@@ -188,7 +171,6 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
           </motion.div>
         )}
 
-        {/* Status indicator */}
         <motion.div
           animate={{
             scale: nodeData.status === "active" ? [1, 1.2, 1] : 1,
@@ -204,27 +186,19 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
           }}
         />
 
-        {/* Icon with spawn animation */}
-        <motion.div 
-          className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1"
-          animate={isSpawning ? { rotate: [0, 10, -10, 0] } : {}}
-          transition={{ duration: 0.5, repeat: isSpawning ? 2 : 0 }}
-        >
+        <motion.div className="text-xl sm:text-2xl text-center mb-0.5 sm:mb-1">
           {nodeData.isHuman ? "👤" : "🤖"}
         </motion.div>
 
-        {/* Name */}
         <div className="text-xs sm:text-sm font-semibold text-white text-center truncate max-w-[80px] sm:max-w-none">
           {nodeData.label}
         </div>
 
-        {/* Role */}
         <div className="text-[10px] sm:text-xs text-center" style={{ color }}>
           {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
           {nodeData.domain && <span className="hidden sm:inline"> • {nodeData.domain}</span>}
         </div>
 
-        {/* Credits - hidden on mobile */}
         {!nodeData.isHuman && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
@@ -235,13 +209,6 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             💰 {nodeData.credits.toLocaleString()}
           </motion.div>
         )}
-
-        {/* Task count - hidden on mobile */}
-        {nodeData.tasksCompleted !== undefined && (
-          <div className="hidden sm:block text-xs text-center text-zinc-500">
-            ✓ {nodeData.tasksCompleted} tasks
-          </div>
-        )}
       </motion.div>
 
       <Handle type="source" position={Position.Bottom} className="!bg-transparent !border-0" />
@@ -249,7 +216,7 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   );
 }
 
-// Custom edge with flowing task packets - clean, minimal dots
+// Custom edge with flowing task packets
 function TaskFlowEdge({
   id,
   sourceX,
@@ -265,7 +232,6 @@ function TaskFlowEdge({
 }: EdgeProps) {
   const { delegations, speed } = useContext(DelegationContext);
   
-  // Get the edge path
   const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -275,21 +241,17 @@ function TaskFlowEdge({
     targetPosition,
   });
 
-  // Find active delegations for this edge
   const activeDelegations = delegations.filter(
     (d) => d.fromId === source && d.toId === target
   );
 
-  // Animation duration scales with speed (faster = shorter duration)
   const baseDuration = 1.2;
-  const duration = baseDuration / Math.sqrt(speed); // sqrt for smoother scaling
+  const duration = baseDuration / Math.sqrt(speed);
 
   return (
     <>
-      {/* Base edge line */}
       <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
       
-      {/* Animated task packets - simple glowing dots */}
       {activeDelegations.map((delegation, index) => (
         <motion.circle
           key={delegation.id}
@@ -309,7 +271,6 @@ function TaskFlowEdge({
           }}
           style={{ 
             offsetPath: `path("${edgePath}")`,
-            // Stagger multiple packets on same edge
             offsetDistance: `${index * 15}%`,
           }}
         />
@@ -325,57 +286,96 @@ interface AgentNetworkProps {
   className?: string;
 }
 
-// Initial raw data (before layout)
-const initialNodes: Node<AgentNodeData>[] = [
-  { id: "human", type: "agent", position: { x: 400, y: 0 }, data: { label: "Adam", role: "ceo", level: 10, status: "active", credits: 0, isHuman: true } },
-  { id: "coo", type: "agent", position: { x: 400, y: 120 }, data: { label: "Agent Dennis", role: "coo", level: 10, status: "active", credits: 50000, tasksCompleted: 12 } },
-  { id: "talent", type: "agent", position: { x: 400, y: 240 }, data: { label: "Talent Agent", role: "hr", level: 9, status: "active", credits: 25000, domain: "HR", tasksCompleted: 8 } },
-  { id: "dev-lead", type: "agent", position: { x: 200, y: 360 }, data: { label: "Dev Lead", role: "manager", level: 8, status: "active", credits: 15000, domain: "Engineering", tasksCompleted: 24 } },
-  { id: "qa-lead", type: "agent", position: { x: 600, y: 360 }, data: { label: "QA Lead", role: "manager", level: 8, status: "active", credits: 12000, domain: "Quality", tasksCompleted: 18 } },
-  { id: "dev-1", type: "agent", position: { x: 100, y: 480 }, data: { label: "Dev Agent 1", role: "senior", level: 6, status: "active", credits: 8000, domain: "Backend", tasksCompleted: 45 } },
-  { id: "dev-2", type: "agent", position: { x: 300, y: 480 }, data: { label: "Dev Agent 2", role: "senior", level: 5, status: "active", credits: 6000, domain: "Frontend", tasksCompleted: 38 } },
-  { id: "qa-1", type: "agent", position: { x: 500, y: 480 }, data: { label: "QA Agent 1", role: "worker", level: 4, status: "active", credits: 4000, domain: "Testing", tasksCompleted: 67 } },
-  { id: "qa-2", type: "agent", position: { x: 700, y: 480 }, data: { label: "QA Agent 2", role: "worker", level: 3, status: "pending", credits: 2000, domain: "Testing", tasksCompleted: 12 } },
-];
+// Convert API agents to ReactFlow nodes and edges
+function buildNodesAndEdges(agents: Agent[]): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
+  // Add human node at the top
+  const nodes: Node<AgentNodeData>[] = [
+    {
+      id: "human",
+      type: "agent",
+      position: { x: 0, y: 0 },
+      data: {
+        label: "Adam",
+        role: "ceo",
+        level: 10,
+        status: "active",
+        credits: 0,
+        isHuman: true,
+      },
+    },
+  ];
 
-const initialEdges: Edge[] = [
-  { id: "e-human-coo", source: "human", target: "coo", type: "taskFlow", animated: true, style: { stroke: "#6366f1", strokeWidth: 2 } },
-  { id: "e-coo-talent", source: "coo", target: "talent", type: "taskFlow", animated: true, style: { stroke: "#a78bfa", strokeWidth: 2 } },
-  { id: "e-talent-dev", source: "talent", target: "dev-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-  { id: "e-talent-qa", source: "talent", target: "qa-lead", type: "taskFlow", animated: true, style: { stroke: "#22c55e", strokeWidth: 2 } },
-  { id: "e-dev-1", source: "dev-lead", target: "dev-1", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-  { id: "e-dev-2", source: "dev-lead", target: "dev-2", type: "taskFlow", animated: true, style: { stroke: "#06b6d4", strokeWidth: 2 } },
-  { id: "e-qa-1", source: "qa-lead", target: "qa-1", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
-  { id: "e-qa-2", source: "qa-lead", target: "qa-2", type: "taskFlow", animated: true, style: { stroke: "#fbbf24", strokeWidth: 2 } },
-];
+  const edges: Edge[] = [];
 
-// Inner component that uses useReactFlow (must be inside ReactFlowProvider)
+  // Convert agents to nodes
+  agents.forEach((agent) => {
+    nodes.push({
+      id: agent.id,
+      type: "agent",
+      position: { x: 0, y: 0 },
+      data: {
+        label: agent.name,
+        role: agent.role,
+        level: agent.level,
+        status: agent.status as "active" | "pending" | "paused" | "suspended",
+        credits: agent.currentBalance,
+        domain: agent.domain || undefined,
+        tasksCompleted: 0,
+      },
+    });
+
+    // Create edge from parent
+    const parentId = agent.parentId || (agent.level >= 9 ? "human" : undefined);
+    if (parentId) {
+      const color = levelColors[agent.level] || "#6366f1";
+      edges.push({
+        id: `e-${parentId}-${agent.id}`,
+        source: parentId,
+        target: agent.id,
+        type: "taskFlow",
+        animated: true,
+        style: { stroke: color, strokeWidth: 2 },
+      });
+    }
+  });
+
+  return { nodes, edges };
+}
+
+// Inner component
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
+  const { agents, loading } = useAgents();
   const { fitView, getNodes, getEdges } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
-  const [spawnedIds, setSpawnedIds] = useState<Set<string>>(new Set());
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
-  const [layoutReady, setLayoutReady] = useState(false);
+  const [hasInitialLayout, setHasInitialLayout] = useState(false);
   
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Run initial layout on mount
+  // Build nodes/edges from agents data
   useEffect(() => {
-    getLayoutedElements(initialNodes, initialEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+    if (loading || agents.length === 0) return;
+    
+    const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents);
+    
+    // Apply layout
+    getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
-      setLayoutReady(true);
-      setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 50);
+      if (!hasInitialLayout) {
+        setHasInitialLayout(true);
+        setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 100);
+      }
     });
-  }, []);
+  }, [agents, loading, hasInitialLayout, setNodes, setEdges, fitView]);
 
-  // Re-layout using current nodes/edges from ReactFlow store (avoids dependency cycle)
+  // Re-layout
   const runLayout = useCallback(async () => {
     const currentNodes = getNodes();
     const currentEdges = getEdges();
-    if (currentNodes.length === 0) return; // Nothing to layout
+    if (currentNodes.length === 0) return;
     
     try {
       const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(currentNodes, currentEdges);
@@ -387,177 +387,57 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     }
   }, [getNodes, getEdges, setNodes, setEdges, fitView]);
 
-  // Process simulation events to spawn/despawn agents
+  // Task delegation simulation
   useEffect(() => {
-    if (!demo.isDemo || demo.recentEvents.length === 0) return;
-    
-    const latestEvent = demo.recentEvents[0];
-    if (!latestEvent) return;
-    
-    // Handle agent spawn
-    if (latestEvent.type === 'agent_created') {
-      const newAgent = latestEvent.payload as any;
-      if (spawnedIds.has(newAgent.id)) return; // Already added
-      
-      setSpawnedIds(prev => new Set(prev).add(newAgent.id));
-      
-      // Add new node (position will be set by layout)
-      const newNode: Node<AgentNodeData> = {
-        id: newAgent.id,
-        type: "agent",
-        position: { x: 0, y: 0 }, // Will be repositioned by dagre
-        data: {
-          label: newAgent.name,
-          role: newAgent.role,
-          level: newAgent.level,
-          status: newAgent.status,
-          credits: newAgent.currentBalance,
-          domain: newAgent.domain,
-          tasksCompleted: 0,
-          isSpawning: true, // Trigger spawn animation
-        },
-      };
-      
-      setNodes((nds) => [...nds, newNode]);
-      
-      // Add edge from parent
-      if (newAgent.parentId) {
-        setEdges((eds) => [
-          ...eds,
-          {
-            id: `e-${newAgent.parentId}-${newAgent.id}`,
-            source: newAgent.parentId,
-            target: newAgent.id,
-            type: "taskFlow",
-            animated: true,
-            style: { stroke: "#22c55e", strokeWidth: 2 },
-          },
-        ]);
-      }
-      
-      // Re-layout after spawn (wait for React state to commit, then layout)
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        setTimeout(async () => {
-          await runLayout();
-          // Clear spawning state after animation
-          setTimeout(() => {
-            setNodes((current) =>
-              current.map((n) =>
-                n.id === newAgent.id ? { ...n, data: { ...n.data, isSpawning: false } } : n
-              )
-            );
-          }, 1500);
-        }, 100);
-      });
-    }
-    
-    // Handle agent status change (despawn)
-    if (latestEvent.type === 'agent_terminated') {
-      const { agent, newStatus } = latestEvent.payload as any;
-      
-      setNodes((nds) =>
-        nds.map((n) =>
-          n.id === agent.id
-            ? {
-                ...n,
-                data: {
-                  ...n.data,
-                  status: newStatus,
-                  isDespawning: newStatus === 'revoked',
-                },
-              }
-            : n
-        )
-      );
-      
-      // Re-layout after despawn (if agent is being removed)
-      if (newStatus === 'revoked') {
-        setTimeout(() => runLayout(), 1000);
-      }
-    }
-  }, [demo.recentEvents, demo.isDemo, setNodes, setEdges, spawnedIds, runLayout]);
-
-  // Simulate real-time credit/task updates and task delegations
-  useEffect(() => {
-    if (!demo.isPlaying) return;
-
-    // Task delegation paths (parent → child relationships)
-    const delegationPaths = [
-      { from: "human", to: "coo" },
-      { from: "coo", to: "talent" },
-      { from: "talent", to: "dev-lead" },
-      { from: "talent", to: "qa-lead" },
-      { from: "dev-lead", to: "dev-1" },
-      { from: "dev-lead", to: "dev-2" },
-      { from: "qa-lead", to: "qa-1" },
-      { from: "qa-lead", to: "qa-2" },
-    ];
+    if (!demo.isPlaying || nodes.length === 0) return;
 
     const taskTitles = [
-      "Review PR #42",
-      "Deploy v2.1",
-      "Fix auth bug",
-      "Update docs",
-      "Run tests",
-      "Code review",
-      "Setup CI/CD",
-      "Refactor API",
+      "Review PR #42", "Deploy v2.1", "Fix auth bug", "Update docs",
+      "Run tests", "Code review", "Setup CI/CD", "Refactor API",
     ];
 
     const interval = setInterval(() => {
-      // Credit/task updates
-      setNodes((nds) =>
-        nds.map((node) => {
-          if (node.data && !node.data.isHuman && Math.random() > 0.6) {
-            const newData = node.data as AgentNodeData;
-            const creditDelta = Math.floor(Math.random() * 100) - 30;
-            return {
-              ...node,
-              data: {
-                ...newData,
-                credits: Math.max(0, newData.credits + creditDelta),
-                tasksCompleted: (newData.tasksCompleted || 0) + (Math.random() > 0.7 ? 1 : 0),
-              },
-            };
-          }
-          return node;
-        })
-      );
+      // Find edges to animate tasks along
+      if (edges.length === 0) return;
+      
+      const randomEdge = edges[Math.floor(Math.random() * edges.length)];
+      const taskTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)];
+      
+      const delegation: TaskDelegation = {
+        id: `del-${Date.now()}-${Math.random()}`,
+        fromId: randomEdge.source,
+        toId: randomEdge.target,
+        taskTitle,
+        startTime: Date.now(),
+      };
+      
+      setActiveDelegations((prev) => [...prev, delegation]);
 
-      // Randomly create task delegations
-      if (Math.random() > 0.5) {
-        const path = delegationPaths[Math.floor(Math.random() * delegationPaths.length)];
-        const taskTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)];
-        const delegation: TaskDelegation = {
-          id: `del-${Date.now()}-${Math.random()}`,
-          fromId: path.from,
-          toId: path.to,
-          taskTitle,
-          startTime: Date.now(),
-        };
-        setActiveDelegations((prev) => [...prev, delegation]);
-
-        // Remove delegation after animation completes (matches edge animation duration)
-        const animDuration = 1200 / Math.sqrt(demo.speed);
-        setTimeout(() => {
-          setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id));
-        }, animDuration);
-      }
-    }, 800 / demo.speed); // Create delegations more frequently
+      const animDuration = 1200 / Math.sqrt(demo.speed);
+      setTimeout(() => {
+        setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id));
+      }, animDuration);
+    }, 800 / demo.speed);
     
     return () => clearInterval(interval);
-  }, [demo.isPlaying, demo.speed, setNodes]);
+  }, [demo.isPlaying, demo.speed, nodes.length, edges]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);
   }
 
-  // Context value includes speed so edges can adapt animation duration
   const contextValue = useMemo(() => ({
     delegations: activeDelegations,
     speed: demo.speed,
   }), [activeDelegations, demo.speed]);
+
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <div className="text-zinc-400">Loading agents...</div>
+      </div>
+    );
+  }
 
   return (
     <DelegationContext.Provider value={contextValue}>
@@ -569,157 +449,122 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
           edgeTypes={edgeTypes}
-        nodeTypes={nodeTypes}
-        fitView
-        minZoom={0.5}
-        maxZoom={1.5}
-        proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{
-          type: "smoothstep",
-          animated: true,
-          markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
-          style: { stroke: "#6366f1", strokeWidth: 2 },
-        }}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
-        <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
-      </ReactFlow>
+          nodeTypes={nodeTypes}
+          fitView
+          minZoom={0.3}
+          maxZoom={1.5}
+          proOptions={{ hideAttribution: true }}
+          defaultEdgeOptions={{
+            type: "smoothstep",
+            animated: true,
+            markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
+            style: { stroke: "#6366f1", strokeWidth: 2 },
+          }}
+        >
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
+          <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+        </ReactFlow>
 
-      {/* Legend - hidden in landscape mobile, compact on portrait mobile, shown on larger screens */}
-      <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
-        <div className="font-semibold mb-2 text-white text-xs sm:text-sm">Levels</div>
-        <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
-          {[
-            { level: "L10", label: "COO", color: "#f472b6" },
-            { level: "L9", label: "HR", color: "#a78bfa" },
-            { level: "L7-8", label: "Mgr", color: "#22c55e" },
-            { level: "L5-6", label: "Sr", color: "#06b6d4" },
-            { level: "L3-4", label: "Wkr", color: "#fbbf24" },
-            { level: "L1-2", label: "New", color: "#71717a" },
-          ].map((item) => (
-            <div key={item.level} className="flex items-center gap-1 sm:gap-2">
-              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-              <span className="text-zinc-400">{item.level}</span>
-              <span className="text-zinc-500 hidden sm:inline">{item.label}</span>
-            </div>
-          ))}
-        </div>
-        <div className="hidden sm:block mt-3 pt-3 border-t border-zinc-800 space-y-1 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-zinc-400">Active</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <span className="text-zinc-400">Pending</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-purple-500" />
-            <span className="text-zinc-400">Paused</span>
+        {/* Legend */}
+        <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
+          <div className="font-semibold mb-2 text-white text-xs sm:text-sm">Levels</div>
+          <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
+            {[
+              { level: "L10", label: "COO", color: "#f472b6" },
+              { level: "L9", label: "HR", color: "#a78bfa" },
+              { level: "L5-6", label: "Sr", color: "#06b6d4" },
+              { level: "L3-4", label: "Wkr", color: "#fbbf24" },
+              { level: "L1-2", label: "New", color: "#71717a" },
+            ].map((item) => (
+              <div key={item.level} className="flex items-center gap-1 sm:gap-2">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                <span className="text-zinc-400">{item.level}</span>
+                <span className="text-zinc-500 hidden sm:inline">{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Selected node details - bottom sheet on mobile, side panel on desktop */}
-      <AnimatePresence>
-        {selectedNode && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute 
-              bottom-20 sm:bottom-auto sm:top-4 
-              left-4 right-4 sm:left-auto sm:right-4 
-              bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-4 
-              sm:w-64"
-          >
-            <button
-              onClick={() => setSelectedNode(null)}
-              className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
+        {/* Selected node details */}
+        <AnimatePresence>
+          {selectedNode && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute bottom-20 sm:bottom-auto sm:top-4 left-4 right-4 sm:left-auto sm:right-4 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-4 sm:w-64"
             >
-              ✕
-            </button>
-            <div className="flex sm:block items-center gap-3">
-              <div className="text-2xl sm:hidden">
-                {(selectedNode.data as AgentNodeData).isHuman ? "👤" : "🤖"}
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
+              >
+                ✕
+              </button>
+              <div className="text-base sm:text-lg font-semibold text-white mb-1">
+                {(selectedNode.data as AgentNodeData).label}
               </div>
-              <div>
-                <div className="text-base sm:text-lg font-semibold text-white mb-0.5 sm:mb-1">
-                  {(selectedNode.data as AgentNodeData).label}
-                </div>
-                <div className="text-xs sm:text-sm text-zinc-400 mb-2 sm:mb-3">
-                  {(selectedNode.data as AgentNodeData).isHuman
-                    ? "Human Operator"
-                    : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
-                </div>
+              <div className="text-xs sm:text-sm text-zinc-400 mb-3">
+                {(selectedNode.data as AgentNodeData).isHuman
+                  ? "Human Operator"
+                  : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
               </div>
-            </div>
-            {!(selectedNode.data as AgentNodeData).isHuman && (
-              <div className="grid grid-cols-2 sm:grid-cols-1 gap-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Credits</span>
-                  <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Tasks</span>
-                  <span className="text-white">{(selectedNode.data as AgentNodeData).tasksCompleted || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Status</span>
-                  <span className={
-                    (selectedNode.data as AgentNodeData).status === "active" ? "text-green-500" :
-                    (selectedNode.data as AgentNodeData).status === "pending" ? "text-yellow-500" : "text-purple-500"
-                  }>
-                    {(selectedNode.data as AgentNodeData).status}
-                  </span>
-                </div>
-                {(selectedNode.data as AgentNodeData).domain && (
+              {!(selectedNode.data as AgentNodeData).isHuman && (
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Domain</span>
-                    <span className="text-white">{(selectedNode.data as AgentNodeData).domain}</span>
+                    <span className="text-zinc-500">Credits</span>
+                    <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
                   </div>
-                )}
-              </div>
-            )}
-          </motion.div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Status</span>
+                    <span className={(selectedNode.data as AgentNodeData).status === "active" ? "text-green-500" : "text-yellow-500"}>
+                      {(selectedNode.data as AgentNodeData).status}
+                    </span>
+                  </div>
+                  {(selectedNode.data as AgentNodeData).domain && (
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">Domain</span>
+                      <span className="text-white">{(selectedNode.data as AgentNodeData).domain}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Task Flow Feed */}
+        {demo.isDemo && activeDelegations.length > 0 && (
+          <div className="absolute bottom-20 right-4 sm:bottom-6 sm:right-4 z-10">
+            <AnimatePresence mode="popLayout">
+              {activeDelegations.slice(-5).map((del, idx) => {
+                const fromNode = nodes.find((n) => n.id === del.fromId);
+                const toNode = nodes.find((n) => n.id === del.toId);
+                return (
+                  <motion.div
+                    key={del.id}
+                    initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                    animate={{ opacity: 1 - idx * 0.15, x: 0, scale: 1 - idx * 0.03, y: idx * -4 }}
+                    exit={{ opacity: 0, x: 30, scale: 0.8 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="bg-zinc-900/95 backdrop-blur border border-green-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-green-500/10"
+                    style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+                    <span className="text-zinc-400 truncate max-w-[60px]">{fromNode?.data?.label || del.fromId}</span>
+                    <span className="text-green-500">→</span>
+                    <span className="text-zinc-400 truncate max-w-[60px]">{toNode?.data?.label || del.toId}</span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         )}
-      </AnimatePresence>
-
-      {/* Task Flow Feed - shows recent delegations in a compact stack */}
-      {demo.isDemo && (
-        <div className="absolute bottom-20 right-4 sm:bottom-6 sm:right-4 z-10">
-          <AnimatePresence mode="popLayout">
-            {activeDelegations.slice(-5).map((del, idx) => {
-              const fromNode = nodes.find((n) => n.id === del.fromId);
-              const toNode = nodes.find((n) => n.id === del.toId);
-              return (
-                <motion.div
-                  key={del.id}
-                  initial={{ opacity: 0, x: 20, scale: 0.8 }}
-                  animate={{ opacity: 1 - idx * 0.15, x: 0, scale: 1 - idx * 0.03, y: idx * -4 }}
-                  exit={{ opacity: 0, x: 30, scale: 0.8 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className="bg-zinc-900/95 backdrop-blur border border-green-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-green-500/10"
-                  style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
-                >
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-                  <span className="text-zinc-400 truncate max-w-[60px]">{fromNode?.data?.label || del.fromId}</span>
-                  <span className="text-green-500">→</span>
-                  <span className="text-zinc-400 truncate max-w-[60px]">{toNode?.data?.label || del.toId}</span>
-                  <span className="text-zinc-500 hidden sm:inline truncate max-w-[80px]">"{del.taskTitle}"</span>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      )}
-
       </div>
     </DelegationContext.Provider>
   );
 }
 
-// Wrapper component that provides ReactFlowProvider
+// Wrapper with ReactFlowProvider
 export function AgentNetwork({ className }: AgentNetworkProps) {
   return (
     <ReactFlowProvider>
