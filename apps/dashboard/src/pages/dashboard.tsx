@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
   CheckSquare,
@@ -62,7 +63,15 @@ function StatCard({ title, value, change, icon: Icon, description }: StatCardPro
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <motion.div 
+          key={String(value)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          className="text-2xl font-bold"
+        >
+          {value}
+        </motion.div>
         {change !== undefined && (
           <p className="flex items-center text-xs text-muted-foreground">
             {isPositive && (
@@ -246,33 +255,45 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {tasks.slice(0, 5).map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between rounded-lg border border-border p-3"
-              >
-                <div className="flex items-center gap-3">
-                  <CheckSquare className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{task.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {task.identifier}
-                    </p>
-                  </div>
-                </div>
-                <Badge
-                  variant={
-                    task.status === "done"
-                      ? "success"
-                      : task.status === "in_progress"
-                        ? "info"
-                        : "secondary"
-                  }
+            <AnimatePresence mode="popLayout">
+              {tasks.slice(0, 5).map((task, index) => (
+                <motion.div
+                  key={task.id}
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 30,
+                    delay: index * 0.05
+                  }}
+                  className="flex items-center justify-between rounded-lg border border-border p-3"
                 >
-                  {task.status.replace("_", " ")}
-                </Badge>
-              </div>
-            ))}
+                  <div className="flex items-center gap-3">
+                    <CheckSquare className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{task.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {task.identifier}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant={
+                      task.status === "done"
+                        ? "success"
+                        : task.status === "in_progress"
+                          ? "info"
+                          : "secondary"
+                    }
+                  >
+                    {task.status.replace("_", " ")}
+                  </Badge>
+                </motion.div>
+              ))}
+            </AnimatePresence>
             {tasks.length === 0 && (
               <p className="text-center text-sm text-muted-foreground py-8">
                 No tasks yet. Create your first task to get started.

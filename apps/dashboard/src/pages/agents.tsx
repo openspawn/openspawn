@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -545,10 +546,19 @@ export function AgentsPage() {
 
       {/* Agents grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredAgents.map((agent) => {
-          const levelColor = getLevelColor(agent.level);
-          return (
-            <Card key={agent.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+        <AnimatePresence mode="popLayout">
+          {filteredAgents.map((agent) => {
+            const levelColor = getLevelColor(agent.level);
+            return (
+              <motion.div
+                key={agent.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              >
+                <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
               {/* Level color bar */}
               <div 
                 className="absolute left-0 top-0 h-1 w-full" 
@@ -624,8 +634,10 @@ export function AgentsPage() {
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
+          </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       {filteredAgents.length === 0 && agents.length > 0 && (

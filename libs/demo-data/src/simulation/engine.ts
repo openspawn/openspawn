@@ -63,6 +63,7 @@ function shouldFire(probability: number): boolean {
 export class SimulationEngine {
   private state: SimulationState;
   private listeners: ((event: SimulationEvent) => void)[] = [];
+  private tickListeners: ((events: SimulationEvent[], tick: number) => void)[] = [];
   private tickInterval: ReturnType<typeof setInterval> | null = null;
   
   constructor(scenario: DemoScenario) {
@@ -88,8 +89,20 @@ export class SimulationEngine {
     };
   }
   
+  // Tick listener - fires once per tick with all events from that tick
+  onTick(callback: (events: SimulationEvent[], tick: number) => void): () => void {
+    this.tickListeners.push(callback);
+    return () => {
+      this.tickListeners = this.tickListeners.filter(l => l !== callback);
+    };
+  }
+  
   private emit(event: SimulationEvent): void {
     this.listeners.forEach(l => l(event));
+  }
+  
+  private emitTick(events: SimulationEvent[], tick: number): void {
+    this.tickListeners.forEach(l => l(events, tick));
   }
   
   // State getters
@@ -213,6 +226,8 @@ export class SimulationEngine {
     // Emit all events
     if (emitEvents) {
       events.forEach(e => this.emit(e));
+      // Emit tick callback with all events from this tick
+      this.emitTick(events, this.state.currentTick);
     }
     
     return events;

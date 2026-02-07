@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
   AlertCircle,
@@ -178,36 +179,55 @@ export function EventsPage() {
           <Card>
             <ScrollArea className="h-[calc(100vh-400px)]">
               <div className="divide-y divide-border">
-                {filteredEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex items-start gap-4 p-4 hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="mt-0.5">{getSeverityIcon(event.severity)}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant={getSeverityVariant(event.severity)}>
-                          {event.type}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {formatTime(event.createdAt)}
-                        </span>
-                      </div>
-                      <p className="text-sm">
-                        <span className="font-medium">{event.actor?.name || "System"}</span>
-                        {" "}
-                        <span className="text-muted-foreground">
-                          {event.entityType} → {event.entityId.slice(0, 8)}...
-                        </span>
-                      </p>
-                      {event.reasoning && (
-                        <p className="text-xs text-muted-foreground mt-1 italic">
-                          "{event.reasoning}"
+                <AnimatePresence mode="popLayout">
+                  {filteredEvents.map((event, index) => (
+                    <motion.div
+                      key={event.id}
+                      layout
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10, height: 0 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 30,
+                        delay: index < 10 ? index * 0.02 : 0
+                      }}
+                      className="flex items-start gap-4 p-4 hover:bg-accent/50 transition-colors"
+                    >
+                      <motion.div 
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", delay: 0.1 }}
+                        className="mt-0.5"
+                      >
+                        {getSeverityIcon(event.severity)}
+                      </motion.div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={getSeverityVariant(event.severity)}>
+                            {event.type}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {formatTime(event.createdAt)}
+                          </span>
+                        </div>
+                        <p className="text-sm">
+                          <span className="font-medium">{event.actor?.name || "System"}</span>
+                          {" "}
+                          <span className="text-muted-foreground">
+                            {event.entityType} → {event.entityId.slice(0, 8)}...
+                          </span>
                         </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                        {event.reasoning && (
+                          <p className="text-xs text-muted-foreground mt-1 italic">
+                            "{event.reasoning}"
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
                 {filteredEvents.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <Activity className="h-12 w-12 text-muted-foreground mb-4" />

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Filter, Search, GripVertical } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -42,29 +43,37 @@ interface Task {
 
 function TaskCard({ task }: { task: Task }) {
   return (
-    <Card className="cursor-pointer transition-colors hover:bg-accent/50">
-      <CardContent className="p-3">
-        <div className="flex items-start gap-2">
-          <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono text-muted-foreground">
-                {task.identifier}
-              </span>
-              <Badge variant={getPriorityVariant(task.priority)} className="text-xs">
-                {task.priority}
-              </Badge>
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+    >
+      <Card className="cursor-pointer transition-colors hover:bg-accent/50">
+        <CardContent className="p-3">
+          <div className="flex items-start gap-2">
+            <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-mono text-muted-foreground">
+                  {task.identifier}
+                </span>
+                <Badge variant={getPriorityVariant(task.priority)} className="text-xs">
+                  {task.priority}
+                </Badge>
+              </div>
+              <p className="text-sm font-medium truncate">{task.title}</p>
+              {task.assignee && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  → {task.assignee.name}
+                </p>
+              )}
             </div>
-            <p className="text-sm font-medium truncate">{task.title}</p>
-            {task.assignee && (
-              <p className="text-xs text-muted-foreground mt-1">
-                → {task.assignee.name}
-              </p>
-            )}
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -84,9 +93,11 @@ function KanbanView({ tasks }: { tasks: Task[] }) {
             </div>
             <ScrollArea className="h-[calc(100vh-320px)]">
               <div className="space-y-2 pr-2">
-                {columnTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
-                ))}
+                <AnimatePresence mode="popLayout">
+                  {columnTasks.map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                  ))}
+                </AnimatePresence>
                 {columnTasks.length === 0 && (
                   <div className="rounded-lg border border-dashed border-border p-4 text-center">
                     <p className="text-xs text-muted-foreground">No tasks</p>
@@ -105,37 +116,44 @@ function ListView({ tasks }: { tasks: Task[] }) {
   return (
     <Card>
       <div className="divide-y divide-border">
-        {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors"
-          >
-            <span className="font-mono text-sm text-muted-foreground w-24">
-              {task.identifier}
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{task.title}</p>
-            </div>
-            <Badge variant={getPriorityVariant(task.priority)}>
-              {task.priority}
-            </Badge>
-            <Badge
-              variant={task.status === "done" ? "success" : "secondary"}
-              className="w-24 justify-center"
+        <AnimatePresence mode="popLayout">
+          {tasks.map((task) => (
+            <motion.div
+              key={task.id}
+              layout
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors"
             >
-              {task.status.replace("_", " ")}
-            </Badge>
-            {task.assignee ? (
-              <span className="text-sm text-muted-foreground w-32 truncate">
-                {task.assignee.name}
+              <span className="font-mono text-sm text-muted-foreground w-24">
+                {task.identifier}
               </span>
-            ) : (
-              <span className="text-sm text-muted-foreground/50 w-32">
-                Unassigned
-              </span>
-            )}
-          </div>
-        ))}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{task.title}</p>
+              </div>
+              <Badge variant={getPriorityVariant(task.priority)}>
+                {task.priority}
+              </Badge>
+              <Badge
+                variant={task.status === "done" ? "success" : "secondary"}
+                className="w-24 justify-center"
+              >
+                {task.status.replace("_", " ")}
+              </Badge>
+              {task.assignee ? (
+                <span className="text-sm text-muted-foreground w-32 truncate">
+                  {task.assignee.name}
+                </span>
+              ) : (
+                <span className="text-sm text-muted-foreground/50 w-32">
+                  Unassigned
+                </span>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
         {tasks.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground">No tasks found</p>

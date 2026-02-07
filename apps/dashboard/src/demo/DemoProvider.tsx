@@ -139,11 +139,11 @@ export function DemoProvider({
     };
   }, []);
 
-  // Subscribe to simulation events
+  // Subscribe to simulation events (for MSW state updates)
   useEffect(() => {
     if (!engine) return;
 
-    const unsubscribe = engine.onEvent((event) => {
+    const unsubscribeEvent = engine.onEvent((event) => {
       // Update MSW state based on event type
       switch (event.type) {
         case 'agent_created': {
@@ -190,17 +190,22 @@ export function DemoProvider({
 
       // Keep last 20 events for UI
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
-      setCurrentTick(engine.getState().currentTick);
-      
-      // Invalidate relevant queries so other tabs update live
-      // Debounce to avoid too many invalidations
-      queryClient.invalidateQueries({ queryKey: ['Agents'] });
-      queryClient.invalidateQueries({ queryKey: ['Tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['Credits'] });
-      queryClient.invalidateQueries({ queryKey: ['Events'] });
     });
 
-    return unsubscribe;
+    // Subscribe to tick events (for query invalidation - once per tick, not per event)
+    const unsubscribeTick = engine.onTick((events, tick) => {
+      setCurrentTick(tick);
+      
+      // Invalidate all queries once per tick - elegant and efficient
+      if (events.length > 0) {
+        queryClient.invalidateQueries();
+      }
+    });
+
+    return () => {
+      unsubscribeEvent();
+      unsubscribeTick();
+    };
   }, [engine, queryClient]);
 
   // Auto-play if requested

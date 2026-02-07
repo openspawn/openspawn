@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 import {
   LineChart,
@@ -172,45 +173,69 @@ export function CreditsPage() {
           <CardContent>
             <ScrollArea className="h-[300px]">
               <div className="space-y-3">
-                {transactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      {tx.type === "CREDIT" ? (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
-                          <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                <AnimatePresence mode="popLayout">
+                  {transactions.map((tx, index) => (
+                    <motion.div
+                      key={tx.id}
+                      layout
+                      initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 30,
+                        delay: index * 0.02 // Stagger effect for initial load
+                      }}
+                      className="flex items-center justify-between rounded-lg border border-border p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        {tx.type === "CREDIT" ? (
+                          <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", delay: 0.1 }}
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10"
+                          >
+                            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                          </motion.div>
+                        ) : (
+                          <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", delay: 0.1 }}
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10"
+                          >
+                            <ArrowDownLeft className="h-4 w-4 text-amber-500" />
+                          </motion.div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium">{tx.reason}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDate(tx.createdAt)} at {formatTime(tx.createdAt)}
+                          </p>
                         </div>
-                      ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10">
-                          <ArrowDownLeft className="h-4 w-4 text-amber-500" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-sm font-medium">{tx.reason}</p>
+                      </div>
+                      <div className="text-right">
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className={`font-medium ${
+                            tx.type === "CREDIT"
+                              ? "text-emerald-500"
+                              : "text-amber-500"
+                          }`}
+                        >
+                          {tx.type === "CREDIT" ? "+" : "-"}
+                          {tx.amount.toLocaleString()}
+                        </motion.p>
                         <p className="text-xs text-muted-foreground">
-                          {formatDate(tx.createdAt)} at {formatTime(tx.createdAt)}
+                          Balance: {tx.balanceAfter.toLocaleString()}
                         </p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className={`font-medium ${
-                          tx.type === "CREDIT"
-                            ? "text-emerald-500"
-                            : "text-amber-500"
-                        }`}
-                      >
-                        {tx.type === "CREDIT" ? "+" : "-"}
-                        {tx.amount.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Balance: {tx.balanceAfter.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
                 {transactions.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <Coins className="h-12 w-12 text-muted-foreground mb-4" />
