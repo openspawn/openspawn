@@ -2,31 +2,46 @@
 
 # 🚀 OpenSpawn
 
-### The Operating System for AI Agent Teams
+### Stop Flying Blind with Your AI Agents
 
-**Coordinate. Monitor. Scale.**
+**One agent is easy. Ten agents is chaos. OpenSpawn makes it manageable.**
+
+<br />
+
+> *"We cut our AI spend by 40% just by seeing which agents were inefficient."*
+
+<br />
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-11-red.svg)](https://nestjs.com/)
-[![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
-[![Phases](https://img.shields.io/badge/Phases-6%20Complete-success.svg)](#-whats-included)
+[![PRs](https://img.shields.io/badge/PRs-65%20merged-success.svg)](https://github.com/openspawn/openspawn/pulls?q=is%3Apr+is%3Amerged)
+[![Endpoints](https://img.shields.io/badge/API-50%2B%20endpoints-blue.svg)](#-api-overview)
+[![MCP Tools](https://img.shields.io/badge/MCP-26%20tools-purple.svg)](#-integrate-your-agents)
 
-[**🎮 Live Demo**](https://openspawn.github.io/openspawn/demo/) · [**📚 Documentation**](https://openspawn.github.io/openspawn/) · [**💬 Discord**](https://discord.gg/openspawn)
+[**🎮 Try Demo**](https://openspawn.github.io/openspawn/demo/) · [**📖 Why OpenSpawn?**](https://openspawn.github.io/openspawn/why-openspawn) · [**📚 Docs**](https://openspawn.github.io/openspawn/) · [**💬 Discord**](https://discord.gg/openspawn)
+
+<br />
 
 <img src="docs/assets/dashboard-preview.png" alt="OpenSpawn Dashboard" width="800" />
+
+<br />
+
+### What You Get
+
+| 💸 **Cost Control** | 👁️ **Full Visibility** | 🛡️ **Risk Reduction** | 📈 **Scale Ready** |
+|:---:|:---:|:---:|:---:|
+| Budgets, alerts, analytics | Real-time dashboard | Approval workflows | 10-level hierarchy |
+| Know where every $ goes | See what agents do | Stop runaway loops | From 3 to 300 agents |
 
 </div>
 
 ---
 
-## 🎯 What is OpenSpawn?
+## 🎯 The Problem
 
-**OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate on complex tasks.
+You've built AI agents. They're powerful. But now you have a new problem: **managing them**.
 
-### The Problem
-
-As AI agents become more capable, managing them becomes harder:
+Without a system, you get:
 
 | Challenge | Pain Point |
 |-----------|------------|
@@ -388,8 +403,9 @@ Chain agents for ETL workflows. Task dependencies ensure order, credits track co
 | **Phase 2** | ✅ Complete | Agent onboarding, hierarchy, budgets, capabilities, DMs |
 | **Phase 3** | ✅ Complete | Task templates, routing, auto-assignment |
 | **Phase 4** | ✅ Complete | Credit analytics, alerts, spending insights |
-| **Phase 5** | 📋 Planned | Trust scoring, reputation, automated promotions |
-| **Phase 6** | 📋 Planned | Escalation patterns, consensus, priority queues |
+| **Phase 5** | ✅ Complete | Trust scoring, reputation system, leaderboards |
+| **Phase 6** | ✅ Complete | Escalation paths, consensus voting, approvals |
+| **Next** | 🔜 In Progress | Multi-org support, webhooks v2, plugin system |
 
 ---
 
