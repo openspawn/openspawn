@@ -84,8 +84,6 @@ http://localhost:4200/?demo=true
 
 Watch agents spawn, tasks flow, and credits move — all simulated.
 
-<img src="docs/assets/demo-mode.gif" alt="Demo Mode" width="600" />
-
 ---
 
 ## 🖥️ Dashboard

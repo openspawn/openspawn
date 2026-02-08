@@ -208,8 +208,8 @@ test.describe('Demo Mode - Network Page', () => {
     // Should see Agent Dennis node
     await expect(page.getByText('Agent Dennis')).toBeVisible();
     
-    // Should see Human (Adam) node
-    await expect(page.getByText('Adam')).toBeVisible();
+    // Should see Human principal node
+    await expect(page.getByText('Human')).toBeVisible();
   });
 
   test('should add nodes when agents spawn during simulation', async ({ page }) => {

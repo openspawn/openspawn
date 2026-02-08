@@ -228,7 +228,7 @@ Server validates:
 
 **Trust Hierarchy:**
 
-- Adam bootstraps Talent Agent manually (single trust anchor)
+- Human operator bootstraps Talent Agent manually (single trust anchor)
 - Talent Agent is sole entity that can register/revoke agents
 - Signing secrets never leave the agent's machine
 - Secrets stored in OpenClaw's isolated `agentDir` (sandbox enforced)
