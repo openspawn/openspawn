@@ -1,5 +1,6 @@
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { AgentAvatar } from "./agent-avatar";
 
 interface LeaderboardEntry {
   id: string;
@@ -49,6 +50,13 @@ export function TrustLeaderboard({
                 <div className="w-8 text-center text-lg">
                   {index < 3 ? RANK_EMOJI[index] : `#${index + 1}`}
                 </div>
+                <AgentAvatar
+                  agentId={entry.agentId}
+                  name={entry.name}
+                  level={entry.level}
+                  size="sm"
+                  showRing={false}
+                />
                 <div>
                   <div className="font-medium">{entry.name}</div>
                   <div className="text-xs text-muted-foreground">
