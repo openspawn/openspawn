@@ -26,6 +26,9 @@ import { ApiKeysService } from "./api-keys.service";
 import { ApiKeysController } from "./api-keys.controller";
 import { ApiKeyGuard, JwtOrApiKeyGuard } from "./api-key.guard";
 
+// User RBAC
+import { UserRolesGuard, PermissionsGuard } from "./user-roles.guard";
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([Agent, Nonce, User, RefreshToken, ApiKey]),
@@ -66,6 +69,9 @@ import { ApiKeyGuard, JwtOrApiKeyGuard } from "./api-key.guard";
     ApiKeysService,
     ApiKeyGuard,
     JwtOrApiKeyGuard,
+    // User RBAC
+    UserRolesGuard,
+    PermissionsGuard,
   ],
   exports: [
     AuthService,
@@ -75,6 +81,8 @@ import { ApiKeyGuard, JwtOrApiKeyGuard } from "./api-key.guard";
     ApiKeysService,
     ApiKeyGuard,
     JwtOrApiKeyGuard,
+    UserRolesGuard,
+    PermissionsGuard,
   ],
 })
 export class AuthModule {}
