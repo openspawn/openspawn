@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "openspawn": {
+      "command": "node",
+      "args": ["/app/mcp/main.js"],
+      "env": {
+        "API_URL": "http://api:3000",
+        "API_KEY": "${OPENSPAWN_API_KEY}"
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+# OpenClaw + OpenSpawn Integration Test
+# Usage: docker compose up -d
+#
+# This spins up:
+# - PostgreSQL database
+# - OpenSpawn API
+# - OpenSpawn MCP server
+# - OpenClaw gateway (with MCP connected)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openspawn
+      POSTGRES_PASSWORD: openspawn
+      POSTGRES_DB: openspawn
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../../config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openspawn"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://openspawn:openspawn@postgres:5432/openspawn
+      ENCRYPTION_KEY: test-encryption-key-32-chars-xx
+      JWT_SECRET: test-jwt-secret
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - test
+
+  mcp:
+    build:
+      context: ../..
+      dockerfile: apps/mcp/Dockerfile
+    environment:
+      API_URL: http://api:3000
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api
+    networks:
+      - test
+
+  # OpenClaw test instance
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENSPAWN_API_KEY: ${OPENSPAWN_API_KEY:-test-key}
+      OPENSPAWN_API_URL: http://api:3000
+    ports:
+      - "3333:3333"  # OpenClaw gateway port
+    depends_on:
+      - mcp
+    volumes:
+      - openclaw_data:/home/openclaw/.openclaw
+    networks:
+      - test
+    stdin_open: true
+    tty: true
+
+volumes:
+  pgdata:
+  openclaw_data:
+
+networks:
+  test:
+    driver: bridge
