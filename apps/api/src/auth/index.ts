@@ -13,5 +13,9 @@ export { JwtAuthGuard } from "./jwt-auth.guard";
 export { JwtStrategy, type JwtUser } from "./jwt.strategy";
 export { GoogleStrategy, type GoogleProfile } from "./google.strategy";
 
+// API key auth
+export { ApiKeysService, type CreateApiKeyDto, type ApiKeyWithSecret, type ApiKeyResponse } from "./api-keys.service";
+export { ApiKeyGuard, JwtOrApiKeyGuard, RequireScope, API_KEY_SCOPE } from "./api-key.guard";
+
 // Decorators
 export * from "./decorators";
