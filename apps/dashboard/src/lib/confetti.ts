@@ -19,8 +19,8 @@ const LEVEL_UP_COLORS = ['#a78bfa', '#c4b5fd', '#ffd700', '#ffec8b', '#f472b6'];
  */
 export function celebrateBurst() {
   confetti({
-    particleCount: 100,
-    spread: 70,
+    particleCount: 50,
+    spread: 60,
     origin: { y: 0.6 },
     colors: THEME_COLORS,
   });
@@ -56,36 +56,18 @@ export function celebrateCannons() {
 }
 
 /**
- * Level up / promotion celebration (stars + confetti)
+ * Level up / promotion celebration (stars + confetti) - subtle version
  */
 export function celebrateLevelUp() {
-  const duration = 1500;
-  const end = Date.now() + duration;
-
-  (function frame() {
-    confetti({
-      particleCount: 2,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 },
-      colors: LEVEL_UP_COLORS,
-      shapes: ['star'],
-      scalar: 1.2,
-    });
-    confetti({
-      particleCount: 2,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 },
-      colors: LEVEL_UP_COLORS,
-      shapes: ['star'],
-      scalar: 1.2,
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  })();
+  // Single burst instead of continuous animation
+  confetti({
+    particleCount: 40,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: LEVEL_UP_COLORS,
+    shapes: ['star', 'circle'],
+    scalar: 1.1,
+  });
 }
 
 /**
@@ -140,32 +122,20 @@ export function celebrateSparkle() {
 }
 
 /**
- * Elite agent celebration (gold rain)
+ * Elite agent celebration (gold burst) - subtle version
  */
 export function celebrateElite() {
-  const duration = 1000;
-  const end = Date.now() + duration;
   const colors = ['#ffd700', '#ffec8b', '#daa520', '#b8860b'];
-
-  (function frame() {
-    confetti({
-      particleCount: 5,
-      startVelocity: 0,
-      ticks: 200,
-      gravity: 0.5,
-      origin: {
-        x: Math.random(),
-        y: 0,
-      },
-      colors,
-      shapes: ['circle'],
-      scalar: 1.5,
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  })();
+  
+  // Single elegant gold burst
+  confetti({
+    particleCount: 60,
+    spread: 80,
+    origin: { y: 0.5 },
+    colors,
+    shapes: ['circle', 'star'],
+    scalar: 1.2,
+  });
 }
 
 // Celebration types mapped to functions
