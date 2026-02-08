@@ -5,19 +5,24 @@ import {
   AgentCapability,
   ApiKey,
   Channel,
+  ConsensusRequest,
+  ConsensusVote,
   CreditRateConfig,
   CreditTransaction,
+  Escalation,
   Event,
   IdempotencyKey,
   Message,
   Nonce,
   Organization,
   RefreshToken,
+  ReputationEvent,
   Task,
   TaskComment,
   TaskDependency,
   TaskTag,
   User,
+  Webhook,
 } from "./entities";
 
 export const entities = [
@@ -38,6 +43,11 @@ export const entities = [
   Event,
   IdempotencyKey,
   Nonce,
+  ReputationEvent,
+  Escalation,
+  ConsensusRequest,
+  ConsensusVote,
+  Webhook,
 ];
 
 export function createDataSourceOptions(

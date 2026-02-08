@@ -19,3 +19,4 @@ export { TaskComment } from "./task-comment.entity";
 export { TaskDependency } from "./task-dependency.entity";
 export { TaskTag } from "./task-tag.entity";
 export { User, UserRole } from "./user.entity";
+export { Webhook } from "./webhook.entity";

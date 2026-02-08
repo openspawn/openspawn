@@ -1,0 +1,16 @@
+{
+  "name": "@openspawn/cli",
+  "version": "0.1.0",
+  "description": "OpenSpawn CLI for agent interaction",
+  "type": "module",
+  "main": "./dist/main.js",
+  "bin": {
+    "openspawn": "./dist/main.js"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

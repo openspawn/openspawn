@@ -13,6 +13,7 @@ import { EventsModule } from "../events";
 import { GraphqlModule } from "../graphql";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
+import { WebhooksModule } from "../webhooks";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -41,6 +42,7 @@ import { AppService } from "./app.service";
     TasksModule,
     CreditsModule,
     MessagesModule,
+    WebhooksModule,
 
     // GraphQL
     GraphqlModule,
