@@ -18,8 +18,11 @@ export interface DemoAgent {
   currentBalance: number;
   lifetimeEarnings: number;
   createdAt: string;
-  parentId?: string; // Who spawned this agent
-  domain?: string;   // e.g., "Engineering", "Finance"
+  parentId?: string;          // Who spawned this agent
+  domain?: string;            // e.g., "Engineering", "Finance"
+  maxChildren?: number;       // Capacity for sub-agents
+  budgetPeriodLimit?: number; // Per-period spending limit
+  budgetPeriodSpent?: number; // Spent this period
 }
 
 export interface DemoTask {

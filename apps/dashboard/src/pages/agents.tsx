@@ -1,6 +1,6 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -21,7 +21,10 @@ import {
   DialogDescription,
   DialogClose,
 } from "../components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useAgents } from "../hooks/use-agents";
+import { AgentOnboarding } from "../components/agent-onboarding";
+import { BudgetManager } from "../components/budget-manager";
 
 interface Agent {
   id: string;
@@ -313,6 +316,7 @@ export function AgentsPage() {
   const { agents, loading, error } = useAgents();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
+  const [activeTab, setActiveTab] = useState("agents");
   
   // Filtering state
   const [searchQuery, setSearchQuery] = useState("");
@@ -415,15 +419,36 @@ export function AgentsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
           <p className="text-muted-foreground">
-            Manage your AI agents and their permissions
+            Manage your AI agents, onboarding, and budgets
           </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Register Agent
+          Spawn Agent
         </Button>
       </div>
 
+      {/* Navigation Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsTrigger value="agents" className="flex items-center gap-2">
+            <Bot className="h-4 w-4" />
+            <span className="hidden sm:inline">All Agents</span>
+            <span className="sm:hidden">Agents</span>
+          </TabsTrigger>
+          <TabsTrigger value="onboarding" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Onboarding</span>
+            <span className="sm:hidden">Onboard</span>
+          </TabsTrigger>
+          <TabsTrigger value="budgets" className="flex items-center gap-2">
+            <Wallet className="h-4 w-4" />
+            Budgets
+          </TabsTrigger>
+        </TabsList>
+
+        {/* All Agents Tab */}
+        <TabsContent value="agents" className="space-y-6">
       {/* Filters and Search */}
       <div className="flex flex-wrap gap-3 items-center">
         {/* Search */}
@@ -683,6 +708,18 @@ export function AgentsPage() {
       {selectedAgent && dialogMode === "credits" && (
         <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
       )}
+        </TabsContent>
+
+        {/* Onboarding Tab */}
+        <TabsContent value="onboarding" className="space-y-6">
+          <AgentOnboarding />
+        </TabsContent>
+
+        {/* Budgets Tab */}
+        <TabsContent value="budgets" className="space-y-6">
+          <BudgetManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
