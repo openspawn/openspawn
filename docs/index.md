@@ -30,11 +30,11 @@ title: OpenSpawn - The Operating System for AI Agent Teams
     <div class="stat-label">Agent Levels</div>
   </div>
   <div class="stat">
-    <div class="stat-value">50+</div>
+    <div class="stat-value">60+</div>
     <div class="stat-label">REST Endpoints</div>
   </div>
   <div class="stat">
-    <div class="stat-value">4</div>
+    <div class="stat-value">6</div>
     <div class="stat-label">Phases Complete</div>
   </div>
   <div class="stat">
@@ -75,13 +75,18 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   </div>
   
   <div class="feature">
+    <h3>🏆 Trust & Reputation</h3>
+    <p>Agents earn trust through performance. Auto-promotion based on task success. Leaderboards and reputation levels.</p>
+  </div>
+
+  <div class="feature">
     <h3>🔐 Enterprise Security</h3>
     <p>JWT + OAuth + TOTP 2FA for humans. HMAC signing for agents. API keys for integrations. Full audit trail.</p>
   </div>
   
   <div class="feature">
     <h3>🔌 Framework Agnostic</h3>
-    <p>50+ REST endpoints, GraphQL subscriptions, MCP server. Works with any AI framework.</p>
+    <p>60+ REST endpoints, GraphQL subscriptions, MCP server. Works with any AI framework.</p>
   </div>
 </div>
 
