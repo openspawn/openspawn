@@ -75,6 +75,7 @@
     "recharts": "^3.7.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "typeorm": "^0.3.28",

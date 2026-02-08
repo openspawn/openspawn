@@ -1,5 +1,6 @@
 import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 import { Layout, ProtectedRoute } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage } from "../pages";
@@ -56,6 +57,15 @@ export function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <DemoWrapper>
+            <Toaster 
+              position="bottom-right" 
+              richColors 
+              closeButton
+              toastOptions={{
+                duration: 4000,
+                className: "font-sans",
+              }}
+            />
             <Router>
               <Routes>
                 {/* Public routes */}

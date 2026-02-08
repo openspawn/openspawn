@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   SimulationEngine,
   createSimulation,
@@ -110,8 +111,59 @@ export function DemoProvider({
     };
   }, []); // Only run once on mount
 
-  // Trigger confetti based on event type
+  // Event icons and messages
+  const getEventInfo = (event: SimulationEvent): { icon: string; message: string; type: 'success' | 'info' | 'warning' } | null => {
+    const payload = event.payload as Record<string, unknown>;
+    
+    switch (event.type) {
+      case 'task_completed': {
+        const task = payload.task as { title?: string } | undefined;
+        return { icon: '✅', message: `Task completed: ${task?.title || 'Unknown'}`, type: 'success' };
+      }
+      case 'agent_promoted': {
+        const agent = payload.agent as { name?: string } | undefined;
+        const newLevel = payload.newLevel as number | undefined;
+        return { icon: '🚀', message: `${agent?.name || 'Agent'} promoted to L${newLevel}!`, type: 'success' };
+      }
+      case 'agent_activated': {
+        const data = payload as { agent?: { name?: string }; activatedBy?: { name?: string } };
+        return { icon: '🎉', message: `${data.agent?.name || 'New agent'} activated by ${data.activatedBy?.name || 'parent'}`, type: 'success' };
+      }
+      case 'agent_created': {
+        const agent = payload as { name?: string };
+        return { icon: '🤖', message: `New agent spawned: ${agent?.name || 'Unknown'}`, type: 'info' };
+      }
+      case 'agent_despawned': {
+        const data = payload as { agent?: { name?: string }; newStatus?: string };
+        return { icon: '💤', message: `${data.agent?.name || 'Agent'} ${data.newStatus === 'revoked' ? 'terminated' : 'suspended'}`, type: 'warning' };
+      }
+      case 'credit_earned': {
+        const data = payload as { agent?: { name?: string }; amount?: number };
+        return { icon: '💰', message: `${data.agent?.name || 'Agent'} earned ${data.amount || 0} credits`, type: 'success' };
+      }
+      case 'credit_spent': {
+        const data = payload as { agent?: { name?: string }; amount?: number };
+        return { icon: '💸', message: `${data.agent?.name || 'Agent'} spent ${data.amount || 0} credits`, type: 'info' };
+      }
+      default:
+        return null;
+    }
+  };
+
+  // Trigger confetti and toast based on event type
   const triggerCelebration = useCallback((event: SimulationEvent) => {
+    // Show toast notification
+    const eventInfo = getEventInfo(event);
+    if (eventInfo) {
+      const toastFn = eventInfo.type === 'success' ? toast.success 
+        : eventInfo.type === 'warning' ? toast.warning 
+        : toast.info;
+      toastFn(`${eventInfo.icon} ${eventInfo.message}`, {
+        duration: 3000,
+      });
+    }
+
+    // Trigger confetti for special events
     switch (event.type) {
       case 'task_completed':
         // Task completed - small celebration
