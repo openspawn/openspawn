@@ -13,6 +13,12 @@
         "tsConfig": "libs/demo-data/tsconfig.lib.json",
         "main": "libs/demo-data/src/index.ts"
       }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "options": {
+        "config": "libs/demo-data/vitest.config.ts"
+      }
     }
   }
 }
