@@ -53,3 +53,4 @@ package-lock.json
 yarn.lock
 e2e/screenshots/
 playwright-report/
+test-results/
