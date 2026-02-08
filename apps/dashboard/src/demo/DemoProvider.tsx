@@ -110,33 +110,28 @@ export function DemoProvider({
     };
   }, []); // Only run once on mount
 
-  // Trigger confetti based on event type
+  // Cooldown tracking for confetti (prevent spam)
+  const lastConfettiRef = useRef<number>(0);
+  const CONFETTI_COOLDOWN_MS = 8000; // 8 seconds between confetti
+
+  // Trigger confetti based on event type (toned down - only major events)
   const triggerCelebration = useCallback((event: SimulationEvent) => {
-    switch (event.type) {
-      case 'task_completed':
-        // Task completed - small celebration
-        celebrateSparkle();
-        break;
-      case 'agent_promoted':
-        // Agent promoted - level up celebration
-        celebrateLevelUp();
-        break;
-      case 'agent_activated':
-        // New agent activated - welcome burst
-        celebrate('burst');
-        break;
-      case 'agent_created':
-        // Agent spawned - subtle sparkle (agent still pending)
-        // No celebration until activated
-        break;
-      default:
-        // Other events don't trigger celebrations
-        break;
+    // Check cooldown before firing confetti
+    const now = Date.now();
+    if (now - lastConfettiRef.current < CONFETTI_COOLDOWN_MS) {
+      return; // Skip if on cooldown
+    }
+
+    // Only celebrate promotions (rare, meaningful events)
+    if (event.type === 'agent_promoted') {
+      lastConfettiRef.current = now;
+      celebrateLevelUp();
     }
     
-    // Special celebration for elite reputation
+    // Special celebration for elite + 100 trust (very rare)
     const payload = event.payload as { agent?: { reputationLevel?: string; trustScore?: number } };
     if (payload?.agent?.reputationLevel === 'ELITE' && payload?.agent?.trustScore === 100) {
+      lastConfettiRef.current = now;
       celebrateElite();
     }
   }, []);
