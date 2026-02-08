@@ -10,7 +10,8 @@ import {
   createMessagesCommand,
   createTasksCommand,
 } from "./commands/index.js";
-import { setJsonOutput, icons } from "./lib/output.js";
+import { setJsonOutput, icons, outputInfo } from "./lib/output.js";
+import { setDemoMode } from "./lib/api.js";
 
 const VERSION = "0.1.0";
 
@@ -45,6 +46,7 @@ ${pc.cyan("Documentation:")}
   ${pc.underline("https://openspawn.github.io/openspawn")}`)
   .version(VERSION, "-v, --version", "Show version number")
   .option("--json", "Output in JSON format")
+  .option("--demo", "Use demo mode with sample data (no API required)")
   .option("--no-color", "Disable colored output")
   .configureOutput({
     writeOut: (str) => process.stdout.write(str),
@@ -55,6 +57,9 @@ ${pc.cyan("Documentation:")}
     const opts = thisCommand.opts();
     if (opts.json) {
       setJsonOutput(true);
+    }
+    if (opts.demo) {
+      setDemoMode(true);
     }
     if (opts.color === false) {
       // Colors are disabled via --no-color

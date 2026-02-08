@@ -1,4 +1,16 @@
 import { getApiKey, getApiUrl } from "./config.js";
+import { DemoClient } from "./demo-client.js";
+
+// Global demo mode flag
+let _demoMode = false;
+
+export function setDemoMode(enabled: boolean): void {
+  _demoMode = enabled;
+}
+
+export function isDemoMode(): boolean {
+  return _demoMode;
+}
 
 export interface ApiResponse<T = unknown> {
   data?: T;
@@ -142,6 +154,9 @@ export class OpenSpawnClient {
   }
 }
 
-export function createClient(): OpenSpawnClient {
+export function createClient(): OpenSpawnClient | DemoClient {
+  if (_demoMode) {
+    return new DemoClient();
+  }
   return new OpenSpawnClient();
 }
