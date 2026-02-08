@@ -11,6 +11,7 @@ import {
   Square,
   LogOut,
   User,
+  Settings,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -42,6 +43,7 @@ const navigation = [
   { name: "Agents", href: "/agents", icon: Users },
   { name: "Credits", href: "/credits", icon: Coins },
   { name: "Events", href: "/events", icon: Activity },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function Layout({ children }: LayoutProps) {
