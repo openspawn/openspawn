@@ -106,10 +106,14 @@ At the bottom of the screen:
 
 ## Next Steps
 
-- [Architecture Overview](openspawn/ARCHITECTURE) — Understand the system
-- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Learn about levels and hierarchy
-- [API Reference](openspawn/API) — Integrate your agents
-- [Database Schema](openspawn/SCHEMA) — Explore the data model
+| Guide | What You'll Learn |
+|-------|-------------------|
+| [Architecture Overview](openspawn/ARCHITECTURE) | System design, data flows, scaling |
+| [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) | Onboarding, hierarchy, capabilities |
+| [Task Workflow](openspawn/TASK-WORKFLOW) | Templates, routing, auto-assignment |
+| [Credit System](openspawn/CREDITS) | Economy, budgets, analytics |
+| [API Reference](openspawn/API) | 50+ endpoints documented |
+| [Database Schema](openspawn/SCHEMA) | 14 tables explained |
 
 ## Troubleshooting
 
