@@ -1,8 +1,9 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { Agent, AgentCapability, Organization, Task, TaskComment, TaskDependency, TaskTag } from "@openspawn/database";
 
+import { AgentsModule } from "../agents";
 import { EventsModule } from "../events";
 
 import { TaskIdentifierService } from "./task-identifier.service";
@@ -24,6 +25,7 @@ import { TasksService } from "./tasks.service";
       TaskComment,
     ]),
     EventsModule,
+    forwardRef(() => AgentsModule),
   ],
   controllers: [TasksController],
   providers: [

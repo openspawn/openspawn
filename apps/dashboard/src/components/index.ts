@@ -5,3 +5,6 @@ export * from "./theme-toggle";
 export * from "./agent-onboarding";
 export * from "./budget-manager";
 export * from "./capability-manager";
+export * from "./reputation-card";
+export * from "./reputation-history";
+export * from "./trust-leaderboard";
