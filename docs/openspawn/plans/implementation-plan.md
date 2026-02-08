@@ -18,7 +18,7 @@ This is a concise implementation guide. For full context, see:
 
 ---
 
-## PR 1: Scaffold + Database (`adamwdennis/scaffold`)
+## PR 1: Scaffold + Database (`feature/scaffold`)
 
 ### Step 1 — Nx Workspace Init
 
@@ -99,7 +99,7 @@ Key details:
 
 ---
 
-## PR 2: Auth + Events (`adamwdennis/auth-core`)
+## PR 2: Auth + Events (`feature/auth-core`)
 
 ### Step 7 — Crypto Utils (`libs/shared-types/src/crypto/`)
 
@@ -146,7 +146,7 @@ Files: `events.module.ts`, `events.service.ts`, `events.controller.ts`, DTOs
 
 ---
 
-## PR 3: Agents + Tasks (`adamwdennis/agents-tasks`)
+## PR 3: Agents + Tasks (`feature/agents-tasks`)
 
 ### Step 14 — Agents Module (`apps/api/src/agents/`)
 
@@ -195,7 +195,7 @@ Endpoints: `POST /tasks`, `GET /tasks`, `GET /tasks/:id`, `POST /tasks/:id/trans
 
 ---
 
-## PR 4: Credits + Messaging (`adamwdennis/credits-messaging`)
+## PR 4: Credits + Messaging (`feature/credits-messaging`)
 
 ### Step 16 — Credits Module (`apps/api/src/credits/`)
 
@@ -234,7 +234,7 @@ Endpoints: `POST /channels`, `GET /channels`, `POST /messages`, `GET /messages`
 
 ---
 
-## PR 5: GraphQL + MCP (`adamwdennis/graphql-mcp`)
+## PR 5: GraphQL + MCP (`feature/graphql-mcp`)
 
 ### Step 18 — GraphQL Layer (`apps/api/src/graphql/`)
 
@@ -260,7 +260,7 @@ Agent identity via env vars or per-session headers. Stateless per-request for Ph
 
 ---
 
-## PR 6: Dashboard (`adamwdennis/dashboard`)
+## PR 6: Dashboard (`feature/dashboard`)
 
 ### Step 20 — React Dashboard (`apps/dashboard/`)
 

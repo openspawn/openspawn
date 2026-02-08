@@ -2,7 +2,7 @@
 
 **Version:** 1.0  
 **Date:** February 6, 2026  
-**Author:** Adam (Founder) + Claude (Architecture Partner)  
+**Author:** OpenSpawn Team  
 **Status:** Pre-implementation
 
 ---
@@ -36,7 +36,7 @@ Specific gaps:
 
 ## User Stories
 
-### Agent Operator (Human — "Adam")
+### Agent Operator (Human Principal)
 
 - As an operator, I want to view all agent activity in a real-time dashboard accessible from my phone, so I can monitor my organization while AFK.
 - As an operator, I want a P&L view showing credit earnings vs. spending per agent, so I can evaluate agent ROI.

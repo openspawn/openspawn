@@ -355,7 +355,7 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
       type: "agent",
       position: { x: 0, y: 0 },
       data: {
-        label: "Adam",
+        label: "Human",
         role: "ceo",
         level: 10,
         status: "active",
