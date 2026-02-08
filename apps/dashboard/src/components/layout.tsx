@@ -15,6 +15,7 @@ import {
   Settings,
   Menu,
   X,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -47,6 +48,7 @@ const navigation = [
   { name: "Agents", href: "/agents", icon: Users },
   { name: "Credits", href: "/credits", icon: Coins },
   { name: "Events", href: "/events", icon: Activity },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
