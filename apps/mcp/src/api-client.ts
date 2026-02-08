@@ -1,20 +1,38 @@
 import { createHmac, randomBytes } from "crypto";
 
-interface ApiClientConfig {
+// HMAC-based agent auth config
+interface HmacAuthConfig {
   baseUrl: string;
   agentId: string;
   secret: string;
 }
 
+// API key auth config
+interface ApiKeyAuthConfig {
+  baseUrl: string;
+  apiKey: string;
+}
+
+type ApiClientConfig = HmacAuthConfig | ApiKeyAuthConfig;
+
+function isApiKeyConfig(config: ApiClientConfig): config is ApiKeyAuthConfig {
+  return 'apiKey' in config;
+}
+
 export class ApiClient {
   private baseUrl: string;
-  private agentId: string;
-  private secret: string;
+  private agentId?: string;
+  private secret?: string;
+  private apiKey?: string;
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl;
-    this.agentId = config.agentId;
-    this.secret = config.secret;
+    if (isApiKeyConfig(config)) {
+      this.apiKey = config.apiKey;
+    } else {
+      this.agentId = config.agentId;
+      this.secret = config.secret;
+    }
   }
 
   private sign(
@@ -25,23 +43,28 @@ export class ApiClient {
     body: string,
   ): string {
     const message = `${method}${path}${timestamp}${nonce}${body}`;
-    return createHmac("sha256", this.secret).update(message).digest("hex");
+    return createHmac("sha256", this.secret!).update(message).digest("hex");
   }
 
   async request<T>(method: string, path: string, body?: Record<string, unknown>): Promise<T> {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const nonce = randomBytes(16).toString("hex");
     const bodyStr = body ? JSON.stringify(body) : "";
-
-    const signature = this.sign(method, path, timestamp, nonce, bodyStr);
-
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-Agent-Id": this.agentId,
-      "X-Timestamp": timestamp,
-      "X-Nonce": nonce,
-      "X-Signature": signature,
     };
+
+    // Use API key auth if available, otherwise use HMAC
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    } else if (this.agentId && this.secret) {
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const nonce = randomBytes(16).toString("hex");
+      const signature = this.sign(method, path, timestamp, nonce, bodyStr);
+
+      headers["X-Agent-Id"] = this.agentId;
+      headers["X-Timestamp"] = timestamp;
+      headers["X-Nonce"] = nonce;
+      headers["X-Signature"] = signature;
+    }
 
     const response = await fetch(`${this.baseUrl}${path}`, {
       method,

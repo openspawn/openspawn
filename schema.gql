@@ -11,6 +11,7 @@ enum AgentRole {
 
 enum AgentStatus {
   ACTIVE
+  PENDING
   REVOKED
   SUSPENDED
 }

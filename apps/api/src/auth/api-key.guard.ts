@@ -59,6 +59,7 @@ export class ApiKeyGuard implements CanActivate {
 
     // Attach user info to request
     (request as any).apiKeyUser = {
+      id: result.userId,
       sub: result.userId,
       orgId: result.orgId,
       scopes: result.scopes,
@@ -112,6 +113,7 @@ export class JwtOrApiKeyGuard implements CanActivate {
       }
 
       (request as any).apiKeyUser = {
+        id: result.userId,
         sub: result.userId,
         orgId: result.orgId,
         scopes: result.scopes,

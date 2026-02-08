@@ -3,6 +3,7 @@ import type { JwtUser } from "./jwt.strategy";
 import type { ApiKeyScope } from "@openspawn/database";
 
 export interface ApiKeyUser {
+  id: string; // User ID (same as sub for compatibility)
   sub: string; // User ID
   orgId: string;
   scopes: ApiKeyScope[];

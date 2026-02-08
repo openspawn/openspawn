@@ -6,12 +6,14 @@ import type { Request } from "express";
 
 import { IS_PUBLIC_KEY } from "./decorators/public.decorator";
 import { AuthService } from "./auth.service";
+import { ApiKeysService } from "./api-keys.service";
 import "./types"; // Extend Express.Request
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
+    private readonly apiKeysService: ApiKeysService,
     private readonly reflector: Reflector,
   ) {}
 
@@ -42,7 +44,25 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // Extract auth headers
+    // Check for API key in Authorization header (Bearer token)
+    const authHeader = request.headers.authorization;
+    if (authHeader?.startsWith("Bearer osp_")) {
+      const key = authHeader.slice(7);
+      const result = await this.apiKeysService.validateKey(key);
+      if (result) {
+        request.apiKeyUser = {
+          id: result.userId,
+          sub: result.userId,
+          orgId: result.orgId,
+          scopes: result.scopes,
+          isApiKey: true,
+        };
+        return true;
+      }
+      throw new UnauthorizedException("Invalid API key");
+    }
+
+    // Extract agent auth headers
     const agentId = request.headers["x-agent-id"] as string | undefined;
     const timestamp = request.headers["x-timestamp"] as string | undefined;
     const nonce = request.headers["x-nonce"] as string | undefined;
