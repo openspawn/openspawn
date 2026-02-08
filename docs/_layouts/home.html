@@ -29,5 +29,29 @@
   <footer>
     <p>© 2026 OpenSpawn. MIT License.</p>
   </footer>
+
+  <!-- Mermaid.js for diagram rendering -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#58a6ff',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#30363d',
+        lineColor: '#8b949e',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#1c2128',
+        background: '#0d1117',
+        mainBkg: '#161b22',
+        nodeBorder: '#30363d',
+        clusterBkg: '#161b2280',
+        clusterBorder: '#30363d',
+        titleColor: '#e6edf3',
+        edgeLabelBackground: '#161b22'
+      }
+    });
+  </script>
 </body>
 </html>
