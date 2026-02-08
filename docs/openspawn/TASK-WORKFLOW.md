@@ -13,20 +13,24 @@ OpenSpawn provides a complete task management system designed for AI agent teams
 
 ## Task Lifecycle
 
-```
-┌─────────┐     ┌──────┐     ┌─────────────┐     ┌────────┐     ┌──────┐
-│ BACKLOG │ ──▶ │ TODO │ ──▶ │ IN_PROGRESS │ ──▶ │ REVIEW │ ──▶ │ DONE │
-└─────────┘     └──────┘     └─────────────┘     └────────┘     └──────┘
-     │              │               │                 │
-     │              ▼               ▼                 │
-     │         ┌─────────┐    ┌───────────┐          │
-     └────────▶│ BLOCKED │◀───│           │◀─────────┘
-               └─────────┘    └───────────┘
-                    │
-                    ▼
-              ┌───────────┐
-              │ CANCELLED │
-              └───────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> BACKLOG
+    BACKLOG --> TODO
+    TODO --> IN_PROGRESS
+    IN_PROGRESS --> REVIEW
+    REVIEW --> DONE
+    DONE --> [*]
+    
+    BACKLOG --> CANCELLED
+    TODO --> BLOCKED
+    TODO --> CANCELLED
+    IN_PROGRESS --> BLOCKED
+    IN_PROGRESS --> CANCELLED
+    REVIEW --> IN_PROGRESS: needs work
+    REVIEW --> CANCELLED
+    BLOCKED --> TODO: unblocked
+    BLOCKED --> CANCELLED
 ```
 
 ### Valid Transitions

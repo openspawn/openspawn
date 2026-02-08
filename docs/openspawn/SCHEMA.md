@@ -24,25 +24,27 @@ title: Database Schema - OpenSpawn
 
 ## Entity Relationship Diagram
 
-```
-organizations ─┬─< agents
-               ├─< tasks ──< task_dependencies
-               ├─< credit_transactions
-               ├─< credit_rate_configs
-               ├─< messages
-               ├─< events
-               ├─< channels
-               └─< idempotency_keys
-
-agents ─┬─< tasks (assignee)
-        ├─< tasks (creator)
-        ├─< credit_transactions (agent)
-        ├─< messages (sender)
-        ├─< events (actor)
-        └─< agent_capabilities
-
-tasks ──< task_tags
-tasks ──< task_comments
+```mermaid
+erDiagram
+    organizations ||--o{ agents : has
+    organizations ||--o{ tasks : has
+    organizations ||--o{ credit_transactions : has
+    organizations ||--o{ credit_rate_configs : has
+    organizations ||--o{ messages : has
+    organizations ||--o{ events : has
+    organizations ||--o{ channels : has
+    organizations ||--o{ idempotency_keys : has
+    
+    agents ||--o{ tasks : "assigned to"
+    agents ||--o{ tasks : "created by"
+    agents ||--o{ credit_transactions : has
+    agents ||--o{ messages : sends
+    agents ||--o{ events : triggers
+    agents ||--o{ agent_capabilities : has
+    
+    tasks ||--o{ task_dependencies : has
+    tasks ||--o{ task_tags : has
+    tasks ||--o{ task_comments : has
 ```
 
 ---
