@@ -14,6 +14,8 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   </div>
 </div>
 
+![OpenSpawn Dashboard]({{ '/assets/dashboard-preview.png' | relative_url }})
+
 ## What is OpenSpawn?
 
 **OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate.

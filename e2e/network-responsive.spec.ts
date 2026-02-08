@@ -123,7 +123,7 @@ test.describe("Network page responsive tests", () => {
     
     // Check various agents are rendered
     const graph = page.locator(".react-flow");
-    await expect(graph.getByText("Adam")).toBeVisible();
+    await expect(graph.getByText("Human")).toBeVisible();
     await expect(graph.getByText("Agent Dennis")).toBeVisible();
     await expect(graph.getByText("Tech Talent")).toBeVisible();
     await expect(graph.getByText("Finance Talent")).toBeVisible();
