@@ -1,0 +1,34 @@
+{
+  "name": "openspawn",
+  "version": "0.1.0",
+  "description": "OpenSpawn CLI - Multi-agent coordination platform",
+  "type": "commonjs",
+  "main": "openspawn.cjs",
+  "bin": {
+    "openspawn": "openspawn.cjs"
+  },
+  "keywords": [
+    "cli",
+    "agent",
+    "ai",
+    "multi-agent",
+    "coordination",
+    "openspawn",
+    "llm",
+    "orchestration"
+  ],
+  "author": "OpenSpawn <hello@openspawn.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openspawn/openspawn.git",
+    "directory": "apps/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/openspawn/openspawn/issues"
+  },
+  "homepage": "https://openspawn.github.io/openspawn/",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

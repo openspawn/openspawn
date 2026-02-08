@@ -1,0 +1,168 @@
+version: "3.8"
+
+# Production Docker Compose for OpenSpawn
+# Usage: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  # PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: openspawn-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-openspawn}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # NestJS API
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: openspawn-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-openspawn}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      PORT: 3000
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # MCP Server
+  mcp:
+    build:
+      context: .
+      dockerfile: apps/mcp/Dockerfile
+    container_name: openspawn-mcp
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:3000
+      PORT: 3001
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # React Dashboard (served via nginx)
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    container_name: openspawn-dashboard
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  # Nginx reverse proxy (optional, for single-port access)
+  nginx:
+    image: nginx:alpine
+    container_name: openspawn-nginx
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+      - "${SSL_PORT:-443}:443"
+    volumes:
+      - ./config/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./config/ssl:/etc/nginx/ssl:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - dashboard
+      - api
+      - mcp
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # LiteLLM Proxy (LLM Gateway)
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: openspawn-litellm
+    restart: unless-stopped
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - ./config/litellm.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - openspawn
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+volumes:
+  postgres_data:
+
+networks:
+  openspawn:
+    driver: bridge
