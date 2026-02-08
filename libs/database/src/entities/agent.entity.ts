@@ -66,6 +66,12 @@ export class Agent {
   @Column({ name: "hmac_secret_enc", type: "bytea" })
   hmacSecretEnc!: Buffer;
 
+  @Column({ name: "parent_id", type: "uuid", nullable: true })
+  parentId!: string | null;
+
+  @Column({ name: "max_children", type: "smallint", default: 0 })
+  maxChildren!: number;
+
   @Column({ type: "jsonb", default: {} })
   metadata!: Record<string, unknown>;
 
@@ -82,6 +88,13 @@ export class Agent {
   @ManyToOne("Organization", "agents")
   @JoinColumn({ name: "org_id" })
   organization?: Organization;
+
+  @ManyToOne("Agent", "children")
+  @JoinColumn({ name: "parent_id" })
+  parent?: Agent;
+
+  @OneToMany("Agent", "parent")
+  children?: Agent[];
 
   @OneToMany("AgentCapability", "agent")
   capabilities?: AgentCapability[];
