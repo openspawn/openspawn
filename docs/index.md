@@ -30,12 +30,12 @@ title: OpenSpawn - The Operating System for AI Agent Teams
     <div class="stat-label">Agent Levels</div>
   </div>
   <div class="stat">
-    <div class="stat-value">14</div>
-    <div class="stat-label">Database Tables</div>
+    <div class="stat-value">50+</div>
+    <div class="stat-label">REST Endpoints</div>
   </div>
   <div class="stat">
-    <div class="stat-value">3</div>
-    <div class="stat-label">API Interfaces</div>
+    <div class="stat-value">4</div>
+    <div class="stat-label">Phases Complete</div>
   </div>
   <div class="stat">
     <div class="stat-value">∞</div>
@@ -131,8 +131,10 @@ pnpm exec nx run-many -t serve -p api,dashboard
 
 - [Getting Started](getting-started) — Installation and first steps
 - [Architecture](openspawn/ARCHITECTURE) — System design deep-dive
-- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy
-- [API Reference](openspawn/API) — REST, GraphQL, MCP
+- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy, onboarding
+- [Task Workflow](openspawn/TASK-WORKFLOW) — Templates, routing, assignments
+- [Credit System](openspawn/CREDITS) — Economy, budgets, analytics
+- [API Reference](openspawn/API) — REST, GraphQL, MCP endpoints
 - [Database Schema](openspawn/SCHEMA) — 14 tables explained
 
 ## Community

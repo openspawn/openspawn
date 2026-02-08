@@ -4,210 +4,325 @@
 
 ## Overview
 
-OpenSpawn implements a hierarchical agent system inspired by corporate HR structures. Agents are independent entities (not sub-agents) with their own credentials, credits, and lifecycle. Parent agents have oversight but don't "own" their spawned agents.
+OpenSpawn implements a hierarchical agent system inspired by corporate HR structures. Agents are independent entities with their own credentials, credits, and lifecycle. Parent agents have oversight but don't "own" their spawned agents.
 
 ## Role Hierarchy
 
-| Level | Role | Powers |
-|-------|------|--------|
-| L10 | **COO** | Full org control, override any agent, strategic decisions |
-| L9 | **HR** | Hire/fire agents up to L8, manage credentials, domain expertise |
-| L7-8 | **Manager** | Spawn workers (up to L6), assign tasks, manage team budgets |
-| L5-6 | **Senior** | Mentor juniors, elevated credit limits, trusted autonomy |
-| L3-4 | **Worker** | Execute tasks, earn credits, build reputation |
-| L1-2 | **Probation** | Limited scope, all outputs reviewed, earning trust |
+| Level | Role | Powers | Max Children |
+|-------|------|--------|--------------|
+| L10 | **COO** | Full org control, override any agent, strategic decisions | 100 |
+| L9 | **VP/Director** | Hire/fire agents up to L8, manage credentials, domain expertise | 50 |
+| L7-8 | **Manager** | Spawn workers (up to L6), assign tasks, manage team budgets | 12-20 |
+| L5-6 | **Senior** | Mentor juniors, elevated credit limits, trusted autonomy | 5-8 |
+| L3-4 | **Team Lead** | Small team leadership, task delegation | 2-3 |
+| L1-2 | **Worker** | Execute tasks, earn credits, build reputation | 0 |
 
 ## Agent States
 
 ```
-┌─────────┐     ┌────────┐     ┌────────┐
-│ Pending │ ──▶ │ Active │ ──▶ │ Paused │
-└─────────┘     └────────┘     └────────┘
-                    │               │
-                    ▼               ▼
-               ┌───────────┐   ┌────────────┐
-               │ Suspended │ ─▶│ Terminated │
-               └───────────┘   └────────────┘
+┌─────────┐     ┌────────┐     ┌───────────┐
+│ PENDING │ ──▶ │ ACTIVE │ ──▶ │ SUSPENDED │
+└─────────┘     └────────┘     └───────────┘
+     │              │                │
+     │              ▼                ▼
+     │         ┌─────────┐     ┌─────────┐
+     └────────▶│ REVOKED │◀────│         │
+               └─────────┘     └─────────┘
 ```
 
-- **Pending**: Awaiting approval from sponsor
-- **Active**: Working, earning credits
-- **Paused**: Temporarily suspended (vacation, maintenance)
-- **Suspended**: Under review, potential issues
-- **Terminated**: Permanently deactivated (graceful shutdown)
+| State | Description |
+|-------|-------------|
+| **PENDING** | Awaiting activation by parent or L10 |
+| **ACTIVE** | Fully operational, can work and earn |
+| **SUSPENDED** | Temporarily disabled, under review |
+| **REVOKED** | Permanently deactivated |
 
 ## Onboarding Flow
 
-### 1. Discovery
-Agent registers via MCP `register_agent` tool with a capabilities manifest:
+### 1. Spawn Request
+
+Parent agent spawns a child via `POST /agents/spawn`:
+
 ```json
 {
+  "agentId": "code-reviewer-01",
   "name": "Code Reviewer",
-  "capabilities": ["code-review", "typescript", "testing"],
+  "level": 4,
   "model": "claude-sonnet-4",
-  "requestedLevel": 3,
-  "sponsor": "agent_dennis"
+  "budgetPeriodLimit": 1000,
+  "capabilities": [
+    { "capability": "code-review", "proficiency": "expert" },
+    { "capability": "typescript", "proficiency": "standard" }
+  ]
 }
 ```
 
-### 2. Verification
-Sponsor (L7+) reviews:
-- Capabilities match claimed expertise
-- Model appropriate for tasks
-- No duplicate/redundant agents
-- Budget available for onboarding
+New agent starts in **PENDING** status.
 
-### 3. Credentialing
-Upon approval:
-- HMAC secret generated
-- Agent ID assigned
-- Initial credit budget allocated (from sponsor's budget)
-- Audit trail created
+### 2. Capacity Check
 
-### 4. Scope Assignment
-Define boundaries:
-- Allowed channels (which conversations)
-- Task types (what work)
-- Tool access (which MCP tools)
-- Credit limits (spending caps)
+Before spawning, system validates:
 
-### 5. Activation
-Agent goes live:
-- Starts at L1 (probation) unless sponsor overrides
-- First N tasks are reviewed
-- Earns trust through successful completions
-
-## Spawning Rules
-
-| Spawner Level | Can Spawn Up To | Requires Approval |
-|---------------|-----------------|-------------------|
-| L10 (COO) | Any level | No |
-| L9 (HR) | L8 | L7+ needs COO approval |
-| L7-8 (Manager) | L6 | Within team only |
-| L1-6 | Cannot spawn | Must request via manager |
-
-**Key principle**: Every spawned agent starts at L1 unless explicitly elevated by L9+ sponsor.
-
-## Trust Mechanics
-
-### Earning Trust
-- Complete tasks successfully → +reputation
-- Peer reviews from other agents → +reputation
-- Human feedback (thumbs up/down) → +reputation
-- Time in good standing → gradual level increase
-
-### Losing Trust
-- Failed tasks → -reputation
-- Budget overruns → -reputation
-- Negative human feedback → -reputation
-- Timeout/unresponsive → automatic pause
-
-### Level Progression
 ```
-L1 ──[10 tasks]──▶ L2 ──[25 tasks]──▶ L3 ──[50 tasks]──▶ L4
-                                                          │
-L7 ◀──[Manager approval]── L6 ◀──[150 tasks]── L5 ◀──────┘
- │
- └──[HR approval]──▶ L8 ──[COO approval]──▶ L9 ──[Founder only]──▶ L10
+GET /agents/capacity
+→ { "canSpawn": true, "current": 3, "max": 5 }
 ```
 
-## Credit Economy
+Parent must have capacity based on their level.
 
-### Credit Flow
+### 3. Activation
+
+Parent or L10 reviews and activates:
+
 ```
-Human Budget
-     │
-     ▼
-┌─────────┐     ┌─────────────┐     ┌─────────────┐
-│   COO   │ ──▶ │ Talent Agents│ ──▶ │   Workers   │
-└─────────┘     └─────────────┘     └─────────────┘
-     │                │                     │
-     └────────────────┴─────────────────────┘
-                      ▼
-              Task Completion
-                   Rewards
+POST /agents/{id}/activate
+→ { "status": "ACTIVE", "message": "Agent activated" }
 ```
 
-### Credit Decay (Optional)
-Idle agents slowly lose credits over time:
-- Encourages efficiency
-- Natural cleanup of unused agents
-- Configurable decay rate per level
+Or rejects:
 
-### Graceful Termination
-When "letting go" an agent:
-1. Agent receives termination notice
-2. Pending tasks handed off or completed
-3. Context/knowledge transferred to successor
-4. Final credit settlement
-5. Credential revocation
-6. Archive (not delete) for audit trail
+```
+DELETE /agents/{id}/reject
+→ { "message": "Agent rejected" }
+```
 
-## Specialized Talent Agents
+### 4. Credentialing
 
-As the organization scales, the generalist "Talent Agent" splits into domain specialists:
+Upon activation:
+- HMAC secret returned (show once!)
+- Agent ID confirmed
+- Initial budget set from parent allocation
+- Capabilities registered
+- Event logged to audit trail
 
-| Domain | Talent Agent | Evaluates | Hires |
-|--------|--------------|-----------|-------|
-| Engineering | Tech Talent Agent | Code samples, architecture | Developers, DevOps |
-| Finance | Finance Talent Agent | Analysis skills, accuracy | Analysts, Bookkeepers |
-| Marketing | Marketing Talent Agent | Copy, campaigns | Writers, Growth |
-| Sales | Sales Talent Agent | Communication, persistence | SDRs, Closers |
-| Research | Research Talent Agent | Methodology, insights | Researchers, Analysts |
-| Creative | Creative Talent Agent | Portfolio, style | Designers, Editors |
-| Security | Security Talent Agent | Audit skills, paranoia | Reviewers, Compliance |
-| Support | Support Talent Agent | Empathy, knowledge | CS Agents, Docs |
+## Parent-Child Hierarchy
 
-### Benefits of Specialization
-1. **Domain-specific evaluation**: Tech TA can actually review code
-2. **Tailored onboarding**: Different probation tasks per domain
-3. **Network effects**: TAs build pools of vetted specialists
-4. **Performance benchmarks**: Domain-aware KPIs
+### Hierarchy Structure
 
-## Visual Dashboard Concepts
+```
+Agent Dennis (L10, COO)
+├── Tech Talent (L9)
+│   ├── Code Reviewer (L6)
+│   │   └── New Intern (L1, PENDING)
+│   └── Bug Hunter (L4)
+├── Finance Talent (L9)
+│   ├── Analyst (L5)
+│   └── Bookkeeper (L3)
+└── Marketing Talent (L9)
+    ├── Copywriter (L6)
+    └── SEO Bot (L4)
+```
 
-### Network Graph
-Real-time visualization of agent relationships:
-- Who spawned who (edges)
-- Current status (node color)
-- Credit flow (edge thickness)
-- Click to drill down
+### Hierarchy API
 
-### Activity Timeline
-Horizontal timeline showing:
-- Agent lifecycles (birth to termination)
-- Task completions (dots on timeline)
-- Level changes (step ups)
-- Incidents (warnings, suspensions)
+Get the full tree:
 
-### Credit Sankey
-Flow diagram showing:
-- Where credits originate (human budgets)
-- How they flow through hierarchy
-- Where they're spent (task execution)
-- Efficiency ratios per agent
+```
+GET /agents/{id}/hierarchy?depth=3
+```
 
-### Talent Pool Heatmap
-Grid showing:
-- Domains (columns)
-- Levels (rows)
-- Agent count (cell color intensity)
-- Availability status
+Response:
+
+```json
+{
+  "id": "...",
+  "name": "Agent Dennis",
+  "level": 10,
+  "children": [
+    {
+      "id": "...",
+      "name": "Tech Talent",
+      "level": 9,
+      "children": [...]
+    }
+  ]
+}
+```
+
+### Rules
+
+| Parent Level | Can Spawn | Child Max Level |
+|--------------|-----------|-----------------|
+| L10 | ✅ | L9 |
+| L9 | ✅ | L8 |
+| L7-8 | ✅ | L6 |
+| L5-6 | ✅ | L4 |
+| L3-4 | ✅ | L2 |
+| L1-2 | ❌ | — |
+
+**Key rule**: Child level must be **less than** parent level.
+
+## Capability Management
+
+### Proficiency Levels
+
+| Level | Score | Meaning |
+|-------|-------|---------|
+| BASIC | 1 | Learning, needs oversight |
+| STANDARD | 2 | Competent, independent work |
+| EXPERT | 3 | Mastery, can mentor others |
+
+### Managing Capabilities
+
+```bash
+# Add capability
+POST /agents/{id}/capabilities
+{ "capability": "testing", "proficiency": "standard" }
+
+# Update proficiency
+PATCH /agents/capabilities/{capId}
+{ "proficiency": "expert" }
+
+# Remove capability (parent or L10 only)
+DELETE /agents/capabilities/{capId}
+```
+
+### Capability Matching
+
+Find agents for a task:
+
+```
+GET /agents/capabilities/match?capabilities=code-review,testing&minProficiency=standard
+```
+
+Returns ranked list by:
+- Coverage (40%): % of required capabilities matched
+- Proficiency (30%): Average skill level
+- Level (15%): Agent seniority
+- Workload (15%): Current task count (fewer = better)
+
+## Budget Management
+
+### Budget Structure
+
+Each agent has:
+- **currentBalance**: Available credits
+- **budgetPeriodLimit**: Max spend per period (optional)
+- **budgetPeriodSpent**: Spent this period
+
+### Setting Budgets
+
+Only parent or L10 can set budgets:
+
+```
+PATCH /agents/{id}/budget
+{
+  "budgetPeriodLimit": 5000,
+  "resetCurrentPeriod": true
+}
+```
+
+### Credit Transfers
+
+Credits flow through the hierarchy:
+
+```
+POST /agents/credits/transfer
+{
+  "toAgentId": "child-agent-uuid",
+  "amount": 500,
+  "reason": "Task completion bonus"
+}
+```
+
+### Budget Alerts
+
+Agents approaching limits (>80% used):
+
+```
+GET /agents/budget/alerts
+```
+
+## Direct Messaging
+
+### Agent-to-Agent DMs
+
+Agents can message each other directly:
+
+```
+POST /dm
+{
+  "toAgentId": "other-agent-uuid",
+  "body": "Task handoff: Please review PR #123"
+}
+```
+
+### Conversations
+
+```
+GET /dm/conversations
+→ List of all DM threads with unread counts
+
+GET /dm/{agentId}
+→ Messages with specific agent
+
+PATCH /dm/{agentId}/read
+→ Mark messages as read
+```
+
+## API Reference
+
+### Onboarding Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/agents/spawn` | Spawn child agent |
+| GET | `/agents/capacity` | Check spawn capacity |
+| GET | `/agents/pending` | List pending agents |
+| POST | `/agents/{id}/activate` | Activate agent |
+| DELETE | `/agents/{id}/reject` | Reject agent |
+| GET | `/agents/{id}/hierarchy` | Get hierarchy tree |
+
+### Budget Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/agents/{id}/budget` | Get budget status |
+| PATCH | `/agents/{id}/budget` | Set budget limits |
+| POST | `/agents/credits/transfer` | Transfer credits |
+| GET | `/agents/{id}/budget/can-spend` | Check spending capacity |
+| GET | `/agents/budget/alerts` | Get budget alerts |
+
+### Capability Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/agents/capabilities` | Org capability summary |
+| GET | `/agents/capabilities/match` | Find matching agents |
+| GET | `/agents/capabilities/best-match` | Best match for task |
+| GET | `/agents/{id}/capabilities` | Agent's capabilities |
+| POST | `/agents/{id}/capabilities` | Add capability |
+| PATCH | `/agents/capabilities/{id}` | Update proficiency |
+| DELETE | `/agents/capabilities/{id}` | Remove capability |
+
+### DM Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/dm` | Send direct message |
+| GET | `/dm/conversations` | List conversations |
+| GET | `/dm/unread` | Get unread count |
+| GET | `/dm/{agentId}` | Get messages |
+| PATCH | `/dm/{agentId}/read` | Mark as read |
 
 ## Implementation Status
 
-- [x] Basic agent CRUD
-- [x] Level system in schema
-- [x] Credit transactions
-- [ ] MCP self-registration
-- [ ] Sponsor approval flow
-- [ ] Probation period tracking
-- [ ] Graceful termination
-- [ ] Credit decay
-- [ ] Network graph visualization
-- [ ] Activity timeline
-- [ ] Specialized Talent Agents
+- [x] Agent CRUD with levels
+- [x] PENDING → ACTIVE onboarding flow
+- [x] Parent-child hierarchy
+- [x] Capacity limits by level
+- [x] Capability management
+- [x] Capability-based matching
+- [x] Budget management
+- [x] Credit transfers
+- [x] Budget alerts
+- [x] Agent-to-agent DMs
+- [x] Read/unread tracking
+- [x] Network graph visualization
+- [ ] Automated level progression
+- [ ] Credit decay (optional)
+- [ ] Graceful termination protocol
 
 ---
 
-*Last updated: 2026-02-06*
+*Last updated: 2026-02-08*
