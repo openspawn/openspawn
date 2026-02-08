@@ -13,5 +13,25 @@ export { JwtAuthGuard } from "./jwt-auth.guard";
 export { JwtStrategy, type JwtUser } from "./jwt.strategy";
 export { GoogleStrategy, type GoogleProfile } from "./google.strategy";
 
+// API key auth
+export { ApiKeysService, type CreateApiKeyDto, type ApiKeyWithSecret, type ApiKeyResponse } from "./api-keys.service";
+export { ApiKeyGuard, JwtOrApiKeyGuard, RequireScope, API_KEY_SCOPE } from "./api-key.guard";
+
+// User RBAC
+export {
+  UserRolesGuard,
+  PermissionsGuard,
+  UserRoles,
+  USER_ROLES_KEY,
+  RequirePermissions,
+  PERMISSIONS_KEY,
+  Permission,
+  PERMISSION_ROLES,
+  hasMinimumRole,
+} from "./user-roles.guard";
+
+// Types
+export type { ApiKeyUser } from "./types";
+
 // Decorators
 export * from "./decorators";

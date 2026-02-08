@@ -4,7 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
-import { Agent, Nonce, RefreshToken, User } from "@openspawn/database";
+import { Agent, Nonce, RefreshToken, User, ApiKey } from "@openspawn/database";
 
 import { UsersModule } from "../users";
 
@@ -21,9 +21,17 @@ import { JwtStrategy } from "./jwt.strategy";
 import { GoogleStrategy } from "./google.strategy";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 
+// API key auth
+import { ApiKeysService } from "./api-keys.service";
+import { ApiKeysController } from "./api-keys.controller";
+import { ApiKeyGuard, JwtOrApiKeyGuard } from "./api-key.guard";
+
+// User RBAC
+import { UserRolesGuard, PermissionsGuard } from "./user-roles.guard";
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Agent, Nonce, User, RefreshToken]),
+    TypeOrmModule.forFeature([Agent, Nonce, User, RefreshToken, ApiKey]),
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       useFactory: () => {
@@ -39,7 +47,7 @@ import { JwtAuthGuard } from "./jwt-auth.guard";
     }),
     UsersModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, ApiKeysController],
   providers: [
     // Agent auth
     AuthService,
@@ -57,7 +65,24 @@ import { JwtAuthGuard } from "./jwt-auth.guard";
     JwtStrategy,
     GoogleStrategy,
     JwtAuthGuard,
+    // API key auth
+    ApiKeysService,
+    ApiKeyGuard,
+    JwtOrApiKeyGuard,
+    // User RBAC
+    UserRolesGuard,
+    PermissionsGuard,
   ],
-  exports: [AuthService, TokensService, TotpService, JwtAuthGuard],
+  exports: [
+    AuthService,
+    TokensService,
+    TotpService,
+    JwtAuthGuard,
+    ApiKeysService,
+    ApiKeyGuard,
+    JwtOrApiKeyGuard,
+    UserRolesGuard,
+    PermissionsGuard,
+  ],
 })
 export class AuthModule {}
