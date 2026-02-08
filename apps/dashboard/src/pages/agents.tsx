@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { AgentAvatar } from "../components/agent-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -109,11 +110,12 @@ function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => v
       <DialogPopup>
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              <AvatarFallback className="bg-secondary">
-                <Bot className="h-6 w-6" />
-              </AvatarFallback>
-            </Avatar>
+            <AgentAvatar 
+              agentId={agent.agentId} 
+              name={agent.name} 
+              level={agent.level} 
+              size="lg" 
+            />
             <div>
               <DialogTitle>{agent.name}</DialogTitle>
               <DialogDescription>@{agent.agentId}</DialogDescription>
@@ -424,11 +426,12 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
                     className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback style={{ backgroundColor: getLevelColor(agent.level) + '30' }}>
-                          <Bot className="h-5 w-5" style={{ color: getLevelColor(agent.level) }} />
-                        </AvatarFallback>
-                      </Avatar>
+                      <AgentAvatar
+                        agentId={agent.agentId}
+                        name={agent.name}
+                        level={agent.level}
+                        size="md"
+                      />
                       <div>
                         <div className="font-medium">{agent.name}</div>
                         <div className="text-xs text-muted-foreground">
@@ -845,14 +848,12 @@ export function AgentsPage() {
               </div>
               <CardHeader className="flex flex-row items-start justify-between pb-2">
                 <div className="flex items-center gap-3">
-                  <Avatar className="ring-2" style={{ ringColor: levelColor }}>
-                    <AvatarFallback 
-                      className="text-white"
-                      style={{ backgroundColor: `${levelColor}30` }}
-                    >
-                      <Bot className="h-4 w-4" style={{ color: levelColor }} />
-                    </AvatarFallback>
-                  </Avatar>
+                  <AgentAvatar
+                    agentId={agent.agentId}
+                    name={agent.name}
+                    level={agent.level}
+                    size="md"
+                  />
                   <div>
                     <CardTitle className="text-base">{agent.name}</CardTitle>
                     <p className="text-xs text-muted-foreground">
