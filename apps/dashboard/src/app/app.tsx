@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Layout, ProtectedRoute } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
@@ -13,6 +13,9 @@ import type { ReactNode } from "react";
 const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 const scenarioParam = urlParams.get('scenario') || 'fresh';
+
+// Use HashRouter for static demo deployment (GitHub Pages), BrowserRouter otherwise
+const Router = isDemoMode ? HashRouter : BrowserRouter;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,7 +56,7 @@ export function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <DemoWrapper>
-            <BrowserRouter>
+            <Router>
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />
@@ -78,7 +81,7 @@ export function App() {
                   }
                 />
               </Routes>
-            </BrowserRouter>
+            </Router>
           </DemoWrapper>
         </QueryClientProvider>
       </AuthProvider>
