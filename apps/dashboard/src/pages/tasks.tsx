@@ -307,19 +307,19 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
 
 function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none">
       {statusColumns.map((column) => {
         const columnTasks = tasks.filter((t) => t.status?.toUpperCase() === column.id);
         return (
-          <div key={column.id} className="flex-shrink-0 w-72">
-            <div className="flex items-center gap-2 mb-3">
+          <div key={column.id} className="flex-shrink-0 w-[280px] sm:w-72 snap-start">
+            <div className="flex items-center gap-2 mb-3 sticky top-0 bg-background/95 backdrop-blur-sm py-1 z-10">
               <div className={`w-2 h-2 rounded-full ${column.color}`} />
               <h3 className="font-medium text-sm">{column.label}</h3>
               <Badge variant="secondary" className="ml-auto">
                 {columnTasks.length}
               </Badge>
             </div>
-            <ScrollArea className="h-[calc(100vh-320px)]">
+            <ScrollArea className="h-[calc(100vh-360px)] sm:h-[calc(100vh-320px)]">
               <div className="space-y-2 pr-2">
                 <AnimatePresence mode="popLayout">
                   {columnTasks.map((task) => (
