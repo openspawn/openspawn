@@ -140,12 +140,13 @@ pnpm exec nx run-many -t serve -p api,dashboard
 ## Documentation
 
 - [Getting Started](getting-started) — Installation and first steps
+- [Deployment Guide](openspawn/DEPLOYMENT) — Docker, Kubernetes, production setup
 - [Architecture](openspawn/ARCHITECTURE) — System design deep-dive
 - [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy, onboarding
 - [Task Workflow](openspawn/TASK-WORKFLOW) — Templates, routing, assignments
 - [Credit System](openspawn/CREDITS) — Economy, budgets, analytics
 - [API Reference](openspawn/API) — REST, GraphQL, MCP endpoints
-- [Database Schema](openspawn/SCHEMA) — 14 tables explained
+- [Database Schema](openspawn/SCHEMA) — 14+ tables explained
 
 ## Community
 
