@@ -1,11 +1,24 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { Agent, AgentCapability, Organization, Task, TaskComment, TaskDependency, TaskTag } from "@openspawn/database";
+import {
+  Agent,
+  AgentCapability,
+  ConsensusRequest,
+  ConsensusVote,
+  Escalation,
+  Organization,
+  Task,
+  TaskComment,
+  TaskDependency,
+  TaskTag,
+} from "@openspawn/database";
 
 import { AgentsModule } from "../agents";
 import { EventsModule } from "../events";
 
+import { ConsensusService } from "./consensus.service";
+import { EscalationService } from "./escalation.service";
 import { TaskIdentifierService } from "./task-identifier.service";
 import { TaskRoutingService } from "./task-routing.service";
 import { TaskTemplatesService } from "./task-templates.service";
@@ -18,6 +31,9 @@ import { TasksService } from "./tasks.service";
     TypeOrmModule.forFeature([
       Agent,
       AgentCapability,
+      ConsensusRequest,
+      ConsensusVote,
+      Escalation,
       Organization,
       Task,
       TaskDependency,
@@ -34,7 +50,16 @@ import { TasksService } from "./tasks.service";
     TaskTransitionService,
     TaskTemplatesService,
     TaskRoutingService,
+    EscalationService,
+    ConsensusService,
   ],
-  exports: [TasksService, TaskTransitionService, TaskTemplatesService, TaskRoutingService],
+  exports: [
+    TasksService,
+    TaskTransitionService,
+    TaskTemplatesService,
+    TaskRoutingService,
+    EscalationService,
+    ConsensusService,
+  ],
 })
 export class TasksModule {}
