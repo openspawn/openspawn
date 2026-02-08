@@ -4,4 +4,5 @@ export * from "./credits";
 export * from "./dashboard";
 export * from "./events";
 export * from "./login";
+export * from "./settings";
 export * from "./tasks";
