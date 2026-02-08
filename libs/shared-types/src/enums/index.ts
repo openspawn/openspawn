@@ -2,7 +2,16 @@ export { AgentRole } from "./agent-role.enum";
 export { AgentStatus } from "./agent-status.enum";
 export { AmountMode } from "./amount-mode.enum";
 export { ChannelType } from "./channel-type.enum";
+export {
+  ConsensusStatus,
+  ConsensusType,
+  VoteValue,
+} from "./consensus-status.enum";
 export { CreditType } from "./credit-type.enum";
+export {
+  EscalationReason,
+  ESCALATION_THRESHOLDS,
+} from "./escalation-reason.enum";
 export { EventSeverity } from "./event-severity.enum";
 export { MessageType } from "./message-type.enum";
 export { Proficiency } from "./proficiency.enum";

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 
-import { TaskStatus } from "@openspawn/shared-types";
+import { ConsensusType, EscalationReason, TaskStatus, VoteValue } from "@openspawn/shared-types";
 
 import { CurrentAgent, type AuthenticatedAgent } from "../auth";
 
@@ -9,6 +9,8 @@ import { AddDependencyDto } from "./dto/add-dependency.dto";
 import { AssignTaskDto } from "./dto/assign-task.dto";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { TransitionTaskDto } from "./dto/transition-task.dto";
+import { ConsensusService, type CreateConsensusDto } from "./consensus.service";
+import { EscalationService } from "./escalation.service";
 import { TaskRoutingService } from "./task-routing.service";
 import { TaskTemplatesService, type CreateTemplateDto, type InstantiateTemplateDto } from "./task-templates.service";
 import { TasksService } from "./tasks.service";
@@ -19,6 +21,8 @@ export class TasksController {
     private readonly tasksService: TasksService,
     private readonly templatesService: TaskTemplatesService,
     private readonly routingService: TaskRoutingService,
+    private readonly escalationService: EscalationService,
+    private readonly consensusService: ConsensusService,
   ) {}
 
   @Post()
@@ -260,5 +264,146 @@ export class TasksController {
       limit ? parseInt(limit, 10) : 5,
     );
     return { data: suggestions };
+  }
+
+  // ============================================
+  // Escalation Endpoints
+  // ============================================
+
+  /**
+   * Escalate a task to a higher-level agent
+   */
+  @Post(":id/escalate")
+  async escalateTask(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("id") id: string,
+    @Body() dto: { reason: EscalationReason; notes?: string; targetAgentId?: string },
+  ) {
+    const escalation = await this.escalationService.escalateTask({
+      orgId: agent.orgId,
+      taskId: id,
+      reason: dto.reason,
+      notes: dto.notes,
+      targetAgentId: dto.targetAgentId,
+      isAutomatic: false,
+    });
+    return { data: escalation, message: "Task escalated" };
+  }
+
+  /**
+   * Get escalation history for a task
+   */
+  @Get(":id/escalations")
+  async getTaskEscalations(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("id") id: string,
+  ) {
+    const escalations = await this.escalationService.getTaskEscalations(id);
+    return { data: escalations };
+  }
+
+  /**
+   * Get all open escalations in the org
+   */
+  @Get("escalations/open")
+  async getOpenEscalations(@CurrentAgent() agent: AuthenticatedAgent) {
+    const escalations = await this.escalationService.getOpenEscalations(agent.orgId);
+    return { data: escalations };
+  }
+
+  /**
+   * Resolve an escalation
+   */
+  @Post("escalations/:escalationId/resolve")
+  async resolveEscalation(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("escalationId") escalationId: string,
+  ) {
+    const escalation = await this.escalationService.resolveEscalation(escalationId);
+    return { data: escalation, message: "Escalation resolved" };
+  }
+
+  // ============================================
+  // Consensus Endpoints
+  // ============================================
+
+  /**
+   * Create a consensus request
+   */
+  @Post("consensus")
+  async createConsensusRequest(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Body() dto: CreateConsensusDto,
+  ) {
+    const request = await this.consensusService.createRequest(
+      agent.orgId,
+      agent.id,
+      dto,
+    );
+    return { data: request };
+  }
+
+  /**
+   * Get all pending consensus requests
+   */
+  @Get("consensus/pending")
+  async getPendingConsensus(@CurrentAgent() agent: AuthenticatedAgent) {
+    const requests = await this.consensusService.getPendingRequests(agent.orgId);
+    return { data: requests };
+  }
+
+  /**
+   * Get consensus requests the agent can vote on
+   */
+  @Get("consensus/votable")
+  async getVotableConsensus(@CurrentAgent() agent: AuthenticatedAgent) {
+    const requests = await this.consensusService.getVotableRequests(
+      agent.orgId,
+      agent.id,
+    );
+    return { data: requests };
+  }
+
+  /**
+   * Get a specific consensus request
+   */
+  @Get("consensus/:requestId")
+  async getConsensusRequest(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("requestId") requestId: string,
+  ) {
+    const request = await this.consensusService.getRequest(requestId);
+    return { data: request };
+  }
+
+  /**
+   * Vote on a consensus request
+   */
+  @Post("consensus/:requestId/vote")
+  async voteOnConsensus(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("requestId") requestId: string,
+    @Body() dto: { vote: VoteValue; reason?: string },
+  ) {
+    const vote = await this.consensusService.castVote(
+      agent.orgId,
+      agent.id,
+      requestId,
+      dto.vote,
+      dto.reason,
+    );
+    return { data: vote, message: "Vote recorded" };
+  }
+
+  /**
+   * Cancel a consensus request (requester only)
+   */
+  @Delete("consensus/:requestId")
+  async cancelConsensus(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("requestId") requestId: string,
+  ) {
+    const request = await this.consensusService.cancelRequest(requestId, agent.id);
+    return { data: request, message: "Consensus request cancelled" };
   }
 }
