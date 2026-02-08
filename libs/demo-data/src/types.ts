@@ -7,6 +7,8 @@ export type TaskPriority = 'low' | 'normal' | 'high' | 'critical';
 export type CreditType = 'CREDIT' | 'DEBIT';
 export type EventSeverity = 'debug' | 'info' | 'success' | 'warning' | 'error' | 'critical';
 
+export type ReputationLevel = 'NEW' | 'PROBATION' | 'TRUSTED' | 'VETERAN' | 'ELITE';
+
 export interface DemoAgent {
   id: string;
   agentId: string;
@@ -23,6 +25,25 @@ export interface DemoAgent {
   maxChildren?: number;       // Capacity for sub-agents
   budgetPeriodLimit?: number; // Per-period spending limit
   budgetPeriodSpent?: number; // Spent this period
+  // Trust & Reputation fields
+  trustScore?: number;        // 0-100, default 50
+  reputationLevel?: ReputationLevel;
+  tasksCompleted?: number;
+  tasksSuccessful?: number;
+  lastActivityAt?: string;
+  lastPromotionAt?: string;
+}
+
+export interface DemoReputationEvent {
+  id: string;
+  agentId: string;
+  eventType: string;
+  delta: number;
+  previousScore: number;
+  newScore: number;
+  reason: string;
+  taskId?: string;
+  createdAt: string;
 }
 
 export interface DemoTask {
