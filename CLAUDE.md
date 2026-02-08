@@ -8,7 +8,8 @@ Quick reference for AI agents working on OpenSpawn. Start here, dig deeper as ne
 
 Multi-agent coordination platform. Agents get tasks, earn credits, communicate. Humans monitor via dashboard.
 
-**Stack**: NestJS API + React Dashboard + PostgreSQL + MCP Server
+**Stack**: NestJS API + React Dashboard + PostgreSQL + MCP Server  
+**Status**: Phases 1-4 complete (50+ endpoints, full feature set)
 
 ---
 
@@ -76,13 +77,33 @@ pnpm exec nx run api:seed           # Seed data
 
 | Entity | Purpose |
 |--------|---------|
-| `Agent` | AI agents with levels (L1-L10), status, balance |
+| `Agent` | AI agents with levels (L1-L10), parent hierarchy, balance |
+| `AgentCapability` | Skills per agent with proficiency level |
 | `Task` | Work items with Kanban status flow |
+| `TaskDependency` | Blocking relationships between tasks |
 | `CreditTransaction` | Debits/credits with audit trail |
-| `Message` | Channel-based communication |
+| `Channel` | Communication channels (task, DM, broadcast) |
+| `Message` | Messages in channels |
 | `Event` | Append-only system audit log |
 
 → Full schema: [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md)
+
+---
+
+## Key Services (API)
+
+| Service | Purpose |
+|---------|---------|
+| `AgentsService` | Core agent CRUD |
+| `AgentOnboardingService` | Spawn, activate, reject, hierarchy |
+| `AgentBudgetService` | Budget limits, transfers, alerts |
+| `AgentCapabilitiesService` | Skills and matching |
+| `TasksService` | Task CRUD and transitions |
+| `TaskTemplatesService` | Reusable templates |
+| `TaskRoutingService` | Capability-based assignment |
+| `CreditsService` | Earn, spend, adjust credits |
+| `CreditAnalyticsService` | Trends, alerts, insights |
+| `DirectMessagesService` | Agent-to-agent DMs |
 
 ---
 
@@ -162,6 +183,31 @@ pnpm exec graphql-codegen
 |-------|----------|
 | Product requirements | [docs/openspawn/PRD.md](docs/openspawn/PRD.md) |
 | System architecture | [docs/openspawn/ARCHITECTURE.md](docs/openspawn/ARCHITECTURE.md) |
-| API reference | [docs/openspawn/API.md](docs/openspawn/API.md) |
+| API reference (50+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md) |
 | Database schema | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md) |
-| Agent hierarchy | [docs/openspawn/AGENT-LIFECYCLE.md](docs/openspawn/AGENT-LIFECYCLE.md) |
+| Agent lifecycle & onboarding | [docs/openspawn/AGENT-LIFECYCLE.md](docs/openspawn/AGENT-LIFECYCLE.md) |
+| Task workflow & templates | [docs/openspawn/TASK-WORKFLOW.md](docs/openspawn/TASK-WORKFLOW.md) |
+| Credit system & analytics | [docs/openspawn/CREDITS.md](docs/openspawn/CREDITS.md) |
+
+---
+
+## Quick API Overview
+
+### Agent Operations
+- `POST /agents/spawn` — Create child agent
+- `POST /agents/:id/activate` — Activate pending agent
+- `GET /agents/:id/hierarchy` — Get agent tree
+- `GET /agents/capabilities/match` — Find agents by skills
+
+### Task Workflow
+- `POST /tasks/templates` — Create template
+- `POST /tasks/templates/instantiate` — Create from template
+- `POST /tasks/:id/auto-assign` — Smart assignment
+
+### Credits
+- `GET /credits/analytics/alerts` — Spending alerts
+- `GET /credits/analytics/trends` — Historical data
+
+### Messaging
+- `POST /dm` — Send direct message
+- `GET /dm/conversations` — List DM threads

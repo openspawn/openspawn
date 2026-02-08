@@ -9,11 +9,17 @@ import { AddDependencyDto } from "./dto/add-dependency.dto";
 import { AssignTaskDto } from "./dto/assign-task.dto";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { TransitionTaskDto } from "./dto/transition-task.dto";
+import { TaskRoutingService } from "./task-routing.service";
+import { TaskTemplatesService, type CreateTemplateDto, type InstantiateTemplateDto } from "./task-templates.service";
 import { TasksService } from "./tasks.service";
 
 @Controller("tasks")
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly templatesService: TaskTemplatesService,
+    private readonly routingService: TaskRoutingService,
+  ) {}
 
   @Post()
   async create(@CurrentAgent() agent: AuthenticatedAgent, @Body() dto: CreateTaskDto) {
@@ -116,5 +122,143 @@ export class TasksController {
   async getComments(@CurrentAgent() agent: AuthenticatedAgent, @Param("id") id: string) {
     const comments = await this.tasksService.getComments(agent.orgId, id);
     return { data: comments };
+  }
+
+  // ============ Template Endpoints ============
+
+  /**
+   * Get all task templates
+   */
+  @Get("templates")
+  async getTemplates(@CurrentAgent() agent: AuthenticatedAgent) {
+    const templates = await this.templatesService.getTemplates(agent.orgId);
+    return { data: templates };
+  }
+
+  /**
+   * Create a new task template
+   */
+  @Post("templates")
+  async createTemplate(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Body() dto: CreateTemplateDto,
+  ) {
+    const template = await this.templatesService.createTemplate(
+      agent.orgId,
+      agent.id,
+      dto,
+    );
+    return { data: template };
+  }
+
+  /**
+   * Get a specific template
+   */
+  @Get("templates/:templateId")
+  async getTemplate(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("templateId") templateId: string,
+  ) {
+    const template = await this.templatesService.getTemplate(agent.orgId, templateId);
+    return { data: template };
+  }
+
+  /**
+   * Delete a template
+   */
+  @Delete("templates/:templateId")
+  async deleteTemplate(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("templateId") templateId: string,
+  ) {
+    await this.templatesService.deleteTemplate(agent.orgId, agent.id, templateId);
+    return { message: "Template deleted" };
+  }
+
+  /**
+   * Instantiate a template to create tasks
+   */
+  @Post("templates/instantiate")
+  async instantiateTemplate(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Body() dto: InstantiateTemplateDto,
+  ) {
+    const tasks = await this.templatesService.instantiateTemplate(
+      agent.orgId,
+      agent.id,
+      dto,
+    );
+    return { data: tasks };
+  }
+
+  /**
+   * Create a template from an existing task
+   */
+  @Post(":id/create-template")
+  async createTemplateFromTask(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("id") id: string,
+    @Body() body: { name: string },
+  ) {
+    const template = await this.templatesService.createFromTask(
+      agent.orgId,
+      agent.id,
+      id,
+      body.name,
+    );
+    return { data: template };
+  }
+
+  // ============ Routing Endpoints ============
+
+  /**
+   * Find candidate agents for a task based on required capabilities
+   */
+  @Get(":id/candidates")
+  async findCandidates(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("id") id: string,
+    @Query("minCoverage") minCoverage?: string,
+    @Query("maxResults") maxResults?: string,
+  ) {
+    const result = await this.routingService.findCandidates(agent.orgId, id, {
+      minCoverage: minCoverage ? parseInt(minCoverage, 10) : undefined,
+      maxResults: maxResults ? parseInt(maxResults, 10) : undefined,
+    });
+    return { data: result };
+  }
+
+  /**
+   * Auto-assign a task to the best matching agent
+   */
+  @Post(":id/auto-assign")
+  async autoAssign(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("id") id: string,
+    @Body() body: { minCoverage?: number; excludeAgentIds?: string[] },
+  ) {
+    const result = await this.routingService.autoAssign(agent.orgId, agent.id, id, {
+      minCoverage: body.minCoverage,
+      excludeAgentIds: body.excludeAgentIds,
+    });
+    return { data: result };
+  }
+
+  /**
+   * Get suggested agents for a set of capabilities
+   */
+  @Get("routing/suggest")
+  async suggestAgents(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Query("capabilities") capabilities: string,
+    @Query("limit") limit?: string,
+  ) {
+    const capList = capabilities.split(",").map((c) => c.trim()).filter(Boolean);
+    const suggestions = await this.routingService.suggestAgents(
+      agent.orgId,
+      capList,
+      limit ? parseInt(limit, 10) : 5,
+    );
+    return { data: suggestions };
   }
 }

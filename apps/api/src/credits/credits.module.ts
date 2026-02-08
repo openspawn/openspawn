@@ -6,6 +6,7 @@ import { Agent, CreditRateConfig, CreditTransaction, Task } from "@openspawn/dat
 import { EventsModule } from "../events";
 
 import { BudgetResetTask } from "./budget-reset.task";
+import { CreditAnalyticsService } from "./credit-analytics.service";
 import { CreditEarningService } from "./credit-earning.service";
 import { CreditsController } from "./credits.controller";
 import { CreditsService } from "./credits.service";
@@ -16,7 +17,7 @@ import { CreditsService } from "./credits.service";
     EventsModule,
   ],
   controllers: [CreditsController],
-  providers: [CreditsService, CreditEarningService, BudgetResetTask],
-  exports: [CreditsService],
+  providers: [CreditsService, CreditEarningService, CreditAnalyticsService, BudgetResetTask],
+  exports: [CreditsService, CreditAnalyticsService],
 })
 export class CreditsModule {}

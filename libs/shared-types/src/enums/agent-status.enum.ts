@@ -1,5 +1,6 @@
 export enum AgentStatus {
-  ACTIVE = "active",
-  SUSPENDED = "suspended",
-  REVOKED = "revoked",
+  PENDING = "pending",      // Awaiting activation by parent/L10
+  ACTIVE = "active",        // Fully operational
+  SUSPENDED = "suspended",  // Temporarily disabled
+  REVOKED = "revoked",      // Permanently disabled
 }

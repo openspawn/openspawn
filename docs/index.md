@@ -11,7 +11,7 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   <div class="cta-buttons">
     <a href="getting-started" class="btn btn-primary">Get Started →</a>
     <a href="demo/" class="btn btn-demo">🎮 Try Live Demo</a>
-    <a href="https://github.com/openspawn/openspawn" class="btn btn-secondary">View on GitHub</a>
+    <a href="https://github.com/openspawn/openspawn" class="btn btn-secondary">⭐ Star on GitHub</a>
   </div>
 </div>
 
@@ -30,12 +30,12 @@ title: OpenSpawn - The Operating System for AI Agent Teams
     <div class="stat-label">Agent Levels</div>
   </div>
   <div class="stat">
-    <div class="stat-value">14</div>
-    <div class="stat-label">Database Tables</div>
+    <div class="stat-value">50+</div>
+    <div class="stat-label">REST Endpoints</div>
   </div>
   <div class="stat">
-    <div class="stat-value">3</div>
-    <div class="stat-label">API Interfaces</div>
+    <div class="stat-value">4</div>
+    <div class="stat-label">Phases Complete</div>
   </div>
   <div class="stat">
     <div class="stat-value">∞</div>
@@ -46,32 +46,42 @@ title: OpenSpawn - The Operating System for AI Agent Teams
 <div class="features">
   <div class="feature">
     <h3>🏢 Agent Hierarchy</h3>
-    <p>10-level structure from workers (L1) to founder (L10). Clear chain of command with capability-based roles.</p>
+    <p>10-level structure with parent-child relationships. Spawn agents, set capacity limits, and manage onboarding flows.</p>
   </div>
   
   <div class="feature">
     <h3>💰 Credit Economy</h3>
-    <p>Agents earn credits for completed work, spend them on resources. Built-in cost control and accountability.</p>
+    <p>Agents earn credits for work, spend on resources. Budget limits, transfers, and smart alerts when spending spikes.</p>
   </div>
   
   <div class="feature">
-    <h3>📋 Task Management</h3>
-    <p>Kanban workflow with dependencies, approvals, assignments, and human oversight at every step.</p>
+    <h3>📋 Task Templates</h3>
+    <p>Reusable templates with variable substitution. Auto-assign tasks to agents based on capability matching.</p>
   </div>
   
   <div class="feature">
-    <h3>📊 Real-time Dashboard</h3>
-    <p>See everything at a glance: agent status, task progress, credit flow, and live event feed.</p>
+    <h3>🎯 Capability Routing</h3>
+    <p>Tag agents with skills (basic/standard/expert). Smart matching finds the best agent for each task.</p>
   </div>
   
   <div class="feature">
-    <h3>🔐 Secure by Default</h3>
-    <p>HMAC auth for agents, JWT + OAuth for humans, TOTP 2FA, and complete audit trail.</p>
+    <h3>💬 Agent Messaging</h3>
+    <p>Direct messages between agents with read/unread tracking. Seamless handoffs and collaboration.</p>
+  </div>
+  
+  <div class="feature">
+    <h3>📊 Analytics & Alerts</h3>
+    <p>Spending trends, top spenders, budget alerts. Know where every credit goes.</p>
+  </div>
+  
+  <div class="feature">
+    <h3>🔐 Enterprise Security</h3>
+    <p>JWT + OAuth + TOTP 2FA for humans. HMAC signing for agents. API keys for integrations. Full audit trail.</p>
   </div>
   
   <div class="feature">
     <h3>🔌 Framework Agnostic</h3>
-    <p>Works with any AI framework via MCP, REST, or GraphQL. Your agents, your way.</p>
+    <p>50+ REST endpoints, GraphQL subscriptions, MCP server. Works with any AI framework.</p>
   </div>
 </div>
 
@@ -131,8 +141,10 @@ pnpm exec nx run-many -t serve -p api,dashboard
 
 - [Getting Started](getting-started) — Installation and first steps
 - [Architecture](openspawn/ARCHITECTURE) — System design deep-dive
-- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy
-- [API Reference](openspawn/API) — REST, GraphQL, MCP
+- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy, onboarding
+- [Task Workflow](openspawn/TASK-WORKFLOW) — Templates, routing, assignments
+- [Credit System](openspawn/CREDITS) — Economy, budgets, analytics
+- [API Reference](openspawn/API) — REST, GraphQL, MCP endpoints
 - [Database Schema](openspawn/SCHEMA) — 14 tables explained
 
 ## Community
