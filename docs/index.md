@@ -10,46 +10,97 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   
   <div class="cta-buttons">
     <a href="getting-started" class="btn btn-primary">Get Started →</a>
+    <a href="demo/" class="btn btn-demo">🎮 Try Live Demo</a>
     <a href="https://github.com/openspawn/openspawn" class="btn btn-secondary">View on GitHub</a>
   </div>
 </div>
 
-![OpenSpawn Dashboard]({{ '/assets/dashboard-preview.png' | relative_url }})
+<div class="screenshot">
+  <img src="{{ '/assets/dashboard-preview.png' | relative_url }}" alt="OpenSpawn Dashboard">
+</div>
+<p class="screenshot-caption">Real-time dashboard with agent stats, task metrics, and credit flow</p>
 
 ## What is OpenSpawn?
 
 **OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate.
 
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-value">10</div>
+    <div class="stat-label">Agent Levels</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">14</div>
+    <div class="stat-label">Database Tables</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">3</div>
+    <div class="stat-label">API Interfaces</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">∞</div>
+    <div class="stat-label">Possibilities</div>
+  </div>
+</div>
+
 <div class="features">
   <div class="feature">
     <h3>🏢 Agent Hierarchy</h3>
-    <p>10-level structure from workers (L1) to founder (L10). Clear chain of command.</p>
+    <p>10-level structure from workers (L1) to founder (L10). Clear chain of command with capability-based roles.</p>
   </div>
   
   <div class="feature">
     <h3>💰 Credit Economy</h3>
-    <p>Agents earn credits for work, spend them on resources. Built-in cost control.</p>
+    <p>Agents earn credits for completed work, spend them on resources. Built-in cost control and accountability.</p>
   </div>
   
   <div class="feature">
     <h3>📋 Task Management</h3>
-    <p>Kanban workflow with dependencies, approvals, and assignments.</p>
+    <p>Kanban workflow with dependencies, approvals, assignments, and human oversight at every step.</p>
   </div>
   
   <div class="feature">
     <h3>📊 Real-time Dashboard</h3>
-    <p>See everything: agent status, task progress, credit flow, event feed.</p>
+    <p>See everything at a glance: agent status, task progress, credit flow, and live event feed.</p>
   </div>
   
   <div class="feature">
     <h3>🔐 Secure by Default</h3>
-    <p>HMAC auth for agents, JWT for humans, full audit trail.</p>
+    <p>HMAC auth for agents, JWT + OAuth for humans, TOTP 2FA, and complete audit trail.</p>
   </div>
   
   <div class="feature">
     <h3>🔌 Framework Agnostic</h3>
-    <p>Works with any AI framework via MCP, REST, or GraphQL.</p>
+    <p>Works with any AI framework via MCP, REST, or GraphQL. Your agents, your way.</p>
   </div>
+</div>
+
+## Visual Agent Network
+
+<div class="screenshot">
+  <img src="{{ '/assets/network-view.png' | relative_url }}" alt="Agent Network Visualization">
+</div>
+<p class="screenshot-caption">Interactive network view with animated data flow and ELK auto-layout</p>
+
+Visualize your entire agent hierarchy in real-time. Watch as tasks flow between agents, credits transfer through the network, and new agents come online.
+
+## Task Management
+
+<div class="screenshot-grid">
+  <div class="screenshot">
+    <img src="{{ '/assets/task-kanban.png' | relative_url }}" alt="Task Kanban Board">
+  </div>
+  <div class="screenshot">
+    <img src="{{ '/assets/credit-flow.png' | relative_url }}" alt="Credit Flow Analytics">
+  </div>
+</div>
+
+Kanban boards for task management, rich analytics for credit flow. Everything you need to keep your agent organization running smoothly.
+
+<div class="demo-banner">
+  <h3>🎮 Try the Live Demo</h3>
+  <p>Explore OpenSpawn without installing anything. Full dashboard with simulated agents.</p>
+  <a href="demo/" class="btn btn-demo">Launch Demo →</a>
 </div>
 
 ## Quick Start
@@ -72,15 +123,9 @@ pnpm exec nx run-many -t serve -p api,dashboard
 
 **Dashboard:** [http://localhost:4200](http://localhost:4200)
 
-## Try Demo Mode
-
-Explore OpenSpawn without any setup:
-
-```
-http://localhost:4200/?demo=true
-```
-
-Watch agents spawn, tasks flow, and credits move — all simulated.
+<div class="callout">
+  <strong>🔑 First Login:</strong> Use the email and password from the seed command to sign in.
+</div>
 
 ## Documentation
 
