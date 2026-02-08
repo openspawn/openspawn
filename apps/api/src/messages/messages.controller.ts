@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
 
 import { CurrentAgent, type AuthenticatedAgent } from "../auth";
 
 import { ChannelsService } from "./channels.service";
+import { DirectMessagesService, type SendDirectMessageDto } from "./direct-messages.service";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SendMessageDto } from "./dto/send-message.dto";
 import { MessagesService } from "./messages.service";
@@ -12,6 +13,7 @@ export class MessagesController {
   constructor(
     private readonly messagesService: MessagesService,
     private readonly channelsService: ChannelsService,
+    private readonly directMessagesService: DirectMessagesService,
   ) {}
 
   // Channel endpoints
@@ -81,5 +83,83 @@ export class MessagesController {
   async getThread(@CurrentAgent() agent: AuthenticatedAgent, @Param("id") id: string) {
     const messages = await this.messagesService.getThread(agent.orgId, id);
     return { data: messages };
+  }
+
+  // ============ Direct Messages Endpoints ============
+
+  /**
+   * Send a direct message to another agent
+   */
+  @Post("dm")
+  async sendDirectMessage(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Body() dto: SendDirectMessageDto,
+  ) {
+    const message = await this.directMessagesService.sendDirectMessage(
+      agent.orgId,
+      agent.id,
+      dto,
+    );
+    return { data: message };
+  }
+
+  /**
+   * Get all conversations for the current agent
+   */
+  @Get("dm/conversations")
+  async getConversations(@CurrentAgent() agent: AuthenticatedAgent) {
+    const conversations = await this.directMessagesService.getConversations(
+      agent.orgId,
+      agent.id,
+    );
+    return { data: conversations };
+  }
+
+  /**
+   * Get total unread DM count
+   */
+  @Get("dm/unread")
+  async getUnreadCount(@CurrentAgent() agent: AuthenticatedAgent) {
+    const count = await this.directMessagesService.getUnreadCount(
+      agent.orgId,
+      agent.id,
+    );
+    return { data: { count } };
+  }
+
+  /**
+   * Get direct messages with a specific agent
+   */
+  @Get("dm/:agentId")
+  async getDirectMessages(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("agentId") otherAgentId: string,
+    @Query("limit") limit?: number,
+    @Query("before") before?: string,
+  ) {
+    const messages = await this.directMessagesService.getDirectMessages(
+      agent.orgId,
+      agent.id,
+      otherAgentId,
+      limit || 50,
+      before,
+    );
+    return { data: messages };
+  }
+
+  /**
+   * Mark messages from a specific agent as read
+   */
+  @Patch("dm/:agentId/read")
+  async markAsRead(
+    @CurrentAgent() agent: AuthenticatedAgent,
+    @Param("agentId") otherAgentId: string,
+  ) {
+    const count = await this.directMessagesService.markAsRead(
+      agent.orgId,
+      agent.id,
+      otherAgentId,
+    );
+    return { data: { markedRead: count } };
   }
 }
