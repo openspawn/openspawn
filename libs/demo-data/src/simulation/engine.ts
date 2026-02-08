@@ -14,14 +14,16 @@ import { generateRandomAgent, generateRandomTask, generateCreditTransaction, gen
 // Probability distributions for different events (per tick)
 const PROBABILITIES = {
   // Agent events
-  agentCreated: 0.15,      // 15% chance per tick (higher for dynamic growth)
+  agentCreated: 0.12,      // 12% chance per tick
   agentActivated: 0.35,    // 35% chance parent activates a pending child
   agentPromoted: 0.05,     // 5% chance per tick
-  agentStatusChange: 0.02, // 2% chance per tick (paused/suspended - rare)
+  agentStatusChange: 0.03, // 3% chance per tick (paused/suspended)
+  agentDespawned: 0.04,    // 4% chance per tick - agents can be terminated
   
   // Task events
-  taskCreated: 0.2,        // 20% chance per tick
-  taskStatusChange: 0.2,   // 20% chance per tick
+  taskCreated: 0.18,       // 18% chance per tick
+  taskStatusChange: 0.45,  // 45% chance per tick - faster task flow
+  taskBatchAdvance: 0.20,  // 20% chance to advance multiple tasks at once
   
   // Credit events
   creditEarned: 0.15,      // 15% chance per tick
@@ -231,16 +233,28 @@ export class SimulationEngine {
       if (event) events.push(event);
     }
     
+    // Agent despawned (terminated or suspended)
+    if (shouldFire(PROBABILITIES.agentDespawned)) {
+      const event = this.despawnAgent();
+      if (event) events.push(event);
+    }
+    
     // Task created
     if (shouldFire(PROBABILITIES.taskCreated)) {
       const event = this.createTask();
       if (event) events.push(event);
     }
     
-    // Task status change
+    // Task status change (single task)
     if (shouldFire(PROBABILITIES.taskStatusChange)) {
       const event = this.advanceTask();
       if (event) events.push(event);
+    }
+    
+    // Batch advance (multiple tasks at once - simulates work sprints)
+    if (shouldFire(PROBABILITIES.taskBatchAdvance)) {
+      const batchEvents = this.batchAdvanceTasks();
+      events.push(...batchEvents);
     }
     
     // Credit earned
@@ -392,13 +406,13 @@ export class SimulationEngine {
     const agent = randomFrom(agents);
     const oldStatus = agent.status;
     
-    // Status transitions
+    // Status transitions - allow pausing/resuming
     const transitions: Record<AgentStatus, AgentStatus[]> = {
       pending: ['active'],
-      active: ['paused'],
-      paused: ['active'],
-      suspended: ['active', 'revoked'],
-      revoked: [],
+      active: ['paused'],       // Can pause active agents
+      paused: ['active'],       // Can resume paused agents
+      suspended: ['active'],    // Can reactivate suspended agents
+      revoked: [],              // Terminal state
     };
     
     const possibleStatuses = transitions[agent.status];
@@ -408,15 +422,50 @@ export class SimulationEngine {
     
     const systemEvent = generateEvent(
       'agent.status_changed',
-      agent.status === 'revoked' ? 'warning' : 'info',
+      'info',
       `${agent.name} status changed to ${agent.status}`,
       { agentId: agent.id, metadata: { previousStatus: oldStatus, newStatus: agent.status } }
     );
     this.state.scenario.events.push(systemEvent);
     
     return {
-      type: 'agent_terminated', // Generic status change event
+      type: 'agent_status_changed',
       payload: { agent, oldStatus, newStatus: agent.status },
+      timestamp: new Date(),
+    };
+  }
+  
+  private despawnAgent(): SimulationEvent | null {
+    // Only despawn low-level agents (L1-L4) that are active and have been around
+    const despawnableAgents = this.state.scenario.agents.filter(a => 
+      a.status === 'active' && 
+      a.level <= 4 && 
+      a.level >= 1
+    );
+    if (despawnableAgents.length <= 2) return null; // Keep at least 2 low-level agents
+    
+    const agent = randomFrom(despawnableAgents);
+    const oldStatus = agent.status;
+    
+    // 70% chance suspended (can be reactivated), 30% chance revoked (permanent)
+    agent.status = Math.random() < 0.7 ? 'suspended' : 'revoked';
+    
+    const severity = agent.status === 'revoked' ? 'warning' : 'info';
+    const reason = agent.status === 'revoked' 
+      ? 'Agent permanently terminated due to inactivity'
+      : 'Agent suspended for resource optimization';
+    
+    const systemEvent = generateEvent(
+      agent.status === 'revoked' ? 'agent.revoked' : 'agent.suspended',
+      severity,
+      `${agent.name} ${agent.status}: ${reason}`,
+      { agentId: agent.id, metadata: { previousStatus: oldStatus, reason } }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: 'agent_despawned',
+      payload: { agent, oldStatus, newStatus: agent.status, reason },
       timestamp: new Date(),
     };
   }
@@ -454,7 +503,29 @@ export class SimulationEngine {
     );
     if (activeTasks.length === 0) return null;
     
-    const task = randomFrom(activeTasks);
+    // Prefer tasks that are further along (weighted selection)
+    const weights: Record<TaskStatus, number> = {
+      backlog: 1,
+      pending: 2,
+      assigned: 3,
+      in_progress: 4,
+      review: 6,      // Higher weight = more likely to be selected
+      done: 0,
+      cancelled: 0,
+    };
+    
+    // Weighted random selection
+    const totalWeight = activeTasks.reduce((sum, t) => sum + weights[t.status], 0);
+    let random = Math.random() * totalWeight;
+    let task = activeTasks[0];
+    for (const t of activeTasks) {
+      random -= weights[t.status];
+      if (random <= 0) {
+        task = t;
+        break;
+      }
+    }
+    
     const oldStatus = task.status;
     const newStatus = TASK_STATUS_FLOW[task.status];
     
@@ -480,7 +551,7 @@ export class SimulationEngine {
     
     const systemEvent = generateEvent(
       `task.${newStatus === 'done' ? 'completed' : 'status_changed'}`,
-      'info',
+      newStatus === 'done' ? 'success' : 'info',
       `${task.title} moved to ${newStatus}`,
       { taskId: task.id, agentId: task.assigneeId }
     );
@@ -491,6 +562,20 @@ export class SimulationEngine {
       payload: { task, oldStatus, newStatus },
       timestamp: new Date(),
     };
+  }
+  
+  private batchAdvanceTasks(): SimulationEvent[] {
+    const events: SimulationEvent[] = [];
+    
+    // Advance 2-4 tasks at once (simulates burst of activity)
+    const count = 2 + Math.floor(Math.random() * 3);
+    
+    for (let i = 0; i < count; i++) {
+      const event = this.advanceTask();
+      if (event) events.push(event);
+    }
+    
+    return events;
   }
   
   private earnCredits(): SimulationEvent | null {

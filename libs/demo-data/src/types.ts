@@ -80,6 +80,7 @@ export interface SimulationState {
 
 export interface SimulationEvent {
   type: 'agent_created' | 'agent_activated' | 'agent_promoted' | 'agent_terminated' |
+        'agent_status_changed' | 'agent_despawned' |
         'task_created' | 'task_assigned' | 'task_completed' |
         'credit_earned' | 'credit_spent' |
         'system_event';
