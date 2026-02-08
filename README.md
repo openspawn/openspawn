@@ -10,7 +10,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-red.svg)](https://nestjs.com/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
-[![Phases](https://img.shields.io/badge/Phases-4%20Complete-success.svg)](#-whats-included)
+[![Phases](https://img.shields.io/badge/Phases-6%20Complete-success.svg)](#-whats-included)
 
 [**🎮 Live Demo**](https://openspawn.github.io/openspawn/demo/) · [**📚 Documentation**](https://openspawn.github.io/openspawn/) · [**💬 Discord**](https://discord.gg/openspawn)
 
