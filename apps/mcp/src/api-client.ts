@@ -129,4 +129,52 @@ export class ApiClient {
     // Returns the current agent based on auth headers
     return this.request("GET", "/health");
   }
+
+  // Trust & Reputation operations
+  async getAgentReputation(agentId: string): Promise<{ data: unknown }> {
+    return this.request("GET", `/agents/${agentId}/reputation`);
+  }
+
+  async getReputationHistory(agentId: string, limit = 20): Promise<{ data: unknown[] }> {
+    return this.request("GET", `/agents/${agentId}/reputation/history?limit=${limit}`);
+  }
+
+  async getTrustLeaderboard(limit = 10): Promise<{ data: unknown[] }> {
+    return this.request("GET", `/agents/leaderboard/trust?limit=${limit}`);
+  }
+
+  async applyReputationBonus(agentId: string, amount: number, reason: string): Promise<{ data: unknown }> {
+    return this.request("POST", `/agents/${agentId}/reputation/bonus`, { amount, reason });
+  }
+
+  async applyReputationPenalty(agentId: string, amount: number, reason: string): Promise<{ data: unknown }> {
+    return this.request("POST", `/agents/${agentId}/reputation/penalty`, { amount, reason });
+  }
+
+  // Escalation operations
+  async createEscalation(taskId: string, reason: string, targetAgentId: string): Promise<{ data: unknown }> {
+    return this.request("POST", `/tasks/${taskId}/escalate`, { reason, targetAgentId });
+  }
+
+  async getEscalations(taskId?: string): Promise<{ data: unknown[] }> {
+    const query = taskId ? `?taskId=${taskId}` : "";
+    return this.request("GET", `/escalations${query}`);
+  }
+
+  async resolveEscalation(escalationId: string, resolution: string): Promise<{ data: unknown }> {
+    return this.request("POST", `/escalations/${escalationId}/resolve`, { resolution });
+  }
+
+  // Consensus operations
+  async requestConsensus(taskId: string, question: string, voterIds: string[]): Promise<{ data: unknown }> {
+    return this.request("POST", `/tasks/${taskId}/consensus`, { question, voterIds });
+  }
+
+  async submitVote(consensusId: string, vote: "approve" | "reject", reason?: string): Promise<{ data: unknown }> {
+    return this.request("POST", `/consensus/${consensusId}/vote`, { vote, reason });
+  }
+
+  async getConsensusStatus(consensusId: string): Promise<{ data: unknown }> {
+    return this.request("GET", `/consensus/${consensusId}`);
+  }
 }
