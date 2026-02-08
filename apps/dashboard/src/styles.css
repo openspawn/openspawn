@@ -101,3 +101,61 @@
     height: 0;
   }
 }
+
+/* Driver.js tour customization */
+.driver-popover {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
+}
+
+.driver-popover-title {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.driver-popover-description {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.driver-popover-progress-text {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.driver-popover-prev-btn,
+.driver-popover-next-btn {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+}
+
+.driver-popover-prev-btn:hover,
+.driver-popover-next-btn:hover {
+  opacity: 0.9 !important;
+}
+
+.driver-popover-close-btn {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.driver-popover-close-btn:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+.driver-popover-arrow-side-left,
+.driver-popover-arrow-side-right,
+.driver-popover-arrow-side-top,
+.driver-popover-arrow-side-bottom {
+  border-color: hsl(var(--border)) !important;
+}
+
+.driver-popover-arrow-side-left::after,
+.driver-popover-arrow-side-right::after,
+.driver-popover-arrow-side-top::after,
+.driver-popover-arrow-side-bottom::after {
+  border-color: hsl(var(--card)) !important;
+}

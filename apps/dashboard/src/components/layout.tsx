@@ -37,13 +37,13 @@ interface LayoutProps {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Network", href: "/network", icon: Network },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare },
-  { name: "Agents", href: "/agents", icon: Users },
-  { name: "Credits", href: "/credits", icon: Coins },
-  { name: "Events", href: "/events", icon: Activity },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard-link" },
+  { name: "Network", href: "/network", icon: Network, tourId: "network-link" },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks-link" },
+  { name: "Agents", href: "/agents", icon: Users, tourId: "agents-link" },
+  { name: "Credits", href: "/credits", icon: Coins, tourId: "credits-link" },
+  { name: "Events", href: "/events", icon: Activity, tourId: "events-link" },
+  { name: "Settings", href: "/settings", icon: Settings, tourId: "settings-link" },
 ];
 
 export function Layout({ children }: LayoutProps) {
@@ -81,7 +81,7 @@ export function Layout({ children }: LayoutProps) {
     <TooltipProvider>
       <div className="flex h-screen bg-background">
         {/* Sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex">
+        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex" data-tour="sidebar">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b border-border px-6">
             <Bot className="h-6 w-6 text-primary" />
@@ -94,7 +94,7 @@ export function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
-                  <Link key={item.name} to={item.href}>
+                  <Link key={item.name} to={item.href} data-tour={item.tourId}>
                     <Button
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
@@ -132,7 +132,7 @@ export function Layout({ children }: LayoutProps) {
               )}
             </Button>
             {isDemo && (
-              <div className="mt-2">
+              <div className="mt-2" data-tour="demo-controls">
                 <DemoControls compact />
               </div>
             )}
@@ -185,7 +185,9 @@ export function Layout({ children }: LayoutProps) {
             ) : null}
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>v0.1.0</span>
-              <ThemeToggle />
+              <div data-tour="theme-toggle">
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </aside>

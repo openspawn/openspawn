@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Sparkles, Network, LayoutDashboard, Coins, CheckSquare } from 'lucide-react';
+import { X, Play, Sparkles, Network, LayoutDashboard, Coins, CheckSquare, HelpCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useDemo } from './DemoProvider';
+import { startTour, markTourCompleted } from '../lib/tour';
 
 const STORAGE_KEY = 'openspawn-demo-welcomed';
 
@@ -107,6 +108,19 @@ export function DemoWelcome() {
               >
                 <Play className="mr-2 h-4 w-4" />
                 Start Exploring
+              </Button>
+              <Button
+                onClick={() => {
+                  handleDismiss();
+                  markTourCompleted(); // Prevent auto-tour since user chose manual
+                  setTimeout(() => startTour(), 300); // Small delay for modal close
+                }}
+                variant="outline"
+                size="lg"
+                className="w-full"
+              >
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Take a Guided Tour
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 This is a live simulation — watch agents work in real-time
