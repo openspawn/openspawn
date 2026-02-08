@@ -42,6 +42,65 @@ function mapAgent(agent: any) {
     updatedAt: agent.createdAt, // Required field
     parentId: agent.parentId || null,
     domain: agent.domain || null,
+    // Trust & Reputation fields
+    trustScore: agent.trustScore ?? 50,
+    reputationLevel: agent.reputationLevel || 'TRUSTED',
+    tasksCompleted: agent.tasksCompleted ?? 0,
+    tasksSuccessful: agent.tasksSuccessful ?? 0,
+    lastActivityAt: agent.lastActivityAt || agent.createdAt,
+    lastPromotionAt: agent.lastPromotionAt || null,
+  };
+}
+
+// Calculate promotion progress
+function getPromotionProgress(agent: any) {
+  const thresholds: Record<number, { trustScore: number; tasks: number }> = {
+    1: { trustScore: 55, tasks: 3 },
+    2: { trustScore: 60, tasks: 10 },
+    3: { trustScore: 65, tasks: 25 },
+    4: { trustScore: 70, tasks: 50 },
+    5: { trustScore: 75, tasks: 100 },
+    6: { trustScore: 80, tasks: 200 },
+    7: { trustScore: 85, tasks: 500 },
+    8: { trustScore: 90, tasks: 1000 },
+    9: { trustScore: 95, tasks: 1500 },
+  };
+  
+  const nextLevel = agent.level + 1;
+  if (nextLevel > 9) return null;
+  
+  const threshold = thresholds[agent.level];
+  if (!threshold) return null;
+  
+  const trustScore = agent.trustScore ?? 50;
+  const tasksCompleted = agent.tasksCompleted ?? 0;
+  
+  return {
+    currentLevel: agent.level,
+    nextLevel,
+    trustScoreRequired: threshold.trustScore,
+    tasksRequired: threshold.tasks,
+    trustScoreProgress: Math.min(100, (trustScore / threshold.trustScore) * 100),
+    tasksProgress: Math.min(100, (tasksCompleted / threshold.tasks) * 100),
+  };
+}
+
+function mapAgentReputation(agent: any) {
+  const trustScore = agent.trustScore ?? 50;
+  const tasksCompleted = agent.tasksCompleted ?? 0;
+  const tasksSuccessful = agent.tasksSuccessful ?? 0;
+  const successRate = tasksCompleted > 0 
+    ? Math.round((tasksSuccessful / tasksCompleted) * 100) 
+    : 0;
+  
+  return {
+    trustScore,
+    reputationLevel: agent.reputationLevel || 'TRUSTED',
+    tasksCompleted,
+    tasksSuccessful,
+    successRate,
+    lastActivityAt: agent.lastActivityAt || null,
+    promotionProgress: getPromotionProgress(agent),
   };
 }
 
@@ -171,6 +230,64 @@ function handleOperation(operationName: string, variables: any): any {
       );
       const evtOffset = (evtPage - 1) * evtLimit;
       return { events: sortedEvents.slice(evtOffset, evtOffset + evtLimit).map(e => mapEvent(e, agents)) };
+
+    case 'AgentReputation':
+      const repAgent = agents.find(a => a.id === variables?.id);
+      return { agentReputation: repAgent ? mapAgentReputation(repAgent) : null };
+
+    case 'TrustLeaderboard':
+      const leaderboardLimit = variables?.limit || 10;
+      const sortedByTrust = [...agents]
+        .filter(a => a.status === 'active')
+        .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
+        .slice(0, leaderboardLimit);
+      return {
+        trustLeaderboard: sortedByTrust.map(a => ({
+          id: a.id,
+          agentId: a.agentId,
+          name: a.name,
+          level: a.level,
+          trustScore: a.trustScore ?? 50,
+          reputationLevel: a.reputationLevel || 'TRUSTED',
+          tasksCompleted: a.tasksCompleted ?? 0,
+        })),
+      };
+
+    case 'ReputationHistory':
+      // Generate some mock history events
+      const histAgent = agents.find(a => a.id === variables?.id);
+      if (!histAgent) return { reputationHistory: [] };
+      
+      const mockHistory = [
+        {
+          id: `rep-${histAgent.id}-1`,
+          eventType: 'TASK_COMPLETED',
+          delta: 2,
+          previousScore: (histAgent.trustScore ?? 50) - 2,
+          newScore: histAgent.trustScore ?? 50,
+          reason: 'Completed task on time',
+          createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: `rep-${histAgent.id}-2`,
+          eventType: 'TASK_COMPLETED',
+          delta: 1,
+          previousScore: (histAgent.trustScore ?? 50) - 3,
+          newScore: (histAgent.trustScore ?? 50) - 2,
+          reason: 'Task completed late',
+          createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: `rep-${histAgent.id}-3`,
+          eventType: 'BONUS',
+          delta: 5,
+          previousScore: (histAgent.trustScore ?? 50) - 8,
+          newScore: (histAgent.trustScore ?? 50) - 3,
+          reason: 'Outstanding performance bonus',
+          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        },
+      ];
+      return { reputationHistory: mockHistory };
 
     default:
       console.warn('[MockFetcher] Unknown operation:', operationName);

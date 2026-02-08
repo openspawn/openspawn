@@ -1,4 +1,4 @@
-import type { DemoAgent } from '../types.js';
+import type { DemoAgent, ReputationLevel } from '../types.js';
 
 // Helper to generate UUIDs
 function uuid(): string {
@@ -56,6 +56,11 @@ export const agents: DemoAgent[] = [
     lifetimeEarnings: 125000,
     createdAt: daysAgo(0),
     domain: 'Operations',
+    trustScore: 98,
+    reputationLevel: 'ELITE',
+    tasksCompleted: 1847,
+    tasksSuccessful: 1820,
+    lastActivityAt: new Date().toISOString(),
   },
   
   // ========== LEVEL 9 - TALENT AGENTS ==========
@@ -72,6 +77,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(2),
     parentId: AGENT_IDS.agentDennis,
     domain: 'Engineering',
+    trustScore: 92,
+    reputationLevel: 'ELITE',
+    tasksCompleted: 423,
+    tasksSuccessful: 401,
+    lastActivityAt: daysAgo(28),
   },
   {
     id: AGENT_IDS.financeTalent,
@@ -86,6 +96,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(3),
     parentId: AGENT_IDS.agentDennis,
     domain: 'Finance',
+    trustScore: 88,
+    reputationLevel: 'ELITE',
+    tasksCompleted: 356,
+    tasksSuccessful: 332,
+    lastActivityAt: daysAgo(27),
   },
   {
     id: AGENT_IDS.marketingTalent,
@@ -100,6 +115,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(5),
     parentId: AGENT_IDS.agentDennis,
     domain: 'Marketing',
+    trustScore: 84,
+    reputationLevel: 'VETERAN',
+    tasksCompleted: 287,
+    tasksSuccessful: 258,
+    lastActivityAt: daysAgo(26),
   },
   {
     id: AGENT_IDS.salesTalent,
@@ -114,6 +134,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(7),
     parentId: AGENT_IDS.agentDennis,
     domain: 'Sales',
+    trustScore: 79,
+    reputationLevel: 'VETERAN',
+    tasksCompleted: 198,
+    tasksSuccessful: 172,
+    lastActivityAt: daysAgo(25),
   },
   
   // ========== LEVEL 5-6 - SENIORS ==========
@@ -130,6 +155,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(8),
     parentId: AGENT_IDS.techTalent,
     domain: 'Engineering',
+    trustScore: 76,
+    reputationLevel: 'VETERAN',
+    tasksCompleted: 142,
+    tasksSuccessful: 128,
+    lastActivityAt: daysAgo(28),
   },
   {
     id: AGENT_IDS.analyst,
@@ -144,6 +174,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(10),
     parentId: AGENT_IDS.financeTalent,
     domain: 'Finance',
+    trustScore: 68,
+    reputationLevel: 'TRUSTED',
+    tasksCompleted: 98,
+    tasksSuccessful: 82,
+    lastActivityAt: daysAgo(27),
   },
   {
     id: AGENT_IDS.copywriter,
@@ -158,6 +193,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(9),
     parentId: AGENT_IDS.marketingTalent,
     domain: 'Marketing',
+    trustScore: 72,
+    reputationLevel: 'VETERAN',
+    tasksCompleted: 115,
+    tasksSuccessful: 104,
+    lastActivityAt: daysAgo(26),
   },
   
   // ========== LEVEL 3-4 - WORKERS ==========
@@ -174,6 +214,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(12),
     parentId: AGENT_IDS.techTalent,
     domain: 'Engineering',
+    trustScore: 58,
+    reputationLevel: 'TRUSTED',
+    tasksCompleted: 67,
+    tasksSuccessful: 54,
+    lastActivityAt: daysAgo(28),
   },
   {
     id: AGENT_IDS.bookkeeper,
@@ -188,6 +233,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(15),
     parentId: AGENT_IDS.financeTalent,
     domain: 'Finance',
+    trustScore: 45,
+    reputationLevel: 'TRUSTED',
+    tasksCompleted: 38,
+    tasksSuccessful: 28,
+    lastActivityAt: daysAgo(20),
   },
   {
     id: AGENT_IDS.seoBot,
@@ -202,6 +252,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(14),
     parentId: AGENT_IDS.marketingTalent,
     domain: 'Marketing',
+    trustScore: 62,
+    reputationLevel: 'TRUSTED',
+    tasksCompleted: 72,
+    tasksSuccessful: 61,
+    lastActivityAt: daysAgo(27),
   },
   {
     id: AGENT_IDS.prospector,
@@ -216,6 +271,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(18),
     parentId: AGENT_IDS.salesTalent,
     domain: 'Sales',
+    trustScore: 52,
+    reputationLevel: 'TRUSTED',
+    tasksCompleted: 45,
+    tasksSuccessful: 36,
+    lastActivityAt: daysAgo(26),
   },
   
   // ========== LEVEL 1-2 - PROBATION ==========
@@ -232,6 +292,11 @@ export const agents: DemoAgent[] = [
     createdAt: daysAgo(25),
     parentId: AGENT_IDS.codeReviewer,
     domain: 'Engineering',
+    trustScore: 35,
+    reputationLevel: 'PROBATION',
+    tasksCompleted: 3,
+    tasksSuccessful: 2,
+    lastActivityAt: daysAgo(24),
   },
 ];
 
@@ -252,9 +317,19 @@ export function getAgentChildren(parentId: string): DemoAgent[] {
   return agents.filter(a => a.parentId === parentId);
 }
 
+// Get reputation level from trust score
+function getReputationLevel(trustScore: number): ReputationLevel {
+  if (trustScore >= 86) return 'ELITE';
+  if (trustScore >= 71) return 'VETERAN';
+  if (trustScore >= 41) return 'TRUSTED';
+  if (trustScore >= 31) return 'PROBATION';
+  return 'NEW';
+}
+
 export function generateRandomAgent(overrides?: Partial<DemoAgent>): DemoAgent {
   const names = ['Scout', 'Helper', 'Analyzer', 'Processor', 'Checker', 'Builder', 'Fixer'];
   const domains = ['Engineering', 'Finance', 'Marketing', 'Sales', 'Support', 'Research'];
+  const trustScore = overrides?.trustScore ?? 50;
   
   return {
     id: uuid(),
@@ -268,6 +343,11 @@ export function generateRandomAgent(overrides?: Partial<DemoAgent>): DemoAgent {
     lifetimeEarnings: 100,
     createdAt: new Date().toISOString(),
     domain: domains[Math.floor(Math.random() * domains.length)],
+    trustScore,
+    reputationLevel: getReputationLevel(trustScore),
+    tasksCompleted: 0,
+    tasksSuccessful: 0,
+    lastActivityAt: new Date().toISOString(),
     ...overrides,
   };
 }

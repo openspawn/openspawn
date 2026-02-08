@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -26,6 +26,9 @@ import { useAgents } from "../hooks/use-agents";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
+import { TrustLeaderboard } from "../components/trust-leaderboard";
+import { ReputationCard } from "../components/reputation-card";
+import { Progress } from "../components/ui/progress";
 
 interface Agent {
   id: string;
@@ -38,6 +41,12 @@ interface Agent {
   lifetimeEarnings: number;
   model: string;
   createdAt: string;
+  // Trust & Reputation
+  trustScore?: number;
+  reputationLevel?: string;
+  tasksCompleted?: number;
+  tasksSuccessful?: number;
+  lastActivityAt?: string;
 }
 
 type DialogMode = "view" | "edit" | "credits" | null;
@@ -89,6 +98,12 @@ type SortField = "name" | "level" | "balance" | "status" | "created";
 type SortDirection = "asc" | "desc";
 
 function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
+  const trustScore = agent.trustScore ?? 50;
+  const repLevel = agent.reputationLevel || 'TRUSTED';
+  const tasksCompleted = agent.tasksCompleted ?? 0;
+  const tasksSuccessful = agent.tasksSuccessful ?? 0;
+  const successRate = tasksCompleted > 0 ? Math.round((tasksSuccessful / tasksCompleted) * 100) : 0;
+
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogPopup>
@@ -110,7 +125,37 @@ function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => v
             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
             <Badge variant="outline">{agent.role}</Badge>
             <Badge variant="secondary">Level {agent.level}</Badge>
+            <Badge className={REPUTATION_COLORS[repLevel] || 'bg-blue-500'}>
+              {REPUTATION_EMOJI[repLevel] || '✅'} {repLevel}
+            </Badge>
           </div>
+          
+          {/* Trust Score */}
+          <div className="p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Trust Score</span>
+              <span className="text-lg font-bold">{trustScore}/100</span>
+            </div>
+            <Progress value={trustScore} className="h-2" />
+          </div>
+          
+          {/* Task Stats */}
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="text-lg font-bold">{tasksCompleted}</div>
+              <div className="text-xs text-muted-foreground">Tasks</div>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="text-lg font-bold">{tasksSuccessful}</div>
+              <div className="text-xs text-muted-foreground">Successful</div>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="text-lg font-bold">{successRate}%</div>
+              <div className="text-xs text-muted-foreground">Rate</div>
+            </div>
+          </div>
+          
+          {/* Credits */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Current Balance</p>
@@ -214,6 +259,199 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
         </DialogFooter>
       </DialogPopup>
     </Dialog>
+  );
+}
+
+// Reputation level colors
+const REPUTATION_COLORS: Record<string, string> = {
+  NEW: "bg-gray-500",
+  PROBATION: "bg-orange-500",
+  TRUSTED: "bg-blue-500",
+  VETERAN: "bg-purple-500",
+  ELITE: "bg-yellow-500",
+};
+
+const REPUTATION_EMOJI: Record<string, string> = {
+  NEW: "🆕",
+  PROBATION: "⚠️",
+  TRUSTED: "✅",
+  VETERAN: "🏆",
+  ELITE: "👑",
+};
+
+function ReputationTab({ agents }: { agents: Agent[] }) {
+  // Sort agents by trust score for leaderboard
+  const leaderboardData = useMemo(() => {
+    return [...agents]
+      .filter(a => a.status?.toLowerCase() === 'active')
+      .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
+      .slice(0, 10)
+      .map(a => ({
+        id: a.id,
+        agentId: a.agentId,
+        name: a.name,
+        level: a.level,
+        trustScore: a.trustScore ?? 50,
+        reputationLevel: a.reputationLevel || 'TRUSTED',
+        tasksCompleted: a.tasksCompleted ?? 0,
+      }));
+  }, [agents]);
+
+  // Calculate reputation distribution
+  const distribution = useMemo(() => {
+    const counts: Record<string, number> = { NEW: 0, PROBATION: 0, TRUSTED: 0, VETERAN: 0, ELITE: 0 };
+    agents.forEach(a => {
+      const level = a.reputationLevel || 'TRUSTED';
+      if (counts[level] !== undefined) counts[level]++;
+    });
+    return counts;
+  }, [agents]);
+
+  // Calculate average trust score
+  const avgTrustScore = useMemo(() => {
+    if (agents.length === 0) return 0;
+    const sum = agents.reduce((acc, a) => acc + (a.trustScore ?? 50), 0);
+    return Math.round(sum / agents.length);
+  }, [agents]);
+
+  // Total tasks completed
+  const totalTasks = useMemo(() => {
+    return agents.reduce((acc, a) => acc + (a.tasksCompleted ?? 0), 0);
+  }, [agents]);
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Avg Trust Score
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{avgTrustScore}/100</div>
+            <Progress value={avgTrustScore} className="mt-2 h-2" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Elite Agents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-500">
+              👑 {distribution.ELITE}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Veteran Agents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-500">
+              🏆 {distribution.VETERAN}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Tasks Done
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalTasks.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Distribution and Leaderboard */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Reputation Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Reputation Distribution</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {Object.entries(distribution).map(([level, count]) => (
+              <div key={level} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <span>{REPUTATION_EMOJI[level]}</span>
+                    <span>{level}</span>
+                  </span>
+                  <span className="font-medium">{count} agents</span>
+                </div>
+                <Progress 
+                  value={agents.length > 0 ? (count / agents.length) * 100 : 0} 
+                  className={`h-2 ${REPUTATION_COLORS[level]}`}
+                />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Leaderboard */}
+        <TrustLeaderboard entries={leaderboardData} />
+      </div>
+
+      {/* All Agents Trust Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Agents Trust Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {agents
+              .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
+              .map((agent) => {
+                const trustScore = agent.trustScore ?? 50;
+                const repLevel = agent.reputationLevel || 'TRUSTED';
+                const successRate = agent.tasksCompleted && agent.tasksCompleted > 0
+                  ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
+                  : 0;
+                
+                return (
+                  <motion.div
+                    key={agent.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback style={{ backgroundColor: getLevelColor(agent.level) + '30' }}>
+                          <Bot className="h-5 w-5" style={{ color: getLevelColor(agent.level) }} />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{agent.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          L{agent.level} · {agent.tasksCompleted ?? 0} tasks · {successRate}% success
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="font-semibold">{trustScore}</div>
+                        <div className="text-xs text-muted-foreground">trust</div>
+                      </div>
+                      <Badge className={REPUTATION_COLORS[repLevel]}>
+                        {REPUTATION_EMOJI[repLevel]} {repLevel}
+                      </Badge>
+                    </div>
+                  </motion.div>
+                );
+              })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -431,11 +669,16 @@ export function AgentsPage() {
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             <span className="hidden sm:inline">All Agents</span>
             <span className="sm:hidden">Agents</span>
+          </TabsTrigger>
+          <TabsTrigger value="reputation" className="flex items-center gap-2">
+            <Trophy className="h-4 w-4" />
+            <span className="hidden sm:inline">Reputation</span>
+            <span className="sm:hidden">Trust</span>
           </TabsTrigger>
           <TabsTrigger value="onboarding" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -714,6 +957,11 @@ export function AgentsPage() {
       {selectedAgent && dialogMode === "credits" && (
         <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
       )}
+        </TabsContent>
+
+        {/* Reputation Tab */}
+        <TabsContent value="reputation" className="space-y-6">
+          <ReputationTab agents={agents} />
         </TabsContent>
 
         {/* Onboarding Tab */}
