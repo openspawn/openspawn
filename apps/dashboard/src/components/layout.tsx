@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,6 +13,8 @@ import {
   LogOut,
   User,
   Settings,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -49,9 +52,15 @@ const navigation = [
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const demo = useDemo();
   const isDemo = searchParams.get("demo") === "true";
   const { user, logout, isAuthenticated } = useAuth();
+
+  // Close mobile menu on navigation
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -190,38 +199,135 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </aside>
 
-        {/* Mobile header */}
-        <div className="flex flex-1 flex-col min-w-0">
-          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden">
+        {/* Mobile drawer overlay */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+
+        {/* Mobile drawer */}
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border transform transition-transform duration-200 ease-in-out lg:hidden",
+            mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          {/* Drawer header */}
+          <div className="flex h-16 items-center justify-between border-b border-border px-4">
             <div className="flex items-center gap-2">
               <Bot className="h-6 w-6 text-primary" />
               <span className="text-lg font-semibold">OpenSpawn</span>
             </div>
-            <ThemeToggle />
-          </header>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
 
-          {/* Mobile navigation */}
-          <nav className="flex gap-1 overflow-x-auto border-b border-border px-4 py-2 lg:hidden">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link key={item.name} to={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{item.name}</span>
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Drawer navigation */}
+          <ScrollArea className="flex-1 px-3 py-4">
+            <nav className="flex flex-col gap-1">
+              {navigation.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link key={item.name} to={item.href}>
+                    <Button
+                      variant={isActive ? "secondary" : "ghost"}
+                      className={cn(
+                        "w-full justify-start gap-3",
+                        isActive && "bg-secondary"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.name}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </nav>
+          </ScrollArea>
+
+          {/* Drawer demo toggle */}
+          <div className="border-t border-border p-3">
+            <Button
+              onClick={handleToggleDemo}
+              variant={isDemo ? "default" : "outline"}
+              size="sm"
+              className="w-full gap-2"
+            >
+              {isDemo ? (
+                <>
+                  <Square className="h-3 w-3" />
+                  Exit Demo
+                </>
+              ) : (
+                <>
+                  <Play className="h-3 w-3" />
+                  Demo Mode
+                </>
+              )}
+            </Button>
+            {isDemo && (
+              <div className="mt-2">
+                <DemoControls compact />
+              </div>
+            )}
+          </div>
+
+          {/* Drawer user section */}
+          <div className="border-t border-border p-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>v0.1.0</span>
+              <ThemeToggle />
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile header */}
+        <div className="flex flex-1 flex-col min-w-0">
+          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <Bot className="h-6 w-6 text-primary" />
+              <span className="text-lg font-semibold">OpenSpawn</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {isDemo && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => demo.setIsPlaying(!demo.isPlaying)}
+                  className="relative"
+                >
+                  {demo.isPlaying ? (
+                    <Square className="h-4 w-4" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                  {demo.isPlaying && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  )}
+                </Button>
+              )}
+              <ThemeToggle />
+            </div>
+          </header>
 
           {/* Main content */}
           <main className="flex-1 overflow-auto">
-            <div className="container mx-auto p-6">{children}</div>
+            <div className="container mx-auto px-4 py-4 sm:p-6">{children}</div>
           </main>
         </div>
       </div>
