@@ -13,7 +13,8 @@
     "format:check": "oxfmt --check",
     "typecheck": "nx run-many -t typecheck",
     "codegen": "graphql-codegen --config codegen.ts",
-    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch",
+    "screenshots": "node scripts/capture-screenshots.mjs"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",

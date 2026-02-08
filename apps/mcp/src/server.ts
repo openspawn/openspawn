@@ -4,8 +4,10 @@ import { ApiClient } from "./api-client.js";
 import {
   registerAgentTools,
   registerCreditTools,
+  registerEscalationTools,
   registerMessageTools,
   registerTaskTools,
+  registerTrustTools,
 } from "./tools/index.js";
 
 export function createMcpServer(): McpServer {
@@ -26,6 +28,8 @@ export function createMcpServer(): McpServer {
   registerCreditTools(server, apiClient);
   registerMessageTools(server, apiClient);
   registerAgentTools(server, apiClient);
+  registerTrustTools(server, apiClient);
+  registerEscalationTools(server, apiClient);
 
   return server;
 }
