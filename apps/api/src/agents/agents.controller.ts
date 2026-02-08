@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 
-import { AgentRole } from "@openspawn/shared-types";
+import { AgentRole, Proficiency } from "@openspawn/shared-types";
 
 import { CurrentAgent, Roles, type AuthenticatedAgent } from "../auth";
 
@@ -8,10 +8,9 @@ import { AgentsService } from "./agents.service";
 import { AgentOnboardingService, type SpawnAgentDto } from "./agent-onboarding.service";
 import { AgentBudgetService, type SetBudgetDto, type TransferCreditsDto } from "./agent-budget.service";
 import { AgentCapabilitiesService, type AddCapabilityDto, type UpdateCapabilityDto } from "./agent-capabilities.service";
+import { TrustService } from "./trust.service";
 import { CreateAgentDto } from "./dto/create-agent.dto";
 import { UpdateAgentDto } from "./dto/update-agent.dto";
-
-import { Proficiency } from "@openspawn/shared-types";
 
 @Controller("agents")
 export class AgentsController {
@@ -20,6 +19,7 @@ export class AgentsController {
     private readonly onboardingService: AgentOnboardingService,
     private readonly budgetService: AgentBudgetService,
     private readonly capabilitiesService: AgentCapabilitiesService,
+    private readonly trustService: TrustService,
   ) {}
 
   /**
@@ -414,5 +414,125 @@ export class AgentsController {
       capabilityId,
     );
     return { message: "Capability removed" };
+  }
+
+  // ============================================
+  // Trust & Reputation Endpoints
+  // ============================================
+
+  /**
+   * Get reputation summary for an agent
+   */
+  @Get(":id/reputation")
+  async getReputation(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") agentId: string,
+  ) {
+    const summary = await this.trustService.getReputationSummary(agentId);
+    return { data: summary };
+  }
+
+  /**
+   * Get reputation event history for an agent
+   */
+  @Get(":id/reputation/history")
+  async getReputationHistory(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") agentId: string,
+    @Query("limit") limit?: string,
+    @Query("offset") offset?: string,
+  ) {
+    const result = await this.trustService.getReputationHistory(agentId, {
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+    return { data: result.events, total: result.total };
+  }
+
+  /**
+   * Award quality bonus to an agent (L7+ or parent only)
+   */
+  @Post(":id/reputation/bonus")
+  async awardQualityBonus(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") agentId: string,
+    @Body() dto: { reason: string; amount?: number },
+  ) {
+    // Verify actor has permission (L7+ or parent)
+    const agent = await this.agentsService.findOne(actor.orgId, agentId);
+    if (actor.level < 7 && agent.parentId !== actor.id) {
+      throw new Error("Only L7+ agents or parent can award bonuses");
+    }
+
+    const event = await this.trustService.awardQualityBonus({
+      orgId: actor.orgId,
+      agentId,
+      awardedBy: actor.id,
+      reason: dto.reason,
+      bonusAmount: dto.amount,
+    });
+    return { data: event, message: "Quality bonus awarded" };
+  }
+
+  /**
+   * Apply quality penalty to an agent (L7+ or parent only)
+   */
+  @Post(":id/reputation/penalty")
+  async applyQualityPenalty(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") agentId: string,
+    @Body() dto: { reason: string; amount?: number },
+  ) {
+    // Verify actor has permission (L7+ or parent)
+    const agent = await this.agentsService.findOne(actor.orgId, agentId);
+    if (actor.level < 7 && agent.parentId !== actor.id) {
+      throw new Error("Only L7+ agents or parent can apply penalties");
+    }
+
+    const event = await this.trustService.applyQualityPenalty({
+      orgId: actor.orgId,
+      agentId,
+      appliedBy: actor.id,
+      reason: dto.reason,
+      penaltyAmount: dto.amount,
+    });
+    return { data: event, message: "Quality penalty applied" };
+  }
+
+  /**
+   * Manually demote an agent (L9+ only)
+   */
+  @Post(":id/demote")
+  @Roles(AgentRole.FOUNDER, AgentRole.ADMIN)
+  async demoteAgent(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") agentId: string,
+    @Body() dto: { reason: string },
+  ) {
+    if (actor.level < 9) {
+      throw new Error("Only L9+ agents can demote");
+    }
+
+    await this.trustService.demoteAgent({
+      agentId,
+      demotedBy: actor.id,
+      reason: dto.reason,
+    });
+    return { message: "Agent demoted" };
+  }
+
+  /**
+   * Get trust leaderboard for the organization
+   */
+  @Get("leaderboard/trust")
+  async getTrustLeaderboard(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Query("limit") limit?: string,
+  ) {
+    const leaderboard = await this.trustService.getLeaderboard(
+      actor.orgId,
+      limit ? parseInt(limit, 10) : 10,
+    );
+    return { data: leaderboard };
   }
 }

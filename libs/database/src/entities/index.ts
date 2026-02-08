@@ -10,6 +10,7 @@ export { Message } from "./message.entity";
 export { Nonce } from "./nonce.entity";
 export { Organization } from "./organization.entity";
 export { RefreshToken } from "./refresh-token.entity";
+export { ReputationEvent } from "./reputation-event.entity";
 export { Task } from "./task.entity";
 export { TaskComment } from "./task-comment.entity";
 export { TaskDependency } from "./task-dependency.entity";
