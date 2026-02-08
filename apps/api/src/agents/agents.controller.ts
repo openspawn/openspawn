@@ -7,8 +7,11 @@ import { CurrentAgent, Roles, type AuthenticatedAgent } from "../auth";
 import { AgentsService } from "./agents.service";
 import { AgentOnboardingService, type SpawnAgentDto } from "./agent-onboarding.service";
 import { AgentBudgetService, type SetBudgetDto, type TransferCreditsDto } from "./agent-budget.service";
+import { AgentCapabilitiesService, type AddCapabilityDto, type UpdateCapabilityDto } from "./agent-capabilities.service";
 import { CreateAgentDto } from "./dto/create-agent.dto";
 import { UpdateAgentDto } from "./dto/update-agent.dto";
+
+import { Proficiency } from "@openspawn/shared-types";
 
 @Controller("agents")
 export class AgentsController {
@@ -16,6 +19,7 @@ export class AgentsController {
     private readonly agentsService: AgentsService,
     private readonly onboardingService: AgentOnboardingService,
     private readonly budgetService: AgentBudgetService,
+    private readonly capabilitiesService: AgentCapabilitiesService,
   ) {}
 
   /**
@@ -285,5 +289,130 @@ export class AgentsController {
   async getBudgetAlerts(@CurrentAgent() actor: AuthenticatedAgent) {
     const alerts = await this.budgetService.getAgentsNearBudgetLimit(actor.orgId);
     return { data: alerts };
+  }
+
+  // ============ Capability Endpoints ============
+
+  /**
+   * Get all unique capabilities in the organization
+   */
+  @Get("capabilities")
+  async getOrgCapabilities(@CurrentAgent() actor: AuthenticatedAgent) {
+    const capabilities = await this.capabilitiesService.getOrgCapabilities(actor.orgId);
+    return { data: capabilities };
+  }
+
+  /**
+   * Find agents with specific capabilities
+   */
+  @Get("capabilities/match")
+  async findAgentsWithCapabilities(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Query("capabilities") capabilities: string,
+    @Query("minProficiency") minProficiency?: string,
+    @Query("onlyActive") onlyActive?: string,
+  ) {
+    const capList = capabilities.split(",").map((c) => c.trim()).filter(Boolean);
+    
+    const matches = await this.capabilitiesService.findAgentsWithCapabilities(
+      actor.orgId,
+      capList,
+      {
+        minProficiency: minProficiency as Proficiency | undefined,
+        onlyActive: onlyActive === "true",
+      },
+    );
+    
+    return { data: matches };
+  }
+
+  /**
+   * Find the best agent match for a set of capabilities
+   */
+  @Get("capabilities/best-match")
+  async findBestMatch(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Query("capabilities") capabilities: string,
+    @Query("minProficiency") minProficiency?: string,
+  ) {
+    const capList = capabilities.split(",").map((c) => c.trim()).filter(Boolean);
+    
+    const match = await this.capabilitiesService.findBestMatch(
+      actor.orgId,
+      capList,
+      {
+        minProficiency: minProficiency as Proficiency | undefined,
+        onlyActive: true,
+      },
+    );
+    
+    return { data: match };
+  }
+
+  /**
+   * Get capabilities for an agent
+   */
+  @Get(":id/capabilities")
+  async getAgentCapabilities(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") id: string,
+  ) {
+    const capabilities = await this.capabilitiesService.getAgentCapabilities(
+      actor.orgId,
+      id,
+    );
+    return { data: capabilities };
+  }
+
+  /**
+   * Add a capability to an agent
+   */
+  @Post(":id/capabilities")
+  async addCapability(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("id") id: string,
+    @Body() dto: AddCapabilityDto,
+  ) {
+    const capability = await this.capabilitiesService.addCapability(
+      actor.orgId,
+      actor.id,
+      id,
+      dto,
+    );
+    return { data: capability };
+  }
+
+  /**
+   * Update a capability's proficiency
+   */
+  @Patch("capabilities/:capabilityId")
+  async updateCapability(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("capabilityId") capabilityId: string,
+    @Body() dto: UpdateCapabilityDto,
+  ) {
+    const capability = await this.capabilitiesService.updateCapability(
+      actor.orgId,
+      actor.id,
+      capabilityId,
+      dto,
+    );
+    return { data: capability };
+  }
+
+  /**
+   * Remove a capability from an agent
+   */
+  @Delete("capabilities/:capabilityId")
+  async removeCapability(
+    @CurrentAgent() actor: AuthenticatedAgent,
+    @Param("capabilityId") capabilityId: string,
+  ) {
+    await this.capabilitiesService.removeCapability(
+      actor.orgId,
+      actor.id,
+      capabilityId,
+    );
+    return { message: "Capability removed" };
   }
 }

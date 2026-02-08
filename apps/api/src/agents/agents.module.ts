@@ -9,6 +9,7 @@ import { AgentsController } from "./agents.controller";
 import { AgentsService } from "./agents.service";
 import { AgentOnboardingService } from "./agent-onboarding.service";
 import { AgentBudgetService } from "./agent-budget.service";
+import { AgentCapabilitiesService } from "./agent-capabilities.service";
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { AgentBudgetService } from "./agent-budget.service";
     EventsModule,
   ],
   controllers: [AgentsController],
-  providers: [AgentsService, AgentOnboardingService, AgentBudgetService],
-  exports: [AgentsService, AgentOnboardingService, AgentBudgetService, TypeOrmModule],
+  providers: [AgentsService, AgentOnboardingService, AgentBudgetService, AgentCapabilitiesService],
+  exports: [AgentsService, AgentOnboardingService, AgentBudgetService, AgentCapabilitiesService, TypeOrmModule],
 })
 export class AgentsModule {}

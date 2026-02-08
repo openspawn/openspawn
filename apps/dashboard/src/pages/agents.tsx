@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { useAgents } from "../hooks/use-agents";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
+import { CapabilityManager } from "../components/capability-manager";
 
 interface Agent {
   id: string;
@@ -430,7 +431,7 @@ export function AgentsPage() {
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             <span className="hidden sm:inline">All Agents</span>
@@ -440,6 +441,11 @@ export function AgentsPage() {
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Onboarding</span>
             <span className="sm:hidden">Onboard</span>
+          </TabsTrigger>
+          <TabsTrigger value="capabilities" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            <span className="hidden sm:inline">Capabilities</span>
+            <span className="sm:hidden">Skills</span>
           </TabsTrigger>
           <TabsTrigger value="budgets" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
@@ -713,6 +719,11 @@ export function AgentsPage() {
         {/* Onboarding Tab */}
         <TabsContent value="onboarding" className="space-y-6">
           <AgentOnboarding />
+        </TabsContent>
+
+        {/* Capabilities Tab */}
+        <TabsContent value="capabilities" className="space-y-6">
+          <CapabilityManager />
         </TabsContent>
 
         {/* Budgets Tab */}
