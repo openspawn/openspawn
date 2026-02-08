@@ -24,15 +24,16 @@ OpenSpawn implements a hierarchical agent system inspired by corporate HR struct
 
 ## Agent States
 
-```
-┌─────────┐     ┌────────┐     ┌───────────┐
-│ PENDING │ ──▶ │ ACTIVE │ ──▶ │ SUSPENDED │
-└─────────┘     └────────┘     └───────────┘
-     │              │                │
-     │              ▼                ▼
-     │         ┌─────────┐     ┌─────────┐
-     └────────▶│ REVOKED │◀────│         │
-               └─────────┘     └─────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: spawn()
+    PENDING --> ACTIVE: activate()
+    PENDING --> REVOKED: reject()
+    ACTIVE --> SUSPENDED: suspend()
+    ACTIVE --> REVOKED: terminate()
+    SUSPENDED --> ACTIVE: reactivate()
+    SUSPENDED --> REVOKED: terminate()
+    REVOKED --> [*]
 ```
 
 | State | Description |

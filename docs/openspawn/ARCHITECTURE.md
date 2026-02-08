@@ -15,30 +15,41 @@ title: Architecture - OpenSpawn
 
 OpenSpawn is a monorepo containing four deployable services that share a PostgreSQL database. Agents interact primarily through an MCP server; humans interact through a React dashboard backed by GraphQL. All services are containerized and deployed via Coolify on a Hetzner CX32 VPS behind Tailscale.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Tailscale Mesh                        │
-│                                                         │
-│  ┌──────────┐   MCP    ┌──────────┐   SQL   ┌────────┐ │
-│  │ OpenClaw ├─────────►│   MCP    ├────────►│        │ │
-│  │  Agents  │          │  Server  │         │ Post-  │ │
-│  └──────────┘          └──────────┘         │ greSQL │ │
-│                              │               │  16    │ │
-│  ┌──────────┐   REST   ┌────┴─────┐         │        │ │
-│  │ External ├─────────►│  NestJS  ├────────►│        │ │
-│  │  Agents  │          │   API    │         │        │ │
-│  └──────────┘          └────┬─────┘         └────────┘ │
-│                              │ GraphQL                   │
-│  ┌──────────┐          ┌────┴─────┐                     │
-│  │  React   │◄─────────┤ GraphQL  │                     │
-│  │Dashboard │  WS Sub  │Resolvers │                     │
-│  └──────────┘          └──────────┘                     │
-│                                                         │
-│  ┌──────────┐          ┌──────────┐                     │
-│  │ LiteLLM  │◄────────►│ Langfuse │                     │
-│  │  Proxy   │  traces  │Observ.   │                     │
-│  └──────────┘          └──────────┘                     │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Tailscale["🔒 Tailscale Mesh"]
+        subgraph Agents["AI Agents"]
+            OpenClaw["OpenClaw Agents"]
+            External["External Agents"]
+        end
+        
+        subgraph Core["Core Services"]
+            MCP["🔌 MCP Server<br/>:3102"]
+            API["⚡ NestJS API<br/>:3100"]
+            GQL["GraphQL Resolvers"]
+        end
+        
+        subgraph Data["Data Layer"]
+            DB[("🗄️ PostgreSQL 16")]
+        end
+        
+        subgraph UI["User Interface"]
+            Dashboard["🖥️ React Dashboard"]
+        end
+        
+        subgraph Observability["Observability"]
+            LiteLLM["LiteLLM Proxy"]
+            Langfuse["Langfuse"]
+        end
+    end
+    
+    OpenClaw -->|MCP| MCP
+    External -->|REST| API
+    MCP --> API
+    API --> DB
+    API --> GQL
+    GQL -->|"WebSocket Sub"| Dashboard
+    LiteLLM <-->|traces| Langfuse
 ```
 
 ## Service Boundaries
