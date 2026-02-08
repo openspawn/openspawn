@@ -13,20 +13,6 @@
         "tsConfig": "libs/demo-data/tsconfig.lib.json",
         "main": "libs/demo-data/src/index.ts"
       }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": ["libs/demo-data/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/demo-data/jest.config.ts",
-        "passWithNoTests": true
-      }
     }
   }
 }

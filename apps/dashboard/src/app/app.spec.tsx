@@ -1,5 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import type { ReactNode } from "react";
+
+// Mock ProtectedRoute to always render children (skip auth in tests)
+vi.mock("../components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../components")>();
+  return {
+    ...actual,
+    ProtectedRoute: ({ children }: { children: ReactNode }) => <>{children}</>,
+  };
+});
+
 import App from "./app";
 
 // Mock recharts to avoid canvas issues in tests
