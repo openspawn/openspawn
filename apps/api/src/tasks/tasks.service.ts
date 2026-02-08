@@ -1,8 +1,10 @@
 import {
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -11,6 +13,7 @@ import { Repository } from "typeorm";
 import { Task, TaskComment, TaskDependency, TaskTag } from "@openspawn/database";
 import { TaskStatus } from "@openspawn/shared-types";
 
+import { TrustService } from "../agents";
 import { EventsService } from "../events";
 
 import { CreateTaskDto } from "./dto/create-task.dto";
@@ -33,6 +36,8 @@ export class TasksService {
     private readonly taskTransitionService: TaskTransitionService,
     private readonly eventsService: EventsService,
     private readonly eventEmitter: EventEmitter2,
+    @Inject(forwardRef(() => TrustService))
+    private readonly trustService: TrustService,
   ) {}
 
   async create(orgId: string, actorId: string, dto: CreateTaskDto): Promise<Task> {
@@ -194,6 +199,37 @@ export class TasksService {
       to: dto.status,
       actorId,
     });
+
+    // Update trust/reputation based on outcome
+    if (saved.assigneeId) {
+      if (dto.status === TaskStatus.DONE) {
+        // Check if on time (if dueDate was set)
+        const onTime = !saved.dueDate || saved.completedAt! <= saved.dueDate;
+        await this.trustService.recordTaskCompleted({
+          orgId,
+          agentId: saved.assigneeId,
+          taskId: saved.id,
+          onTime,
+        });
+      } else if (dto.status === TaskStatus.CANCELLED && previousStatus !== TaskStatus.BACKLOG) {
+        // Task cancelled after work started = failure
+        await this.trustService.recordTaskFailed({
+          orgId,
+          agentId: saved.assigneeId,
+          taskId: saved.id,
+          reason: dto.reason,
+        });
+      } else if (dto.status === TaskStatus.IN_PROGRESS && previousStatus === TaskStatus.REVIEW) {
+        // Sent back from review = rework needed
+        await this.trustService.recordTaskRework({
+          orgId,
+          agentId: saved.assigneeId,
+          taskId: saved.id,
+          triggeredBy: actorId,
+          reason: dto.reason,
+        });
+      }
+    }
 
     return saved;
   }
