@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useDemo } from "../demo";
 import { DemoControls } from "../demo/DemoControls";
 import { useAuth } from "../contexts";
+import { useRealtime, useIsRealtime } from "../hooks/use-realtime";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -61,6 +62,10 @@ export function Layout({ children }: LayoutProps) {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Enable real-time updates
+  useRealtime();
+  const isRealtime = useIsRealtime();
 
   const handleLogout = async () => {
     await logout();
