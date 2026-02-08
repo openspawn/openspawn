@@ -75,6 +75,22 @@ export class Agent {
   @Column({ type: "jsonb", default: {} })
   metadata!: Record<string, unknown>;
 
+  // Trust & Reputation fields
+  @Column({ name: "trust_score", type: "smallint", default: 50 })
+  trustScore!: number;
+
+  @Column({ name: "tasks_completed", type: "int", default: 0 })
+  tasksCompleted!: number;
+
+  @Column({ name: "tasks_successful", type: "int", default: 0 })
+  tasksSuccessful!: number;
+
+  @Column({ name: "last_activity_at", type: "timestamptz", nullable: true })
+  lastActivityAt!: Date | null;
+
+  @Column({ name: "last_promotion_at", type: "timestamptz", nullable: true })
+  lastPromotionAt!: Date | null;
+
   @DeleteDateColumn({ name: "deleted_at", type: "timestamptz", nullable: true })
   deletedAt!: Date | null;
 
