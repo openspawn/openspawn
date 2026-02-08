@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 import {
@@ -10,20 +11,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { useCredits } from "../hooks/use-credits";
-
-// Mock data for the chart
-const balanceHistory = [
-  { time: "00:00", balance: 1000 },
-  { time: "04:00", balance: 1150 },
-  { time: "08:00", balance: 1320 },
-  { time: "12:00", balance: 1180 },
-  { time: "16:00", balance: 1450 },
-  { time: "20:00", balance: 1600 },
-  { time: "24:00", balance: 1520 },
-];
 
 function formatTime(dateString: string) {
   const date = new Date(dateString);
@@ -33,6 +22,11 @@ function formatTime(dateString: string) {
 function formatDate(dateString: string) {
   const date = new Date(dateString);
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+function formatChartTime(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 export function CreditsPage() {
@@ -47,6 +41,40 @@ export function CreditsPage() {
     .reduce((sum, t) => sum + t.amount, 0);
 
   const netBalance = totalEarned - totalSpent;
+
+  // Compute balance history from transactions (sorted chronologically)
+  const balanceHistory = useMemo(() => {
+    if (transactions.length === 0) return [];
+    
+    // Sort transactions by time (oldest first)
+    const sorted = [...transactions].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    
+    // Build running balance - start from 0 and track cumulative
+    let runningBalance = 0;
+    const history = sorted.map((tx) => {
+      runningBalance += tx.type === "CREDIT" ? tx.amount : -tx.amount;
+      return {
+        time: formatChartTime(tx.createdAt),
+        balance: runningBalance,
+        fullTime: tx.createdAt,
+      };
+    });
+    
+    // If we have many transactions, sample to avoid overcrowded x-axis
+    if (history.length > 20) {
+      const step = Math.ceil(history.length / 20);
+      const sampled = history.filter((_, i) => i % step === 0);
+      // Always include the last point
+      if (sampled[sampled.length - 1] !== history[history.length - 1]) {
+        sampled.push(history[history.length - 1]);
+      }
+      return sampled;
+    }
+    
+    return history;
+  }, [transactions]);
 
   if (loading) {
     return (
@@ -137,30 +165,44 @@ export function CreditsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={balanceHistory}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis
-                    dataKey="time"
-                    className="text-xs fill-muted-foreground"
-                  />
-                  <YAxis className="text-xs fill-muted-foreground" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="balance"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {balanceHistory.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={balanceHistory}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis
+                      dataKey="time"
+                      className="text-xs fill-muted-foreground"
+                      interval="preserveStartEnd"
+                    />
+                    <YAxis className="text-xs fill-muted-foreground" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "0.5rem",
+                      }}
+                      labelFormatter={(label) => `Time: ${label}`}
+                      formatter={(value: number) => [`${value.toLocaleString()} credits`, "Balance"]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="balance"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={balanceHistory.length < 15}
+                      animationDuration={500}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <div className="text-center">
+                    <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No transaction history yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Chart will appear as transactions occur</p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
