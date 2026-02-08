@@ -1,0 +1,22 @@
+{
+  "name": "cli",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/cli/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p apps/cli/tsconfig.json"
+      },
+      "outputs": ["{workspaceRoot}/dist/apps/cli"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx apps/cli/src/main.ts"
+      }
+    }
+  }
+}
