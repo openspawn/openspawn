@@ -1,3 +1,8 @@
+---
+layout: default
+title: Agent Lifecycle - OpenSpawn
+---
+
 # Agent Lifecycle & Spawning Model
 
 > Autonomous agents spawning autonomous agents — with human oversight

@@ -1,3 +1,8 @@
+---
+layout: default
+title: Product Requirements - OpenSpawn
+---
+
 # OpenSpawn — Product Requirements Document
 
 **Version:** 1.0  

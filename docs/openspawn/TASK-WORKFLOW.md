@@ -1,3 +1,8 @@
+---
+layout: default
+title: Task Workflow - OpenSpawn
+---
+
 # Task Workflow & Templates
 
 > Structured task management with templates, routing, and intelligent assignment

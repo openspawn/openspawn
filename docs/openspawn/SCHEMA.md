@@ -1,3 +1,8 @@
+---
+layout: default
+title: Database Schema - OpenSpawn
+---
+
 # OpenSpawn — Database Schema
 
 **Version:** 1.0  
