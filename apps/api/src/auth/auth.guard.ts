@@ -5,16 +5,8 @@ import { GqlContextType, GqlExecutionContext } from "@nestjs/graphql";
 import type { Request } from "express";
 
 import { IS_PUBLIC_KEY } from "./decorators/public.decorator";
-import { AuthService, type AuthenticatedAgent } from "./auth.service";
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      agent?: AuthenticatedAgent;
-    }
-  }
-}
+import { AuthService } from "./auth.service";
+import "./types"; // Extend Express.Request
 
 @Injectable()
 export class AuthGuard implements CanActivate {
