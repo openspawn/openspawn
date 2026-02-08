@@ -10,7 +10,7 @@ import {
   createMessagesCommand,
   createTasksCommand,
 } from "./commands/index.js";
-import { setJsonOutput, icons } from "./lib/output.js";
+import { setJsonOutput, icons, setDemoMode } from "./lib/output.js";
 
 const VERSION = "0.1.0";
 
@@ -46,6 +46,7 @@ ${pc.cyan("Documentation:")}
   .version(VERSION, "-v, --version", "Show version number")
   .option("--json", "Output in JSON format")
   .option("--no-color", "Disable colored output")
+  .option("--demo", "Use demo mode with mock data (no API required)")
   .configureOutput({
     writeOut: (str) => process.stdout.write(str),
     writeErr: (str) => process.stderr.write(str),
@@ -55,6 +56,9 @@ ${pc.cyan("Documentation:")}
     const opts = thisCommand.opts();
     if (opts.json) {
       setJsonOutput(true);
+    }
+    if (opts.demo) {
+      setDemoMode(true);
     }
     if (opts.color === false) {
       // Colors are disabled via --no-color

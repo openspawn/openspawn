@@ -1,4 +1,6 @@
 import { getApiKey, getApiUrl } from "./config.js";
+import { isDemoMode } from "./output.js";
+import { DemoClient } from "./demo-client.js";
 
 export interface ApiResponse<T = unknown> {
   data?: T;
@@ -142,6 +144,9 @@ export class OpenSpawnClient {
   }
 }
 
-export function createClient(): OpenSpawnClient {
+export function createClient(): OpenSpawnClient | DemoClient {
+  if (isDemoMode()) {
+    return new DemoClient();
+  }
   return new OpenSpawnClient();
 }

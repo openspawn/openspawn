@@ -3,6 +3,7 @@ import Table from "cli-table3";
 import figures from "figures";
 
 let outputJson = false;
+let demoMode = false;
 
 export function setJsonOutput(enabled: boolean): void {
   outputJson = enabled;
@@ -10,6 +11,14 @@ export function setJsonOutput(enabled: boolean): void {
 
 export function isJsonOutput(): boolean {
   return outputJson;
+}
+
+export function setDemoMode(enabled: boolean): void {
+  demoMode = enabled;
+}
+
+export function isDemoMode(): boolean {
+  return demoMode;
 }
 
 // ═══════════════════════════════════════════════════════════════
