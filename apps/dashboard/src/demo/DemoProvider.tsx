@@ -11,6 +11,7 @@ import {
   type DemoScenario,
 } from '@openspawn/demo-data';
 import { setDemoEngine } from './mock-fetcher';
+import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
 
 export type ScenarioName = 'fresh' | 'startup' | 'growth' | 'enterprise';
 
@@ -109,6 +110,37 @@ export function DemoProvider({
     };
   }, []); // Only run once on mount
 
+  // Trigger confetti based on event type
+  const triggerCelebration = useCallback((event: SimulationEvent) => {
+    switch (event.type) {
+      case 'task_completed':
+        // Task completed - small celebration
+        celebrateSparkle();
+        break;
+      case 'agent_promoted':
+        // Agent promoted - level up celebration
+        celebrateLevelUp();
+        break;
+      case 'agent_activated':
+        // New agent activated - welcome burst
+        celebrate('burst');
+        break;
+      case 'agent_created':
+        // Agent spawned - subtle sparkle (agent still pending)
+        // No celebration until activated
+        break;
+      default:
+        // Other events don't trigger celebrations
+        break;
+    }
+    
+    // Special celebration for elite reputation
+    const payload = event.payload as { agent?: { reputationLevel?: string; trustScore?: number } };
+    if (payload?.agent?.reputationLevel === 'ELITE' && payload?.agent?.trustScore === 100) {
+      celebrateElite();
+    }
+  }, []);
+
   // Subscribe to simulation events
   useEffect(() => {
     const engine = engineRef.current;
@@ -117,6 +149,8 @@ export function DemoProvider({
     // Track recent events for UI display
     const unsubscribeEvent = engine.onEvent((event) => {
       setRecentEvents((prev) => [event, ...prev].slice(0, 20));
+      // Trigger celebration effects
+      triggerCelebration(event);
     });
 
     // Refetch queries once per tick
