@@ -79,6 +79,23 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
+  async updateProfile(id: string, dto: { name?: string; email?: string }): Promise<User> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    if (dto.name !== undefined) {
+      user.name = dto.name;
+    }
+    if (dto.email !== undefined) {
+      user.email = dto.email;
+      user.emailVerified = false; // Require re-verification on email change
+    }
+
+    return this.userRepository.save(user);
+  }
+
   async updatePassword(id: string, newPassword: string): Promise<void> {
     const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
     await this.userRepository.update(id, { passwordHash });

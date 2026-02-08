@@ -1,20 +1,47 @@
 import { useState } from "react";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { useAuth } from "../../contexts";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 export function ProfileSettings() {
-  const { user } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [isSaving, setIsSaving] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const handleSave = async () => {
     setIsSaving(true);
-    // TODO: Implement profile update API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSaving(false);
+    setStatus(null);
+
+    try {
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, email }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile");
+      }
+
+      await refreshUser?.();
+      setStatus({ type: "success", message: "Profile updated successfully" });
+    } catch (error) {
+      setStatus({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to update profile",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -62,6 +89,23 @@ export function ProfileSettings() {
             </span>
           </div>
         </div>
+
+        {status && (
+          <div
+            className={`flex items-center gap-2 rounded-md p-3 text-sm ${
+              status.type === "success"
+                ? "bg-green-500/10 text-green-500"
+                : "bg-red-500/10 text-red-500"
+            }`}
+          >
+            {status.type === "success" ? (
+              <CheckCircle2 className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
+            {status.message}
+          </div>
+        )}
 
         <Button onClick={handleSave} disabled={isSaving}>
           {isSaving ? (

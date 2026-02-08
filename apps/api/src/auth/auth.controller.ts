@@ -61,6 +61,11 @@ interface TotpDisableDto {
   code: string; // Require TOTP code to disable
 }
 
+interface UpdateProfileDto {
+  name?: string;
+  email?: string;
+}
+
 @Controller("auth")
 export class AuthController {
   constructor(
@@ -198,6 +203,47 @@ export class AuthController {
       emailVerified: fullUser.emailVerified,
       lastLoginAt: fullUser.lastLoginAt,
       createdAt: fullUser.createdAt,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("profile")
+  async updateProfile(@CurrentUser() user: JwtUser, @Body() dto: UpdateProfileDto) {
+    const fullUser = await this.usersService.findById(user.id);
+    if (!fullUser) {
+      throw new UnauthorizedException("User not found");
+    }
+
+    const updates: { name?: string; email?: string } = {};
+
+    if (dto.name !== undefined) {
+      updates.name = dto.name;
+    }
+
+    if (dto.email !== undefined && dto.email.toLowerCase() !== fullUser.email) {
+      // Check if email is already taken
+      const existingUser = await this.usersService.findByEmail(fullUser.orgId, dto.email);
+      if (existingUser && existingUser.id !== user.id) {
+        throw new BadRequestException("Email is already in use");
+      }
+      updates.email = dto.email.toLowerCase();
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return {
+        id: fullUser.id,
+        email: fullUser.email,
+        name: fullUser.name,
+        role: fullUser.role,
+      };
+    }
+
+    const updated = await this.usersService.updateProfile(user.id, updates);
+    return {
+      id: updated.id,
+      email: updated.email,
+      name: updated.name,
+      role: updated.role,
     };
   }
 
