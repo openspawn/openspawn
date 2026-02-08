@@ -24,6 +24,16 @@ title: OpenSpawn - The Operating System for AI Agent Teams
 
 **OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate.
 
+<div class="value-prop">
+  <h3>😤 The Problem</h3>
+  <p>Your AI agents are powerful but unmanageable. Mystery bills. Zero visibility. No accountability. Runaway loops.</p>
+  
+  <h3>✅ The Solution</h3>
+  <p>OpenSpawn gives you hierarchy, budgets, task management, and audit trails — everything you need to run AI agents like a real organization.</p>
+  
+  <a href="why-openspawn" class="btn btn-learn">Learn Why OpenSpawn →</a>
+</div>
+
 <div class="stats-bar">
   <div class="stat">
     <div class="stat-value">10</div>
@@ -139,7 +149,9 @@ pnpm exec nx run-many -t serve -p api,dashboard
 
 ## Documentation
 
+- **[Why OpenSpawn?](why-openspawn)** — The problem we solve, who it's for, concrete benefits
 - [Getting Started](getting-started) — Installation and first steps
+- [CLI Reference](cli) — Command-line tool for power users
 - [Architecture](openspawn/ARCHITECTURE) — System design deep-dive
 - [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy, onboarding
 - [Task Workflow](openspawn/TASK-WORKFLOW) — Templates, routing, assignments
