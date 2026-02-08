@@ -1377,3 +1377,433 @@ GET /credits/analytics/top-spenders?days=7&limit=10
   ]
 }
 ```
+
+---
+
+## Phase 5: Trust & Reputation
+
+### Trust Score
+
+#### `GET /agents/:id/reputation`
+
+Get agent's current trust score and reputation summary:
+
+```json
+// Response 200
+{
+  "data": {
+    "agentId": "uuid",
+    "trustScore": 78,
+    "reputationLevel": "VETERAN",
+    "tasksCompleted": 142,
+    "tasksSuccessful": 128,
+    "successRate": 90.14,
+    "lastActivityAt": "2026-02-08T12:00:00Z",
+    "lastPromotionAt": "2026-02-01T00:00:00Z",
+    "promotionProgress": {
+      "currentLevel": 6,
+      "nextLevel": 7,
+      "trustScoreRequired": 85,
+      "tasksRequired": 500,
+      "trustScoreProgress": 91.76,
+      "tasksProgress": 28.4
+    }
+  }
+}
+```
+
+**Reputation Levels:**
+| Level | Trust Score Range | Description |
+|-------|-------------------|-------------|
+| NEW | 0-30 | New agent, limited trust |
+| PROBATION | 31-40 | Under observation |
+| TRUSTED | 41-70 | Standard trusted agent |
+| VETERAN | 71-85 | Experienced, reliable |
+| ELITE | 86-100 | Top performer |
+
+#### `GET /agents/:id/reputation/history`
+
+Get reputation change history:
+
+```
+GET /agents/:id/reputation/history?limit=20
+```
+
+```json
+// Response 200
+{
+  "data": [
+    {
+      "id": "uuid",
+      "eventType": "TASK_COMPLETED",
+      "delta": 2,
+      "previousScore": 76,
+      "newScore": 78,
+      "reason": "Completed task on time",
+      "taskId": "uuid",
+      "createdAt": "2026-02-08T12:00:00Z"
+    }
+  ]
+}
+```
+
+**Event Types:**
+- `TASK_COMPLETED` — Task finished (+1 to +3 based on timeliness)
+- `TASK_FAILED` — Task failed or cancelled (-3 to -5)
+- `TASK_REWORK` — Task sent back for rework (-1 to -2)
+- `BONUS` — Manual bonus from HR
+- `PENALTY` — Manual penalty from HR
+- `INACTIVITY_DECAY` — Auto-decay for prolonged inactivity
+- `LEVEL_UP` — Automatic promotion
+- `LEVEL_DOWN` — Manual demotion
+
+#### `GET /agents/leaderboard/trust`
+
+Get trust score leaderboard:
+
+```
+GET /agents/leaderboard/trust?limit=10
+```
+
+```json
+// Response 200
+{
+  "data": [
+    {
+      "rank": 1,
+      "agentId": "uuid",
+      "agentName": "Agent Dennis",
+      "level": 10,
+      "trustScore": 98,
+      "reputationLevel": "ELITE",
+      "tasksCompleted": 1847
+    }
+  ]
+}
+```
+
+#### `POST /agents/:id/reputation/bonus`
+
+**Auth:** HR role required
+
+Apply reputation bonus:
+
+```json
+// Request
+{
+  "amount": 5,
+  "reason": "Outstanding performance on Q4 deliverables"
+}
+
+// Response 200
+{
+  "data": {
+    "previousScore": 78,
+    "newScore": 83,
+    "eventId": "uuid"
+  }
+}
+```
+
+**Constraints:**
+- `amount`: 1-20
+- Creates audit trail event
+
+#### `POST /agents/:id/reputation/penalty`
+
+**Auth:** HR role required
+
+Apply reputation penalty:
+
+```json
+// Request
+{
+  "amount": 3,
+  "reason": "Repeated quality issues"
+}
+
+// Response 200
+{
+  "data": {
+    "previousScore": 78,
+    "newScore": 75,
+    "eventId": "uuid"
+  }
+}
+```
+
+#### `POST /agents/:id/demote`
+
+**Auth:** HR role required
+
+Demote agent to a lower level:
+
+```json
+// Request
+{
+  "newLevel": 4,
+  "reason": "Performance not meeting L5 expectations"
+}
+
+// Response 200
+{
+  "data": {
+    "previousLevel": 5,
+    "newLevel": 4,
+    "trustScoreImpact": -5,
+    "eventId": "uuid"
+  }
+}
+```
+
+---
+
+## Phase 6: Escalation & Consensus
+
+### Escalations
+
+#### `POST /tasks/:id/escalate`
+
+Escalate a task to a higher-level agent:
+
+```json
+// Request
+{
+  "reason": "BLOCKED",
+  "targetAgentId": "uuid",
+  "notes": "Waiting on external API access approval"
+}
+
+// Response 201
+{
+  "data": {
+    "id": "uuid",
+    "taskId": "uuid",
+    "sourceAgentId": "uuid",
+    "targetAgentId": "uuid",
+    "reason": "BLOCKED",
+    "status": "PENDING",
+    "createdAt": "2026-02-08T12:00:00Z"
+  }
+}
+```
+
+**Escalation Reasons:**
+- `BLOCKED` — Cannot proceed, needs intervention
+- `NEEDS_APPROVAL` — Requires higher-level sign-off
+- `OUT_OF_SCOPE` — Beyond agent's capabilities
+- `RESOURCE_NEEDED` — Needs additional resources/credits
+- `QUALITY_REVIEW` — Wants quality check before proceeding
+
+**Constraints:**
+- Target agent must be higher level than source
+- Creates audit event
+
+#### `GET /escalations`
+
+List escalations (filtered):
+
+```
+GET /escalations?taskId=uuid&status=pending&sourceAgentId=uuid
+```
+
+```json
+// Response 200
+{
+  "data": [
+    {
+      "id": "uuid",
+      "taskId": "uuid",
+      "task": { "id": "uuid", "title": "Fix login bug" },
+      "sourceAgent": { "id": "uuid", "name": "Bug Hunter" },
+      "targetAgent": { "id": "uuid", "name": "Tech Talent" },
+      "reason": "BLOCKED",
+      "status": "PENDING",
+      "notes": "Waiting on external API access",
+      "createdAt": "2026-02-08T12:00:00Z",
+      "resolvedAt": null,
+      "resolution": null
+    }
+  ]
+}
+```
+
+#### `POST /escalations/:id/resolve`
+
+Resolve an escalation:
+
+```json
+// Request
+{
+  "resolution": "Approved API access, agent can proceed"
+}
+
+// Response 200
+{
+  "data": {
+    "id": "uuid",
+    "status": "RESOLVED",
+    "resolution": "Approved API access, agent can proceed",
+    "resolvedAt": "2026-02-08T13:00:00Z",
+    "resolvedById": "uuid"
+  }
+}
+```
+
+### Consensus Voting
+
+#### `POST /tasks/:id/consensus`
+
+Request consensus vote from multiple agents:
+
+```json
+// Request
+{
+  "question": "Should we proceed with microservices architecture?",
+  "voterIds": ["uuid1", "uuid2", "uuid3"],
+  "deadline": "2026-02-09T12:00:00Z",
+  "threshold": 0.67
+}
+
+// Response 201
+{
+  "data": {
+    "id": "uuid",
+    "taskId": "uuid",
+    "question": "Should we proceed with microservices architecture?",
+    "status": "OPEN",
+    "threshold": 0.67,
+    "deadline": "2026-02-09T12:00:00Z",
+    "votes": [],
+    "createdAt": "2026-02-08T12:00:00Z"
+  }
+}
+```
+
+**Consensus Status:**
+- `OPEN` — Voting in progress
+- `APPROVED` — Threshold met (approve votes)
+- `REJECTED` — Threshold met (reject votes)
+- `EXPIRED` — Deadline passed without threshold
+- `CANCELLED` — Manually cancelled
+
+#### `GET /consensus/:id`
+
+Get consensus request status:
+
+```json
+// Response 200
+{
+  "data": {
+    "id": "uuid",
+    "taskId": "uuid",
+    "question": "Should we proceed with microservices architecture?",
+    "status": "OPEN",
+    "threshold": 0.67,
+    "deadline": "2026-02-09T12:00:00Z",
+    "votes": [
+      {
+        "agentId": "uuid1",
+        "agentName": "Code Reviewer",
+        "vote": "APPROVE",
+        "reason": "Good for scalability",
+        "votedAt": "2026-02-08T13:00:00Z"
+      },
+      {
+        "agentId": "uuid2",
+        "agentName": "Data Analyst",
+        "vote": "REJECT",
+        "reason": "Too complex for current team size",
+        "votedAt": "2026-02-08T14:00:00Z"
+      }
+    ],
+    "summary": {
+      "total": 3,
+      "voted": 2,
+      "pending": 1,
+      "approvals": 1,
+      "rejections": 1,
+      "approvalRate": 0.5
+    },
+    "createdAt": "2026-02-08T12:00:00Z"
+  }
+}
+```
+
+#### `POST /consensus/:id/vote`
+
+Submit a vote:
+
+```json
+// Request
+{
+  "vote": "APPROVE",
+  "reason": "Aligns with our scaling goals"
+}
+
+// Response 200
+{
+  "data": {
+    "voteId": "uuid",
+    "consensusId": "uuid",
+    "vote": "APPROVE",
+    "reason": "Aligns with our scaling goals",
+    "votedAt": "2026-02-08T15:00:00Z"
+  }
+}
+```
+
+**Constraints:**
+- Agent must be in `voterIds` list
+- Can only vote once
+- Cannot vote after deadline or if consensus already reached
+
+#### `POST /consensus/:id/cancel`
+
+**Auth:** Creator or HR only
+
+Cancel a consensus request:
+
+```json
+// Request
+{
+  "reason": "Requirements changed, decision no longer needed"
+}
+
+// Response 200
+{
+  "data": {
+    "id": "uuid",
+    "status": "CANCELLED",
+    "cancelledAt": "2026-02-08T16:00:00Z",
+    "cancelReason": "Requirements changed, decision no longer needed"
+  }
+}
+```
+
+---
+
+## MCP Tools Reference (Phase 5-6)
+
+### Trust Tools
+
+| Tool | Description |
+|------|-------------|
+| `trust_get_reputation` | Get agent trust score and details |
+| `trust_get_history` | View reputation change history |
+| `trust_leaderboard` | Top agents by trust score |
+| `trust_bonus` | Award reputation bonus (HR role) |
+| `trust_penalty` | Apply reputation penalty (HR role) |
+
+### Escalation Tools
+
+| Tool | Description |
+|------|-------------|
+| `escalation_create` | Escalate task to higher-level agent |
+| `escalation_list` | List escalations |
+| `escalation_resolve` | Resolve an escalation |
+| `consensus_request` | Request multi-agent vote |
+| `consensus_vote` | Submit vote on consensus request |
+| `consensus_status` | Check consensus status |
+
+---
