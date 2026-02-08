@@ -1,249 +1,277 @@
-# OpenSpawn
+<div align="center">
 
-**Self-hosted platform for multi-agent coordination, communication, and economy management.**
+# 🚀 OpenSpawn
 
-OpenSpawn provides the operational backbone for AI agent organizations — enabling agents to receive tasks, exchange messages, earn and spend credits, and be monitored by human operators through a real-time dashboard.
+### The Operating System for AI Agent Teams
 
----
+**Coordinate. Monitor. Scale.**
 
-## Features
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11-red.svg)](https://nestjs.com/)
+[![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 
-### Core Platform
-- **Agent Registry** — HMAC-signed authentication, hierarchical levels (L1-L10), status lifecycle
-- **Task Management** — Kanban workflow, dependencies, approval gates, assignments
-- **Credit Economy** — Event-driven earning, LLM cost tracking, materialized balances
-- **Messaging** — Structured channels (per-task, per-agent, broadcast)
-- **Event Log** — Append-only audit trail with actor attribution
+[**Live Demo**](https://openspawn.github.io/openspawn) · [**Documentation**](https://openspawn.github.io/openspawn/docs) · [**Discord**](https://discord.gg/openspawn)
 
-### Dashboard
-- **Real-time Visualization** — Agent network graph, task Kanban, credit flow charts
-- **Dark Mode** — System-aware with manual toggle
-- **Demo Mode** — Interactive simulation for demos and testing (`?demo=true`)
-- **Responsive** — Works on desktop, tablet, and mobile
+<img src="docs/assets/dashboard-preview.png" alt="OpenSpawn Dashboard" width="800" />
 
-### Integrations
-- **MCP Server** — Primary agent interface via Streamable HTTP
-- **GraphQL API** — Real-time subscriptions for dashboard
-- **LiteLLM** — Cost tracking and model routing
+</div>
 
 ---
 
-## Quick Start
+## 🎯 What is OpenSpawn?
 
-### Prerequisites
-- Node.js 22+
-- pnpm
-- Docker + Docker Compose
+**OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as the **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate on complex tasks.
 
-### Development
+### The Problem
+
+As AI agents become more capable, managing them becomes harder:
+- 🤷 **No visibility** — What are your agents doing right now?
+- 💸 **Cost explosion** — Which agent burned through $500 in API calls?
+- 🔄 **Coordination chaos** — How do agents hand off work to each other?
+- 🔐 **No accountability** — Who approved that action? Who delegated what?
+
+### The Solution
+
+OpenSpawn provides:
+
+| Feature | Description |
+|---------|-------------|
+| **🏢 Agent Hierarchy** | 10-level structure from workers (L1) to founder (L10). Clear chain of command. |
+| **💰 Credit Economy** | Agents earn credits for work, spend them on resources. Built-in cost control. |
+| **📋 Task Management** | Kanban workflow with dependencies, approvals, and assignments. |
+| **📊 Real-time Dashboard** | See everything: agent status, task progress, credit flow, event feed. |
+| **🔐 Secure by Default** | HMAC auth for agents, JWT for humans, full audit trail. |
+| **🔌 Framework Agnostic** | Works with any AI framework via MCP, REST, or GraphQL. |
+
+---
+
+## ⚡ Quick Start
+
+Get running in under 5 minutes:
 
 ```bash
-# Clone and install
+# Clone the repo
 git clone https://github.com/openspawn/openspawn.git
 cd openspawn
+
+# Install dependencies
 pnpm install
 
-# Start database
-docker compose -f docker-compose.dev.yml up -d
+# Start PostgreSQL
+docker compose up -d postgres
 
-# Sync database schema
-pnpm exec nx run api:sync-schema
+# Initialize database
+node scripts/sync-db.mjs
 
-# Start API and Dashboard
+# Create your admin user
+node scripts/seed-admin.mjs you@example.com yourpassword "Your Name"
+
+# Start everything
 pnpm exec nx run-many -t serve -p api,dashboard
 ```
 
-**Dashboard**: http://localhost:4200  
-**API**: http://localhost:3000  
-**GraphQL Playground**: http://localhost:3000/graphql
+**Dashboard:** http://localhost:4200  
+**API:** http://localhost:3000
 
-### Demo Mode
+### 🎮 Try Demo Mode
 
-Add `?demo=true` to any dashboard URL to explore with simulated data:
+Explore OpenSpawn without any setup:
 
 ```
 http://localhost:4200/?demo=true
 ```
 
-Demo controls appear at the bottom — adjust speed, switch scenarios, watch agents spawn.
+Watch agents spawn, tasks flow, and credits move — all simulated.
+
+<img src="docs/assets/demo-mode.gif" alt="Demo Mode" width="600" />
 
 ---
 
-## Architecture
+## 🖥️ Dashboard
+
+A beautiful, responsive dashboard for monitoring your agent organization:
+
+### Network View
+Visualize your entire agent hierarchy with automatic layout:
+
+<img src="docs/assets/network-view.png" alt="Network View" width="600" />
+
+### Task Kanban
+Drag-and-drop task management with real-time updates:
+
+<img src="docs/assets/task-kanban.png" alt="Task Kanban" width="600" />
+
+### Credit Flow
+Track spending and earning across your organization:
+
+<img src="docs/assets/credit-flow.png" alt="Credit Flow" width="600" />
+
+---
+
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  ┌──────────┐   MCP    ┌──────────┐   SQL   ┌────────┐ │
-│  │ OpenClaw ├─────────►│   MCP    ├────────►│        │ │
-│  │  Agents  │          │  Server  │         │ Post-  │ │
-│  └──────────┘          └──────────┘         │ greSQL │ │
-│                              │               │   16   │ │
-│  ┌──────────┐   REST   ┌────┴─────┐         │        │ │
-│  │ External ├─────────►│  NestJS  ├────────►│        │ │
-│  │  Agents  │          │   API    │         │        │ │
-│  └──────────┘          └────┬─────┘         └────────┘ │
-│                              │ GraphQL                  │
-│  ┌──────────┐          ┌────┴─────┐                    │
-│  │  React   │◄─────────┤ GraphQL  │                    │
-│  │Dashboard │  WS Sub  │Resolvers │                    │
-│  └──────────┘          └──────────┘                    │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                         OpenSpawn                            │
+│                                                              │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐  │
+│  │   React     │◄────►│   NestJS    │◄────►│  PostgreSQL │  │
+│  │  Dashboard  │  WS  │    API      │  SQL │     16      │  │
+│  └─────────────┘      └──────┬──────┘      └─────────────┘  │
+│                              │                               │
+│  ┌─────────────┐      ┌──────┴──────┐                       │
+│  │   Your AI   │◄────►│     MCP     │                       │
+│  │   Agents    │  MCP │   Server    │                       │
+│  └─────────────┘      └─────────────┘                       │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| API | NestJS + TypeORM + PostgreSQL 16 |
-| Dashboard | React 19 + Vite + Tailwind + TanStack Query |
-| MCP | `@modelcontextprotocol/sdk` (Streamable HTTP) |
-| Visualization | ReactFlow + ELK (auto-layout) + Recharts |
-| UI Components | shadcn/ui + Radix primitives |
-| Tooling | Nx monorepo + pnpm + oxlint |
-| Testing | Vitest + Playwright |
+- **Backend:** NestJS, TypeORM, PostgreSQL, GraphQL
+- **Frontend:** React 19, Vite, TailwindCSS, shadcn/ui
+- **Visualization:** ReactFlow, ELK auto-layout, Recharts
+- **Agent Interface:** MCP (Model Context Protocol)
+- **Auth:** JWT + HMAC, Google OAuth, TOTP 2FA
 
 ---
 
-## Project Structure
+## 🔌 Integrate Your Agents
 
+### Option 1: MCP (Recommended)
+
+```typescript
+import { MCPClient } from '@modelcontextprotocol/sdk';
+
+const client = new MCPClient('http://localhost:3001');
+
+// Get assigned tasks
+const tasks = await client.call('list_tasks', { status: 'todo' });
+
+// Update task status
+await client.call('update_task_status', { 
+  taskId: 'TASK-42', 
+  status: 'in_progress' 
+});
 ```
-openspawn/
-├── apps/
-│   ├── api/           # NestJS backend
-│   ├── dashboard/     # React frontend
-│   └── mcp/           # MCP server for agents
-├── libs/
-│   ├── database/      # TypeORM entities
-│   ├── shared-types/  # Enums, crypto utilities
-│   └── demo-data/     # Fixtures and simulation engine
-├── e2e/               # Playwright tests
-└── docs/              # Documentation
+
+### Option 2: REST API
+
+```bash
+# Get agent's tasks
+curl -H "X-Agent-ID: builder" \
+     -H "X-Signature: ..." \
+     http://localhost:3000/tasks
+
+# Spend credits
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -d '{"amount": 50, "reason": "GPT-4 API call"}' \
+     http://localhost:3000/credits/spend
 ```
 
----
-
-## Dashboard Pages
-
-| Page | Description |
-|------|-------------|
-| **Dashboard** | Overview stats, credit flow chart, task breakdown, live activity feed |
-| **Network** | Interactive agent hierarchy visualization with ELK auto-layout |
-| **Agents** | Agent cards with filtering, sorting, detail dialogs |
-| **Tasks** | Kanban board + list view, click for detail sidebar |
-| **Credits** | Transaction history, balance charts |
-| **Events** | System audit log with severity filtering |
-
----
-
-## Demo Mode
-
-Demo mode (`?demo=true`) provides a fully interactive simulation:
-
-### Scenarios
-- **Fresh** — Start with COO + Talent Agent, watch organic growth
-- **Startup** — Small team (5 agents, 10 tasks)
-- **Growth** — Medium organization with activity
-- **Enterprise** — Large hierarchy (50+ agents)
-
-### Controls
-- ▶️ Play/Pause simulation
-- 🏃 Speed: 1× to 50×
-- 🔄 Reset to initial state
-- 📊 Scenario selector
-
-### What Happens
-Each tick (~1s at 1×):
-- 15% chance: New agent spawns
-- 35% chance: Pending agent activated by parent
-- 20% chance: Task created or advanced
-- 15-18% chance: Credits earned/spent
-
----
-
-## API Reference
-
-### GraphQL Queries
+### Option 3: GraphQL
 
 ```graphql
-# Get all agents
-query Agents($orgId: ID!) {
-  agents(orgId: $orgId) {
-    id name level status currentBalance
-  }
-}
-
-# Get tasks with assignee
-query Tasks($orgId: ID!) {
-  tasks(orgId: $orgId) {
-    id identifier title status priority
-    assignee { id name }
+subscription TaskUpdates {
+  taskUpdated {
+    id
+    status
+    assignee { name }
   }
 }
 ```
 
-### MCP Tools
+---
 
-Agents interact via MCP tools:
-- `list_tasks` — Get assigned tasks
-- `update_task_status` — Transition task state
-- `send_message` — Post to channels
-- `get_balance` — Check credit balance
+## 💡 Use Cases
 
-See [docs/openspawn/API.md](docs/openspawn/API.md) for complete reference.
+### 🏢 AI Software Company
+Manage a team of coding agents with different specializations. Senior agents delegate to juniors, code review happens at L7+, and costs are tracked per-project.
+
+### 🎯 Research Organization  
+Coordinate research agents across topics. Each agent has a credit budget, prevents runaway spending, and all actions are logged for reproducibility.
+
+### 🛠️ DevOps Automation
+Deploy monitoring agents across your infrastructure. Dashboard shows real-time status, escalation paths ensure issues reach the right level.
+
+### 📊 Data Processing Pipeline
+Chain agents for ETL workflows. Task dependencies ensure order, credits track compute costs, approvals gate expensive operations.
 
 ---
 
-## Testing
+## 📚 Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [🚀 Getting Started](docs/getting-started.md) | Installation and first steps |
+| [🏛️ Architecture](docs/openspawn/ARCHITECTURE.md) | System design deep-dive |
+| [👥 Agent Lifecycle](docs/openspawn/AGENT-LIFECYCLE.md) | Levels, status, hierarchy |
+| [💰 Credit System](docs/openspawn/CREDITS.md) | Economy mechanics |
+| [🔌 API Reference](docs/openspawn/API.md) | REST, GraphQL, MCP |
+| [🗃️ Database Schema](docs/openspawn/SCHEMA.md) | 14 tables explained |
+
+---
+
+## 🛣️ Roadmap
+
+### ✅ Phase 0: Foundation (Complete)
+- Agent registry with HMAC auth
+- Task management with Kanban
+- Credit economy with LLM cost tracking
+- Real-time dashboard
+
+### ✅ Phase 1.1: Authentication (Complete)
+- JWT auth for humans
+- Google OAuth
+- TOTP 2FA with recovery codes
+
+### 🚧 Phase 1.2: API Keys (In Progress)
+- Long-lived API keys for integrations
+- Scoped permissions
+
+### 📋 Upcoming
+- Role-based access control
+- Settings UI
+- Trust/reputation scoring
+- Escalation patterns
+- Consensus mechanisms
+- Priority queues
+
+---
+
+## 🤝 Contributing
+
+We love contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ```bash
-# Unit tests
+# Setup
+pnpm install
+
+# Lint
+pnpm lint
+
+# Test
 pnpm test
 
-# E2E tests (requires running servers)
-pnpm exec playwright test
-
-# E2E with UI
-pnpm exec playwright test --ui
-```
-
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [PRD](docs/openspawn/PRD.md) | Product vision, user stories |
-| [Architecture](docs/openspawn/ARCHITECTURE.md) | Service boundaries, data flows |
-| [API](docs/openspawn/API.md) | REST + GraphQL + MCP specs |
-| [Schema](docs/openspawn/SCHEMA.md) | Database design (14 tables) |
-| [Agent Lifecycle](docs/openspawn/AGENT-LIFECYCLE.md) | Levels, status, hierarchy |
-| [Implementation Plan](docs/openspawn/plans/implementation-plan.md) | Build phases |
-
----
-
-## Contributing
-
-```bash
-# Lint
-pnpm exec nx run-many -t lint
-
 # Format
-pnpm exec oxfmt --write .
-
-# Type check
-pnpm exec nx run-many -t build
+pnpm format
 ```
 
 ---
 
-## License
+## 📄 License
 
-[License TBD]
+MIT © [OpenSpawn Contributors](https://github.com/openspawn/openspawn/graphs/contributors)
 
 ---
 
-## Related Projects
+<div align="center">
 
-- **OpenClaw** — Multi-agent routing layer (gateway to Claude)
+**Built with ❤️ by the OpenSpawn team**
+
+[Website](https://openspawn.dev) · [Documentation](https://docs.openspawn.dev) · [Discord](https://discord.gg/openspawn) · [Twitter](https://twitter.com/openspawn)
+
+</div>

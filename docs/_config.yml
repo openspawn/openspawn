@@ -1,0 +1,39 @@
+title: OpenSpawn
+description: The Operating System for AI Agent Teams
+url: https://openspawn.github.io
+baseurl: /openspawn
+repository: openspawn/openspawn
+
+# Theme
+remote_theme: pages-themes/midnight@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# Custom
+logo: /assets/logo.png
+show_downloads: false
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "openspawn"
+    values:
+      layout: "default"
+
+# Markdown
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
