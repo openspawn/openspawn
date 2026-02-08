@@ -3,6 +3,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - 'docs/**'
+      - 'apps/dashboard/**'
+      - 'libs/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -19,6 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for Nx affected commands
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -29,11 +38,21 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      # Nx cache for faster builds
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nx-${{ runner.os }}-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build demo dashboard
-        run: pnpm exec nx build dashboard --configuration=demo
+        run: pnpm exec nx build dashboard
         env:
           VITE_DEMO_MODE: 'true'
           VITE_API_URL: ''
@@ -48,7 +67,6 @@ jobs:
       - name: Build Jekyll site
         run: |
           cd docs
-          bundle install
           bundle exec jekyll build --baseurl /openspawn
         env:
           JEKYLL_ENV: production
