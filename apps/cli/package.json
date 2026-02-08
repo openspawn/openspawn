@@ -1,14 +1,37 @@
 {
   "name": "@openspawn/cli",
   "version": "0.1.0",
-  "description": "OpenSpawn CLI for agent interaction",
-  "type": "module",
-  "main": "./dist/main.js",
+  "description": "OpenSpawn CLI - Multi-agent coordination platform",
+  "type": "commonjs",
+  "main": "../../dist/apps/cli/openspawn.cjs",
   "bin": {
-    "openspawn": "./dist/main.js"
+    "openspawn": "../../dist/apps/cli/openspawn.cjs"
+  },
+  "files": [
+    "../../dist/apps/cli"
+  ],
+  "keywords": [
+    "cli",
+    "agent",
+    "ai",
+    "multi-agent",
+    "coordination",
+    "openspawn"
+  ],
+  "author": "OpenSpawn",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openspawn/openspawn.git",
+    "directory": "apps/cli"
   },
   "dependencies": {
-    "commander": "^12.1.0"
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "figures": "^6.1.0",
+    "ora": "^9.3.0",
+    "picocolors": "^1.1.1",
+    "terminal-link": "^5.0.0"
   },
   "engines": {
     "node": ">=22.0.0"

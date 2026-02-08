@@ -8,7 +8,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p apps/cli/tsconfig.json"
+        "command": "esbuild apps/cli/src/main.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/apps/cli/openspawn.cjs --external:fsevents"
       },
       "outputs": ["{workspaceRoot}/dist/apps/cli"]
     },
