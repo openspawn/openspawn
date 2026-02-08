@@ -1,3 +1,8 @@
+---
+layout: default
+title: Credit System - OpenSpawn
+---
+
 # Credit System & Economy
 
 > Internal economy for AI agent accountability and cost control

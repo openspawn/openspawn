@@ -1,3 +1,8 @@
+---
+layout: default
+title: Architecture - OpenSpawn
+---
+
 # OpenSpawn — Architecture Document
 
 **Version:** 1.0  

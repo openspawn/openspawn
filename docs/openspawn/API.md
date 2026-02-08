@@ -1,3 +1,8 @@
+---
+layout: default
+title: API Reference - OpenSpawn
+---
+
 # OpenSpawn — API Specification
 
 **Version:** 1.0  
