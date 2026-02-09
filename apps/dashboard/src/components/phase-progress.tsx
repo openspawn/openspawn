@@ -25,8 +25,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
       {/* Desktop: Horizontal timeline */}
       <div className="hidden md:block">
         <div className="relative">
-          {/* Progress line */}
-          <div className="absolute top-5 left-0 right-0 h-1 bg-slate-700 rounded-full">
+          {/* Progress line - z-0 to stay behind nodes */}
+          <div className="absolute top-5 left-0 right-0 h-1 bg-slate-700 rounded-full z-0">
             <motion.div
               className="h-full bg-gradient-to-r from-violet-500 via-blue-500 to-cyan-500 rounded-full"
               initial={{ width: 0 }}
@@ -52,13 +52,13 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                     !onPhaseClick && "cursor-default"
                   )}
                 >
-                  {/* Node */}
+                  {/* Node - solid bg to cover progress line */}
                   <motion.div
                     className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all z-10",
-                      isComplete && "bg-green-500/20 border-green-500 text-green-400",
-                      isCurrent && "bg-blue-500/20 border-blue-500 text-blue-400 ring-4 ring-blue-500/20",
-                      isFuture && "bg-slate-800 border-slate-600 text-slate-500"
+                      "w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all relative z-10",
+                      isComplete && "bg-slate-900 border-green-500 text-green-400",
+                      isCurrent && "bg-slate-900 border-blue-500 text-blue-400 ring-4 ring-blue-500/20",
+                      isFuture && "bg-slate-900 border-slate-600 text-slate-500"
                     )}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
