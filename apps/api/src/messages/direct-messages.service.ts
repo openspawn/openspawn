@@ -122,16 +122,16 @@ export class DirectMessagesService {
     // Get or create the DM channel
     const channel = await this.getOrCreateDMChannel(orgId, fromAgentId, dto.toAgentId);
 
-    // Create the message with explicit recipientId column
+    // Create the message (recipient is implicit from DM channel)
     const message = this.messageRepository.create({
       orgId,
       channelId: channel.id,
       senderId: fromAgentId,
-      recipientId: dto.toAgentId,
       type: dto.type || MessageType.TEXT,
       body: dto.body,
       metadata: {
         ...dto.metadata,
+        recipientId: dto.toAgentId,
         read: false,
       },
     });

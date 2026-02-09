@@ -11,4 +11,3 @@ export { EventType } from "./event.type";
 export { MessageGqlType } from "./message.type";
 export { ChannelGqlType } from "./channel.type";
 export { DirectMessageType, DirectMessageAgentType, ConversationType, SendDirectMessageInput } from "./direct-message.type";
-export { DirectMessageType, DirectMessageAgentType, ConversationType, SendDirectMessageInput } from "./direct-message.type";
