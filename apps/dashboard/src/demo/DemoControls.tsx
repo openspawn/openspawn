@@ -12,7 +12,7 @@ const SPEED_OPTIONS = [
 ];
 
 const SCENARIO_OPTIONS = [
-  { value: 'novatech' as const, label: 'AcmeTech', icon: Factory, agents: 22, description: 'Product launch lifecycle' },
+  { value: 'acmetech' as const, label: 'AcmeTech', icon: Factory, agents: 22, description: 'Product launch lifecycle' },
   { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5, description: 'Small team' },
   { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14, description: 'Scaling up' },
   { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50, description: 'Full org' },

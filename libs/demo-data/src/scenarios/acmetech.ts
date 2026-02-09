@@ -1102,9 +1102,9 @@ const events: DemoEvent[] = [
 // EXPORT SCENARIO
 // =============================================================================
 
-export const novatechScenario: DemoScenario = {
-  name: 'novatech',
-  description: 'NovaTech AI: Full product launch lifecycle with 22 agents across 6 departments',
+export const acmetechScenario: DemoScenario = {
+  name: 'acmetech',
+  description: 'AcmeTech AI: Full product launch lifecycle with 22 agents across 6 departments',
   agents,
   tasks: tasks as DemoTask[], // Cast to remove phase for base type
   credits,
@@ -1113,6 +1113,6 @@ export const novatechScenario: DemoScenario = {
 };
 
 // Export phase info for UI
-export { tasks as novatechTasks, AGENT_IDS as NOVATECH_AGENTS };
+export { tasks as acmetechTasks, AGENT_IDS as ACMETECH_AGENTS };
 
-export default novatechScenario;
+export default acmetechScenario;
