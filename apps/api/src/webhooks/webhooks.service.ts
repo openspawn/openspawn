@@ -1,9 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Repository } from "typeorm";
 import { Webhook, Event } from "@openspawn/database";
 import * as crypto from "node:crypto";
+import * as dns from "node:dns/promises";
 
 export interface WebhookPayload {
   event: string;
@@ -20,10 +21,100 @@ export class WebhooksService {
     private readonly webhookRepo: Repository<Webhook>,
   ) {}
 
+  /**
+   * Validates webhook URL to prevent SSRF attacks.
+   * Blocks requests to internal/private IP ranges.
+   */
+  private async validateWebhookUrl(url: string): Promise<void> {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      throw new BadRequestException("Invalid webhook URL");
+    }
+
+    // Only allow http/https
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      throw new BadRequestException("Webhook URL must use HTTP or HTTPS protocol");
+    }
+
+    const hostname = parsedUrl.hostname;
+
+    // Block obvious localhost variants
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+      throw new BadRequestException("Webhook URL cannot target localhost");
+    }
+
+    // Resolve hostname to IP addresses
+    let addresses: string[];
+    try {
+      const result = await dns.lookup(hostname, { all: true });
+      addresses = result.map((r) => r.address);
+    } catch {
+      throw new BadRequestException(`Cannot resolve webhook hostname: ${hostname}`);
+    }
+
+    for (const ip of addresses) {
+      if (this.isPrivateIp(ip)) {
+        throw new BadRequestException("Webhook URL cannot target internal/private IP addresses");
+      }
+    }
+  }
+
+  /**
+   * Checks if an IP address is in a private/internal range.
+   */
+  private isPrivateIp(ip: string): boolean {
+    // IPv4 checks
+    if (ip.includes(".")) {
+      const parts = ip.split(".").map(Number);
+      if (parts.length !== 4) return false;
+
+      // 127.0.0.0/8 - Loopback
+      if (parts[0] === 127) return true;
+
+      // 10.0.0.0/8 - Private
+      if (parts[0] === 10) return true;
+
+      // 172.16.0.0/12 - Private (172.16.x.x - 172.31.x.x)
+      if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
+
+      // 192.168.0.0/16 - Private
+      if (parts[0] === 192 && parts[1] === 168) return true;
+
+      // 169.254.0.0/16 - Link-local (AWS metadata, etc.)
+      if (parts[0] === 169 && parts[1] === 254) return true;
+
+      // 0.0.0.0/8 - Current network
+      if (parts[0] === 0) return true;
+    }
+
+    // IPv6 checks
+    if (ip.includes(":")) {
+      const normalized = ip.toLowerCase();
+
+      // ::1 - Loopback
+      if (normalized === "::1") return true;
+
+      // fc00::/7 - Unique local addresses (fc00:: - fdff::)
+      if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true;
+
+      // fe80::/10 - Link-local
+      if (normalized.startsWith("fe80")) return true;
+
+      // :: - Unspecified
+      if (normalized === "::") return true;
+    }
+
+    return false;
+  }
+
   async create(
     orgId: string,
     data: { name: string; url: string; secret?: string; events: string[] },
   ): Promise<Webhook> {
+    await this.validateWebhookUrl(data.url);
+
     const webhook = this.webhookRepo.create({
       orgId,
       name: data.name,
@@ -53,6 +144,10 @@ export class WebhooksService {
   ): Promise<Webhook | null> {
     const webhook = await this.findById(orgId, id);
     if (!webhook) return null;
+
+    if (data.url) {
+      await this.validateWebhookUrl(data.url);
+    }
 
     Object.assign(webhook, data);
     return this.webhookRepo.save(webhook);
@@ -84,6 +179,9 @@ export class WebhooksService {
   }
 
   private async sendWebhook(webhook: Webhook, payload: WebhookPayload): Promise<void> {
+    // Validate URL at delivery time to catch URLs stored before validation existed
+    await this.validateWebhookUrl(webhook.url);
+
     const body = JSON.stringify(payload);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

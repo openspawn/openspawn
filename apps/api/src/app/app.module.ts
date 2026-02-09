@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { entities } from "@openspawn/database";
@@ -20,6 +22,14 @@ import { AppService } from "./app.service";
 
 @Module({
   imports: [
+    // Rate limiting
+    ThrottlerModule.forRoot([
+      {
+        ttl: parseInt(process.env["THROTTLE_TTL"] || "60000", 10),
+        limit: parseInt(process.env["THROTTLE_LIMIT"] || "100", 10),
+      },
+    ]),
+
     // Database
     TypeOrmModule.forRoot({
       type: "postgres",
@@ -48,7 +58,13 @@ import { AppService } from "./app.service";
     GraphqlModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

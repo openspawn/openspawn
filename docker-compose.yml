@@ -46,7 +46,7 @@ services:
       dockerfile: apps/mcp/Dockerfile
     container_name: openspawn-mcp
     environment:
-      API_URL: http://api:3000
+      API_URL: http://api:3000/api/v1
       PORT: 3001
     ports:
       - "3001:3001"

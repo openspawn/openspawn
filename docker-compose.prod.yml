@@ -68,7 +68,7 @@ services:
     container_name: openspawn-mcp
     restart: unless-stopped
     environment:
-      API_URL: http://api:3000
+      API_URL: http://api:3000/api/v1
       PORT: 3001
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]

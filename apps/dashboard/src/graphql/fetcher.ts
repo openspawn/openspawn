@@ -16,7 +16,7 @@ function getApiUrl(): string {
   // This ensures accessing from 192.168.x.x uses that IP, not localhost
   if (typeof window !== "undefined" && window.location?.hostname) {
     const { protocol, hostname } = window.location;
-    const url = `${protocol}//${hostname}:3000/graphql`;
+    const url = `${protocol}//${hostname}:3000/api/v1/graphql`;
     console.log("[GraphQL] Auto-detected API URL:", url);
     return url;
   }
@@ -27,7 +27,7 @@ function getApiUrl(): string {
     return import.meta.env.VITE_API_URL;
   }
 
-  return "http://localhost:3000/graphql";
+  return "http://localhost:3000/api/v1/graphql";
 }
 
 // Lazy initialization to ensure window.location is available
