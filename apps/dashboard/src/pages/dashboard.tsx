@@ -26,6 +26,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { PhaseProgress } from "../components/phase-progress";
+import { IdleAgentsWidget } from "../components/idle-agents-widget";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
@@ -378,15 +379,16 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      {/* Recent activity */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Recent Activity</CardTitle>
-          <Badge variant="outline" className="text-xs">
-            <Zap className="h-3 w-3 mr-1" />
-            Live
-          </Badge>
-        </CardHeader>
+      {/* Recent activity + Idle Agents */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Activity</CardTitle>
+            <Badge variant="outline" className="text-xs">
+              <Zap className="h-3 w-3 mr-1" />
+              Live
+            </Badge>
+          </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <AnimatePresence mode="popLayout">
@@ -444,6 +446,13 @@ export function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+        {/* Idle Agents Widget */}
+        <IdleAgentsWidget 
+          maxCount={6} 
+          className="lg:col-span-1"
+        />
+      </div>
     </div>
   );
 }

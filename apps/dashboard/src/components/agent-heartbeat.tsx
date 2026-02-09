@@ -34,14 +34,14 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
 
   const pulseColors = {
     ACTIVE: 'bg-green-500',
-    IDLE: 'bg-yellow-500',
+    IDLE: 'bg-emerald-400',  // Brighter for availability
     PENDING: 'bg-blue-500',
     SUSPENDED: 'bg-red-500',
   };
 
   const ringColors = {
     ACTIVE: 'ring-green-500/50',
-    IDLE: 'ring-yellow-500/50',
+    IDLE: 'ring-emerald-400/60',  // Brighter for availability
     PENDING: 'ring-blue-500/50',
     SUSPENDED: 'ring-red-500/50',
   };
@@ -94,7 +94,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
         )}
       </AnimatePresence>
 
-      {/* Activity indicator ring */}
+      {/* Activity indicator ring for working agents */}
       {isWorking && status === 'ACTIVE' && (
         <motion.span
           initial={{ rotate: 0 }}
@@ -105,6 +105,36 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
             'border-t-green-400 border-r-green-400/50'
           )}
         />
+      )}
+
+      {/* Special idle pulse - subtle glow to show agent is available */}
+      {showPulse && status === 'IDLE' && (
+        <>
+          <motion.span
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.4, 0.1, 0.4],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute inset-0 rounded-full bg-emerald-400/30"
+          />
+          <motion.span
+            animate={{
+              scale: [1, 1.5],
+              opacity: [0.6, 0],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: 'easeOut',
+            }}
+            className="absolute inset-0 rounded-full border-2 border-emerald-400"
+          />
+        </>
       )}
     </div>
   );

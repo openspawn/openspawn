@@ -17,6 +17,7 @@ import type { Organization } from "./organization.entity";
 @Entity("messages")
 @Index(["channelId", "createdAt"])
 @Index(["orgId", "senderId"])
+@Index(["orgId", "recipientId"])
 @Index(["parentMessageId"])
 export class Message {
   @PrimaryGeneratedColumn("uuid")
@@ -30,6 +31,10 @@ export class Message {
 
   @Column({ name: "sender_id", type: "uuid" })
   senderId!: string;
+
+  /** Recipient ID for direct messages (peer-to-peer). Null for channel/broadcast messages */
+  @Column({ name: "recipient_id", type: "uuid", nullable: true })
+  recipientId!: string | null;
 
   @Column({ type: "varchar", length: 20, default: MessageType.TEXT })
   type!: MessageType;
@@ -46,7 +51,6 @@ export class Message {
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
-  // Relations
   @ManyToOne("Organization")
   @JoinColumn({ name: "org_id" })
   organization?: Organization;
@@ -58,6 +62,10 @@ export class Message {
   @ManyToOne("Agent")
   @JoinColumn({ name: "sender_id" })
   sender?: Agent;
+
+  @ManyToOne("Agent")
+  @JoinColumn({ name: "recipient_id" })
+  recipient?: Agent;
 
   @ManyToOne("Message", "replies")
   @JoinColumn({ name: "parent_message_id" })

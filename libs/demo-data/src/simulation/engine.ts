@@ -577,6 +577,14 @@ export class SimulationEngine {
       { taskId: task.id, agentId: task.assigneeId }
     );
     this.state.scenario.events.push(systemEvent);
+
+    // Emit idle event if agent completed a task and has no more work
+    if (newStatus === 'done' && task.assigneeId) {
+      const idleEvent = this.checkAndEmitAgentIdle(task.assigneeId, task.id, task.title);
+      if (idleEvent) {
+        this.emit(idleEvent);
+      }
+    }
     
     return {
       type: newStatus === 'done' ? 'task_completed' : 'task_assigned',
@@ -664,6 +672,52 @@ export class SimulationEngine {
     return {
       type: 'credit_spent',
       payload: { agent, amount, transaction },
+      timestamp: new Date(),
+    };
+  }
+  
+  /**
+   * Check if an agent is now idle (no active tasks) and emit an idle event
+   */
+  private checkAndEmitAgentIdle(
+    agentId: string,
+    completedTaskId?: string,
+    completedTaskTitle?: string
+  ): SimulationEvent | null {
+    const agent = this.state.scenario.agents.find(a => a.id === agentId);
+    if (!agent || agent.status !== 'active') return null;
+    
+    const activeTasks = this.state.scenario.tasks.filter(
+      t => t.assigneeId === agentId && 
+           t.status !== 'done' && 
+           t.status !== 'cancelled'
+    );
+    
+    if (activeTasks.length > 0) return null;
+    
+    const reason = completedTaskId ? 'task_complete' : 'unassigned';
+    
+    const idleEvent = generateEvent(
+      'agent.idle',
+      'info',
+      completedTaskTitle 
+        ? `${agent.name} completed "${completedTaskTitle}" and is now available`
+        : `${agent.name} is now available for work`,
+      { 
+        agentId: agent.id, 
+        metadata: { 
+          reason,
+          previousTaskId: completedTaskId,
+          previousTaskTitle: completedTaskTitle,
+          availableAt: new Date().toISOString(),
+        } 
+      }
+    );
+    this.state.scenario.events.push(idleEvent);
+    
+    return {
+      type: 'agent_idle',
+      payload: { agent, reason, previousTaskId: completedTaskId, previousTaskTitle: completedTaskTitle, availableAt: new Date() },
       timestamp: new Date(),
     };
   }

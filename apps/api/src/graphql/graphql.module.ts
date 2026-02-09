@@ -14,6 +14,7 @@ import { PubSubProvider } from "./pubsub.provider";
 import {
   AgentResolver,
   CreditResolver,
+  DirectMessageResolver,
   EventResolver,
   MessageResolver,
   TaskResolver,
@@ -45,6 +46,7 @@ import {
     CreditResolver,
     EventResolver,
     MessageResolver,
+    DirectMessageResolver,
   ],
   exports: [PubSubProvider],
 })
