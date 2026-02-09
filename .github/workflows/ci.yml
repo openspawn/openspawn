@@ -56,6 +56,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify codegen is up to date
+        run: |
+          pnpm run codegen
+          if ! git diff --quiet apps/dashboard/src/graphql/generated/ schema.gql; then
+            echo "❌ Generated files are out of date. Run 'pnpm run codegen' and commit the changes."
+            git diff --stat apps/dashboard/src/graphql/generated/ schema.gql
+            exit 1
+          fi
+          echo "✅ Codegen files are up to date"
+
       - name: Lint
         run: pnpm exec nx run-many -t lint --parallel=3
         continue-on-error: true  # Don't fail on lint for now

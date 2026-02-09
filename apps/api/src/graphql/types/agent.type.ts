@@ -54,19 +54,19 @@ export class AgentType {
   @Field(() => Int)
   tasksSuccessful!: number;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   lastActivityAt?: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   lastPromotionAt?: Date | null;
 
   @Field(() => ID, { nullable: true })
   parentId?: string | null;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 
-  @Field()
+  @Field(() => Date)
   updatedAt!: Date;
 }
 
@@ -110,7 +110,7 @@ export class AgentReputationType {
   @Field(() => Float)
   successRate!: number;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   lastActivityAt?: Date | null;
 
   @Field(() => PromotionProgressType, { nullable: true })
@@ -138,7 +138,7 @@ export class ReputationHistoryEntryType {
   @Field()
   reason!: string;
 
-  @Field()
+  @Field(() => Date)
   createdAt!: Date;
 }
 
