@@ -14,12 +14,12 @@ import { setJsonOutput, icons, setDemoMode } from "./lib/output.js";
 
 const VERSION = "0.1.0";
 
-// ASCII art banner
+// ASCII art banner (emoji = 2 visual chars, so adjust padding)
 const banner = `
-  ${pc.cyan("┌─────────────────────────────────────┐")}
-  ${pc.cyan("│")}  ${icons.rocket} ${pc.bold(pc.white("OpenSpawn"))} ${pc.dim("CLI")} ${pc.dim(`v${VERSION}`)}          ${pc.cyan("│")}
-  ${pc.cyan("│")}  ${pc.dim("Multi-agent coordination platform")}   ${pc.cyan("│")}
-  ${pc.cyan("└─────────────────────────────────────┘")}
+${pc.cyan("┌──────────────────────────────────────────┐")}
+${pc.cyan("│")}  ${icons.rocket} ${pc.bold(pc.white("OpenSpawn CLI"))} ${pc.dim(`v${VERSION}`)}                 ${pc.cyan("│")}
+${pc.cyan("│")}  ${pc.dim("Multi-agent coordination platform")}       ${pc.cyan("│")}
+${pc.cyan("└──────────────────────────────────────────┘")}
 `;
 
 const program = new Command();

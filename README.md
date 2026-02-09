@@ -6,7 +6,7 @@
 
 <br />
 
-<img src="https://vhs.charm.sh/vhs-z82JuWRGZm5jEevEFv1w5.gif" alt="OpenSpawn CLI Demo" width="800" />
+<img src="https://vhs.charm.sh/vhs-5EptZ1r9WVQYDbYWchZNvp.gif" alt="OpenSpawn CLI Demo" width="800" />
 
 <br />
 <br />
