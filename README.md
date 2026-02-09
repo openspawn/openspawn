@@ -15,12 +15,6 @@
 [![Docs](https://img.shields.io/badge/📚_Docs-Read-22c55e?style=for-the-badge)](https://openspawn.github.io/openspawn/)
 [![Discord](https://img.shields.io/badge/💬_Discord-Join-5865f2?style=for-the-badge)](https://discord.gg/openspawn)
 
-<br />
-
-```bash
-npx openspawn --demo
-```
-
 </div>
 
 ---
