@@ -285,6 +285,18 @@ function EventLabel({ event }: { event: { type: string; payload: any } }) {
           💸 <strong>{event.payload.agent.name}</strong> spent {event.payload.amount} credits
         </span>
       );
+    case 'prehook_blocked':
+      return (
+        <span className="text-amber-500">
+          🛡️ <strong>{event.payload.webhookName}</strong> blocked: {event.payload.reason || event.payload.eventType}
+        </span>
+      );
+    case 'prehook_allowed':
+      return (
+        <span className="text-green-400">
+          ✓ <strong>{event.payload.webhookName}</strong> approved {event.payload.eventType}
+        </span>
+      );
     default:
       return <span>📡 {event.type}</span>;
   }

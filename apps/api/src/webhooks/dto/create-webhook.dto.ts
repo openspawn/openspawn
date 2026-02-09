@@ -1,4 +1,4 @@
-import { IsString, IsUrl, IsArray, IsOptional, ArrayMinSize } from "class-validator";
+import { IsString, IsUrl, IsArray, IsOptional, IsBoolean, IsInt, Min, Max, IsIn } from "class-validator";
 
 export class CreateWebhookDto {
   @IsString()
@@ -14,4 +14,18 @@ export class CreateWebhookDto {
   @IsArray()
   @IsString({ each: true })
   events!: string[];
+
+  @IsOptional()
+  @IsIn(["pre", "post"])
+  hookType?: "pre" | "post";
+
+  @IsOptional()
+  @IsBoolean()
+  canBlock?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1000)
+  @Max(30000)
+  timeoutMs?: number;
 }

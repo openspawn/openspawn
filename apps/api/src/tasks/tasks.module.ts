@@ -16,6 +16,7 @@ import {
 
 import { AgentsModule } from "../agents";
 import { EventsModule } from "../events";
+import { WebhooksModule } from "../webhooks/webhooks.module";
 
 import { ConsensusController } from "./consensus.controller";
 import { ConsensusService } from "./consensus.service";
@@ -46,6 +47,7 @@ import { TasksService } from "./tasks.service";
     ]),
     EventsModule,
     forwardRef(() => AgentsModule),
+    forwardRef(() => WebhooksModule),
   ],
   controllers: [
     TasksController,

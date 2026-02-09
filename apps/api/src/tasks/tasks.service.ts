@@ -15,11 +15,22 @@ import { TaskStatus } from "@openspawn/shared-types";
 
 import { TrustService } from "../agents";
 import { EventsService } from "../events";
+import { WebhooksService } from "../webhooks/webhooks.service";
 
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { TransitionTaskDto } from "./dto/transition-task.dto";
 import { TaskIdentifierService } from "./task-identifier.service";
 import { TaskTransitionService } from "./task-transition.service";
+
+/** Exception thrown when a pre-hook blocks an action */
+export class PreHookBlockedException extends ForbiddenException {
+  constructor(
+    public readonly reason: string,
+    public readonly blockedBy: string[],
+  ) {
+    super(`Action blocked by webhook: ${reason}`);
+  }
+}
 
 @Injectable()
 export class TasksService {
@@ -38,6 +49,8 @@ export class TasksService {
     private readonly eventEmitter: EventEmitter2,
     @Inject(forwardRef(() => TrustService))
     private readonly trustService: TrustService,
+    @Inject(forwardRef(() => WebhooksService))
+    private readonly webhooksService: WebhooksService,
   ) {}
 
   async create(orgId: string, actorId: string, dto: CreateTaskDto): Promise<Task> {
@@ -150,6 +163,25 @@ export class TasksService {
 
     // Validate transition
     this.taskTransitionService.validateTransition(task.status, dto.status);
+
+    // Execute pre-hooks for task transitions
+    const preHookResult = await this.webhooksService.executePreHooks(orgId, "task.transition", {
+      taskId: id,
+      taskIdentifier: task.identifier,
+      taskTitle: task.title,
+      fromStatus: task.status,
+      toStatus: dto.status,
+      actorId,
+      assigneeId: task.assigneeId,
+      reason: dto.reason,
+    });
+
+    if (!preHookResult.allow) {
+      throw new PreHookBlockedException(
+        preHookResult.reason || "Transition blocked by webhook",
+        preHookResult.blockedBy || [],
+      );
+    }
 
     // Check blocking dependencies for moving to done
     if (dto.status === TaskStatus.DONE) {

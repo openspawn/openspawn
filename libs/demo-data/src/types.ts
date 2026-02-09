@@ -120,7 +120,23 @@ export interface SimulationEvent {
         'agent_status_changed' | 'agent_despawned' | 'agent_idle' |
         'task_created' | 'task_assigned' | 'task_completed' |
         'credit_earned' | 'credit_spent' |
+        'prehook_blocked' | 'prehook_allowed' |
         'system_event';
   payload: unknown;
   timestamp: Date;
+}
+
+export interface DemoWebhook {
+  id: string;
+  name: string;
+  url: string;
+  events: string[];
+  enabled: boolean;
+  hookType: 'pre' | 'post';
+  canBlock: boolean;
+  timeoutMs: number;
+  failureCount: number;
+  lastTriggeredAt?: string;
+  lastError?: string;
+  createdAt: string;
 }
