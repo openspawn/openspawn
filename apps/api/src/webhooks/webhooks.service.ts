@@ -1,6 +1,6 @@
 import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { OnEvent } from "@nestjs/event-emitter";
+import { OnEvent, EventEmitter2 } from "@nestjs/event-emitter";
 import { Repository } from "typeorm";
 import { Webhook, Event } from "@openspawn/database";
 import * as crypto from "node:crypto";
@@ -12,6 +12,31 @@ export interface WebhookPayload {
   data: Record<string, unknown>;
 }
 
+export interface PreHookResult {
+  allow: boolean;
+  reason?: string;
+  blockedBy?: string[];
+  executionTimeMs?: number;
+}
+
+export interface PreHookResponse {
+  allow: boolean;
+  reason?: string;
+}
+
+interface HookExecutionEvent {
+  webhookId: string;
+  webhookName: string;
+  orgId: string;
+  eventType: string;
+  hookType: "pre" | "post";
+  success: boolean;
+  blocked?: boolean;
+  reason?: string;
+  executionTimeMs: number;
+  error?: string;
+}
+
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
@@ -19,6 +44,7 @@ export class WebhooksService {
   constructor(
     @InjectRepository(Webhook)
     private readonly webhookRepo: Repository<Webhook>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /**
@@ -111,7 +137,15 @@ export class WebhooksService {
 
   async create(
     orgId: string,
-    data: { name: string; url: string; secret?: string; events: string[] },
+    data: {
+      name: string;
+      url: string;
+      secret?: string;
+      events: string[];
+      hookType?: "pre" | "post";
+      canBlock?: boolean;
+      timeoutMs?: number;
+    },
   ): Promise<Webhook> {
     await this.validateWebhookUrl(data.url);
 
@@ -122,6 +156,9 @@ export class WebhooksService {
       secret: data.secret,
       events: data.events,
       enabled: true,
+      hookType: data.hookType ?? "post",
+      canBlock: data.canBlock ?? false,
+      timeoutMs: data.timeoutMs ?? 5000,
     });
     return this.webhookRepo.save(webhook);
   }
@@ -140,7 +177,16 @@ export class WebhooksService {
   async update(
     orgId: string,
     id: string,
-    data: Partial<{ name: string; url: string; secret: string; events: string[]; enabled: boolean }>,
+    data: Partial<{
+      name: string;
+      url: string;
+      secret: string;
+      events: string[];
+      enabled: boolean;
+      hookType: "pre" | "post";
+      canBlock: boolean;
+      timeoutMs: number;
+    }>,
   ): Promise<Webhook | null> {
     const webhook = await this.findById(orgId, id);
     if (!webhook) return null;
@@ -158,9 +204,197 @@ export class WebhooksService {
     return (result.affected ?? 0) > 0;
   }
 
+  /**
+   * Execute pre-hooks for an action. If any blocking pre-hook returns allow: false,
+   * the action should be blocked.
+   */
+  async executePreHooks(
+    orgId: string,
+    eventType: string,
+    payload: Record<string, unknown>,
+  ): Promise<PreHookResult> {
+    const startTime = Date.now();
+
+    // Find all enabled pre-hooks for this event type
+    const preHooks = await this.webhookRepo.find({
+      where: { orgId, enabled: true, hookType: "pre" },
+    });
+
+    // Filter hooks that match this event type
+    const matchingHooks = preHooks.filter(
+      (w) => w.events.length === 0 || w.events.includes(eventType) || w.events.includes("*"),
+    );
+
+    if (matchingHooks.length === 0) {
+      return { allow: true, executionTimeMs: Date.now() - startTime };
+    }
+
+    this.logger.debug(`Executing ${matchingHooks.length} pre-hooks for ${eventType}`);
+
+    // Execute all pre-hooks in parallel with individual timeouts
+    const results = await Promise.allSettled(
+      matchingHooks.map((hook) => this.executePreHook(hook, eventType, payload)),
+    );
+
+    // Process results
+    const blockedBy: string[] = [];
+    const reasons: string[] = [];
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      const hook = matchingHooks[i];
+
+      if (result.status === "rejected") {
+        // Hook failed - emit event for audit
+        this.emitHookExecution({
+          webhookId: hook.id,
+          webhookName: hook.name,
+          orgId,
+          eventType,
+          hookType: "pre",
+          success: false,
+          error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+          executionTimeMs: hook.timeoutMs,
+        });
+        continue;
+      }
+
+      const { allow, reason, executionTimeMs } = result.value;
+
+      // Emit execution event for audit trail
+      this.emitHookExecution({
+        webhookId: hook.id,
+        webhookName: hook.name,
+        orgId,
+        eventType,
+        hookType: "pre",
+        success: true,
+        blocked: !allow && hook.canBlock,
+        reason,
+        executionTimeMs,
+      });
+
+      // Only blocking hooks can actually block the action
+      if (!allow && hook.canBlock) {
+        blockedBy.push(hook.name);
+        if (reason) {
+          reasons.push(`${hook.name}: ${reason}`);
+        }
+      }
+    }
+
+    const executionTimeMs = Date.now() - startTime;
+
+    if (blockedBy.length > 0) {
+      return {
+        allow: false,
+        reason: reasons.length > 0 ? reasons.join("; ") : `Blocked by: ${blockedBy.join(", ")}`,
+        blockedBy,
+        executionTimeMs,
+      };
+    }
+
+    return { allow: true, executionTimeMs };
+  }
+
+  /**
+   * Execute a single pre-hook and return the result
+   */
+  private async executePreHook(
+    hook: Webhook,
+    eventType: string,
+    payload: Record<string, unknown>,
+  ): Promise<{ allow: boolean; reason?: string; executionTimeMs: number }> {
+    const startTime = Date.now();
+
+    // Validate URL at execution time
+    await this.validateWebhookUrl(hook.url);
+
+    const webhookPayload: WebhookPayload = {
+      event: eventType,
+      timestamp: new Date().toISOString(),
+      data: {
+        ...payload,
+        hookType: "pre",
+        requiresResponse: true,
+      },
+    };
+
+    const body = JSON.stringify(webhookPayload);
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "X-OpenSpawn-Event": eventType,
+      "X-OpenSpawn-Delivery": crypto.randomUUID(),
+      "X-OpenSpawn-Hook-Type": "pre",
+    };
+
+    if (hook.secret) {
+      const signature = crypto
+        .createHmac("sha256", hook.secret)
+        .update(body)
+        .digest("hex");
+      headers["X-OpenSpawn-Signature"] = `sha256=${signature}`;
+    }
+
+    try {
+      const response = await fetch(hook.url, {
+        method: "POST",
+        headers,
+        body,
+        signal: AbortSignal.timeout(hook.timeoutMs),
+      });
+
+      const executionTimeMs = Date.now() - startTime;
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Update last triggered
+      await this.webhookRepo.update(hook.id, {
+        lastTriggeredAt: new Date(),
+        failureCount: 0,
+        lastError: undefined,
+      });
+
+      // Parse response to get allow/deny decision
+      const responseData = (await response.json()) as PreHookResponse;
+
+      return {
+        allow: responseData.allow !== false, // Default to allow if not specified
+        reason: responseData.reason,
+        executionTimeMs,
+      };
+    } catch (error) {
+      const executionTimeMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      this.logger.warn(`Pre-hook ${hook.id} failed: ${errorMessage}`);
+
+      await this.webhookRepo.update(hook.id, {
+        failureCount: hook.failureCount + 1,
+        lastError: errorMessage,
+      });
+
+      // Disable after 10 consecutive failures
+      if (hook.failureCount >= 9) {
+        await this.webhookRepo.update(hook.id, { enabled: false });
+        this.logger.warn(`Pre-hook ${hook.id} disabled after 10 failures`);
+      }
+
+      // On failure, default to allow (fail-open) to prevent blocking on webhook issues
+      return { allow: true, executionTimeMs };
+    }
+  }
+
+  private emitHookExecution(event: HookExecutionEvent): void {
+    this.eventEmitter.emit("webhook.executed", event);
+  }
+
   async dispatchEvent(orgId: string, eventType: string, data: Record<string, unknown>): Promise<void> {
+    // Only dispatch to post-hooks (pre-hooks are handled separately via executePreHooks)
     const webhooks = await this.webhookRepo.find({
-      where: { orgId, enabled: true },
+      where: { orgId, enabled: true, hookType: "post" },
     });
 
     const payload: WebhookPayload = {
@@ -176,6 +410,17 @@ export class WebhooksService {
     await Promise.allSettled(
       matchingWebhooks.map((webhook) => this.sendWebhook(webhook, payload)),
     );
+  }
+
+  /**
+   * Get pre-hook execution logs for an organization
+   */
+  async getPreHookLogs(orgId: string, limit = 50): Promise<Webhook[]> {
+    return this.webhookRepo.find({
+      where: { orgId, hookType: "pre" },
+      order: { lastTriggeredAt: "DESC" },
+      take: limit,
+    });
   }
 
   private async sendWebhook(webhook: Webhook, payload: WebhookPayload): Promise<void> {

@@ -34,9 +34,19 @@ const PROBABILITIES = {
   messageSent: 0.40,       // 40% chance per tick - agents chat frequently
   messageBurst: 0.15,      // 15% chance of multiple messages at once
   
+  // Pre-hook events (Phase 8.1)
+  prehookTriggered: 0.08,  // 8% chance per tick - pre-hook fires
+  
   // System events
   systemEvent: 0.05,       // 5% chance per tick
 };
+
+// Demo webhooks for simulation
+const DEMO_WEBHOOKS = [
+  { name: 'Compliance Check', hookType: 'pre' as const, canBlock: true, blockChance: 0.15 },
+  { name: 'Budget Guard', hookType: 'pre' as const, canBlock: true, blockChance: 0.10 },
+  { name: 'QA Review', hookType: 'pre' as const, canBlock: true, blockChance: 0.08 },
+];
 
 // Capacity limits by level (how many active children a parent can manage)
 const CAPACITY_BY_LEVEL: Record<number, number> = {
@@ -288,6 +298,12 @@ export class SimulationEngine {
     if (shouldFire(PROBABILITIES.messageBurst)) {
       const burstEvents = this.burstMessages();
       events.push(...burstEvents);
+    }
+    
+    // Pre-hook triggered (Phase 8.1)
+    if (shouldFire(PROBABILITIES.prehookTriggered)) {
+      const event = this.triggerPrehook();
+      if (event) events.push(event);
     }
     
     // Emit all events
@@ -770,6 +786,94 @@ export class SimulationEngine {
     }
     
     return events;
+  }
+  
+  /**
+   * Simulate a pre-hook being triggered (Phase 8.1)
+   * Pre-hooks fire before actions and can block them
+   */
+  private triggerPrehook(): SimulationEvent | null {
+    // Pick a random webhook from our demo webhooks
+    const webhook = randomFrom(DEMO_WEBHOOKS);
+    
+    // Pick a random event type that triggered it
+    const eventTypes = ['task.transition', 'credit.spent', 'agent.spawned'];
+    const eventType = randomFrom(eventTypes);
+    
+    // Get context based on event type
+    let context: { task?: DemoTask; agent?: DemoAgent; amount?: number } = {};
+    
+    if (eventType === 'task.transition') {
+      const activeTasks = this.state.scenario.tasks.filter(
+        t => t.status !== 'done' && t.status !== 'cancelled'
+      );
+      if (activeTasks.length > 0) {
+        context.task = randomFrom(activeTasks);
+      }
+    } else if (eventType === 'agent.spawned') {
+      const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active');
+      if (activeAgents.length > 0) {
+        context.agent = randomFrom(activeAgents);
+      }
+    } else if (eventType === 'credit.spent') {
+      const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active');
+      if (activeAgents.length > 0) {
+        context.agent = randomFrom(activeAgents);
+        context.amount = 50 + Math.floor(Math.random() * 200);
+      }
+    }
+    
+    // Determine if the hook blocks the action
+    const blocked = webhook.canBlock && Math.random() < webhook.blockChance;
+    
+    // Generate reason if blocked
+    const reasons = [
+      'Requires manager approval for this action',
+      'Budget threshold exceeded',
+      'Compliance review required',
+      'Action blocked by policy',
+      'Waiting for external approval',
+    ];
+    const reason = blocked ? randomFrom(reasons) : undefined;
+    
+    // Create system event
+    const severity = blocked ? 'warning' : 'info';
+    const message = blocked
+      ? `${webhook.name} blocked ${eventType}: ${reason}`
+      : `${webhook.name} approved ${eventType}`;
+    
+    const systemEvent = generateEvent(
+      blocked ? 'prehook.blocked' : 'prehook.allowed',
+      severity,
+      message,
+      {
+        metadata: {
+          webhookName: webhook.name,
+          eventType,
+          blocked,
+          reason,
+          taskId: context.task?.id,
+          agentId: context.agent?.id,
+          amount: context.amount,
+          executionTimeMs: 50 + Math.floor(Math.random() * 200),
+        }
+      }
+    );
+    this.state.scenario.events.push(systemEvent);
+    
+    return {
+      type: blocked ? 'prehook_blocked' : 'prehook_allowed',
+      payload: {
+        webhookName: webhook.name,
+        eventType,
+        blocked,
+        reason,
+        task: context.task,
+        agent: context.agent,
+        amount: context.amount,
+      },
+      timestamp: new Date(),
+    };
   }
 }
 

@@ -1,4 +1,4 @@
-import { IsString, IsUrl, IsArray, IsOptional, IsBoolean } from "class-validator";
+import { IsString, IsUrl, IsArray, IsOptional, IsBoolean, IsInt, Min, Max, IsIn } from "class-validator";
 
 export class UpdateWebhookDto {
   @IsOptional()
@@ -21,4 +21,18 @@ export class UpdateWebhookDto {
   @IsOptional()
   @IsBoolean()
   enabled?: boolean;
+
+  @IsOptional()
+  @IsIn(["pre", "post"])
+  hookType?: "pre" | "post";
+
+  @IsOptional()
+  @IsBoolean()
+  canBlock?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1000)
+  @Max(30000)
+  timeoutMs?: number;
 }
