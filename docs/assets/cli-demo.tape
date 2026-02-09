@@ -47,17 +47,5 @@ Type "openspawn credits balance"
 Enter
 Sleep 3s
 
-# End card
-Type "clear"
-Enter
-Sleep 300ms
-Type "echo ''"
-Enter
-Type "echo '  ✨ Try it: npx openspawn --demo'"
-Enter
-Sleep 800ms
-Type "echo '  🌐 Demo:  openspawn.github.io/openspawn/demo'"
-Enter
-Type "echo ''"
-Enter
-Sleep 3s
+# Hold on final output
+Sleep 2s
