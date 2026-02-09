@@ -28,17 +28,19 @@ export type AgentReputationType = {
   trustScore: Scalars['Int']['output'];
 };
 
-export type AgentRole =
-  | 'ADMIN'
-  | 'FOUNDER'
-  | 'HR'
-  | 'WORKER';
+export enum AgentRole {
+  Admin = 'ADMIN',
+  Founder = 'FOUNDER',
+  Hr = 'HR',
+  Worker = 'WORKER'
+}
 
-export type AgentStatus =
-  | 'ACTIVE'
-  | 'PENDING'
-  | 'REVOKED'
-  | 'SUSPENDED';
+export enum AgentStatus {
+  Active = 'ACTIVE',
+  Pending = 'PENDING',
+  Revoked = 'REVOKED',
+  Suspended = 'SUSPENDED'
+}
 
 export type AgentType = {
   agentId: Scalars['String']['output'];
@@ -74,11 +76,12 @@ export type ChannelGqlType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type ChannelType =
-  | 'AGENT'
-  | 'BROADCAST'
-  | 'GENERAL'
-  | 'TASK';
+export enum ChannelType {
+  Agent = 'AGENT',
+  Broadcast = 'BROADCAST',
+  General = 'GENERAL',
+  Task = 'TASK'
+}
 
 export type CreditTransactionType = {
   agentId: Scalars['ID']['output'];
@@ -92,14 +95,16 @@ export type CreditTransactionType = {
   type: CreditType;
 };
 
-export type CreditType =
-  | 'CREDIT'
-  | 'DEBIT';
+export enum CreditType {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT'
+}
 
-export type EventSeverity =
-  | 'ERROR'
-  | 'INFO'
-  | 'WARNING';
+export enum EventSeverity {
+  Error = 'ERROR',
+  Info = 'INFO',
+  Warning = 'WARNING'
+}
 
 export type EventType = {
   actor?: Maybe<AgentType>;
@@ -133,11 +138,12 @@ export type MessageGqlType = {
   type: MessageType;
 };
 
-export type MessageType =
-  | 'HANDOFF'
-  | 'REQUEST'
-  | 'STATUS_UPDATE'
-  | 'TEXT';
+export enum MessageType {
+  Handoff = 'HANDOFF',
+  Request = 'REQUEST',
+  StatusUpdate = 'STATUS_UPDATE',
+  Text = 'TEXT'
+}
 
 export type PromotionProgressType = {
   currentLevel: Scalars['Int']['output'];
@@ -243,12 +249,13 @@ export type ReputationHistoryEntryType = {
   reason: Scalars['String']['output'];
 };
 
-export type ReputationLevel =
-  | 'ELITE'
-  | 'NEW'
-  | 'PROBATION'
-  | 'TRUSTED'
-  | 'VETERAN';
+export enum ReputationLevel {
+  Elite = 'ELITE',
+  New = 'NEW',
+  Probation = 'PROBATION',
+  Trusted = 'TRUSTED',
+  Veteran = 'VETERAN'
+}
 
 export type Subscription = {
   creditTransactionCreated: CreditTransactionType;
@@ -278,20 +285,22 @@ export type SubscriptionTaskUpdatedArgs = {
   orgId: Scalars['ID']['input'];
 };
 
-export type TaskPriority =
-  | 'HIGH'
-  | 'LOW'
-  | 'NORMAL'
-  | 'URGENT';
+export enum TaskPriority {
+  High = 'HIGH',
+  Low = 'LOW',
+  Normal = 'NORMAL',
+  Urgent = 'URGENT'
+}
 
-export type TaskStatus =
-  | 'BACKLOG'
-  | 'BLOCKED'
-  | 'CANCELLED'
-  | 'DONE'
-  | 'IN_PROGRESS'
-  | 'REVIEW'
-  | 'TODO';
+export enum TaskStatus {
+  Backlog = 'BACKLOG',
+  Blocked = 'BLOCKED',
+  Cancelled = 'CANCELLED',
+  Done = 'DONE',
+  InProgress = 'IN_PROGRESS',
+  Review = 'REVIEW',
+  Todo = 'TODO'
+}
 
 export type TaskType = {
   approvalRequired: Scalars['Boolean']['output'];

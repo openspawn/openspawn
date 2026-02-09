@@ -33,7 +33,8 @@ import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 
 // Use generated types from GraphQL
-import type { AgentType, AgentStatus } from "../graphql/generated/graphql";
+import { AgentStatus } from "../graphql/generated/graphql";
+import type { AgentType } from "../graphql/generated/graphql";
 type Agent = AgentType;
 
 type DialogMode = "view" | "edit" | "credits" | null;
@@ -65,16 +66,14 @@ function getLevelLabel(level: number): string {
   return "Probation";
 }
 
-function getStatusVariant(status: string) {
-  switch (status?.toUpperCase()) {
-    case "ACTIVE":
+function getStatusVariant(status: AgentStatus) {
+  switch (status) {
+    case AgentStatus.Active:
       return "success";
-    case "PENDING":
+    case AgentStatus.Pending:
       return "warning";
-    case "PAUSED":
-      return "warning";
-    case "SUSPENDED":
-    case "REVOKED":
+    case AgentStatus.Suspended:
+    case AgentStatus.Revoked:
       return "destructive";
     default:
       return "secondary";
@@ -271,7 +270,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
   // Sort agents by trust score for leaderboard
   const leaderboardData = useMemo(() => {
     return [...agents]
-      .filter(a => a.status === 'ACTIVE')
+      .filter(a => a.status === AgentStatus.Active)
       .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
       .slice(0, 10)
       .map(a => ({
@@ -772,7 +771,7 @@ export function AgentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-500">
-              {agents.filter((a) => a.status === "ACTIVE").length}
+              {agents.filter((a) => a.status === AgentStatus.Active).length}
             </div>
           </CardContent>
         </Card>
