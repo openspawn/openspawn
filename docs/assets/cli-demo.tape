@@ -33,17 +33,17 @@ Enter
 Sleep 3s
 
 # List agents
-Type "openspawn agents list --demo"
+Type "openspawn agents list"
 Enter
 Sleep 3.5s
 
 # List tasks  
-Type "openspawn tasks list --demo"
+Type "openspawn tasks list"
 Enter
 Sleep 3.5s
 
 # Check credits
-Type "openspawn credits balance --demo"
+Type "openspawn credits balance"
 Enter
 Sleep 3s
 
