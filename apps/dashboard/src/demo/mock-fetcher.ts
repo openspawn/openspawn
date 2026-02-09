@@ -168,6 +168,25 @@ function mapEvent(event: any, agents: any[]) {
   };
 }
 
+// Map demo message to GraphQL format
+function mapMessage(msg: any, agents: any[]) {
+  const fromAgent = agents.find((a: any) => a.id === msg.fromAgentId);
+  const toAgent = agents.find((a: any) => a.id === msg.toAgentId);
+
+  return {
+    id: msg.id,
+    fromAgentId: msg.fromAgentId,
+    toAgentId: msg.toAgentId,
+    fromAgent: fromAgent ? { id: fromAgent.id, name: fromAgent.name, level: fromAgent.level } : null,
+    toAgent: toAgent ? { id: toAgent.id, name: toAgent.name, level: toAgent.level } : null,
+    content: msg.content,
+    type: msg.type.toUpperCase(),
+    taskRef: msg.taskRef || null,
+    read: msg.read,
+    createdAt: msg.createdAt,
+  };
+}
+
 // Handle GraphQL operations
 function handleOperation(operationName: string, variables: any): any {
   const engine = engineRef?.();
@@ -180,12 +199,14 @@ function handleOperation(operationName: string, variables: any): any {
   const tasks = engine.getTasks();
   const credits = engine.getCredits();
   const events = engine.getEvents();
+  const messages = engine.getMessages();
 
   console.log('[MockFetcher]', operationName, '→', {
     agents: agents.length,
     tasks: tasks.length,
     credits: credits.length,
     events: events.length,
+    messages: messages.length,
   });
 
   switch (operationName) {
@@ -288,6 +309,59 @@ function handleOperation(operationName: string, variables: any): any {
         },
       ];
       return { reputationHistory: mockHistory };
+
+    case 'Messages':
+      const msgLimit = variables?.limit || 50;
+      const sortedMessages = [...messages].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      return { messages: sortedMessages.slice(0, msgLimit).map(m => mapMessage(m, agents)) };
+
+    case 'Conversations':
+      // Group messages by conversation (pair of agents)
+      const conversationMap = new Map<string, any[]>();
+      messages.forEach(msg => {
+        const key = [msg.fromAgentId, msg.toAgentId].sort().join('-');
+        if (!conversationMap.has(key)) conversationMap.set(key, []);
+        conversationMap.get(key)!.push(msg);
+      });
+      
+      const conversations = Array.from(conversationMap.entries()).map(([key, msgs]) => {
+        const [agent1Id, agent2Id] = key.split('-');
+        const agent1 = agents.find(a => a.id === agent1Id);
+        const agent2 = agents.find(a => a.id === agent2Id);
+        const latestMsg = msgs.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        
+        return {
+          id: key,
+          agents: [
+            agent1 ? { id: agent1.id, name: agent1.name, level: agent1.level } : null,
+            agent2 ? { id: agent2.id, name: agent2.name, level: agent2.level } : null,
+          ].filter(Boolean),
+          messageCount: msgs.length,
+          unreadCount: msgs.filter(m => !m.read).length,
+          latestMessage: mapMessage(latestMsg, agents),
+          createdAt: latestMsg.createdAt,
+        };
+      }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      return { conversations };
+
+    case 'ConversationMessages':
+      const { agent1Id: a1, agent2Id: a2 } = variables || {};
+      if (!a1 || !a2) return { conversationMessages: [] };
+      
+      const convoMessages = messages
+        .filter(m => 
+          (m.fromAgentId === a1 && m.toAgentId === a2) ||
+          (m.fromAgentId === a2 && m.toAgentId === a1)
+        )
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .map(m => mapMessage(m, agents));
+      
+      return { conversationMessages: convoMessages };
 
     default:
       console.warn('[MockFetcher] Unknown operation:', operationName);

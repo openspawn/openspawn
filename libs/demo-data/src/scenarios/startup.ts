@@ -3,6 +3,7 @@ import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents.js';
 import { tasks, generateRandomTask } from '../fixtures/tasks.js';
 import { creditTransactions } from '../fixtures/credits.js';
 import { events } from '../fixtures/events.js';
+import { generateInitialMessages } from '../fixtures/messages.js';
 
 /**
  * Startup Scenario: Small team, early stage
@@ -34,6 +35,12 @@ export const startupScenario: DemoScenario = {
     !e.agentId || 
     [AGENT_IDS.agentDennis, AGENT_IDS.techTalent, AGENT_IDS.marketingTalent,
      AGENT_IDS.codeReviewer, AGENT_IDS.copywriter].includes(e.agentId as any)
+  ),
+  
+  messages: generateInitialMessages(
+    [AGENT_IDS.agentDennis, AGENT_IDS.techTalent, AGENT_IDS.marketingTalent,
+     AGENT_IDS.codeReviewer, AGENT_IDS.copywriter],
+    tasks.slice(0, 10).map(t => t.identifier)
   ),
 };
 

@@ -3,6 +3,7 @@ import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents.js';
 import { tasks, generateRandomTask } from '../fixtures/tasks.js';
 import { creditTransactions, generateCreditTransaction } from '../fixtures/credits.js';
 import { events, generateEvent } from '../fixtures/events.js';
+import { generateInitialMessages } from '../fixtures/messages.js';
 
 // Additional domains for enterprise scale
 const ENTERPRISE_DOMAINS = ['Engineering', 'Finance', 'Marketing', 'Sales', 'Support', 'Research', 'Legal', 'HR'];
@@ -138,6 +139,10 @@ const enterpriseTasks = generateEnterpriseTasks();
 const enterpriseCredits = generateEnterpriseCredits(enterpriseAgents);
 const enterpriseEvents = generateEnterpriseEvents(enterpriseAgents);
 
+// Build combined agent and task lists
+const allEnterpriseAgents = [...agents, ...enterpriseAgents];
+const allEnterpriseTasks = [...tasks, ...enterpriseTasks];
+
 /**
  * Enterprise Scenario: Large organization
  * - 50+ agents across 8 domains
@@ -147,10 +152,14 @@ const enterpriseEvents = generateEnterpriseEvents(enterpriseAgents);
 export const enterpriseScenario: DemoScenario = {
   name: 'enterprise',
   description: 'Large organization - 50+ agents, 8 domains, complex hierarchy',
-  agents: [...agents, ...enterpriseAgents],
-  tasks: [...tasks, ...enterpriseTasks],
+  agents: allEnterpriseAgents,
+  tasks: allEnterpriseTasks,
   credits: [...creditTransactions, ...enterpriseCredits],
   events: [...events, ...enterpriseEvents],
+  messages: generateInitialMessages(
+    allEnterpriseAgents.map(a => a.id),
+    allEnterpriseTasks.map(t => t.identifier)
+  ),
 };
 
 export default enterpriseScenario;
