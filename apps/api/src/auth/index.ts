@@ -5,6 +5,7 @@ export { AuthModule } from "./auth.module";
 export { AuthService, type AuthenticatedAgent } from "./auth.service";
 export { AuthGuard } from "./auth.guard";
 export { RolesGuard } from "./roles.guard";
+export { AgentModeGuard } from "./agent-mode.guard";
 
 // User auth (JWT-based)
 export { TokensService, type AccessTokenPayload, type TokenPair } from "./tokens.service";

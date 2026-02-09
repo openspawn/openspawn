@@ -1,4 +1,6 @@
-import { IsInt, IsObject, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
+import { IsEnum, IsInt, IsObject, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
+
+import { AgentMode } from "@openspawn/shared-types";
 
 export class UpdateAgentDto {
   @IsOptional()
@@ -16,6 +18,10 @@ export class UpdateAgentDto {
   @IsString()
   @MaxLength(100)
   model?: string;
+
+  @IsOptional()
+  @IsEnum(AgentMode)
+  mode?: AgentMode;
 
   @IsOptional()
   @IsInt()

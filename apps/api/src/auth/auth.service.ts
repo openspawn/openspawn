@@ -10,12 +10,15 @@ import {
   secureCompare,
 } from "@openspawn/shared-types";
 
+import type { AgentMode } from "@openspawn/shared-types";
+
 export interface AuthenticatedAgent {
   id: string;
   orgId: string;
   agentId: string;
   name: string;
   role: string;
+  mode: AgentMode;
   level: number;
 }
 
@@ -99,6 +102,7 @@ export class AuthService {
       agentId: agent.agentId,
       name: agent.name,
       role: agent.role,
+      mode: agent.mode,
       level: agent.level,
     };
   }
