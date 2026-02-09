@@ -11,7 +11,39 @@ import type {
   DemoEvent,
   DemoMessage,
 } from '@openspawn/demo-data';
+import {
+  TasksDocument,
+  TaskDocument,
+  AgentsDocument,
+  CreditHistoryDocument,
+  EventsDocument,
+  MessagesDocument,
+} from '../graphql/generated/graphql';
 import { debug } from '../lib/debug';
+
+// Extract operation name from a DocumentNode at runtime
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getOperationName(doc: { definitions: Array<{ name?: { value: string } }> }): string {
+  return doc.definitions[0]?.name?.value ?? 'Unknown';
+}
+
+// Operation names derived from generated documents (type-safe)
+const OP = {
+  Tasks: getOperationName(TasksDocument),
+  Task: getOperationName(TaskDocument),
+  Agents: getOperationName(AgentsDocument),
+  CreditHistory: getOperationName(CreditHistoryDocument),
+  Events: getOperationName(EventsDocument),
+  Messages: getOperationName(MessagesDocument),
+  // Demo-only operations (not in codegen yet)
+  Agent: 'Agent',
+  Credits: 'Credits',
+  AgentReputation: 'AgentReputation',
+  TrustLeaderboard: 'TrustLeaderboard',
+  ReputationHistory: 'ReputationHistory',
+  Conversations: 'Conversations',
+  ConversationMessages: 'ConversationMessages',
+} as const;
 
 // Reference to the simulation engine (set by DemoProvider)
 let engineRef: (() => SimulationEngine | null) | null = null;
@@ -228,24 +260,24 @@ function handleOperation(operationName: string, variables: OperationVariables): 
   });
 
   switch (operationName) {
-    case 'Agents':
+    case OP.Agents:
       return { agents: agents.map(mapAgent) };
 
-    case 'Agent': {
+    case OP.Agent: {
       const agent = agents.find(a => a.id === variables.id);
       return { agent: agent ? mapAgent(agent) : null };
     }
 
-    case 'Tasks':
+    case OP.Tasks:
       return { tasks: tasks.map(t => mapTask(t, agents)) };
 
-    case 'Task': {
+    case OP.Task: {
       const task = tasks.find(t => t.id === variables.id);
       return { task: task ? mapTask(task, agents) : null };
     }
 
-    case 'Credits':
-    case 'CreditHistory': {
+    case OP.Credits:
+    case OP.CreditHistory: {
       const limit = variables.limit ?? 50;
       const creditOffset = variables.offset ?? 0;
       const sorted = [...credits].sort(
@@ -265,7 +297,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       return { creditHistory: withBalances.slice(creditOffset, creditOffset + limit) };
     }
 
-    case 'Events': {
+    case OP.Events: {
       const evtLimit = variables.limit ?? 50;
       const evtPage = variables.page ?? 1;
       const sortedEvents = [...events].sort(
@@ -275,12 +307,12 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       return { events: sortedEvents.slice(evtOffset, evtOffset + evtLimit).map(e => mapEvent(e, agents)) };
     }
 
-    case 'AgentReputation': {
+    case OP.AgentReputation: {
       const repAgent = agents.find(a => a.id === variables.id);
       return { agentReputation: repAgent ? mapAgentReputation(repAgent) : null };
     }
 
-    case 'TrustLeaderboard': {
+    case OP.TrustLeaderboard: {
       const leaderboardLimit = variables.limit ?? 10;
       const sortedByTrust = [...agents]
         .filter(a => a.status === 'active')
@@ -299,7 +331,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       };
     }
 
-    case 'ReputationHistory': {
+    case OP.ReputationHistory: {
       // Generate some mock history events
       const histAgent = agents.find(a => a.id === variables.id);
       if (!histAgent) return { reputationHistory: [] };
@@ -336,7 +368,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       return { reputationHistory: mockHistory };
     }
 
-    case 'Messages': {
+    case OP.Messages: {
       const msgLimit = variables.limit ?? 50;
       const sortedMessages = [...messages].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -344,7 +376,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       return { messages: sortedMessages.slice(0, msgLimit).map(m => mapMessage(m, agents)) };
     }
 
-    case 'Conversations': {
+    case OP.Conversations: {
       // Group messages by conversation (pair of agents)
       const conversationMap = new Map<string, DemoMessage[]>();
       messages.forEach(msg => {
@@ -377,7 +409,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       return { conversations };
     }
 
-    case 'ConversationMessages': {
+    case OP.ConversationMessages: {
       const a1 = variables.agent1Id;
       const a2 = variables.agent2Id;
       if (!a1 || !a2) return { conversationMessages: [] };
