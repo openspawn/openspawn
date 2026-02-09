@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 // Check for demo mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
-const scenarioParam = urlParams.get('scenario') || 'fresh';
+const scenarioParam = urlParams.get('scenario') || 'novatech';
 
 // Use HashRouter for static demo deployment (GitHub Pages), BrowserRouter otherwise
 const Router = isDemoMode ? HashRouter : BrowserRouter;
