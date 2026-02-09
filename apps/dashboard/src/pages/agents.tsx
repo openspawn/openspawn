@@ -271,7 +271,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
   // Sort agents by trust score for leaderboard
   const leaderboardData = useMemo(() => {
     return [...agents]
-      .filter(a => a.status?.toLowerCase() === 'active')
+      .filter(a => a.status === 'ACTIVE')
       .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
       .slice(0, 10)
       .map(a => ({
