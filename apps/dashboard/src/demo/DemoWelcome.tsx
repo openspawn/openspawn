@@ -7,7 +7,7 @@ import { useDemo, type ScenarioName } from './DemoProvider';
 const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; description: string; stats: string; color: string }[] = [
   {
     id: 'novatech',
-    name: 'NovaTech Product Launch',
+    name: 'AcmeTech Product Launch',
     icon: <Building2 className="w-6 h-6" />,
     description: 'Watch 22 agents build a SaaS dashboard from discovery to launch',
     stats: '22 agents • 24 tasks • 6 phases',
@@ -50,7 +50,7 @@ const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; descri
 const STORAGE_KEY = 'openspawn-demo-welcomed';
 
 export function DemoWelcome() {
-  const { setScenario, play } = useDemo();
+  const { setScenario } = useDemo();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<ScenarioName>('novatech');
 
@@ -64,8 +64,7 @@ export function DemoWelcome() {
 
   const handleStart = () => {
     localStorage.setItem(STORAGE_KEY, 'true');
-    setScenario(selectedScenario);
-    play();
+    setScenario(selectedScenario, true); // autoPlay = true
     setIsOpen(false);
   };
 
