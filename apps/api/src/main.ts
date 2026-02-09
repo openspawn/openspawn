@@ -31,7 +31,7 @@ async function bootstrap() {
   const host = process.env["HOST"] || "0.0.0.0";
   await app.listen(port, host);
 
-  Logger.log(\`🚀 OpenSpawn API running on http://\${host}:\${port}\`);
+  Logger.log(`🚀 OpenSpawn API running on http://${host}:${port}`);
 }
 
 bootstrap();
