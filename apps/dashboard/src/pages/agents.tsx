@@ -32,9 +32,9 @@ import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 
-// Use generated type from GraphQL query
-import type { AgentsQuery, AgentStatus } from "../graphql/generated/graphql";
-type Agent = AgentsQuery["agents"][number];
+// Use generated types from GraphQL
+import type { AgentType, AgentStatus } from "../graphql/generated/graphql";
+type Agent = AgentType;
 
 type DialogMode = "view" | "edit" | "credits" | null;
 
