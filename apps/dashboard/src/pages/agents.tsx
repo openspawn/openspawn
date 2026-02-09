@@ -33,7 +33,7 @@ import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 
 // Use generated type from GraphQL query
-import type { AgentsQuery } from "../graphql/generated/graphql";
+import type { AgentsQuery, AgentStatus } from "../graphql/generated/graphql";
 type Agent = AgentsQuery["agents"][number];
 
 type DialogMode = "view" | "edit" | "credits" | null;
@@ -189,7 +189,7 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
   }
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setStatus(e.target.value as Agent["status"]);
+    setStatus(e.target.value as AgentStatus);
   }
 
   function handleSave() {
