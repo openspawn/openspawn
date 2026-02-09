@@ -122,6 +122,27 @@ export class DemoClient {
     return this.simulateRequest({ ...task, status }, 400);
   }
 
+  async assignTask(taskId: string, assigneeId: string) {
+    const task = demoTasks.find((t) => t.identifier === taskId || t.id === taskId);
+    if (!task) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+    const agent = demoAgents.find((a) => a.identifier === assigneeId || a.id === assigneeId);
+    return this.simulateRequest({
+      ...task,
+      assigneeId,
+      assignee: agent || null,
+    }, 400);
+  }
+
+  async transitionTask(taskId: string, status: string) {
+    const task = demoTasks.find((t) => t.identifier === taskId || t.id === taskId);
+    if (!task) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+    return this.simulateRequest({ ...task, status }, 400);
+  }
+
   // Credits
   async getBalance(_agentId?: string) {
     return this.simulateRequest({
@@ -144,6 +165,16 @@ export class DemoClient {
       remaining: demoCredits.budgetRemaining,
       resetDate: '2026-03-01T00:00:00Z',
     });
+  }
+
+  async transferCredits(fromId: string, toId: string, amount: number) {
+    return this.simulateRequest({
+      success: true,
+      fromAgentId: fromId,
+      toAgentId: toId,
+      amount,
+      timestamp: new Date().toISOString(),
+    }, 500);
   }
 
   // Messages

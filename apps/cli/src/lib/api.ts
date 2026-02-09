@@ -150,3 +150,14 @@ export function createClient(): OpenSpawnClient | DemoClient {
   }
   return new OpenSpawnClient();
 }
+
+/**
+ * Extract data from either ApiResponse wrapper or raw data.
+ * OpenSpawnClient returns { data: T }, DemoClient returns T directly.
+ */
+export function unwrap<T>(response: T | ApiResponse<T>): T {
+  if (response && typeof response === 'object' && 'data' in response) {
+    return (response as ApiResponse<T>).data as T;
+  }
+  return response as T;
+}
