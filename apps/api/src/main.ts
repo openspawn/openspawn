@@ -15,14 +15,18 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS for dashboard
-  app.enableCors();
+  // Enable CORS for dashboard with restricted origins
+  app.enableCors({
+    origin: process.env['ALLOWED_ORIGINS']?.split(',') || ['http://localhost:4200', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
 
   const port = process.env["PORT"] || 3000;
   const host = process.env["HOST"] || "0.0.0.0";
   await app.listen(port, host);
 
-  Logger.log(`🚀 OpenSpawn API running on http://${host}:${port}`);
+  Logger.log(\`🚀 OpenSpawn API running on http://\${host}:\${port}\`);
 }
 
 bootstrap();
