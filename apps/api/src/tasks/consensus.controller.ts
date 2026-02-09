@@ -6,11 +6,11 @@ import { CurrentAgent, type AuthenticatedAgent } from "../auth";
 
 import { ConsensusService, type CreateConsensusDto } from "./consensus.service";
 
-@Controller("tasks")
+@Controller("tasks/consensus")
 export class ConsensusController {
   constructor(private readonly consensusService: ConsensusService) {}
 
-  @Post("consensus")
+  @Post()
   async createConsensusRequest(
     @CurrentAgent() agent: AuthenticatedAgent,
     @Body() dto: CreateConsensusDto,
@@ -23,13 +23,13 @@ export class ConsensusController {
     return { data: request };
   }
 
-  @Get("consensus/pending")
+  @Get("pending")
   async getPendingConsensus(@CurrentAgent() agent: AuthenticatedAgent) {
     const requests = await this.consensusService.getPendingRequests(agent.orgId);
     return { data: requests };
   }
 
-  @Get("consensus/votable")
+  @Get("votable")
   async getVotableConsensus(@CurrentAgent() agent: AuthenticatedAgent) {
     const requests = await this.consensusService.getVotableRequests(
       agent.orgId,
@@ -38,7 +38,7 @@ export class ConsensusController {
     return { data: requests };
   }
 
-  @Get("consensus/:requestId")
+  @Get(":requestId")
   async getConsensusRequest(
     @CurrentAgent() agent: AuthenticatedAgent,
     @Param("requestId") requestId: string,
@@ -47,7 +47,7 @@ export class ConsensusController {
     return { data: request };
   }
 
-  @Post("consensus/:requestId/vote")
+  @Post(":requestId/vote")
   async voteOnConsensus(
     @CurrentAgent() agent: AuthenticatedAgent,
     @Param("requestId") requestId: string,
@@ -63,7 +63,7 @@ export class ConsensusController {
     return { data: vote, message: "Vote recorded" };
   }
 
-  @Delete("consensus/:requestId")
+  @Delete(":requestId")
   async cancelConsensus(
     @CurrentAgent() agent: AuthenticatedAgent,
     @Param("requestId") requestId: string,

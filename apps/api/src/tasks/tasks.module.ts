@@ -22,6 +22,7 @@ import { ConsensusService } from "./consensus.service";
 import { EscalationsController } from "./escalations.controller";
 import { EscalationService } from "./escalation.service";
 import { TaskIdentifierService } from "./task-identifier.service";
+import { TaskRoutingController } from "./task-routing.controller";
 import { TaskRoutingService } from "./task-routing.service";
 import { TaskTemplatesController } from "./task-templates.controller";
 import { TaskTemplatesService } from "./task-templates.service";
@@ -49,6 +50,7 @@ import { TasksService } from "./tasks.service";
   controllers: [
     TasksController,
     TaskTemplatesController,
+    TaskRoutingController,
     EscalationsController,
     ConsensusController,
   ],
