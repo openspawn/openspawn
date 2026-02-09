@@ -25,10 +25,12 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { PhaseProgress } from "../components/phase-progress";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
+import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 
 interface StatCardProps {
   title: string;
@@ -119,6 +121,38 @@ export function DashboardPage() {
   const { tasks } = useTasks();
   const { transactions } = useCredits();
   const { events } = useEvents();
+  const { isDemo, scenario } = useDemo();
+
+  // Determine current phase based on task progress (for NovaTech scenario)
+  const currentPhase = useMemo(() => {
+    if (scenario !== 'novatech') return 'development';
+    
+    // Count completed tasks per phase (based on task identifiers)
+    const taskPhases = {
+      discovery: ['NT-001', 'NT-002', 'NT-003'],
+      definition: ['NT-004', 'NT-005', 'NT-006', 'NT-007'],
+      development: ['NT-008', 'NT-009', 'NT-010', 'NT-011', 'NT-012', 'NT-013'],
+      'go-to-market': ['NT-014', 'NT-015', 'NT-016', 'NT-017', 'NT-018'],
+      launch: ['NT-019', 'NT-020', 'NT-021'],
+      growth: ['NT-022', 'NT-023', 'NT-024'],
+    };
+
+    const phases = ['discovery', 'definition', 'development', 'go-to-market', 'launch', 'growth'];
+    
+    for (const phase of phases) {
+      const phaseTasks = taskPhases[phase as keyof typeof taskPhases] || [];
+      const completedCount = phaseTasks.filter(id => 
+        tasks.find(t => t.identifier === id && t.status?.toUpperCase() === 'DONE')
+      ).length;
+      
+      // If any task in this phase is not done, this is the current phase
+      if (completedCount < phaseTasks.length) {
+        return phase;
+      }
+    }
+    
+    return 'growth'; // All done
+  }, [tasks, scenario]);
 
   const activeAgents = agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length;
   const pendingAgents = agents.filter((a) => a.status?.toUpperCase() === "PENDING").length;
@@ -186,9 +220,29 @@ export function DashboardPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Overview of your multi-agent system
+          {isDemo && scenario === 'novatech' 
+            ? 'NovaTech AI — Product Launch Lifecycle' 
+            : 'Overview of your multi-agent system'}
         </p>
       </div>
+
+      {/* Phase Progress (NovaTech scenario only) */}
+      {isDemo && scenario === 'novatech' && PROJECT_PHASES && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              🚀 Project Progress
+              <Badge variant="outline" className="ml-auto">Dashboard v2.0 Launch</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PhaseProgress 
+              phases={PROJECT_PHASES} 
+              currentPhase={currentPhase}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

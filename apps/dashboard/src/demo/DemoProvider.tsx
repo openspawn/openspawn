@@ -7,13 +7,18 @@ import {
   growthScenario,
   startupScenario,
   enterpriseScenario,
+  novatechScenario,
+  PROJECT_PHASES,
   type SimulationEvent,
   type DemoScenario,
 } from '@openspawn/demo-data';
 import { setDemoEngine } from './mock-fetcher';
 import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
 
-export type ScenarioName = 'fresh' | 'startup' | 'growth' | 'enterprise';
+export type ScenarioName = 'novatech' | 'fresh' | 'startup' | 'growth' | 'enterprise';
+
+// Re-export phase info for UI components
+export { PROJECT_PHASES };
 
 interface DemoContextValue {
   isDemo: boolean;
@@ -55,6 +60,7 @@ export function useDemo(): DemoContextValue {
 }
 
 const SCENARIOS: Record<ScenarioName, DemoScenario> = {
+  novatech: novatechScenario,  // Default: Realistic product launch
   fresh: freshScenario,
   startup: startupScenario,
   growth: growthScenario,
@@ -62,8 +68,8 @@ const SCENARIOS: Record<ScenarioName, DemoScenario> = {
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
-  return 'fresh'; // Default to fresh start
+  if (s === 'novatech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
+  return 'novatech'; // Default to NovaTech product launch
 }
 
 interface DemoProviderProps {
