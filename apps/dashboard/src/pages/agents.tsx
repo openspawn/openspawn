@@ -23,7 +23,8 @@ import {
   DialogClose,
 } from "../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { useAgents } from "../hooks/use-agents";
+import { PhaseChip } from "../components/phase-chip";
+import { useAgents, useCurrentPhase } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
@@ -556,6 +557,7 @@ function AdjustCreditsDialog({ agent, onClose }: { agent: Agent; onClose: () => 
 
 export function AgentsPage() {
   const { agents, loading, error } = useAgents();
+  const { currentPhase } = useCurrentPhase();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");
@@ -658,11 +660,14 @@ export function AgentsPage() {
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
-          <p className="text-muted-foreground">
-            Manage your AI agents, onboarding, and budgets
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
+            <p className="text-muted-foreground">
+              Manage your AI agents, onboarding, and budgets
+            </p>
+          </div>
+          {currentPhase && <PhaseChip phase={currentPhase} />}
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />

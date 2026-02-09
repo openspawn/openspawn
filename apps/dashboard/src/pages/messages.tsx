@@ -19,7 +19,8 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { cn } from '../lib/utils';
 import { getAgentAvatarUrl } from '../lib/avatar';
-import { useMessages, useAgents, type Message } from '../hooks';
+import { PhaseChip } from '../components/phase-chip';
+import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
 
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -651,6 +652,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
 export function MessagesPage() {
   const { messages, loading: messagesLoading } = useMessages(100);
   const { agents, loading: agentsLoading } = useAgents();
+  const { currentPhase } = useCurrentPhase();
 
   const loading = messagesLoading || agentsLoading;
 
@@ -668,9 +670,12 @@ export function MessagesPage() {
   return (
     <div className="p-3 md:p-6 space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold">Agent Communications</h1>
-          <p className="text-slate-400 text-xs md:text-sm">Watch your agents coordinate in real-time</p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold">Agent Communications</h1>
+            <p className="text-slate-400 text-xs md:text-sm">Watch your agents coordinate in real-time</p>
+          </div>
+          {currentPhase && <PhaseChip phase={currentPhase} className="hidden sm:inline-flex" />}
         </div>
         <Badge variant="outline" className="self-start sm:self-auto">{messages.length} messages</Badge>
       </div>
