@@ -44,9 +44,9 @@ import {
     TaskResolver,
     AgentResolver,
     CreditResolver,
+    DirectMessageResolver,
     EventResolver,
     MessageResolver,
-    DirectMessageResolver,
   ],
   exports: [PubSubProvider],
 })

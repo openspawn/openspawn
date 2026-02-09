@@ -9,95 +9,48 @@ export const DIRECT_MESSAGE_CREATED = "directMessageCreated";
 
 @Resolver(() => DirectMessageType)
 export class DirectMessageResolver {
-  constructor(
-    private readonly directMessagesService: DirectMessagesService,
-    private readonly pubSub: PubSubProvider,
-    private readonly eventEmitter: EventEmitter2,
-  ) {
-    this.eventEmitter.on("message.direct", async (payload: { message: DirectMessageType }) => {
-      await this.pubSub.publish(DIRECT_MESSAGE_CREATED, { directMessageCreated: payload.message });
+  constructor(private dms: DirectMessagesService, private pubSub: PubSubProvider, private emitter: EventEmitter2) {
+    this.emitter.on("message.direct", async (p: {message: DirectMessageType}) => {
+      await this.pubSub.publish(DIRECT_MESSAGE_CREATED, { directMessageCreated: p.message });
     });
   }
 
   @Query(() => [ConversationType])
-  async conversations(
-    @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("agentId", { type: () => ID }) agentId: string,
-    @OrgFromContext() authOrgId?: string,
-  ): Promise<ConversationType[]> {
-    validateOrgAccess(orgId, authOrgId);
-    return this.directMessagesService.getConversations(orgId, agentId);
+  async conversations(@Args("orgId", {type:()=>ID}) orgId: string, @Args("agentId", {type:()=>ID}) agentId: string, @OrgFromContext() auth?: string) {
+    validateOrgAccess(orgId, auth);
+    return this.dms.getConversations(orgId, agentId);
   }
 
   @Query(() => [DirectMessageType])
-  async directMessages(
-    @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("agent1Id", { type: () => ID }) agent1Id: string,
-    @Args("agent2Id", { type: () => ID }) agent2Id: string,
-    @Args("limit", { type: () => Int, defaultValue: 50 }) limit: number,
-    @Args("before", { type: () => ID, nullable: true }) before?: string,
-    @OrgFromContext() authOrgId?: string,
-  ): Promise<DirectMessageType[]> {
-    validateOrgAccess(orgId, authOrgId);
-    const msgs = await this.directMessagesService.getDirectMessages(orgId, agent1Id, agent2Id, limit, before);
-    return msgs.map(m => ({
-      id: m.id, fromAgentId: m.fromAgentId,
-      fromAgent: { id: m.fromAgentId, name: m.fromAgentName, level: 5 },
-      toAgentId: m.toAgentId, toAgent: { id: m.toAgentId, name: m.toAgentName, level: 5 },
-      body: m.body, type: m.type, read: m.read, createdAt: m.createdAt,
-    }));
+  async directMessages(@Args("orgId",{type:()=>ID}) orgId: string, @Args("agent1Id",{type:()=>ID}) a1: string, @Args("agent2Id",{type:()=>ID}) a2: string, @Args("limit",{type:()=>Int,defaultValue:50}) limit: number, @Args("before",{type:()=>ID,nullable:true}) before?: string, @OrgFromContext() auth?: string) {
+    validateOrgAccess(orgId, auth);
+    const msgs = await this.dms.getDirectMessages(orgId, a1, a2, limit, before);
+    return msgs.map(m => ({id:m.id,fromAgentId:m.fromAgentId,fromAgent:{id:m.fromAgentId,name:m.fromAgentName,level:5},toAgentId:m.toAgentId,toAgent:{id:m.toAgentId,name:m.toAgentName,level:5},body:m.body,type:m.type,read:m.read,createdAt:m.createdAt}));
   }
 
   @Query(() => Int)
-  async unreadMessageCount(
-    @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("agentId", { type: () => ID }) agentId: string,
-    @OrgFromContext() authOrgId?: string,
-  ): Promise<number> {
-    validateOrgAccess(orgId, authOrgId);
-    return this.directMessagesService.getUnreadCount(orgId, agentId);
+  async unreadMessageCount(@Args("orgId",{type:()=>ID}) orgId: string, @Args("agentId",{type:()=>ID}) agentId: string, @OrgFromContext() auth?: string) {
+    validateOrgAccess(orgId, auth);
+    return this.dms.getUnreadCount(orgId, agentId);
   }
 
   @Mutation(() => DirectMessageType)
-  async sendDirectMessage(
-    @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("input") input: SendDirectMessageInput,
-    @OrgFromContext() authOrgId?: string,
-  ): Promise<DirectMessageType> {
-    validateOrgAccess(orgId, authOrgId);
-    const msg = await this.directMessagesService.sendDirectMessage(orgId, input.fromAgentId, {
-      toAgentId: input.toAgentId, body: input.body, type: input.type,
-    });
-    const result = {
-      id: msg.id, fromAgentId: msg.senderId, fromAgent: null,
-      toAgentId: input.toAgentId, toAgent: null,
-      body: msg.body, type: msg.type, read: false, createdAt: msg.createdAt,
-    };
-    this.eventEmitter.emit("message.direct", { message: result });
-    return result;
+  async sendDirectMessage(@Args("orgId",{type:()=>ID}) orgId: string, @Args("input") input: SendDirectMessageInput, @OrgFromContext() auth?: string) {
+    validateOrgAccess(orgId, auth);
+    const m = await this.dms.sendDirectMessage(orgId, input.fromAgentId, {toAgentId:input.toAgentId,body:input.body,type:input.type});
+    const r = {id:m.id,fromAgentId:m.senderId,fromAgent:null,toAgentId:input.toAgentId,toAgent:null,body:m.body,type:m.type,read:false,createdAt:m.createdAt};
+    this.emitter.emit("message.direct", {message:r});
+    return r;
   }
 
   @Mutation(() => Int)
-  async markMessagesAsRead(
-    @Args("orgId", { type: () => ID }) orgId: string,
-    @Args("agentId", { type: () => ID }) agentId: string,
-    @Args("otherAgentId", { type: () => ID }) otherAgentId: string,
-    @OrgFromContext() authOrgId?: string,
-  ): Promise<number> {
-    validateOrgAccess(orgId, authOrgId);
-    return this.directMessagesService.markAsRead(orgId, agentId, otherAgentId);
+  async markMessagesAsRead(@Args("orgId",{type:()=>ID}) orgId: string, @Args("agentId",{type:()=>ID}) agentId: string, @Args("otherAgentId",{type:()=>ID}) otherId: string, @OrgFromContext() auth?: string) {
+    validateOrgAccess(orgId, auth);
+    return this.dms.markAsRead(orgId, agentId, otherId);
   }
 
-  @Subscription(() => DirectMessageType, {
-    filter: (payload, vars) => {
-      const m = payload.directMessageCreated;
-      return m.toAgentId === vars.agentId || m.fromAgentId === vars.agentId;
-    },
-  })
-  directMessageCreated(
-    @Args("orgId", { type: () => ID }) _orgId: string,
-    @Args("agentId", { type: () => ID }) _agentId: string,
-  ): AsyncIterator<DirectMessageType> {
+  @Subscription(() => DirectMessageType, {filter:(p,v) => p.directMessageCreated.toAgentId === v.agentId || p.directMessageCreated.fromAgentId === v.agentId})
+  directMessageCreated(@Args("orgId",{type:()=>ID}) _o: string, @Args("agentId",{type:()=>ID}) _a: string): AsyncIterator<DirectMessageType> {
     return this.pubSub.asyncIterableIterator(DIRECT_MESSAGE_CREATED);
   }
 }
