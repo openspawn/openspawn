@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { User, Shield, Key, Building2 } from "lucide-react";
+import { User, Shield, Key, Building2, Palette } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ProfileSettings } from "../components/settings/profile-settings";
 import { SecuritySettings } from "../components/settings/security-settings";
 import { ApiKeySettings } from "../components/settings/api-key-settings";
 import { OrgSettings } from "../components/settings/org-settings";
+import { AppearanceSettings } from "../components/settings/appearance-settings";
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -20,10 +21,14 @@ export function SettingsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[700px]">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            <span className="hidden sm:inline">Appearance</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -35,12 +40,16 @@ export function SettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="organization" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Organization</span>
+            <span className="hidden sm:inline">Org</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
           <ProfileSettings />
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <AppearanceSettings />
         </TabsContent>
 
         <TabsContent value="security">

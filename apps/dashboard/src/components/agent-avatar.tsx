@@ -3,9 +3,9 @@
  * Uses DiceBear to generate consistent avatars based on agent ID
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { getAgentAvatarUrl } from '../lib/avatar';
+import { getAgentAvatarUrl, getAvatarStyle, type AvatarStyleKey } from '../lib/avatar';
 import { Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -50,10 +50,21 @@ export function AgentAvatar({
   const sizeConfig = SIZE_MAP[size];
   const levelColor = LEVEL_COLORS[level] || '#71717a';
   
-  // Memoize avatar generation to avoid recalculating on every render
+  // Track avatar style changes
+  const [avatarStyle, setAvatarStyle] = useState<AvatarStyleKey>(getAvatarStyle());
+  
+  useEffect(() => {
+    const handleStyleChange = (e: CustomEvent<AvatarStyleKey>) => {
+      setAvatarStyle(e.detail);
+    };
+    window.addEventListener('avatar-style-changed', handleStyleChange as EventListener);
+    return () => window.removeEventListener('avatar-style-changed', handleStyleChange as EventListener);
+  }, []);
+  
+  // Memoize avatar generation - regenerate when style changes
   const avatarUrl = useMemo(
     () => getAgentAvatarUrl(agentId, level, sizeConfig.px * 2), // 2x for retina
-    [agentId, level, sizeConfig.px]
+    [agentId, level, sizeConfig.px, avatarStyle]
   );
 
   return (
