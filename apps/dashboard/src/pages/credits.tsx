@@ -13,6 +13,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { useCredits } from "../hooks/use-credits";
+import { BudgetBurndown } from "../components/budget-burndown";
+import { ModelUsageBreakdown } from "../components/model-usage";
+import { AgentEfficiencyLeaderboard } from "../components/agent-efficiency";
 
 function formatTime(dateString: string) {
   const date = new Date(dateString);
@@ -288,6 +291,21 @@ export function CreditsPage() {
             </ScrollArea>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Advanced Analytics Section */}
+      <div className="grid gap-6 md:grid-cols-2 mt-6">
+        <BudgetBurndown
+          budget={25000}
+          spent={totalSpent || 9250}
+          periodDays={30}
+          daysElapsed={12}
+        />
+        <ModelUsageBreakdown />
+      </div>
+
+      <div className="mt-6">
+        <AgentEfficiencyLeaderboard />
       </div>
     </div>
   );
