@@ -45,8 +45,9 @@ general_settings:
 
   # Success callback to notify OpenSpawn API of token usage
   # The x-litellm-secret header authenticates the callback
+  # OPENSPAWN_API_URL should include the base URL (e.g., http://localhost:3000 or https://api.openspawn.io)
   success_callback:
     - type: webhook
-      url: http://localhost:3000/credits/litellm-callback
+      url: ${OPENSPAWN_API_URL}/credits/litellm-callback
       headers:
         x-litellm-secret: os.environ/LITELLM_CALLBACK_SECRET
