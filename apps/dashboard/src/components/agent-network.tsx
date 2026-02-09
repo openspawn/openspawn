@@ -23,8 +23,9 @@ import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
 import { useAgents, type Agent } from "../hooks/use-agents";
+import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 
-// Context to share active delegations and speed with edge components
+// Context to share active delegations, speed, and avatar settings with edge/node components
 interface TaskDelegation {
   id: string;
   fromId: string;
@@ -32,11 +33,12 @@ interface TaskDelegation {
   taskTitle: string;
   startTime: number;
 }
-interface DelegationContextValue {
+interface NetworkContextValue {
   delegations: TaskDelegation[];
   speed: number;
+  avatarVersion: number; // Increments when avatar settings change
 }
-const DelegationContext = createContext<DelegationContextValue>({ delegations: [], speed: 1 });
+const NetworkContext = createContext<NetworkContextValue>({ delegations: [], speed: 1, avatarVersion: 0 });
 
 // ELK instance for layout
 const elk = new ELK();
@@ -123,6 +125,7 @@ const roleLabels: Record<string, string> = {
 
 interface AgentNodeData {
   label: string;
+  agentId: string;
   role: string;
   level: number;
   status: "active" | "pending" | "paused" | "suspended";
@@ -138,6 +141,7 @@ interface AgentNodeData {
 // Custom node component - stable outer div for ReactFlow, animation on inner content
 function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   const nodeData = data as AgentNodeData;
+  const { avatarVersion } = useContext(NetworkContext);
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
   const isSpawning = nodeData.isSpawning;
   const isDespawning = nodeData.isDespawning;
@@ -146,6 +150,12 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
   // Fixed dimensions for consistent handle positioning
   const nodeWidth = compact ? 80 : 140;
   const nodeHeight = compact ? 56 : 80;
+  
+  // Generate avatar URL (memoized with avatarVersion dependency for reactivity)
+  const avatarUrl = useMemo(() => {
+    if (nodeData.isHuman) return null;
+    return getAgentAvatarUrl(nodeData.agentId, nodeData.level, compact ? 32 : 48);
+  }, [nodeData.agentId, nodeData.level, nodeData.isHuman, compact, avatarVersion]);
   
   return (
     // Stable outer container - ReactFlow measures this for handle positions
@@ -231,10 +241,20 @@ function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
             }}
           />
 
-          {/* Icon */}
+          {/* Avatar/Icon */}
           {!compact && (
-            <div className="text-lg leading-none mb-0.5">
-              {nodeData.isHuman ? "👤" : "🤖"}
+            <div className="mb-0.5">
+              {nodeData.isHuman ? (
+                <span className="text-lg leading-none">👤</span>
+              ) : avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={nodeData.label}
+                  className="w-6 h-6 rounded-full ring-1 ring-white/20"
+                />
+              ) : (
+                <span className="text-lg leading-none">🤖</span>
+              )}
             </div>
           )}
 
@@ -289,7 +309,7 @@ function TaskFlowEdge({
   source,
   target,
 }: EdgeProps) {
-  const { delegations, speed } = useContext(DelegationContext);
+  const { delegations, speed } = useContext(NetworkContext);
   
   // ReactFlow now provides correct handle positions (no manual offset needed)
   const [edgePath] = getSmoothStepPath({
@@ -356,6 +376,7 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
       position: { x: 0, y: 0 },
       data: {
         label: "Human",
+        agentId: "human",
         role: "ceo",
         level: 10,
         status: "active",
@@ -376,6 +397,7 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
       position: { x: 0, y: 0 },
       data: {
         label: agent.name,
+        agentId: agent.agentId || agent.id,
         role: agent.role,
         level: agent.level,
         status: agent.status as "active" | "pending" | "paused" | "suspended",
@@ -415,10 +437,20 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
+  const [avatarVersion, setAvatarVersion] = useState(0);
   const prevAgentCountRef = useRef(0);
   
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  
+  // Listen for avatar style changes to trigger re-render
+  useEffect(() => {
+    const handleAvatarChange = () => {
+      setAvatarVersion(v => v + 1);
+    };
+    window.addEventListener('avatar-style-changed', handleAvatarChange);
+    return () => window.removeEventListener('avatar-style-changed', handleAvatarChange);
+  }, []);
 
   // Auto-layout: runs whenever agents or compact mode changes
   useEffect(() => {
@@ -483,7 +515,8 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const contextValue = useMemo(() => ({
     delegations: activeDelegations,
     speed: demo.speed,
-  }), [activeDelegations, demo.speed]);
+    avatarVersion,
+  }), [activeDelegations, demo.speed, avatarVersion]);
 
   if (loading) {
     return (
@@ -494,7 +527,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   }
 
   return (
-    <DelegationContext.Provider value={contextValue}>
+    <NetworkContext.Provider value={contextValue}>
       <div className={`relative ${className}`}>
         <ReactFlow
           nodes={nodes}
@@ -629,7 +662,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           </div>
         )}
       </div>
-    </DelegationContext.Provider>
+    </NetworkContext.Provider>
   );
 }
 
