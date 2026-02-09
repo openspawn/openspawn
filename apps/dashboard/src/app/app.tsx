@@ -6,7 +6,7 @@ import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keybo
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
-import { DemoProvider, DemoControls } from "../demo";
+import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { AuthProvider } from "../contexts";
 import type { ReactNode } from "react";
 
@@ -38,6 +38,7 @@ function DemoWrapper({ children }: { children: ReactNode }) {
   return (
     <DemoProvider scenario={scenarioParam} autoPlay={false} initialSpeed={1}>
       {children}
+      <DemoWelcome />
       <DemoControls />
     </DemoProvider>
   );
