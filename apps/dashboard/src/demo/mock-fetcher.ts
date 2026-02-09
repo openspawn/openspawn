@@ -17,7 +17,7 @@ let engineRef: (() => SimulationEngine | null) | null = null;
 
 export function setDemoEngine(getEngine: () => SimulationEngine | null): void {
   engineRef = getEngine;
-  console.log('[MockFetcher] Engine reference set');
+  debug.mockFetcher('Engine reference set');
 }
 
 // ============================================================================
@@ -478,7 +478,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
   const events = engine.getEvents();
   const messages = engine.getMessages();
 
-  console.log('[MockFetcher]', operationName, '→', {
+  debug.mockFetcher(operationName, '→', {
     agents: agents.length,
     tasks: tasks.length,
     credits: credits.length,

@@ -14,6 +14,7 @@ import {
 } from '@openspawn/demo-data';
 import { setDemoEngine } from './mock-fetcher';
 import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
+import { debug } from '../lib/debug';
 
 export type ScenarioName = 'novatech' | 'fresh' | 'startup' | 'growth' | 'enterprise';
 
@@ -98,7 +99,7 @@ export function DemoProvider({
 
   // Initialize simulation (no MSW needed!)
   useEffect(() => {
-    console.log('[Demo] Initializing simulation...');
+    debug.demo('Initializing simulation...');
     
     // Create simulation engine
     const initialScenario = SCENARIOS[scenario];
@@ -108,7 +109,7 @@ export function DemoProvider({
     // Connect engine to mock fetcher (this is the key!)
     setDemoEngine(() => engineRef.current);
     
-    console.log('[Demo] Ready with scenario:', scenario);
+    debug.demo('Ready with scenario:', scenario);
     setIsReady(true);
 
     return () => {
@@ -157,7 +158,7 @@ export function DemoProvider({
 
     // Refetch queries once per tick
     const unsubscribeTick = engine.onTick((events, tick) => {
-      console.log('[Demo] Tick', tick, '→', events.length, 'events');
+      debug.demo('Tick', tick, '→', events.length, 'events');
       setCurrentTick(tick);
       
       // Force refetch all active queries (they'll hit mock fetcher)
@@ -213,7 +214,7 @@ export function DemoProvider({
     // Refetch all queries with new scenario data
     queryClient.refetchQueries();
     
-    console.log('[Demo] Switched to scenario:', name);
+    debug.demo('Switched to scenario:', name);
   }, [pause, queryClient]);
 
   const reset = useCallback(() => {
