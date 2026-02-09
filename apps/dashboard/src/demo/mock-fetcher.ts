@@ -3,15 +3,286 @@
  * No service worker needed - works on any origin, including production
  */
 
-import type { SimulationEngine } from '@openspawn/demo-data';
+import type {
+  SimulationEngine,
+  DemoAgent,
+  DemoTask,
+  DemoEvent,
+  DemoCreditTransaction,
+  DemoMessage,
+} from '@openspawn/demo-data';
 
 // Reference to the simulation engine (set by DemoProvider)
 let engineRef: (() => SimulationEngine | null) | null = null;
 
-export function setDemoEngine(getEngine: () => SimulationEngine | null) {
+export function setDemoEngine(getEngine: () => SimulationEngine | null): void {
   engineRef = getEngine;
   console.log('[MockFetcher] Engine reference set');
 }
+
+// ============================================================================
+// GraphQL Response Types
+// ============================================================================
+
+interface GraphQLAgentRef {
+  id: string;
+  name: string;
+  level?: number;
+}
+
+interface GraphQLAgent {
+  id: string;
+  agentId: string;
+  name: string;
+  role: string;
+  status: string;
+  level: number;
+  model: string;
+  currentBalance: number;
+  lifetimeEarnings: number;
+  budgetPeriodLimit: number;
+  budgetPeriodSpent: number;
+  managementFeePct: number;
+  createdAt: string;
+  updatedAt: string;
+  parentId: string | null;
+  domain: string | null;
+  trustScore: number;
+  reputationLevel: string;
+  tasksCompleted: number;
+  tasksSuccessful: number;
+  lastActivityAt: string;
+  lastPromotionAt: string | null;
+}
+
+interface PromotionProgress {
+  currentLevel: number;
+  nextLevel: number;
+  trustScoreRequired: number;
+  tasksRequired: number;
+  trustScoreProgress: number;
+  tasksProgress: number;
+}
+
+interface GraphQLAgentReputation {
+  trustScore: number;
+  reputationLevel: string;
+  tasksCompleted: number;
+  tasksSuccessful: number;
+  successRate: number;
+  lastActivityAt: string | null;
+  promotionProgress: PromotionProgress | null;
+}
+
+interface GraphQLTask {
+  id: string;
+  identifier: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  assigneeId: string | null;
+  assignee: GraphQLAgentRef | null;
+  creatorId: string;
+  approvalRequired: boolean;
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+interface GraphQLCredit {
+  id: string;
+  agentId: string;
+  type: string;
+  amount: number;
+  reason: string;
+  balanceAfter: number;
+  createdAt: string;
+  sourceTaskId: string | null;
+  triggerType: string;
+}
+
+interface GraphQLEvent {
+  id: string;
+  type: string;
+  actorId: string | null;
+  actor: GraphQLAgentRef | null;
+  entityType: string;
+  entityId: string;
+  severity: string;
+  reasoning: string;
+  createdAt: string;
+}
+
+interface GraphQLMessage {
+  id: string;
+  fromAgentId: string;
+  toAgentId: string;
+  fromAgent: GraphQLAgentRef | null;
+  toAgent: GraphQLAgentRef | null;
+  content: string;
+  type: string;
+  taskRef: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+interface GraphQLConversation {
+  id: string;
+  agents: GraphQLAgentRef[];
+  messageCount: number;
+  unreadCount: number;
+  latestMessage: GraphQLMessage;
+  createdAt: string;
+}
+
+interface GraphQLReputationHistoryEntry {
+  id: string;
+  eventType: string;
+  delta: number;
+  previousScore: number;
+  newScore: number;
+  reason: string;
+  createdAt: string;
+}
+
+interface GraphQLLeaderboardEntry {
+  id: string;
+  agentId: string;
+  name: string;
+  level: number;
+  trustScore: number;
+  reputationLevel: string;
+  tasksCompleted: number;
+}
+
+// ============================================================================
+// Operation Variables Types
+// ============================================================================
+
+interface AgentVariables {
+  id: string;
+}
+
+interface TaskVariables {
+  id: string;
+}
+
+interface CreditsVariables {
+  limit?: number;
+  offset?: number;
+}
+
+interface EventsVariables {
+  limit?: number;
+  page?: number;
+}
+
+interface AgentReputationVariables {
+  id: string;
+}
+
+interface TrustLeaderboardVariables {
+  limit?: number;
+}
+
+interface ReputationHistoryVariables {
+  id: string;
+}
+
+interface MessagesVariables {
+  limit?: number;
+}
+
+interface ConversationMessagesVariables {
+  agent1Id: string;
+  agent2Id: string;
+}
+
+type OperationVariables =
+  | AgentVariables
+  | TaskVariables
+  | CreditsVariables
+  | EventsVariables
+  | AgentReputationVariables
+  | TrustLeaderboardVariables
+  | ReputationHistoryVariables
+  | MessagesVariables
+  | ConversationMessagesVariables
+  | Record<string, unknown>
+  | undefined;
+
+// ============================================================================
+// Operation Result Types
+// ============================================================================
+
+interface AgentsResult {
+  agents: GraphQLAgent[];
+}
+
+interface AgentResult {
+  agent: GraphQLAgent | null;
+}
+
+interface TasksResult {
+  tasks: GraphQLTask[];
+}
+
+interface TaskResult {
+  task: GraphQLTask | null;
+}
+
+interface CreditHistoryResult {
+  creditHistory: GraphQLCredit[];
+}
+
+interface EventsResult {
+  events: GraphQLEvent[];
+}
+
+interface AgentReputationResult {
+  agentReputation: GraphQLAgentReputation | null;
+}
+
+interface TrustLeaderboardResult {
+  trustLeaderboard: GraphQLLeaderboardEntry[];
+}
+
+interface ReputationHistoryResult {
+  reputationHistory: GraphQLReputationHistoryEntry[];
+}
+
+interface MessagesResult {
+  messages: GraphQLMessage[];
+}
+
+interface ConversationsResult {
+  conversations: GraphQLConversation[];
+}
+
+interface ConversationMessagesResult {
+  conversationMessages: GraphQLMessage[];
+}
+
+type OperationResult =
+  | AgentsResult
+  | AgentResult
+  | TasksResult
+  | TaskResult
+  | CreditHistoryResult
+  | EventsResult
+  | AgentReputationResult
+  | TrustLeaderboardResult
+  | ReputationHistoryResult
+  | MessagesResult
+  | ConversationsResult
+  | ConversationMessagesResult
+  | null;
+
+// ============================================================================
+// Severity Mapping
+// ============================================================================
 
 // Severity mapping (demo uses lowercase, GraphQL expects uppercase)
 const severityMap: Record<string, string> = {
@@ -23,8 +294,12 @@ const severityMap: Record<string, string> = {
   critical: 'ERROR',
 };
 
+// ============================================================================
+// Mapping Functions
+// ============================================================================
+
 // Map demo data to GraphQL response format
-function mapAgent(agent: any) {
+function mapAgent(agent: DemoAgent): GraphQLAgent {
   return {
     id: agent.id,
     agentId: agent.agentId,
@@ -53,7 +328,7 @@ function mapAgent(agent: any) {
 }
 
 // Calculate promotion progress
-function getPromotionProgress(agent: any) {
+function getPromotionProgress(agent: DemoAgent): PromotionProgress | null {
   const thresholds: Record<number, { trustScore: number; tasks: number }> = {
     1: { trustScore: 55, tasks: 3 },
     2: { trustScore: 60, tasks: 10 },
@@ -65,16 +340,16 @@ function getPromotionProgress(agent: any) {
     8: { trustScore: 90, tasks: 1000 },
     9: { trustScore: 95, tasks: 1500 },
   };
-  
+
   const nextLevel = agent.level + 1;
   if (nextLevel > 9) return null;
-  
+
   const threshold = thresholds[agent.level];
   if (!threshold) return null;
-  
+
   const trustScore = agent.trustScore ?? 50;
   const tasksCompleted = agent.tasksCompleted ?? 0;
-  
+
   return {
     currentLevel: agent.level,
     nextLevel,
@@ -85,14 +360,12 @@ function getPromotionProgress(agent: any) {
   };
 }
 
-function mapAgentReputation(agent: any) {
+function mapAgentReputation(agent: DemoAgent): GraphQLAgentReputation {
   const trustScore = agent.trustScore ?? 50;
   const tasksCompleted = agent.tasksCompleted ?? 0;
   const tasksSuccessful = agent.tasksSuccessful ?? 0;
-  const successRate = tasksCompleted > 0 
-    ? Math.round((tasksSuccessful / tasksCompleted) * 100) 
-    : 0;
-  
+  const successRate = tasksCompleted > 0 ? Math.round((tasksSuccessful / tasksCompleted) * 100) : 0;
+
   return {
     trustScore,
     reputationLevel: agent.reputationLevel || 'TRUSTED',
@@ -115,10 +388,8 @@ const taskStatusMap: Record<string, string> = {
   cancelled: 'CANCELLED',
 };
 
-function mapTask(task: any, agents: any[]) {
-  const assignee = task.assigneeId 
-    ? agents.find((a: any) => a.id === task.assigneeId) 
-    : null;
+function mapTask(task: DemoTask, agents: DemoAgent[]): GraphQLTask {
+  const assignee = task.assigneeId ? agents.find((a) => a.id === task.assigneeId) : null;
 
   return {
     id: task.id,
@@ -138,7 +409,7 @@ function mapTask(task: any, agents: any[]) {
   };
 }
 
-function mapCredit(tx: any, runningBalance: number) {
+function mapCredit(tx: DemoCreditTransaction, runningBalance: number): GraphQLCredit {
   return {
     id: tx.id,
     agentId: tx.agentId,
@@ -152,15 +423,15 @@ function mapCredit(tx: any, runningBalance: number) {
   };
 }
 
-function mapEvent(event: any, agents: any[]) {
-  const actor = event.agentId ? agents.find((a: any) => a.id === event.agentId) : null;
+function mapEvent(event: DemoEvent, agents: DemoAgent[]): GraphQLEvent {
+  const actor = event.agentId ? agents.find((a) => a.id === event.agentId) : null;
 
   return {
     id: event.id,
     type: event.type,
     actorId: event.agentId || null,
     actor: actor ? { id: actor.id, name: actor.name } : null,
-    entityType: event.taskId ? 'task' : (event.agentId ? 'agent' : 'system'),
+    entityType: event.taskId ? 'task' : event.agentId ? 'agent' : 'system',
     entityId: event.taskId || event.agentId || 'system',
     severity: severityMap[event.severity] || 'INFO',
     reasoning: event.message,
@@ -169,15 +440,17 @@ function mapEvent(event: any, agents: any[]) {
 }
 
 // Map demo message to GraphQL format
-function mapMessage(msg: any, agents: any[]) {
-  const fromAgent = agents.find((a: any) => a.id === msg.fromAgentId);
-  const toAgent = agents.find((a: any) => a.id === msg.toAgentId);
+function mapMessage(msg: DemoMessage, agents: DemoAgent[]): GraphQLMessage {
+  const fromAgent = agents.find((a) => a.id === msg.fromAgentId);
+  const toAgent = agents.find((a) => a.id === msg.toAgentId);
 
   return {
     id: msg.id,
     fromAgentId: msg.fromAgentId,
     toAgentId: msg.toAgentId,
-    fromAgent: fromAgent ? { id: fromAgent.id, name: fromAgent.name, level: fromAgent.level } : null,
+    fromAgent: fromAgent
+      ? { id: fromAgent.id, name: fromAgent.name, level: fromAgent.level }
+      : null,
     toAgent: toAgent ? { id: toAgent.id, name: toAgent.name, level: toAgent.level } : null,
     content: msg.content,
     type: msg.type.toUpperCase(),
@@ -187,8 +460,12 @@ function mapMessage(msg: any, agents: any[]) {
   };
 }
 
+// ============================================================================
+// Operation Handler
+// ============================================================================
+
 // Handle GraphQL operations
-function handleOperation(operationName: string, variables: any): any {
+function handleOperation(operationName: string, variables: OperationVariables): OperationResult {
   const engine = engineRef?.();
   if (!engine) {
     console.error('[MockFetcher] No engine available');
@@ -213,20 +490,26 @@ function handleOperation(operationName: string, variables: any): any {
     case 'Agents':
       return { agents: agents.map(mapAgent) };
 
-    case 'Agent':
-      const agent = agents.find(a => a.id === variables.id);
+    case 'Agent': {
+      const vars = variables as AgentVariables;
+      const agent = agents.find((a) => a.id === vars.id);
       return { agent: agent ? mapAgent(agent) : null };
+    }
 
     case 'Tasks':
-      return { tasks: tasks.map(t => mapTask(t, agents)) };
+      return { tasks: tasks.map((t) => mapTask(t, agents)) };
 
-    case 'Task':
-      const task = tasks.find(t => t.id === variables.id);
+    case 'Task': {
+      const vars = variables as TaskVariables;
+      const task = tasks.find((t) => t.id === vars.id);
       return { task: task ? mapTask(task, agents) : null };
+    }
 
     case 'Credits':
-    case 'CreditHistory':
-      const { limit = 50, offset: creditOffset = 0 } = variables || {};
+    case 'CreditHistory': {
+      const vars = variables as CreditsVariables | undefined;
+      const limit = vars?.limit ?? 50;
+      const creditOffset = vars?.offset ?? 0;
       const sorted = [...credits].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
@@ -236,34 +519,42 @@ function handleOperation(operationName: string, variables: any): any {
       );
       const balanceMap = new Map<string, number>();
       let runningBalance = 1000;
-      chronological.forEach(tx => {
+      chronological.forEach((tx) => {
         runningBalance += tx.type === 'CREDIT' ? tx.amount : -tx.amount;
         balanceMap.set(tx.id, runningBalance);
       });
-      const withBalances = sorted.map(tx => mapCredit(tx, balanceMap.get(tx.id) || 0));
+      const withBalances = sorted.map((tx) => mapCredit(tx, balanceMap.get(tx.id) || 0));
       return { creditHistory: withBalances.slice(creditOffset, creditOffset + limit) };
+    }
 
-    case 'Events':
-      const evtLimit = variables?.limit || 50;
-      const evtPage = variables?.page || 1;
+    case 'Events': {
+      const vars = variables as EventsVariables | undefined;
+      const evtLimit = vars?.limit ?? 50;
+      const evtPage = vars?.page ?? 1;
       const sortedEvents = [...events].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       const evtOffset = (evtPage - 1) * evtLimit;
-      return { events: sortedEvents.slice(evtOffset, evtOffset + evtLimit).map(e => mapEvent(e, agents)) };
+      return {
+        events: sortedEvents.slice(evtOffset, evtOffset + evtLimit).map((e) => mapEvent(e, agents)),
+      };
+    }
 
-    case 'AgentReputation':
-      const repAgent = agents.find(a => a.id === variables?.id);
+    case 'AgentReputation': {
+      const vars = variables as AgentReputationVariables | undefined;
+      const repAgent = agents.find((a) => a.id === vars?.id);
       return { agentReputation: repAgent ? mapAgentReputation(repAgent) : null };
+    }
 
-    case 'TrustLeaderboard':
-      const leaderboardLimit = variables?.limit || 10;
+    case 'TrustLeaderboard': {
+      const vars = variables as TrustLeaderboardVariables | undefined;
+      const leaderboardLimit = vars?.limit ?? 10;
       const sortedByTrust = [...agents]
-        .filter(a => a.status === 'active')
+        .filter((a) => a.status === 'active')
         .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
         .slice(0, leaderboardLimit);
       return {
-        trustLeaderboard: sortedByTrust.map(a => ({
+        trustLeaderboard: sortedByTrust.map((a) => ({
           id: a.id,
           agentId: a.agentId,
           name: a.name,
@@ -273,13 +564,15 @@ function handleOperation(operationName: string, variables: any): any {
           tasksCompleted: a.tasksCompleted ?? 0,
         })),
       };
+    }
 
-    case 'ReputationHistory':
+    case 'ReputationHistory': {
+      const vars = variables as ReputationHistoryVariables | undefined;
       // Generate some mock history events
-      const histAgent = agents.find(a => a.id === variables?.id);
+      const histAgent = agents.find((a) => a.id === vars?.id);
       if (!histAgent) return { reputationHistory: [] };
-      
-      const mockHistory = [
+
+      const mockHistory: GraphQLReputationHistoryEntry[] = [
         {
           id: `rep-${histAgent.id}-1`,
           eventType: 'TASK_COMPLETED',
@@ -309,59 +602,69 @@ function handleOperation(operationName: string, variables: any): any {
         },
       ];
       return { reputationHistory: mockHistory };
+    }
 
-    case 'Messages':
-      const msgLimit = variables?.limit || 50;
+    case 'Messages': {
+      const vars = variables as MessagesVariables | undefined;
+      const msgLimit = vars?.limit ?? 50;
       const sortedMessages = [...messages].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      return { messages: sortedMessages.slice(0, msgLimit).map(m => mapMessage(m, agents)) };
+      return { messages: sortedMessages.slice(0, msgLimit).map((m) => mapMessage(m, agents)) };
+    }
 
-    case 'Conversations':
+    case 'Conversations': {
       // Group messages by conversation (pair of agents)
-      const conversationMap = new Map<string, any[]>();
-      messages.forEach(msg => {
+      const conversationMap = new Map<string, DemoMessage[]>();
+      messages.forEach((msg) => {
         const key = [msg.fromAgentId, msg.toAgentId].sort().join('-');
         if (!conversationMap.has(key)) conversationMap.set(key, []);
         conversationMap.get(key)!.push(msg);
       });
-      
-      const conversations = Array.from(conversationMap.entries()).map(([key, msgs]) => {
-        const [agent1Id, agent2Id] = key.split('-');
-        const agent1 = agents.find(a => a.id === agent1Id);
-        const agent2 = agents.find(a => a.id === agent2Id);
-        const latestMsg = msgs.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )[0];
-        
-        return {
-          id: key,
-          agents: [
-            agent1 ? { id: agent1.id, name: agent1.name, level: agent1.level } : null,
-            agent2 ? { id: agent2.id, name: agent2.name, level: agent2.level } : null,
-          ].filter(Boolean),
-          messageCount: msgs.length,
-          unreadCount: msgs.filter(m => !m.read).length,
-          latestMessage: mapMessage(latestMsg, agents),
-          createdAt: latestMsg.createdAt,
-        };
-      }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      
-      return { conversations };
 
-    case 'ConversationMessages':
-      const { agent1Id: a1, agent2Id: a2 } = variables || {};
+      const conversations: GraphQLConversation[] = Array.from(conversationMap.entries())
+        .map(([key, msgs]) => {
+          const [agent1Id, agent2Id] = key.split('-');
+          const agent1 = agents.find((a) => a.id === agent1Id);
+          const agent2 = agents.find((a) => a.id === agent2Id);
+          const latestMsg = msgs.sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )[0];
+
+          return {
+            id: key,
+            agents: [
+              agent1 ? { id: agent1.id, name: agent1.name, level: agent1.level } : null,
+              agent2 ? { id: agent2.id, name: agent2.name, level: agent2.level } : null,
+            ].filter((a): a is GraphQLAgentRef => a !== null),
+            messageCount: msgs.length,
+            unreadCount: msgs.filter((m) => !m.read).length,
+            latestMessage: mapMessage(latestMsg, agents),
+            createdAt: latestMsg.createdAt,
+          };
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return { conversations };
+    }
+
+    case 'ConversationMessages': {
+      const vars = variables as ConversationMessagesVariables | undefined;
+      const a1 = vars?.agent1Id;
+      const a2 = vars?.agent2Id;
       if (!a1 || !a2) return { conversationMessages: [] };
-      
+
       const convoMessages = messages
-        .filter(m => 
-          (m.fromAgentId === a1 && m.toAgentId === a2) ||
-          (m.fromAgentId === a2 && m.toAgentId === a1)
+        .filter(
+          (m) =>
+            (m.fromAgentId === a1 && m.toAgentId === a2) ||
+            (m.fromAgentId === a2 && m.toAgentId === a1)
         )
         .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-        .map(m => mapMessage(m, agents));
-      
+        .map((m) => mapMessage(m, agents));
+
       return { conversationMessages: convoMessages };
+    }
 
     default:
       console.warn('[MockFetcher] Unknown operation:', operationName);
@@ -385,11 +688,11 @@ export function demoFetcher<TData, TVariables extends Record<string, unknown>>(
   return async () => {
     const operationName = extractOperationName(query);
     const result = handleOperation(operationName, variables);
-    
+
     if (result === null) {
       throw new Error(`Demo mode: Operation ${operationName} not supported`);
     }
-    
+
     return result as TData;
   };
 }
