@@ -30,6 +30,10 @@ const PROBABILITIES = {
   creditEarned: 0.15,      // 15% chance per tick
   creditSpent: 0.18,       // 18% chance per tick
   
+  // Message events
+  messageSent: 0.40,       // 40% chance per tick - agents chat frequently
+  messageBurst: 0.15,      // 15% chance of multiple messages at once
+  
   // System events
   systemEvent: 0.05,       // 5% chance per tick
 };
@@ -272,6 +276,18 @@ export class SimulationEngine {
     if (shouldFire(PROBABILITIES.creditSpent)) {
       const event = this.spendCredits();
       if (event) events.push(event);
+    }
+    
+    // Message sent
+    if (shouldFire(PROBABILITIES.messageSent)) {
+      const event = this.sendMessage();
+      if (event) events.push(event);
+    }
+    
+    // Message burst (multiple messages at once - simulates active discussion)
+    if (shouldFire(PROBABILITIES.messageBurst)) {
+      const burstEvents = this.burstMessages();
+      events.push(...burstEvents);
     }
     
     // Emit all events
@@ -650,6 +666,56 @@ export class SimulationEngine {
       payload: { agent, amount, transaction },
       timestamp: new Date(),
     };
+  }
+  
+  private sendMessage(): SimulationEvent | null {
+    const activeAgents = this.state.scenario.agents.filter(a => a.status === 'active');
+    if (activeAgents.length < 2) return null;
+    
+    // Pick two different agents
+    const fromAgent = randomFrom(activeAgents);
+    const otherAgents = activeAgents.filter(a => a.id !== fromAgent.id);
+    const toAgent = randomFrom(otherAgents);
+    
+    // Higher level agents are more likely to send task-related messages
+    const taskRelated = fromAgent.level >= 7 || Math.random() > 0.6;
+    
+    // Get a task to reference
+    const activeTasks = this.state.scenario.tasks.filter(
+      t => t.status !== 'done' && t.status !== 'cancelled'
+    );
+    const taskRef = taskRelated && activeTasks.length > 0 
+      ? randomFrom(activeTasks).identifier 
+      : undefined;
+    
+    // Generate the message
+    const message = generateMessage(fromAgent.id, toAgent.id, {
+      type: taskRef ? 'task' : randomFrom(['status', 'general', 'question'] as const),
+      taskRef,
+      hoursAgo: 0, // Just now
+    });
+    
+    this.state.scenario.messages.push(message);
+    
+    return {
+      type: 'system_event',
+      payload: { message, from: fromAgent, to: toAgent },
+      timestamp: new Date(),
+    };
+  }
+  
+  private burstMessages(): SimulationEvent[] {
+    const events: SimulationEvent[] = [];
+    
+    // Send 2-4 messages in quick succession (simulates conversation)
+    const count = 2 + Math.floor(Math.random() * 3);
+    
+    for (let i = 0; i < count; i++) {
+      const event = this.sendMessage();
+      if (event) events.push(event);
+    }
+    
+    return events;
   }
 }
 
