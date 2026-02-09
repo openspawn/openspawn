@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2 } from "lucide-react";
+import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -8,6 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ScrollArea } from "../components/ui/scroll-area";
 import { PhaseChip } from "../components/phase-chip";
 import { useTasks, type Task, useCurrentPhase } from "../hooks";
+
+type SortField = "created" | "priority" | "status" | "title";
+type SortDirection = "asc" | "desc";
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
@@ -170,7 +173,7 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: "100%", opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed right-0 top-0 h-full w-full sm:w-[400px] bg-background border-l border-border shadow-xl z-50 flex flex-col"
+      className="fixed right-0 top-0 h-full w-full sm:w-[400px] bg-background border-l border-border shadow-xl z-30 flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
@@ -341,7 +344,13 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
   );
 }
 
-function ListView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
+interface ListViewProps {
+  tasks: Task[];
+  onTaskClick: (task: Task) => void;
+  selectedTaskId?: string;
+}
+
+function ListView({ tasks, onTaskClick, selectedTaskId }: ListViewProps) {
   return (
     <Card>
       <div className="divide-y divide-border">
@@ -349,6 +358,7 @@ function ListView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: T
           {tasks.map((task) => {
             const dueDate = formatDate(task.dueDate);
             const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
+            const isSelected = task.id === selectedTaskId;
             
             return (
               <motion.div
@@ -359,7 +369,9 @@ function ListView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: T
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 onClick={() => onTaskClick(task)}
-                className="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors cursor-pointer"
+                className={`flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors cursor-pointer ${
+                  isSelected ? "bg-accent/70 border-l-2 border-l-primary" : ""
+                }`}
               >
                 <span className="font-mono text-sm text-muted-foreground w-20 flex-shrink-0">
                   {task.identifier}
@@ -409,11 +421,101 @@ function ListView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: T
   );
 }
 
+// Priority order for sorting
+const PRIORITY_ORDER: Record<string, number> = {
+  URGENT: 0,
+  CRITICAL: 0,
+  HIGH: 1,
+  NORMAL: 2,
+  LOW: 3,
+};
+
+// Status order for sorting
+const STATUS_ORDER: Record<string, number> = {
+  IN_PROGRESS: 0,
+  REVIEW: 1,
+  TODO: 2,
+  BACKLOG: 3,
+  BLOCKED: 4,
+  DONE: 5,
+  CANCELLED: 6,
+};
+
 export function TasksPage() {
   const { tasks, loading, error } = useTasks();
-  const { currentPhase, isNovaTech } = useCurrentPhase();
+  const { currentPhase } = useCurrentPhase();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  
+  // Filter & Sort state for List view
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [sortField, setSortField] = useState<SortField>("created");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc"); // newest first by default
+
+  // Filter and sort tasks for list view
+  const filteredAndSortedTasks = useMemo(() => {
+    let result = [...tasks];
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(t => 
+        t.title.toLowerCase().includes(query) ||
+        t.identifier.toLowerCase().includes(query) ||
+        t.description?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Status filter
+    if (statusFilter !== "all") {
+      result = result.filter(t => t.status?.toUpperCase() === statusFilter);
+    }
+    
+    // Priority filter
+    if (priorityFilter !== "all") {
+      result = result.filter(t => t.priority?.toUpperCase() === priorityFilter);
+    }
+    
+    // Sort
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case "created":
+          comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+          break;
+        case "priority":
+          comparison = (PRIORITY_ORDER[a.priority?.toUpperCase() || "NORMAL"] || 2) - 
+                       (PRIORITY_ORDER[b.priority?.toUpperCase() || "NORMAL"] || 2);
+          break;
+        case "status":
+          comparison = (STATUS_ORDER[a.status?.toUpperCase() || "BACKLOG"] || 3) - 
+                       (STATUS_ORDER[b.status?.toUpperCase() || "BACKLOG"] || 3);
+          break;
+        case "title":
+          comparison = a.title.localeCompare(b.title);
+          break;
+      }
+      return sortDirection === "desc" ? -comparison : comparison;
+    });
+    
+    return result;
+  }, [tasks, searchQuery, statusFilter, priorityFilter, sortField, sortDirection]);
+
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDirection(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  }
+
+  function handleTaskClick(task: Task) {
+    // Just update selected task - don't close sidebar
+    setSelectedTask(task);
+  }
 
   if (loading) {
     return (
@@ -432,7 +534,7 @@ export function TasksPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 transition-all ${selectedTask ? "mr-0 sm:mr-[400px]" : ""}`}>
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -444,18 +546,10 @@ export function TasksPage() {
           </div>
           {currentPhase && <PhaseChip phase={currentPhase} />}
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Task
-          </Button>
-        </div>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          New Task
+        </Button>
       </div>
 
       {/* View toggle */}
@@ -464,31 +558,94 @@ export function TasksPage() {
           <TabsTrigger value="kanban">Kanban</TabsTrigger>
           <TabsTrigger value="list">List</TabsTrigger>
         </TabsList>
+        
         <TabsContent value="kanban" className="mt-4">
-          <KanbanView tasks={tasks} onTaskClick={setSelectedTask} />
+          <KanbanView tasks={tasks} onTaskClick={handleTaskClick} />
         </TabsContent>
-        <TabsContent value="list" className="mt-4">
-          <ListView tasks={tasks} onTaskClick={setSelectedTask} />
+        
+        <TabsContent value="list" className="mt-4 space-y-4">
+          {/* Filters and Sort for List view */}
+          <div className="flex flex-wrap gap-3 items-center">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search tasks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">All Status</option>
+              <option value="BACKLOG">Backlog</option>
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="REVIEW">Review</option>
+              <option value="DONE">Done</option>
+              <option value="BLOCKED">Blocked</option>
+            </select>
+            
+            {/* Priority Filter */}
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">All Priority</option>
+              <option value="URGENT">Urgent</option>
+              <option value="HIGH">High</option>
+              <option value="NORMAL">Normal</option>
+              <option value="LOW">Low</option>
+            </select>
+            
+            {/* Sort buttons */}
+            <div className="flex items-center gap-1 ml-auto">
+              <span className="text-sm text-muted-foreground">Sort:</span>
+              {(["created", "priority", "status", "title"] as SortField[]).map((field) => (
+                <Button
+                  key={field}
+                  variant={sortField === field ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => handleSort(field)}
+                  className="capitalize"
+                >
+                  {field === "created" ? "Date" : field}
+                  {sortField === field && (
+                    <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                  )}
+                </Button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Results count */}
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredAndSortedTasks.length} of {tasks.length} tasks
+          </div>
+          
+          <ListView 
+            tasks={filteredAndSortedTasks} 
+            onTaskClick={handleTaskClick}
+            selectedTaskId={selectedTask?.id}
+          />
         </TabsContent>
       </Tabs>
       
-      {/* Task Detail Sidebar */}
+      {/* Task Detail Sidebar - no backdrop, stays open */}
       <AnimatePresence>
         {selectedTask && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedTask(null)}
-              className="fixed inset-0 bg-black/50 z-40"
-            />
-            <TaskDetailSidebar 
-              task={selectedTask} 
-              onClose={() => setSelectedTask(null)} 
-            />
-          </>
+          <TaskDetailSidebar 
+            task={selectedTask} 
+            onClose={() => setSelectedTask(null)} 
+          />
         )}
       </AnimatePresence>
     </div>
