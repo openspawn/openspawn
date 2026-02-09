@@ -29,7 +29,7 @@ import {
         "graphql-ws": true,
       },
       playground: process.env["NODE_ENV"] !== "production",
-      introspection: true,
+      introspection: process.env["NODE_ENV"] !== "production",
       context: ({ req }: { req: unknown }) => ({ req }),
     }),
     AgentsModule,

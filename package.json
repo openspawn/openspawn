@@ -80,7 +80,8 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "typeorm": "^0.3.28",
-    "urql": "^5.0.1"
+    "urql": "^5.0.1",
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.1",
