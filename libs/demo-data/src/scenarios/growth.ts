@@ -3,6 +3,7 @@ import { agents } from '../fixtures/agents.js';
 import { tasks } from '../fixtures/tasks.js';
 import { creditTransactions } from '../fixtures/credits.js';
 import { events } from '../fixtures/events.js';
+import { generateInitialMessages } from '../fixtures/messages.js';
 
 /**
  * Growth Scenario: Scaling team
@@ -19,6 +20,10 @@ export const growthScenario: DemoScenario = {
   tasks: [...tasks],
   credits: [...creditTransactions],
   events: [...events],
+  messages: generateInitialMessages(
+    agents.map(a => a.id),
+    tasks.map(t => t.identifier)
+  ),
 };
 
 export default growthScenario;

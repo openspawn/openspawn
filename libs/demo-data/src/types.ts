@@ -81,6 +81,19 @@ export interface DemoEvent {
   taskId?: string;
 }
 
+export type MessageType = 'task' | 'status' | 'report' | 'question' | 'escalation' | 'general';
+
+export interface DemoMessage {
+  id: string;
+  fromAgentId: string;
+  toAgentId: string;
+  content: string;
+  type: MessageType;
+  taskRef?: string;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface DemoScenario {
   name: string;
   description: string;
@@ -88,6 +101,7 @@ export interface DemoScenario {
   tasks: DemoTask[];
   credits: DemoCreditTransaction[];
   events: DemoEvent[];
+  messages: DemoMessage[];
 }
 
 export interface SimulationState {

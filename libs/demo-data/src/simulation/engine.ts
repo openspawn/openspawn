@@ -6,10 +6,11 @@ import type {
   DemoTask,
   DemoCreditTransaction,
   DemoEvent,
+  DemoMessage,
   TaskStatus,
   AgentStatus,
 } from '../types.js';
-import { generateRandomAgent, generateRandomTask, generateCreditTransaction, generateEvent } from '../fixtures/index.js';
+import { generateRandomAgent, generateRandomTask, generateCreditTransaction, generateEvent, generateMessage } from '../fixtures/index.js';
 
 // Probability distributions for different events (per tick)
 const PROBABILITIES = {
@@ -152,6 +153,10 @@ export class SimulationEngine {
   
   getEvents(): DemoEvent[] {
     return this.deepClone(this.state.scenario.events);
+  }
+  
+  getMessages(): DemoMessage[] {
+    return this.deepClone(this.state.scenario.messages || []);
   }
   
   // Playback controls

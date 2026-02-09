@@ -26,6 +26,9 @@ export const freshScenario: DemoScenario = {
   
   // No events yet
   events: [],
+  
+  // No messages yet
+  messages: [],
 };
 
 export default freshScenario;
