@@ -17,6 +17,7 @@ import type { Organization } from "./organization.entity";
 @Entity("messages")
 @Index(["channelId", "createdAt"])
 @Index(["orgId", "senderId"])
+@Index(["orgId", "recipientId"])
 @Index(["parentMessageId"])
 export class Message {
   @PrimaryGeneratedColumn("uuid")
@@ -40,6 +41,9 @@ export class Message {
   @Column({ name: "parent_message_id", type: "uuid", nullable: true })
   parentMessageId!: string | null;
 
+  @Column({ name: "recipient_id", type: "uuid", nullable: true })
+  recipientId!: string | null;
+
   @Column({ type: "jsonb", default: {} })
   metadata!: Record<string, unknown>;
 
@@ -58,6 +62,10 @@ export class Message {
   @ManyToOne("Agent")
   @JoinColumn({ name: "sender_id" })
   sender?: Agent;
+
+  @ManyToOne("Agent")
+  @JoinColumn({ name: "recipient_id" })
+  recipient?: Agent;
 
   @ManyToOne("Message", "replies")
   @JoinColumn({ name: "parent_message_id" })
