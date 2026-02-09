@@ -1,10 +1,14 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import helmet from "helmet";
 
 import { AppModule } from "./app/app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Security headers
+  app.use(helmet());
 
   // Set global API version prefix
   app.setGlobalPrefix('api/v1', {
@@ -20,12 +24,8 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS for dashboard with restricted origins
-  app.enableCors({
-    origin: process.env['ALLOWED_ORIGINS']?.split(',') || ['http://localhost:4200', 'http://localhost:5173'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  });
+  // Enable CORS for dashboard
+  app.enableCors();
 
   const port = process.env["PORT"] || 3000;
   const host = process.env["HOST"] || "0.0.0.0";
