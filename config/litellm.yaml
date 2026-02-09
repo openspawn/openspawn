@@ -42,3 +42,11 @@ litellm_settings:
 general_settings:
   # Master key for API authentication
   master_key: os.environ/LITELLM_MASTER_KEY
+
+  # Success callback to notify OpenSpawn API of token usage
+  # The x-litellm-secret header authenticates the callback
+  success_callback:
+    - type: webhook
+      url: http://localhost:3000/credits/litellm-callback
+      headers:
+        x-litellm-secret: os.environ/LITELLM_CALLBACK_SECRET
