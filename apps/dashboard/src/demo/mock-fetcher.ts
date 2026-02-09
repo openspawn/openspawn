@@ -4,13 +4,14 @@
  */
 
 import type { SimulationEngine } from '@openspawn/demo-data';
+import { debug } from '../lib/debug';
 
 // Reference to the simulation engine (set by DemoProvider)
 let engineRef: (() => SimulationEngine | null) | null = null;
 
 export function setDemoEngine(getEngine: () => SimulationEngine | null) {
   engineRef = getEngine;
-  console.log('[MockFetcher] Engine reference set');
+  debug.mockFetcher('Engine reference set');
 }
 
 // Severity mapping (demo uses lowercase, GraphQL expects uppercase)
@@ -201,7 +202,7 @@ function handleOperation(operationName: string, variables: any): any {
   const events = engine.getEvents();
   const messages = engine.getMessages();
 
-  console.log('[MockFetcher]', operationName, '→', {
+  debug.mockFetcher(operationName, '→', {
     agents: agents.length,
     tasks: tasks.length,
     credits: credits.length,
