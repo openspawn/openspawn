@@ -11,7 +11,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { Task, TaskComment, TaskDependency, TaskTag } from "@openspawn/database";
-import { TaskStatus } from "@openspawn/shared-types";
+import { TaskPriority, TaskStatus } from "@openspawn/shared-types";
 
 import { TrustService } from "../agents";
 import { EventsService } from "../events";
@@ -523,6 +523,104 @@ export class TasksService {
     return this.commentRepository.find({
       where: { taskId },
       order: { createdAt: "ASC" },
+    });
+  }
+
+  /**
+   * Get count of tasks available to claim (unassigned, unblocked, TODO status)
+   */
+  async getClaimableTaskCount(orgId: string): Promise<number> {
+    // Get all unassigned TODO tasks
+    const unassignedTasks = await this.taskRepository
+      .createQueryBuilder("task")
+      .where("task.org_id = :orgId", { orgId })
+      .andWhere("task.assignee_id IS NULL")
+      .andWhere("task.status = :status", { status: TaskStatus.TODO })
+      .getMany();
+
+    // Filter out tasks with blocking dependencies
+    let claimableCount = 0;
+    for (const task of unassignedTasks) {
+      const blockingDeps = await this.dependencyRepository.find({
+        where: { taskId: task.id, blocking: true },
+        relations: ["dependsOn"],
+      });
+
+      const hasUnfinishedBlocker = blockingDeps.some(
+        (dep) => dep.dependsOn?.status !== TaskStatus.DONE,
+      );
+
+      if (!hasUnfinishedBlocker) {
+        claimableCount++;
+      }
+    }
+
+    return claimableCount;
+  }
+
+  /**
+   * Claim the next available task for an agent
+   * Uses row-level locking to prevent race conditions
+   */
+  async claimNextTask(
+    orgId: string,
+    agentId: string,
+  ): Promise<{ success: boolean; task?: Task; message?: string }> {
+    // Use a transaction with row-level locking
+    return this.taskRepository.manager.transaction(async (manager) => {
+      // Find next claimable task ordered by priority
+      const priorityOrder = ["URGENT", "HIGH", "NORMAL", "LOW"];
+
+      for (const priority of priorityOrder) {
+        // Find unassigned TODO task with this priority, lock for update
+        const task = await manager
+          .createQueryBuilder(Task, "task")
+          .setLock("pessimistic_write")
+          .where("task.org_id = :orgId", { orgId })
+          .andWhere("task.assignee_id IS NULL")
+          .andWhere("task.status = :status", { status: TaskStatus.TODO })
+          .andWhere("task.priority = :priority", { priority })
+          .orderBy("task.created_at", "ASC")
+          .getOne();
+
+        if (task) {
+          // Check for blocking dependencies
+          const blockingDeps = await this.dependencyRepository.find({
+            where: { taskId: task.id, blocking: true },
+            relations: ["dependsOn"],
+          });
+
+          const hasUnfinishedBlocker = blockingDeps.some(
+            (dep) => dep.dependsOn?.status !== TaskStatus.DONE,
+          );
+
+          if (hasUnfinishedBlocker) {
+            continue; // Try next priority level
+          }
+
+          // Claim the task
+          task.assigneeId = agentId;
+          task.status = TaskStatus.IN_PROGRESS;
+          const saved = await manager.save(task);
+
+          await this.eventsService.emit({
+            orgId,
+            type: "task.claimed",
+            actorId: agentId,
+            entityType: "task",
+            entityId: task.id,
+            data: {
+              identifier: task.identifier,
+              title: task.title,
+              priority: task.priority,
+            },
+          });
+
+          return { success: true, task: saved };
+        }
+      }
+
+      return { success: false, message: "No tasks available to claim" };
     });
   }
 }

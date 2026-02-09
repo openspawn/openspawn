@@ -533,7 +533,7 @@ describe("TasksService - Self-Claim Tasks", () => {
       }),
       manager: {
         transaction: vi.fn().mockImplementation((cb) => cb(mockManager)),
-      },
+      } as any,
     };
 
     dependencyRepo = {

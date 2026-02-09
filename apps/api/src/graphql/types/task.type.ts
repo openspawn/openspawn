@@ -23,6 +23,18 @@ export class TaskRejectionType {
   rejectionCount!: number;
 }
 
+@ObjectType({ description: "Result of a claimNextTask mutation" })
+export class ClaimTaskResultType {
+  @Field(() => Boolean, { description: "Whether the claim was successful" })
+  success!: boolean;
+
+  @Field(() => String, { description: "Message describing the result" })
+  message!: string;
+
+  @Field(() => TaskType, { nullable: true, description: "The claimed task, if successful" })
+  task?: TaskType | null;
+}
+
 @ObjectType()
 export class TaskType {
   @Field(() => ID)
