@@ -130,7 +130,24 @@ New agent makes mistakes but has identical access to veterans. No way to ramp up
 
 ---
 
-## ⚡ 5-Minute Setup
+## ⚡ Quick Start
+
+### One-Liner Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/openspawn/openspawn/main/scripts/install.sh | bash
+```
+
+This will:
+- Check prerequisites (Docker, Git)
+- Clone the repository
+- Start Postgres, API, and Dashboard
+- Print the URLs when ready
+
+### Manual Setup
+
+<details>
+<summary>Click to expand manual setup instructions</summary>
 
 ```bash
 # Clone & install
@@ -148,9 +165,13 @@ node scripts/seed-admin.mjs you@example.com password "Your Name"
 pnpm exec nx run-many -t serve -p api,dashboard
 ```
 
+</details>
+
+### Services
+
 | Service | URL |
 |---------|-----|
-| 🖥️ Dashboard | http://localhost:4200 |
+| 🖥️ Dashboard | http://localhost:8080 |
 | ⚡ API | http://localhost:3000 |
 | 📊 GraphQL | http://localhost:3000/graphql |
 
