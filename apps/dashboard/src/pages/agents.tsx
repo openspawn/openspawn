@@ -34,8 +34,8 @@ import { Progress } from "../components/ui/progress";
 
 // Use generated types from GraphQL
 import { AgentStatus } from "../graphql/generated/graphql";
-import type { AgentType } from "../graphql/generated/graphql";
-type Agent = AgentType;
+import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+type Agent = AgentFieldsFragment;
 
 type DialogMode = "view" | "edit" | "credits" | null;
 

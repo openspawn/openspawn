@@ -1,5 +1,34 @@
 import { graphql } from "./generated";
 
+// Fragments
+export const AgentFieldsFragmentDocument = graphql(`
+  fragment AgentFields on AgentType {
+    id
+    agentId
+    name
+    role
+    status
+    level
+    model
+    currentBalance
+    budgetPeriodLimit
+    budgetPeriodSpent
+    managementFeePct
+    parentId
+    createdAt
+    updatedAt
+    # Trust & Reputation
+    trustScore
+    reputationLevel
+    tasksCompleted
+    tasksSuccessful
+    lastActivityAt
+    lastPromotionAt
+    lifetimeEarnings
+    domain
+  }
+`);
+
 // Queries
 export const TasksQueryDocument = graphql(`
   query Tasks($orgId: ID!, $status: TaskStatus) {
@@ -53,29 +82,7 @@ export const TaskQueryDocument = graphql(`
 export const AgentsQueryDocument = graphql(`
   query Agents($orgId: ID!) {
     agents(orgId: $orgId) {
-      id
-      agentId
-      name
-      role
-      status
-      level
-      model
-      currentBalance
-      budgetPeriodLimit
-      budgetPeriodSpent
-      managementFeePct
-      parentId
-      createdAt
-      updatedAt
-      # Trust & Reputation
-      trustScore
-      reputationLevel
-      tasksCompleted
-      tasksSuccessful
-      lastActivityAt
-      lastPromotionAt
-      lifetimeEarnings
-      domain
+      ...AgentFields
     }
   }
 `);

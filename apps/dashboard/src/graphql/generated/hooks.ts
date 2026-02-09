@@ -321,6 +321,8 @@ export type TaskType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
+
 export type TasksQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
   status?: InputMaybe<TaskStatus>;
@@ -380,7 +382,32 @@ export type MessagesQueryVariables = Exact<{
 export type MessagesQuery = { messages: Array<{ id: string, channelId: string, senderId: string, type: MessageType, body: string, parentMessageId?: string | null, createdAt: string }> };
 
 
-
+export const AgentFieldsFragmentDoc = `
+    fragment AgentFields on AgentType {
+  id
+  agentId
+  name
+  role
+  status
+  level
+  model
+  currentBalance
+  budgetPeriodLimit
+  budgetPeriodSpent
+  managementFeePct
+  parentId
+  createdAt
+  updatedAt
+  trustScore
+  reputationLevel
+  tasksCompleted
+  tasksSuccessful
+  lastActivityAt
+  lastPromotionAt
+  lifetimeEarnings
+  domain
+}
+    `;
 export const TasksDocument = `
     query Tasks($orgId: ID!, $status: TaskStatus) {
   tasks(orgId: $orgId, status: $status) {
@@ -475,31 +502,10 @@ useTaskQuery.fetcher = (variables: TaskQueryVariables, options?: RequestInit['he
 export const AgentsDocument = `
     query Agents($orgId: ID!) {
   agents(orgId: $orgId) {
-    id
-    agentId
-    name
-    role
-    status
-    level
-    model
-    currentBalance
-    budgetPeriodLimit
-    budgetPeriodSpent
-    managementFeePct
-    parentId
-    createdAt
-    updatedAt
-    trustScore
-    reputationLevel
-    tasksCompleted
-    tasksSuccessful
-    lastActivityAt
-    lastPromotionAt
-    lifetimeEarnings
-    domain
+    ...AgentFields
   }
 }
-    `;
+    ${AgentFieldsFragmentDoc}`;
 
 export const useAgentsQuery = <
       TData = AgentsQuery,
