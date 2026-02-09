@@ -18,6 +18,13 @@ export type Scalars = {
   DateTime: { input: string; output: string; }
 };
 
+/** Operational mode that restricts what actions an agent can perform */
+export enum AgentMode {
+  Observer = 'OBSERVER',
+  Orchestrator = 'ORCHESTRATOR',
+  Worker = 'WORKER'
+}
+
 export type AgentReputationType = {
   lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
   promotionProgress?: Maybe<PromotionProgressType>;
@@ -55,6 +62,7 @@ export type AgentType = {
   level: Scalars['Int']['output'];
   lifetimeEarnings: Scalars['Int']['output'];
   managementFeePct: Scalars['Int']['output'];
+  mode: AgentMode;
   model: Scalars['String']['output'];
   name: Scalars['String']['output'];
   parentId?: Maybe<Scalars['ID']['output']>;
@@ -321,7 +329,7 @@ export type TaskType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
+export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
 
 export type TasksQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -344,7 +352,7 @@ export type AgentsQueryVariables = Exact<{
 }>;
 
 
-export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null }> };
+export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null }> };
 
 export type CreditHistoryQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -388,6 +396,7 @@ export const AgentFieldsFragmentDoc = `
   agentId
   name
   role
+  mode
   status
   level
   model

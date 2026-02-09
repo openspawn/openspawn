@@ -7,6 +7,7 @@ export const AgentFieldsFragmentDocument = graphql(`
     agentId
     name
     role
+    mode
     status
     level
     model

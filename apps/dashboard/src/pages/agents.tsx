@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -31,9 +31,10 @@ import { CapabilityManager } from "../components/capability-manager";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
+import { AgentModeBadge, AgentModeSelector, AgentModeCard } from "../components/agent-mode-selector";
 
 // Use generated types from GraphQL
-import { AgentStatus } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 type Agent = AgentFieldsFragment;
 
@@ -111,6 +112,7 @@ function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => v
           <div className="flex flex-wrap gap-2">
             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
             <Badge variant="outline">{agent.role}</Badge>
+            <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="md" />
             <Badge variant="secondary">Level {agent.level}</Badge>
             <Badge className={REPUTATION_COLORS[repLevel] || 'bg-blue-500'}>
               {REPUTATION_EMOJI[repLevel] || '✅'} {repLevel}
@@ -178,6 +180,7 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
   const [name, setName] = useState(agent.name);
   const [model, setModel] = useState(agent.model);
   const [status, setStatus] = useState(agent.status);
+  const [mode, setMode] = useState<AgentMode>(agent.mode ?? AgentMode.Worker);
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e.target.value);
@@ -223,6 +226,15 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
               onChange={(e) => setModel(e.target.value)}
               placeholder="e.g., gpt-4o, claude-sonnet-4"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Agent Mode</label>
+            <AgentModeSelector
+              value={mode}
+              onChange={setMode}
+              size="md"
+              showDescription
             />
           </div>
           <div className="space-y-2">
@@ -880,6 +892,7 @@ export function AgentsPage() {
               <CardContent>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
+                  <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
