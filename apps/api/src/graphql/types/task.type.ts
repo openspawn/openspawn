@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, registerEnumType } from "@nestjs/graphql";
+import { Field, ID, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
 
 import { TaskPriority, TaskStatus } from "@openspawn/shared-types";
 
@@ -7,6 +7,21 @@ import { AgentType } from "./agent.type";
 // Register enums
 registerEnumType(TaskStatus, { name: "TaskStatus" });
 registerEnumType(TaskPriority, { name: "TaskPriority" });
+
+@ObjectType({ description: "Rejection metadata when a task completion is rejected by a pre-hook" })
+export class TaskRejectionType {
+  @Field(() => String, { description: "Feedback explaining why completion was rejected" })
+  feedback!: string;
+
+  @Field(() => Date, { description: "When the rejection occurred" })
+  rejectedAt!: Date;
+
+  @Field(() => String, { description: "Who/what rejected the completion (webhook names)" })
+  rejectedBy!: string;
+
+  @Field(() => Int, { description: "How many times this task has been rejected" })
+  rejectionCount!: number;
+}
 
 @ObjectType()
 export class TaskType {
@@ -51,6 +66,9 @@ export class TaskType {
 
   @Field(() => Date, { nullable: true })
   completedAt?: Date | null;
+
+  @Field(() => TaskRejectionType, { nullable: true, description: "Present when task completion was rejected" })
+  rejection?: TaskRejectionType | null;
 
   @Field(() => Date)
   createdAt!: Date;

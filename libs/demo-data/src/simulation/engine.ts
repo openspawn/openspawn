@@ -25,6 +25,7 @@ const PROBABILITIES = {
   taskCreated: 0.18,       // 18% chance per tick
   taskStatusChange: 0.45,  // 45% chance per tick - faster task flow
   taskBatchAdvance: 0.20,  // 20% chance to advance multiple tasks at once
+  taskCompletionRejection: 0.25, // 25% chance that a task moving to DONE gets rejected
   
   // Credit events
   creditEarned: 0.15,      // 15% chance per tick
@@ -46,6 +47,20 @@ const DEMO_WEBHOOKS = [
   { name: 'Compliance Check', hookType: 'pre' as const, canBlock: true, blockChance: 0.15 },
   { name: 'Budget Guard', hookType: 'pre' as const, canBlock: true, blockChance: 0.10 },
   { name: 'QA Review', hookType: 'pre' as const, canBlock: true, blockChance: 0.08 },
+];
+
+// QA rejection reasons for task completion
+const QA_REJECTION_REASONS = [
+  'Missing unit tests for new functionality',
+  'Code coverage below 80% threshold',
+  'Documentation not updated for API changes',
+  'Security review pending for sensitive data access',
+  'Performance benchmarks not met - response time exceeds 200ms',
+  'Accessibility requirements not satisfied (WCAG 2.1 AA)',
+  'Integration tests failing in staging environment',
+  'Missing error handling for edge cases',
+  'Code review comments not addressed',
+  'Database migration script needs review',
 ];
 
 // Capacity limits by level (how many active children a parent can manage)
@@ -568,9 +583,6 @@ export class SimulationEngine {
     
     if (!newStatus) return null;
     
-    task.status = newStatus;
-    task.updatedAt = new Date().toISOString();
-    
     // Assign to an agent if moving to assigned
     if (newStatus === 'assigned' && !task.assigneeId) {
       const workers = this.state.scenario.agents.filter(
@@ -579,6 +591,55 @@ export class SimulationEngine {
       if (workers.length > 0) {
         task.assigneeId = randomFrom(workers).id;
       }
+    }
+    
+    // Check for task completion rejection when moving to done
+    if (newStatus === 'done' && shouldFire(PROBABILITIES.taskCompletionRejection)) {
+      // Reject the completion - send back to review with feedback
+      task.status = 'review';
+      task.updatedAt = new Date().toISOString();
+      
+      const rejectionReason = randomFrom(QA_REJECTION_REASONS);
+      task.metadata = {
+        ...task.metadata,
+        rejectionFeedback: rejectionReason,
+        rejectedAt: new Date().toISOString(),
+        rejectedBy: 'QA Review',
+        rejectionCount: (task.metadata?.rejectionCount || 0) + 1,
+      };
+      
+      const systemEvent = generateEvent(
+        'task.completion_rejected',
+        'warning',
+        `${task.title} completion rejected: ${rejectionReason}`,
+        { taskId: task.id, agentId: task.assigneeId, metadata: { reason: rejectionReason } }
+      );
+      this.state.scenario.events.push(systemEvent);
+      
+      return {
+        type: 'task_completion_rejected',
+        payload: { 
+          task, 
+          oldStatus, 
+          feedback: rejectionReason,
+          rejectedBy: 'QA Review',
+        },
+        timestamp: new Date(),
+      };
+    }
+    
+    task.status = newStatus;
+    task.updatedAt = new Date().toISOString();
+    
+    // Clear rejection metadata when moving back to in_progress from review
+    if (newStatus === 'in_progress' && oldStatus === 'review' && task.metadata?.rejectionFeedback) {
+      task.metadata = {
+        ...task.metadata,
+        rejectionFeedback: undefined,
+        rejectedAt: undefined,
+        rejectedBy: undefined,
+        // Keep rejectionCount for tracking
+      };
     }
     
     // Mark completed if done

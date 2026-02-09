@@ -300,6 +300,18 @@ export enum TaskPriority {
   Urgent = 'URGENT'
 }
 
+/** Rejection metadata when a task completion is rejected by a pre-hook */
+export type TaskRejectionType = {
+  /** Feedback explaining why completion was rejected */
+  feedback: Scalars['String']['output'];
+  /** When the rejection occurred */
+  rejectedAt: Scalars['DateTime']['output'];
+  /** Who/what rejected the completion (webhook names) */
+  rejectedBy: Scalars['String']['output'];
+  /** How many times this task has been rejected */
+  rejectionCount: Scalars['Int']['output'];
+};
+
 export enum TaskStatus {
   Backlog = 'BACKLOG',
   Blocked = 'BLOCKED',
@@ -324,6 +336,8 @@ export type TaskType = {
   identifier: Scalars['String']['output'];
   parentTaskId?: Maybe<Scalars['ID']['output']>;
   priority: TaskPriority;
+  /** Present when task completion was rejected */
+  rejection?: Maybe<TaskRejectionType>;
   status: TaskStatus;
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -337,7 +351,7 @@ export type TasksQueryVariables = Exact<{
 }>;
 
 
-export type TasksQuery = { tasks: Array<{ id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, approvalRequired: boolean, dueDate?: string | null, completedAt?: string | null, createdAt: string, assignee?: { id: string, name: string } | null }> };
+export type TasksQuery = { tasks: Array<{ id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, approvalRequired: boolean, dueDate?: string | null, completedAt?: string | null, createdAt: string, assignee?: { id: string, name: string } | null, rejection?: { feedback: string, rejectedAt: string, rejectedBy: string, rejectionCount: number } | null }> };
 
 export type TaskQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -345,7 +359,7 @@ export type TaskQueryVariables = Exact<{
 }>;
 
 
-export type TaskQuery = { task?: { id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, parentTaskId?: string | null, approvalRequired: boolean, approvedAt?: string | null, dueDate?: string | null, completedAt?: string | null, createdAt: string, updatedAt: string, assignee?: { id: string, name: string } | null } | null };
+export type TaskQuery = { task?: { id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, parentTaskId?: string | null, approvalRequired: boolean, approvedAt?: string | null, dueDate?: string | null, completedAt?: string | null, createdAt: string, updatedAt: string, assignee?: { id: string, name: string } | null, rejection?: { feedback: string, rejectedAt: string, rejectedBy: string, rejectionCount: number } | null } | null };
 
 export type AgentsQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -436,6 +450,12 @@ export const TasksDocument = `
     dueDate
     completedAt
     createdAt
+    rejection {
+      feedback
+      rejectedAt
+      rejectedBy
+      rejectionCount
+    }
   }
 }
     `;
@@ -483,6 +503,12 @@ export const TaskDocument = `
     completedAt
     createdAt
     updatedAt
+    rejection {
+      feedback
+      rejectedAt
+      rejectedBy
+      rejectionCount
+    }
   }
 }
     `;

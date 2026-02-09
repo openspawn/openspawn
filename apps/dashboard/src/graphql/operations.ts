@@ -50,6 +50,12 @@ export const TasksQueryDocument = graphql(`
       dueDate
       completedAt
       createdAt
+      rejection {
+        feedback
+        rejectedAt
+        rejectedBy
+        rejectionCount
+      }
     }
   }
 `);
@@ -76,6 +82,12 @@ export const TaskQueryDocument = graphql(`
       completedAt
       createdAt
       updatedAt
+      rejection {
+        feedback
+        rejectedAt
+        rejectedBy
+        rejectionCount
+      }
     }
   }
 `);
