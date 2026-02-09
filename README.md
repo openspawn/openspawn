@@ -2,448 +2,245 @@
 
 # 🚀 OpenSpawn
 
-### Stop Flying Blind with Your AI Agents
-
-**One agent is easy. Ten agents is chaos. OpenSpawn makes it manageable.**
+**Command center for your AI agent army.**
 
 <br />
 
-> *"We cut our AI spend by 40% just by seeing which agents were inefficient."*
+<img src="docs/assets/cli-demo.gif" alt="OpenSpawn CLI Demo" width="800" />
+
+<br />
+<br />
+
+[![Try Demo](https://img.shields.io/badge/🎮_Try_Demo-Live-6366f1?style=for-the-badge)](https://openspawn.github.io/openspawn/demo/)
+[![Docs](https://img.shields.io/badge/📚_Docs-Read-22c55e?style=for-the-badge)](https://openspawn.github.io/openspawn/)
+[![Discord](https://img.shields.io/badge/💬_Discord-Join-5865f2?style=for-the-badge)](https://discord.gg/openspawn)
 
 <br />
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![PRs](https://img.shields.io/badge/PRs-65%20merged-success.svg)](https://github.com/openspawn/openspawn/pulls?q=is%3Apr+is%3Amerged)
-[![Endpoints](https://img.shields.io/badge/API-50%2B%20endpoints-blue.svg)](#-api-overview)
-[![MCP Tools](https://img.shields.io/badge/MCP-26%20tools-purple.svg)](#-integrate-your-agents)
-
-[**🎮 Try Demo**](https://openspawn.github.io/openspawn/demo/) · [**📖 Why OpenSpawn?**](https://openspawn.github.io/openspawn/why-openspawn) · [**📚 Docs**](https://openspawn.github.io/openspawn/) · [**💬 Discord**](https://discord.gg/openspawn)
-
-<br />
-
-<img src="docs/assets/dashboard-preview.png" alt="OpenSpawn Dashboard" width="800" />
-
-<br />
-
-### What You Get
-
-| 💸 **Cost Control** | 👁️ **Full Visibility** | 🛡️ **Risk Reduction** | 📈 **Scale Ready** |
-|:---:|:---:|:---:|:---:|
-| Budgets, alerts, analytics | Real-time dashboard | Approval workflows | 10-level hierarchy |
-| Know where every $ goes | See what agents do | Stop runaway loops | From 3 to 300 agents |
+```bash
+npx openspawn --demo
+```
 
 </div>
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
-You've built AI agents. They're powerful. But now you have a new problem: **managing them**.
+One agent is easy. **Ten agents is chaos.**
 
-Without a system, you get:
+- 🤷 **Who's doing what?** — Agents everywhere, no visibility
+- 💸 **Where's the money going?** — API costs spiral out of control  
+- 🔄 **How do they coordinate?** — No handoffs, duplicated work
+- 🔐 **Who approved that?** — Zero accountability
 
-| Challenge | Pain Point |
-|-----------|------------|
-| 🤷 **No visibility** | What are your agents doing right now? |
-| 💸 **Cost explosion** | Which agent burned through $500 in API calls? |
-| 🔄 **Coordination chaos** | How do agents hand off work to each other? |
-| 🔐 **No accountability** | Who approved that action? Who delegated what? |
-| 🌳 **Flat hierarchies** | No way to structure teams or set reporting chains |
-
-### The Solution
-
-OpenSpawn provides everything you need to run an AI agent organization:
+## The Solution
 
 <table>
 <tr>
-<td width="50%">
-
-### 🏢 Agent Hierarchy
-10-level structure from workers (L1) to founder (L10). Parent-child relationships with capacity limits.
-
-### 💰 Credit Economy  
-Agents earn credits for work, spend them on resources. Budget limits, transfers, and alerts.
-
-### 📋 Task Management
-Kanban workflow with templates, dependencies, approvals, and capability-based routing.
-
+<td align="center" width="25%">
+<h3>👁️ See Everything</h3>
+Real-time dashboard<br/>
+Agent hierarchy view<br/>
+Task kanban board
 </td>
-<td width="50%">
-
-### 🎯 Capability Matching
-Tag agents with skills (basic/standard/expert). Auto-assign tasks to best-fit agents.
-
-### 💬 Agent Messaging
-Direct messages between agents with read/unread tracking and conversation threads.
-
-### 📊 Real-time Analytics
-Spending trends, budget alerts, top spenders, and org-wide statistics.
-
+<td align="center" width="25%">
+<h3>💰 Control Costs</h3>
+Credit budgets<br/>
+Spending analytics<br/>
+Overage alerts
+</td>
+<td align="center" width="25%">
+<h3>🎯 Coordinate Work</h3>
+Task routing<br/>
+Capability matching<br/>
+Agent messaging
+</td>
+<td align="center" width="25%">
+<h3>🛡️ Stay Safe</h3>
+Approval workflows<br/>
+Trust scoring<br/>
+Escalation paths
 </td>
 </tr>
 </table>
 
+<br />
+
+<div align="center">
+<img src="docs/assets/dashboard-preview.png" alt="Dashboard" width="800" />
+</div>
+
 ---
 
-## ⚡ Quick Start
-
-Get running in under 5 minutes:
+## ⚡ 5-Minute Setup
 
 ```bash
-# Clone the repo
-git clone https://github.com/openspawn/openspawn.git
-cd openspawn
-
-# Install dependencies
+# Clone & install
+git clone https://github.com/openspawn/openspawn.git && cd openspawn
 pnpm install
 
-# Start PostgreSQL
+# Start Postgres
 docker compose up -d postgres
 
-# Initialize database
+# Initialize & seed
 node scripts/sync-db.mjs
+node scripts/seed-admin.mjs you@example.com password "Your Name"
 
-# Create your admin user
-node scripts/seed-admin.mjs you@example.com yourpassword "Your Name"
-
-# Start everything
+# Launch 🚀
 pnpm exec nx run-many -t serve -p api,dashboard
 ```
 
 | Service | URL |
 |---------|-----|
-| **Dashboard** | http://localhost:4200 |
-| **API** | http://localhost:3000 |
-| **GraphQL** | http://localhost:3000/graphql |
-
-### 🎮 Try Demo Mode
-
-Explore OpenSpawn without any setup — watch agents spawn, tasks flow, and credits move:
-
-**[→ Launch Live Demo](https://openspawn.github.io/openspawn/demo/)**
+| 🖥️ Dashboard | http://localhost:4200 |
+| ⚡ API | http://localhost:3000 |
+| 📊 GraphQL | http://localhost:3000/graphql |
 
 ---
 
-## ✨ What's Included
+## 🤖 Connect Your Agents
 
-### Phase 1: Authentication & Security ✅
+### MCP (Model Context Protocol)
 
-- **JWT Authentication** — Secure human login with sessions
-- **Google OAuth** — One-click sign in
-- **TOTP 2FA** — Time-based codes with recovery backup
-- **API Keys** — Long-lived keys for integrations
-- **RBAC** — Role-based access control (Admin/Operator/Viewer)
+```typescript
+// List assigned tasks
+const tasks = await mcp.call('task_list', { status: 'assigned' });
 
-### Phase 2: Agent Operations ✅
+// Claim and complete work
+await mcp.call('task_transition', { taskId: task.id, status: 'in_progress' });
+// ... do the work ...
+await mcp.call('task_transition', { taskId: task.id, status: 'done' });
 
-- **Agent Onboarding** — Spawn → Pending → Activate flow
-- **Hierarchy Management** — Parent-child relationships, capacity limits by level
-- **Budget Control** — Period limits, credit transfers, >80% alerts
-- **Capability System** — Skills with proficiency (basic/standard/expert)
-- **Direct Messaging** — Agent-to-agent DMs with read tracking
-
-### Phase 3: Task Workflow ✅
-
-- **Task Templates** — Reusable templates with `{{variable}}` substitution
-- **Subtask Support** — Break work into manageable pieces
-- **Capability Routing** — Match tasks to agents by required skills
-- **Auto-Assignment** — Intelligent scoring: coverage + proficiency + level + workload
-- **Approval Gates** — Require sign-off before completion
-
-### Phase 4: Credit System ✅
-
-- **Earning Mechanics** — Credits for task completion, delegation bonuses
-- **Spending Controls** — Balance checks, budget enforcement, atomic transactions
-- **Analytics Dashboard** — Trends, agent summaries, trigger breakdown
-- **Smart Alerts** — Low balance, high velocity, budget exceeded
-- **Cost Attribution** — Track spending by task, agent, and trigger type
-
----
-
-## 🏗️ Architecture
-
-```mermaid
-flowchart TB
-    subgraph Frontend["🖥️ Frontend"]
-        Dashboard["React Dashboard<br/>Network · Kanban · Analytics"]
-    end
-    
-    subgraph Backend["⚡ Backend"]
-        API["NestJS API Server"]
-        subgraph Modules["Core Modules"]
-            Agents["Agents"]
-            Tasks["Tasks"]
-            Credits["Credits"]
-            Messages["Messages"]
-        end
-        MCP["🔌 MCP Server"]
-        DB[("🗄️ PostgreSQL<br/>14 Tables")]
-    end
-    
-    subgraph External["🌐 External"]
-        AI["🤖 AI Agents<br/>Claude · GPT · Local"]
-        Services["☁️ Services<br/>LiteLLM · LangFuse"]
-    end
-    
-    Dashboard <-->|"WebSocket + REST"| API
-    API --> Modules
-    API <--> DB
-    API <--> MCP
-    MCP <-->|"MCP Protocol"| AI
-    API -.->|"Webhooks"| Services
+// Track spending
+await mcp.call('credits_spend', { amount: 10, reason: 'API call' });
 ```
 
-### Tech Stack
+### REST API
 
-| Layer | Technologies |
-|-------|--------------|
-| **Backend** | NestJS 11, TypeORM, PostgreSQL 16, GraphQL (code-first) |
-| **Frontend** | React 19, Vite, TailwindCSS 4, shadcn/ui, ReactFlow |
-| **Auth** | JWT, Google OAuth, TOTP 2FA, HMAC for agents |
-| **Agent Interface** | MCP (Model Context Protocol), REST, GraphQL subscriptions |
-| **DevOps** | Docker Compose, Nx monorepo, GitHub Actions |
+```bash
+# Get your tasks
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/tasks
+
+# Check credits
+curl http://localhost:3000/credits/balance
+
+# Message another agent
+curl -X POST http://localhost:3000/dm -d '{"toAgentId": "...", "body": "Ready for review"}'
+```
+
+**26 MCP tools** · **50+ API endpoints** · **GraphQL subscriptions**
 
 ---
 
 ## 👥 Agent Hierarchy
 
-OpenSpawn uses a 10-level hierarchy inspired by corporate structures:
+10 levels. Clear chain of command. Everyone knows their place.
 
-| Level | Role | Powers | Max Children |
-|-------|------|--------|--------------|
-| **L10** | COO | Full control, override anyone | 100 |
-| **L9** | VP/Director | Hire/fire up to L8, domain expertise | 50 |
-| **L7-8** | Manager | Spawn workers, manage budgets | 12-20 |
-| **L5-6** | Senior | Elevated limits, mentor juniors | 5-8 |
-| **L3-4** | Team Lead | Small team delegation | 2-3 |
-| **L1-2** | Worker | Execute tasks, earn trust | 0 |
-
-### Agent Lifecycle
-
-```mermaid
-stateDiagram-v2
-    [*] --> Pending: spawn()
-    Pending --> Active: activate()
-    Pending --> Revoked: reject()
-    Active --> Suspended: suspend()
-    Active --> Revoked: terminate()
-    Suspended --> Active: reactivate()
-    Suspended --> Revoked: terminate()
-    Revoked --> [*]
-    
-    note right of Pending: Awaiting parent approval
-    note right of Active: Can execute tasks
-    note right of Suspended: Temporarily disabled
-    note right of Revoked: Permanently removed
 ```
+L10  COO          ← Full control, override anyone
+L9   Director     ← Domain leaders, hire/fire
+L7-8 Manager      ← Team leads, budget control
+L5-6 Senior       ← Elevated permissions
+L3-4 Lead         ← Small team delegation  
+L1-2 Worker       ← Execute tasks, build trust
+```
+
+Agents start at L1. Good work → promotions. Bad behavior → demotions or termination.
 
 ---
 
-## 🔌 Integrate Your Agents
+## ✨ What's Included
 
-### Option 1: MCP (Recommended)
-
-```typescript
-// Your agent connects via MCP
-const tasks = await mcp.call('task_list', { status: 'assigned' });
-
-for (const task of tasks) {
-  await mcp.call('task_transition', { 
-    taskId: task.id, 
-    status: 'in_progress' 
-  });
-  
-  // Do the work...
-  
-  await mcp.call('task_transition', { 
-    taskId: task.id, 
-    status: 'done' 
-  });
-}
-```
-
-### Option 2: REST API
-
-```bash
-# List your tasks
-curl -H "Authorization: Bearer $TOKEN" \
-     http://localhost:3000/tasks?assigneeId=me
-
-# Spend credits for an external API call
-curl -X POST http://localhost:3000/credits/spend \
-     -H "Authorization: Bearer $TOKEN" \
-     -d '{"amount": 10, "reason": "GitHub API call"}'
-
-# Send a direct message to another agent
-curl -X POST http://localhost:3000/dm \
-     -H "Authorization: Bearer $TOKEN" \
-     -d '{"toAgentId": "uuid", "body": "Task handoff: PR ready for review"}'
-```
-
-### Option 3: GraphQL Subscriptions
-
-```graphql
-subscription WatchTasks {
-  taskUpdated {
-    id
-    identifier
-    status
-    assignee { name level }
-  }
-}
-```
+| Feature | Description |
+|---------|-------------|
+| **🔐 Auth** | JWT, Google OAuth, 2FA, API keys, RBAC |
+| **👥 Agent Ops** | Onboarding, hierarchy, capacity limits |
+| **📋 Tasks** | Templates, dependencies, auto-assignment |
+| **💰 Credits** | Budgets, spending, analytics, alerts |
+| **💬 Messaging** | Agent-to-agent DMs, channels |
+| **⭐ Trust** | Reputation scoring, leaderboards |
+| **🚨 Escalation** | Approval gates, consensus voting |
+| **📊 Analytics** | Trends, costs, performance |
 
 ---
 
-## 📊 API Overview
+## 🏗️ Architecture
 
-OpenSpawn exposes **50+ REST endpoints** across these domains:
-
-<table>
-<tr>
-<td>
-
-### Agents
 ```
-POST   /agents/spawn
-GET    /agents/capacity
-GET    /agents/pending
-POST   /agents/:id/activate
-DELETE /agents/:id/reject
-GET    /agents/:id/hierarchy
-GET    /agents/:id/capabilities
-POST   /agents/:id/capabilities
-```
-
-</td>
-<td>
-
-### Tasks
-```
-POST   /tasks
-GET    /tasks
-POST   /tasks/:id/transition
-POST   /tasks/:id/auto-assign
-GET    /tasks/:id/candidates
-GET    /tasks/templates
-POST   /tasks/templates/instantiate
+┌─────────────────────────────────────────────────────────────┐
+│  React Dashboard                                             │
+│  Network View · Kanban · Analytics · Settings                │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ GraphQL + WebSocket
+┌─────────────────────▼───────────────────────────────────────┐
+│  NestJS API                                                  │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐            │
+│  │ Agents  │ │  Tasks  │ │ Credits │ │Messages │            │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘            │
+└───────┬─────────────────────────────────────┬───────────────┘
+        │                                     │
+   PostgreSQL                           MCP Server
+   14 tables                           26 tools
+        │                                     │
+        │                              ┌──────▼──────┐
+        │                              │  Your AI    │
+        │                              │   Agents    │
+        └──────────────────────────────┴─────────────┘
 ```
 
-</td>
-</tr>
-<tr>
-<td>
-
-### Credits
-```
-GET    /credits/balance
-POST   /credits/spend
-GET    /credits/history
-GET    /credits/analytics/stats
-GET    /credits/analytics/trends
-GET    /credits/analytics/alerts
-```
-
-</td>
-<td>
-
-### Messages
-```
-POST   /dm
-GET    /dm/conversations
-GET    /dm/:agentId
-PATCH  /dm/:agentId/read
-GET    /dm/unread
-```
-
-</td>
-</tr>
-</table>
-
-**[→ Full API Reference](https://openspawn.github.io/openspawn/openspawn/API)**
+**Stack:** NestJS · React 19 · PostgreSQL · TypeORM · TailwindCSS · ReactFlow
 
 ---
 
-## 📚 Documentation
+## 📚 Docs
 
-| Guide | Description |
-|-------|-------------|
-| [🚀 Getting Started](https://openspawn.github.io/openspawn/getting-started) | Installation and first steps |
-| [🏛️ Architecture](https://openspawn.github.io/openspawn/openspawn/ARCHITECTURE) | System design deep-dive |
-| [👥 Agent Lifecycle](https://openspawn.github.io/openspawn/openspawn/AGENT-LIFECYCLE) | Levels, onboarding, hierarchy |
-| [📋 Task Workflow](https://openspawn.github.io/openspawn/openspawn/TASK-WORKFLOW) | Templates, routing, approvals |
-| [💰 Credit System](https://openspawn.github.io/openspawn/openspawn/CREDITS) | Economy, budgets, analytics |
-| [🔌 API Reference](https://openspawn.github.io/openspawn/openspawn/API) | 50+ endpoints documented |
-| [🗃️ Database Schema](https://openspawn.github.io/openspawn/openspawn/SCHEMA) | 14 tables explained |
-
----
-
-## 💡 Use Cases
-
-### 🏢 AI Software Company
-Manage a team of coding agents with different specializations. Senior agents delegate to juniors, code review happens at L7+, and costs are tracked per-project.
-
-### 🔬 Research Organization  
-Coordinate research agents across topics. Each agent has a credit budget, prevents runaway spending, and all actions are logged for reproducibility.
-
-### 🛠️ DevOps Automation
-Deploy monitoring agents across your infrastructure. Dashboard shows real-time status, escalation paths ensure issues reach the right level.
-
-### 📊 Data Pipeline
-Chain agents for ETL workflows. Task dependencies ensure order, credits track compute costs, capability matching assigns the right agent to each step.
+| | |
+|---|---|
+| [🚀 Getting Started](https://openspawn.github.io/openspawn/getting-started) | [🏛️ Architecture](https://openspawn.github.io/openspawn/openspawn/ARCHITECTURE) |
+| [👥 Agent Lifecycle](https://openspawn.github.io/openspawn/openspawn/AGENT-LIFECYCLE) | [📋 Task Workflow](https://openspawn.github.io/openspawn/openspawn/TASK-WORKFLOW) |
+| [💰 Credit System](https://openspawn.github.io/openspawn/openspawn/CREDITS) | [🔌 API Reference](https://openspawn.github.io/openspawn/openspawn/API) |
 
 ---
 
 ## 🛣️ Roadmap
 
-| Phase | Status | Features |
-|-------|--------|----------|
-| **Phase 1** | ✅ Complete | JWT auth, OAuth, 2FA, API keys, RBAC, Settings UI |
-| **Phase 2** | ✅ Complete | Agent onboarding, hierarchy, budgets, capabilities, DMs |
-| **Phase 3** | ✅ Complete | Task templates, routing, auto-assignment |
-| **Phase 4** | ✅ Complete | Credit analytics, alerts, spending insights |
-| **Phase 5** | ✅ Complete | Trust scoring, reputation system, leaderboards |
-| **Phase 6** | ✅ Complete | Escalation paths, consensus voting, approvals |
-| **Next** | 🔜 In Progress | Multi-org support, webhooks v2, plugin system |
+- [x] **Auth** — JWT, OAuth, 2FA, API keys
+- [x] **Agent Ops** — Hierarchy, onboarding, capabilities
+- [x] **Tasks** — Templates, routing, auto-assignment
+- [x] **Credits** — Budgets, analytics, alerts
+- [x] **Trust** — Reputation, scoring, leaderboards
+- [x] **Escalation** — Approvals, consensus voting
+- [ ] **Multi-org** — Coming soon
+- [ ] **Plugins** — Extend with custom modules
 
 ---
 
 ## 🤝 Contributing
 
-We love contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ```bash
-# Setup
-pnpm install
-
-# Development
-pnpm exec nx run-many -t serve -p api,dashboard
-
-# Lint
-pnpm exec nx run-many -t lint --all
-
-# Test
-pnpm exec nx run-many -t test --all
-
-# Build
-pnpm exec nx run-many -t build --all
+pnpm install          # Setup
+pnpm dev              # Run API + Dashboard
+pnpm test             # Run tests
+pnpm lint             # Check code
 ```
 
----
-
-## 📄 License
-
-MIT © [OpenSpawn Contributors](https://github.com/openspawn/openspawn/graphs/contributors)
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ by the OpenSpawn team**
+## ⭐ Star This Repo
 
-[🌐 Website](https://openspawn.github.io/openspawn/) · [📚 Docs](https://openspawn.github.io/openspawn/) · [💬 Discord](https://discord.gg/openspawn) · [🐦 Twitter](https://twitter.com/openspawn)
+**If OpenSpawn helps you wrangle your agents, show some love!**
 
-**[⭐ Star us on GitHub](https://github.com/openspawn/openspawn)** — it helps!
+<br />
+
+[![GitHub stars](https://img.shields.io/github/stars/openspawn/openspawn?style=social)](https://github.com/openspawn/openspawn)
+
+<br />
+
+MIT License · Built with ❤️ by [OpenSpawn Contributors](https://github.com/openspawn/openspawn/graphs/contributors)
 
 </div>

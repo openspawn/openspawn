@@ -4,47 +4,74 @@
 Output docs/assets/cli-demo.gif
 
 Set Shell "bash"
-Set FontSize 14
-Set Width 900
-Set Height 600
+Set FontSize 16
+Set Width 1000
+Set Height 650
 Set Theme "Catppuccin Mocha"
-Set Padding 20
+Set Padding 24
+Set TypingSpeed 50ms
 
-# Show the banner
-Type "openspawn --demo"
+# Start with a fresh prompt
+Hide
+Type "cd ~/github/openspawn/openspawn && clear"
 Enter
-Sleep 2s
+Sleep 500ms
+Show
 
-# List agents
-Type "openspawn agents list --demo"
+# Show the slick banner
+Type "pnpm exec tsx apps/cli/src/main.ts --help"
 Enter
-Sleep 3s
+Sleep 2.5s
 
-# Show agent details
-Type "openspawn agents get talent-agent --demo"
+# Clear and show agents
+Type "clear"
 Enter
-Sleep 2s
+Sleep 300ms
 
-# List tasks
-Type "openspawn tasks list --demo"
+Type "# 👥 See your agent organization"
 Enter
-Sleep 3s
+Sleep 800ms
 
-# Show task board
-Type "openspawn tasks board --demo"
-Enter
-Sleep 3s
-
-# Check credits
-Type "openspawn credits balance --demo"
-Enter
-Sleep 2s
-
-# Show help
-Type "openspawn --help"
+Type "pnpm exec tsx apps/cli/src/main.ts agents list --demo"
 Enter
 Sleep 3s
 
-# End
-Type "# 🚀 OpenSpawn CLI - Multi-agent coordination"
-Sleep 2s
+# Show tasks
+Type "clear"
+Enter
+Sleep 300ms
+
+Type "# 📋 Track tasks across your team"
+Enter
+Sleep 800ms
+
+Type "pnpm exec tsx apps/cli/src/main.ts tasks list --demo"
+Enter
+Sleep 3s
+
+# Show credits
+Type "clear"
+Enter
+Sleep 300ms
+
+Type "# 💰 Monitor spending in real-time"
+Enter
+Sleep 800ms
+
+Type "pnpm exec tsx apps/cli/src/main.ts credits balance --demo"
+Enter
+Sleep 3s
+
+# Final message
+Type "clear"
+Enter
+Sleep 300ms
+
+Type "# ✨ Try it: npx openspawn --demo"
+Enter
+Sleep 500ms
+Type "#"
+Enter
+Type "# 🌐 Dashboard: openspawn.github.io/openspawn/demo"
+Enter
+Sleep 3s
