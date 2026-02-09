@@ -113,9 +113,11 @@ export interface SimulationState {
   simulatedTime: Date;
 }
 
+export type IdleReason = 'task_complete' | 'blocked' | 'awaiting_input' | 'unassigned' | 'newly_activated';
+
 export interface SimulationEvent {
   type: 'agent_created' | 'agent_activated' | 'agent_promoted' | 'agent_terminated' |
-        'agent_status_changed' | 'agent_despawned' |
+        'agent_status_changed' | 'agent_despawned' | 'agent_idle' |
         'task_created' | 'task_assigned' | 'task_completed' |
         'credit_earned' | 'credit_spent' |
         'system_event';
