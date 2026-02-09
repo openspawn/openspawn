@@ -16,6 +16,17 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "mobile-chrome",
+      use: { ...devices["Pixel 5"] },
+    },
+    {
+      name: "tablet",
+      use: { 
+        ...devices["iPad (gen 7)"],
+        viewport: { width: 768, height: 1024 },
+      },
+    },
   ],
   webServer: [
     {
