@@ -9,6 +9,7 @@ import { Repository } from "typeorm";
 
 import { Agent, AgentCapability } from "@openspawn/database";
 import {
+  AgentMode,
   AgentRole,
   AgentStatus,
   encryptSecret,
@@ -65,6 +66,7 @@ export class AgentsService {
       model: dto.model || "sonnet",
       status: AgentStatus.ACTIVE,
       role: dto.role || AgentRole.WORKER,
+      mode: dto.mode || AgentMode.WORKER,
       managementFeePct: dto.managementFeePct || 0,
       currentBalance: 0,
       budgetPeriodSpent: 0,
@@ -139,6 +141,7 @@ export class AgentsService {
     if (dto.name !== undefined) agent.name = dto.name;
     if (dto.level !== undefined) agent.level = dto.level;
     if (dto.model !== undefined) agent.model = dto.model;
+    if (dto.mode !== undefined) agent.mode = dto.mode;
     if (dto.managementFeePct !== undefined) agent.managementFeePct = dto.managementFeePct;
     if (dto.budgetPeriodLimit !== undefined) agent.budgetPeriodLimit = dto.budgetPeriodLimit;
     if (dto.metadata !== undefined) agent.metadata = dto.metadata;

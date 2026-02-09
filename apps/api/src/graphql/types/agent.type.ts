@@ -1,8 +1,12 @@
 import { Field, Float, ID, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
 
-import { AgentRole, AgentStatus, ReputationLevel } from "@openspawn/shared-types";
+import { AgentMode, AgentRole, AgentStatus, ReputationLevel } from "@openspawn/shared-types";
 
 // Register enums
+registerEnumType(AgentMode, {
+  name: "AgentMode",
+  description: "Operational mode that restricts what actions an agent can perform",
+});
 registerEnumType(AgentRole, { name: "AgentRole" });
 registerEnumType(AgentStatus, { name: "AgentStatus" });
 registerEnumType(ReputationLevel, { name: "ReputationLevel" });
@@ -20,6 +24,9 @@ export class AgentType {
 
   @Field(() => AgentRole)
   role!: AgentRole;
+
+  @Field(() => AgentMode)
+  mode!: AgentMode;
 
   @Field(() => AgentStatus)
   status!: AgentStatus;

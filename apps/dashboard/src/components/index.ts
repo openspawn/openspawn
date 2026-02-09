@@ -3,6 +3,7 @@ export * from "./protected-route";
 export * from "./theme-provider";
 export * from "./theme-toggle";
 export * from "./agent-avatar";
+export * from "./agent-mode-selector";
 export * from "./agent-onboarding";
 export * from "./budget-manager";
 export * from "./capability-manager";

@@ -12,7 +12,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 
-import { AgentRole, Proficiency } from "@openspawn/shared-types";
+import { AgentMode, AgentRole, Proficiency } from "@openspawn/shared-types";
 
 export class CapabilityDto {
   @IsString()
@@ -47,6 +47,10 @@ export class CreateAgentDto {
   @IsOptional()
   @IsEnum(AgentRole)
   role?: AgentRole;
+
+  @IsOptional()
+  @IsEnum(AgentMode)
+  mode?: AgentMode;
 
   @IsOptional()
   @IsInt()

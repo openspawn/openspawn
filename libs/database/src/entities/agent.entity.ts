@@ -1,4 +1,4 @@
-import { AgentRole, AgentStatus } from "@openspawn/shared-types";
+import { AgentMode, AgentRole, AgentStatus } from "@openspawn/shared-types";
 import {
   Check,
   Column,
@@ -47,6 +47,9 @@ export class Agent {
 
   @Column({ type: "varchar", length: 50, default: AgentRole.WORKER })
   role!: AgentRole;
+
+  @Column({ type: "varchar", length: 20, default: AgentMode.WORKER })
+  mode!: AgentMode;
 
   @Column({ name: "management_fee_pct", type: "smallint", default: 0 })
   managementFeePct!: number;

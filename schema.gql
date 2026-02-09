@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Operational mode that restricts what actions an agent can perform"""
+enum AgentMode {
+  OBSERVER
+  ORCHESTRATOR
+  WORKER
+}
+
 type AgentReputationType {
   lastActivityAt: DateTime
   promotionProgress: PromotionProgressType
@@ -39,6 +46,7 @@ type AgentType {
   level: Int!
   lifetimeEarnings: Int!
   managementFeePct: Int!
+  mode: AgentMode!
   model: String!
   name: String!
   parentId: ID
