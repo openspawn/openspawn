@@ -8,7 +8,7 @@ import { TaskStatus } from "@openspawn/shared-types";
 import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
 import { TasksService } from "../../tasks";
 import { PubSubProvider, TASK_UPDATED } from "../pubsub.provider";
-import { AgentType, TaskType } from "../types";
+import { AgentType, TaskRejectionType, TaskType } from "../types";
 
 /**
  * Security Model:
@@ -56,6 +56,19 @@ export class TaskResolver {
   async assignee(@Parent() task: TaskType): Promise<AgentType | null> {
     if (!task.assigneeId) return null;
     return this.agentRepository.findOne({ where: { id: task.assigneeId } });
+  }
+
+  @ResolveField(() => TaskRejectionType, { nullable: true })
+  rejection(@Parent() task: TaskType & { metadata?: Record<string, unknown> }): TaskRejectionType | null {
+    const metadata = task.metadata;
+    if (!metadata?.rejectionFeedback) return null;
+
+    return {
+      feedback: metadata.rejectionFeedback as string,
+      rejectedAt: new Date(metadata.rejectedAt as string),
+      rejectedBy: metadata.rejectedBy as string,
+      rejectionCount: (metadata.rejectionCount as number) || 1,
+    };
   }
 
   @Subscription(() => TaskType, {

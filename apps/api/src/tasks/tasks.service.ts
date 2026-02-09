@@ -203,11 +203,88 @@ export class TasksService {
         throw new ForbiddenException("Task requires approval before completion");
       }
 
+      // Execute pre-hooks specifically for task completion
+      const completionHookResult = await this.webhooksService.executePreHooks(
+        orgId,
+        "task.complete",
+        {
+          taskId: id,
+          taskIdentifier: task.identifier,
+          taskTitle: task.title,
+          task: {
+            id: task.id,
+            identifier: task.identifier,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            assigneeId: task.assigneeId,
+            creatorId: task.creatorId,
+            metadata: task.metadata,
+          },
+          actorId,
+          assigneeId: task.assigneeId,
+        },
+      );
+
+      // If completion is rejected by pre-hook, redirect to REVIEW with feedback
+      if (!completionHookResult.allow) {
+        const previousStatus = task.status;
+        task.status = TaskStatus.REVIEW;
+        task.metadata = {
+          ...task.metadata,
+          rejectionFeedback: completionHookResult.reason || "Completion rejected by webhook",
+          rejectedAt: new Date().toISOString(),
+          rejectedBy: completionHookResult.blockedBy?.join(", ") || "pre-hook",
+          rejectionCount: ((task.metadata?.rejectionCount as number) || 0) + 1,
+        };
+
+        const saved = await this.taskRepository.save(task);
+
+        // Emit completion rejected event
+        await this.eventsService.emit({
+          orgId,
+          type: "task.completion_rejected",
+          actorId,
+          entityType: "task",
+          entityId: id,
+          data: {
+            from: previousStatus,
+            feedback: completionHookResult.reason,
+            rejectedBy: completionHookResult.blockedBy,
+          },
+        });
+
+        // Emit for other listeners
+        this.eventEmitter.emit("task.completion_rejected", {
+          task: saved,
+          from: previousStatus,
+          feedback: completionHookResult.reason,
+          rejectedBy: completionHookResult.blockedBy,
+          actorId,
+        });
+
+        return saved;
+      }
+
       task.completedAt = new Date();
     }
 
     const previousStatus = task.status;
     task.status = dto.status;
+
+    // Clear rejection feedback when moving back to IN_PROGRESS from REVIEW
+    if (dto.status === TaskStatus.IN_PROGRESS && previousStatus === TaskStatus.REVIEW) {
+      if (task.metadata?.rejectionFeedback) {
+        task.metadata = {
+          ...task.metadata,
+          rejectionFeedback: undefined,
+          rejectedAt: undefined,
+          rejectedBy: undefined,
+          // Keep rejectionCount for tracking
+        };
+      }
+    }
 
     const saved = await this.taskRepository.save(task);
 

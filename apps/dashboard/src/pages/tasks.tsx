@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown } from "lucide-react";
+import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -98,6 +98,7 @@ interface TaskCardProps {
 function TaskCard({ task, onClick, compact }: TaskCardProps) {
   const dueDate = formatDate(task.dueDate);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
+  const hasRejection = task.rejection && task.status === "REVIEW";
   
   return (
     <motion.div
@@ -108,13 +109,15 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
       onClick={onClick}
     >
-      <Card className="cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20">
+      <Card className={`cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20 ${
+        hasRejection ? 'border-amber-500/50 bg-amber-500/5' : ''
+      }`}>
         <CardContent className="p-3">
           <div className="flex items-start gap-2">
             <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50 flex-shrink-0" />
             <div className="flex-1 min-w-0 space-y-2">
               {/* Header: ID + Priority */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-mono text-muted-foreground">
                   {task.identifier}
                 </span>
@@ -126,10 +129,26 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
                     approval
                   </Badge>
                 )}
+                {hasRejection && (
+                  <Badge variant="outline" className="text-xs text-amber-600 border-amber-500/50 bg-amber-500/10 animate-pulse">
+                    <AlertTriangle className="w-3 h-3 mr-1" />
+                    needs fixes
+                  </Badge>
+                )}
               </div>
               
               {/* Title */}
               <p className="text-sm font-medium leading-tight">{task.title}</p>
+              
+              {/* Rejection feedback preview */}
+              {hasRejection && task.rejection && (
+                <div className="rounded-md bg-amber-500/10 border border-amber-500/30 px-2 py-1.5">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 line-clamp-2">
+                    <ShieldAlert className="w-3 h-3 inline mr-1" />
+                    {task.rejection.feedback}
+                  </p>
+                </div>
+              )}
               
               {/* Meta row: Assignee, Due date */}
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -150,6 +169,13 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
                     <span>{dueDate}</span>
                   </div>
                 )}
+                
+                {task.rejection?.rejectionCount && task.rejection.rejectionCount > 1 && (
+                  <div className="flex items-center gap-1 text-amber-500">
+                    <History className="w-3 h-3" />
+                    <span>{task.rejection.rejectionCount}x</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -166,6 +192,7 @@ interface TaskDetailSidebarProps {
 
 function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
+  const hasRejection = task.rejection && task.status === "REVIEW";
   
   return (
     <motion.div
@@ -188,6 +215,54 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
         </Button>
       </div>
       
+      {/* Rejection Banner */}
+      {hasRejection && task.rejection && (
+        <motion.div 
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          className="border-b border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-orange-500/15"
+        >
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-full bg-amber-500/20 animate-pulse">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-amber-600 dark:text-amber-400">
+                  Completion Rejected
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  by {task.rejection.rejectedBy} • {formatFullDate(task.rejection.rejectedAt)}
+                </p>
+              </div>
+              {task.rejection.rejectionCount > 1 && (
+                <Badge variant="outline" className="ml-auto text-amber-500 border-amber-500/50">
+                  <History className="w-3 h-3 mr-1" />
+                  {task.rejection.rejectionCount} rejections
+                </Badge>
+              )}
+            </div>
+            
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
+              <h4 className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3" />
+                Required Fixes
+              </h4>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                {task.rejection.feedback}
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="flex-1 border-amber-500/30 text-amber-600 hover:bg-amber-500/10">
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Resume Work
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+      
       {/* Content */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6">
@@ -197,12 +272,16 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
           </div>
           
           {/* Status */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <Badge 
-              variant={task.status === "DONE" ? "success" : "secondary"}
+              variant={task.status === "DONE" ? "success" : hasRejection ? "warning" : "secondary"}
               className="text-sm px-3 py-1"
             >
-              <CheckCircle2 className="w-3 h-3 mr-1" />
+              {hasRejection ? (
+                <AlertTriangle className="w-3 h-3 mr-1" />
+              ) : (
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+              )}
               {task.status?.replace("_", " ")}
             </Badge>
             {task.approvalRequired && !task.approvedAt && (
@@ -300,9 +379,16 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
           <Button variant="outline" className="flex-1" onClick={onClose}>
             Close
           </Button>
-          <Button className="flex-1">
-            Edit Task
-          </Button>
+          {hasRejection ? (
+            <Button className="flex-1 bg-amber-500 hover:bg-amber-600 text-white">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Resume Work
+            </Button>
+          ) : (
+            <Button className="flex-1">
+              Edit Task
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>

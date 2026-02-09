@@ -207,6 +207,21 @@ enum TaskStatus {
   TODO
 }
 
+"""Rejection metadata when a task completion is rejected by a pre-hook"""
+type TaskRejectionType {
+  """Feedback explaining why completion was rejected"""
+  feedback: String!
+
+  """When the rejection occurred"""
+  rejectedAt: DateTime!
+
+  """Who/what rejected the completion (webhook names)"""
+  rejectedBy: String!
+
+  """How many times this task has been rejected"""
+  rejectionCount: Int!
+}
+
 type TaskType {
   approvalRequired: Boolean!
   approvedAt: DateTime
@@ -221,6 +236,9 @@ type TaskType {
   identifier: String!
   parentTaskId: ID
   priority: TaskPriority!
+
+  """Present when task completion was rejected"""
+  rejection: TaskRejectionType
   status: TaskStatus!
   title: String!
   updatedAt: DateTime!

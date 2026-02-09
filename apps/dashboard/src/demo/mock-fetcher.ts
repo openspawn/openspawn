@@ -160,6 +160,14 @@ function mapTask(task: DemoTask, agents: DemoAgent[]) {
     ? agents.find((a) => a.id === task.assigneeId) 
     : null;
 
+  // Map rejection metadata if present
+  const rejection = task.metadata?.rejectionFeedback ? {
+    feedback: task.metadata.rejectionFeedback,
+    rejectedAt: task.metadata.rejectedAt,
+    rejectedBy: task.metadata.rejectedBy ?? 'QA Review',
+    rejectionCount: task.metadata.rejectionCount ?? 1,
+  } : null;
+
   return {
     id: task.id,
     identifier: task.identifier,
@@ -175,6 +183,7 @@ function mapTask(task: DemoTask, agents: DemoAgent[]) {
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
     completedAt: task.completedAt ?? null,
+    rejection,
   };
 }
 

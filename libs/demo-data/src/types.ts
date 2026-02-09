@@ -46,6 +46,13 @@ export interface DemoReputationEvent {
   createdAt: string;
 }
 
+export interface TaskRejectionMetadata {
+  rejectionFeedback?: string;
+  rejectedAt?: string;
+  rejectedBy?: string;
+  rejectionCount?: number;
+}
+
 export interface DemoTask {
   id: string;
   identifier: string;
@@ -58,6 +65,7 @@ export interface DemoTask {
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
+  metadata?: TaskRejectionMetadata;
 }
 
 export interface DemoCreditTransaction {
@@ -118,7 +126,7 @@ export type IdleReason = 'task_complete' | 'blocked' | 'awaiting_input' | 'unass
 export interface SimulationEvent {
   type: 'agent_created' | 'agent_activated' | 'agent_promoted' | 'agent_terminated' |
         'agent_status_changed' | 'agent_despawned' | 'agent_idle' |
-        'task_created' | 'task_assigned' | 'task_completed' |
+        'task_created' | 'task_assigned' | 'task_completed' | 'task_completion_rejected' |
         'credit_earned' | 'credit_spent' |
         'prehook_blocked' | 'prehook_allowed' |
         'system_event';
