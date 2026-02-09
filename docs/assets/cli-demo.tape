@@ -11,14 +11,17 @@ Set Theme "Catppuccin Mocha"
 Set Padding 24
 Set TypingSpeed 40ms
 
-# Setup alias in hidden mode
+# Setup PATH in hidden mode so 'openspawn' command works
 Hide
-Type "cd ~/github/openspawn/openspawn"
+Type "export PATH=$HOME/github/openspawn/openspawn/scripts:$PATH"
 Enter
-Sleep 300ms
-Type "alias openspawn='pnpm exec tsx apps/cli/src/main.ts 2>/dev/null'"
+Sleep 200ms
+Type "chmod +x $HOME/github/openspawn/openspawn/scripts/openspawn-demo.sh"
 Enter
-Sleep 300ms
+Sleep 200ms
+Type "alias openspawn='openspawn-demo.sh'"
+Enter
+Sleep 200ms
 Type "clear"
 Enter
 Sleep 300ms
@@ -34,7 +37,7 @@ Type "openspawn agents list --demo"
 Enter
 Sleep 3.5s
 
-# List tasks
+# List tasks  
 Type "openspawn tasks list --demo"
 Enter
 Sleep 3.5s
@@ -48,17 +51,13 @@ Sleep 3s
 Type "clear"
 Enter
 Sleep 300ms
-Type "echo '✨ Try it yourself:'"
-Enter
-Sleep 500ms
-Type "echo '   npx openspawn --demo'"
-Enter
-Sleep 500ms
 Type "echo ''"
 Enter
-Type "echo '🌐 Live dashboard:'"
+Type "echo '  ✨ Try it: npx openspawn --demo'"
 Enter
-Sleep 500ms
-Type "echo '   openspawn.github.io/openspawn/demo'"
+Sleep 800ms
+Type "echo '  🌐 Demo:  openspawn.github.io/openspawn/demo'"
+Enter
+Type "echo ''"
 Enter
 Sleep 3s
