@@ -527,35 +527,30 @@ export class TasksService {
   }
 
   /**
-   * Priority ordering for self-claim: URGENT > HIGH > NORMAL > LOW
-   */
-  private readonly PRIORITY_ORDER: Record<TaskPriority, number> = {
-    [TaskPriority.URGENT]: 0,
-    [TaskPriority.HIGH]: 1,
-    [TaskPriority.NORMAL]: 2,
-    [TaskPriority.LOW]: 3,
-  };
-
-  /**
-   * Get count of tasks that can be claimed by an agent
-   * Tasks must be unassigned, in claimable status, and not blocked
+   * Get count of tasks available to claim (unassigned, unblocked, TODO status)
    */
   async getClaimableTaskCount(orgId: string): Promise<number> {
-    const claimableStatuses = [TaskStatus.BACKLOG, TaskStatus.TODO];
-
-    // Get unassigned tasks in claimable statuses
-    const tasks = await this.taskRepository
+    // Get all unassigned TODO tasks
+    const unassignedTasks = await this.taskRepository
       .createQueryBuilder("task")
       .where("task.org_id = :orgId", { orgId })
       .andWhere("task.assignee_id IS NULL")
-      .andWhere("task.status IN (:...statuses)", { statuses: claimableStatuses })
+      .andWhere("task.status = :status", { status: TaskStatus.TODO })
       .getMany();
 
-    // Filter out blocked tasks (those with incomplete blocking dependencies)
+    // Filter out tasks with blocking dependencies
     let claimableCount = 0;
-    for (const task of tasks) {
-      const isBlocked = await this.isTaskBlocked(task.id);
-      if (!isBlocked) {
+    for (const task of unassignedTasks) {
+      const blockingDeps = await this.dependencyRepository.find({
+        where: { taskId: task.id, blocking: true },
+        relations: ["dependsOn"],
+      });
+
+      const hasUnfinishedBlocker = blockingDeps.some(
+        (dep) => dep.dependsOn?.status !== TaskStatus.DONE,
+      );
+
+      if (!hasUnfinishedBlocker) {
         claimableCount++;
       }
     }
@@ -564,102 +559,68 @@ export class TasksService {
   }
 
   /**
-   * Check if a task is blocked by incomplete dependencies
-   */
-  private async isTaskBlocked(taskId: string): Promise<boolean> {
-    const blockingDeps = await this.dependencyRepository.find({
-      where: { taskId, blocking: true },
-      relations: ["dependsOn"],
-    });
-
-    return blockingDeps.some((dep) => dep.dependsOn?.status !== TaskStatus.DONE);
-  }
-
-  /**
    * Claim the next available task for an agent
-   * Returns the claimed task or null if none available
    * Uses row-level locking to prevent race conditions
    */
   async claimNextTask(
     orgId: string,
     agentId: string,
   ): Promise<{ success: boolean; message: string; task: Task | null }> {
-    const claimableStatuses = [TaskStatus.BACKLOG, TaskStatus.TODO];
-
-    // Use transaction with row-level locking for race condition prevention
+    // Use a transaction with row-level locking
     return this.taskRepository.manager.transaction(async (manager) => {
-      // Find all candidate tasks ordered by priority
-      const candidates = await manager
-        .createQueryBuilder(Task, "task")
-        .setLock("pessimistic_write")
-        .where("task.org_id = :orgId", { orgId })
-        .andWhere("task.assignee_id IS NULL")
-        .andWhere("task.status IN (:...statuses)", { statuses: claimableStatuses })
-        .orderBy("task.created_at", "ASC")
-        .getMany();
+      // Find next claimable task ordered by priority
+      const priorityOrder = ["URGENT", "HIGH", "NORMAL", "LOW"];
 
-      if (candidates.length === 0) {
-        return { success: false, message: "No tasks available to claim", task: null };
-      }
+      for (const priority of priorityOrder) {
+        // Find unassigned TODO task with this priority, lock for update
+        const task = await manager
+          .createQueryBuilder(Task, "task")
+          .setLock("pessimistic_write")
+          .where("task.org_id = :orgId", { orgId })
+          .andWhere("task.assignee_id IS NULL")
+          .andWhere("task.status = :status", { status: TaskStatus.TODO })
+          .andWhere("task.priority = :priority", { priority })
+          .orderBy("task.created_at", "ASC")
+          .getOne();
 
-      // Sort by priority (URGENT first)
-      candidates.sort(
-        (a, b) => this.PRIORITY_ORDER[a.priority] - this.PRIORITY_ORDER[b.priority]
-      );
+        if (task) {
+          // Check for blocking dependencies
+          const blockingDeps = await this.dependencyRepository.find({
+            where: { taskId: task.id, blocking: true },
+            relations: ["dependsOn"],
+          });
 
-      // Find first unblocked task
-      let taskToClaim: Task | null = null;
-      for (const candidate of candidates) {
-        const blockingDeps = await manager.find(TaskDependency, {
-          where: { taskId: candidate.id, blocking: true },
-          relations: ["dependsOn"],
-        });
+          const hasUnfinishedBlocker = blockingDeps.some(
+            (dep) => dep.dependsOn?.status !== TaskStatus.DONE,
+          );
 
-        const isBlocked = blockingDeps.some(
-          (dep) => dep.dependsOn?.status !== TaskStatus.DONE
-        );
+          if (hasUnfinishedBlocker) {
+            continue; // Try next priority level
+          }
 
-        if (!isBlocked) {
-          taskToClaim = candidate;
-          break;
+          // Claim the task
+          task.assigneeId = agentId;
+          task.status = TaskStatus.IN_PROGRESS;
+          const saved = await manager.save(task);
+
+          await this.eventsService.emit({
+            orgId,
+            type: "task.claimed",
+            actorId: agentId,
+            entityType: "task",
+            entityId: task.id,
+            data: {
+              identifier: task.identifier,
+              title: task.title,
+              priority: task.priority,
+            },
+          });
+
+          return { success: true, message: `Claimed task ${saved.identifier}`, task: saved };
         }
       }
 
-      if (!taskToClaim) {
-        return { success: false, message: "All available tasks are blocked", task: null };
-      }
-
-      // Claim the task
-      taskToClaim.assigneeId = agentId;
-      taskToClaim.status = TaskStatus.IN_PROGRESS;
-      const saved = await manager.save(taskToClaim);
-
-      // Emit events (outside transaction context)
-      setImmediate(async () => {
-        await this.eventsService.emit({
-          orgId,
-          type: "task.claimed",
-          actorId: agentId,
-          entityType: "task",
-          entityId: saved.id,
-          data: {
-            identifier: saved.identifier,
-            title: saved.title,
-            priority: saved.priority,
-          },
-        });
-
-        this.eventEmitter.emit("task.claimed", {
-          task: saved,
-          agentId,
-        });
-      });
-
-      return {
-        success: true,
-        message: `Claimed task ${saved.identifier}`,
-        task: saved,
-      };
+      return { success: false, message: "No tasks available to claim", task: null };
     });
   }
 }
