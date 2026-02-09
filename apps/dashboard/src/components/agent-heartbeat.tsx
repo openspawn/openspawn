@@ -34,14 +34,14 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
 
   const pulseColors = {
     ACTIVE: 'bg-green-500',
-    IDLE: 'bg-yellow-500',
+    IDLE: 'bg-emerald-400',
     PENDING: 'bg-blue-500',
     SUSPENDED: 'bg-red-500',
   };
 
   const ringColors = {
     ACTIVE: 'ring-green-500/50',
-    IDLE: 'ring-yellow-500/50',
+    IDLE: 'ring-emerald-400/60',
     PENDING: 'ring-blue-500/50',
     SUSPENDED: 'ring-red-500/50',
   };
