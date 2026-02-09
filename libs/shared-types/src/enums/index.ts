@@ -22,3 +22,4 @@ export {
 export { ReputationLevel, getReputationLevel } from "./reputation-level.enum";
 export { TaskPriority } from "./task-priority.enum";
 export { TaskStatus } from "./task-status.enum";
+export { IdleReason } from "./idle-reason.enum";

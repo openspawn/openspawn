@@ -12,10 +12,12 @@ import { TasksModule } from "../tasks";
 
 import { PubSubProvider } from "./pubsub.provider";
 import {
+  DirectMessageResolver,
   AgentResolver,
   CreditResolver,
   EventResolver,
   MessageResolver,
+  DirectMessageResolver,
   TaskResolver,
 } from "./resolvers";
 
@@ -45,6 +47,7 @@ import {
     CreditResolver,
     EventResolver,
     MessageResolver,
+  DirectMessageResolver,
   ],
   exports: [PubSubProvider],
 })
