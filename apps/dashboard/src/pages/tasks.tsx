@@ -6,7 +6,8 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { useTasks, type Task } from "../hooks/use-tasks";
+import { PhaseChip } from "../components/phase-chip";
+import { useTasks, type Task, useCurrentPhase } from "../hooks";
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
@@ -410,6 +411,7 @@ function ListView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: T
 
 export function TasksPage() {
   const { tasks, loading, error } = useTasks();
+  const { currentPhase, isNovaTech } = useCurrentPhase();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
@@ -433,11 +435,14 @@ export function TasksPage() {
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
-          <p className="text-muted-foreground">
-            Manage and track agent tasks
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
+            <p className="text-muted-foreground">
+              Manage and track agent tasks
+            </p>
+          </div>
+          {currentPhase && <PhaseChip phase={currentPhase} />}
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon">

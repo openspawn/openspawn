@@ -16,3 +16,4 @@ export * from "./agent-efficiency";
 export * from "./model-usage";
 export * from "./agent-heartbeat";
 export { PhaseProgress } from './phase-progress';
+export { PhaseChip } from './phase-chip';
