@@ -6,6 +6,11 @@ import { AppModule } from "./app/app.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Set global API version prefix
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['/health', '/ready', '/metrics'],
+  });
+
   // Enable validation
   app.useGlobalPipes(
     new ValidationPipe({
@@ -26,7 +31,7 @@ async function bootstrap() {
   const host = process.env["HOST"] || "0.0.0.0";
   await app.listen(port, host);
 
-  Logger.log(\`🚀 OpenSpawn API running on http://\${host}:\${port}\`);
+  Logger.log(`🚀 OpenSpawn API running on http://${host}:${port}`);
 }
 
 bootstrap();

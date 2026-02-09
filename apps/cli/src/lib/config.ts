@@ -11,7 +11,7 @@ const CONFIG_DIR = join(homedir(), ".openspawn");
 const CONFIG_FILE = join(CONFIG_DIR, "config.json");
 
 const DEFAULT_CONFIG: CliConfig = {
-  apiUrl: "http://localhost:3000",
+  apiUrl: "http://localhost:3000/api/v1",
 };
 
 export function ensureConfigDir(): void {
