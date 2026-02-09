@@ -4,47 +4,48 @@
 Output docs/assets/cli-demo.gif
 
 Set Shell "bash"
-Set FontSize 14
-Set Width 900
-Set Height 600
+Set FontSize 16
+Set Width 1200
+Set Height 650
 Set Theme "Catppuccin Mocha"
-Set Padding 20
+Set Padding 24
+Set TypingSpeed 40ms
 
-# Show the banner
-Type "openspawn --demo"
+# Setup PATH in hidden mode so 'openspawn' command works
+Hide
+Type "export PATH=$HOME/github/openspawn/openspawn/scripts:$PATH"
 Enter
-Sleep 2s
+Sleep 200ms
+Type "chmod +x $HOME/github/openspawn/openspawn/scripts/openspawn-demo.sh"
+Enter
+Sleep 200ms
+Type "alias openspawn='openspawn-demo.sh'"
+Enter
+Sleep 200ms
+Type "clear"
+Enter
+Sleep 300ms
+Show
+
+# Show the slick banner
+Type "openspawn"
+Enter
+Sleep 3s
 
 # List agents
-Type "openspawn agents list --demo"
+Type "openspawn agents list"
 Enter
-Sleep 3s
+Sleep 3.5s
 
-# Show agent details
-Type "openspawn agents get talent-agent --demo"
+# List tasks  
+Type "openspawn tasks list"
 Enter
-Sleep 2s
-
-# List tasks
-Type "openspawn tasks list --demo"
-Enter
-Sleep 3s
-
-# Show task board
-Type "openspawn tasks board --demo"
-Enter
-Sleep 3s
+Sleep 3.5s
 
 # Check credits
-Type "openspawn credits balance --demo"
-Enter
-Sleep 2s
-
-# Show help
-Type "openspawn --help"
+Type "openspawn credits balance"
 Enter
 Sleep 3s
 
-# End
-Type "# 🚀 OpenSpawn CLI - Multi-agent coordination"
+# Hold on final output
 Sleep 2s
