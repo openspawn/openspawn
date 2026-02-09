@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Query,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { timingSafeEqual } from "crypto";
 
 import { AgentRole, CreditType } from "@openspawn/shared-types";
 
@@ -71,11 +80,37 @@ export class CreditsController {
 
   /**
    * LiteLLM callback endpoint - internal use only
-   * In production, this should be secured with a shared secret
+   * Secured with a shared secret via x-litellm-secret header
    */
   @Public()
   @Post("litellm-callback")
-  async litellmCallback(@Body() dto: LiteLLMCallbackDto, @Query("orgId") orgId: string) {
+  async litellmCallback(
+    @Body() dto: LiteLLMCallbackDto,
+    @Query("orgId") orgId: string,
+    @Headers("x-litellm-secret") providedSecret?: string,
+  ) {
+    const expectedSecret = process.env.LITELLM_CALLBACK_SECRET;
+
+    // Validate the callback secret
+    if (!expectedSecret) {
+      throw new UnauthorizedException("LiteLLM callback secret not configured");
+    }
+
+    if (!providedSecret) {
+      throw new UnauthorizedException("Missing x-litellm-secret header");
+    }
+
+    // Use timing-safe comparison to prevent timing attacks
+    const expectedBuffer = Buffer.from(expectedSecret, "utf8");
+    const providedBuffer = Buffer.from(providedSecret, "utf8");
+
+    if (
+      expectedBuffer.length !== providedBuffer.length ||
+      !timingSafeEqual(expectedBuffer, providedBuffer)
+    ) {
+      throw new UnauthorizedException("Invalid callback secret");
+    }
+
     const transaction = await this.creditsService.processLiteLLMCallback(
       orgId,
       dto.agentId,
