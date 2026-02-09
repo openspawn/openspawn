@@ -9,69 +9,56 @@ Set Width 1000
 Set Height 650
 Set Theme "Catppuccin Mocha"
 Set Padding 24
-Set TypingSpeed 50ms
+Set TypingSpeed 40ms
 
-# Start with a fresh prompt
+# Setup alias in hidden mode
 Hide
-Type "cd ~/github/openspawn/openspawn && clear"
+Type "cd ~/github/openspawn/openspawn"
 Enter
-Sleep 500ms
+Sleep 300ms
+Type "alias openspawn='pnpm exec tsx apps/cli/src/main.ts 2>/dev/null'"
+Enter
+Sleep 300ms
+Type "clear"
+Enter
+Sleep 300ms
 Show
 
 # Show the slick banner
-Type "pnpm exec tsx apps/cli/src/main.ts --help"
-Enter
-Sleep 2.5s
-
-# Clear and show agents
-Type "clear"
-Enter
-Sleep 300ms
-
-Type "# 👥 See your agent organization"
-Enter
-Sleep 800ms
-
-Type "pnpm exec tsx apps/cli/src/main.ts agents list --demo"
+Type "openspawn"
 Enter
 Sleep 3s
 
-# Show tasks
-Type "clear"
+# List agents
+Type "openspawn agents list --demo"
 Enter
-Sleep 300ms
+Sleep 3.5s
 
-Type "# 📋 Track tasks across your team"
+# List tasks
+Type "openspawn tasks list --demo"
 Enter
-Sleep 800ms
+Sleep 3.5s
 
-Type "pnpm exec tsx apps/cli/src/main.ts tasks list --demo"
-Enter
-Sleep 3s
-
-# Show credits
-Type "clear"
-Enter
-Sleep 300ms
-
-Type "# 💰 Monitor spending in real-time"
-Enter
-Sleep 800ms
-
-Type "pnpm exec tsx apps/cli/src/main.ts credits balance --demo"
+# Check credits
+Type "openspawn credits balance --demo"
 Enter
 Sleep 3s
 
-# Final message
+# End card
 Type "clear"
 Enter
 Sleep 300ms
-
-Type "# ✨ Try it: npx openspawn --demo"
+Type "echo '✨ Try it yourself:'"
 Enter
 Sleep 500ms
-Type "#"
+Type "echo '   npx openspawn --demo'"
 Enter
-Type "# 🌐 Dashboard: openspawn.github.io/openspawn/demo"
+Sleep 500ms
+Type "echo ''"
+Enter
+Type "echo '🌐 Live dashboard:'"
+Enter
+Sleep 500ms
+Type "echo '   openspawn.github.io/openspawn/demo'"
 Enter
 Sleep 3s
