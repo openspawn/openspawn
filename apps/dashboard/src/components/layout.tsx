@@ -15,6 +15,7 @@ import {
   Settings,
   Menu,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -44,6 +45,7 @@ const navigation = [
   { name: "Network", href: "/network", icon: Network },
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Agents", href: "/agents", icon: Users },
+  { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Credits", href: "/credits", icon: Coins },
   { name: "Events", href: "/events", icon: Activity },
   { name: "Settings", href: "/settings", icon: Settings },

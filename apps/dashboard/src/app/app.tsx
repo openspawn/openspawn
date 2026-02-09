@@ -2,7 +2,7 @@ import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Layout, ProtectedRoute } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage } from "../pages";
+import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { DemoProvider, DemoControls } from "../demo";
@@ -74,6 +74,7 @@ export function App() {
                           <Route path="/agents" element={<AgentsPage />} />
                           <Route path="/credits" element={<CreditsPage />} />
                           <Route path="/events" element={<EventsPage />} />
+                          <Route path="/messages" element={<MessagesPage />} />
                           <Route path="/network" element={<NetworkPage />} />
                           <Route path="/settings" element={<SettingsPage />} />
                         </Routes>
