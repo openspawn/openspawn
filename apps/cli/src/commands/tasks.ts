@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import pc from "picocolors";
-import { createClient } from "../lib/api.js";
+import { createClient, unwrap } from "../lib/api.js";
 import {
   output,
   outputError,
@@ -105,7 +105,7 @@ ${pc.cyan("Examples:")}
           return client.listTasks({ status: opts.status });
         });
 
-        let taskList = ((data.data ?? data) as Task[]) || [];
+        let taskList = (unwrap(data) as Task[]) || [];
 
         // Apply filters
         if (opts.assignee) {
@@ -166,7 +166,7 @@ ${pc.cyan("Examples:")}
           return client.getTask(id);
         });
 
-        const task = (data.data ?? data) as Task;
+        const task = unwrap(data) as Task;
         formatTask(task);
       } catch (err) {
         outputError(err instanceof Error ? err.message : String(err));
@@ -207,7 +207,7 @@ ${pc.cyan("Examples:")}
           { successText: `Task created!` }
         );
 
-        const task = (data.data ?? data) as Task;
+        const task = unwrap(data) as Task;
         formatTask(task);
       } catch (err) {
         outputError(err instanceof Error ? err.message : String(err));

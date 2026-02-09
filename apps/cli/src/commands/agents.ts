@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import pc from "picocolors";
-import { createClient } from "../lib/api.js";
+import { createClient, unwrap } from "../lib/api.js";
 import {
   output,
   outputError,
@@ -77,7 +77,7 @@ ${pc.cyan("Examples:")}
           return client.listAgents();
         });
 
-        let agentList = (data.data ?? data) as Agent[];
+        let agentList = unwrap(data) as Agent[];
 
         // Apply filters
         if (opts.status) {
@@ -134,7 +134,7 @@ ${pc.cyan("Examples:")}
           return client.getAgent(id);
         });
 
-        const agent = (data.data ?? data) as Agent;
+        const agent = unwrap(data) as Agent;
         formatAgent(agent);
       } catch (err) {
         outputError(
@@ -183,7 +183,7 @@ ${pc.cyan("Examples:")}
           { successText: `Agent ${pc.cyan(options.name)} created!` }
         );
 
-        const agent = (data.data ?? data) as Agent;
+        const agent = unwrap(data) as Agent;
         formatAgent(agent);
       } catch (err) {
         outputError(

@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import pc from "picocolors";
-import { createClient } from "../lib/api.js";
+import { createClient, unwrap } from "../lib/api.js";
 import {
   output,
   outputError,
@@ -103,7 +103,7 @@ ${pc.cyan("Examples:")}
           }
         );
 
-        const balance = (data.data ?? data) as Balance;
+        const balance = unwrap(data) as Balance;
 
         console.log();
         console.log(`  ${icons.credit} ${pc.bold("Credit Balance")}`);
