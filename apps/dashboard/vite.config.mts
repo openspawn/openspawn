@@ -1,6 +1,6 @@
 /// <reference types='vitest' />
 import { defineConfig, type Plugin } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
 import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
 import { copyFileSync, existsSync } from "node:fs";
@@ -43,7 +43,22 @@ export default defineConfig(() => ({
     port: 4200,
     host: "0.0.0.0",
   },
-  plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"]), fixBaseHref()],
+  plugins: [
+    react({
+      plugins: [
+        [
+          '@swc-contrib/plugin-graphql-codegen-client-preset',
+          {
+            artifactDirectory: './src/graphql/generated',
+            gqlTagName: 'graphql',
+          },
+        ],
+      ],
+    }),
+    nxViteTsPaths(),
+    nxCopyAssetsPlugin(["*.md"]),
+    fixBaseHref(),
+  ],
   // Uncomment this if you are using workers.
   // worker: {
   //   plugins: () => [ nxViteTsPaths() ],

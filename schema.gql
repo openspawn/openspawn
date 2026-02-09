@@ -32,10 +32,12 @@ type AgentType {
   budgetPeriodSpent: Int!
   createdAt: DateTime!
   currentBalance: Int!
+  domain: String
   id: ID!
   lastActivityAt: DateTime
   lastPromotionAt: DateTime
   level: Int!
+  lifetimeEarnings: Int!
   managementFeePct: Int!
   model: String!
   name: String!

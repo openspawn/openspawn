@@ -28,17 +28,19 @@ export type AgentReputationType = {
   trustScore: Scalars['Int']['output'];
 };
 
-export type AgentRole =
-  | 'ADMIN'
-  | 'FOUNDER'
-  | 'HR'
-  | 'WORKER';
+export enum AgentRole {
+  Admin = 'ADMIN',
+  Founder = 'FOUNDER',
+  Hr = 'HR',
+  Worker = 'WORKER'
+}
 
-export type AgentStatus =
-  | 'ACTIVE'
-  | 'PENDING'
-  | 'REVOKED'
-  | 'SUSPENDED';
+export enum AgentStatus {
+  Active = 'ACTIVE',
+  Pending = 'PENDING',
+  Revoked = 'REVOKED',
+  Suspended = 'SUSPENDED'
+}
 
 export type AgentType = {
   agentId: Scalars['String']['output'];
@@ -46,10 +48,12 @@ export type AgentType = {
   budgetPeriodSpent: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   currentBalance: Scalars['Int']['output'];
+  domain?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
   lastPromotionAt?: Maybe<Scalars['DateTime']['output']>;
   level: Scalars['Int']['output'];
+  lifetimeEarnings: Scalars['Int']['output'];
   managementFeePct: Scalars['Int']['output'];
   model: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -72,11 +76,12 @@ export type ChannelGqlType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type ChannelType =
-  | 'AGENT'
-  | 'BROADCAST'
-  | 'GENERAL'
-  | 'TASK';
+export enum ChannelType {
+  Agent = 'AGENT',
+  Broadcast = 'BROADCAST',
+  General = 'GENERAL',
+  Task = 'TASK'
+}
 
 export type CreditTransactionType = {
   agentId: Scalars['ID']['output'];
@@ -90,14 +95,16 @@ export type CreditTransactionType = {
   type: CreditType;
 };
 
-export type CreditType =
-  | 'CREDIT'
-  | 'DEBIT';
+export enum CreditType {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT'
+}
 
-export type EventSeverity =
-  | 'ERROR'
-  | 'INFO'
-  | 'WARNING';
+export enum EventSeverity {
+  Error = 'ERROR',
+  Info = 'INFO',
+  Warning = 'WARNING'
+}
 
 export type EventType = {
   actor?: Maybe<AgentType>;
@@ -131,11 +138,12 @@ export type MessageGqlType = {
   type: MessageType;
 };
 
-export type MessageType =
-  | 'HANDOFF'
-  | 'REQUEST'
-  | 'STATUS_UPDATE'
-  | 'TEXT';
+export enum MessageType {
+  Handoff = 'HANDOFF',
+  Request = 'REQUEST',
+  StatusUpdate = 'STATUS_UPDATE',
+  Text = 'TEXT'
+}
 
 export type PromotionProgressType = {
   currentLevel: Scalars['Int']['output'];
@@ -241,12 +249,13 @@ export type ReputationHistoryEntryType = {
   reason: Scalars['String']['output'];
 };
 
-export type ReputationLevel =
-  | 'ELITE'
-  | 'NEW'
-  | 'PROBATION'
-  | 'TRUSTED'
-  | 'VETERAN';
+export enum ReputationLevel {
+  Elite = 'ELITE',
+  New = 'NEW',
+  Probation = 'PROBATION',
+  Trusted = 'TRUSTED',
+  Veteran = 'VETERAN'
+}
 
 export type Subscription = {
   creditTransactionCreated: CreditTransactionType;
@@ -276,20 +285,22 @@ export type SubscriptionTaskUpdatedArgs = {
   orgId: Scalars['ID']['input'];
 };
 
-export type TaskPriority =
-  | 'HIGH'
-  | 'LOW'
-  | 'NORMAL'
-  | 'URGENT';
+export enum TaskPriority {
+  High = 'HIGH',
+  Low = 'LOW',
+  Normal = 'NORMAL',
+  Urgent = 'URGENT'
+}
 
-export type TaskStatus =
-  | 'BACKLOG'
-  | 'BLOCKED'
-  | 'CANCELLED'
-  | 'DONE'
-  | 'IN_PROGRESS'
-  | 'REVIEW'
-  | 'TODO';
+export enum TaskStatus {
+  Backlog = 'BACKLOG',
+  Blocked = 'BLOCKED',
+  Cancelled = 'CANCELLED',
+  Done = 'DONE',
+  InProgress = 'IN_PROGRESS',
+  Review = 'REVIEW',
+  Todo = 'TODO'
+}
 
 export type TaskType = {
   approvalRequired: Scalars['Boolean']['output'];
@@ -309,6 +320,8 @@ export type TaskType = {
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
+
+export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
 
 export type TasksQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -331,7 +344,7 @@ export type AgentsQueryVariables = Exact<{
 }>;
 
 
-export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string }> };
+export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null }> };
 
 export type CreditHistoryQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -368,10 +381,10 @@ export type MessagesQueryVariables = Exact<{
 
 export type MessagesQuery = { messages: Array<{ id: string, channelId: string, senderId: string, type: MessageType, body: string, parentMessageId?: string | null, createdAt: string }> };
 
-
+export const AgentFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AgentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AgentType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"model"}},{"kind":"Field","name":{"kind":"Name","value":"currentBalance"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodLimit"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodSpent"}},{"kind":"Field","name":{"kind":"Name","value":"managementFeePct"}},{"kind":"Field","name":{"kind":"Name","value":"parentId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"trustScore"}},{"kind":"Field","name":{"kind":"Name","value":"reputationLevel"}},{"kind":"Field","name":{"kind":"Name","value":"tasksCompleted"}},{"kind":"Field","name":{"kind":"Name","value":"tasksSuccessful"}},{"kind":"Field","name":{"kind":"Name","value":"lastActivityAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastPromotionAt"}},{"kind":"Field","name":{"kind":"Name","value":"lifetimeEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}}]}}]} as unknown as DocumentNode<AgentFieldsFragment, unknown>;
 export const TasksDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Tasks"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TaskStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tasks"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"assigneeId"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"approvalRequired"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<TasksQuery, TasksQueryVariables>;
 export const TaskDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Task"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"task"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"assigneeId"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"parentTaskId"}},{"kind":"Field","name":{"kind":"Name","value":"approvalRequired"}},{"kind":"Field","name":{"kind":"Name","value":"approvedAt"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<TaskQuery, TaskQueryVariables>;
-export const AgentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Agents"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"agents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"model"}},{"kind":"Field","name":{"kind":"Name","value":"currentBalance"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodLimit"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodSpent"}},{"kind":"Field","name":{"kind":"Name","value":"managementFeePct"}},{"kind":"Field","name":{"kind":"Name","value":"parentId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<AgentsQuery, AgentsQueryVariables>;
+export const AgentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Agents"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"agents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AgentFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AgentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AgentType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"model"}},{"kind":"Field","name":{"kind":"Name","value":"currentBalance"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodLimit"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodSpent"}},{"kind":"Field","name":{"kind":"Name","value":"managementFeePct"}},{"kind":"Field","name":{"kind":"Name","value":"parentId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"trustScore"}},{"kind":"Field","name":{"kind":"Name","value":"reputationLevel"}},{"kind":"Field","name":{"kind":"Name","value":"tasksCompleted"}},{"kind":"Field","name":{"kind":"Name","value":"tasksSuccessful"}},{"kind":"Field","name":{"kind":"Name","value":"lastActivityAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastPromotionAt"}},{"kind":"Field","name":{"kind":"Name","value":"lifetimeEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}}]}}]} as unknown as DocumentNode<AgentsQuery, AgentsQueryVariables>;
 export const CreditHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CreditHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"agentId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"creditHistory"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"agentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"agentId"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"balanceAfter"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"sourceTaskId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<CreditHistoryQuery, CreditHistoryQueryVariables>;
 export const EventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Events"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"page"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"events"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"page"},"value":{"kind":"Variable","name":{"kind":"Name","value":"page"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"actorId"}},{"kind":"Field","name":{"kind":"Name","value":"actor"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"entityType"}},{"kind":"Field","name":{"kind":"Name","value":"entityId"}},{"kind":"Field","name":{"kind":"Name","value":"severity"}},{"kind":"Field","name":{"kind":"Name","value":"reasoning"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<EventsQuery, EventsQueryVariables>;
 export const ChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Channels"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"channels"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"taskId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<ChannelsQuery, ChannelsQueryVariables>;
