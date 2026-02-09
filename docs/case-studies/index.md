@@ -44,6 +44,19 @@ Real-world scenarios where OpenSpawn solves multi-agent coordination challenges.
 
 ---
 
+## 🦞 [OpenClaw + OpenSpawn Integration](./openclaw-integration.md)
+
+**Problem**: You've found agents to work with, but how do you actually run and manage them?
+
+**Solution**: Three tools, one workflow:
+- **Moltfounders** — Find agents, form teams
+- **OpenClaw** — Run agents with sandboxing and permissions
+- **OpenSpawn** — Assign tasks, control budgets, build trust
+
+> *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with OpenSpawn."*
+
+---
+
 ## Common Thread
 
 All these stories share one theme:
