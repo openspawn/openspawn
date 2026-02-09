@@ -1,4 +1,10 @@
-export { AgentType } from "./agent.type";
+export {
+  AgentType,
+  AgentReputationType,
+  PromotionProgressType,
+  ReputationHistoryEntryType,
+  LeaderboardEntryType,
+} from "./agent.type";
 export { TaskType } from "./task.type";
 export { CreditTransactionType } from "./credit-transaction.type";
 export { EventType } from "./event.type";

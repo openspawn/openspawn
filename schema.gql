@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AgentReputationType {
+  lastActivityAt: DateTime
+  promotionProgress: PromotionProgressType
+  reputationLevel: ReputationLevel!
+  successRate: Float!
+  tasksCompleted: Int!
+  tasksSuccessful: Int!
+  trustScore: Int!
+}
+
 enum AgentRole {
   ADMIN
   FOUNDER
@@ -23,12 +33,19 @@ type AgentType {
   createdAt: DateTime!
   currentBalance: Int!
   id: ID!
+  lastActivityAt: DateTime
+  lastPromotionAt: DateTime
   level: Int!
   managementFeePct: Int!
   model: String!
   name: String!
+  parentId: ID
+  reputationLevel: ReputationLevel!
   role: AgentRole!
   status: AgentStatus!
+  tasksCompleted: Int!
+  tasksSuccessful: Int!
+  trustScore: Int!
   updatedAt: DateTime!
 }
 
@@ -88,6 +105,16 @@ type EventType {
   type: String!
 }
 
+type LeaderboardEntryType {
+  agentId: ID!
+  id: ID!
+  level: Int!
+  name: String!
+  reputationLevel: ReputationLevel!
+  tasksCompleted: Int!
+  trustScore: Int!
+}
+
 type MessageGqlType {
   body: String!
   channelId: ID!
@@ -105,15 +132,45 @@ enum MessageType {
   TEXT
 }
 
+type PromotionProgressType {
+  currentLevel: Int!
+  nextLevel: Int!
+  tasksProgress: Int!
+  tasksRequired: Int!
+  trustScoreProgress: Int!
+  trustScoreRequired: Int!
+}
+
 type Query {
   agent(id: ID!, orgId: ID!): AgentType
+  agentReputation(agentId: ID!, orgId: ID!): AgentReputationType
   agents(orgId: ID!): [AgentType!]!
   channels(orgId: ID!): [ChannelGqlType!]!
   creditHistory(agentId: ID, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
   events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
   messages(before: ID, channelId: ID!, limit: Int! = 50, orgId: ID!): [MessageGqlType!]!
+  reputationHistory(agentId: ID!, limit: Int, orgId: ID!): [ReputationHistoryEntryType!]!
   task(id: ID!, orgId: ID!): TaskType
   tasks(assigneeId: ID, orgId: ID!, status: TaskStatus): [TaskType!]!
+  trustLeaderboard(limit: Int, orgId: ID!): [LeaderboardEntryType!]!
+}
+
+type ReputationHistoryEntryType {
+  createdAt: DateTime!
+  delta: Int!
+  eventType: String!
+  id: ID!
+  newScore: Int!
+  previousScore: Int!
+  reason: String!
+}
+
+enum ReputationLevel {
+  ELITE
+  NEW
+  PROBATION
+  TRUSTED
+  VETERAN
 }
 
 type Subscription {

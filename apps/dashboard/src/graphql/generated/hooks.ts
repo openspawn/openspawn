@@ -18,6 +18,16 @@ export type Scalars = {
   DateTime: { input: string; output: string; }
 };
 
+export type AgentReputationType = {
+  lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
+  promotionProgress?: Maybe<PromotionProgressType>;
+  reputationLevel: ReputationLevel;
+  successRate: Scalars['Float']['output'];
+  tasksCompleted: Scalars['Int']['output'];
+  tasksSuccessful: Scalars['Int']['output'];
+  trustScore: Scalars['Int']['output'];
+};
+
 export type AgentRole =
   | 'ADMIN'
   | 'FOUNDER'
@@ -26,6 +36,7 @@ export type AgentRole =
 
 export type AgentStatus =
   | 'ACTIVE'
+  | 'PENDING'
   | 'REVOKED'
   | 'SUSPENDED';
 
@@ -36,12 +47,19 @@ export type AgentType = {
   createdAt: Scalars['DateTime']['output'];
   currentBalance: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
+  lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
+  lastPromotionAt?: Maybe<Scalars['DateTime']['output']>;
   level: Scalars['Int']['output'];
   managementFeePct: Scalars['Int']['output'];
   model: Scalars['String']['output'];
   name: Scalars['String']['output'];
+  parentId?: Maybe<Scalars['ID']['output']>;
+  reputationLevel: ReputationLevel;
   role: AgentRole;
   status: AgentStatus;
+  tasksCompleted: Scalars['Int']['output'];
+  tasksSuccessful: Scalars['Int']['output'];
+  trustScore: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -93,6 +111,16 @@ export type EventType = {
   type: Scalars['String']['output'];
 };
 
+export type LeaderboardEntryType = {
+  agentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  level: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  reputationLevel: ReputationLevel;
+  tasksCompleted: Scalars['Int']['output'];
+  trustScore: Scalars['Int']['output'];
+};
+
 export type MessageGqlType = {
   body: Scalars['String']['output'];
   channelId: Scalars['ID']['output'];
@@ -109,20 +137,38 @@ export type MessageType =
   | 'STATUS_UPDATE'
   | 'TEXT';
 
+export type PromotionProgressType = {
+  currentLevel: Scalars['Int']['output'];
+  nextLevel: Scalars['Int']['output'];
+  tasksProgress: Scalars['Int']['output'];
+  tasksRequired: Scalars['Int']['output'];
+  trustScoreProgress: Scalars['Int']['output'];
+  trustScoreRequired: Scalars['Int']['output'];
+};
+
 export type Query = {
   agent?: Maybe<AgentType>;
+  agentReputation?: Maybe<AgentReputationType>;
   agents: Array<AgentType>;
   channels: Array<ChannelGqlType>;
   creditHistory: Array<CreditTransactionType>;
   events: Array<EventType>;
   messages: Array<MessageGqlType>;
+  reputationHistory: Array<ReputationHistoryEntryType>;
   task?: Maybe<TaskType>;
   tasks: Array<TaskType>;
+  trustLeaderboard: Array<LeaderboardEntryType>;
 };
 
 
 export type QueryAgentArgs = {
   id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryAgentReputationArgs = {
+  agentId: Scalars['ID']['input'];
   orgId: Scalars['ID']['input'];
 };
 
@@ -160,6 +206,13 @@ export type QueryMessagesArgs = {
 };
 
 
+export type QueryReputationHistoryArgs = {
+  agentId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type QueryTaskArgs = {
   id: Scalars['ID']['input'];
   orgId: Scalars['ID']['input'];
@@ -171,6 +224,29 @@ export type QueryTasksArgs = {
   orgId: Scalars['ID']['input'];
   status?: InputMaybe<TaskStatus>;
 };
+
+
+export type QueryTrustLeaderboardArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  orgId: Scalars['ID']['input'];
+};
+
+export type ReputationHistoryEntryType = {
+  createdAt: Scalars['DateTime']['output'];
+  delta: Scalars['Int']['output'];
+  eventType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  newScore: Scalars['Int']['output'];
+  previousScore: Scalars['Int']['output'];
+  reason: Scalars['String']['output'];
+};
+
+export type ReputationLevel =
+  | 'ELITE'
+  | 'NEW'
+  | 'PROBATION'
+  | 'TRUSTED'
+  | 'VETERAN';
 
 export type Subscription = {
   creditTransactionCreated: CreditTransactionType;
@@ -255,7 +331,7 @@ export type AgentsQueryVariables = Exact<{
 }>;
 
 
-export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, createdAt: string }> };
+export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string }> };
 
 export type CreditHistoryQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -399,6 +475,7 @@ export const AgentsDocument = `
     budgetPeriodLimit
     budgetPeriodSpent
     managementFeePct
+    parentId
     createdAt
   }
 }

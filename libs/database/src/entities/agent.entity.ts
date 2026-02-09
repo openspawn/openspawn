@@ -91,6 +91,12 @@ export class Agent {
   @Column({ name: "last_promotion_at", type: "timestamptz", nullable: true })
   lastPromotionAt!: Date | null;
 
+  @Column({ name: "lifetime_earnings", type: "int", default: 0 })
+  lifetimeEarnings!: number;
+
+  @Column({ type: "varchar", length: 100, nullable: true })
+  domain!: string | null;
+
   @DeleteDateColumn({ name: "deleted_at", type: "timestamptz", nullable: true })
   deletedAt!: Date | null;
 

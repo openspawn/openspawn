@@ -64,9 +64,8 @@ export const AgentsQueryDocument = graphql(`
       budgetPeriodLimit
       budgetPeriodSpent
       managementFeePct
-      createdAt
       parentId
-      domain
+      createdAt
     }
   }
 `);
