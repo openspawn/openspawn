@@ -6,8 +6,8 @@ import { useDemo, type ScenarioName } from './DemoProvider';
 
 const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; description: string; stats: string; color: string }[] = [
   {
-    id: 'novatech',
-    name: 'NovaTech Product Launch',
+    id: 'acmetech',
+    name: 'AcmeTech Product Launch',
     icon: <Building2 className="w-6 h-6" />,
     description: 'Watch 22 agents build a SaaS dashboard from discovery to launch',
     stats: '22 agents • 24 tasks • 6 phases',
@@ -50,9 +50,9 @@ const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; descri
 const STORAGE_KEY = 'openspawn-demo-welcomed';
 
 export function DemoWelcome() {
-  const { setScenario, play } = useDemo();
+  const { setScenario } = useDemo();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedScenario, setSelectedScenario] = useState<ScenarioName>('novatech');
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioName>('acmetech');
 
   useEffect(() => {
     // Check if user has seen the welcome before
@@ -64,8 +64,7 @@ export function DemoWelcome() {
 
   const handleStart = () => {
     localStorage.setItem(STORAGE_KEY, 'true');
-    setScenario(selectedScenario);
-    play();
+    setScenario(selectedScenario, true); // autoPlay = true
     setIsOpen(false);
   };
 
@@ -141,7 +140,7 @@ export function DemoWelcome() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-white">{scenario.name}</h3>
-                          {scenario.id === 'novatech' && (
+                          {scenario.id === 'acmetech' && (
                             <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500/20 text-violet-400 rounded">
                               RECOMMENDED
                             </span>

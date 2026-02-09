@@ -7,7 +7,7 @@ import {
   growthScenario,
   startupScenario,
   enterpriseScenario,
-  novatechScenario,
+  acmetechScenario,
   PROJECT_PHASES,
   type SimulationEvent,
   type DemoScenario,
@@ -16,7 +16,7 @@ import { setDemoEngine } from './mock-fetcher';
 import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
 import { debug } from '../lib/debug';
 
-export type ScenarioName = 'novatech' | 'fresh' | 'startup' | 'growth' | 'enterprise';
+export type ScenarioName = 'acmetech' | 'fresh' | 'startup' | 'growth' | 'enterprise';
 
 // Re-export phase info for UI components
 export { PROJECT_PHASES };
@@ -32,7 +32,7 @@ interface DemoContextValue {
   play: () => void;
   pause: () => void;
   setSpeed: (speed: number) => void;
-  setScenario: (name: ScenarioName) => void;
+  setScenario: (name: ScenarioName, autoPlay?: boolean) => void;
   reset: () => void;
 }
 
@@ -61,7 +61,7 @@ export function useDemo(): DemoContextValue {
 }
 
 const SCENARIOS: Record<ScenarioName, DemoScenario> = {
-  novatech: novatechScenario,  // Default: Realistic product launch
+  acmetech: acmetechScenario,  // Default: Realistic product launch
   fresh: freshScenario,
   startup: startupScenario,
   growth: growthScenario,
@@ -69,8 +69,8 @@ const SCENARIOS: Record<ScenarioName, DemoScenario> = {
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (s === 'novatech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
-  return 'novatech'; // Default to NovaTech product launch
+  if (s === 'acmetech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
+  return 'acmetech'; // Default to AcmeTech product launch
 }
 
 interface DemoProviderProps {
@@ -196,7 +196,7 @@ export function DemoProvider({
     setSpeedState(newSpeed);
   }, []);
 
-  const setScenario = useCallback((name: ScenarioName) => {
+  const setScenario = useCallback((name: ScenarioName, autoPlay = false) => {
     pause();
     
     // Create new engine with new scenario
@@ -214,7 +214,16 @@ export function DemoProvider({
     // Refetch all queries with new scenario data
     queryClient.refetchQueries();
     
-    debug.demo('Switched to scenario:', name);
+    // Auto-play if requested (useful for initial demo start)
+    if (autoPlay) {
+      // Small delay to ensure engine is ready
+      setTimeout(() => {
+        engineRef.current?.play();
+        setIsPlaying(true);
+      }, 50);
+    }
+    
+    debug.demo('Switched to scenario:', name, autoPlay ? '(auto-playing)' : '');
   }, [pause, queryClient]);
 
   const reset = useCallback(() => {
