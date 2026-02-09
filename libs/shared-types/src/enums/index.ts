@@ -1,3 +1,10 @@
+export {
+  AgentMode,
+  MODE_ALLOWED_ACTIONS,
+  MODE_LABELS,
+  MODE_DESCRIPTIONS,
+  isModeAllowed,
+} from "./agent-mode.enum";
 export { AgentRole } from "./agent-role.enum";
 export { AgentStatus } from "./agent-status.enum";
 export { AmountMode } from "./amount-mode.enum";
