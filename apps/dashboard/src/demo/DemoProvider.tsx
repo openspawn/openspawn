@@ -143,6 +143,7 @@ export function DemoProvider({
   }, []);
 
   // Subscribe to simulation events
+  // Re-subscribe when scenario changes (new engine is created)
   useEffect(() => {
     const engine = engineRef.current;
     if (!engine || !isReady) return;
@@ -169,7 +170,7 @@ export function DemoProvider({
       unsubscribeEvent();
       unsubscribeTick();
     };
-  }, [isReady, queryClient]);
+  }, [isReady, queryClient, scenario, triggerCelebration]);
 
   // Auto-play if requested
   useEffect(() => {
