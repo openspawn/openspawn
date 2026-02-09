@@ -1,5 +1,6 @@
-import { Args, ID, Query, Resolver } from "@nestjs/graphql";
+import { Args, ID, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 
+import { getReputationLevel, ReputationLevel } from "@openspawn/shared-types";
 import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
 import { AgentsService } from "../../agents";
 import { AgentType } from "../types";
@@ -37,5 +38,10 @@ export class AgentResolver {
     } catch {
       return null;
     }
+  }
+
+  @ResolveField(() => ReputationLevel)
+  reputationLevel(@Parent() agent: AgentType): ReputationLevel {
+    return getReputationLevel(agent.trustScore);
   }
 }
