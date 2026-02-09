@@ -5,7 +5,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { getAgentAvatarUrl, getAvatarStyle, type AvatarStyleKey } from '../lib/avatar';
+import { getAgentAvatarUrl, getAvatarSettings } from '../lib/avatar';
 import { Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -50,21 +50,21 @@ export function AgentAvatar({
   const sizeConfig = SIZE_MAP[size];
   const levelColor = LEVEL_COLORS[level] || '#71717a';
   
-  // Track avatar style changes
-  const [avatarStyle, setAvatarStyle] = useState<AvatarStyleKey>(getAvatarStyle());
+  // Track avatar settings changes (style, background color, background type)
+  const [avatarSettings, setAvatarSettings] = useState(getAvatarSettings);
   
   useEffect(() => {
-    const handleStyleChange = (e: CustomEvent<AvatarStyleKey>) => {
-      setAvatarStyle(e.detail);
+    const handleStyleChange = () => {
+      setAvatarSettings(getAvatarSettings());
     };
     window.addEventListener('avatar-style-changed', handleStyleChange as EventListener);
     return () => window.removeEventListener('avatar-style-changed', handleStyleChange as EventListener);
   }, []);
   
-  // Memoize avatar generation - regenerate when style changes
+  // Memoize avatar generation - regenerate when any setting changes
   const avatarUrl = useMemo(
     () => getAgentAvatarUrl(agentId, level, sizeConfig.px * 2), // 2x for retina
-    [agentId, level, sizeConfig.px, avatarStyle]
+    [agentId, level, sizeConfig.px, avatarSettings]
   );
 
   return (

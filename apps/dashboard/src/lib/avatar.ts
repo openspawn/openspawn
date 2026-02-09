@@ -69,8 +69,33 @@ export const AVATAR_STYLES = {
 
 export type AvatarStyleKey = keyof typeof AVATAR_STYLES;
 
-// LocalStorage key for avatar style preference
+// LocalStorage keys
 const AVATAR_STYLE_KEY = 'openspawn-avatar-style';
+const AVATAR_BG_MODE_KEY = 'openspawn-avatar-bg-mode';
+const AVATAR_BG_COLOR_KEY = 'openspawn-avatar-bg-color';
+
+// Background color schemes
+export const BACKGROUND_COLORS = {
+  levelBased: { name: 'Level-Based', description: 'Colors based on agent level (pink→purple→cyan→yellow→gray)', colors: null },
+  purple: { name: 'Purple', description: 'Purple gradient', colors: ['c4b5fd', 'a78bfa', '8b5cf6'] },
+  blue: { name: 'Blue', description: 'Blue gradient', colors: ['93c5fd', '60a5fa', '3b82f6'] },
+  green: { name: 'Green', description: 'Green gradient', colors: ['86efac', '4ade80', '22c55e'] },
+  orange: { name: 'Orange', description: 'Orange gradient', colors: ['fdba74', 'fb923c', 'f97316'] },
+  pink: { name: 'Pink', description: 'Pink gradient', colors: ['f9a8d4', 'f472b6', 'ec4899'] },
+  cyan: { name: 'Cyan', description: 'Cyan gradient', colors: ['67e8f9', '22d3ee', '06b6d4'] },
+  slate: { name: 'Slate', description: 'Neutral gray', colors: ['cbd5e1', '94a3b8', '64748b'] },
+  transparent: { name: 'Transparent', description: 'No background', colors: ['transparent'] },
+} as const;
+
+export type BackgroundColorKey = keyof typeof BACKGROUND_COLORS;
+
+// Background type options
+export const BACKGROUND_TYPES = {
+  gradientLinear: { name: 'Linear Gradient', value: 'gradientLinear' },
+  solid: { name: 'Solid Color', value: 'solid' },
+} as const;
+
+export type BackgroundTypeKey = keyof typeof BACKGROUND_TYPES;
 
 // Get saved avatar style or default
 export function getAvatarStyle(): AvatarStyleKey {
@@ -82,12 +107,54 @@ export function getAvatarStyle(): AvatarStyleKey {
   return 'bottts';
 }
 
+// Get saved background color scheme
+export function getBackgroundColor(): BackgroundColorKey {
+  if (typeof window === 'undefined') return 'levelBased';
+  const saved = localStorage.getItem(AVATAR_BG_COLOR_KEY);
+  if (saved && saved in BACKGROUND_COLORS) {
+    return saved as BackgroundColorKey;
+  }
+  return 'levelBased';
+}
+
+// Get saved background type
+export function getBackgroundType(): BackgroundTypeKey {
+  if (typeof window === 'undefined') return 'gradientLinear';
+  const saved = localStorage.getItem(AVATAR_BG_MODE_KEY);
+  if (saved && saved in BACKGROUND_TYPES) {
+    return saved as BackgroundTypeKey;
+  }
+  return 'gradientLinear';
+}
+
 // Save avatar style preference
 export function setAvatarStyle(style: AvatarStyleKey): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(AVATAR_STYLE_KEY, style);
-  // Dispatch event so components can react
-  window.dispatchEvent(new CustomEvent('avatar-style-changed', { detail: style }));
+  window.dispatchEvent(new CustomEvent('avatar-style-changed', { detail: { style } }));
+}
+
+// Save background color preference
+export function setBackgroundColor(color: BackgroundColorKey): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(AVATAR_BG_COLOR_KEY, color);
+  window.dispatchEvent(new CustomEvent('avatar-style-changed', { detail: { bgColor: color } }));
+}
+
+// Save background type preference
+export function setBackgroundType(type: BackgroundTypeKey): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(AVATAR_BG_MODE_KEY, type);
+  window.dispatchEvent(new CustomEvent('avatar-style-changed', { detail: { bgType: type } }));
+}
+
+// Get all current avatar settings
+export function getAvatarSettings() {
+  return {
+    style: getAvatarStyle(),
+    bgColor: getBackgroundColor(),
+    bgType: getBackgroundType(),
+  };
 }
 
 // Get the DiceBear style object
@@ -109,6 +176,15 @@ const LEVEL_BACKGROUNDS: Record<number, string[]> = {
   1: ['d4d4d8', 'a1a1aa', '71717a'],
 };
 
+// Get background colors based on settings
+function getBackgroundColors(level: number): string[] {
+  const bgColorKey = getBackgroundColor();
+  if (bgColorKey === 'levelBased') {
+    return LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5];
+  }
+  return BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'];
+}
+
 export interface AvatarOptions {
   seed: string;
   level?: number;
@@ -127,13 +203,14 @@ export interface AvatarOptions {
 export function generateAgentAvatar({ seed, level = 5, size = 64, styleOverride }: AvatarOptions): string {
   const styleKey = styleOverride || getAvatarStyle();
   const style = getStyle(styleKey);
-  const backgrounds = LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5];
+  const backgrounds = getBackgroundColors(level);
+  const bgType = getBackgroundType();
   
   const avatar = createAvatar(style, {
     seed,
     size,
     backgroundColor: backgrounds,
-    backgroundType: ['gradientLinear'],
+    backgroundType: [bgType],
     backgroundRotation: [0, 90, 180, 270],
   });
 
@@ -149,16 +226,50 @@ export function getAgentAvatarUrl(agentId: string, level: number = 5, size: numb
 }
 
 /**
- * Generate a preview avatar for a specific style
+ * Generate a preview avatar for a specific style (uses current background settings)
  */
-export function generateStylePreview(styleKey: AvatarStyleKey, seed: string = 'preview', size: number = 64): string {
+export function generateStylePreview(styleKey: AvatarStyleKey, seed: string = 'preview', size: number = 64, level: number = 9): string {
   const style = getStyle(styleKey);
+  const backgrounds = getBackgroundColors(level);
+  const bgType = getBackgroundType();
   
   const avatar = createAvatar(style, {
     seed,
     size,
-    backgroundColor: ['c4b5fd', 'a78bfa', '8b5cf6'], // Purple gradient
-    backgroundType: ['gradientLinear'],
+    backgroundColor: backgrounds,
+    backgroundType: [bgType],
+    backgroundRotation: [0, 90, 180, 270],
+  });
+
+  return avatar.toDataUri();
+}
+
+/**
+ * Generate a preview with specific background settings (for settings UI)
+ */
+export function generateBackgroundPreview(
+  bgColorKey: BackgroundColorKey, 
+  bgTypeKey: BackgroundTypeKey,
+  seed: string = 'bg-preview', 
+  size: number = 64,
+  level: number = 9
+): string {
+  const styleKey = getAvatarStyle();
+  const style = getStyle(styleKey);
+  
+  let backgrounds: string[];
+  if (bgColorKey === 'levelBased') {
+    backgrounds = LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5];
+  } else {
+    backgrounds = BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'];
+  }
+  
+  const avatar = createAvatar(style, {
+    seed,
+    size,
+    backgroundColor: backgrounds,
+    backgroundType: [bgTypeKey],
+    backgroundRotation: [0, 90, 180, 270],
   });
 
   return avatar.toDataUri();
