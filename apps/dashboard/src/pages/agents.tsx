@@ -32,24 +32,10 @@ import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 
-interface Agent {
-  id: string;
-  agentId: string;
-  name: string;
-  status: string;
-  role: string;
-  level: number;
-  currentBalance: number;
-  lifetimeEarnings: number;
-  model: string;
-  createdAt: string;
-  // Trust & Reputation
-  trustScore?: number;
-  reputationLevel?: string;
-  tasksCompleted?: number;
-  tasksSuccessful?: number;
-  lastActivityAt?: string;
-}
+// Use generated types from GraphQL
+import { AgentStatus } from "../graphql/generated/graphql";
+import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+type Agent = AgentFieldsFragment;
 
 type DialogMode = "view" | "edit" | "credits" | null;
 
@@ -80,16 +66,14 @@ function getLevelLabel(level: number): string {
   return "Probation";
 }
 
-function getStatusVariant(status: string) {
-  switch (status?.toUpperCase()) {
-    case "ACTIVE":
+function getStatusVariant(status: AgentStatus) {
+  switch (status) {
+    case AgentStatus.Active:
       return "success";
-    case "PENDING":
+    case AgentStatus.Pending:
       return "warning";
-    case "PAUSED":
-      return "warning";
-    case "SUSPENDED":
-    case "REVOKED":
+    case AgentStatus.Suspended:
+    case AgentStatus.Revoked:
       return "destructive";
     default:
       return "secondary";
@@ -204,7 +188,7 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
   }
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setStatus(e.target.value);
+    setStatus(e.target.value as AgentStatus);
   }
 
   function handleSave() {
@@ -286,7 +270,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
   // Sort agents by trust score for leaderboard
   const leaderboardData = useMemo(() => {
     return [...agents]
-      .filter(a => a.status?.toLowerCase() === 'active')
+      .filter(a => a.status === AgentStatus.Active)
       .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
       .slice(0, 10)
       .map(a => ({
@@ -787,7 +771,7 @@ export function AgentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-500">
-              {agents.filter((a) => a.status === "active").length}
+              {agents.filter((a) => a.status === AgentStatus.Active).length}
             </div>
           </CardContent>
         </Card>

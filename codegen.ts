@@ -13,7 +13,7 @@ const config: CodegenConfig = {
       config: {
         useTypeImports: true,
         skipTypename: true,
-        enumsAsTypes: true,
+        enumsAsTypes: false,
         scalars: {
           DateTime: "string",
           Date: "string",
@@ -29,7 +29,7 @@ const config: CodegenConfig = {
         },
         reactQueryVersion: 5,
         skipTypename: true,
-        enumsAsTypes: true,
+        enumsAsTypes: false,
         exposeQueryKeys: true,
         exposeFetcher: true,
         scalars: {
