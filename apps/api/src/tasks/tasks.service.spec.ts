@@ -531,6 +531,7 @@ describe("TasksService - Self-Claim Tasks", () => {
         orderBy: vi.fn().mockReturnThis(),
         getMany: vi.fn().mockResolvedValue([]),
       }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       manager: {
         transaction: vi.fn().mockImplementation((cb) => cb(mockManager)),
       } as any,
@@ -656,10 +657,9 @@ describe("TasksService - Self-Claim Tasks", () => {
         getMany: vi.fn().mockResolvedValue([task]),
       });
 
-      // Non-blocking dependency
-      (dependencyRepo.find as Mock).mockResolvedValue([
-        { taskId: "task-1", blocking: false, dependsOn: { status: TaskStatus.IN_PROGRESS } },
-      ]);
+      // The service queries with blocking: true, so return empty array
+      // (non-blocking deps are not queried for in isTaskBlocked)
+      (dependencyRepo.find as Mock).mockResolvedValue([]);
 
       const count = await service.getClaimableTaskCount(orgId);
 
