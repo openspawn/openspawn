@@ -7,6 +7,7 @@ import {
   ChannelType,
   CreditType,
   EventSeverity,
+  IdleReason,
   MessageType,
   Proficiency,
   TaskPriority,
@@ -97,6 +98,32 @@ describe("Enums", () => {
       expect(Proficiency.BASIC).toBe("basic");
       expect(Proficiency.STANDARD).toBe("standard");
       expect(Proficiency.EXPERT).toBe("expert");
+    });
+  });
+
+  describe("IdleReason", () => {
+    it("should have correct values", () => {
+      expect(IdleReason.TASK_COMPLETE).toBe("task_complete");
+      expect(IdleReason.BLOCKED).toBe("blocked");
+      expect(IdleReason.AWAITING_INPUT).toBe("awaiting_input");
+      expect(IdleReason.UNASSIGNED).toBe("unassigned");
+      expect(IdleReason.NEWLY_ACTIVATED).toBe("newly_activated");
+    });
+
+    it("should have exactly 5 idle reasons", () => {
+      const values = Object.values(IdleReason);
+      expect(values).toHaveLength(5);
+    });
+
+    it("should be usable as event metadata", () => {
+      const eventData = {
+        agentId: "agent-123",
+        reason: IdleReason.TASK_COMPLETE,
+        previousTaskId: "task-456",
+      };
+
+      expect(eventData.reason).toBe("task_complete");
+      expect(typeof eventData.reason).toBe("string");
     });
   });
 });

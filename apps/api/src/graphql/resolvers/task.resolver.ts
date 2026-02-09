@@ -1,4 +1,4 @@
-import { Args, ID, Parent, Query, ResolveField, Resolver, Subscription } from "@nestjs/graphql";
+import { Args, ID, Int, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from "@nestjs/graphql";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -8,7 +8,7 @@ import { TaskStatus } from "@openspawn/shared-types";
 import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
 import { TasksService } from "../../tasks";
 import { PubSubProvider, TASK_UPDATED } from "../pubsub.provider";
-import { AgentType, TaskRejectionType, TaskType } from "../types";
+import { AgentType, ClaimTaskResultType, TaskRejectionType, TaskType } from "../types";
 
 /**
  * Security Model:
@@ -50,6 +50,25 @@ export class TaskResolver {
     } catch {
       return null;
     }
+  }
+
+  @Query(() => Int, { description: "Get count of tasks available to claim" })
+  async claimableTaskCount(
+    @Args("orgId", { type: () => ID }) orgId: string,
+    @OrgFromContext() authenticatedOrgId?: string,
+  ): Promise<number> {
+    validateOrgAccess(orgId, authenticatedOrgId);
+    return this.tasksService.getClaimableTaskCount(orgId);
+  }
+
+  @Mutation(() => ClaimTaskResultType, { description: "Claim the next available task" })
+  async claimNextTask(
+    @Args("orgId", { type: () => ID }) orgId: string,
+    @Args("agentId", { type: () => ID }) agentId: string,
+    @OrgFromContext() authenticatedOrgId?: string,
+  ): Promise<ClaimTaskResultType> {
+    validateOrgAccess(orgId, authenticatedOrgId);
+    return this.tasksService.claimNextTask(orgId, agentId);
   }
 
   @ResolveField(() => AgentType, { nullable: true })
