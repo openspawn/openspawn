@@ -16,6 +16,10 @@ import {
   Menu,
   X,
   MessageSquare,
+  BookOpen,
+  ExternalLink,
+  HelpCircle,
+  Github,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -147,6 +151,32 @@ export function Layout({ children }: LayoutProps) {
                 <DemoControls compact />
               </div>
             )}
+          </div>
+
+          {/* Help Links */}
+          <div className="border-t border-border px-3 py-2">
+            <div className="flex flex-col gap-1">
+              <a
+                href="https://openspawn.github.io/openspawn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              >
+                <BookOpen className="h-4 w-4" />
+                Documentation
+                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+              </a>
+              <a
+                href="https://github.com/openspawn/openspawn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+              </a>
+            </div>
           </div>
 
           {/* User & Footer */}
@@ -281,7 +311,33 @@ export function Layout({ children }: LayoutProps) {
             )}
           </div>
 
-          {/* Drawer user section */}
+          {/* Drawer help links */}
+          <div className="border-t border-border px-3 py-2">
+            <div className="flex flex-col gap-1">
+              <a
+                href="https://openspawn.github.io/openspawn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              >
+                <BookOpen className="h-4 w-4" />
+                Documentation
+                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+              </a>
+              <a
+                href="https://github.com/openspawn/openspawn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+              </a>
+            </div>
+          </div>
+
+          {/* Drawer footer */}
           <div className="border-t border-border p-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>v0.1.0</span>

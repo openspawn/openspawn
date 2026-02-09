@@ -15,3 +15,4 @@ export * from "./budget-burndown";
 export * from "./agent-efficiency";
 export * from "./model-usage";
 export * from "./agent-heartbeat";
+export { PhaseProgress } from './phase-progress';

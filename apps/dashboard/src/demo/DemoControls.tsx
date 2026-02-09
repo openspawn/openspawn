@@ -1,4 +1,4 @@
-import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory } from 'lucide-react';
 import { useDemo } from './DemoProvider';
 import { Button } from '../components/ui/button';
 import { cn } from '../lib/utils';
@@ -12,10 +12,11 @@ const SPEED_OPTIONS = [
 ];
 
 const SCENARIO_OPTIONS = [
-  { value: 'fresh' as const, label: 'Fresh', icon: Zap, agents: 1 },
-  { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5 },
-  { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14 },
-  { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50 },
+  { value: 'novatech' as const, label: 'NovaTech', icon: Factory, agents: 22, description: 'Product launch lifecycle' },
+  { value: 'fresh' as const, label: 'Fresh', icon: Zap, agents: 1, description: 'Start from scratch' },
+  { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5, description: 'Small team' },
+  { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14, description: 'Scaling up' },
+  { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50, description: 'Full org' },
 ];
 
 interface DemoControlsProps {

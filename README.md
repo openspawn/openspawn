@@ -67,7 +67,87 @@ Escalation paths
 
 ---
 
-## ⚡ 5-Minute Setup
+## 📖 Real-World Scenarios
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 💸 The $3,000 Weekend
+
+> *"I had no visibility. No budget caps. Just a bill."*
+
+Agent gets stuck in a loop, burns API credits all weekend. Monday brings a massive invoice.
+
+**OpenSpawn:** Per-agent budgets, real-time spending dashboards, automatic limits.
+
+</td>
+<td width="50%" valign="top">
+
+### 🔍 Which Agent Broke Production?
+
+> *"Who approved this? Nobody knows."*
+
+Bug ships to production. Post-mortem asks: which agent approved it? No audit trail exists.
+
+**OpenSpawn:** Full event history, actor attribution, reasoning logs for every action.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### ⭐ The New Agent Problem
+
+> *"Every agent has the same permissions."*
+
+New agent makes mistakes but has identical access to veterans. No way to ramp up trust gradually.
+
+**OpenSpawn:** Trust scores (0-100), reputation levels, performance-based autonomy.
+
+</td>
+<td width="50%" valign="top">
+
+### 🤝 Too Many Cooks
+
+> *"Agents can't talk to each other."*
+
+8 agents across 3 teams. Marketing needs Dev help, but there's no coordination layer.
+
+**OpenSpawn:** Agent messaging, task-bound channels, escalation paths. [A2A-ready](https://google.github.io/A2A/).
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+
+**The common thread:** *"I went from 1 agent to N agents, and everything broke."*
+
+📚 [Read full case studies →](https://openspawn.github.io/openspawn/case-studies/)
+
+</div>
+
+---
+
+## ⚡ Quick Start
+
+### One-Liner Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/openspawn/openspawn/main/scripts/install.sh | bash
+```
+
+This will:
+- Check prerequisites (Docker, Git)
+- Clone the repository
+- Start Postgres, API, and Dashboard
+- Print the URLs when ready
+
+### Manual Setup
+
+<details>
+<summary>Click to expand manual setup instructions</summary>
 
 ```bash
 # Clone & install
@@ -85,9 +165,13 @@ node scripts/seed-admin.mjs you@example.com password "Your Name"
 pnpm exec nx run-many -t serve -p api,dashboard
 ```
 
+</details>
+
+### Services
+
 | Service | URL |
 |---------|-----|
-| 🖥️ Dashboard | http://localhost:4200 |
+| 🖥️ Dashboard | http://localhost:8080 |
 | ⚡ API | http://localhost:3000 |
 | 📊 GraphQL | http://localhost:3000/graphql |
 
