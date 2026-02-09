@@ -1,7 +1,8 @@
 import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Layout, ProtectedRoute } from "../components";
+import { Layout, ProtectedRoute, NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
+import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
@@ -50,13 +51,24 @@ function MaybeProtectedRoute({ children }: { children: ReactNode }) {
   return <ProtectedRoute>{children}</ProtectedRoute>;
 }
 
+function KeyboardShortcutsWrapper({ children }: { children: ReactNode }) {
+  const { helpOpen, setHelpOpen } = useKeyboardShortcuts();
+  return (
+    <>
+      {children}
+      <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+    </>
+  );
+}
+
 export function App() {
   return (
     <ThemeProvider defaultTheme="dark">
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <DemoWrapper>
-            <Router>
+          <NotificationProvider>
+            <DemoWrapper>
+              <Router>
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />
@@ -84,7 +96,8 @@ export function App() {
                 />
               </Routes>
             </Router>
-          </DemoWrapper>
+            </DemoWrapper>
+          </NotificationProvider>
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
