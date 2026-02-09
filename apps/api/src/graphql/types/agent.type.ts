@@ -60,6 +60,12 @@ export class AgentType {
   @Field(() => Date, { nullable: true })
   lastPromotionAt?: Date | null;
 
+  @Field(() => Int)
+  lifetimeEarnings!: number;
+
+  @Field({ nullable: true })
+  domain?: string | null;
+
   @Field(() => ID, { nullable: true })
   parentId?: string | null;
 

@@ -46,10 +46,12 @@ export type AgentType = {
   budgetPeriodSpent: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   currentBalance: Scalars['Int']['output'];
+  domain?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
   lastPromotionAt?: Maybe<Scalars['DateTime']['output']>;
   level: Scalars['Int']['output'];
+  lifetimeEarnings: Scalars['Int']['output'];
   managementFeePct: Scalars['Int']['output'];
   model: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -331,7 +333,7 @@ export type AgentsQueryVariables = Exact<{
 }>;
 
 
-export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string }> };
+export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null }> };
 
 export type CreditHistoryQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -477,6 +479,15 @@ export const AgentsDocument = `
     managementFeePct
     parentId
     createdAt
+    updatedAt
+    trustScore
+    reputationLevel
+    tasksCompleted
+    tasksSuccessful
+    lastActivityAt
+    lastPromotionAt
+    lifetimeEarnings
+    domain
   }
 }
     `;

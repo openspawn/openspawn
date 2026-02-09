@@ -32,24 +32,9 @@ import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 
-interface Agent {
-  id: string;
-  agentId: string;
-  name: string;
-  status: string;
-  role: string;
-  level: number;
-  currentBalance: number;
-  lifetimeEarnings: number;
-  model: string;
-  createdAt: string;
-  // Trust & Reputation
-  trustScore?: number;
-  reputationLevel?: string;
-  tasksCompleted?: number;
-  tasksSuccessful?: number;
-  lastActivityAt?: string;
-}
+// Use generated type from GraphQL query
+import type { AgentsQuery } from "../graphql/generated/graphql";
+type Agent = AgentsQuery["agents"][number];
 
 type DialogMode = "view" | "edit" | "credits" | null;
 
@@ -204,7 +189,7 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
   }
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setStatus(e.target.value);
+    setStatus(e.target.value as Agent["status"]);
   }
 
   function handleSave() {
@@ -787,7 +772,7 @@ export function AgentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-500">
-              {agents.filter((a) => a.status === "active").length}
+              {agents.filter((a) => a.status === "ACTIVE").length}
             </div>
           </CardContent>
         </Card>

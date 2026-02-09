@@ -66,6 +66,16 @@ export const AgentsQueryDocument = graphql(`
       managementFeePct
       parentId
       createdAt
+      updatedAt
+      # Trust & Reputation
+      trustScore
+      reputationLevel
+      tasksCompleted
+      tasksSuccessful
+      lastActivityAt
+      lastPromotionAt
+      lifetimeEarnings
+      domain
     }
   }
 `);
