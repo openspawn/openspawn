@@ -53,17 +53,25 @@
     --accent: 190 90% 55%;
     --accent-foreground: 220 35% 10%;
     
-    /* Success - sea green */
-    --success: 160 70% 45%;
-    --success-foreground: 160 70% 95%;
+    /* Success - emerald */
+    --success: 160 84% 39%;
+    --success-foreground: 160 84% 95%;
     
-    /* Warning - amber/coral */
-    --warning: 25 95% 55%;
-    --warning-foreground: 25 20% 10%;
+    /* Warning - amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 20% 10%;
     
-    /* Destructive - keep red but ocean-tinted */
-    --destructive: 0 70% 45%;
+    /* Destructive - rose/red */
+    --destructive: 350 89% 60%;
     --destructive-foreground: 0 0% 98%;
+    
+    /* Info - cyan (same as primary) */
+    --info: 185 85% 60%;
+    --info-foreground: 220 35% 10%;
+    
+    /* Special - violet/purple */
+    --special: 258 90% 66%;
+    --special-foreground: 258 90% 95%;
     
     /* Borders with subtle cyan tint */
     --border: 210 25% 22%;
@@ -101,6 +109,14 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
+  --color-special: hsl(var(--special));
+  --color-special-foreground: hsl(var(--special-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
