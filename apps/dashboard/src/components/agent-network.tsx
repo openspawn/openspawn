@@ -28,6 +28,7 @@ import { useMessages, useConversations } from "../hooks/use-messages";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 import { AgentDetailPanel } from "./agent-detail-panel";
 import { useAgentHealth } from "../hooks/use-agent-health";
+import { useTouchDevice } from "../hooks/use-touch-device";
 import { levelColors } from "../lib/status-colors";
 
 // Context to share active delegations, speed, avatar settings, and activity data
@@ -64,6 +65,7 @@ interface NetworkContextValue {
   agentActivity: Map<string, AgentActivity>;
   edgeMessages: Map<string, EdgeMessageData>;
   agentHealth: Map<string, AgentHealthData>;
+  isMobileOrTouch: boolean;
 }
 
 const NetworkContext = createContext<NetworkContextValue>({ 
@@ -73,6 +75,7 @@ const NetworkContext = createContext<NetworkContextValue>({
   agentActivity: new Map(),
   edgeMessages: new Map(),
   agentHealth: new Map(),
+  isMobileOrTouch: false,
 });
 
 // ELK instance for layout
@@ -175,7 +178,7 @@ interface AgentNodeData extends Record<string, unknown> {
 // Custom node component with heat map coloring
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
-  const { avatarVersion, agentActivity, agentHealth } = useContext(NetworkContext);
+  const { avatarVersion, agentActivity, agentHealth, isMobileOrTouch } = useContext(NetworkContext);
   
   // Get activity data
   const activity = agentActivity.get(nodeData.agentId);
@@ -209,8 +212,10 @@ function AgentNode({ data, selected }: NodeProps) {
   const isActive = nodeData.status === "active" && activityLevel !== 'idle';
   const isIdle = activityLevel === 'idle';
   
-  const nodeWidth = compact ? 90 : 160;
-  const nodeHeight = compact ? 64 : 96;
+  // Increase node size on mobile for easier tapping (44px+ touch targets)
+  const mobileScale = isMobileOrTouch ? 1.2 : 1;
+  const nodeWidth = (compact ? 90 : 160) * mobileScale;
+  const nodeHeight = (compact ? 64 : 96) * mobileScale;
   
   const avatarUrl = useMemo(() => {
     if (nodeData.isHuman) return null;
@@ -245,8 +250,8 @@ function AgentNode({ data, selected }: NodeProps) {
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className="absolute inset-0"
       >
-        {/* Pulsing glow for active/busy agents */}
-        {isActive && (
+        {/* Pulsing glow for active/busy agents — disabled on mobile for performance */}
+        {isActive && !isMobileOrTouch && (
           <motion.div
             animate={{ 
               scale: [1, 1.3, 1],
@@ -261,8 +266,15 @@ function AgentNode({ data, selected }: NodeProps) {
             style={{ backgroundColor: color }}
           />
         )}
+        {/* Static glow fallback on mobile */}
+        {isActive && isMobileOrTouch && (
+          <div
+            className="absolute inset-0 rounded-xl blur-md opacity-30"
+            style={{ backgroundColor: color }}
+          />
+        )}
         
-        {isSpawning && (
+        {isSpawning && !isMobileOrTouch && (
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 2, opacity: [0, 0.5, 0] }}
@@ -386,17 +398,21 @@ function AgentNode({ data, selected }: NodeProps) {
             return <div className="mb-0.5">{avatarImg}</div>;
           })()}
 
-          {/* Name */}
+          {/* Name — larger font on mobile for readability */}
           <div 
-            className={`font-semibold text-white text-center truncate w-full ${compact ? 'text-[10px]' : 'text-sm'}`}
+            className={`font-semibold text-white text-center truncate w-full ${
+              compact 
+                ? (isMobileOrTouch ? 'text-xs' : 'text-[10px]') 
+                : (isMobileOrTouch ? 'text-base' : 'text-sm')
+            }`}
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
           >
             {compact ? (nodeData.isHuman ? "👤 " : "") + nodeData.label.split(' ')[0] : nodeData.label}
           </div>
 
-          {/* Role */}
+          {/* Role — slightly larger on mobile */}
           {!compact && (
-            <div className="text-[9px] text-center truncate w-full" style={{ color }}>
+            <div className={`text-center truncate w-full ${isMobileOrTouch ? 'text-[11px]' : 'text-[9px]'}`} style={{ color }}>
               {nodeData.isHuman ? "Human" : roleLabels[nodeData.role] || nodeData.role}
             </div>
           )}
@@ -441,7 +457,7 @@ function TaskFlowEdge({
   target,
   selected,
 }: EdgeProps & { selected?: boolean }) {
-  const { delegations, speed, edgeMessages } = useContext(NetworkContext);
+  const { delegations, speed, edgeMessages, isMobileOrTouch } = useContext(NetworkContext);
   
   const [edgePath] = getSmoothStepPath({
     sourceX,
@@ -471,14 +487,15 @@ function TaskFlowEdge({
   const baseDuration = 1.2;
   const duration = baseDuration / Math.sqrt(speed);
 
-  // Generate multiple particles for busy edges
-  const particleCount = Math.min(Math.max(1, Math.floor(messageCount / 5)), 3);
+  // Reduce particle count on mobile for performance
+  const maxParticles = isMobileOrTouch ? 1 : 3;
+  const particleCount = Math.min(Math.max(1, Math.floor(messageCount / 5)), maxParticles);
   const particles = Array.from({ length: particleCount }, (_, i) => i);
 
   return (
     <>
-      {/* Glow underlay for active edges */}
-      {messageCount > 0 && (
+      {/* Glow underlay for active edges — skip on mobile */}
+      {messageCount > 0 && !isMobileOrTouch && (
         <BaseEdge
           id={`${id}-glow`}
           path={edgePath}
@@ -502,8 +519,8 @@ function TaskFlowEdge({
         markerEnd={markerEnd} 
       />
       
-      {/* Animated particles along edge */}
-      {activeDelegations.map((delegation) => (
+      {/* Animated particles along edge — simplified on mobile */}
+      {!isMobileOrTouch && activeDelegations.map((delegation) => (
         <motion.g key={delegation.id}>
           {/* Main particle */}
           <motion.circle
@@ -546,9 +563,21 @@ function TaskFlowEdge({
           />
         </motion.g>
       ))}
+      {/* Mobile: simpler single particle for active delegations */}
+      {isMobileOrTouch && activeDelegations.slice(0, 1).map((delegation) => (
+        <motion.circle
+          key={delegation.id}
+          r={5}
+          fill="#22c55e"
+          initial={{ offsetDistance: "0%", opacity: 0 }}
+          animate={{ offsetDistance: "100%", opacity: [0, 1, 1, 0] }}
+          transition={{ duration, ease: "easeInOut" }}
+          style={{ offsetPath: `path("${edgePath}")` }}
+        />
+      ))}
       
-      {/* Ambient particles for high-traffic edges */}
-      {messageCount > 10 && particles.map((i) => (
+      {/* Ambient particles for high-traffic edges — skip on mobile */}
+      {!isMobileOrTouch && messageCount > 10 && particles.map((i) => (
         <motion.circle
           key={`ambient-${i}`}
           r={3}
@@ -818,6 +847,44 @@ function buildNodesAndEdges(
   return { nodes, edges };
 }
 
+// Touch-optimized zoom controls for mobile
+function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
+  const { zoomIn, zoomOut } = useReactFlow();
+  
+  return (
+    <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-2">
+      <button
+        onClick={() => zoomIn({ duration: 200 })}
+        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+                   text-white text-xl font-bold flex items-center justify-center
+                   active:bg-zinc-600 transition-colors shadow-lg"
+        aria-label="Zoom in"
+      >
+        +
+      </button>
+      <button
+        onClick={() => zoomOut({ duration: 200 })}
+        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+                   text-white text-xl font-bold flex items-center justify-center
+                   active:bg-zinc-600 transition-colors shadow-lg"
+        aria-label="Zoom out"
+      >
+        −
+      </button>
+      <button
+        onClick={onFitView}
+        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+                   text-white text-sm font-semibold flex items-center justify-center
+                   active:bg-zinc-600 transition-colors shadow-lg"
+        aria-label="Fit view"
+        title="Fit all nodes"
+      >
+        ⊡
+      </button>
+    </div>
+  );
+}
+
 // Inner component
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
@@ -825,7 +892,8 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const { tasks, loading: tasksLoading } = useTasks();
   const { messages } = useMessages(100);
   const { conversations } = useConversations();
-  const { fitView } = useReactFlow();
+  const { fitView, zoomIn, setCenter, getNode } = useReactFlow();
+  const { isMobileOrTouch, isMobile } = useTouchDevice();
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<{ 
     source: string; 
@@ -841,10 +909,21 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const agentHealth = useAgentHealth();
   const prevAgentCountRef = useRef(0);
   
+  // Double-tap detection for zoom-to-node
+  const lastTapRef = useRef<{ time: number; nodeId: string | null }>({ time: 0, nodeId: null });
+  // Long-press detection
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressNodeRef = useRef<string | null>(null);
+  
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   
   const loading = agentsLoading || tasksLoading;
+  
+  // Handle fit view for mobile controls
+  const handleFitView = useCallback(() => {
+    fitView({ padding: 0.2, duration: 400 });
+  }, [fitView]);
   
   // Calculate activity metrics
   const agentActivity = useMemo(() => {
@@ -864,7 +943,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     return () => window.removeEventListener('avatar-style-changed', handleAvatarChange);
   }, []);
 
-  // Auto-layout
+  // Auto-layout — use slightly more spacing on mobile to accommodate larger nodes
   useEffect(() => {
     if (loading) return;
     
@@ -879,9 +958,11 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
       const agentCountChanged = agents.length !== prevAgentCountRef.current;
       prevAgentCountRef.current = agents.length;
       
-      setTimeout(() => fitView({ padding: 0.15, duration: 800 }), 50);
+      // More padding on mobile so nodes aren't clipped at edges
+      const padding = isMobileOrTouch ? 0.25 : 0.15;
+      setTimeout(() => fitView({ padding, duration: isMobileOrTouch ? 400 : 800 }), 50);
     });
-  }, [agents, loading, compact, agentActivity, setNodes, setEdges, fitView]);
+  }, [agents, loading, compact, agentActivity, isMobileOrTouch, setNodes, setEdges, fitView]);
 
   // Task delegation simulation
   useEffect(() => {
@@ -918,11 +999,54 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   }, [demo.isPlaying, demo.speed, nodes.length, edges]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+    
+    // Double-tap detection: zoom to node on double-tap (mobile)
+    if (
+      isMobileOrTouch &&
+      lastTap.nodeId === node.id &&
+      now - lastTap.time < 400
+    ) {
+      // Double-tap → zoom into this node
+      const nodeWidth = compact ? 90 : 160;
+      const nodeHeight = compact ? 64 : 96;
+      setCenter(
+        node.position.x + nodeWidth / 2,
+        node.position.y + nodeHeight / 2,
+        { zoom: 1.3, duration: 400 }
+      );
+      lastTapRef.current = { time: 0, nodeId: null };
+      return;
+    }
+    
+    lastTapRef.current = { time: now, nodeId: node.id };
+    
     setSelectedNode(node as Node<AgentNodeData>);
     setSelectedEdge(null);
     if (node.id !== "human") {
       setDetailPanelAgentId(node.id);
     }
+  }
+  
+  // Long-press handler for touch devices — opens detail panel
+  function handleNodeMouseDown(_event: React.MouseEvent, node: Node) {
+    if (!isMobileOrTouch) return;
+    longPressNodeRef.current = node.id;
+    longPressTimerRef.current = setTimeout(() => {
+      if (longPressNodeRef.current === node.id && node.id !== "human") {
+        setDetailPanelAgentId(node.id);
+        setSelectedNode(node as Node<AgentNodeData>);
+      }
+    }, 500); // 500ms long-press
+  }
+  
+  function handleNodeMouseUp() {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    longPressNodeRef.current = null;
   }
 
   function handleEdgeClick(_event: React.MouseEvent, edge: Edge) {
@@ -947,7 +1071,8 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     agentActivity,
     edgeMessages,
     agentHealth,
-  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth]);
+    isMobileOrTouch,
+  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth, isMobileOrTouch]);
 
   if (loading) {
     return (
@@ -966,26 +1091,48 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
+          onNodeMouseEnter={undefined}
+          onNodeMouseLeave={handleNodeMouseUp}
           onEdgeClick={handleEdgeClick}
           edgeTypes={edgeTypes}
           nodeTypes={nodeTypes}
           fitView
-          minZoom={0.3}
-          maxZoom={1.5}
+          minZoom={0.2}
+          maxZoom={2.0}
+          /* Touch: ReactFlow natively supports pinch-to-zoom and pan.
+             Ensure these are enabled and not accidentally blocked. */
+          panOnDrag
+          panOnScroll={false}
+          zoomOnPinch
+          zoomOnScroll={!isMobileOrTouch}
+          zoomOnDoubleClick={false}
+          preventScrolling
+          /* Disable node dragging on mobile to prevent accidental moves */
+          nodesDraggable={!isMobileOrTouch}
           proOptions={{ hideAttribution: true }}
           defaultEdgeOptions={{
             type: "taskFlow",
-            animated: true,
+            animated: !isMobileOrTouch,
             markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
             style: { stroke: "#6366f1", strokeWidth: 2 },
           }}
+          onNodeDragStart={handleNodeMouseDown as any}
+          onNodeDragStop={handleNodeMouseUp as any}
         >
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
-          <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+          {/* Desktop: standard controls. Mobile: hidden (replaced by MobileZoomControls) */}
+          {!isMobileOrTouch && (
+            <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+          )}
         </ReactFlow>
+        
+        {/* Mobile touch controls — large tap targets */}
+        {isMobileOrTouch && (
+          <MobileZoomControls onFitView={handleFitView} />
+        )}
 
-        {/* Legend */}
-        <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
+        {/* Legend — hidden on very small touch devices to save space */}
+        <div className={`absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? 'hidden sm:block' : ''}`}>
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-white text-xs sm:text-sm">Activity</span>
             <button
