@@ -391,13 +391,13 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       // Group messages by conversation (pair of agents)
       const conversationMap = new Map<string, DemoMessage[]>();
       messages.forEach(msg => {
-        const key = [msg.fromAgentId, msg.toAgentId].sort().join('-');
+        const key = [msg.fromAgentId, msg.toAgentId].sort().join('::');
         if (!conversationMap.has(key)) conversationMap.set(key, []);
         conversationMap.get(key)!.push(msg);
       });
       
       const conversations = Array.from(conversationMap.entries()).map(([key, msgs]) => {
-        const [agent1Id, agent2Id] = key.split('-');
+        const [agent1Id, agent2Id] = key.split('::');
         const agent1 = agents.find(a => a.id === agent1Id);
         const agent2 = agents.find(a => a.id === agent2Id);
         const latestMsg = msgs.sort((a, b) => 

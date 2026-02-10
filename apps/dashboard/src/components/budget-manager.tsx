@@ -54,7 +54,7 @@ const MOCK_BUDGETS: BudgetStatus[] = [
   },
 ];
 
-export function BudgetManager() {
+export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) => void }) {
   const [budgets] = useState<BudgetStatus[]>(MOCK_BUDGETS);
   const [showTransfer, setShowTransfer] = useState(false);
   const [transferring, setTransferring] = useState(false);
@@ -104,7 +104,8 @@ export function BudgetManager() {
                   key={budget.agentId}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/5 p-3"
+                  className="flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 cursor-pointer hover:bg-amber-500/10 transition-colors"
+                  onClick={() => onAgentClick?.(budget.agentId)}
                 >
                   <div>
                     <p className="font-medium">{budget.agentName}</p>
@@ -227,7 +228,7 @@ export function BudgetManager() {
         <CardContent>
           <div className="space-y-4">
             {budgets.map((budget) => (
-              <div key={budget.agentId} className="space-y-2">
+              <div key={budget.agentId} className="space-y-2 p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => onAgentClick?.(budget.agentId)}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{budget.agentName}</span>

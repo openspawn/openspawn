@@ -250,7 +250,7 @@ const REPUTATION_EMOJI: Record<string, string> = {
   ELITE: "👑",
 };
 
-function ReputationTab({ agents }: { agents: Agent[] }) {
+function ReputationTab({ agents, onAgentClick }: { agents: Agent[]; onAgentClick?: (id: string) => void }) {
   const { presenceMap } = usePresence();
   const healthMap = useAgentHealth();
   // Sort agents by trust score for leaderboard
@@ -370,7 +370,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
         </Card>
 
         {/* Leaderboard */}
-        <TrustLeaderboard entries={leaderboardData} />
+        <TrustLeaderboard entries={leaderboardData} onAgentClick={onAgentClick} />
       </div>
 
       {/* All Agents Trust Overview */}
@@ -394,7 +394,8 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
                     key={agent.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => onAgentClick?.(agent.id)}
                   >
                     <div className="flex items-center gap-3">
                       <AgentAvatar
@@ -1098,7 +1099,7 @@ export function AgentsPage() {
 
         {/* Reputation Tab */}
         <TabsContent value="reputation" className="space-y-6">
-          <ReputationTab agents={agents} />
+          <ReputationTab agents={agents} onAgentClick={openAgentDetail} />
         </TabsContent>
 
         {/* Onboarding Tab */}
@@ -1108,12 +1109,12 @@ export function AgentsPage() {
 
         {/* Capabilities Tab */}
         <TabsContent value="capabilities" className="space-y-6">
-          <CapabilityManager />
+          <CapabilityManager onAgentClick={openAgentDetail} />
         </TabsContent>
 
         {/* Budgets Tab */}
         <TabsContent value="budgets" className="space-y-6">
-          <BudgetManager />
+          <BudgetManager onAgentClick={openAgentDetail} />
         </TabsContent>
       </Tabs>
 

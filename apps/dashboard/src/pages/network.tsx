@@ -56,7 +56,7 @@ export function NetworkPage() {
     <div className="h-[calc(100vh-theme(spacing.16))] -m-6 lg:-m-6 -mx-4 sm:-mx-6">
       {/* Header bar with title + stats + view toggle */}
       <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-10
-        bg-zinc-900/90 backdrop-blur border border-border
+        bg-card/90 backdrop-blur border border-border
         rounded-full px-4 sm:px-6 py-2 sm:py-3
         w-auto max-w-[calc(100%-4rem)]">
         <div className="flex gap-4 sm:gap-6 items-center">
@@ -71,7 +71,7 @@ export function NetworkPage() {
           <div className="w-px h-8 bg-border hidden sm:block" />
 
           {/* View toggle */}
-          <div className="flex items-center gap-1 bg-zinc-800 rounded-full p-0.5">
+          <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
             <Button
               variant={view === "network" ? "secondary" : "ghost"}
               size="sm"

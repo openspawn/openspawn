@@ -113,8 +113,8 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Chart */}
-        <div className="relative">
-          <svg width="100%" viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="overflow-visible">
+        <div className="relative overflow-hidden">
+          <svg width="100%" viewBox={`-50 -10 ${chartWidth + 60} ${chartHeight + 40}`}>
             {/* Grid lines */}
             {[0.25, 0.5, 0.75, 1].map((pct) => (
               <g key={pct}>
