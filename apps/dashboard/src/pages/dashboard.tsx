@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -30,6 +30,7 @@ import { Badge } from "../components/ui/badge";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { PhaseProgress } from "../components/phase-progress";
 import { IdleAgentsWidget } from "../components/idle-agents-widget";
+import { DashboardGrid, DashboardToolbar, useDashboardLayout } from "../components/dashboard-grid";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
@@ -147,6 +148,7 @@ export function DashboardPage() {
   const { transactions } = useCredits();
   const { events } = useEvents();
   const { isDemo, scenario, speed } = useDemo();
+  const layout = useDashboardLayout();
 
   // Debounced events: at high speeds, batch updates to avoid render thrashing
   const [displayEvents, setDisplayEvents] = useState(events);
@@ -268,196 +270,155 @@ export function DashboardPage() {
     return buckets;
   }, [transactions]);
 
-  return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          {isDemo && scenario === 'novatech' 
-            ? 'NovaTech AI — Product Launch Lifecycle' 
-            : 'Overview of your multi-agent system'}
-        </p>
-      </div>
+  // Widget render map
+  const renderWidget = useCallback((id: string) => {
+    switch (id) {
+      case "stats-overview":
+        return (
+          <StaggerContainer className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StaggerItem><StatCard
+              title="Active Agents"
+              value={activeAgents}
+              icon={Users}
+              description={pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined}
+              sparklineData={sparklines.agents}
+              sparklineColor="#06b6d4"
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Tasks In Progress"
+              value={inProgressTasks}
+              icon={CheckSquare}
+              description={`${tasks.filter(t => t.status === "review").length} in review`}
+              sparklineData={sparklines.tasks}
+              sparklineColor="#06b6d4"
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Completed Tasks"
+              value={completedTasks}
+              icon={TrendingUp}
+              description={`${tasks.length} total tasks`}
+              sparklineData={sparklines.completed}
+              sparklineColor="#10b981"
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Credit Flow"
+              value={`+${totalCreditsEarned.toLocaleString()}`}
+              icon={Coins}
+              description={`-${totalCreditsSpent.toLocaleString()} spent`}
+              sparklineData={sparklines.credits}
+              sparklineColor="#f59e0b"
+            /></StaggerItem>
+          </StaggerContainer>
+        );
+      case "credit-flow-chart":
+        return renderCreditChart();
+      case "tasks-by-status":
+        return renderTasksChart();
+      case "recent-activity":
+        return renderRecentActivity();
+      case "available-agents":
+        return (
+          <IdleAgentsWidget
+            maxCount={6}
+            onAgentClick={(agent) => navigate(`/agents?selected=${agent.agentId}`)}
+          />
+        );
+      default:
+        return null;
+    }
+  }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, tasks, totalCreditsEarned, totalCreditsSpent, sparklines, navigate, displayEvents, creditHistory, tasksByStatus, events, isHighSpeed, speed]);
 
-      {/* Phase Progress (NovaTech scenario only) */}
-      {isDemo && scenario === 'novatech' && PROJECT_PHASES && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              🚀 Project Progress
-              <Badge variant="outline" className="ml-auto">Dashboard v2.0 Launch</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PhaseProgress 
-              phases={PROJECT_PHASES} 
-              currentPhase={currentPhase}
-            />
-          </CardContent>
-        </Card>
-      )}
+  function renderCreditChart() {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Credit Flow</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={creditHistory}>
+                <defs>
+                  <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="spent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="period" className="text-xs fill-muted-foreground" />
+                <YAxis className="text-xs fill-muted-foreground" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "0.5rem",
+                  }}
+                />
+                <Area type="monotone" dataKey="earned" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#earned)" isAnimationActive={true} />
+                <Area type="monotone" dataKey="spent" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#spent)" isAnimationActive={true} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {/* Stats grid */}
-      <StaggerContainer className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StaggerItem><StatCard
-          title="Active Agents"
-          value={activeAgents}
-          icon={Users}
-          description={pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined}
-          sparklineData={sparklines.agents}
-          sparklineColor="#06b6d4"
-        /></StaggerItem>
-        <StaggerItem><StatCard
-          title="Tasks In Progress"
-          value={inProgressTasks}
-          icon={CheckSquare}
-          description={`${tasks.filter(t => t.status === "review").length} in review`}
-          sparklineData={sparklines.tasks}
-          sparklineColor="#06b6d4"
-        /></StaggerItem>
-        <StaggerItem><StatCard
-          title="Completed Tasks"
-          value={completedTasks}
-          icon={TrendingUp}
-          description={`${tasks.length} total tasks`}
-          sparklineData={sparklines.completed}
-          sparklineColor="#10b981"
-        /></StaggerItem>
-        <StaggerItem><StatCard
-          title="Credit Flow"
-          value={`+${totalCreditsEarned.toLocaleString()}`}
-          icon={Coins}
-          description={`-${totalCreditsSpent.toLocaleString()} spent`}
-          sparklineData={sparklines.credits}
-          sparklineColor="#f59e0b"
-        /></StaggerItem>
-      </StaggerContainer>
+  function renderTasksChart() {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Tasks by Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={tasksByStatus} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
+                <XAxis type="number" className="text-xs fill-muted-foreground" />
+                <YAxis type="category" dataKey="status" className="text-xs fill-muted-foreground" width={85} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "0.5rem",
+                  }}
+                />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive={true} animationDuration={500}>
+                  {tasksByStatus.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {/* Charts */}
-      <div className="grid gap-4 lg:grid-cols-7">
-        {/* Credit flow chart */}
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Credit Flow</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={creditHistory}>
-                  <defs>
-                    <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="spent" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    className="stroke-border"
-                  />
-                  <XAxis
-                    dataKey="period"
-                    className="text-xs fill-muted-foreground"
-                  />
-                  <YAxis className="text-xs fill-muted-foreground" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="earned"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#earned)"
-                    isAnimationActive={true}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="spent"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#spent)"
-                    isAnimationActive={true}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tasks by status */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Tasks by Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={tasksByStatus} layout="vertical">
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    className="stroke-border"
-                    horizontal={false}
-                  />
-                  <XAxis type="number" className="text-xs fill-muted-foreground" />
-                  <YAxis
-                    type="category"
-                    dataKey="status"
-                    className="text-xs fill-muted-foreground"
-                    width={85}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    radius={[0, 4, 4, 0]}
-                    isAnimationActive={true}
-                    animationDuration={500}
-                  >
-                    {tasksByStatus.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent activity + Idle Agents */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Activity</CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                <Zap className="h-3 w-3 mr-1" />
-                Live
-              </Badge>
-              <Link 
-                to="/events" 
-                className="text-xs text-cyan-500 hover:text-cyan-400 transition-colors whitespace-nowrap"
-              >
-                See all →
-              </Link>
-            </div>
-          </CardHeader>
+  function renderRecentActivity() {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Recent Activity</CardTitle>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              <Zap className="h-3 w-3 mr-1" />
+              Live
+            </Badge>
+            <Link
+              to="/events"
+              className="text-xs text-cyan-500 hover:text-cyan-400 transition-colors whitespace-nowrap"
+            >
+              See all →
+            </Link>
+          </div>
+        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <AnimatePresence mode="popLayout" initial={false}>
@@ -468,20 +429,16 @@ export function DashboardPage() {
                   initial={isHighSpeed ? false : { opacity: 0, x: -20, scale: 0.95 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                  transition={isHighSpeed 
+                  transition={isHighSpeed
                     ? { duration: 0.15 }
                     : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
                   }
                   className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div>
-                      {getEventIcon(event.type)}
-                    </div>
+                    <div>{getEventIcon(event.type)}</div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {event.actor?.name || "System"}
-                      </p>
+                      <p className="text-sm font-medium truncate">{event.actor?.name || "System"}</p>
                       <p className="text-xs text-muted-foreground truncate max-w-[200px]">
                         {event.reasoning || event.type.replace(/\./g, ' → ')}
                       </p>
@@ -509,14 +466,56 @@ export function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+    );
+  }
 
-        {/* Idle Agents Widget */}
-        <IdleAgentsWidget 
-          maxCount={6} 
-          className="lg:col-span-1"
-          onAgentClick={(agent) => navigate(`/agents?selected=${agent.agentId}`)}
+  return (
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            {isDemo && scenario === 'novatech' 
+              ? 'NovaTech AI — Product Launch Lifecycle' 
+              : 'Overview of your multi-agent system'}
+          </p>
+        </div>
+        <DashboardToolbar
+          editMode={layout.editMode}
+          setEditMode={layout.setEditMode}
+          widgets={layout.widgets}
+          toggleVisibility={layout.toggleVisibility}
+          applyPreset={layout.applyPreset}
+          resetLayout={layout.resetLayout}
         />
       </div>
+
+      {/* Phase Progress (NovaTech scenario only) */}
+      {isDemo && scenario === 'novatech' && PROJECT_PHASES && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              🚀 Project Progress
+              <Badge variant="outline" className="ml-auto">Dashboard v2.0 Launch</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PhaseProgress 
+              phases={PROJECT_PHASES} 
+              currentPhase={currentPhase}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Customizable widget grid */}
+      <DashboardGrid
+        widgets={layout.widgets}
+        editMode={layout.editMode}
+        reorder={layout.reorder}
+        renderWidget={renderWidget}
+      />
     </div>
   );
 }
