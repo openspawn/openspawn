@@ -1,33 +1,25 @@
 {
-  "name": "OpenSpawn Dashboard",
-  "short_name": "OpenSpawn",
+  "name": "BikiniBottom Dashboard",
+  "short_name": "BikiniBottom",
   "description": "Multi-agent coordination platform dashboard",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0b",
-  "theme_color": "#6366f1",
+  "theme_color": "#06b6d4",
   "orientation": "any",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "developer tools"],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "label": "Dashboard overview"
-    }
-  ]
+  "categories": ["productivity", "developer tools"]
 }
