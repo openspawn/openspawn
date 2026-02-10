@@ -178,18 +178,19 @@ export function DashboardPage() {
     credits: generateSparklineData(7, "stable"),
   }), []);
 
-  const activeAgents = agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length;
-  const pendingAgents = agents.filter((a) => a.status?.toUpperCase() === "PENDING").length;
-  const completedTasks = tasks.filter((t) => t.status?.toUpperCase() === "DONE").length;
-  const inProgressTasks = tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length;
+  const activeAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length, [agents]);
+  const pendingAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "PENDING").length, [agents]);
+  const completedTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "DONE").length, [tasks]);
+  const inProgressTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length, [tasks]);
+  const reviewTasks = useMemo(() => tasks.filter(t => t.status === "review").length, [tasks]);
 
-  const totalCreditsEarned = transactions
+  const totalCreditsEarned = useMemo(() => transactions
     .filter((t) => t.type === "CREDIT")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
   
-  const totalCreditsSpent = transactions
+  const totalCreditsSpent = useMemo(() => transactions
     .filter((t) => t.type === "DEBIT")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
 
   // Real task status counts from simulation (normalized to uppercase)
   const tasksByStatus = useMemo(() => [
@@ -256,7 +257,7 @@ export function DashboardPage() {
               title="Tasks In Progress"
               value={inProgressTasks}
               icon={CheckSquare}
-              description={`${tasks.filter(t => t.status === "review").length} in review`}
+              description={`${reviewTasks} in review`}
               sparklineData={sparklines.tasks}
               sparklineColor="#06b6d4"
             /></StaggerItem>
@@ -300,7 +301,7 @@ export function DashboardPage() {
       default:
         return null;
     }
-  }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, tasks, totalCreditsEarned, totalCreditsSpent, sparklines, navigate, displayEvents, creditHistory, tasksByStatus, events, isHighSpeed, speed]);
+  }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, reviewTasks, tasks.length, totalCreditsEarned, totalCreditsSpent, sparklines, navigate]);
 
   function renderCreditChart() {
     return (
