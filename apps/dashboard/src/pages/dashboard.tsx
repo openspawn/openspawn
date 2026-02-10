@@ -139,7 +139,7 @@ export function DashboardPage() {
     tasks: generateSparklineData(7, "up"),
     completed: generateSparklineData(7, "up"),
     credits: generateSparklineData(7, "stable"),
-  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  }), []);
 
   const activeAgents = agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length;
   const pendingAgents = agents.filter((a) => a.status?.toUpperCase() === "PENDING").length;

@@ -221,14 +221,14 @@ export function generateAgentAvatar({ seed, level = 5, size = 64, styleOverride 
  * Get avatar URL as a direct data URI
  * Use this in img src or Avatar components
  */
-export function getAgentAvatarUrl(agentId: string, level: number = 5, size: number = 64): string {
+export function getAgentAvatarUrl(agentId: string, level = 5, size = 64): string {
   return generateAgentAvatar({ seed: agentId, level, size });
 }
 
 /**
  * Generate a preview avatar for a specific style (uses current background settings)
  */
-export function generateStylePreview(styleKey: AvatarStyleKey, seed: string = 'preview', size: number = 64, level: number = 9): string {
+export function generateStylePreview(styleKey: AvatarStyleKey, seed = 'preview', size = 64, level = 9): string {
   const style = getStyle(styleKey);
   const backgrounds = getBackgroundColors(level);
   const bgType = getBackgroundType();
@@ -250,9 +250,9 @@ export function generateStylePreview(styleKey: AvatarStyleKey, seed: string = 'p
 export function generateBackgroundPreview(
   bgColorKey: BackgroundColorKey, 
   bgTypeKey: BackgroundTypeKey,
-  seed: string = 'bg-preview', 
-  size: number = 64,
-  level: number = 9
+  seed = 'bg-preview', 
+  size = 64,
+  level = 9
 ): string {
   const styleKey = getAvatarStyle();
   const style = getStyle(styleKey);

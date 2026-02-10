@@ -89,7 +89,7 @@ function AgentRow({ agent, presence, currentTask, health, expanded, onToggle }: 
   // Deterministic sparkline data based on agent status
   const sparkData = useMemo(
     () => generateSparklineData(8, presence === "active" ? "up" : presence === "error" ? "down" : "stable"),
-    [agent.id, presence] // eslint-disable-line react-hooks/exhaustive-deps
+    [agent.id, presence]
   );
 
   const levelColor = getLevelColor(agent.level);

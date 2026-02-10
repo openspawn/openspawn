@@ -39,7 +39,7 @@ export function SplitPanel({
     try {
       const stored = localStorage.getItem(`${STORAGE_KEY}-${storageKey}`);
       if (stored) return Number(stored);
-    } catch {}
+    } catch { /* noop */ }
     return defaultLeftWidth;
   });
 
@@ -47,7 +47,7 @@ export function SplitPanel({
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_KEY}-${storageKey}`, String(leftPercent));
-    } catch {}
+    } catch { /* noop */ }
   }, [leftPercent, storageKey]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {

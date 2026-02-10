@@ -50,11 +50,11 @@ export function useDemo(): DemoContextValue {
       currentTick: 0,
       scenario: 'fresh',
       recentEvents: [],
-      play: () => {},
-      pause: () => {},
-      setSpeed: () => {},
-      setScenario: () => {},
-      reset: () => {},
+      play: () => { /* noop */ },
+      pause: () => { /* noop */ },
+      setSpeed: () => { /* noop */ },
+      setScenario: () => { /* noop */ },
+      reset: () => { /* noop */ },
     };
   }
   return ctx;

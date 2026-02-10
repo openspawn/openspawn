@@ -722,7 +722,7 @@ export function AgentsPage() {
     active: generateSparklineData(7, "up"),
     balance: generateSparklineData(7, "stable"),
     level: generateSparklineData(7, "up"),
-  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  }), []);
   
   // Filtering state
   const [searchQuery, setSearchQuery] = useState("");
@@ -1041,7 +1041,7 @@ export function AgentsPage() {
               title="No agents registered yet"
               description="Register your first agent to get started with the multi-agent system."
               ctaLabel="Register your first agent →"
-              onCta={() => {}}
+              onCta={() => { /* noop */ }}
             />
           </CardContent>
         </Card>

@@ -6,8 +6,8 @@
 export const debug = {
   demo: import.meta.env.DEV
     ? (...args: unknown[]) => console.log('[Demo]', ...args)
-    : () => {},
+    : () => { /* noop */ },
   mockFetcher: import.meta.env.DEV
     ? (...args: unknown[]) => console.log('[MockFetcher]', ...args)
-    : () => {},
+    : () => { /* noop */ },
 };

@@ -161,7 +161,7 @@ export function CreditsPage() {
     earned: generateSparklineData(7, "up"),
     spent: generateSparklineData(7, "up"),
     burnRate: generateSparklineData(7, "down"),
-  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  }), []);
 
   // Compute balance history from transactions (sorted chronologically)
   const balanceHistory = useMemo(() => {

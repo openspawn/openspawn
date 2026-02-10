@@ -232,7 +232,7 @@ export class SimulationEngine {
   }
   
   // Main simulation tick
-  tick(emitEvents: boolean = true): SimulationEvent[] {
+  tick(emitEvents = true): SimulationEvent[] {
     const events: SimulationEvent[] = [];
     const now = new Date();
     
@@ -862,7 +862,7 @@ export class SimulationEngine {
     const eventType = randomFrom(eventTypes);
     
     // Get context based on event type
-    let context: { task?: DemoTask; agent?: DemoAgent; amount?: number } = {};
+    const context: { task?: DemoTask; agent?: DemoAgent; amount?: number } = {};
     
     if (eventType === 'task.transition') {
       const activeTasks = this.state.scenario.tasks.filter(

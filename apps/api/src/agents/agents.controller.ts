@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 
-import { AgentRole, Proficiency } from "@openspawn/shared-types";
+import { AgentRole, Proficiency, generateSigningSecret, encryptSecret } from "@openspawn/shared-types";
 
 import { CurrentAgent, Roles, type AuthenticatedAgent } from "../auth";
 
@@ -125,7 +125,6 @@ export class AgentsController {
     @Body() dto: SpawnAgentDto & { hmacSecretEnc?: string },
   ) {
     // For now, generate a new secret (in production, might be passed in)
-    const { generateSigningSecret, encryptSecret } = await import("@openspawn/shared-types");
     const plaintextSecret = generateSigningSecret();
     const encryptionKey = process.env["ENCRYPTION_KEY"];
     if (!encryptionKey) {
