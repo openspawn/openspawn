@@ -123,9 +123,12 @@ export function DemoProvider({
 
   // Trigger confetti based on event type (toned down - only major events)
   // Disabled entirely at high speeds (>1x) to avoid visual clutter
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+
   const triggerCelebration = useCallback((event: SimulationEvent) => {
     // Skip all confetti at high demo speeds
-    if (speed > 1) return;
+    if (speedRef.current > 1) return;
 
     // Check cooldown before firing confetti
     const now = Date.now();
@@ -145,7 +148,7 @@ export function DemoProvider({
       lastConfettiRef.current = now;
       celebrateElite();
     }
-  }, [speed]);
+  }, []);
 
   // Subscribe to simulation events
   // Re-subscribe when scenario changes (new engine is created)
