@@ -15,6 +15,7 @@ interface LeaderboardEntry {
 interface TrustLeaderboardProps {
   entries: LeaderboardEntry[];
   title?: string;
+  onAgentClick?: (id: string) => void;
 }
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -30,6 +31,7 @@ const RANK_EMOJI = ["🥇", "🥈", "🥉"];
 export function TrustLeaderboard({
   entries,
   title = "Trust Leaderboard",
+  onAgentClick,
 }: TrustLeaderboardProps) {
   return (
     <Card>
@@ -44,7 +46,8 @@ export function TrustLeaderboard({
           {entries.map((entry, index) => (
             <div
               key={entry.id}
-              className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+              className="flex items-center justify-between p-2 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
+              onClick={() => onAgentClick?.(entry.id)}
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 text-center text-lg">

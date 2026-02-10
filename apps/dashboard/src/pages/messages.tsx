@@ -108,15 +108,18 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
       };
     });
 
-    // Create edges from message pairs
+    // Create edges from message pairs (only between agents visible in the graph)
+    const visibleAgentIds = new Set(agentNodes.map(n => n.id));
     const messagePairs = new Map<string, number>();
     messages.forEach((msg) => {
-      const key = [msg.fromAgentId, msg.toAgentId].sort().join('-');
+      if (!visibleAgentIds.has(msg.fromAgentId) || !visibleAgentIds.has(msg.toAgentId)) return;
+      if (msg.fromAgentId === msg.toAgentId) return;
+      const key = [msg.fromAgentId, msg.toAgentId].sort().join('::');
       messagePairs.set(key, (messagePairs.get(key) || 0) + 1);
     });
 
     const edgeList: Edge[] = Array.from(messagePairs.entries()).map(([key, count]) => {
-      const [source, target] = key.split('-');
+      const [source, target] = key.split('::');
       return {
         id: key,
         source,
@@ -140,7 +143,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
     if (messages.length === 0) return;
     const interval = setInterval(() => {
       const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-      const key = [randomMsg.fromAgentId, randomMsg.toAgentId].sort().join('-');
+      const key = [randomMsg.fromAgentId, randomMsg.toAgentId].sort().join('::');
       setPulsingEdges(new Set([key]));
       setTimeout(() => setPulsingEdges(new Set()), 1000);
     }, 2000);
@@ -149,7 +152,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 
   const selectedMessages = selectedEdge
     ? messages.filter((m) => {
-        const key = [m.fromAgentId, m.toAgentId].sort().join('-');
+        const key = [m.fromAgentId, m.toAgentId].sort().join('::');
         return key === selectedEdge;
       })
     : [];
@@ -224,7 +227,7 @@ function FeedVirtualList({ filtered, allMessages, onViewThread }: { filtered: Me
             {filtered.map((msg) => {
               const sender = msg.fromAgent;
               const receiver = msg.toAgent;
-              const convoKey = [msg.fromAgentId, msg.toAgentId].sort().join('-');
+              const convoKey = [msg.fromAgentId, msg.toAgentId].sort().join('::');
               return (
                 <motion.div
                   key={msg.id}
@@ -378,7 +381,7 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
   // Group messages by conversation
   const conversations = useMemo(() => {
     const groups = messages.reduce((acc, msg) => {
-      const key = [msg.fromAgentId, msg.toAgentId].sort().join('-');
+      const key = [msg.fromAgentId, msg.toAgentId].sort().join('::');
       if (!acc[key]) acc[key] = [];
       acc[key].push(msg);
       return acc;
@@ -394,7 +397,7 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
       {conversations.slice(0, 12).map(([key, msgs]) => {
-        const [agent1Id, agent2Id] = key.split('-');
+        const [agent1Id, agent2Id] = key.split('::');
         // Look up from the agents list first, fall back to message-embedded data
         const agent1 = agentMap.get(agent1Id) || msgs.find(m => m.fromAgentId === agent1Id)?.fromAgent || msgs.find(m => m.toAgentId === agent1Id)?.toAgent;
         const agent2 = agentMap.get(agent2Id) || msgs.find(m => m.fromAgentId === agent2Id)?.fromAgent || msgs.find(m => m.toAgentId === agent2Id)?.toAgent;
@@ -775,7 +778,7 @@ function ContextLinkedMessages({ messages, agents, onViewThread }: { messages: M
                             variant="ghost"
                             size="sm"
                             className="h-5 px-1.5 text-[9px] md:text-[10px] text-primary hover:text-primary/80 ml-auto"
-                            onClick={() => onViewThread([msg.fromAgentId, msg.toAgentId].sort().join('-'))}
+                            onClick={() => onViewThread([msg.fromAgentId, msg.toAgentId].sort().join('::'))}
                           >
                             View thread →
                           </Button>
@@ -808,7 +811,7 @@ export function MessagesPage() {
   const threadMessages = useMemo(() => {
     if (!threadConvoKey) return [];
     return messages.filter((m) => {
-      const key = [m.fromAgentId, m.toAgentId].sort().join('-');
+      const key = [m.fromAgentId, m.toAgentId].sort().join('::');
       return key === threadConvoKey;
     });
   }, [messages, threadConvoKey]);

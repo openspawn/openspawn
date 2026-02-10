@@ -73,7 +73,7 @@ const proficiencyLabels: Record<Proficiency, string> = {
   expert: "Expert",
 };
 
-export function CapabilityManager({ agentId }: { agentId?: string }) {
+export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string; onAgentClick?: (id: string) => void }) {
   const [orgCapabilities] = useState<OrgCapability[]>(MOCK_ORG_CAPABILITIES);
   const [agentCapabilities, setAgentCapabilities] = useState<Capability[]>(MOCK_AGENT_CAPABILITIES);
   const [searchQuery, setSearchQuery] = useState("");
@@ -175,7 +175,8 @@ export function CapabilityManager({ agentId }: { agentId?: string }) {
                       {matches.map((match) => (
                         <div
                           key={`${match.agentId}-${match.capability}`}
-                          className="flex items-center justify-between rounded-lg border border-border p-3"
+                          className="flex items-center justify-between rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => onAgentClick?.(match.agentId)}
                         >
                           <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">

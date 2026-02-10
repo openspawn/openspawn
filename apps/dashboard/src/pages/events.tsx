@@ -98,14 +98,11 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
                 key={event.id}
                 ref={virtualizer.measureElement}
                 data-index={virtualRow.index}
-                layout
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10, height: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 30,
+                  duration: 0.2,
                   delay: virtualRow.index < 10 ? virtualRow.index * 0.02 : 0,
                 }}
                 style={{
@@ -117,14 +114,9 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
                 }}
                 className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-accent/50 transition-colors border-b border-border min-h-[44px]"
               >
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", delay: 0.1 }}
-                  className="mt-0.5 shrink-0"
-                >
+                <div className="mt-0.5 shrink-0">
                   {getSeverityIcon(event.severity)}
-                </motion.div>
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <Badge variant={getSeverityVariant(event.severity)} className="text-xs">

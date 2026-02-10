@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock } from "lucide-react";
 import { Button } from "./ui/button";
@@ -12,7 +12,8 @@ import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+import { useContainerSize } from "../hooks/use-container-size";
 import { ChartTooltip } from "./ui/chart-tooltip";
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
 import { TimelineView } from "./timeline-view";
@@ -280,6 +281,8 @@ function TasksTab({ agent }: { agent: Agent }) {
 // Credits Tab Content
 function CreditsTab({ agent }: { agent: Agent }) {
   const { transactions: creditHistory, loading } = useCredits(undefined, agent.id, 20);
+  const chartRef = useRef<HTMLDivElement>(null);
+  const chartSize = useContainerSize(chartRef);
 
   // Prepare chart data for last 7 days
   const chartData = useMemo(() => {
@@ -348,26 +351,28 @@ function CreditsTab({ agent }: { agent: Agent }) {
       {/* Usage Chart */}
       <div className="p-4 rounded-lg bg-muted/50 border border-border">
         <h3 className="text-sm font-medium mb-4">7-Day Activity</h3>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={chartData}>
-            <XAxis 
-              dataKey="date" 
-              tick={{ fill: '#64748b', fontSize: 12 }}
-              axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
-              tickLine={false}
-            />
-            <YAxis 
-              tick={{ fill: '#64748b', fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
-            />
-            <Bar dataKey="earned" fill="#10b981" radius={[6, 6, 0, 0]} animationDuration={800} />
-            <Bar dataKey="spent" fill="#f43f5e" radius={[6, 6, 0, 0]} animationDuration={800} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div ref={chartRef} className="w-full" style={{ height: 200 }}>
+          {chartSize.width > 0 && (
+            <BarChart data={chartData} width={chartSize.width} height={200}>
+              <XAxis 
+                dataKey="date" 
+                tick={{ fill: '#64748b', fontSize: 12 }}
+                axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fill: '#64748b', fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
+              />
+              <Bar dataKey="earned" fill="#10b981" radius={[6, 6, 0, 0]} animationDuration={800} />
+              <Bar dataKey="spent" fill="#f43f5e" radius={[6, 6, 0, 0]} animationDuration={800} />
+            </BarChart>
+          )}
+        </div>
       </div>
 
       {/* Transaction History */}

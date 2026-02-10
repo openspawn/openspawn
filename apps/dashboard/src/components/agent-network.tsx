@@ -65,6 +65,7 @@ interface NetworkContextValue {
   edgeMessages: Map<string, EdgeMessageData>;
   agentHealth: Map<string, AgentHealthData>;
   isMobileOrTouch: boolean;
+  dimIdle: boolean;
 }
 
 const NetworkContext = createContext<NetworkContextValue>({ 
@@ -75,6 +76,7 @@ const NetworkContext = createContext<NetworkContextValue>({
   edgeMessages: new Map(),
   agentHealth: new Map(),
   isMobileOrTouch: false,
+  dimIdle: false,
 });
 
 // ELK instance for layout
@@ -177,7 +179,7 @@ interface AgentNodeData extends Record<string, unknown> {
 // Custom node component with heat map coloring
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
-  const { avatarVersion, agentActivity, agentHealth, isMobileOrTouch } = useContext(NetworkContext);
+  const { avatarVersion, agentActivity, agentHealth, isMobileOrTouch, dimIdle } = useContext(NetworkContext);
   
   // Get activity data
   const activity = agentActivity.get(nodeData.agentId);
@@ -243,7 +245,7 @@ function AgentNode({ data, selected }: NodeProps) {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ 
           scale: isDespawning ? 0 : 1, 
-          opacity: isDespawning ? 0 : (isIdle ? 0.75 : 1),
+          opacity: isDespawning ? 0 : (isIdle && dimIdle ? 0.35 : isIdle ? 0.9 : 1),
         }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -636,7 +638,7 @@ function EdgeTooltip({
     >
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 text-zinc-500 hover:text-foreground p-1"
+        className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-1"
       >
         ✕
       </button>
@@ -855,7 +857,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
     <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-2">
       <button
         onClick={() => zoomIn({ duration: 200 })}
-        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+        className="w-12 h-12 rounded-xl bg-card/95 backdrop-blur border border-border 
                    text-foreground text-xl font-bold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Zoom in"
@@ -864,7 +866,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
       </button>
       <button
         onClick={() => zoomOut({ duration: 200 })}
-        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+        className="w-12 h-12 rounded-xl bg-card/95 backdrop-blur border border-border 
                    text-foreground text-xl font-bold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Zoom out"
@@ -873,7 +875,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
       </button>
       <button
         onClick={onFitView}
-        className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
+        className="w-12 h-12 rounded-xl bg-card/95 backdrop-blur border border-border 
                    text-foreground text-sm font-semibold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Fit view"
@@ -903,6 +905,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   } | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
+  const [dimIdle, setDimIdle] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
   const [avatarVersion, setAvatarVersion] = useState(0);
   const agentHealth = useAgentHealth();
@@ -1081,7 +1084,8 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     edgeMessages,
     agentHealth,
     isMobileOrTouch,
-  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth, isMobileOrTouch]);
+    dimIdle,
+  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth, isMobileOrTouch, dimIdle]);
 
   if (loading) {
     return (
@@ -1128,10 +1132,10 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
           onNodeDragStart={handleNodeMouseDown as any}
           onNodeDragStop={handleNodeMouseUp as any}
         >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--border))" />
           {/* Desktop: standard controls. Mobile: hidden (replaced by MobileZoomControls) */}
           {!isMobileOrTouch && (
-            <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-foreground [&>button:hover]:!bg-zinc-700" />
+            <Controls className="!bg-card !border-border !rounded-lg [&>button]:!bg-card [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-accent" />
           )}
         </ReactFlow>
         
@@ -1141,20 +1145,33 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
         )}
 
         {/* Legend — hidden on very small touch devices to save space */}
-        <div className={`absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? 'hidden sm:block' : ''}`}>
+        <div className={`absolute top-4 left-4 bg-card/90 backdrop-blur border border-border rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? 'hidden sm:block' : ''}`}>
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-foreground text-xs sm:text-sm">Activity</span>
-            <button
-              onClick={() => setCompact(!compact)}
-              className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
-                compact 
-                  ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' 
-                  : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700'
-              }`}
-              title={compact ? "Expand nodes" : "Compact nodes"}
-            >
-              {compact ? "▪" : "▫"}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setDimIdle(!dimIdle)}
+                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                  dimIdle
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'bg-muted text-muted-foreground border border-border hover:bg-accent'
+                }`}
+                title={dimIdle ? "Show all nodes" : "Dim idle nodes"}
+              >
+                {dimIdle ? "◐" : "◑"}
+              </button>
+              <button
+                onClick={() => setCompact(!compact)}
+                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                  compact 
+                    ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' 
+                    : 'bg-muted text-muted-foreground border border-border hover:bg-accent'
+                }`}
+                title={compact ? "Expand nodes" : "Compact nodes"}
+              >
+                {compact ? "▪" : "▫"}
+              </button>
+            </div>
           </div>
           <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
             {[
@@ -1165,8 +1182,8 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-1 sm:gap-2">
                 <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-                <span className="text-zinc-400">{item.label}</span>
-                <span className="text-zinc-500 hidden sm:inline text-[10px]">{item.desc}</span>
+                <span className="text-muted-foreground">{item.label}</span>
+                <span className="text-muted-foreground/70 hidden sm:inline text-[10px]">{item.desc}</span>
               </div>
             ))}
           </div>
@@ -1179,18 +1196,18 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="absolute bottom-20 sm:bottom-auto sm:top-4 left-4 right-4 sm:left-auto sm:right-4 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-lg p-4 sm:w-64"
+              className="absolute bottom-20 sm:bottom-auto sm:top-4 left-4 right-4 sm:left-auto sm:right-4 bg-card/95 backdrop-blur border border-border rounded-lg p-4 sm:w-64"
             >
               <button
                 onClick={() => setSelectedNode(null)}
-                className="absolute top-2 right-2 text-zinc-500 hover:text-foreground p-1"
+                className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-1"
               >
                 ✕
               </button>
               <div className="text-base sm:text-lg font-semibold text-foreground mb-1">
                 {(selectedNode.data as AgentNodeData).label}
               </div>
-              <div className="text-xs sm:text-sm text-zinc-400 mb-3">
+              <div className="text-xs sm:text-sm text-muted-foreground mb-3">
                 {(selectedNode.data as AgentNodeData).isHuman
                   ? "Human Operator"
                   : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}

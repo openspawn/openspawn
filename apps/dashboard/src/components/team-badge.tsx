@@ -63,7 +63,7 @@ export function TeamFilterDropdown({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        'px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0',
+        'px-3 pr-8 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0',
         className,
       )}
     >
