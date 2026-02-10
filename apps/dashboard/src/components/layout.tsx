@@ -22,6 +22,7 @@ import {
   HelpCircle,
   Github,
   Search,
+  Signal,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -64,6 +65,7 @@ const navigation: { name: string; href: string; icon: typeof LayoutDashboard; to
 // Bottom nav items for mobile (subset of main nav)
 const bottomNavItems: { name: string; href: string; icon: typeof LayoutDashboard }[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Status", href: "/status", icon: Signal },
   { name: "Agents", href: "/agents", icon: Users },
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Messages", href: "/messages", icon: MessageSquare },
