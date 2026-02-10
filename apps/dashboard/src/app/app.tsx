@@ -8,7 +8,19 @@ import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { CommandPalette } from "../components/command-palette";
+
+declare const __COMMIT_SHA__: string;
+declare const __BUILD_TIME__: string;
+
+// Log build info to console
+console.log(
+  `%c🌊 BikiniBottom %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
+  'color: #06b6d4; font-weight: bold; font-size: 14px',
+  'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
+  'color: #64748b'
+);
 import { PageTransition } from "../components/page-transition";
+import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
 import { AuthProvider } from "../contexts";
 import type { ReactNode } from "react";
 
@@ -70,9 +82,13 @@ export function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
+            <OnboardingProvider>
             <DemoWrapper>
               <Router>
               <CommandPalette />
+              <WelcomeScreen />
+              <FeatureTour />
+              <CompletionCelebration />
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />
@@ -101,6 +117,7 @@ export function App() {
               </Routes>
             </Router>
             </DemoWrapper>
+            </OnboardingProvider>
           </NotificationProvider>
         </QueryClientProvider>
       </AuthProvider>
