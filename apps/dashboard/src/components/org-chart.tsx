@@ -2,7 +2,8 @@
  * Org Chart — ReactFlow tree layout showing teams → sub-teams → agents.
  * Features: animated edge pulses, click-to-detail, presence glow on active agents.
  */
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef, memo } from 'react';
+import { useDemo } from '../demo/DemoProvider';
 import {
   ReactFlow,
   Controls,
@@ -469,6 +470,12 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
   const [isLayouted, setIsLayouted] = useState(false);
   const baseEdgesRef = useRef<Edge[]>([]);
 
+  // Only re-layout when agent IDs change (add/remove), not on every data update
+  const agentIds = useMemo(
+    () => agents.map((a) => a.agentId).sort().join(','),
+    [agents],
+  );
+
   useEffect(() => {
     if (loading) return;
 
@@ -481,17 +488,25 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
       setEdges(le);
       setIsLayouted(true);
     });
-  }, [agents, loading, setNodes, setEdges]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agentIds, loading, setNodes, setEdges]);
 
-  // Animate random edges to simulate message flow
+  // Animate random edges to simulate message flow (scales with demo speed)
+  const { speed } = useDemo();
+
   useEffect(() => {
     if (!isLayouted || baseEdgesRef.current.length === 0) return;
 
+    // Scale animation timing with speed — faster speed = more frequent + shorter animations
+    const intervalMs = Math.max(500, 3000 / speed);
+    const displayMs = Math.max(300, 2000 / speed);
+    // More simultaneous animations at higher speeds
+    const animCount = speed >= 10 ? 4 : speed >= 5 ? 3 : 2;
+
     const interval = setInterval(() => {
       const base = baseEdgesRef.current;
-      // Pick 1-2 random edges to animate
       const animatedIds = new Set<string>();
-      const count = Math.min(2, base.length);
+      const count = Math.min(animCount, base.length);
       while (animatedIds.size < count) {
         animatedIds.add(base[Math.floor(Math.random() * base.length)].id);
       }
@@ -503,7 +518,6 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
         })),
       );
 
-      // Clear animation after 2s
       setTimeout(() => {
         setEdges(
           base.map((e) => ({
@@ -511,11 +525,11 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
             data: { ...((e.data as object) || {}), animated: false },
           })),
         );
-      }, 2000);
-    }, 3000);
+      }, displayMs);
+    }, intervalMs);
 
     return () => clearInterval(interval);
-  }, [isLayouted, setEdges]);
+  }, [isLayouted, setEdges, speed]);
 
   // Handle node clicks → open agent detail panel
   const handleNodeClick = useCallback(
