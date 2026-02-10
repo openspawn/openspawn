@@ -33,7 +33,7 @@ const MOCK_MEMBERS: OrgMember[] = [
 
 export function OrgSettings() {
   const { user } = useAuth();
-  const [orgName, setOrgName] = useState("OpenSpawn");
+  const [orgName, setOrgName] = useState("BikiniBottom");
   const [isSaving, setIsSaving] = useState(false);
   const [members] = useState<OrgMember[]>(MOCK_MEMBERS);
 

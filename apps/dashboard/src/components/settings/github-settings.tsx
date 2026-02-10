@@ -240,7 +240,7 @@ export function GitHubSettings() {
               <div>
                 <CardTitle>GitHub Integration</CardTitle>
                 <CardDescription>
-                  Bidirectional sync between GitHub issues/PRs and OpenSpawn tasks
+                  Bidirectional sync between GitHub issues/PRs and BikiniBottom tasks
                 </CardDescription>
               </div>
             </div>
@@ -471,7 +471,7 @@ export function GitHubSettings() {
               Linked Items
             </CardTitle>
             <CardDescription>
-              Active links between GitHub and OpenSpawn
+              Active links between GitHub and BikiniBottom
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -336,7 +336,7 @@ export function InboundWebhooksSettings() {
               Inbound Webhooks
             </CardTitle>
             <CardDescription>
-              Allow external services to create tasks in OpenSpawn via HTTP POST
+              Allow external services to create tasks in BikiniBottom via HTTP POST
             </CardDescription>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -664,7 +664,7 @@ export function InboundWebhooksSettings() {
                           <div className="pt-2 border-t">
                             <Button variant="link" size="sm" asChild>
                               <a
-                                href="https://docs.openspawn.com/features/inbound-webhooks"
+                                href="https://github.com/openspawn/openspawn/blob/main/docs/features/inbound-webhooks.md"
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
