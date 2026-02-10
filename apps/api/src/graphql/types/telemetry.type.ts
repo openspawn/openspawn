@@ -1,5 +1,4 @@
-import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
-import { GraphQLJSON } from "graphql-type-json";
+import { Field, Float, ObjectType } from "@nestjs/graphql";
 
 @ObjectType({ description: "A single trace span from OpenTelemetry" })
 export class TraceSpanType {
@@ -30,8 +29,8 @@ export class TraceSpanType {
   @Field(() => String)
   status!: string;
 
-  @Field(() => GraphQLJSON)
-  attributes!: Record<string, string>;
+  @Field(() => String, { description: "JSON-encoded attributes" })
+  attributes!: string;
 }
 
 @ObjectType({ description: "A metric data point" })
@@ -48,6 +47,6 @@ export class MetricPointType {
   @Field(() => Float)
   timestamp!: number;
 
-  @Field(() => GraphQLJSON)
-  labels!: Record<string, string>;
+  @Field(() => String, { description: "JSON-encoded labels" })
+  labels!: string;
 }
