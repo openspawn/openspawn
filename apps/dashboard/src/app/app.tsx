@@ -7,6 +7,7 @@ import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallback
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
+import { CommandPalette } from "../components/command-palette";
 import { AuthProvider } from "../contexts";
 import type { ReactNode } from "react";
 
@@ -70,6 +71,7 @@ export function App() {
           <NotificationProvider>
             <DemoWrapper>
               <Router>
+              <CommandPalette />
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />

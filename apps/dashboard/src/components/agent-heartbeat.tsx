@@ -33,17 +33,17 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
   };
 
   const pulseColors = {
-    ACTIVE: 'bg-green-500',
-    IDLE: 'bg-emerald-400',  // Brighter for availability
-    PENDING: 'bg-blue-500',
-    SUSPENDED: 'bg-red-500',
+    ACTIVE: 'bg-emerald-500',
+    IDLE: 'bg-slate-400',
+    PENDING: 'bg-amber-500',
+    SUSPENDED: 'bg-rose-500',
   };
 
   const ringColors = {
-    ACTIVE: 'ring-green-500/50',
-    IDLE: 'ring-emerald-400/60',  // Brighter for availability
-    PENDING: 'ring-blue-500/50',
-    SUSPENDED: 'ring-red-500/50',
+    ACTIVE: 'ring-emerald-500/50',
+    IDLE: 'ring-slate-400/50',
+    PENDING: 'ring-amber-500/50',
+    SUSPENDED: 'ring-rose-500/50',
   };
 
   return (
