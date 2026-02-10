@@ -11,7 +11,7 @@ import {
 import { Public } from "../auth/decorators";
 import { GitHubService } from "./github.service";
 
-@Controller("github/webhook")
+@Controller("integrations/github/webhook")
 export class GitHubWebhookController {
   private readonly logger = new Logger(GitHubWebhookController.name);
 
