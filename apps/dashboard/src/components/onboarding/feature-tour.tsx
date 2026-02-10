@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, LayoutDashboard, Users, CheckSquare, Network, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useOnboarding } from './onboarding-provider';
+import { useDemo } from '../../demo/DemoProvider';
 
 interface TourStep {
   selector: string;
@@ -53,6 +54,7 @@ interface SpotlightRect {
 
 export function FeatureTour() {
   const { isOnboarding, currentStep, totalSteps, nextStep, prevStep, skipOnboarding } = useOnboarding();
+  const { isDemo } = useDemo();
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const [tooltipPos, setTooltipPos] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
   const rafRef = useRef<number>(0);
@@ -130,7 +132,9 @@ export function FeatureTour() {
     skipOnboarding();
   }, [spotlight, skipOnboarding]);
 
-  if (!isOnboarding || !step) return null;
+  // Don't show tour while DemoWelcome modal is still open (prevents overlap)
+  const demoWelcomeOpen = isDemo && !localStorage.getItem('openspawn-demo-welcomed');
+  if (!isOnboarding || !step || demoWelcomeOpen) return null;
 
   // Calculate tooltip position
   const getTooltipStyle = (): React.CSSProperties => {
