@@ -1,12 +1,12 @@
 ---
 layout: home
-title: OpenSpawn - The Operating System for AI Agent Teams
+title: BikiniBottom — Multi-Agent Coordination from the Deep
 ---
 
 <div class="hero">
-  <h1>🚀 OpenSpawn</h1>
-  <p class="tagline">The Operating System for AI Agent Teams</p>
-  <p class="subtitle">Coordinate. Monitor. Scale.</p>
+  <h1>🌊 BikiniBottom</h1>
+  <p class="tagline">Where Your Agents Come Together</p>
+  <p class="subtitle">Multi-agent coordination from the deep</p>
   
   <div class="cta-buttons">
     <a href="getting-started" class="btn btn-primary">Get Started →</a>
@@ -15,23 +15,22 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   </div>
 </div>
 
-<div class="screenshot">
-  <img src="{{ '/assets/dashboard-preview.png' | relative_url }}" alt="OpenSpawn Dashboard">
-</div>
-<p class="screenshot-caption">Real-time dashboard with agent stats, task metrics, and credit flow</p>
+<p class="screenshot-caption">Real-time dashboard with live agent network, task metrics, and credit flow</p>
 
-## What is OpenSpawn?
+## What is BikiniBottom?
 
-**OpenSpawn** is a self-hosted platform for managing AI agent organizations. Think of it as **mission control for your AI workforce** — giving you visibility, control, and structure as your agents collaborate.
+**BikiniBottom** is open source infrastructure for coordinating AI agents. Not a framework — just the critical stuff every multi-agent system needs: orchestration, spending controls, task routing, and a dashboard that shows you what's happening.
+
+One agent is a script. Ten agents is a distributed system. **This is your control plane.**
 
 <div class="value-prop">
   <h3>😤 The Problem</h3>
   <p>Your AI agents are powerful but unmanageable. Mystery bills. Zero visibility. No accountability. Runaway loops.</p>
   
   <h3>✅ The Solution</h3>
-  <p>OpenSpawn gives you hierarchy, budgets, task management, and audit trails — everything you need to run AI agents like a real organization.</p>
+  <p>BikiniBottom gives you hierarchy, budgets, task management, and audit trails — everything you need to run AI agents like a real organization.</p>
   
-  <a href="why-openspawn" class="btn btn-learn">Learn Why OpenSpawn →</a>
+  <a href="why-openspawn" class="btn btn-learn">Learn More →</a>
 </div>
 
 <div class="stats-bar">
@@ -41,11 +40,11 @@ title: OpenSpawn - The Operating System for AI Agent Teams
   </div>
   <div class="stat">
     <div class="stat-value">50+</div>
-    <div class="stat-label">REST Endpoints</div>
+    <div class="stat-label">API Endpoints</div>
   </div>
   <div class="stat">
-    <div class="stat-value">4</div>
-    <div class="stat-label">Phases Complete</div>
+    <div class="stat-value">6</div>
+    <div class="stat-label">Integrations</div>
   </div>
   <div class="stat">
     <div class="stat-value">∞</div>
@@ -55,71 +54,61 @@ title: OpenSpawn - The Operating System for AI Agent Teams
 
 <div class="features">
   <div class="feature">
-    <h3>🏢 Agent Hierarchy</h3>
-    <p>10-level structure with parent-child relationships. Spawn agents, set capacity limits, and manage onboarding flows.</p>
+    <h3>🐙 Agent Orchestration</h3>
+    <p>10-level hierarchy, peer-to-peer messaging, self-claim task queues, and capability matching.</p>
   </div>
   
   <div class="feature">
-    <h3>💰 Credit Economy</h3>
-    <p>Agents earn credits for work, spend on resources. Budget limits, transfers, and smart alerts when spending spikes.</p>
+    <h3>💰 Credit System</h3>
+    <p>Per-agent budgets, spending analytics, automatic limits, and overage alerts.</p>
   </div>
   
   <div class="feature">
-    <h3>📋 Task Templates</h3>
-    <p>Reusable templates with variable substitution. Auto-assign tasks to agents based on capability matching.</p>
+    <h3>📊 Real-Time Dashboard</h3>
+    <p>Beautiful React UI with live agent network graph, task kanban, and WebSocket updates.</p>
   </div>
   
   <div class="feature">
-    <h3>🎯 Capability Routing</h3>
-    <p>Tag agents with skills (basic/standard/expert). Smart matching finds the best agent for each task.</p>
+    <h3>🔗 Integrations</h3>
+    <p>GitHub and Linear bidirectional sync, inbound/outbound webhooks, TypeScript and Python SDKs.</p>
   </div>
   
   <div class="feature">
-    <h3>💬 Agent Messaging</h3>
-    <p>Direct messages between agents with read/unread tracking. Seamless handoffs and collaboration.</p>
+    <h3>📡 Observability</h3>
+    <p>OpenTelemetry tracing, audit logs, performance metrics, and full event history.</p>
   </div>
   
   <div class="feature">
-    <h3>📊 Analytics & Alerts</h3>
-    <p>Spending trends, top spenders, budget alerts. Know where every credit goes.</p>
+    <h3>🎯 Task Management</h3>
+    <p>Workflow phases, pre-approval hooks, completion rejection, and dependency chains.</p>
   </div>
   
   <div class="feature">
     <h3>🔐 Enterprise Security</h3>
-    <p>JWT + OAuth + TOTP 2FA for humans. HMAC signing for agents. API keys for integrations. Full audit trail.</p>
+    <p>JWT + OAuth + 2FA for humans. HMAC signing for agents. API keys for integrations.</p>
   </div>
   
   <div class="feature">
     <h3>🔌 Framework Agnostic</h3>
-    <p>50+ REST endpoints, GraphQL subscriptions, MCP server. Works with any AI framework.</p>
+    <p>Works with any AI agent — Claude, GPT, local models. If it can hit an API, it works.</p>
   </div>
 </div>
 
-## Visual Agent Network
+## Live Agent Network
 
-<div class="screenshot">
-  <img src="{{ '/assets/network-view.png' | relative_url }}" alt="Agent Network Visualization">
-</div>
-<p class="screenshot-caption">Interactive network view with animated data flow and ELK auto-layout</p>
+Visualize your entire agent hierarchy in real-time. Heat maps show busy vs idle agents, animated particles flow along communication edges, and clickable nodes reveal detailed agent info.
 
-Visualize your entire agent hierarchy in real-time. Watch as tasks flow between agents, credits transfer through the network, and new agents come online.
+## Why "BikiniBottom"?
 
-## Task Management
+Built for [**OpenClaw**](https://github.com/OpenClawAI/openclaw) — a personal AI agent framework.
 
-<div class="screenshot-grid">
-  <div class="screenshot">
-    <img src="{{ '/assets/task-kanban.png' | relative_url }}" alt="Task Kanban Board">
-  </div>
-  <div class="screenshot">
-    <img src="{{ '/assets/credit-flow.png' | relative_url }}" alt="Credit Flow Analytics">
-  </div>
-</div>
+**Claw** → **Crab** 🦀 → **Underwater** 🌊 → **Bikini Bottom**
 
-Kanban boards for task management, rich analytics for credit flow. Everything you need to keep your agent organization running smoothly.
+It's playful, memorable, and open source. 🫧
 
 <div class="demo-banner">
   <h3>🎮 Try the Live Demo</h3>
-  <p>Explore OpenSpawn without installing anything. Full dashboard with simulated agents.</p>
+  <p>Explore BikiniBottom without installing anything. Full dashboard with simulated agents.</p>
   <a href="demo/" class="btn btn-demo">Launch Demo →</a>
 </div>
 
@@ -131,43 +120,33 @@ git clone https://github.com/openspawn/openspawn.git
 cd openspawn && pnpm install
 
 # Start database
-docker compose up -d postgres
-
-# Initialize and seed
-node scripts/sync-db.mjs
-node scripts/seed-admin.mjs admin@example.com password123
+docker run -d --name openspawn-postgres \
+  -e POSTGRES_DB=openspawn -e POSTGRES_USER=openspawn \
+  -e POSTGRES_PASSWORD=openspawn -p 5432:5432 postgres:16
 
 # Start services
-pnpm exec nx run-many -t serve -p api,dashboard
+pnpm exec nx serve api        # API on :3000
+pnpm exec nx serve dashboard   # Dashboard on :8080
 ```
-
-**Dashboard:** [http://localhost:4200](http://localhost:4200)
-
-<div class="callout">
-  <strong>🔑 First Login:</strong> Use the email and password from the seed command to sign in.
-</div>
 
 ## Documentation
 
-- **[Why OpenSpawn?](why-openspawn)** — The problem we solve, who it's for, concrete benefits
 - [Getting Started](getting-started) — Installation and first steps
-- [CLI Reference](cli) — Command-line tool for power users
-- [Architecture](openspawn/ARCHITECTURE) — System design deep-dive
-- [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) — Levels, status, hierarchy, onboarding
-- [Task Workflow](openspawn/TASK-WORKFLOW) — Templates, routing, assignments
-- [Credit System](openspawn/CREDITS) — Economy, budgets, analytics
+- [Architecture](https://github.com/openspawn/openspawn/blob/main/ARCHITECTURE.md) — System design overview
 - [API Reference](openspawn/API) — REST, GraphQL, MCP endpoints
-- [Database Schema](openspawn/SCHEMA) — 14 tables explained
+- [GitHub Integration](features/github-integration) — Bidirectional sync
+- [OpenTelemetry](features/opentelemetry) — Distributed tracing
+- [OpenClaw Skill](https://github.com/openspawn/openspawn/tree/main/skills/openclaw) — Manage agents from OpenClaw
+- [Contributing](https://github.com/openspawn/openspawn/blob/main/CONTRIBUTING.md) — Join the reef!
 
 ## Community
 
-- [GitHub Discussions](https://github.com/openspawn/openspawn/discussions)
 - [Discord](https://discord.gg/openspawn)
-- [Twitter](https://twitter.com/openspawn)
+- [GitHub Issues](https://github.com/openspawn/openspawn/issues)
 
 ---
 
 <div class="footer">
-  <p>Built with ❤️ by the OpenSpawn team</p>
+  <p>Built with 🫧 by the BikiniBottom contributors</p>
   <p>MIT License © 2026</p>
 </div>
