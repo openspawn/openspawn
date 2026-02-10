@@ -85,7 +85,7 @@ function OverviewTab({ agent }: { agent: Agent }) {
         <Badge style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
           Level {agent.level} • {getLevelLabel(agent.level)}
         </Badge>
-        <TeamBadge teamId={(agent as any).teamId} />
+        <TeamBadge teamId={agent.teamId} />
         {agent.reputationLevel && (
           <Badge variant="secondary">
             🏆 {agent.reputationLevel}
@@ -628,7 +628,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">{agent.name}</h2>
-                    <TeamBadge teamId={(agent as any).teamId} />
+                    <TeamBadge teamId={agent.teamId} />
                   </div>
                   <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
                 </div>

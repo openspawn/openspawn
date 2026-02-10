@@ -584,8 +584,8 @@ export function TasksPage() {
     if (teamFilterValue !== "all") {
       const teamAgentIds = new Set(
         agents
-          .filter((a: any) => (a as any).teamId === teamFilterValue)
-          .map((a: any) => a.id),
+          .filter((a) => a.teamId === teamFilterValue)
+          .map((a) => a.id),
       );
       result = result.filter(t => t.assigneeId && teamAgentIds.has(t.assigneeId));
     }

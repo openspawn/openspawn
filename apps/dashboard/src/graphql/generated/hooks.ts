@@ -71,6 +71,7 @@ export type AgentType = {
   status: AgentStatus;
   tasksCompleted: Scalars['Int']['output'];
   tasksSuccessful: Scalars['Int']['output'];
+  teamId?: Maybe<Scalars['String']['output']>;
   trustScore: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -657,7 +658,7 @@ export type DeleteInboundWebhookKeyMutationVariables = Exact<{
 
 export type DeleteInboundWebhookKeyMutation = { deleteInboundWebhookKey: boolean };
 
-export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
+export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null, teamId?: string | null };
 
 export type TasksQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -791,6 +792,7 @@ export const AgentFieldsFragmentDoc = `
   lastPromotionAt
   lifetimeEarnings
   domain
+  teamId
 }
     `;
 export const InboundWebhookKeysDocument = `
