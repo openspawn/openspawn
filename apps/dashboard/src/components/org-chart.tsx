@@ -339,7 +339,7 @@ function buildOrgGraph(
   // Count agents per team
   const agentCountMap = new Map<string, number>();
   agents.forEach((a) => {
-    const tid = (a as Agent & { teamId?: string }).teamId;
+    const tid = a.teamId;
     if (tid) agentCountMap.set(tid, (agentCountMap.get(tid) ?? 0) + 1);
   });
 
@@ -384,7 +384,7 @@ function buildOrgGraph(
     if (subs.length > 0) return; // skip parent teams; agents are shown under sub-teams
 
     const teamAgents = agents.filter(
-      (a) => (a as Agent & { teamId?: string }).teamId === team.id,
+      (a) => a.teamId === team.id,
     );
     const color = getTeamColor(team.color);
 
@@ -424,7 +424,7 @@ function buildOrgGraph(
     if (subs.length === 0) return; // already handled above
 
     const teamAgents = agents.filter(
-      (a) => (a as Agent & { teamId?: string }).teamId === team.id,
+      (a) => a.teamId === team.id,
     );
     const color = getTeamColor(team.color);
 
@@ -462,7 +462,7 @@ function buildOrgGraph(
 }
 
 // ── Inner component ─────────────────────────────────────────────────────────
-function OrgChartInner({ className, onAgentClick }: { className?: string; onAgentClick?: (agentId: string) => void }) {
+function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: string; onAgentClick?: (agentId: string) => void; onTeamClick?: (teamId: string) => void }) {
   const { agents, loading } = useAgents();
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
@@ -521,11 +521,13 @@ function OrgChartInner({ className, onAgentClick }: { className?: string; onAgen
   const handleNodeClick = useCallback(
     (_: unknown, node: Node) => {
       const d = node.data as Record<string, unknown>;
-      if (!d.isTeam && d.agentDbId && onAgentClick) {
+      if (d.isTeam && d.teamId && onTeamClick) {
+        onTeamClick(d.teamId as string);
+      } else if (!d.isTeam && d.agentDbId && onAgentClick) {
         onAgentClick(d.agentDbId as string);
       }
     },
-    [onAgentClick],
+    [onAgentClick, onTeamClick],
   );
 
   if (loading) {
@@ -568,10 +570,10 @@ function OrgChartInner({ className, onAgentClick }: { className?: string; onAgen
 }
 
 // ── Public component (wrapped in provider) ──────────────────────────────────
-export function OrgChart({ className, onAgentClick }: { className?: string; onAgentClick?: (agentId: string) => void }) {
+export function OrgChart({ className, onAgentClick, onTeamClick }: { className?: string; onAgentClick?: (agentId: string) => void; onTeamClick?: (teamId: string) => void }) {
   return (
     <ReactFlowProvider>
-      <OrgChartInner className={className} onAgentClick={onAgentClick} />
+      <OrgChartInner className={className} onAgentClick={onAgentClick} onTeamClick={onTeamClick} />
     </ReactFlowProvider>
   );
 }

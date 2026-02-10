@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AgentNetwork } from "../components/agent-network";
 import { OrgChart } from "../components/org-chart";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { TeamDetailPanel } from "../components/team-detail-panel";
 import { useAgents } from "../hooks";
 import { useSidePanel } from "../contexts";
 import { EmptyState } from "../components/ui/empty-state";
@@ -19,6 +20,17 @@ export function NetworkPage() {
     openSidePanel(
       <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
       { width: 520 }
+    );
+  };
+
+  const openTeamDetail = (teamId: string) => {
+    openSidePanel(
+      <TeamDetailPanel
+        teamId={teamId}
+        onAgentClick={openAgentDetail}
+        onTeamClick={openTeamDetail}
+      />,
+      { width: 480, title: 'Team Details' }
     );
   };
 
@@ -117,7 +129,7 @@ export function NetworkPage() {
       {view === "network" ? (
         <AgentNetwork className="w-full h-full" />
       ) : (
-        <OrgChart className="w-full h-full" onAgentClick={openAgentDetail} />
+        <OrgChart className="w-full h-full" onAgentClick={openAgentDetail} onTeamClick={openTeamDetail} />
       )}
 
       {/* Agent Detail Panel now uses global side panel */}
