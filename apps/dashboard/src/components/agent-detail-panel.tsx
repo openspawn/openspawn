@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins } from "lucide-react";
+import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -15,6 +15,7 @@ import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartTooltip } from "./ui/chart-tooltip";
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
+import { TimelineView } from "./timeline-view";
 
 type Agent = AgentFieldsFragment;
 
@@ -736,6 +737,13 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                   Messages
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="timeline"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+                >
+                  <Clock className="h-4 w-4 mr-2" />
+                  Timeline
+                </TabsTrigger>
+                <TabsTrigger 
                   value="settings"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
@@ -760,6 +768,9 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                   </TabsContent>
                   <TabsContent value="messages" className="mt-0">
                     <MessagesTab agent={agent} />
+                  </TabsContent>
+                  <TabsContent value="timeline" className="mt-0">
+                    <TimelineView agentId={agent.agentId} />
                   </TabsContent>
                   <TabsContent value="settings" className="mt-0">
                     <SettingsTab agent={agent} />
