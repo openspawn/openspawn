@@ -24,6 +24,10 @@
 
 ---
 
+<img src="docs/assets/dashboard-preview.png" alt="BikiniBottom Dashboard" width="100%" />
+
+---
+
 ## What Is This?
 
 **BikiniBottom is infrastructure for coordinating AI agents.** Not a framework. Not opinionated. Just the boring, critical stuff that every multi-agent system needs: orchestration, spending controls, task routing, and a dashboard that actually shows you what's happening.
@@ -100,6 +104,25 @@ Completion rejection
 Dependency chains  
 
 </td>
+</tr>
+</table>
+
+---
+
+## 📸 Screenshots
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/network-view.png" alt="Agent Network Graph" /><br /><b>Agent Network</b> — Heat maps, animated edges, hierarchy view</td>
+<td width="50%"><img src="docs/assets/task-kanban.png" alt="Task Kanban Board" /><br /><b>Task Kanban</b> — Drag-and-drop with priority badges</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/assets/agent-detail.png" alt="Agent Detail Panel" /><br /><b>Agent Detail</b> — Trust scores, credits, tasks, messages</td>
+<td width="50%"><img src="docs/assets/credit-flow.png" alt="Credit Analytics" /><br /><b>Credits</b> — Budget burn-down, model usage, transactions</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/assets/comms-feed.png" alt="Agent Communications Feed" /><br /><b>Comms Feed</b> — Real-time message stream with type filters</td>
+<td width="50%"><img src="docs/assets/comms-graph.png" alt="Communication Graph" /><br /><b>Comms Graph</b> — Agent-to-agent communication visualization</td>
 </tr>
 </table>
 
