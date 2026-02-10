@@ -23,5 +23,7 @@ export { User, UserRole } from "./user.entity";
 export { Webhook } from "./webhook.entity";
 export { GitHubConnection } from "./github-connection.entity";
 export type { GitHubSyncConfig } from "./github-connection.entity";
+export { LinearConnection } from "./linear-connection.entity";
+export type { LinearSyncConfig } from "./linear-connection.entity";
 export { IntegrationLink } from "./integration-link.entity";
 export type { IntegrationSourceType, IntegrationTargetType } from "./integration-link.entity";

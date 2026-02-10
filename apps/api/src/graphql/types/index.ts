@@ -23,4 +23,9 @@ export {
   CreateGitHubConnectionInput,
   UpdateGitHubConnectionInput,
 } from "./github-connection.type";
+export {
+  LinearConnectionType,
+  CreateLinearConnectionInput,
+  UpdateLinearConnectionInput,
+} from "./linear-connection.type";
 export { IntegrationLinkType } from "./integration-link.type";
