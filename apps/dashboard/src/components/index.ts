@@ -11,6 +11,7 @@ export * from "./reputation-card";
 export * from "./reputation-history";
 export * from "./trust-leaderboard";
 export * from "./live-notifications";
+export * from "./notification-center";
 export * from "./agent-activity-heatmap";
 export * from "./budget-burndown";
 export * from "./agent-efficiency";

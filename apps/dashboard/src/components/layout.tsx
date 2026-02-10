@@ -40,6 +40,7 @@ import { DemoControls } from "../demo/DemoControls";
 import { useAuth } from "../contexts";
 import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
+import { NotificationCenter } from "./notification-center";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -412,9 +413,16 @@ export function Layout({ children }: LayoutProps) {
                   )}
                 </Button>
               )}
+              <NotificationCenter />
               <ThemeToggle />
             </div>
           </header>
+
+          {/* Desktop top bar */}
+          <div className="hidden lg:flex items-center justify-end gap-2 px-6 py-2 border-b border-border">
+            <NotificationCenter />
+            <ThemeToggle />
+          </div>
 
           {/* Main content */}
           <main className="flex-1 overflow-auto">
