@@ -9,6 +9,8 @@ import { NetworkPage } from "../pages/network";
 import { MobileStatusPage } from "../pages/mobile-status";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { CommandPalette } from "../components/command-palette";
+import { PwaInstallPrompt } from "../components/pwa-install-prompt";
+import { OfflineIndicator } from "../components/offline-indicator";
 
 declare const __COMMIT_SHA__: string;
 declare const __BUILD_TIME__: string;
@@ -86,6 +88,8 @@ export function App() {
             <OnboardingProvider>
             <DemoWrapper>
               <Router>
+              <OfflineIndicator />
+              <PwaInstallPrompt />
               <CommandPalette />
               <WelcomeScreen />
               <FeatureTour />
