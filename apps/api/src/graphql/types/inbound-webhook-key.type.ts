@@ -32,7 +32,7 @@ export class InboundWebhookKeyType {
   @Field()
   enabled!: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   lastUsedAt?: Date | null;
 
   @Field()
@@ -59,7 +59,7 @@ export class CreateInboundWebhookKeyInput {
 
 @InputType()
 export class UpdateInboundWebhookKeyInput {
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   name?: string;
 
   @Field(() => ID, { nullable: true })
@@ -71,6 +71,6 @@ export class UpdateInboundWebhookKeyInput {
   @Field(() => [String], { nullable: true })
   defaultTags?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
   enabled?: boolean;
 }

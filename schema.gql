@@ -97,6 +97,13 @@ type ConversationType {
   unreadCount: Int!
 }
 
+input CreateInboundWebhookKeyInput {
+  defaultAgentId: ID
+  defaultPriority: TaskPriority
+  defaultTags: [String!]
+  name: String!
+}
+
 input CreateWebhookInput {
   canBlock: Boolean
   events: [String!]!
@@ -165,6 +172,20 @@ type EventType {
   type: String!
 }
 
+type InboundWebhookKeyType {
+  createdAt: DateTime!
+  defaultAgentId: ID
+  defaultPriority: TaskPriority
+  defaultTags: [String!]!
+  enabled: Boolean!
+  id: ID!
+  key: String!
+  lastUsedAt: DateTime
+  name: String!
+  secret: String!
+  updatedAt: DateTime!
+}
+
 type LeaderboardEntryType {
   agentId: ID!
   id: ID!
@@ -195,11 +216,15 @@ enum MessageType {
 type Mutation {
   """Claim the next available task"""
   claimNextTask(agentId: ID!, orgId: ID!): ClaimTaskResultType!
+  createInboundWebhookKey(input: CreateInboundWebhookKeyInput!, orgId: ID!): InboundWebhookKeyType!
   createWebhook(input: CreateWebhookInput!, orgId: ID!): WebhookType!
+  deleteInboundWebhookKey(id: ID!, orgId: ID!): Boolean!
   deleteWebhook(id: ID!, orgId: ID!): Boolean!
   markMessagesAsRead(agentId: ID!, orgId: ID!, otherAgentId: ID!): Int!
+  rotateInboundWebhookKey(id: ID!, orgId: ID!): InboundWebhookKeyType!
   sendDirectMessage(input: SendDirectMessageInput!, orgId: ID!): DirectMessageType!
   testWebhook(id: ID!, orgId: ID!): Boolean!
+  updateInboundWebhookKey(id: ID!, input: UpdateInboundWebhookKeyInput!, orgId: ID!): InboundWebhookKeyType!
   updateWebhook(id: ID!, input: UpdateWebhookInput!, orgId: ID!): WebhookType!
 }
 
@@ -224,6 +249,8 @@ type Query {
   creditHistory(agentId: ID, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
   directMessages(agent1Id: ID!, agent2Id: ID!, before: ID, limit: Int! = 50, orgId: ID!): [DirectMessageType!]!
   events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
+  inboundWebhookKey(id: ID!, orgId: ID!): InboundWebhookKeyType
+  inboundWebhookKeys(orgId: ID!): [InboundWebhookKeyType!]!
   messages(before: ID, channelId: ID!, limit: Int! = 50, orgId: ID!): [MessageGqlType!]!
   reputationHistory(agentId: ID!, limit: Int, orgId: ID!): [ReputationHistoryEntryType!]!
   task(id: ID!, orgId: ID!): TaskType
@@ -267,6 +294,7 @@ type Subscription {
   taskUpdated(orgId: ID!): TaskType!
 }
 
+"""Task priority level"""
 enum TaskPriority {
   HIGH
   LOW
@@ -319,6 +347,14 @@ type TaskType {
   status: TaskStatus!
   title: String!
   updatedAt: DateTime!
+}
+
+input UpdateInboundWebhookKeyInput {
+  defaultAgentId: ID
+  defaultPriority: TaskPriority
+  defaultTags: [String!]
+  enabled: Boolean
+  name: String
 }
 
 input UpdateWebhookInput {

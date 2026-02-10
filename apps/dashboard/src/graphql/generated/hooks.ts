@@ -111,6 +111,13 @@ export type ConversationType = {
   unreadCount: Scalars['Int']['output'];
 };
 
+export type CreateInboundWebhookKeyInput = {
+  defaultAgentId?: InputMaybe<Scalars['ID']['input']>;
+  defaultPriority?: InputMaybe<TaskPriority>;
+  defaultTags?: InputMaybe<Array<Scalars['String']['input']>>;
+  name: Scalars['String']['input'];
+};
+
 export type CreateWebhookInput = {
   canBlock?: InputMaybe<Scalars['Boolean']['input']>;
   events: Array<Scalars['String']['input']>;
@@ -174,6 +181,20 @@ export type EventType = {
   type: Scalars['String']['output'];
 };
 
+export type InboundWebhookKeyType = {
+  createdAt: Scalars['DateTime']['output'];
+  defaultAgentId?: Maybe<Scalars['ID']['output']>;
+  defaultPriority?: Maybe<TaskPriority>;
+  defaultTags: Array<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+  name: Scalars['String']['output'];
+  secret: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LeaderboardEntryType = {
   agentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
@@ -204,11 +225,15 @@ export enum MessageType {
 export type Mutation = {
   /** Claim the next available task */
   claimNextTask: ClaimTaskResultType;
+  createInboundWebhookKey: InboundWebhookKeyType;
   createWebhook: WebhookType;
+  deleteInboundWebhookKey: Scalars['Boolean']['output'];
   deleteWebhook: Scalars['Boolean']['output'];
   markMessagesAsRead: Scalars['Int']['output'];
+  rotateInboundWebhookKey: InboundWebhookKeyType;
   sendDirectMessage: DirectMessageType;
   testWebhook: Scalars['Boolean']['output'];
+  updateInboundWebhookKey: InboundWebhookKeyType;
   updateWebhook: WebhookType;
 };
 
@@ -219,8 +244,20 @@ export type MutationClaimNextTaskArgs = {
 };
 
 
+export type MutationCreateInboundWebhookKeyArgs = {
+  input: CreateInboundWebhookKeyInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateWebhookArgs = {
   input: CreateWebhookInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
   orgId: Scalars['ID']['input'];
 };
 
@@ -238,6 +275,12 @@ export type MutationMarkMessagesAsReadArgs = {
 };
 
 
+export type MutationRotateInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type MutationSendDirectMessageArgs = {
   input: SendDirectMessageInput;
   orgId: Scalars['ID']['input'];
@@ -246,6 +289,13 @@ export type MutationSendDirectMessageArgs = {
 
 export type MutationTestWebhookArgs = {
   id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateInboundWebhookKeyInput;
   orgId: Scalars['ID']['input'];
 };
 
@@ -276,6 +326,8 @@ export type Query = {
   creditHistory: Array<CreditTransactionType>;
   directMessages: Array<DirectMessageType>;
   events: Array<EventType>;
+  inboundWebhookKey?: Maybe<InboundWebhookKeyType>;
+  inboundWebhookKeys: Array<InboundWebhookKeyType>;
   messages: Array<MessageGqlType>;
   reputationHistory: Array<ReputationHistoryEntryType>;
   task?: Maybe<TaskType>;
@@ -341,6 +393,17 @@ export type QueryEventsArgs = {
   limit?: Scalars['Int']['input'];
   orgId: Scalars['ID']['input'];
   page?: Scalars['Int']['input'];
+};
+
+
+export type QueryInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryInboundWebhookKeysArgs = {
+  orgId: Scalars['ID']['input'];
 };
 
 
@@ -454,6 +517,7 @@ export type SubscriptionTaskUpdatedArgs = {
   orgId: Scalars['ID']['input'];
 };
 
+/** Task priority level */
 export enum TaskPriority {
   High = 'HIGH',
   Low = 'LOW',
@@ -504,6 +568,14 @@ export type TaskType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type UpdateInboundWebhookKeyInput = {
+  defaultAgentId?: InputMaybe<Scalars['ID']['input']>;
+  defaultPriority?: InputMaybe<TaskPriority>;
+  defaultTags?: InputMaybe<Array<Scalars['String']['input']>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateWebhookInput = {
   canBlock?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -537,6 +609,53 @@ export type WebhookType = {
   updatedAt: Scalars['DateTime']['output'];
   url: Scalars['String']['output'];
 };
+
+export type InboundWebhookKeysQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+}>;
+
+
+export type InboundWebhookKeysQuery = { inboundWebhookKeys: Array<{ id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string }> };
+
+export type AgentsForWebhookQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+}>;
+
+
+export type AgentsForWebhookQuery = { agents: Array<{ id: string, name: string, agentId: string, status: AgentStatus }> };
+
+export type CreateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  input: CreateInboundWebhookKeyInput;
+}>;
+
+
+export type CreateInboundWebhookKeyMutation = { createInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type UpdateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  input: UpdateInboundWebhookKeyInput;
+}>;
+
+
+export type UpdateInboundWebhookKeyMutation = { updateInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type RotateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RotateInboundWebhookKeyMutation = { rotateInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type DeleteInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteInboundWebhookKeyMutation = { deleteInboundWebhookKey: boolean };
 
 export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
 
@@ -674,6 +793,201 @@ export const AgentFieldsFragmentDoc = `
   domain
 }
     `;
+export const InboundWebhookKeysDocument = `
+    query InboundWebhookKeys($orgId: ID!) {
+  inboundWebhookKeys(orgId: $orgId) {
+    id
+    name
+    key
+    secret
+    defaultAgentId
+    defaultPriority
+    defaultTags
+    enabled
+    lastUsedAt
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useInboundWebhookKeysQuery = <
+      TData = InboundWebhookKeysQuery,
+      TError = unknown
+    >(
+      variables: InboundWebhookKeysQueryVariables,
+      options?: Omit<UseQueryOptions<InboundWebhookKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<InboundWebhookKeysQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<InboundWebhookKeysQuery, TError, TData>(
+      {
+    queryKey: ['InboundWebhookKeys', variables],
+    queryFn: fetcher<InboundWebhookKeysQuery, InboundWebhookKeysQueryVariables>(InboundWebhookKeysDocument, variables),
+    ...options
+  }
+    )};
+
+useInboundWebhookKeysQuery.getKey = (variables: InboundWebhookKeysQueryVariables) => ['InboundWebhookKeys', variables];
+
+
+useInboundWebhookKeysQuery.fetcher = (variables: InboundWebhookKeysQueryVariables, options?: RequestInit['headers']) => fetcher<InboundWebhookKeysQuery, InboundWebhookKeysQueryVariables>(InboundWebhookKeysDocument, variables, options);
+
+export const AgentsForWebhookDocument = `
+    query AgentsForWebhook($orgId: ID!) {
+  agents(orgId: $orgId) {
+    id
+    name
+    agentId
+    status
+  }
+}
+    `;
+
+export const useAgentsForWebhookQuery = <
+      TData = AgentsForWebhookQuery,
+      TError = unknown
+    >(
+      variables: AgentsForWebhookQueryVariables,
+      options?: Omit<UseQueryOptions<AgentsForWebhookQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AgentsForWebhookQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AgentsForWebhookQuery, TError, TData>(
+      {
+    queryKey: ['AgentsForWebhook', variables],
+    queryFn: fetcher<AgentsForWebhookQuery, AgentsForWebhookQueryVariables>(AgentsForWebhookDocument, variables),
+    ...options
+  }
+    )};
+
+useAgentsForWebhookQuery.getKey = (variables: AgentsForWebhookQueryVariables) => ['AgentsForWebhook', variables];
+
+
+useAgentsForWebhookQuery.fetcher = (variables: AgentsForWebhookQueryVariables, options?: RequestInit['headers']) => fetcher<AgentsForWebhookQuery, AgentsForWebhookQueryVariables>(AgentsForWebhookDocument, variables, options);
+
+export const CreateInboundWebhookKeyDocument = `
+    mutation CreateInboundWebhookKey($orgId: ID!, $input: CreateInboundWebhookKeyInput!) {
+  createInboundWebhookKey(orgId: $orgId, input: $input) {
+    id
+    name
+    key
+    secret
+    defaultAgentId
+    defaultPriority
+    defaultTags
+    enabled
+    lastUsedAt
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useCreateInboundWebhookKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateInboundWebhookKeyMutation, TError, CreateInboundWebhookKeyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateInboundWebhookKeyMutation, TError, CreateInboundWebhookKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateInboundWebhookKey'],
+    mutationFn: (variables?: CreateInboundWebhookKeyMutationVariables) => fetcher<CreateInboundWebhookKeyMutation, CreateInboundWebhookKeyMutationVariables>(CreateInboundWebhookKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useCreateInboundWebhookKeyMutation.fetcher = (variables: CreateInboundWebhookKeyMutationVariables, options?: RequestInit['headers']) => fetcher<CreateInboundWebhookKeyMutation, CreateInboundWebhookKeyMutationVariables>(CreateInboundWebhookKeyDocument, variables, options);
+
+export const UpdateInboundWebhookKeyDocument = `
+    mutation UpdateInboundWebhookKey($orgId: ID!, $id: ID!, $input: UpdateInboundWebhookKeyInput!) {
+  updateInboundWebhookKey(orgId: $orgId, id: $id, input: $input) {
+    id
+    name
+    key
+    secret
+    defaultAgentId
+    defaultPriority
+    defaultTags
+    enabled
+    lastUsedAt
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useUpdateInboundWebhookKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateInboundWebhookKeyMutation, TError, UpdateInboundWebhookKeyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateInboundWebhookKeyMutation, TError, UpdateInboundWebhookKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateInboundWebhookKey'],
+    mutationFn: (variables?: UpdateInboundWebhookKeyMutationVariables) => fetcher<UpdateInboundWebhookKeyMutation, UpdateInboundWebhookKeyMutationVariables>(UpdateInboundWebhookKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useUpdateInboundWebhookKeyMutation.fetcher = (variables: UpdateInboundWebhookKeyMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateInboundWebhookKeyMutation, UpdateInboundWebhookKeyMutationVariables>(UpdateInboundWebhookKeyDocument, variables, options);
+
+export const RotateInboundWebhookKeyDocument = `
+    mutation RotateInboundWebhookKey($orgId: ID!, $id: ID!) {
+  rotateInboundWebhookKey(orgId: $orgId, id: $id) {
+    id
+    name
+    key
+    secret
+    defaultAgentId
+    defaultPriority
+    defaultTags
+    enabled
+    lastUsedAt
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useRotateInboundWebhookKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RotateInboundWebhookKeyMutation, TError, RotateInboundWebhookKeyMutationVariables, TContext>) => {
+    
+    return useMutation<RotateInboundWebhookKeyMutation, TError, RotateInboundWebhookKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['RotateInboundWebhookKey'],
+    mutationFn: (variables?: RotateInboundWebhookKeyMutationVariables) => fetcher<RotateInboundWebhookKeyMutation, RotateInboundWebhookKeyMutationVariables>(RotateInboundWebhookKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useRotateInboundWebhookKeyMutation.fetcher = (variables: RotateInboundWebhookKeyMutationVariables, options?: RequestInit['headers']) => fetcher<RotateInboundWebhookKeyMutation, RotateInboundWebhookKeyMutationVariables>(RotateInboundWebhookKeyDocument, variables, options);
+
+export const DeleteInboundWebhookKeyDocument = `
+    mutation DeleteInboundWebhookKey($orgId: ID!, $id: ID!) {
+  deleteInboundWebhookKey(orgId: $orgId, id: $id)
+}
+    `;
+
+export const useDeleteInboundWebhookKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteInboundWebhookKeyMutation, TError, DeleteInboundWebhookKeyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteInboundWebhookKeyMutation, TError, DeleteInboundWebhookKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteInboundWebhookKey'],
+    mutationFn: (variables?: DeleteInboundWebhookKeyMutationVariables) => fetcher<DeleteInboundWebhookKeyMutation, DeleteInboundWebhookKeyMutationVariables>(DeleteInboundWebhookKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useDeleteInboundWebhookKeyMutation.fetcher = (variables: DeleteInboundWebhookKeyMutationVariables, options?: RequestInit['headers']) => fetcher<DeleteInboundWebhookKeyMutation, DeleteInboundWebhookKeyMutationVariables>(DeleteInboundWebhookKeyDocument, variables, options);
+
 export const TasksDocument = `
     query Tasks($orgId: ID!, $status: TaskStatus) {
   tasks(orgId: $orgId, status: $status) {
