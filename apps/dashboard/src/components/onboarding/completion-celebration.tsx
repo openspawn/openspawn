@@ -62,7 +62,7 @@ export function CompletionCelebration() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100]"
+            className="fixed inset-0 bg-popover/90 backdrop-blur-md z-[100]"
             onClick={dismissCelebration}
           />
 
@@ -83,7 +83,7 @@ export function CompletionCelebration() {
                 className="mx-auto mb-6"
               >
                 <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <PartyPopper className="w-10 h-10 text-white" />
+                  <PartyPopper className="w-10 h-10 text-foreground" />
                 </div>
               </motion.div>
 
@@ -92,7 +92,7 @@ export function CompletionCelebration() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-3xl font-bold text-white mb-2"
+                className="text-3xl font-bold text-foreground mb-2"
               >
                 You're ready! 🎉
               </motion.h2>
@@ -101,7 +101,7 @@ export function CompletionCelebration() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-slate-400 mb-8"
+                className="text-muted-foreground mb-8"
               >
                 You've got the lay of the ocean floor. Time to dive in and put your agents to work.
               </motion.p>

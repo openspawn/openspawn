@@ -47,8 +47,8 @@ const IDLE_REASON_CONFIG: Record<IdleReason, {
   unassigned: { 
     icon: Inbox, 
     label: "No Tasks", 
-    color: "text-slate-500",
-    bgColor: "bg-slate-500/10",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted",
   },
   newly_activated: { 
     icon: UserPlus, 

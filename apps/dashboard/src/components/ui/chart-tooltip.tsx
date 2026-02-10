@@ -17,10 +17,10 @@ export function ChartTooltip({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-xl border border-cyan-500/20 bg-slate-900/95 px-4 py-3 shadow-xl shadow-cyan-500/5 backdrop-blur-sm">
-      <div className="flex items-center gap-2 mb-2 border-b border-slate-700/50 pb-2">
+    <div className="rounded-xl border border-border bg-popover/95 px-4 py-3 shadow-xl backdrop-blur-sm">
+      <div className="flex items-center gap-2 mb-2 border-b border-border/50 pb-2">
         {icon}
-        <span className="text-xs font-medium text-slate-300">
+        <span className="text-xs font-medium text-muted-foreground">
           {labelFormatter(String(label))}
         </span>
       </div>
@@ -32,11 +32,11 @@ export function ChartTooltip({
                 className="h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-xs text-slate-400 capitalize">
+              <span className="text-xs text-muted-foreground capitalize">
                 {entry.name ?? entry.dataKey}
               </span>
             </div>
-            <span className="text-sm font-semibold text-slate-100">
+            <span className="text-sm font-semibold text-foreground">
               {valueFormatter(entry.value as number)}
             </span>
           </div>
@@ -48,9 +48,9 @@ export function ChartTooltip({
 
 /** Re-usable contentStyle for inline Recharts <Tooltip> when you don't need a full custom component */
 export const oceanTooltipStyle = {
-  backgroundColor: 'rgba(15, 23, 42, 0.95)',
-  border: '1px solid rgba(6, 182, 212, 0.2)',
+  backgroundColor: 'hsl(var(--popover) / 0.95)',
+  border: '1px solid hsl(var(--border))',
   borderRadius: '0.75rem',
-  boxShadow: '0 8px 32px rgba(6, 182, 212, 0.08)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
   backdropFilter: 'blur(8px)',
 };

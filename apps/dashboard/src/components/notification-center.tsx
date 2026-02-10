@@ -89,11 +89,11 @@ export function NotificationCenter() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 z-50 h-full w-full sm:w-[400px] flex flex-col bg-slate-950/95 backdrop-blur-md border-l border-slate-800/60"
+              className="fixed top-0 right-0 z-50 h-full w-full sm:w-[400px] flex flex-col bg-popover/95 backdrop-blur-md border-l border-border"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/60">
-                <h2 className="text-lg font-semibold text-white">Notifications</h2>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
@@ -108,7 +108,7 @@ export function NotificationCenter() {
               {/* List */}
               <div className="flex-1 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                     <span className="text-4xl mb-2">🌊</span>
                     <p className="text-sm">All caught up!</p>
                   </div>
@@ -126,26 +126,26 @@ export function NotificationCenter() {
                           transition={{ delay: i * 0.03 }}
                           onClick={() => markAsRead(notification.id)}
                           className={cn(
-                            'w-full text-left px-5 py-3.5 border-l-2 transition-colors hover:bg-slate-800/40',
+                            'w-full text-left px-5 py-3.5 border-l-2 transition-colors hover:bg-muted/60',
                             notification.read
                               ? 'border-l-transparent bg-transparent'
                               : cn(config.border, config.bg)
                           )}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={cn('mt-0.5 p-1.5 rounded-md', notification.read ? 'bg-slate-800/50' : config.bg)}>
-                              <Icon className={cn('h-4 w-4', notification.read ? 'text-slate-500' : config.accent)} />
+                            <div className={cn('mt-0.5 p-1.5 rounded-md', notification.read ? 'bg-muted' : config.bg)}>
+                              <Icon className={cn('h-4 w-4', notification.read ? 'text-muted-foreground' : config.accent)} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-2">
-                                <p className={cn('text-sm font-medium truncate', notification.read ? 'text-slate-400' : 'text-white')}>
+                                <p className={cn('text-sm font-medium truncate', notification.read ? 'text-muted-foreground' : 'text-foreground')}>
                                   {notification.title}
                                 </p>
-                                <span className="text-[11px] text-slate-500 whitespace-nowrap">
+                                <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap">
                                   {relativeTime(notification.timestamp)}
                                 </span>
                               </div>
-                              <p className={cn('text-xs mt-0.5 line-clamp-2', notification.read ? 'text-slate-500' : 'text-slate-300')}>
+                              <p className={cn('text-xs mt-0.5 line-clamp-2', notification.read ? 'text-muted-foreground/70' : 'text-muted-foreground')}>
                                 {notification.description}
                               </p>
                             </div>

@@ -46,7 +46,7 @@ function generateDemoActivity(agentId: string, weeks: number): ActivityData[] {
 }
 
 const intensityColors = [
-  'bg-slate-800', // 0
+  'bg-muted', // 0
   'bg-emerald-900/50', // 1-3
   'bg-emerald-700/60', // 4-6
   'bg-emerald-500/70', // 7-9
@@ -79,8 +79,8 @@ export function AgentActivityHeatmap({ agentId, agentName, weeks = 12 }: AgentAc
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-slate-300">{agentName}'s Activity</h4>
-        <div className="flex items-center gap-4 text-xs text-slate-400">
+        <h4 className="text-sm font-medium text-muted-foreground">{agentName}'s Activity</h4>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>{totalActivity} tasks</span>
           <span>{activeDays} active days</span>
           <span>{avgPerDay}/day avg</span>
@@ -95,7 +95,7 @@ export function AgentActivityHeatmap({ agentId, agentName, weeks = 12 }: AgentAc
               <div
                 key={day}
                 className={cn(
-                  'text-[10px] text-slate-500 h-3 flex items-center',
+                  'text-[10px] text-muted-foreground/70 h-3 flex items-center',
                   i % 2 === 0 ? 'opacity-100' : 'opacity-0'
                 )}
               >
@@ -123,7 +123,7 @@ export function AgentActivityHeatmap({ agentId, agentName, weeks = 12 }: AgentAc
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
                       <p className="font-medium">{day.count} tasks</p>
-                      <p className="text-slate-400">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                      <p className="text-muted-foreground">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
                     </TooltipContent>
                   </Tooltip>
                 ))}
@@ -134,7 +134,7 @@ export function AgentActivityHeatmap({ agentId, agentName, weeks = 12 }: AgentAc
       </TooltipProvider>
 
       {/* Legend */}
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
         <span>Less</span>
         {intensityColors.map((color, i) => (
           <div key={i} className={cn('w-3 h-3 rounded-sm', color)} />

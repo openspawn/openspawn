@@ -34,14 +34,14 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
 
   const pulseColors = {
     ACTIVE: 'bg-emerald-500',
-    IDLE: 'bg-slate-400',
+    IDLE: 'bg-muted-foreground',
     PENDING: 'bg-amber-500',
     SUSPENDED: 'bg-rose-500',
   };
 
   const ringColors = {
     ACTIVE: 'ring-emerald-500/50',
-    IDLE: 'ring-slate-400/50',
+    IDLE: 'ring-muted-foreground/50',
     PENDING: 'ring-amber-500/50',
     SUSPENDED: 'ring-rose-500/50',
   };
@@ -55,7 +55,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
         className={cn(
           'rounded-full ring-2 transition-all',
           sizeClasses[size],
-          isWorking && status === 'ACTIVE' ? ringColors[status] : 'ring-slate-600'
+          isWorking && status === 'ACTIVE' ? ringColors[status] : 'ring-border'
         )}
         animate={isWorking && status === 'ACTIVE' ? {
           scale: [1, 1.05, 1],
@@ -70,7 +70,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
       {/* Status indicator dot */}
       <span
         className={cn(
-          'absolute bottom-0 right-0 block rounded-full ring-2 ring-slate-800',
+          'absolute bottom-0 right-0 block rounded-full ring-2 ring-card',
           size === 'sm' && 'w-2.5 h-2.5',
           size === 'md' && 'w-3 h-3',
           size === 'lg' && 'w-4 h-4',
@@ -120,7 +120,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute inset-0 rounded-full bg-slate-400/30"
+            className="absolute inset-0 rounded-full bg-muted-foreground/30"
           />
           <motion.span
             animate={{
@@ -132,7 +132,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
               repeat: Infinity,
               ease: 'easeOut',
             }}
-            className="absolute inset-0 rounded-full border-2 border-slate-400"
+            className="absolute inset-0 rounded-full border-2 border-muted-foreground"
           />
         </>
       )}
@@ -152,7 +152,7 @@ export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: num
             status={agent.status as AgentHeartbeatProps['status']}
             size="sm"
           />
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-muted rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             {agent.name}
           </div>
         </div>

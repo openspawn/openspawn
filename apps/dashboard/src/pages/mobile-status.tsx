@@ -45,7 +45,7 @@ const STATUS_LABELS: Record<PresenceStatus, string> = {
 const STATUS_BG: Record<PresenceStatus, string> = {
   active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   busy: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  idle: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  idle: "bg-muted text-muted-foreground border-border",
   error: "bg-rose-500/10 text-rose-400 border-rose-500/20",
 };
 

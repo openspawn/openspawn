@@ -21,9 +21,11 @@ const SCENARIO_OPTIONS = [
 
 interface DemoControlsProps {
   compact?: boolean;
+  /** Render as an inline strip for the desktop header bar */
+  header?: boolean;
 }
 
-export function DemoControls({ compact = false }: DemoControlsProps) {
+export function DemoControls({ compact = false, header = false }: DemoControlsProps) {
   const {
     isDemo,
     isPlaying,
@@ -41,6 +43,85 @@ export function DemoControls({ compact = false }: DemoControlsProps) {
   if (!isDemo) return null;
 
   const lastEvent = recentEvents[0];
+
+  // Header mode: inline strip for desktop top bar
+  if (header) {
+    return (
+      <div className="flex items-center gap-1.5">
+        {/* Scenario selector */}
+        <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+          {SCENARIO_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setScenario(opt.value)}
+              title={`${opt.label} (${opt.agents} agents)`}
+              className={cn(
+                'px-1.5 py-1 rounded text-[11px] font-medium transition-colors flex items-center gap-1',
+                scenario === opt.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <opt.icon className="h-3 w-3" />
+              <span className="hidden xl:inline">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-5 bg-border" />
+
+        {/* Play/Pause */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={isPlaying ? pause : play}
+          className="h-7 w-7"
+        >
+          {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+        </Button>
+
+        {/* Speed */}
+        <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+          {SPEED_OPTIONS.slice(0, 4).map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setSpeed(opt.value)}
+              className={cn(
+                'px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors',
+                speed === opt.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tick */}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Zap className="h-3 w-3 text-yellow-500" />
+          <span className="font-mono tabular-nums">{currentTick}</span>
+        </div>
+
+        {/* Reset */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={reset}
+          className="h-7 w-7"
+          title="Reset simulation"
+        >
+          <RotateCcw className="h-3 w-3" />
+        </Button>
+
+        {/* Demo indicator */}
+        {isPlaying && (
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+        )}
+      </div>
+    );
+  }
 
   // Compact mode for sidebar
   if (compact) {

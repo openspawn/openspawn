@@ -332,7 +332,7 @@ export function CapabilityManager({ agentId }: { agentId?: string }) {
                         <Zap className="h-5 w-5 text-primary" />
                         <div>
                           <p className="font-medium">{cap.capability}</p>
-                          <Badge className={`${proficiencyColors[cap.proficiency]} text-white`}>
+                          <Badge className={`${proficiencyColors[cap.proficiency]} text-foreground`}>
                             {proficiencyLabels[cap.proficiency]}
                           </Badge>
                         </div>

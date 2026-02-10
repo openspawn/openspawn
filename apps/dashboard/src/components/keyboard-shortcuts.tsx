@@ -124,8 +124,8 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg"
           >
-            <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+            <div className="bg-muted border border-border rounded-xl shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-cyan-500/20">
                     <Command className="w-5 h-5 text-cyan-400" />
@@ -134,7 +134,7 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+                  className="p-2 rounded-lg hover:bg-muted transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -143,7 +143,7 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
               <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
                 {Object.entries(grouped).map(([category, items]) => (
                   <div key={category}>
-                    <h3 className="text-sm font-medium text-slate-400 mb-3">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-3">
                       {categories[category as keyof typeof categories]}
                     </h3>
                     <div className="space-y-2">
@@ -152,8 +152,8 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
                           key={shortcut.key}
                           className="flex items-center justify-between py-2"
                         >
-                          <span className="text-slate-300">{shortcut.description}</span>
-                          <kbd className="px-2 py-1 text-xs font-mono bg-slate-700 rounded border border-slate-600">
+                          <span className="text-muted-foreground">{shortcut.description}</span>
+                          <kbd className="px-2 py-1 text-xs font-mono bg-muted rounded border border-border">
                             {shortcut.key}
                           </kbd>
                         </div>
@@ -163,9 +163,9 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
                 ))}
               </div>
 
-              <div className="px-6 py-4 border-t border-slate-700 bg-slate-800/50">
-                <p className="text-sm text-slate-400">
-                  Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-slate-700 rounded">?</kbd> to toggle this help
+              <div className="px-6 py-4 border-t border-border bg-muted/50">
+                <p className="text-sm text-muted-foreground">
+                  Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">?</kbd> to toggle this help
                 </p>
               </div>
             </div>

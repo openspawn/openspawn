@@ -40,7 +40,7 @@ export function NetworkPage() {
         w-auto max-w-[calc(100%-4rem)]">
         <div className="flex gap-4 sm:gap-6 items-center">
           <div className="hidden sm:block">
-            <h1 className="text-sm sm:text-base font-bold text-white leading-tight">
+            <h1 className="text-sm sm:text-base font-bold text-foreground leading-tight">
               {view === "network" ? "Agent Network" : "Org Chart"}
             </h1>
             <p className="text-[10px] sm:text-xs text-zinc-500">
@@ -76,7 +76,7 @@ export function NetworkPage() {
               <div className="w-px h-8 bg-zinc-700 hidden sm:block" />
               <div className="flex gap-3 sm:gap-5 items-center">
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-white">
+                  <div className="text-sm sm:text-lg font-bold text-foreground">
                     {agents.length}
                   </div>
                   <div className="text-[9px] sm:text-xs text-zinc-500">Agents</div>
@@ -94,7 +94,7 @@ export function NetworkPage() {
                   <div className="text-[9px] sm:text-xs text-zinc-500">Pending</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-sm sm:text-lg font-bold text-white">
+                  <div className="text-sm sm:text-lg font-bold text-foreground">
                     {(agents.reduce((s, a) => s + a.currentBalance, 0) / 1000).toFixed(1)}K
                   </div>
                   <div className="text-[9px] sm:text-xs text-zinc-500">Credits</div>

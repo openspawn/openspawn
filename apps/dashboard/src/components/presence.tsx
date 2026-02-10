@@ -19,7 +19,7 @@ const dotColors: Record<PresenceStatus, string> = {
   active: 'bg-emerald-500',
   busy: 'bg-amber-500',
   error: 'bg-rose-500',
-  idle: 'bg-slate-500',
+  idle: 'bg-muted-foreground',
 };
 
 const glowColors: Record<PresenceStatus, string> = {
@@ -33,7 +33,7 @@ const ringColors: Record<PresenceStatus, string> = {
   active: 'ring-emerald-500/60',
   busy: 'ring-amber-500/50',
   error: 'ring-rose-500/60',
-  idle: 'ring-slate-500/25',
+  idle: 'ring-muted-foreground/25',
 };
 
 /* ------------------------------------------------------------------ */
