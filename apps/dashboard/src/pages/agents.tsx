@@ -36,6 +36,7 @@ import { Progress } from "../components/ui/progress";
 import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector, AgentModeCard } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { SplitPanel } from "../components/ui/split-panel";
 
 // Use generated types from GraphQL
 import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
@@ -877,7 +878,11 @@ export function AgentsPage() {
         </TabsList>
 
         {/* All Agents Tab */}
-        <TabsContent value="agents" className="space-y-6">
+        <TabsContent value="agents">
+      <SplitPanel
+        storageKey="agents"
+        rightOpen={!!detailPanelAgentId}
+        left={<div className="p-4 space-y-6">
       {/* Filters and Search */}
       <div className="flex flex-wrap gap-3 items-center">
         {/* Search */}
@@ -1058,6 +1063,15 @@ export function AgentsPage() {
       {selectedAgent && dialogMode === "credits" && (
         <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
       )}
+      </div>}
+        right={
+          <AgentDetailPanel
+            agentId={detailPanelAgentId}
+            onClose={() => setDetailPanelAgentId(null)}
+            inline
+          />
+        }
+      />
         </TabsContent>
 
         {/* Reputation Tab */}
@@ -1081,11 +1095,7 @@ export function AgentsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Agent Detail Panel */}
-      <AgentDetailPanel 
-        agentId={detailPanelAgentId} 
-        onClose={() => setDetailPanelAgentId(null)} 
-      />
+      {/* Agent Detail Panel now integrated in SplitPanel above */}
     </div>
   );
 }

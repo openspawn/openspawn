@@ -10,3 +10,4 @@ export * from "./tabs";
 export * from "./tooltip";
 export * from "./empty-state";
 export * from "./sparkline";
+export * from "./split-panel";
