@@ -308,7 +308,7 @@ function AgentNode({ data, selected }: NodeProps) {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3 }}
-              className={`absolute rounded-full font-bold text-white bg-purple-600 ${compact ? '-bottom-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-bottom-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
+              className={`absolute rounded-full font-bold text-white bg-violet-600 ${compact ? '-bottom-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-bottom-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
             >
               {taskCount}
             </motion.div>
@@ -937,7 +937,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
               onClick={() => setCompact(!compact)}
               className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
                 compact 
-                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                  ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' 
                   : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700'
               }`}
               title={compact ? "Expand nodes" : "Compact nodes"}
@@ -994,7 +994,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">Tasks</span>
-                    <span className="text-purple-400">
+                    <span className="text-violet-400">
                       {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.taskCount || 0}
                     </span>
                   </div>
@@ -1004,7 +1004,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">Status</span>
-                    <span className={(selectedNode.data as AgentNodeData).status === "active" ? "text-green-500" : "text-yellow-500"}>
+                    <span className={(selectedNode.data as AgentNodeData).status === "active" ? "text-emerald-500" : "text-amber-500"}>
                       {(selectedNode.data as AgentNodeData).status}
                     </span>
                   </div>
@@ -1041,12 +1041,12 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                     animate={{ opacity: 1 - idx * 0.15, x: 0, scale: 1 - idx * 0.03, y: idx * -4 }}
                     exit={{ opacity: 0, x: 30, scale: 0.8 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="bg-zinc-900/95 backdrop-blur border border-green-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-green-500/10"
+                    className="bg-zinc-900/95 backdrop-blur border border-emerald-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/10"
                     style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
                   >
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
                     <span className="text-zinc-400 truncate max-w-[60px]">{String(fromNode?.data?.label || "") || del.fromId}</span>
-                    <span className="text-green-500">→</span>
+                    <span className="text-emerald-500">→</span>
                     <span className="text-zinc-400 truncate max-w-[60px]">{String(toNode?.data?.label || "") || del.toId}</span>
                   </motion.div>
                 );

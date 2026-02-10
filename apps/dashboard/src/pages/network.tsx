@@ -48,17 +48,17 @@ export function NetworkPage() {
           </div>
           <div className="w-px h-6 bg-zinc-700 hidden sm:block" />
           <div className="text-center">
-            <div className="text-base sm:text-xl font-bold text-green-500">11</div>
+            <div className="text-base sm:text-xl font-bold text-emerald-500">11</div>
             <div className="text-[9px] sm:text-xs text-zinc-500 hidden landscape:hidden sm:block">Active</div>
           </div>
           <div className="w-px h-6 bg-zinc-700 hidden sm:block" />
           <div className="text-center">
-            <div className="text-base sm:text-xl font-bold text-yellow-500">2</div>
+            <div className="text-base sm:text-xl font-bold text-amber-500">2</div>
             <div className="text-[9px] sm:text-xs text-zinc-500 hidden landscape:hidden sm:block">Pending</div>
           </div>
           <div className="w-px h-6 bg-zinc-700 hidden sm:block" />
           <div className="text-center">
-            <div className="text-base sm:text-xl font-bold text-purple-500">1</div>
+            <div className="text-base sm:text-xl font-bold text-violet-500">1</div>
             <div className="text-[9px] sm:text-xs text-zinc-500 hidden landscape:hidden sm:block">Paused</div>
           </div>
           <div className="w-px h-6 bg-zinc-700 hidden sm:block" />

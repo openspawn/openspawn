@@ -127,8 +127,8 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
             <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-500/20">
-                    <Command className="w-5 h-5 text-indigo-400" />
+                  <div className="p-2 rounded-lg bg-cyan-500/20">
+                    <Command className="w-5 h-5 text-cyan-400" />
                   </div>
                   <h2 className="text-lg font-semibold">Keyboard Shortcuts</h2>
                 </div>

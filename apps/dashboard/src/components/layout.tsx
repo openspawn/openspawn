@@ -122,7 +122,7 @@ export function Layout({ children }: LayoutProps) {
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
                         "w-full justify-start gap-3",
-                        isActive && "bg-secondary"
+                        isActive && "bg-secondary text-primary"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -288,7 +288,7 @@ export function Layout({ children }: LayoutProps) {
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
                         "w-full justify-start gap-3",
-                        isActive && "bg-secondary"
+                        isActive && "bg-secondary text-primary"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -399,7 +399,7 @@ export function Layout({ children }: LayoutProps) {
                     <Play className="h-4 w-4" />
                   )}
                   {demo.isPlaying && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   )}
                 </Button>
               )}

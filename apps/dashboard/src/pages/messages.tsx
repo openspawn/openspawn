@@ -33,10 +33,10 @@ const formatTime = (dateStr: string) => {
 };
 
 const typeColors: Record<string, string> = {
-  TASK: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  STATUS: 'bg-green-500/20 text-green-400 border-green-500/30',
-  REPORT: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  QUESTION: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  TASK: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+  STATUS: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  REPORT: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+  QUESTION: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   ESCALATION: 'bg-red-500/20 text-red-400 border-red-500/30',
   GENERAL: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
 };
@@ -246,7 +246,7 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
                   }}
                   className="flex gap-3 md:gap-4 pb-3 pl-8 md:pl-12 relative"
                 >
-                  <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 border-2 border-indigo-500 top-3" />
+                  <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 border-2 border-cyan-500 top-3" />
                   
                   <Card className={cn(
                     "flex-1 bg-slate-800/50 border-l-4",
@@ -361,8 +361,8 @@ function ConversationCards({ messages }: { messages: Message[] }) {
             <Card
               className={cn(
                 "bg-slate-800/50 border-slate-700 cursor-pointer transition-all active:scale-[0.98]",
-                "hover:border-indigo-500/50",
-                isExpanded && "sm:col-span-2 lg:col-span-2 border-indigo-500"
+                "hover:border-cyan-500/50",
+                isExpanded && "sm:col-span-2 lg:col-span-2 border-cyan-500"
               )}
               onClick={() => setSelectedConvo(isExpanded ? null : key)}
             >
@@ -409,7 +409,7 @@ function ConversationCards({ messages }: { messages: Message[] }) {
                             <div
                               className={cn(
                                 "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
-                                isAgent1 ? "bg-slate-700" : "bg-indigo-600/30"
+                                isAgent1 ? "bg-slate-700" : "bg-cyan-600/30"
                               )}
                             >
                               {msg.content}

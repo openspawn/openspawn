@@ -268,9 +268,9 @@ function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void
 const REPUTATION_COLORS: Record<string, string> = {
   NEW: "bg-gray-500",
   PROBATION: "bg-orange-500",
-  TRUSTED: "bg-blue-500",
-  VETERAN: "bg-purple-500",
-  ELITE: "bg-yellow-500",
+  TRUSTED: "bg-cyan-500",
+  VETERAN: "bg-violet-500",
+  ELITE: "bg-amber-500",
 };
 
 const REPUTATION_EMOJI: Record<string, string> = {
@@ -343,7 +343,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">
+            <div className="text-2xl font-bold text-amber-500">
               👑 {distribution.ELITE}
             </div>
           </CardContent>
@@ -355,7 +355,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-500">
+            <div className="text-2xl font-bold text-violet-500">
               🏆 {distribution.VETERAN}
             </div>
           </CardContent>

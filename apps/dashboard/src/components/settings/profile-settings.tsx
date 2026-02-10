@@ -94,7 +94,7 @@ export function ProfileSettings() {
           <div
             className={`flex items-center gap-2 rounded-md p-3 text-sm ${
               status.type === "success"
-                ? "bg-green-500/10 text-green-500"
+                ? "bg-emerald-500/10 text-emerald-500"
                 : "bg-red-500/10 text-red-500"
             }`}
           >

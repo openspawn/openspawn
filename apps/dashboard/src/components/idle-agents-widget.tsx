@@ -41,7 +41,7 @@ const IDLE_REASON_CONFIG: Record<IdleReason, {
     icon: Clock, 
     label: "Awaiting Input", 
     color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
+    bgColor: "bg-cyan-500/10",
   },
   unassigned: { 
     icon: Inbox, 
@@ -52,8 +52,8 @@ const IDLE_REASON_CONFIG: Record<IdleReason, {
   newly_activated: { 
     icon: UserPlus, 
     label: "Just Activated", 
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
   },
 };
 

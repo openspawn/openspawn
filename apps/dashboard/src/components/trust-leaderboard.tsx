@@ -20,9 +20,9 @@ interface TrustLeaderboardProps {
 const LEVEL_COLORS: Record<string, string> = {
   NEW: "bg-gray-500",
   PROBATION: "bg-orange-500",
-  TRUSTED: "bg-blue-500",
-  VETERAN: "bg-purple-500",
-  ELITE: "bg-yellow-500",
+  TRUSTED: "bg-cyan-500",
+  VETERAN: "bg-violet-500",
+  ELITE: "bg-amber-500",
 };
 
 const RANK_EMOJI = ["🥇", "🥈", "🥉"];
