@@ -9,41 +9,41 @@ const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; descri
     id: 'acmetech',
     name: 'AcmeTech Product Launch',
     icon: <Building2 className="w-6 h-6" />,
-    description: 'Watch 22 agents build a SaaS dashboard from discovery to launch',
+    description: 'Deep dive into a full product launch — 22 agents navigating the depths from discovery to deployment',
     stats: '22 agents • 24 tasks • 6 phases',
-    color: 'from-violet-500 to-purple-600',
+    color: 'from-cyan-500 to-blue-600',
   },
   {
     id: 'startup',
     name: 'Startup Team',
     icon: <Rocket className="w-6 h-6" />,
-    description: 'Small agile team tackling their first sprint',
+    description: 'A nimble school of agents exploring shallow waters in their first sprint',
     stats: '5 agents • 10 tasks • Active',
-    color: 'from-orange-500 to-red-500',
+    color: 'from-orange-400 to-coral-500',
   },
   {
     id: 'growth',
     name: 'Growth Stage',
     icon: <TrendingUp className="w-6 h-6" />,
-    description: 'Scaling team with established workflows',
+    description: 'Mid-depth operations — established currents and coordinated workflows',
     stats: '12 agents • 18 tasks • Busy',
-    color: 'from-emerald-500 to-teal-500',
+    color: 'from-teal-500 to-emerald-600',
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     icon: <Users className="w-6 h-6" />,
-    description: 'Large organization with complex hierarchy',
+    description: 'Deep ocean trenches — complex hierarchies and vast coordination networks',
     stats: '25+ agents • 30+ tasks • Complex',
-    color: 'from-blue-500 to-indigo-600',
+    color: 'from-blue-600 to-indigo-700',
   },
   {
     id: 'fresh',
     name: 'Fresh Start',
     icon: <Sparkles className="w-6 h-6" />,
-    description: 'Empty slate - watch agents spawn from scratch',
+    description: 'Pristine waters — witness the birth of your agent ecosystem from nothing',
     stats: '0 agents • 0 tasks • Clean',
-    color: 'from-slate-500 to-slate-600',
+    color: 'from-slate-600 to-cyan-700',
   },
 ];
 
@@ -110,17 +110,17 @@ export function DemoWelcome() {
               </button>
               
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">Welcome to OpenSpawn</h2>
-                  <p className="text-sm text-slate-400">Multi-agent coordination platform</p>
+                  <h2 className="text-xl font-bold text-white">Welcome to BikiniBottom</h2>
+                  <p className="text-sm text-slate-400">Multi-Agent Coordination</p>
                 </div>
               </div>
               
               <p className="text-slate-300 text-sm mt-3">
-                Pick a scenario to explore. Watch AI agents collaborate, manage tasks, and spend credits in real-time.
+                Dive into the depths. Pick a scenario and watch AI agents collaborate like a coordinated ocean ecosystem — managing tasks, delegating work, and flowing through projects in real-time.
               </p>
             </div>
 
@@ -135,7 +135,7 @@ export function DemoWelcome() {
                     whileTap={{ scale: 0.99 }}
                     className={`relative w-full p-4 rounded-xl border-2 text-left transition-all ${
                       selectedScenario === scenario.id
-                        ? 'border-violet-500 bg-violet-500/10'
+                        ? 'border-cyan-500 bg-cyan-500/10'
                         : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
                     }`}
                   >
@@ -147,7 +147,7 @@ export function DemoWelcome() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-white">{scenario.name}</h3>
                           {scenario.id === 'acmetech' && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500/20 text-violet-400 rounded">
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-cyan-500/20 text-cyan-400 rounded">
                               RECOMMENDED
                             </span>
                           )}
@@ -156,7 +156,7 @@ export function DemoWelcome() {
                         <p className="text-xs text-slate-500 mt-1">{scenario.stats}</p>
                       </div>
                       {selectedScenario === scenario.id && (
-                        <div className="w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center shrink-0">
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
@@ -176,7 +176,7 @@ export function DemoWelcome() {
                 </p>
                 <Button
                   onClick={handleStart}
-                  className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white px-6"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Start Demo

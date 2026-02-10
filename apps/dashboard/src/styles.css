@@ -25,25 +25,52 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    /* Deep ocean background - dark blue-black */
+    --background: 220 35% 8%;
+    --foreground: 180 30% 95%;
+    
+    /* Cards with subtle blue tint */
+    --card: 220 30% 10%;
+    --card-foreground: 180 25% 95%;
+    
+    /* Popovers */
+    --popover: 220 30% 12%;
+    --popover-foreground: 180 25% 95%;
+    
+    /* Primary - bioluminescent cyan/aqua */
+    --primary: 185 85% 60%;
+    --primary-foreground: 220 35% 10%;
+    
+    /* Secondary - deep teal */
+    --secondary: 200 40% 20%;
+    --secondary-foreground: 180 30% 95%;
+    
+    /* Muted elements */
+    --muted: 210 30% 18%;
+    --muted-foreground: 200 15% 60%;
+    
+    /* Accent - bright cyan for highlights */
+    --accent: 190 90% 55%;
+    --accent-foreground: 220 35% 10%;
+    
+    /* Success - sea green */
+    --success: 160 70% 45%;
+    --success-foreground: 160 70% 95%;
+    
+    /* Warning - amber/coral */
+    --warning: 25 95% 55%;
+    --warning-foreground: 25 20% 10%;
+    
+    /* Destructive - keep red but ocean-tinted */
+    --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    
+    /* Borders with subtle cyan tint */
+    --border: 210 25% 22%;
+    --input: 210 25% 22%;
+    
+    /* Ring - cyan glow */
+    --ring: 185 85% 60%;
   }
 }
 
@@ -99,5 +126,55 @@
   }
   to {
     height: 0;
+  }
+}
+
+/* Underwater theme animations */
+@keyframes wave-subtle {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-2px) translateY(1px);
+  }
+  75% {
+    transform: translateX(2px) translateY(-1px);
+  }
+}
+
+@keyframes bubble-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes current-flow {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(10px);
+    opacity: 0.15;
+  }
+}
+
+@keyframes bioluminescent-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.8));
   }
 }
