@@ -23,6 +23,7 @@ import {
   Bar,
   Cell,
 } from "recharts";
+import { StaggerContainer, StaggerItem } from "../components/stagger";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
@@ -269,40 +270,40 @@ export function DashboardPage() {
       )}
 
       {/* Stats grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
+      <StaggerContainer className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StaggerItem><StatCard
           title="Active Agents"
           value={activeAgents}
           icon={Users}
           description={pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined}
           sparklineData={sparklines.agents}
           sparklineColor="#06b6d4"
-        />
-        <StatCard
+        /></StaggerItem>
+        <StaggerItem><StatCard
           title="Tasks In Progress"
           value={inProgressTasks}
           icon={CheckSquare}
           description={`${tasks.filter(t => t.status === "review").length} in review`}
           sparklineData={sparklines.tasks}
           sparklineColor="#06b6d4"
-        />
-        <StatCard
+        /></StaggerItem>
+        <StaggerItem><StatCard
           title="Completed Tasks"
           value={completedTasks}
           icon={TrendingUp}
           description={`${tasks.length} total tasks`}
           sparklineData={sparklines.completed}
           sparklineColor="#10b981"
-        />
-        <StatCard
+        /></StaggerItem>
+        <StaggerItem><StatCard
           title="Credit Flow"
           value={`+${totalCreditsEarned.toLocaleString()}`}
           icon={Coins}
           description={`-${totalCreditsSpent.toLocaleString()} spent`}
           sparklineData={sparklines.credits}
           sparklineColor="#f59e0b"
-        />
-      </div>
+        /></StaggerItem>
+      </StaggerContainer>
 
       {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-7">

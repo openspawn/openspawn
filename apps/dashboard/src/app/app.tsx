@@ -8,6 +8,7 @@ import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { CommandPalette } from "../components/command-palette";
+import { PageTransition } from "../components/page-transition";
 import { AuthProvider } from "../contexts";
 import type { ReactNode } from "react";
 
@@ -83,7 +84,7 @@ export function App() {
                   element={
                     <MaybeProtectedRoute>
                       <Layout>
-                        <Routes>
+                        <PageTransition>
                           <Route path="/" element={<DashboardPage />} />
                           <Route path="/tasks" element={<TasksPage />} />
                           <Route path="/agents" element={<AgentsPage />} />
@@ -92,7 +93,7 @@ export function App() {
                           <Route path="/messages" element={<MessagesPage />} />
                           <Route path="/network" element={<NetworkPage />} />
                           <Route path="/settings" element={<SettingsPage />} />
-                        </Routes>
+                        </PageTransition>
                       </Layout>
                     </MaybeProtectedRoute>
                   }
