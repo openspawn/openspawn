@@ -13,7 +13,8 @@ import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useEvents } from "../hooks/use-events";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 function getSeverityIcon(severity: string) {
   switch (severity.toUpperCase()) {
@@ -61,6 +62,91 @@ function formatTime(dateString: string) {
   if (diffDays < 7) return `${diffDays}d ago`;
 
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeof useEvents>["events"] }) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: filteredEvents.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 80,
+    overscan: 5,
+  });
+
+  if (filteredEvents.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Activity className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No events found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={parentRef} className="h-[calc(100vh-400px)] overflow-auto">
+      <div style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}>
+        <AnimatePresence mode="popLayout">
+          {virtualizer.getVirtualItems().map((virtualRow) => {
+            const event = filteredEvents[virtualRow.index];
+            return (
+              <motion.div
+                key={event.id}
+                layout
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10, height: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                  delay: virtualRow.index < 10 ? virtualRow.index * 0.02 : 0,
+                }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="flex items-start gap-4 p-4 hover:bg-accent/50 transition-colors border-b border-border"
+              >
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", delay: 0.1 }}
+                  className="mt-0.5"
+                >
+                  {getSeverityIcon(event.severity)}
+                </motion.div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant={getSeverityVariant(event.severity)}>
+                      {event.type}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatTime(event.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-sm">
+                    <span className="font-medium">{event.actor?.name || "System"}</span>
+                    {" "}
+                    <span className="text-muted-foreground">
+                      {event.entityType} → {event.entityId.slice(0, 8)}...
+                    </span>
+                  </p>
+                  {event.reasoning && (
+                    <p className="text-xs text-muted-foreground mt-1 italic">
+                      "{event.reasoning}"
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 }
 
 export function EventsPage() {
@@ -181,65 +267,7 @@ export function EventsPage() {
 
         <TabsContent value={filter} className="mt-4">
           <Card>
-            <ScrollArea className="h-[calc(100vh-400px)]">
-              <div className="divide-y divide-border">
-                <AnimatePresence mode="popLayout">
-                  {filteredEvents.map((event, index) => (
-                    <motion.div
-                      key={event.id}
-                      layout
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10, height: 0 }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 400, 
-                        damping: 30,
-                        delay: index < 10 ? index * 0.02 : 0
-                      }}
-                      className="flex items-start gap-4 p-4 hover:bg-accent/50 transition-colors"
-                    >
-                      <motion.div 
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", delay: 0.1 }}
-                        className="mt-0.5"
-                      >
-                        {getSeverityIcon(event.severity)}
-                      </motion.div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant={getSeverityVariant(event.severity)}>
-                            {event.type}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {formatTime(event.createdAt)}
-                          </span>
-                        </div>
-                        <p className="text-sm">
-                          <span className="font-medium">{event.actor?.name || "System"}</span>
-                          {" "}
-                          <span className="text-muted-foreground">
-                            {event.entityType} → {event.entityId.slice(0, 8)}...
-                          </span>
-                        </p>
-                        {event.reasoning && (
-                          <p className="text-xs text-muted-foreground mt-1 italic">
-                            "{event.reasoning}"
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {filteredEvents.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">No events found</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+            <EventVirtualList filteredEvents={filteredEvents} />
           </Card>
         </TabsContent>
       </Tabs>

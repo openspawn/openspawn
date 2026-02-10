@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   ReactFlow,
   Node,
@@ -209,6 +210,85 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 // ============================================================
 // VIEW 2: Mission Control Feed (Mobile-Optimized)
 // ============================================================
+function FeedVirtualList({ filtered }: { filtered: Message[] }) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: filtered.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 120,
+    overscan: 5,
+  });
+
+  return (
+    <div className="relative">
+      <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
+      <div ref={parentRef} className="h-[600px] overflow-auto">
+        <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
+          <AnimatePresence mode="popLayout">
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const msg = filtered[virtualRow.index];
+              const sender = msg.fromAgent;
+              const receiver = msg.toAgent;
+              return (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className="flex gap-3 md:gap-4 pb-3 pl-8 md:pl-12 relative"
+                >
+                  <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 border-2 border-indigo-500 top-3" />
+                  
+                  <Card className={cn(
+                    "flex-1 bg-slate-800/50 border-l-4",
+                    msg.type === 'TASK' && 'border-l-blue-500',
+                    msg.type === 'STATUS' && 'border-l-green-500',
+                    msg.type === 'REPORT' && 'border-l-purple-500',
+                    msg.type === 'QUESTION' && 'border-l-yellow-500',
+                    msg.type === 'ESCALATION' && 'border-l-red-500',
+                  )}>
+                    <CardContent className="p-2 md:p-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                        <div className="flex items-center gap-1.5 md:gap-2">
+                          <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
+                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{sender?.name || 'Unknown'}</span>
+                          <span className="text-slate-500 text-xs">→</span>
+                          <img src={getAgentAvatarUrl(msg.toAgentId, receiver?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
+                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{receiver?.name || 'Unknown'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
+                            {typeIcons[msg.type] || '💬'}
+                          </Badge>
+                          <span className="text-[10px] md:text-xs text-slate-500">{formatTime(msg.createdAt)}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
+                      {msg.taskRef && (
+                        <Badge variant="outline" className="mt-2 text-[9px] md:text-[10px]">
+                          🔗 {msg.taskRef}
+                        </Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MissionControlFeed({ messages }: { messages: Message[] }) {
   const [filter, setFilter] = useState<string | null>(null);
 
@@ -239,61 +319,7 @@ function MissionControlFeed({ messages }: { messages: Message[] }) {
         ))}
       </div>
 
-      <div className="relative">
-        <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
-        
-        <AnimatePresence mode="popLayout">
-          {filtered.slice(0, 15).map((msg) => {
-            const sender = msg.fromAgent;
-            const receiver = msg.toAgent;
-            return (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="flex gap-3 md:gap-4 mb-3 pl-8 md:pl-12 relative"
-              >
-                <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 border-2 border-indigo-500 top-3" />
-                
-                <Card className={cn(
-                  "flex-1 bg-slate-800/50 border-l-4",
-                  msg.type === 'TASK' && 'border-l-blue-500',
-                  msg.type === 'STATUS' && 'border-l-green-500',
-                  msg.type === 'REPORT' && 'border-l-purple-500',
-                  msg.type === 'QUESTION' && 'border-l-yellow-500',
-                  msg.type === 'ESCALATION' && 'border-l-red-500',
-                )}>
-                  <CardContent className="p-2 md:p-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-                      <div className="flex items-center gap-1.5 md:gap-2">
-                        <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
-                        <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{sender?.name || 'Unknown'}</span>
-                        <span className="text-slate-500 text-xs">→</span>
-                        <img src={getAgentAvatarUrl(msg.toAgentId, receiver?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
-                        <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{receiver?.name || 'Unknown'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
-                          {typeIcons[msg.type] || '💬'}
-                        </Badge>
-                        <span className="text-[10px] md:text-xs text-slate-500">{formatTime(msg.createdAt)}</span>
-                      </div>
-                    </div>
-                    <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
-                    {msg.taskRef && (
-                      <Badge variant="outline" className="mt-2 text-[9px] md:text-[10px]">
-                        🔗 {msg.taskRef}
-                      </Badge>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
+      <FeedVirtualList filtered={filtered} />
     </div>
   );
 }

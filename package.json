@@ -44,6 +44,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/react-query": "^5.90.20",
+    "@tanstack/react-virtual": "^3.13.18",
     "@urql/core": "^6.0.1",
     "@xyflow/react": "^12.10.0",
     "autoprefixer": "^10.4.24",
