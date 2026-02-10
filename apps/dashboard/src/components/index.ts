@@ -19,3 +19,5 @@ export * from "./model-usage";
 export * from "./agent-heartbeat";
 export { PhaseProgress } from './phase-progress';
 export { PhaseChip } from './phase-chip';
+export { PageTransition } from './page-transition';
+export { StaggerContainer, StaggerItem } from './stagger';

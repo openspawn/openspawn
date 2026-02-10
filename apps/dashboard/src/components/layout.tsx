@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
@@ -124,12 +125,19 @@ export function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
-                  <Link key={item.name} to={item.href}>
+                  <Link key={item.name} to={item.href} className="relative">
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-active"
+                        className="absolute inset-0 rounded-md bg-secondary"
+                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                      />
+                    )}
                     <Button
-                      variant={isActive ? "secondary" : "ghost"}
+                      variant="ghost"
                       className={cn(
-                        "w-full justify-start gap-3",
-                        isActive && "bg-secondary text-primary"
+                        "w-full justify-start gap-3 relative z-10",
+                        isActive && "text-primary hover:bg-transparent"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
