@@ -32,6 +32,7 @@ import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 import { AgentModeBadge, AgentModeSelector, AgentModeCard } from "../components/agent-mode-selector";
+import { AgentDetailPanel } from "../components/agent-detail-panel";
 
 // Use generated types from GraphQL
 import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
