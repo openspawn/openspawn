@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Why OpenSpawn?
+title: Why BikiniBottom?
 nav_order: 1
 ---
 
-# Why OpenSpawn?
+# Why BikiniBottom?
 
 ## The Problem: AI Agent Chaos
 
@@ -26,7 +26,7 @@ You've built AI agents. They're powerful. They can code, research, write, analyz
 
 ## The Solution: Structure Your AI Workforce
 
-OpenSpawn gives you everything you need to run an **AI agent organization** — the same way you'd run a human organization:
+BikiniBottom gives you everything you need to run an **AI agent organization** — the same way you'd run a human organization:
 
 ### 🏢 Hierarchy & Structure
 - **10 Levels** — From L1 workers to L10 founders
@@ -96,7 +96,7 @@ You're building AI solutions for clients. You need to show them exactly what the
 └─────────────────────────────────────────────────────────────┘
 ```
 
-OpenSpawn sits **between you and your agents**. Agents authenticate, request credits, update tasks, and message each other through OpenSpawn. You get a single pane of glass.
+BikiniBottom sits **between you and your agents**. Agents authenticate, request credits, update tasks, and message each other through BikiniBottom. You get a single pane of glass.
 
 ---
 
@@ -163,7 +163,7 @@ pnpm exec nx run-many -t serve -p api,dashboard
 
 ## Compare
 
-| Feature | OpenSpawn | DIY | Competitors |
+| Feature | BikiniBottom | DIY | Competitors |
 |---------|-----------|-----|-------------|
 | Self-hosted | ✅ | ✅ | ❌ Usually SaaS |
 | Agent hierarchy | ✅ 10 levels | ❌ Build it | ⚠️ Limited |
@@ -181,7 +181,7 @@ pnpm exec nx run-many -t serve -p api,dashboard
 <div class="cta-grid">
   <a href="getting-started" class="cta-card">
     <h3>📖 Getting Started</h3>
-    <p>Install and run OpenSpawn in 5 minutes</p>
+    <p>Install and run BikiniBottom in 5 minutes</p>
   </a>
   <a href="demo/" class="cta-card">
     <h3>🎮 Live Demo</h3>

@@ -1,11 +1,11 @@
 ---
 layout: home
-title: Getting Started - OpenSpawn
+title: Getting Started - BikiniBottom
 ---
 
 # Getting Started
 
-Get OpenSpawn running in under 5 minutes.
+Get BikiniBottom running in under 5 minutes.
 
 ## Prerequisites
 
@@ -84,7 +84,7 @@ pnpm exec nx run dashboard:serve
 
 ## Demo Mode
 
-Try OpenSpawn without creating data:
+Try BikiniBottom without creating data:
 
 ```
 http://localhost:4200/?demo=true
