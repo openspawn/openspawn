@@ -21,6 +21,7 @@ import {
   ExternalLink,
   HelpCircle,
   Github,
+  Search,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -42,17 +43,18 @@ import { useAuth } from "../contexts";
 import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
+import { useOnboarding } from "./onboarding/onboarding-provider";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Network", href: "/network", icon: Network },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare },
-  { name: "Agents", href: "/agents", icon: Users },
+const navigation: { name: string; href: string; icon: typeof LayoutDashboard; tourId?: string }[] = [
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard" },
+  { name: "Network", href: "/network", icon: Network, tourId: "network" },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks" },
+  { name: "Agents", href: "/agents", icon: Users, tourId: "agents" },
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Credits", href: "/credits", icon: Coins },
   { name: "Events", href: "/events", icon: Activity },
@@ -67,6 +69,7 @@ export function Layout({ children }: LayoutProps) {
   const isDemo = searchParams.get("demo") === "true";
   const { user, logout, isAuthenticated } = useAuth();
   const { activeCount } = usePresence();
+  const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
 
   // Close mobile menu on navigation
   useEffect(() => {
@@ -125,7 +128,7 @@ export function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
-                  <Link key={item.name} to={item.href} className="relative">
+                  <Link key={item.name} to={item.href} className="relative" {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active"
@@ -199,6 +202,15 @@ export function Layout({ children }: LayoutProps) {
                 GitHub
                 <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
               </a>
+              {hasCompletedOnboarding && (
+                <button
+                  onClick={resetOnboarding}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  Restart Tour
+                </button>
+              )}
             </div>
           </div>
 
@@ -365,6 +377,18 @@ export function Layout({ children }: LayoutProps) {
                 GitHub
                 <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
               </a>
+              {hasCompletedOnboarding && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    resetOnboarding();
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  Restart Tour
+                </button>
+              )}
             </div>
           </div>
 
@@ -428,6 +452,17 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Desktop top bar */}
           <div className="hidden lg:flex items-center justify-end gap-2 px-6 py-2 border-b border-border">
+            <button
+              data-tour="cmdk"
+              onClick={() => {
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted transition-colors mr-auto"
+            >
+              <Search className="h-3 w-3" />
+              <span>Search…</span>
+              <kbd className="ml-2 px-1.5 py-0.5 text-[10px] bg-background border border-border rounded font-mono">⌘K</kbd>
+            </button>
             <NotificationCenter />
             <ThemeToggle />
           </div>
