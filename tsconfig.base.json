@@ -11,7 +11,10 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strict": true,
@@ -26,10 +29,23 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@openspawn/shared-types": ["libs/shared-types/src/index.ts"],
-      "@openspawn/database": ["libs/database/src/index.ts"],
-      "@openspawn/demo-data": ["libs/demo-data/src/index.ts"]
+      "@openspawn/shared-types": [
+        "libs/shared-types/src/index.ts"
+      ],
+      "@openspawn/database": [
+        "libs/database/src/index.ts"
+      ],
+      "@openspawn/demo-data": [
+        "libs/demo-data/src/index.ts"
+      ],
+      "@openspawn/sdk": [
+        "libs/sdk/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp", "dist"]
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
 }
