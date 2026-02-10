@@ -404,12 +404,14 @@ function ConversationCards({ messages }: { messages: Message[] }) {
 }
 
 // ============================================================
-// VIEW 4: Context-Linked Messages (Collapsible Sidebar)
+// VIEW 4: Context-Linked Messages (Compact Horizontal Filters)
 // ============================================================
 function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agents: any[] }) {
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false);
+  const [showTaskDropdown, setShowTaskDropdown] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(true);
 
   // Get unique task refs from messages
   const tasks = useMemo(() => {
@@ -425,222 +427,253 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
   });
 
   const hasFilters = selectedAgent || selectedTask;
+  const selectedAgentData = agents.find(a => a.id === selectedAgent);
 
   return (
-    <div className="space-y-4">
-      {/* Mobile filter toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className="md:hidden"
-        >
-          🔍 Filters {hasFilters && `(${(selectedAgent ? 1 : 0) + (selectedTask ? 1 : 0)})`}
-        </Button>
-        
-        {/* Active filter badges */}
-        {selectedAgent && (
-          <Badge variant="secondary" className="text-xs gap-1">
-            👤 {agents.find(a => a.id === selectedAgent)?.name}
-            <button onClick={() => setSelectedAgent(null)} className="ml-1 hover:text-red-400">✕</button>
-          </Badge>
-        )}
-        {selectedTask && (
-          <Badge variant="secondary" className="text-xs gap-1">
-            📋 {selectedTask}
-            <button onClick={() => setSelectedTask(null)} className="ml-1 hover:text-red-400">✕</button>
-          </Badge>
-        )}
-        {hasFilters && (
-          <Button variant="ghost" size="sm" onClick={() => { setSelectedAgent(null); setSelectedTask(null); }}>
-            Clear all
+    <div className="space-y-3">
+      {/* Compact horizontal filter bar */}
+      <motion.div
+        initial={false}
+        animate={{ height: filtersExpanded ? 'auto' : '40px' }}
+        className="overflow-hidden"
+      >
+        <div className="flex items-center gap-2 flex-wrap bg-slate-800/50 border border-slate-700 rounded-lg p-2">
+          {/* Toggle filters button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setFiltersExpanded(!filtersExpanded)}
+            className="h-7 px-2 text-xs"
+          >
+            {filtersExpanded ? '▼' : '▶'} Filters
           </Button>
-        )}
-        
-        <span className="text-xs text-slate-400 ml-auto">
-          {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
-        </span>
-      </div>
 
-      <div className="flex gap-4">
-        {/* Filters sidebar - collapsible on mobile */}
-        <AnimatePresence>
-          {(showFilters || window.innerWidth >= 768) && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 'auto', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="hidden md:block w-56 lg:w-64 space-y-3 shrink-0"
-            >
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader className="pb-2 p-3">
-                  <CardTitle className="text-xs md:text-sm">Filter by Agent</CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <ScrollArea className="h-48">
-                    <div className="space-y-1">
-                      <Button
-                        variant={selectedAgent === null ? 'default' : 'ghost'}
-                        size="sm"
-                        className="w-full justify-start text-xs"
-                        onClick={() => setSelectedAgent(null)}
+          <AnimatePresence mode="wait">
+            {filtersExpanded && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="flex items-center gap-2 flex-wrap flex-1"
+              >
+                {/* Agent filter dropdown */}
+                <div className="relative">
+                  <Button
+                    variant={selectedAgent ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => {
+                      setShowAgentDropdown(!showAgentDropdown);
+                      setShowTaskDropdown(false);
+                    }}
+                    className="h-7 px-2 text-xs gap-1.5"
+                  >
+                    {selectedAgentData ? (
+                      <>
+                        <img src={getAgentAvatarUrl(selectedAgent!, selectedAgentData.level)} className="w-4 h-4 rounded-full" />
+                        <span className="max-w-[100px] truncate">{selectedAgentData.name}</span>
+                      </>
+                    ) : (
+                      <>👤 Agent</>
+                    )}
+                    {showAgentDropdown ? '▲' : '▼'}
+                  </Button>
+                  
+                  <AnimatePresence>
+                    {showAgentDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full mt-1 z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
                       >
-                        All Agents
-                      </Button>
-                      {agents.slice(0, 8).map((agent) => (
-                        <Button
-                          key={agent.id}
-                          variant={selectedAgent === agent.id ? 'default' : 'ghost'}
-                          size="sm"
-                          className="w-full justify-start gap-2 text-xs"
-                          onClick={() => setSelectedAgent(agent.id)}
-                        >
-                          <img src={getAgentAvatarUrl(agent.id, agent.level)} className="w-4 h-4 rounded-full" />
-                          <span className="truncate">{agent.name}</span>
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-
-              {tasks.length > 0 && (
-                <Card className="bg-slate-800/50 border-slate-700">
-                  <CardHeader className="pb-2 p-3">
-                    <CardTitle className="text-xs md:text-sm">Filter by Task</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-3 pt-0">
-                    <ScrollArea className="h-32">
-                      <div className="space-y-1">
-                        <Button
-                          variant={selectedTask === null ? 'default' : 'ghost'}
-                          size="sm"
-                          className="w-full justify-start text-xs"
-                          onClick={() => setSelectedTask(null)}
-                        >
-                          All Tasks
-                        </Button>
-                        {tasks.slice(0, 6).map((task) => (
-                          <Button
-                            key={task}
-                            variant={selectedTask === task ? 'default' : 'ghost'}
-                            size="sm"
-                            className="w-full justify-start text-xs"
-                            onClick={() => setSelectedTask(task)}
-                          >
-                            📋 {task}
-                          </Button>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Mobile filter sheet */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden w-full absolute left-0 right-0 top-12 z-10 bg-slate-900 border border-slate-700 rounded-lg p-3"
-            >
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs font-medium mb-2">Agents</p>
-                  <div className="space-y-1">
-                    {agents.slice(0, 5).map((agent) => (
-                      <Button
-                        key={agent.id}
-                        variant={selectedAgent === agent.id ? 'default' : 'ghost'}
-                        size="sm"
-                        className="w-full justify-start gap-1 text-xs"
-                        onClick={() => { setSelectedAgent(agent.id); setShowFilters(false); }}
-                      >
-                        <img src={getAgentAvatarUrl(agent.id, agent.level)} className="w-4 h-4 rounded-full" />
-                        <span className="truncate">{agent.name}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                {tasks.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium mb-2">Tasks</p>
-                    <div className="space-y-1">
-                      {tasks.slice(0, 5).map((task) => (
-                        <Button
-                          key={task}
-                          variant={selectedTask === task ? 'default' : 'ghost'}
-                          size="sm"
-                          className="w-full justify-start text-xs"
-                          onClick={() => { setSelectedTask(task); setShowFilters(false); }}
-                        >
-                          {task}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Messages */}
-        <div className="flex-1 min-w-0">
-          <div className="space-y-2 md:space-y-3">
-            {filteredMessages.length === 0 ? (
-              <Card className="bg-slate-800/50 border-slate-700 p-6 md:p-8 text-center">
-                <p className="text-slate-400 text-sm">No messages match the current filters</p>
-              </Card>
-            ) : (
-              filteredMessages.slice(0, 15).map((msg) => {
-                const sender = msg.fromAgent;
-                const receiver = msg.toAgent;
-                return (
-                  <Card key={msg.id} className="bg-slate-800/50 border-slate-700">
-                    <CardContent className="p-2 md:p-3">
-                      <div className="flex items-start gap-2 md:gap-3">
-                        <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-8 h-8 md:w-10 md:h-10 rounded-full shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1 md:gap-2 mb-1 flex-wrap">
-                            <span className="font-medium text-xs md:text-sm">{sender?.name || 'Unknown'}</span>
-                            <span className="text-slate-500 text-xs">→</span>
-                            <span className="font-medium text-xs md:text-sm">{receiver?.name || 'Unknown'}</span>
-                            <span className="text-[10px] md:text-xs text-slate-500 ml-auto">{formatTime(msg.createdAt)}</span>
-                          </div>
-                          <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
-                          <div className="flex gap-1 md:gap-2 mt-2 flex-wrap">
-                            <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
-                              {typeIcons[msg.type] || '💬'} {msg.type?.toLowerCase()}
-                            </Badge>
-                            {msg.taskRef && (
-                              <Badge
-                                variant="outline"
-                                className="text-[9px] md:text-[10px] cursor-pointer hover:bg-slate-700"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedTask(msg.taskRef!);
+                        <ScrollArea className="max-h-[280px]">
+                          <div className="p-1">
+                            <Button
+                              variant={selectedAgent === null ? 'secondary' : 'ghost'}
+                              size="sm"
+                              className="w-full justify-start text-xs h-8"
+                              onClick={() => {
+                                setSelectedAgent(null);
+                                setShowAgentDropdown(false);
+                              }}
+                            >
+                              All Agents
+                            </Button>
+                            {agents.map((agent) => (
+                              <Button
+                                key={agent.id}
+                                variant={selectedAgent === agent.id ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="w-full justify-start gap-2 text-xs h-8"
+                                onClick={() => {
+                                  setSelectedAgent(agent.id);
+                                  setShowAgentDropdown(false);
                                 }}
                               >
-                                🔗 {msg.taskRef}
-                              </Badge>
-                            )}
+                                <img src={getAgentAvatarUrl(agent.id, agent.level)} className="w-4 h-4 rounded-full" />
+                                <span className="truncate">{agent.name}</span>
+                              </Button>
+                            ))}
                           </div>
+                        </ScrollArea>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Task filter dropdown */}
+                {tasks.length > 0 && (
+                  <div className="relative">
+                    <Button
+                      variant={selectedTask ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        setShowTaskDropdown(!showTaskDropdown);
+                        setShowAgentDropdown(false);
+                      }}
+                      className="h-7 px-2 text-xs gap-1.5"
+                    >
+                      {selectedTask ? (
+                        <>
+                          📋 <span className="max-w-[100px] truncate">{selectedTask}</span>
+                        </>
+                      ) : (
+                        <>📋 Task</>
+                      )}
+                      {showTaskDropdown ? '▲' : '▼'}
+                    </Button>
+                    
+                    <AnimatePresence>
+                      {showTaskDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute top-full mt-1 z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
+                        >
+                          <ScrollArea className="max-h-[280px]">
+                            <div className="p-1">
+                              <Button
+                                variant={selectedTask === null ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="w-full justify-start text-xs h-8"
+                                onClick={() => {
+                                  setSelectedTask(null);
+                                  setShowTaskDropdown(false);
+                                }}
+                              >
+                                All Tasks
+                              </Button>
+                              {tasks.map((task) => (
+                                <Button
+                                  key={task}
+                                  variant={selectedTask === task ? 'secondary' : 'ghost'}
+                                  size="sm"
+                                  className="w-full justify-start text-xs h-8"
+                                  onClick={() => {
+                                    setSelectedTask(task);
+                                    setShowTaskDropdown(false);
+                                  }}
+                                >
+                                  📋 {task}
+                                </Button>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                {/* Clear filters */}
+                {hasFilters && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedAgent(null);
+                        setSelectedTask(null);
+                      }}
+                      className="h-7 px-2 text-xs text-red-400 hover:text-red-300"
+                    >
+                      ✕ Clear
+                    </Button>
+                  </motion.div>
+                )}
+
+                {/* Message count */}
+                <span className="text-xs text-slate-400 ml-auto">
+                  {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Messages - Now gets majority of vertical space */}
+      <div className="space-y-2 md:space-y-3">
+        {filteredMessages.length === 0 ? (
+          <Card className="bg-slate-800/50 border-slate-700 p-6 md:p-8 text-center">
+            <p className="text-slate-400 text-sm">No messages match the current filters</p>
+          </Card>
+        ) : (
+          filteredMessages.slice(0, 20).map((msg) => {
+            const sender = msg.fromAgent;
+            const receiver = msg.toAgent;
+            return (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Card className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+                  <CardContent className="p-2 md:p-3">
+                    <div className="flex items-start gap-2 md:gap-3">
+                      <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-8 h-8 md:w-10 md:h-10 rounded-full shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 md:gap-2 mb-1 flex-wrap">
+                          <span className="font-medium text-xs md:text-sm">{sender?.name || 'Unknown'}</span>
+                          <span className="text-slate-500 text-xs">→</span>
+                          <span className="font-medium text-xs md:text-sm">{receiver?.name || 'Unknown'}</span>
+                          <span className="text-[10px] md:text-xs text-slate-500 ml-auto">{formatTime(msg.createdAt)}</span>
+                        </div>
+                        <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
+                        <div className="flex gap-1 md:gap-2 mt-2 flex-wrap">
+                          <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
+                            {typeIcons[msg.type] || '💬'} {msg.type?.toLowerCase()}
+                          </Badge>
+                          {msg.taskRef && (
+                            <Badge
+                              variant="outline"
+                              className="text-[9px] md:text-[10px] cursor-pointer hover:bg-slate-700 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTask(msg.taskRef!);
+                              }}
+                            >
+                              🔗 {msg.taskRef}
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
-          </div>
-        </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })
+        )}
       </div>
     </div>
   );
