@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Sparkles, Clock, CheckCircle, AlertTriangle, UserPlus, Inbox, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -226,9 +227,15 @@ export function IdleAgentsWidget({
             <Sparkles className="h-5 w-5 text-emerald-500" />
           </motion.div>
           <span>Available Agents</span>
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="ml-auto mr-2">
             {idleAgents.length}
           </Badge>
+          <Link 
+            to="/agents" 
+            className="text-xs text-cyan-500 hover:text-cyan-400 transition-colors whitespace-nowrap"
+          >
+            See all →
+          </Link>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
