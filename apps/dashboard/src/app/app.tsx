@@ -38,10 +38,10 @@ const Router = isDemoMode ? HashRouter : BrowserRouter;
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: isDemoMode ? 0 : 1000 * 60, // No cache in demo mode
-      gcTime: isDemoMode ? 0 : 1000 * 60 * 5, // No garbage collection delay in demo
+      staleTime: isDemoMode ? 1000 * 5 : 1000 * 60, // 5s in demo (refreshed by simulation ticks)
+      gcTime: isDemoMode ? 1000 * 30 : 1000 * 60 * 5, // 30s in demo
       refetchOnWindowFocus: false,
-      refetchOnMount: isDemoMode ? 'always' : true, // Always refetch in demo mode
+      refetchOnMount: true,
     },
   },
 });

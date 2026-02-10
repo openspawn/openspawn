@@ -3,7 +3,23 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { cn } from "../../lib/utils";
 
 const Dialog = BaseDialog.Root;
-const DialogTrigger = BaseDialog.Trigger;
+// DialogTrigger with render prop support for custom elements
+const DialogTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseDialog.Trigger> & { asChild?: boolean }
+>(({ asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <BaseDialog.Trigger ref={ref} render={children} {...props} />
+    );
+  }
+  return (
+    <BaseDialog.Trigger ref={ref} {...props}>
+      {children}
+    </BaseDialog.Trigger>
+  );
+});
+DialogTrigger.displayName = "DialogTrigger";
 // DialogClose with render prop support for custom elements
 const DialogClose = React.forwardRef<
   HTMLButtonElement,

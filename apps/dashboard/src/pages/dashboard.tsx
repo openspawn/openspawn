@@ -1,4 +1,37 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { Component, useMemo, useState, useEffect, useRef, useCallback, type ReactNode, type ErrorInfo } from "react";
+
+class ChartErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('[Chart Error]', error, info); }
+  render() {
+    if (this.state.hasError) return <div className="flex items-center justify-center h-full text-muted-foreground text-sm">Chart unavailable</div>;
+    return this.props.children;
+  }
+}
+
+/** Measures container dimensions without recharts' buggy ResponsiveContainer */
+function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        const { width, height } = entry.contentRect;
+        setSize((prev) =>
+          prev.width === Math.round(width) && prev.height === Math.round(height)
+            ? prev
+            : { width: Math.round(width), height: Math.round(height) }
+        );
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return size;
+}
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,7 +50,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   BarChart,
   Bar,
   Cell,
@@ -80,6 +112,11 @@ export function DashboardPage() {
   const { events } = useEvents();
   const { isDemo, scenario, speed } = useDemo();
   const layout = useDashboardLayout();
+
+  const creditChartRef = useRef<HTMLDivElement>(null);
+  const tasksChartRef = useRef<HTMLDivElement>(null);
+  const creditChartSize = useContainerSize(creditChartRef);
+  const tasksChartSize = useContainerSize(tasksChartRef);
 
   // Debounced events: at high speeds, batch updates to avoid render thrashing
   const [displayEvents, setDisplayEvents] = useState(events);
@@ -272,9 +309,10 @@ export function DashboardPage() {
           <CardTitle className="text-base sm:text-lg">Credit Flow</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[220px] sm:h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={creditHistory}>
+          <div ref={creditChartRef} className="h-[220px] sm:h-[300px]">
+            <ChartErrorBoundary>
+              {creditChartSize.width > 0 && creditChartSize.height > 0 && (
+              <AreaChart data={creditHistory} width={creditChartSize.width} height={creditChartSize.height}>
                 <defs>
                   <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -298,7 +336,8 @@ export function DashboardPage() {
                 <Area type="monotone" dataKey="earned" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#earned)" isAnimationActive={true} />
                 <Area type="monotone" dataKey="spent" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#spent)" isAnimationActive={true} />
               </AreaChart>
-            </ResponsiveContainer>
+              )}
+            </ChartErrorBoundary>
           </div>
         </CardContent>
       </Card>
@@ -312,9 +351,10 @@ export function DashboardPage() {
           <CardTitle className="text-base sm:text-lg">Tasks by Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[220px] sm:h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={tasksByStatus} layout="vertical">
+          <div ref={tasksChartRef} className="h-[220px] sm:h-[300px]">
+            <ChartErrorBoundary>
+              {tasksChartSize.width > 0 && tasksChartSize.height > 0 && (
+              <BarChart data={tasksByStatus} layout="vertical" width={tasksChartSize.width} height={tasksChartSize.height}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
                 <XAxis type="number" className="text-xs fill-muted-foreground" />
                 <YAxis type="category" dataKey="status" className="text-xs fill-muted-foreground" width={85} />
@@ -331,7 +371,8 @@ export function DashboardPage() {
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer>
+              )}
+            </ChartErrorBoundary>
           </div>
         </CardContent>
       </Card>
