@@ -63,8 +63,14 @@ export function DemoWelcome() {
   }, []);
 
   const handleStart = () => {
+    // Ensure we always have a valid scenario, even if state is somehow undefined
+    const validScenarios: ScenarioName[] = ['acmetech', 'startup', 'growth', 'enterprise', 'fresh'];
+    const scenarioToStart = selectedScenario && validScenarios.includes(selectedScenario) 
+      ? selectedScenario 
+      : 'acmetech'; // Default fallback
+    
     localStorage.setItem(STORAGE_KEY, 'true');
-    setScenario(selectedScenario, true); // autoPlay = true
+    setScenario(scenarioToStart, true); // autoPlay = true
     setIsOpen(false);
   };
 

@@ -557,6 +557,7 @@ export function AgentsPage() {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");
+  const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
   
   // Filtering state
   const [searchQuery, setSearchQuery] = useState("");
@@ -834,7 +835,10 @@ export function AgentsPage() {
                 exit={{ opacity: 0, scale: 0.9, y: -20 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
-                <Card className="relative overflow-hidden group hover:shadow-lg transition-shadow">
+                <Card 
+                  className="relative overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => setDetailPanelAgentId(agent.id)}
+                >
               {/* Level color bar */}
               <div 
                 className="absolute left-0 top-0 h-1 w-full" 
@@ -864,7 +868,12 @@ export function AgentsPage() {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -982,6 +991,12 @@ export function AgentsPage() {
           <BudgetManager />
         </TabsContent>
       </Tabs>
+
+      {/* Agent Detail Panel */}
+      <AgentDetailPanel 
+        agentId={detailPanelAgentId} 
+        onClose={() => setDetailPanelAgentId(null)} 
+      />
     </div>
   );
 }
