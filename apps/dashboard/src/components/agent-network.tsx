@@ -942,6 +942,12 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     return () => window.removeEventListener('avatar-style-changed', handleAvatarChange);
   }, []);
 
+  // Only re-layout when agent IDs change (add/remove), not on every data update
+  const agentIds = useMemo(
+    () => agents.map((a) => a.id).sort().join(','),
+    [agents],
+  );
+
   // Auto-layout — use slightly more spacing on mobile to accommodate larger nodes
   useEffect(() => {
     if (loading) return;
@@ -954,16 +960,19 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
       setEdges(layoutedEdges);
       setIsLayouted(true);
       
-      const agentCountChanged = agents.length !== prevAgentCountRef.current;
       prevAgentCountRef.current = agents.length;
       
       // More padding on mobile so nodes aren't clipped at edges
       const padding = isMobileOrTouch ? 0.25 : 0.15;
       setTimeout(() => fitView({ padding, duration: isMobileOrTouch ? 400 : 800 }), 50);
     });
-  }, [agents, loading, compact, agentActivity, isMobileOrTouch, setNodes, setEdges, fitView]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agentIds, loading, compact, isMobileOrTouch, setNodes, setEdges, fitView]);
 
-  // Task delegation simulation
+  // Task delegation simulation — use ref for edges to avoid interval restart on edge changes
+  const edgesRef = useRef(edges);
+  edgesRef.current = edges;
+
   useEffect(() => {
     if (!demo.isPlaying || nodes.length === 0) return;
 
@@ -973,9 +982,10 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     ];
 
     const interval = setInterval(() => {
-      if (edges.length === 0) return;
+      const currentEdges = edgesRef.current;
+      if (currentEdges.length === 0) return;
       
-      const randomEdge = edges[Math.floor(Math.random() * edges.length)];
+      const randomEdge = currentEdges[Math.floor(Math.random() * currentEdges.length)];
       const taskTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)];
       
       const delegation: TaskDelegation = {
@@ -995,7 +1005,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     }, 800 / demo.speed);
     
     return () => clearInterval(interval);
-  }, [demo.isPlaying, demo.speed, nodes.length, edges]);
+  }, [demo.isPlaying, demo.speed, nodes.length]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     const now = Date.now();
