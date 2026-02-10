@@ -30,6 +30,7 @@ import { StatCard } from "../components/ui/stat-card";
 import { PageHeader } from "../components/ui/page-header";
 import { PhaseProgress } from "../components/phase-progress";
 import { IdleAgentsWidget } from "../components/idle-agents-widget";
+import { TeamStatsCards } from "../components/team-stats-cards";
 import { DashboardGrid, DashboardToolbar, useDashboardLayout } from "../components/dashboard-grid";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
@@ -239,6 +240,12 @@ export function DashboardPage() {
               sparklineColor="#f59e0b"
             /></StaggerItem>
           </StaggerContainer>
+        );
+      case "teams-overview":
+        return (
+          <TeamStatsCards
+            onTeamClick={(teamId) => navigate(`/agents?tab=teams&team=${teamId}`)}
+          />
         );
       case "credit-flow-chart":
         return renderCreditChart();

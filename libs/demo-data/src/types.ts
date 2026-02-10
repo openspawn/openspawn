@@ -22,6 +22,7 @@ export interface DemoAgent {
   createdAt: string;
   parentId?: string;          // Who spawned this agent
   domain?: string;            // e.g., "Engineering", "Finance"
+  teamId?: string;            // Team assignment for org chart
   maxChildren?: number;       // Capacity for sub-agents
   budgetPeriodLimit?: number; // Per-period spending limit
   budgetPeriodSpent?: number; // Spent this period

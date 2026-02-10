@@ -37,6 +37,7 @@ const STORAGE_KEY = "bb-dashboard-layout";
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: "stats-overview", label: "Stats Overview", visible: true },
+  { id: "teams-overview", label: "Teams", visible: true },
   { id: "credit-flow-chart", label: "Credit Flow Chart", visible: true },
   { id: "tasks-by-status", label: "Tasks by Status", visible: true },
   { id: "available-agents", label: "Available Agents", visible: true },
@@ -47,12 +48,12 @@ const PRESETS: Record<string, { label: string; description: string; widgets: str
   overview: {
     label: "Overview",
     description: "All widgets visible",
-    widgets: ["stats-overview", "credit-flow-chart", "tasks-by-status", "available-agents", "recent-activity"],
+    widgets: ["stats-overview", "teams-overview", "credit-flow-chart", "tasks-by-status", "available-agents", "recent-activity"],
   },
   operations: {
     label: "Operations",
     description: "Agents + Tasks focus",
-    widgets: ["stats-overview", "tasks-by-status", "available-agents"],
+    widgets: ["stats-overview", "teams-overview", "tasks-by-status", "available-agents"],
   },
   finance: {
     label: "Finance",
