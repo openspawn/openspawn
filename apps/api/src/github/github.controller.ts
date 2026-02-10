@@ -15,7 +15,7 @@ import { IntegrationLinkService } from "./integration-link.service";
 import { CreateGitHubConnectionDto } from "./dto/create-github-connection.dto";
 import { UpdateGitHubConnectionDto } from "./dto/update-github-connection.dto";
 
-@Controller("github/connections")
+@Controller("integrations/github/connections")
 @UseGuards(AuthGuard)
 export class GitHubController {
   constructor(

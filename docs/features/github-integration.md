@@ -38,14 +38,14 @@ OpenSpawn Events ──@OnEvent──► GitHubService.syncOutbound ──► Gi
    - **Pull Requests**: Read & Write  
    - **Checks**: Read
 3. Subscribe to events: `issues`, `issue_comment`, `pull_request`, `check_suite`
-4. Set the webhook URL to: `https://your-domain.com/api/github/webhook`
+4. Set the webhook URL to: `https://your-domain.com/api/integrations/github/webhook`
 
 ### 2. Create a Connection in OpenSpawn
 
 Navigate to **Settings → GitHub** in the dashboard, or use the API:
 
 ```bash
-POST /api/github/connections
+POST /api/integrations/github/connections
 {
   "name": "my-org/my-repo",
   "installationId": "12345678",

@@ -225,7 +225,7 @@ export function GitHubSettings() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const webhookUrl = `${window.location.origin}/api/github/webhook`;
+  const webhookUrl = `${window.location.origin}/api/integrations/github/webhook`;
 
   return (
     <div className="space-y-6">
