@@ -18,3 +18,9 @@ export { ChannelGqlType } from "./channel.type";
 export { DirectMessageType, DirectMessageAgentType, ConversationType, SendDirectMessageInput } from "./direct-message.type";
 export { WebhookType, WebhookHookType } from "./webhook.type";
 export { CreateWebhookInput, UpdateWebhookInput } from "./webhook-input.type";
+export {
+  GitHubConnectionType,
+  CreateGitHubConnectionInput,
+  UpdateGitHubConnectionInput,
+} from "./github-connection.type";
+export { IntegrationLinkType } from "./integration-link.type";

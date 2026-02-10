@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Shield, Key, Building2, Palette, Webhook, WebhookIcon } from "lucide-react";
+import { User, Shield, Key, Building2, Palette, Webhook, WebhookIcon, Github } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ProfileSettings } from "../components/settings/profile-settings";
@@ -9,6 +9,7 @@ import { OrgSettings } from "../components/settings/org-settings";
 import { AppearanceSettings } from "../components/settings/appearance-settings";
 import { WebhooksSettings } from "../components/settings/webhooks-settings";
 import { InboundWebhooksSettings } from "../components/settings/inbound-webhooks-settings";
+import { GitHubSettings } from "../components/settings/github-settings";
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -23,7 +24,7 @@ export function SettingsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7 lg:w-[980px]">
+        <TabsList className="grid w-full grid-cols-8 lg:w-[1120px]">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
@@ -47,6 +48,10 @@ export function SettingsPage() {
           <TabsTrigger value="inbound" className="flex items-center gap-2">
             <WebhookIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Inbound</span>
+          </TabsTrigger>
+          <TabsTrigger value="github" className="flex items-center gap-2">
+            <Github className="h-4 w-4" />
+            <span className="hidden sm:inline">GitHub</span>
           </TabsTrigger>
           <TabsTrigger value="organization" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -76,6 +81,10 @@ export function SettingsPage() {
 
         <TabsContent value="inbound">
           <InboundWebhooksSettings />
+        </TabsContent>
+
+        <TabsContent value="github">
+          <GitHubSettings />
         </TabsContent>
 
         <TabsContent value="organization">

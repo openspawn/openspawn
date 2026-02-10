@@ -21,3 +21,7 @@ export { TaskDependency } from "./task-dependency.entity";
 export { TaskTag } from "./task-tag.entity";
 export { User, UserRole } from "./user.entity";
 export { Webhook } from "./webhook.entity";
+export { GitHubConnection } from "./github-connection.entity";
+export type { GitHubSyncConfig } from "./github-connection.entity";
+export { IntegrationLink } from "./integration-link.entity";
+export type { IntegrationSourceType, IntegrationTargetType } from "./integration-link.entity";

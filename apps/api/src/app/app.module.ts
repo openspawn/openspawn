@@ -12,6 +12,7 @@ import { CommonModule } from "../common/common.module";
 import { OrgScopeMiddleware } from "../common/middleware/org-scope.middleware";
 import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
+import { GitHubModule } from "../github";
 import { GraphqlModule } from "../graphql";
 import { InboundWebhooksModule } from "../inbound-webhooks/inbound-webhooks.module";
 import { MessagesModule } from "../messages";
@@ -55,6 +56,7 @@ import { AppService } from "./app.service";
     MessagesModule,
     WebhooksModule,
     InboundWebhooksModule,
+    GitHubModule,
 
     // GraphQL
     GraphqlModule,
