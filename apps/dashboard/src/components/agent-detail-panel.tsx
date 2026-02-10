@@ -24,8 +24,6 @@ type Agent = AgentFieldsFragment;
 interface AgentDetailPanelProps {
   agentId: string | null;
   onClose: () => void;
-  /** Render inline (for split-panel) instead of as a fixed overlay */
-  inline?: boolean;
 }
 
 function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning" | "destructive" | "secondary"; label: string } {
@@ -595,7 +593,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
   );
 }
 
-export function AgentDetailPanel({ agentId, onClose, inline }: AgentDetailPanelProps) {
+export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
   const { agents } = useAgents();
   const [activeTab, setActiveTab] = useState("overview");
   
@@ -604,14 +602,7 @@ export function AgentDetailPanel({ agentId, onClose, inline }: AgentDetailPanelP
     [agents, agentId]
   );
 
-  // Close on Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [onClose]);
+  // Escape key is handled by SidePanelProvider
 
   if (!agentId || !agent) return null;
 
@@ -731,30 +722,5 @@ export function AgentDetailPanel({ agentId, onClose, inline }: AgentDetailPanelP
     </>
   );
 
-  if (inline) {
-    return <div className="h-full flex flex-col bg-background">{panelContent}</div>;
-  }
-
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-end">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        />
-        <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="relative h-full w-full max-w-2xl bg-background border-l border-border shadow-2xl flex flex-col"
-        >
-          {panelContent}
-        </motion.div>
-      </div>
-    </AnimatePresence>
-  );
+  return <div className="h-full flex flex-col bg-background">{panelContent}</div>;
 }

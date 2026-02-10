@@ -10,7 +10,7 @@ import { PageHeader } from "../components/ui/page-header";
 import { PhaseChip } from "../components/phase-chip";
 import { useTasks, type Task, useCurrentPhase, useAgents } from "../hooks";
 import { useTeams } from "../hooks";
-import { SplitPanel } from "../components/ui/split-panel";
+import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
 
 type SortField = "created" | "priority" | "status" | "title";
@@ -543,6 +543,7 @@ export function TasksPage() {
   const { currentPhase } = useCurrentPhase();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const { openSidePanel, closeSidePanel } = useSidePanel();
   
   const { agents } = useAgents();
   const { teams: allTeams } = useTeams();
@@ -624,8 +625,11 @@ export function TasksPage() {
   }
 
   function handleTaskClick(task: Task) {
-    // Just update selected task - don't close sidebar
     setSelectedTask(task);
+    openSidePanel(
+      <TaskDetailSidebar task={task} onClose={() => { setSelectedTask(null); closeSidePanel(); }} />,
+      { width: 480 }
+    );
   }
 
   if (loading) {
@@ -645,11 +649,7 @@ export function TasksPage() {
   }
 
   return (
-    <SplitPanel
-      storageKey="tasks"
-      defaultLeftWidth={55}
-      rightOpen={!!selectedTask}
-      left={<div className="p-4 space-y-6">
+    <div className="p-4 space-y-6">
       {/* Page header */}
       <PageHeader
         title="Tasks"
@@ -763,15 +763,6 @@ export function TasksPage() {
         </TabsContent>
       </Tabs>
       
-    </div>}
-      right={
-        selectedTask ? (
-          <TaskDetailSidebar 
-            task={selectedTask} 
-            onClose={() => setSelectedTask(null)} 
-          />
-        ) : null
-      }
-    />
+    </div>
   );
 }

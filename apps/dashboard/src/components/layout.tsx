@@ -26,9 +26,12 @@ import {
   ChevronLeft,
   Star,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import { SidePanelShell } from "./ui/side-panel";
+import { useSidePanel } from "../contexts";
 import { ThemeToggle } from "./theme-toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import {
@@ -107,6 +110,7 @@ export function Layout({ children }: LayoutProps) {
   const { activeCount } = usePresence();
   const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
   const { collapsed: sidebarCollapsed, toggle: toggleSidebar } = useSidebarCollapsed();
+  const sidePanel = useSidePanel();
 
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
@@ -711,10 +715,57 @@ export function Layout({ children }: LayoutProps) {
             <ThemeToggle />
           </div>
 
-          {/* Main content */}
-          <main ref={mainContentRef} className="flex-1 overflow-auto">
-            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-20 sm:pb-6 lg:pb-6 max-w-7xl">{children}</div>
-          </main>
+          {/* Main content + side panel */}
+          <div className="flex flex-1 min-h-0">
+            <main ref={mainContentRef} className="flex-1 overflow-auto min-w-0">
+              <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-20 sm:pb-6 lg:pb-6 max-w-7xl">{children}</div>
+            </main>
+
+            {/* Global Side Panel - desktop: inline, mobile: full-screen overlay */}
+            <AnimatePresence>
+              {sidePanel.isOpen && sidePanel.content && (
+                <>
+                  {/* Mobile: full-screen overlay */}
+                  <motion.div
+                    key="side-panel-mobile"
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "100%" }}
+                    transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                    className="fixed inset-0 z-50 bg-background md:hidden"
+                  >
+                    <SidePanelShell
+                      title={sidePanel.title}
+                      onClose={sidePanel.closeSidePanel}
+                      width={sidePanel.width}
+                      onWidthChange={sidePanel.setWidth}
+                    >
+                      {sidePanel.content}
+                    </SidePanelShell>
+                  </motion.div>
+
+                  {/* Desktop: inline panel */}
+                  <motion.div
+                    key="side-panel-desktop"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: sidePanel.width, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                    className="hidden md:block flex-shrink-0 border-l border-border overflow-hidden h-full"
+                  >
+                    <SidePanelShell
+                      title={sidePanel.title}
+                      onClose={sidePanel.closeSidePanel}
+                      width={sidePanel.width}
+                      onWidthChange={sidePanel.setWidth}
+                    >
+                      {sidePanel.content}
+                    </SidePanelShell>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Mobile bottom navigation bar */}
           <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden">
