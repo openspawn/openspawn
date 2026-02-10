@@ -31,7 +31,7 @@ describe("InboundWebhookReceiverController", () => {
     updatedAt: new Date(),
   } as InboundWebhookKey;
 
-  const mockTask: Task = {
+  const mockTask = {
     id: "task-1",
     orgId,
     identifier: "TASK-001",
@@ -39,7 +39,7 @@ describe("InboundWebhookReceiverController", () => {
     status: TaskStatus.BACKLOG,
     priority: TaskPriority.NORMAL,
     metadata: { createdViaWebhook: true },
-  } as Task;
+  } as unknown as Task;
 
   beforeEach(() => {
     vi.clearAllMocks();

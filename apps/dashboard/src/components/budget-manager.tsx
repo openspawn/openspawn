@@ -147,7 +147,7 @@ export function BudgetManager() {
               <CardTitle>Budget Overview</CardTitle>
             </div>
             <Dialog open={showTransfer} onOpenChange={setShowTransfer}>
-              <DialogTrigger asChild>
+              <DialogTrigger>
                 <Button variant="outline" size="sm">
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Transfer Credits
