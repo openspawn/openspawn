@@ -6,6 +6,7 @@ import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keybo
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
+import { MobileStatusPage } from "../pages/mobile-status";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { CommandPalette } from "../components/command-palette";
 
@@ -109,6 +110,7 @@ export function App() {
                           <Route path="/messages" element={<MessagesPage />} />
                           <Route path="/network" element={<NetworkPage />} />
                           <Route path="/settings" element={<SettingsPage />} />
+                          <Route path="/status" element={<MobileStatusPage />} />
                         </PageTransition>
                       </Layout>
                     </MaybeProtectedRoute>
