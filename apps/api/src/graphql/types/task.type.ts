@@ -28,8 +28,8 @@ export class ClaimTaskResultType {
   @Field(() => Boolean, { description: "Whether the claim was successful" })
   success!: boolean;
 
-  @Field(() => String, { description: "Message describing the result" })
-  message!: string;
+  @Field(() => String, { nullable: true, description: "Message describing the result (present on failure)" })
+  message?: string | null;
 
   @Field(() => TaskType, { nullable: true, description: "The claimed task, if successful" })
   task?: TaskType | null;
