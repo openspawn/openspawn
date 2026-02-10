@@ -1,7 +1,5 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
@@ -38,6 +36,26 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+}
+
+/**
+ * Minimal Slot implementation: renders the single child element with merged props.
+ */
+function Slot({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }) {
+  if (React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      ...props,
+      ...children.props,
+      className: cn(
+        (props as Record<string, unknown>).className as string,
+        children.props.className
+      ),
+    } as Record<string, unknown>);
+  }
+  return <>{children}</>;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
