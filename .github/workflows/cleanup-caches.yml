@@ -3,6 +3,7 @@ name: Cleanup PR Caches
 on:
   pull_request:
     types: [closed]
+  workflow_dispatch:
 
 jobs:
   cleanup:
@@ -10,30 +11,62 @@ jobs:
     permissions:
       actions: write
     steps:
-      - name: Cleanup caches for closed PR branch
+      - name: Cleanup caches
         uses: actions/github-script@v7
         with:
           script: |
-            const ref = `refs/pull/${context.payload.pull_request.number}/merge`;
-            const headRef = `refs/heads/${context.payload.pull_request.head.ref}`;
+            // When triggered manually, purge ALL non-main caches
+            // When triggered by PR close, purge that PR's caches
+            const isManual = context.eventName === 'workflow_dispatch';
 
-            for (const refToClean of [ref, headRef]) {
-              console.log(`Cleaning caches for ref: ${refToClean}`);
-              try {
+            if (isManual) {
+              console.log('Manual trigger: purging all non-main caches');
+              let page = 1;
+              let deleted = 0;
+              while (true) {
                 const caches = await github.rest.actions.getActionsCacheList({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  ref: refToClean,
+                  per_page: 100,
+                  page,
                 });
+                if (caches.data.actions_caches.length === 0) break;
                 for (const cache of caches.data.actions_caches) {
-                  console.log(`Deleting cache: ${cache.key} (${cache.id})`);
-                  await github.rest.actions.deleteActionsCacheById({
+                  if (cache.ref !== 'refs/heads/main') {
+                    console.log(`Deleting: ${cache.key} (ref: ${cache.ref})`);
+                    await github.rest.actions.deleteActionsCacheById({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      cache_id: cache.id,
+                    });
+                    deleted++;
+                  }
+                }
+                page++;
+              }
+              console.log(`Deleted ${deleted} caches`);
+            } else {
+              const ref = `refs/pull/${context.payload.pull_request.number}/merge`;
+              const headRef = `refs/heads/${context.payload.pull_request.head.ref}`;
+
+              for (const refToClean of [ref, headRef]) {
+                console.log(`Cleaning caches for ref: ${refToClean}`);
+                try {
+                  const caches = await github.rest.actions.getActionsCacheList({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    cache_id: cache.id,
+                    ref: refToClean,
                   });
+                  for (const cache of caches.data.actions_caches) {
+                    console.log(`Deleting: ${cache.key} (${cache.id})`);
+                    await github.rest.actions.deleteActionsCacheById({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      cache_id: cache.id,
+                    });
+                  }
+                } catch (e) {
+                  console.log(`No caches found for ${refToClean}`);
                 }
-              } catch (e) {
-                console.log(`No caches found for ${refToClean}`);
               }
             }
