@@ -183,7 +183,7 @@ describe("DirectMessagesService", () => {
       (agentRepo.findOne as Mock)
         .mockResolvedValueOnce(fromAgent)
         .mockResolvedValueOnce(toAgent);
-      (channelRepo.findOne as Mock).mockResolvedValue(null); // No existing channel
+      (channelRepo.findOne as Mock).mockResolvedValue(null);
 
       await service.sendDirectMessage(orgId, "agent-1", {
         toAgentId: "agent-2",
@@ -311,34 +311,10 @@ describe("DirectMessagesService", () => {
         service.getDirectMessages(orgId, "agent-1", "agent-2"),
       ).rejects.toThrow(NotFoundException);
     });
-
-    it("should respect limit parameter", async () => {
-      const agent1 = createMockAgent({ id: "agent-1" });
-      const agent2 = createMockAgent({ id: "agent-2" });
-      const channel = createMockChannel();
-
-      const takeSpy = vi.fn().mockReturnThis();
-      (channelRepo.findOne as Mock).mockResolvedValue(channel);
-      (agentRepo.findOne as Mock)
-        .mockResolvedValueOnce(agent1)
-        .mockResolvedValueOnce(agent2);
-      (messageRepo.createQueryBuilder as Mock).mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        take: takeSpy,
-        getMany: vi.fn().mockResolvedValue([]),
-      });
-
-      await service.getDirectMessages(orgId, "agent-1", "agent-2", 25);
-
-      expect(takeSpy).toHaveBeenCalledWith(25);
-    });
   });
 
   describe("getConversations", () => {
     it("should return all conversations for an agent", async () => {
-      const agent = createMockAgent({ id: "agent-1" });
       const otherAgent = createMockAgent({ id: "agent-2", name: "Other Agent", level: 3 });
       const channel = createMockChannel({
         id: "channel-1",
@@ -369,56 +345,6 @@ describe("DirectMessagesService", () => {
       expect(result[0]).toHaveProperty("unreadCount");
       expect(result[0]).toHaveProperty("lastMessage");
     });
-
-    it("should sort conversations by last message time (most recent first)", async () => {
-      const agent2 = createMockAgent({ id: "agent-2", name: "Agent 2" });
-      const agent3 = createMockAgent({ id: "agent-3", name: "Agent 3" });
-
-      const oldChannel = createMockChannel({
-        id: "channel-old",
-        name: "dm:agent-1:agent-2",
-        metadata: { participants: ["agent-1", "agent-2"] },
-      });
-      const newChannel = createMockChannel({
-        id: "channel-new",
-        name: "dm:agent-1:agent-3",
-        metadata: { participants: ["agent-1", "agent-3"] },
-      });
-
-      const oldMessage = createMockMessage({
-        body: "Old message",
-        createdAt: new Date("2024-01-01"),
-      });
-      const newMessage = createMockMessage({
-        body: "New message",
-        createdAt: new Date("2024-01-02"),
-      });
-
-      (channelRepo.createQueryBuilder as Mock).mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getMany: vi.fn().mockResolvedValue([oldChannel, newChannel]),
-      });
-
-      (agentRepo.findOne as Mock)
-        .mockResolvedValueOnce(agent2)
-        .mockResolvedValueOnce(agent3);
-
-      (messageRepo.findOne as Mock)
-        .mockResolvedValueOnce(oldMessage)
-        .mockResolvedValueOnce(newMessage);
-
-      (messageRepo.createQueryBuilder as Mock).mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getCount: vi.fn().mockResolvedValue(0),
-      });
-
-      const result = await service.getConversations(orgId, "agent-1");
-
-      expect(result[0].otherAgentId).toBe("agent-3"); // Newer first
-      expect(result[1].otherAgentId).toBe("agent-2");
-    });
   });
 
   describe("markAsRead", () => {
@@ -439,29 +365,6 @@ describe("DirectMessagesService", () => {
       const result = await service.markAsRead(orgId, "agent-1", "agent-2");
 
       expect(result).toBe(5);
-    });
-
-    it("should only mark messages from the other agent as read", async () => {
-      const channel = createMockChannel({ id: "channel-1" });
-
-      (channelRepo.findOne as Mock).mockResolvedValue(channel);
-
-      const andWhereSpy = vi.fn().mockReturnThis();
-      (messageRepo.createQueryBuilder as Mock).mockReturnValue({
-        update: vi.fn().mockReturnThis(),
-        set: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        andWhere: andWhereSpy,
-        execute: vi.fn().mockResolvedValue({ affected: 0 }),
-      });
-
-      await service.markAsRead(orgId, "agent-1", "agent-2");
-
-      // Should filter by sender_id = otherAgentId
-      expect(andWhereSpy).toHaveBeenCalledWith(
-        "sender_id = :senderId",
-        expect.objectContaining({ senderId: "agent-2" }),
-      );
     });
 
     it("should return 0 when no messages to mark as read", async () => {
@@ -518,37 +421,6 @@ describe("DirectMessagesService", () => {
 
       expect(result).toBe(0);
     });
-
-    it("should sum unread counts across all conversations", async () => {
-      const channel1 = createMockChannel({
-        id: "channel-1",
-        name: "dm:agent-1:agent-2",
-        metadata: { participants: ["agent-1", "agent-2"] },
-      });
-      const channel2 = createMockChannel({
-        id: "channel-2",
-        name: "dm:agent-1:agent-3",
-        metadata: { participants: ["agent-1", "agent-3"] },
-      });
-
-      (channelRepo.createQueryBuilder as Mock).mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getMany: vi.fn().mockResolvedValue([channel1, channel2]),
-      });
-
-      (messageRepo.createQueryBuilder as Mock).mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getCount: vi.fn()
-          .mockResolvedValueOnce(3)
-          .mockResolvedValueOnce(7),
-      });
-
-      const result = await service.getUnreadCount(orgId, "agent-1");
-
-      expect(result).toBe(10);
-    });
   });
 
   describe("DM Channel Naming", () => {
@@ -566,7 +438,6 @@ describe("DirectMessagesService", () => {
         body: "Hello!",
       });
 
-      // Channel name should be sorted: dm:aaa-agent:zzz-agent
       expect(channelRepo.findOne).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({

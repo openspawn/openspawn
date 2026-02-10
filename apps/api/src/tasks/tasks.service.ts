@@ -565,7 +565,7 @@ export class TasksService {
   async claimNextTask(
     orgId: string,
     agentId: string,
-  ): Promise<{ success: boolean; task?: Task; message?: string }> {
+  ): Promise<{ success: boolean; message: string; task: Task | null }> {
     // Use a transaction with row-level locking
     return this.taskRepository.manager.transaction(async (manager) => {
       // Find next claimable task ordered by priority
@@ -616,11 +616,11 @@ export class TasksService {
             },
           });
 
-          return { success: true, task: saved };
+          return { success: true, message: `Claimed task ${saved.identifier}`, task: saved };
         }
       }
 
-      return { success: false, message: "No tasks available to claim" };
+      return { success: false, message: "No tasks available to claim", task: null };
     });
   }
 }

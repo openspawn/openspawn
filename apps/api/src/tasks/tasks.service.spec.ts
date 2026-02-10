@@ -515,7 +515,7 @@ describe("TasksService - Self-Claim Tasks", () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         orderBy: vi.fn().mockReturnThis(),
-        getMany: vi.fn().mockResolvedValue([]),
+        getOne: vi.fn().mockResolvedValue(null),
       }),
       find: vi.fn().mockResolvedValue([]),
       save: vi.fn().mockImplementation((task) => Promise.resolve(task)),
@@ -529,7 +529,7 @@ describe("TasksService - Self-Claim Tasks", () => {
         where: vi.fn().mockReturnThis(),
         andWhere: vi.fn().mockReturnThis(),
         orderBy: vi.fn().mockReturnThis(),
-        getMany: vi.fn().mockResolvedValue([]),
+        getOne: vi.fn().mockResolvedValue(null),
       }),
       manager: {
         transaction: vi.fn().mockImplementation((cb) => cb(mockManager)),
@@ -656,10 +656,9 @@ describe("TasksService - Self-Claim Tasks", () => {
         getMany: vi.fn().mockResolvedValue([task]),
       });
 
-      // Non-blocking dependency
-      (dependencyRepo.find as Mock).mockResolvedValue([
-        { taskId: "task-1", blocking: false, dependsOn: { status: TaskStatus.IN_PROGRESS } },
-      ]);
+      // Non-blocking dependencies are not returned when querying with blocking: true
+      // So return empty array to simulate no blocking dependencies
+      (dependencyRepo.find as Mock).mockResolvedValue([]);
 
       const count = await service.getClaimableTaskCount(orgId);
 
@@ -675,7 +674,7 @@ describe("TasksService - Self-Claim Tasks", () => {
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([]),
+          getOne: vi.fn().mockResolvedValue(null),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn(),
@@ -689,22 +688,12 @@ describe("TasksService - Self-Claim Tasks", () => {
       expect(result.task).toBeNull();
     });
 
-    it("should claim highest priority unassigned task", async () => {
-      const lowPriority = createMockTask({
-        id: "low",
-        priority: TaskPriority.LOW,
-        status: TaskStatus.BACKLOG,
-      });
-      const urgentPriority = createMockTask({
+    it("should claim the first task at URGENT priority", async () => {
+      const urgentTask = createMockTask({
         id: "urgent",
         identifier: "TASK-URGENT",
         priority: TaskPriority.URGENT,
-        status: TaskStatus.BACKLOG,
-      });
-      const highPriority = createMockTask({
-        id: "high",
-        priority: TaskPriority.HIGH,
-        status: TaskStatus.BACKLOG,
+        status: TaskStatus.TODO,
       });
 
       const mockManager = {
@@ -713,7 +702,7 @@ describe("TasksService - Self-Claim Tasks", () => {
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([lowPriority, urgentPriority, highPriority]),
+          getOne: vi.fn().mockResolvedValue(urgentTask),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn().mockImplementation((task) => Promise.resolve(task)),
@@ -728,21 +717,27 @@ describe("TasksService - Self-Claim Tasks", () => {
       expect(result.task?.status).toBe(TaskStatus.IN_PROGRESS);
     });
 
-    it("should respect priority ordering: URGENT > HIGH > NORMAL > LOW", async () => {
-      const tasks = [
-        createMockTask({ id: "low", priority: TaskPriority.LOW }),
-        createMockTask({ id: "normal", priority: TaskPriority.NORMAL }),
-        createMockTask({ id: "high", priority: TaskPriority.HIGH }),
-        createMockTask({ id: "urgent", priority: TaskPriority.URGENT }),
-      ];
+    it("should try lower priorities when higher priorities have no tasks", async () => {
+      const normalTask = createMockTask({
+        id: "normal",
+        identifier: "TASK-NORMAL",
+        priority: TaskPriority.NORMAL,
+        status: TaskStatus.TODO,
+      });
 
+      let callCount = 0;
       const mockManager = {
         createQueryBuilder: vi.fn().mockReturnValue({
           setLock: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue(tasks),
+          getOne: vi.fn().mockImplementation(() => {
+            callCount++;
+            // Return null for URGENT, HIGH; return task for NORMAL
+            if (callCount <= 2) return Promise.resolve(null);
+            return Promise.resolve(normalTask);
+          }),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn().mockImplementation((task) => Promise.resolve(task)),
@@ -751,59 +746,66 @@ describe("TasksService - Self-Claim Tasks", () => {
 
       const result = await service.claimNextTask(orgId, agentId);
 
-      expect(result.task?.id).toBe("urgent");
+      expect(result.success).toBe(true);
+      expect(result.task?.id).toBe("normal");
     });
 
-    it("should only claim unblocked tasks", async () => {
-      const blockedTask = createMockTask({
+    it("should skip blocked tasks and try next priority", async () => {
+      const urgentBlockedTask = createMockTask({
         id: "blocked",
         priority: TaskPriority.URGENT,
+        status: TaskStatus.TODO,
       });
-      const unblockedTask = createMockTask({
-        id: "unblocked",
-        priority: TaskPriority.LOW,
+      const highTask = createMockTask({
+        id: "high",
+        priority: TaskPriority.HIGH,
+        status: TaskStatus.TODO,
       });
 
+      let callCount = 0;
       const mockManager = {
         createQueryBuilder: vi.fn().mockReturnValue({
           setLock: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([blockedTask, unblockedTask]),
-        }),
-        find: vi.fn().mockImplementation((_entity, { where }) => {
-          if (where?.taskId === "blocked") {
-            return Promise.resolve([
-              { blocking: true, dependsOn: { status: TaskStatus.IN_PROGRESS } },
-            ]);
-          }
-          return Promise.resolve([]);
+          getOne: vi.fn().mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return Promise.resolve(urgentBlockedTask);
+            if (callCount === 2) return Promise.resolve(highTask);
+            return Promise.resolve(null);
+          }),
         }),
         save: vi.fn().mockImplementation((task) => Promise.resolve(task)),
       };
       (taskRepo.manager!.transaction as Mock).mockImplementation((cb) => cb(mockManager));
 
+      // Mock dependencyRepo.find (used inside the transaction)
+      (dependencyRepo.find as Mock).mockImplementation(({ where }) => {
+        if (where?.taskId === "blocked") {
+          return Promise.resolve([
+            { blocking: true, dependsOn: { status: TaskStatus.IN_PROGRESS } },
+          ]);
+        }
+        return Promise.resolve([]);
+      });
+
       const result = await service.claimNextTask(orgId, agentId);
 
       expect(result.success).toBe(true);
-      expect(result.task?.id).toBe("unblocked");
+      expect(result.task?.id).toBe("high");
     });
 
-    it("should return failure when all available tasks are blocked", async () => {
-      const blockedTask = createMockTask({ id: "blocked" });
-
+    it("should return failure when no tasks available at any priority", async () => {
       const mockManager = {
         createQueryBuilder: vi.fn().mockReturnValue({
           setLock: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([blockedTask]),
+          getOne: vi.fn().mockResolvedValue(null),
         }),
-        find: vi.fn().mockResolvedValue([
-          { blocking: true, dependsOn: { status: TaskStatus.IN_PROGRESS } },
-        ]),
+        find: vi.fn().mockResolvedValue([]),
         save: vi.fn(),
       };
       (taskRepo.manager!.transaction as Mock).mockImplementation((cb) => cb(mockManager));
@@ -811,12 +813,12 @@ describe("TasksService - Self-Claim Tasks", () => {
       const result = await service.claimNextTask(orgId, agentId);
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe("All available tasks are blocked");
+      expect(result.message).toBe("No tasks available to claim");
       expect(result.task).toBeNull();
     });
 
     it("should set task status to IN_PROGRESS when claimed", async () => {
-      const task = createMockTask({ status: TaskStatus.BACKLOG });
+      const task = createMockTask({ status: TaskStatus.TODO });
 
       const mockManager = {
         createQueryBuilder: vi.fn().mockReturnValue({
@@ -824,7 +826,7 @@ describe("TasksService - Self-Claim Tasks", () => {
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([task]),
+          getOne: vi.fn().mockResolvedValue(task),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn().mockImplementation((t) => Promise.resolve(t)),
@@ -837,7 +839,7 @@ describe("TasksService - Self-Claim Tasks", () => {
     });
 
     it("should use row-level locking for race condition prevention", async () => {
-      const task = createMockTask();
+      const task = createMockTask({ status: TaskStatus.TODO });
 
       const setLockSpy = vi.fn().mockReturnThis();
       const mockManager = {
@@ -846,7 +848,7 @@ describe("TasksService - Self-Claim Tasks", () => {
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([task]),
+          getOne: vi.fn().mockResolvedValue(task),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn().mockImplementation((t) => Promise.resolve(t)),
@@ -859,7 +861,7 @@ describe("TasksService - Self-Claim Tasks", () => {
     });
 
     it("should include task identifier in success message", async () => {
-      const task = createMockTask({ identifier: "TASK-123" });
+      const task = createMockTask({ identifier: "TASK-123", status: TaskStatus.TODO });
 
       const mockManager = {
         createQueryBuilder: vi.fn().mockReturnValue({
@@ -867,7 +869,7 @@ describe("TasksService - Self-Claim Tasks", () => {
           where: vi.fn().mockReturnThis(),
           andWhere: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          getMany: vi.fn().mockResolvedValue([task]),
+          getOne: vi.fn().mockResolvedValue(task),
         }),
         find: vi.fn().mockResolvedValue([]),
         save: vi.fn().mockImplementation((t) => Promise.resolve(t)),
