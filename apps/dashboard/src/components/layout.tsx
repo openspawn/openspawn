@@ -176,7 +176,7 @@ export function Layout({ children }: LayoutProps) {
           animate={{ width: sidebarWidth }}
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Logo */}
+          {/* Logo + collapse toggle */}
           <div className="flex h-16 items-center gap-2 border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <Bot className="h-6 w-6 flex-shrink-0 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
@@ -196,9 +196,32 @@ export function Layout({ children }: LayoutProps) {
                 </span>
               </motion.div>
             )}
-            {!sidebarCollapsed && isDemo && activeCount > 0 && (
-              <ActiveAgentsBadge count={activeCount} className="ml-auto" />
-            )}
+            <div className="ml-auto flex items-center gap-1">
+              {!sidebarCollapsed && isDemo && activeCount > 0 && (
+                <ActiveAgentsBadge count={activeCount} />
+              )}
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                    onClick={toggleSidebar}
+                    aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  >
+                    <motion.div
+                      animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </motion.div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>
+                  {sidebarCollapsed ? "Expand" : "Collapse"} <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Navigation */}
@@ -468,30 +491,6 @@ export function Layout({ children }: LayoutProps) {
             </div>
           )}
 
-          {/* Collapse toggle */}
-          <div className="border-t border-border p-2 flex justify-center">
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={toggleSidebar}
-                  aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                >
-                  <motion.div
-                    animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
-                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </motion.div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={8}>
-                {sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              </TooltipContent>
-            </Tooltip>
-          </div>
         </motion.aside>
 
         {/* Mobile drawer overlay */}
@@ -681,8 +680,9 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </header>
 
-          {/* Desktop top bar */}
-          <div className="hidden lg:flex h-16 items-center justify-end gap-2 px-6 border-b border-border">
+          {/* Desktop top bar — aligned with sidebar header */}
+          <div className="hidden lg:flex h-16 items-center justify-end gap-2 px-6 border-b border-border relative overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.02] bg-gradient-to-r from-cyan-500 to-transparent pointer-events-none" />
             <button
               data-tour="cmdk"
               onClick={() => {
