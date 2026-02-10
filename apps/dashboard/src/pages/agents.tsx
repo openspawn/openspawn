@@ -39,6 +39,8 @@ import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { TeamDetailPanel } from "../components/team-detail-panel";
+import { TeamDialog } from "../components/team-management";
+import { getParentTeams } from "../demo/teams";
 import { useSidePanel } from "../contexts";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 import { TeamBadge, TeamFilterDropdown } from "../components/team-badge";
@@ -732,6 +734,10 @@ export function AgentsPage() {
     );
   };
 
+  // Team CRUD
+  const [createTeamOpen, setCreateTeamOpen] = useState(false);
+  const parentTeamsForDialog = useMemo(() => getParentTeams(), []);
+
   // Mobile filter toggle
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -1072,7 +1078,22 @@ export function AgentsPage() {
 
         {/* Teams Tab */}
         <TabsContent value="teams" className="space-y-6">
+          <div className="flex justify-end">
+            <Button variant="outline" size="sm" onClick={() => setCreateTeamOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Team
+            </Button>
+          </div>
           <TeamView onAgentClick={openAgentDetail} onTeamClick={openTeamDetail} />
+          <TeamDialog
+            open={createTeamOpen}
+            onOpenChange={setCreateTeamOpen}
+            parentTeams={parentTeamsForDialog}
+            onSave={(t) => {
+              console.log('Team created:', t);
+              setCreateTeamOpen(false);
+            }}
+          />
         </TabsContent>
 
         {/* Reputation Tab */}
