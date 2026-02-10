@@ -13,6 +13,8 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TypingIndicator } from '../components/presence';
+import { usePresence } from '../hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -290,6 +292,20 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
   );
 }
 
+function ComposingIndicators() {
+  const { presenceMap } = usePresence();
+  const composing = Array.from(presenceMap.values()).filter((p) => p.isComposing);
+  if (composing.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-1 px-2 py-1.5 border-t border-border/40">
+      {composing.slice(0, 3).map((p) => (
+        <TypingIndicator key={p.agentId} agentName={p.agentId} />
+      ))}
+    </div>
+  );
+}
+
 function MissionControlFeed({ messages }: { messages: Message[] }) {
   const [filter, setFilter] = useState<string | null>(null);
 
@@ -321,6 +337,7 @@ function MissionControlFeed({ messages }: { messages: Message[] }) {
       </div>
 
       <FeedVirtualList filtered={filtered} />
+      <ComposingIndicators />
     </div>
   );
 }

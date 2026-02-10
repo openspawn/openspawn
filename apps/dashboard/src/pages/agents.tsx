@@ -25,7 +25,7 @@ import {
 } from "../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PhaseChip } from "../components/phase-chip";
-import { useAgents, useCurrentPhase } from "../hooks";
+import { useAgents, useCurrentPhase, usePresence } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
@@ -431,6 +431,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
                         name={agent.name}
                         level={agent.level}
                         size="md"
+                        presenceStatus={presenceMap.get(agent.id)?.status}
                       />
                       <div>
                         <div className="font-medium">{agent.name}</div>
@@ -630,12 +631,18 @@ function AgentVirtualGrid({
                               name={agent.name}
                               level={agent.level}
                               size="md"
+                              presenceStatus={presenceMap.get(agent.id)?.status}
                             />
                             <div>
                               <CardTitle className="text-base">{agent.name}</CardTitle>
                               <p className="text-xs text-muted-foreground">
                                 {getLevelLabel(agent.level)} • @{agent.agentId}
                               </p>
+                              {presenceMap.get(agent.id)?.currentTask && (
+                                <p className="text-[10px] text-emerald-400 truncate max-w-[160px]">
+                                  working on: {presenceMap.get(agent.id)!.currentTask}
+                                </p>
+                              )}
                             </div>
                           </div>
                           <DropdownMenu>
@@ -705,6 +712,7 @@ function AgentVirtualGrid({
 export function AgentsPage() {
   const { agents, loading, error } = useAgents();
   const { currentPhase } = useCurrentPhase();
+  const { presenceMap } = usePresence();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");

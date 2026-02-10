@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getAgentAvatarUrl, getAvatarSettings } from '../lib/avatar';
 import { Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { PresenceGlow, StatusDot } from './presence';
+import type { PresenceStatus } from '../hooks/use-presence';
 
 interface AgentAvatarProps {
   agentId: string;
@@ -16,6 +18,8 @@ interface AgentAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showRing?: boolean;
+  /** When provided, wraps the avatar with a presence glow ring and status dot */
+  presenceStatus?: PresenceStatus;
 }
 
 const SIZE_MAP = {
@@ -46,6 +50,7 @@ export function AgentAvatar({
   size = 'md',
   className,
   showRing = true,
+  presenceStatus,
 }: AgentAvatarProps) {
   const sizeConfig = SIZE_MAP[size];
   const levelColor = LEVEL_COLORS[level] || '#71717a';
@@ -67,14 +72,14 @@ export function AgentAvatar({
     [agentId, level, sizeConfig.px, avatarSettings]
   );
 
-  return (
+  const avatar = (
     <Avatar
       className={cn(
         sizeConfig.class,
-        showRing && 'ring-2',
+        showRing && !presenceStatus && 'ring-2',
         className
       )}
-      style={showRing ? { '--tw-ring-color': levelColor } as React.CSSProperties : undefined}
+      style={showRing && !presenceStatus ? { '--tw-ring-color': levelColor } as React.CSSProperties : undefined}
     >
       <AvatarImage src={avatarUrl} alt={name || agentId} />
       <AvatarFallback
@@ -84,4 +89,21 @@ export function AgentAvatar({
       </AvatarFallback>
     </Avatar>
   );
+
+  if (presenceStatus) {
+    return (
+      <div className="relative inline-flex">
+        <PresenceGlow status={presenceStatus}>
+          {avatar}
+        </PresenceGlow>
+        <StatusDot
+          status={presenceStatus}
+          size="sm"
+          className="absolute -bottom-0.5 -right-0.5 z-10"
+        />
+      </div>
+    );
+  }
+
+  return avatar;
 }
