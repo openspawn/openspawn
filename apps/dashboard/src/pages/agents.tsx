@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -33,6 +33,7 @@ import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
+import { TeamView } from "../components/team-view";
 import { Progress } from "../components/ui/progress";
 import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
@@ -833,11 +834,16 @@ export function AgentsPage() {
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-5 lg:w-[600px] scrollbar-hide">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-6 lg:w-[720px] scrollbar-hide">
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             <span className="hidden sm:inline">All Agents</span>
             <span className="sm:hidden">Agents</span>
+          </TabsTrigger>
+          <TabsTrigger value="teams" className="flex items-center gap-2">
+            <Network className="h-4 w-4" />
+            <span className="hidden sm:inline">Teams</span>
+            <span className="sm:hidden">Teams</span>
           </TabsTrigger>
           <TabsTrigger value="reputation" className="flex items-center gap-2">
             <Trophy className="h-4 w-4" />
@@ -1042,6 +1048,11 @@ export function AgentsPage() {
           />
         }
       />
+        </TabsContent>
+
+        {/* Teams Tab */}
+        <TabsContent value="teams" className="space-y-6">
+          <TeamView onAgentClick={setDetailPanelAgentId} />
         </TabsContent>
 
         {/* Reputation Tab */}

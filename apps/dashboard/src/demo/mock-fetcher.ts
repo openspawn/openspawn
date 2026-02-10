@@ -89,6 +89,8 @@ function mapAgent(agent: DemoAgent) {
     tasksSuccessful: agent.tasksSuccessful ?? 0,
     lastActivityAt: agent.lastActivityAt ?? agent.createdAt,
     lastPromotionAt: agent.lastPromotionAt ?? null,
+    // Team assignment
+    teamId: agent.teamId ?? null,
   };
 }
 

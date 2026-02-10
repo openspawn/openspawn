@@ -23,3 +23,6 @@ export { PhaseChip } from './phase-chip';
 export { PageTransition } from './page-transition';
 export { StaggerContainer, StaggerItem } from './stagger';
 export { TimelineView } from './timeline-view';
+export { TeamView } from './team-view';
+export { TeamStatsCards } from './team-stats-cards';
+export { OrgChart } from './org-chart';
