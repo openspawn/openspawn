@@ -3,8 +3,8 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 import {
-  LineChart,
-  Line,
+  Area,
+  AreaChart,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -12,9 +12,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { ScrollArea } from "../components/ui/scroll-area";
 import { EmptyState } from "../components/ui/empty-state";
-import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
+import { generateSparklineData } from "../components/ui/sparkline";
+import { StatCard } from "../components/ui/stat-card";
+import { PageHeader } from "../components/ui/page-header";
+import { OceanGradients, OCEAN_COLORS } from "../components/ui/chart-gradients";
+import { ChartTooltip } from "../components/ui/chart-tooltip";
 import { useCredits } from "../hooks/use-credits";
 import { BudgetBurndown } from "../components/budget-burndown";
 import { ModelUsageBreakdown } from "../components/model-usage";
@@ -42,6 +45,7 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
     getScrollElement: () => parentRef.current,
     estimateSize: () => 72,
     overscan: 5,
+    measureElement: (element) => element.getBoundingClientRect().height,
   });
 
   if (transactions.length === 0) {
@@ -64,6 +68,8 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
             return (
               <motion.div
                 key={tx.id}
+                ref={virtualizer.measureElement}
+                data-index={virtualRow.index}
                 layout
                 initial={{ opacity: 0, x: -20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -212,75 +218,41 @@ export function CreditsPage() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Credits</h1>
-        <p className="text-muted-foreground">
-          Track credit transactions and balances
-        </p>
-      </div>
+      <PageHeader
+        title="Credits"
+        description="Track credit transactions and balances"
+      />
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Net Balance
-            </CardTitle>
-            <Coins className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">{netBalance.toLocaleString()}</div>
-              <Sparkline data={creditSparklines.balance} color="#06b6d4" showDot showArea showTrend />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Earned
-            </CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold text-emerald-500">
-                +{totalEarned.toLocaleString()}
-              </div>
-              <Sparkline data={creditSparklines.earned} color="#10b981" showDot showArea />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Spent
-            </CardTitle>
-            <ArrowDownLeft className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold text-amber-500">
-                -{totalSpent.toLocaleString()}
-              </div>
-              <Sparkline data={creditSparklines.spent} color="#f59e0b" showDot showArea />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Transactions
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">{transactions.length}</div>
-              <Sparkline data={creditSparklines.burnRate} color="#f43f5e" showDot showTrend />
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Net Balance"
+          value={netBalance.toLocaleString()}
+          icon={Coins}
+          sparklineData={creditSparklines.balance}
+          sparklineColor="#06b6d4"
+        />
+        <StatCard
+          title="Total Earned"
+          value={`+${totalEarned.toLocaleString()}`}
+          icon={ArrowUpRight}
+          sparklineData={creditSparklines.earned}
+          sparklineColor="#10b981"
+        />
+        <StatCard
+          title="Total Spent"
+          value={`-${totalSpent.toLocaleString()}`}
+          icon={ArrowDownLeft}
+          sparklineData={creditSparklines.spent}
+          sparklineColor="#f59e0b"
+        />
+        <StatCard
+          title="Transactions"
+          value={transactions.length}
+          icon={TrendingUp}
+          sparklineData={creditSparklines.burnRate}
+          sparklineColor="#f43f5e"
+        />
       </div>
 
       {/* Chart and transactions */}

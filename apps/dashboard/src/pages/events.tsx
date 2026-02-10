@@ -7,12 +7,13 @@ import {
   Info,
   Filter,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { ScrollArea } from "../components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { EmptyState } from "../components/ui/empty-state";
+import { PageHeader } from "../components/ui/page-header";
+import { StatCard } from "../components/ui/stat-card";
 import { useEvents } from "../hooks/use-events";
 import { useState, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -72,6 +73,7 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
     getScrollElement: () => parentRef.current,
     estimateSize: () => 80,
     overscan: 5,
+    measureElement: (element) => element.getBoundingClientRect().height,
   });
 
   if (filteredEvents.length === 0) {
@@ -94,6 +96,8 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
             return (
               <motion.div
                 key={event.id}
+                ref={virtualizer.measureElement}
+                data-index={virtualRow.index}
                 layout
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -186,71 +190,23 @@ export function EventsPage() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Events</h1>
-          <p className="text-muted-foreground">
-            System events and audit log
-          </p>
-        </div>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
-      </div>
+      <PageHeader
+        title="Events"
+        description="System events and audit log"
+        actions={
+          <Button variant="outline">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+          </Button>
+        }
+      />
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Events
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{events.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Critical
-            </CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-500">
-              {severityCounts.critical}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Warnings
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-500">
-              {severityCounts.warning}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Info
-            </CardTitle>
-            <Info className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-500">
-              {severityCounts.info}
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard title="Total Events" value={events.length} icon={Activity} />
+        <StatCard title="Critical" value={severityCounts.critical} icon={AlertCircle} />
+        <StatCard title="Warnings" value={severityCounts.warning} icon={AlertTriangle} />
+        <StatCard title="Info" value={severityCounts.info} icon={Info} />
       </div>
 
       {/* Events list */}

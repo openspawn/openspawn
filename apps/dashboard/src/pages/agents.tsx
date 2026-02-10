@@ -1,12 +1,13 @@
 import { useState, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
-import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { PageHeader } from "../components/ui/page-header";
+import { StatCard } from "../components/ui/stat-card";
 import { AgentAvatar } from "../components/agent-avatar";
 import {
   DropdownMenu,
@@ -31,12 +32,12 @@ import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
-import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
 import { EmptyState } from "../components/ui/empty-state";
-import { AgentModeBadge, AgentModeSelector, AgentModeCard } from "../components/agent-mode-selector";
+import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { SplitPanel } from "../components/ui/split-panel";
+import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 
 // Use generated types from GraphQL
 import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
@@ -44,47 +45,6 @@ import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 type Agent = AgentFieldsFragment;
 
 type DialogMode = "view" | "edit" | "credits" | null;
-
-// Level colors matching network page
-const levelColors: Record<number, string> = {
-  10: "#f472b6", // COO - pink
-  9: "#a78bfa",  // HR - purple
-  8: "#22c55e",  // Manager - green
-  7: "#22c55e",
-  6: "#06b6d4",  // Senior - cyan
-  5: "#06b6d4",
-  4: "#fbbf24",  // Worker - yellow
-  3: "#fbbf24",
-  2: "#71717a",  // Probation - gray
-  1: "#71717a",
-};
-
-function getLevelColor(level: number): string {
-  return levelColors[level] || "#71717a";
-}
-
-function getLevelLabel(level: number): string {
-  if (level >= 10) return "COO";
-  if (level >= 9) return "HR";
-  if (level >= 7) return "Manager";
-  if (level >= 5) return "Senior";
-  if (level >= 3) return "Worker";
-  return "Probation";
-}
-
-function getStatusVariant(status: AgentStatus) {
-  switch (status) {
-    case AgentStatus.Active:
-      return "success";
-    case AgentStatus.Pending:
-      return "warning";
-    case AgentStatus.Suspended:
-    case AgentStatus.Revoked:
-      return "destructive";
-    default:
-      return "secondary";
-  }
-}
 
 type SortField = "name" | "level" | "balance" | "status" | "created";
 type SortDirection = "asc" | "desc";
@@ -840,21 +800,19 @@ export function AgentsPage() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Agents</h1>
-            <p className="text-muted-foreground">
-              Manage your AI agents, onboarding, and budgets
-            </p>
+      <PageHeader
+        title="Agents"
+        description="Manage your AI agents, onboarding, and budgets"
+        actions={
+          <div className="flex items-center gap-3">
+            {currentPhase && <PhaseChip phase={currentPhase} />}
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Spawn Agent
+            </Button>
           </div>
-          {currentPhase && <PhaseChip phase={currentPhase} />}
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Spawn Agent
-        </Button>
-      </div>
+        }
+      />
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -954,66 +912,34 @@ export function AgentsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Agents
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">{agents.length}</div>
-              <Sparkline data={agentSparklines.total} color="#06b6d4" showDot showArea />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold text-emerald-500">
-                {agents.filter((a) => a.status === AgentStatus.Active).length}
-              </div>
-              <Sparkline data={agentSparklines.active} color="#10b981" showDot showArea />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">
-                {agents.reduce((sum, a) => sum + a.currentBalance, 0).toLocaleString()}
-              </div>
-              <Sparkline data={agentSparklines.balance} color="#f59e0b" showDot showArea />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Avg Level
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">
-                {agents.length
-                  ? (agents.reduce((sum, a) => sum + a.level, 0) / agents.length).toFixed(1)
-                  : "—"}
-              </div>
-              <Sparkline data={agentSparklines.level} color="#8b5cf6" showDot />
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total Agents"
+          value={agents.length}
+          sparklineData={agentSparklines.total}
+          sparklineColor="#06b6d4"
+        />
+        <StatCard
+          title="Active"
+          value={agents.filter((a) => a.status === AgentStatus.Active).length}
+          sparklineData={agentSparklines.active}
+          sparklineColor="#10b981"
+        />
+        <StatCard
+          title="Total Balance"
+          value={agents.reduce((sum, a) => sum + a.currentBalance, 0).toLocaleString()}
+          sparklineData={agentSparklines.balance}
+          sparklineColor="#f59e0b"
+        />
+        <StatCard
+          title="Avg Level"
+          value={
+            agents.length
+              ? (agents.reduce((sum, a) => sum + a.level, 0) / agents.length).toFixed(1)
+              : "—"
+          }
+          sparklineData={agentSparklines.level}
+          sparklineColor="#8b5cf6"
+        />
       </div>
 
       {/* Results count */}
