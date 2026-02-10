@@ -97,5 +97,5 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: TypeScript check
-        run: pnpm exec tsc --noEmit -p tsconfig.base.json
+        run: pnpm exec tsc --noEmit -p apps/api/tsconfig.app.json
         continue-on-error: true  # May have issues, don't block
