@@ -677,7 +677,7 @@ export function Layout({ children }: LayoutProps) {
           </header>
 
           {/* Desktop top bar */}
-          <div className="hidden lg:flex items-center justify-end gap-2 px-6 py-2 border-b border-border">
+          <div className="hidden lg:flex h-16 items-center justify-end gap-2 px-6 border-b border-border">
             <button
               data-tour="cmdk"
               onClick={() => {
@@ -695,7 +695,7 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Main content */}
           <main ref={mainContentRef} className="flex-1 overflow-auto">
-            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-28 sm:pb-20 max-w-7xl">{children}</div>
+            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-28 sm:pb-20 lg:pb-32 max-w-7xl">{children}</div>
             
             {/* Footer Badge — mobile/tablet (no sidebar offset) */}
             <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden sm:flex lg:hidden">
@@ -724,11 +724,11 @@ export function Layout({ children }: LayoutProps) {
                 </div>
               </div>
             </div>
-            {/* Footer Badge — desktop (tracks sidebar width) */}
+            {/* Footer Badge — desktop (tracks sidebar width, sits above demo bar) */}
             <motion.div
               animate={{ left: sidebarWidth }}
               transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-              className="fixed bottom-0 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden lg:flex"
+              className="fixed bottom-16 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden lg:flex"
             >
               <div className="container mx-auto flex items-center justify-between text-xs">
                 <a
