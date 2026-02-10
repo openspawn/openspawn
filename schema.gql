@@ -75,6 +75,38 @@ enum ChannelType {
   TASK
 }
 
+"""Result of a claimNextTask mutation"""
+type ClaimTaskResultType {
+  """Message describing the result"""
+  message: String!
+
+  """Whether the claim was successful"""
+  success: Boolean!
+
+  """The claimed task, if successful"""
+  task: TaskType
+}
+
+type ConversationType {
+  channelId: ID!
+  lastMessage: String!
+  lastMessageAt: DateTime!
+  otherAgentId: ID!
+  otherAgentLevel: Int!
+  otherAgentName: String!
+  unreadCount: Int!
+}
+
+input CreateWebhookInput {
+  canBlock: Boolean
+  events: [String!]!
+  hookType: WebhookHookType
+  name: String!
+  secret: String
+  timeoutMs: Int
+  url: String!
+}
+
 type CreditTransactionType {
   agentId: ID!
   amount: Int!
@@ -96,6 +128,24 @@ enum CreditType {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type DirectMessageAgentType {
+  id: ID!
+  level: Int!
+  name: String!
+}
+
+type DirectMessageType {
+  body: String!
+  createdAt: DateTime!
+  fromAgent: DirectMessageAgentType
+  fromAgentId: ID!
+  id: ID!
+  read: Boolean!
+  toAgent: DirectMessageAgentType
+  toAgentId: ID!
+  type: String!
+}
 
 enum EventSeverity {
   ERROR
@@ -142,6 +192,17 @@ enum MessageType {
   TEXT
 }
 
+type Mutation {
+  """Claim the next available task"""
+  claimNextTask(agentId: ID!, orgId: ID!): ClaimTaskResultType!
+  createWebhook(input: CreateWebhookInput!, orgId: ID!): WebhookType!
+  deleteWebhook(id: ID!, orgId: ID!): Boolean!
+  markMessagesAsRead(agentId: ID!, orgId: ID!, otherAgentId: ID!): Int!
+  sendDirectMessage(input: SendDirectMessageInput!, orgId: ID!): DirectMessageType!
+  testWebhook(id: ID!, orgId: ID!): Boolean!
+  updateWebhook(id: ID!, input: UpdateWebhookInput!, orgId: ID!): WebhookType!
+}
+
 type PromotionProgressType {
   currentLevel: Int!
   nextLevel: Int!
@@ -156,13 +217,21 @@ type Query {
   agentReputation(agentId: ID!, orgId: ID!): AgentReputationType
   agents(orgId: ID!): [AgentType!]!
   channels(orgId: ID!): [ChannelGqlType!]!
+
+  """Get count of tasks available to claim"""
+  claimableTaskCount(orgId: ID!): Int!
+  conversations(agentId: ID!, orgId: ID!): [ConversationType!]!
   creditHistory(agentId: ID, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
+  directMessages(agent1Id: ID!, agent2Id: ID!, before: ID, limit: Int! = 50, orgId: ID!): [DirectMessageType!]!
   events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
   messages(before: ID, channelId: ID!, limit: Int! = 50, orgId: ID!): [MessageGqlType!]!
   reputationHistory(agentId: ID!, limit: Int, orgId: ID!): [ReputationHistoryEntryType!]!
   task(id: ID!, orgId: ID!): TaskType
   tasks(assigneeId: ID, orgId: ID!, status: TaskStatus): [TaskType!]!
   trustLeaderboard(limit: Int, orgId: ID!): [LeaderboardEntryType!]!
+  unreadMessageCount(agentId: ID!, orgId: ID!): Int!
+  webhook(id: ID!, orgId: ID!): WebhookType
+  webhooks(orgId: ID!): [WebhookType!]!
 }
 
 type ReputationHistoryEntryType {
@@ -183,8 +252,16 @@ enum ReputationLevel {
   VETERAN
 }
 
+input SendDirectMessageInput {
+  body: String!
+  fromAgentId: ID!
+  toAgentId: ID!
+  type: String
+}
+
 type Subscription {
   creditTransactionCreated(orgId: ID!): CreditTransactionType!
+  directMessageCreated(agentId: ID!, orgId: ID!): DirectMessageType!
   eventCreated(orgId: ID!): EventType!
   messageCreated(channelId: ID, orgId: ID!): MessageGqlType!
   taskUpdated(orgId: ID!): TaskType!
@@ -195,16 +272,6 @@ enum TaskPriority {
   LOW
   NORMAL
   URGENT
-}
-
-enum TaskStatus {
-  BACKLOG
-  BLOCKED
-  CANCELLED
-  DONE
-  IN_PROGRESS
-  REVIEW
-  TODO
 }
 
 """Rejection metadata when a task completion is rejected by a pre-hook"""
@@ -220,6 +287,16 @@ type TaskRejectionType {
 
   """How many times this task has been rejected"""
   rejectionCount: Int!
+}
+
+enum TaskStatus {
+  BACKLOG
+  BLOCKED
+  CANCELLED
+  DONE
+  IN_PROGRESS
+  REVIEW
+  TODO
 }
 
 type TaskType {
@@ -242,4 +319,38 @@ type TaskType {
   status: TaskStatus!
   title: String!
   updatedAt: DateTime!
+}
+
+input UpdateWebhookInput {
+  canBlock: Boolean
+  enabled: Boolean
+  events: [String!]
+  hookType: WebhookHookType
+  name: String
+  secret: String
+  timeoutMs: Int
+  url: String
+}
+
+enum WebhookHookType {
+  POST
+  PRE
+}
+
+type WebhookType {
+  canBlock: Boolean!
+  createdAt: DateTime!
+  enabled: Boolean!
+  events: [String!]!
+  failureCount: Float!
+  hookType: WebhookHookType!
+  id: ID!
+  lastError: String
+  lastTriggeredAt: DateTime
+  name: String!
+  orgId: ID!
+  secret: String
+  timeoutMs: Float!
+  updatedAt: DateTime!
+  url: String!
 }

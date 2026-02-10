@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { fetcher } from '../fetcher';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -91,6 +91,36 @@ export enum ChannelType {
   Task = 'TASK'
 }
 
+/** Result of a claimNextTask mutation */
+export type ClaimTaskResultType = {
+  /** Message describing the result */
+  message: Scalars['String']['output'];
+  /** Whether the claim was successful */
+  success: Scalars['Boolean']['output'];
+  /** The claimed task, if successful */
+  task?: Maybe<TaskType>;
+};
+
+export type ConversationType = {
+  channelId: Scalars['ID']['output'];
+  lastMessage: Scalars['String']['output'];
+  lastMessageAt: Scalars['DateTime']['output'];
+  otherAgentId: Scalars['ID']['output'];
+  otherAgentLevel: Scalars['Int']['output'];
+  otherAgentName: Scalars['String']['output'];
+  unreadCount: Scalars['Int']['output'];
+};
+
+export type CreateWebhookInput = {
+  canBlock?: InputMaybe<Scalars['Boolean']['input']>;
+  events: Array<Scalars['String']['input']>;
+  hookType?: InputMaybe<WebhookHookType>;
+  name: Scalars['String']['input'];
+  secret?: InputMaybe<Scalars['String']['input']>;
+  timeoutMs?: InputMaybe<Scalars['Int']['input']>;
+  url: Scalars['String']['input'];
+};
+
 export type CreditTransactionType = {
   agentId: Scalars['ID']['output'];
   amount: Scalars['Int']['output'];
@@ -107,6 +137,24 @@ export enum CreditType {
   Credit = 'CREDIT',
   Debit = 'DEBIT'
 }
+
+export type DirectMessageAgentType = {
+  id: Scalars['ID']['output'];
+  level: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type DirectMessageType = {
+  body: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  fromAgent?: Maybe<DirectMessageAgentType>;
+  fromAgentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  read: Scalars['Boolean']['output'];
+  toAgent?: Maybe<DirectMessageAgentType>;
+  toAgentId: Scalars['ID']['output'];
+  type: Scalars['String']['output'];
+};
 
 export enum EventSeverity {
   Error = 'ERROR',
@@ -153,6 +201,61 @@ export enum MessageType {
   Text = 'TEXT'
 }
 
+export type Mutation = {
+  /** Claim the next available task */
+  claimNextTask: ClaimTaskResultType;
+  createWebhook: WebhookType;
+  deleteWebhook: Scalars['Boolean']['output'];
+  markMessagesAsRead: Scalars['Int']['output'];
+  sendDirectMessage: DirectMessageType;
+  testWebhook: Scalars['Boolean']['output'];
+  updateWebhook: WebhookType;
+};
+
+
+export type MutationClaimNextTaskArgs = {
+  agentId: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateWebhookArgs = {
+  input: CreateWebhookInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWebhookArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationMarkMessagesAsReadArgs = {
+  agentId: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+  otherAgentId: Scalars['ID']['input'];
+};
+
+
+export type MutationSendDirectMessageArgs = {
+  input: SendDirectMessageInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationTestWebhookArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWebhookArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateWebhookInput;
+  orgId: Scalars['ID']['input'];
+};
+
 export type PromotionProgressType = {
   currentLevel: Scalars['Int']['output'];
   nextLevel: Scalars['Int']['output'];
@@ -167,13 +270,20 @@ export type Query = {
   agentReputation?: Maybe<AgentReputationType>;
   agents: Array<AgentType>;
   channels: Array<ChannelGqlType>;
+  /** Get count of tasks available to claim */
+  claimableTaskCount: Scalars['Int']['output'];
+  conversations: Array<ConversationType>;
   creditHistory: Array<CreditTransactionType>;
+  directMessages: Array<DirectMessageType>;
   events: Array<EventType>;
   messages: Array<MessageGqlType>;
   reputationHistory: Array<ReputationHistoryEntryType>;
   task?: Maybe<TaskType>;
   tasks: Array<TaskType>;
   trustLeaderboard: Array<LeaderboardEntryType>;
+  unreadMessageCount: Scalars['Int']['output'];
+  webhook?: Maybe<WebhookType>;
+  webhooks: Array<WebhookType>;
 };
 
 
@@ -199,10 +309,30 @@ export type QueryChannelsArgs = {
 };
 
 
+export type QueryClaimableTaskCountArgs = {
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryConversationsArgs = {
+  agentId: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type QueryCreditHistoryArgs = {
   agentId?: InputMaybe<Scalars['ID']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryDirectMessagesArgs = {
+  agent1Id: Scalars['ID']['input'];
+  agent2Id: Scalars['ID']['input'];
+  before?: InputMaybe<Scalars['ID']['input']>;
+  limit?: Scalars['Int']['input'];
   orgId: Scalars['ID']['input'];
 };
 
@@ -247,6 +377,23 @@ export type QueryTrustLeaderboardArgs = {
   orgId: Scalars['ID']['input'];
 };
 
+
+export type QueryUnreadMessageCountArgs = {
+  agentId: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryWebhookArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryWebhooksArgs = {
+  orgId: Scalars['ID']['input'];
+};
+
 export type ReputationHistoryEntryType = {
   createdAt: Scalars['DateTime']['output'];
   delta: Scalars['Int']['output'];
@@ -265,8 +412,16 @@ export enum ReputationLevel {
   Veteran = 'VETERAN'
 }
 
+export type SendDirectMessageInput = {
+  body: Scalars['String']['input'];
+  fromAgentId: Scalars['ID']['input'];
+  toAgentId: Scalars['ID']['input'];
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Subscription = {
   creditTransactionCreated: CreditTransactionType;
+  directMessageCreated: DirectMessageType;
   eventCreated: EventType;
   messageCreated: MessageGqlType;
   taskUpdated: TaskType;
@@ -274,6 +429,12 @@ export type Subscription = {
 
 
 export type SubscriptionCreditTransactionCreatedArgs = {
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionDirectMessageCreatedArgs = {
+  agentId: Scalars['ID']['input'];
   orgId: Scalars['ID']['input'];
 };
 
@@ -343,6 +504,40 @@ export type TaskType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type UpdateWebhookInput = {
+  canBlock?: InputMaybe<Scalars['Boolean']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  events?: InputMaybe<Array<Scalars['String']['input']>>;
+  hookType?: InputMaybe<WebhookHookType>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  secret?: InputMaybe<Scalars['String']['input']>;
+  timeoutMs?: InputMaybe<Scalars['Int']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum WebhookHookType {
+  Post = 'POST',
+  Pre = 'PRE'
+}
+
+export type WebhookType = {
+  canBlock: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  enabled: Scalars['Boolean']['output'];
+  events: Array<Scalars['String']['output']>;
+  failureCount: Scalars['Float']['output'];
+  hookType: WebhookHookType;
+  id: Scalars['ID']['output'];
+  lastError?: Maybe<Scalars['String']['output']>;
+  lastTriggeredAt?: Maybe<Scalars['DateTime']['output']>;
+  name: Scalars['String']['output'];
+  orgId: Scalars['ID']['output'];
+  secret?: Maybe<Scalars['String']['output']>;
+  timeoutMs: Scalars['Float']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
 
 export type TasksQueryVariables = Exact<{
@@ -402,6 +597,54 @@ export type MessagesQueryVariables = Exact<{
 
 
 export type MessagesQuery = { messages: Array<{ id: string, channelId: string, senderId: string, type: MessageType, body: string, parentMessageId?: string | null, createdAt: string }> };
+
+export type WebhooksQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+}>;
+
+
+export type WebhooksQuery = { webhooks: Array<{ id: string, orgId: string, name: string, url: string, secret?: string | null, events: Array<string>, enabled: boolean, hookType: WebhookHookType, canBlock: boolean, timeoutMs: number, failureCount: number, lastTriggeredAt?: string | null, lastError?: string | null, createdAt: string, updatedAt: string }> };
+
+export type WebhookQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type WebhookQuery = { webhook?: { id: string, orgId: string, name: string, url: string, secret?: string | null, events: Array<string>, enabled: boolean, hookType: WebhookHookType, canBlock: boolean, timeoutMs: number, failureCount: number, lastTriggeredAt?: string | null, lastError?: string | null, createdAt: string, updatedAt: string } | null };
+
+export type CreateWebhookMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  input: CreateWebhookInput;
+}>;
+
+
+export type CreateWebhookMutation = { createWebhook: { id: string, orgId: string, name: string, url: string, secret?: string | null, events: Array<string>, enabled: boolean, hookType: WebhookHookType, canBlock: boolean, timeoutMs: number, failureCount: number, lastTriggeredAt?: string | null, lastError?: string | null, createdAt: string, updatedAt: string } };
+
+export type UpdateWebhookMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  input: UpdateWebhookInput;
+}>;
+
+
+export type UpdateWebhookMutation = { updateWebhook: { id: string, orgId: string, name: string, url: string, secret?: string | null, events: Array<string>, enabled: boolean, hookType: WebhookHookType, canBlock: boolean, timeoutMs: number, failureCount: number, lastTriggeredAt?: string | null, lastError?: string | null, createdAt: string, updatedAt: string } };
+
+export type DeleteWebhookMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWebhookMutation = { deleteWebhook: boolean };
+
+export type TestWebhookMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type TestWebhookMutation = { testWebhook: boolean };
 
 
 export const AgentFieldsFragmentDoc = `
@@ -707,3 +950,209 @@ useMessagesQuery.getKey = (variables: MessagesQueryVariables) => ['Messages', va
 
 
 useMessagesQuery.fetcher = (variables: MessagesQueryVariables, options?: RequestInit['headers']) => fetcher<MessagesQuery, MessagesQueryVariables>(MessagesDocument, variables, options);
+
+export const WebhooksDocument = `
+    query Webhooks($orgId: ID!) {
+  webhooks(orgId: $orgId) {
+    id
+    orgId
+    name
+    url
+    secret
+    events
+    enabled
+    hookType
+    canBlock
+    timeoutMs
+    failureCount
+    lastTriggeredAt
+    lastError
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useWebhooksQuery = <
+      TData = WebhooksQuery,
+      TError = unknown
+    >(
+      variables: WebhooksQueryVariables,
+      options?: Omit<UseQueryOptions<WebhooksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WebhooksQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WebhooksQuery, TError, TData>(
+      {
+    queryKey: ['Webhooks', variables],
+    queryFn: fetcher<WebhooksQuery, WebhooksQueryVariables>(WebhooksDocument, variables),
+    ...options
+  }
+    )};
+
+useWebhooksQuery.getKey = (variables: WebhooksQueryVariables) => ['Webhooks', variables];
+
+
+useWebhooksQuery.fetcher = (variables: WebhooksQueryVariables, options?: RequestInit['headers']) => fetcher<WebhooksQuery, WebhooksQueryVariables>(WebhooksDocument, variables, options);
+
+export const WebhookDocument = `
+    query Webhook($orgId: ID!, $id: ID!) {
+  webhook(orgId: $orgId, id: $id) {
+    id
+    orgId
+    name
+    url
+    secret
+    events
+    enabled
+    hookType
+    canBlock
+    timeoutMs
+    failureCount
+    lastTriggeredAt
+    lastError
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useWebhookQuery = <
+      TData = WebhookQuery,
+      TError = unknown
+    >(
+      variables: WebhookQueryVariables,
+      options?: Omit<UseQueryOptions<WebhookQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WebhookQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WebhookQuery, TError, TData>(
+      {
+    queryKey: ['Webhook', variables],
+    queryFn: fetcher<WebhookQuery, WebhookQueryVariables>(WebhookDocument, variables),
+    ...options
+  }
+    )};
+
+useWebhookQuery.getKey = (variables: WebhookQueryVariables) => ['Webhook', variables];
+
+
+useWebhookQuery.fetcher = (variables: WebhookQueryVariables, options?: RequestInit['headers']) => fetcher<WebhookQuery, WebhookQueryVariables>(WebhookDocument, variables, options);
+
+export const CreateWebhookDocument = `
+    mutation CreateWebhook($orgId: ID!, $input: CreateWebhookInput!) {
+  createWebhook(orgId: $orgId, input: $input) {
+    id
+    orgId
+    name
+    url
+    secret
+    events
+    enabled
+    hookType
+    canBlock
+    timeoutMs
+    failureCount
+    lastTriggeredAt
+    lastError
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useCreateWebhookMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWebhookMutation, TError, CreateWebhookMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWebhookMutation, TError, CreateWebhookMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateWebhook'],
+    mutationFn: (variables?: CreateWebhookMutationVariables) => fetcher<CreateWebhookMutation, CreateWebhookMutationVariables>(CreateWebhookDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useCreateWebhookMutation.fetcher = (variables: CreateWebhookMutationVariables, options?: RequestInit['headers']) => fetcher<CreateWebhookMutation, CreateWebhookMutationVariables>(CreateWebhookDocument, variables, options);
+
+export const UpdateWebhookDocument = `
+    mutation UpdateWebhook($orgId: ID!, $id: ID!, $input: UpdateWebhookInput!) {
+  updateWebhook(orgId: $orgId, id: $id, input: $input) {
+    id
+    orgId
+    name
+    url
+    secret
+    events
+    enabled
+    hookType
+    canBlock
+    timeoutMs
+    failureCount
+    lastTriggeredAt
+    lastError
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export const useUpdateWebhookMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWebhookMutation, TError, UpdateWebhookMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWebhookMutation, TError, UpdateWebhookMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateWebhook'],
+    mutationFn: (variables?: UpdateWebhookMutationVariables) => fetcher<UpdateWebhookMutation, UpdateWebhookMutationVariables>(UpdateWebhookDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useUpdateWebhookMutation.fetcher = (variables: UpdateWebhookMutationVariables, options?: RequestInit['headers']) => fetcher<UpdateWebhookMutation, UpdateWebhookMutationVariables>(UpdateWebhookDocument, variables, options);
+
+export const DeleteWebhookDocument = `
+    mutation DeleteWebhook($orgId: ID!, $id: ID!) {
+  deleteWebhook(orgId: $orgId, id: $id)
+}
+    `;
+
+export const useDeleteWebhookMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWebhookMutation, TError, DeleteWebhookMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWebhookMutation, TError, DeleteWebhookMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteWebhook'],
+    mutationFn: (variables?: DeleteWebhookMutationVariables) => fetcher<DeleteWebhookMutation, DeleteWebhookMutationVariables>(DeleteWebhookDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useDeleteWebhookMutation.fetcher = (variables: DeleteWebhookMutationVariables, options?: RequestInit['headers']) => fetcher<DeleteWebhookMutation, DeleteWebhookMutationVariables>(DeleteWebhookDocument, variables, options);
+
+export const TestWebhookDocument = `
+    mutation TestWebhook($orgId: ID!, $id: ID!) {
+  testWebhook(orgId: $orgId, id: $id)
+}
+    `;
+
+export const useTestWebhookMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestWebhookMutation, TError, TestWebhookMutationVariables, TContext>) => {
+    
+    return useMutation<TestWebhookMutation, TError, TestWebhookMutationVariables, TContext>(
+      {
+    mutationKey: ['TestWebhook'],
+    mutationFn: (variables?: TestWebhookMutationVariables) => fetcher<TestWebhookMutation, TestWebhookMutationVariables>(TestWebhookDocument, variables)(),
+    ...options
+  }
+    )};
+
+
+useTestWebhookMutation.fetcher = (variables: TestWebhookMutationVariables, options?: RequestInit['headers']) => fetcher<TestWebhookMutation, TestWebhookMutationVariables>(TestWebhookDocument, variables, options);

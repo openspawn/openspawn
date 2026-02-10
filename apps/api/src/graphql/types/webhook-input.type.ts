@@ -1,9 +1,5 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-
-export enum WebhookHookType {
-  PRE = "pre",
-  POST = "post",
-}
+import { WebhookHookType } from "./webhook.type";
 
 @InputType()
 export class CreateWebhookInput {

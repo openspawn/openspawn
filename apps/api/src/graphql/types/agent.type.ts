@@ -70,7 +70,7 @@ export class AgentType {
   @Field(() => Int)
   lifetimeEarnings!: number;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   domain?: string | null;
 
   @Field(() => ID, { nullable: true })
