@@ -9,7 +9,9 @@ export function NetworkPage() {
   if (agents.length === 0) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-theme(spacing.16))]">
+
         <Card className="max-w-md w-full bg-slate-800/30 border-slate-700">
+        <Card className="max-w-md w-full">
           <CardContent>
             <EmptyState
               variant="network"
