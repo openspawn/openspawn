@@ -1,7 +1,15 @@
 import { Args, Int, Query, Resolver } from "@nestjs/graphql";
 
-import { TelemetryService } from "../../telemetry";
+import { TelemetryService, TraceSpan, MetricPoint } from "../../telemetry";
 import { TraceSpanType, MetricPointType } from "../types/telemetry.type";
+
+function mapSpan(span: TraceSpan): TraceSpanType {
+  return { ...span, attributes: JSON.stringify(span.attributes) };
+}
+
+function mapMetric(metric: MetricPoint): MetricPointType {
+  return { ...metric, labels: JSON.stringify(metric.labels) };
+}
 
 @Resolver()
 export class TelemetryResolver {
@@ -11,14 +19,14 @@ export class TelemetryResolver {
   async traces(
     @Args("limit", { type: () => Int, defaultValue: 50 }) limit: number,
   ): Promise<TraceSpanType[]> {
-    return this.telemetryService.getTraces(limit);
+    return this.telemetryService.getTraces(limit).map(mapSpan);
   }
 
   @Query(() => [MetricPointType], { description: "Fetch recent metrics" })
   async metrics(
     @Args("limit", { type: () => Int, defaultValue: 100 }) limit: number,
   ): Promise<MetricPointType[]> {
-    return this.telemetryService.getMetrics(limit);
+    return this.telemetryService.getMetrics(limit).map(mapMetric);
   }
 
   @Query(() => [TraceSpanType], {
@@ -27,7 +35,7 @@ export class TelemetryResolver {
   async tracesByOperation(
     @Args("operationName") operationName: string,
   ): Promise<TraceSpanType[]> {
-    return this.telemetryService.getTracesByOperation(operationName);
+    return this.telemetryService.getTracesByOperation(operationName).map(mapSpan);
   }
 
   @Query(() => [MetricPointType], {
@@ -36,7 +44,7 @@ export class TelemetryResolver {
   async metricsByName(
     @Args("name") name: string,
   ): Promise<MetricPointType[]> {
-    return this.telemetryService.getMetricsByName(name);
+    return this.telemetryService.getMetricsByName(name).map(mapMetric);
   }
 
   @Query(() => Boolean, { description: "Check if telemetry is enabled" })

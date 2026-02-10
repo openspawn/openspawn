@@ -14,18 +14,21 @@ describe("TelemetryResolver", () => {
     service.clearAll();
   });
 
-  it("should return traces", async () => {
+  it("should return traces with JSON-encoded attributes", async () => {
     service.recordTaskLifecycle("t1", "created");
     const traces = await resolver.traces(50);
     expect(traces).toHaveLength(1);
     expect(traces[0].operationName).toBe("task.created");
+    expect(typeof traces[0].attributes).toBe("string");
+    expect(JSON.parse(traces[0].attributes)).toHaveProperty("task.id", "t1");
   });
 
-  it("should return metrics", async () => {
+  it("should return metrics with JSON-encoded labels", async () => {
     service.recordLatency("GET /test", 100);
     const metrics = await resolver.metrics(100);
     expect(metrics).toHaveLength(1);
     expect(metrics[0].value).toBe(100);
+    expect(typeof metrics[0].labels).toBe("string");
   });
 
   it("should filter traces by operation", async () => {
