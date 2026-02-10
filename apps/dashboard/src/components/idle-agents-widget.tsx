@@ -238,16 +238,20 @@ export function IdleAgentsWidget({
           </Link>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <AnimatePresence mode="popLayout">
-          {idleAgents.map((idleInfo) => (
-            <IdleAgentCard
-              key={idleInfo.agent.id}
-              idleInfo={idleInfo}
-              onClick={() => onAgentClick?.(idleInfo.agent)}
-            />
-          ))}
-        </AnimatePresence>
+      <CardContent>
+        {/* Horizontal scroll on mobile, vertical list on desktop */}
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 snap-x snap-mandatory sm:snap-none sm:flex-col sm:overflow-x-visible sm:mx-0 sm:px-0 sm:pb-0 sm:space-y-2 sm:gap-0 scrollbar-hide">
+          <AnimatePresence mode="popLayout">
+            {idleAgents.map((idleInfo) => (
+              <div key={idleInfo.agent.id} className="flex-shrink-0 w-[260px] snap-start sm:w-full sm:flex-shrink">
+                <IdleAgentCard
+                  idleInfo={idleInfo}
+                  onClick={() => onAgentClick?.(idleInfo.agent)}
+                />
+              </div>
+            ))}
+          </AnimatePresence>
+        </div>
         
         {agents.filter(a => a.status === "ACTIVE").length > 0 && (
           <div className="pt-2 text-center">

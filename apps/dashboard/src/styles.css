@@ -296,6 +296,43 @@
   }
 }
 
+/* ========================================
+   Mobile responsive utilities
+   ======================================== */
+
+/* Minimum touch target sizes on mobile */
+@media (max-width: 640px) {
+  button,
+  a,
+  [role="button"],
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Don't force icon-only buttons to be huge */
+  button > svg:only-child {
+    min-height: unset;
+    min-width: unset;
+  }
+
+  /* Ensure readable body text */
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Underwater theme animations */
 @keyframes wave-subtle {
   0%, 100% {

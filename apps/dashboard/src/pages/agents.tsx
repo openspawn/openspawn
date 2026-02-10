@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy } from "lucide-react";
@@ -27,6 +27,7 @@ import {
 } from "../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PhaseChip } from "../components/phase-chip";
+import { cn } from "../lib/utils";
 import { useAgents, useCurrentPhase, usePresence, useAgentHealth } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
@@ -288,7 +289,7 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -534,13 +535,26 @@ function AgentVirtualGrid({
   const healthMap = useAgentHealth();
   const parentRef = useRef<HTMLDivElement>(null);
   // Chunk agents into rows of 3 (matching lg:grid-cols-3)
+  // Responsive columns: 1 on mobile, 2 on tablet, 3 on desktop
+  const [colCount, setColCount] = useState(3);
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth < 640) setColCount(1);
+      else if (window.innerWidth < 1024) setColCount(2);
+      else setColCount(3);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   const rows = useMemo(() => {
     const result: Agent[][] = [];
-    for (let i = 0; i < filteredAgents.length; i += 3) {
-      result.push(filteredAgents.slice(i, i + 3));
+    for (let i = 0; i < filteredAgents.length; i += colCount) {
+      result.push(filteredAgents.slice(i, i + colCount));
     }
     return result;
-  }, [filteredAgents]);
+  }, [filteredAgents, colCount]);
 
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -564,7 +578,7 @@ function AgentVirtualGrid({
                 width: "100%",
                 transform: `translateY(${virtualRow.start}px)`,
               }}
-              className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pb-4"
+              className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pb-4"
             >
               <AnimatePresence mode="popLayout">
                 {rowAgents.map((agent) => {
@@ -695,6 +709,9 @@ export function AgentsPage() {
   const [activeTab, setActiveTab] = useState("agents");
   const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
 
+  // Mobile filter toggle
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
   // Sparkline mock data for stat cards
   const agentSparklines = useMemo(() => ({
     total: generateSparklineData(7, "up"),
@@ -816,7 +833,7 @@ export function AgentsPage() {
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-5 lg:w-[600px] scrollbar-hide">
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             <span className="hidden sm:inline">All Agents</span>
@@ -850,68 +867,87 @@ export function AgentsPage() {
         rightOpen={!!detailPanelAgentId}
         left={<div className="p-4 space-y-6">
       {/* Filters and Search */}
-      <div className="flex flex-wrap gap-3 items-center">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search agents..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+      <div className="space-y-3">
+        <div className="flex gap-3 items-center">
+          {/* Search */}
+          <div className="relative flex-1 min-w-0 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search agents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+            />
+          </div>
+          
+          {/* Mobile filter toggle */}
+          <Button
+            variant={filtersOpen ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+            className="sm:hidden min-h-[44px] min-w-[44px]"
+          >
+            <Filter className="h-4 w-4 mr-1" />
+            Filters
+          </Button>
         </div>
-        
-        {/* Status Filter */}
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="pending">Pending</option>
-          <option value="paused">Paused</option>
-          <option value="suspended">Suspended</option>
-        </select>
-        
-        {/* Level Filter */}
-        <select
-          value={levelFilter}
-          onChange={(e) => setLevelFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="all">All Levels</option>
-          <option value="9-10">L9-10 (Leadership)</option>
-          <option value="7-8">L7-8 (Manager)</option>
-          <option value="5-6">L5-6 (Senior)</option>
-          <option value="3-4">L3-4 (Worker)</option>
-          <option value="1-2">L1-2 (Probation)</option>
-        </select>
-        
-        {/* Sort */}
-        <div className="flex items-center gap-1 ml-auto">
-          <span className="text-sm text-muted-foreground">Sort:</span>
-          {(["level", "name", "balance", "created"] as SortField[]).map((field) => (
-            <Button
-              key={field}
-              variant={sortField === field ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => handleSort(field)}
-              className="capitalize"
-            >
-              {field}
-              {sortField === field && (
-                <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
-              )}
-            </Button>
-          ))}
+
+        {/* Filter controls — always visible on desktop, toggled on mobile */}
+        <div className={cn(
+          "flex-wrap gap-3 items-center",
+          filtersOpen ? "flex" : "hidden sm:flex"
+        )}>
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="paused">Paused</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          
+          {/* Level Filter */}
+          <select
+            value={levelFilter}
+            onChange={(e) => setLevelFilter(e.target.value)}
+            className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+          >
+            <option value="all">All Levels</option>
+            <option value="9-10">L9-10 (Leadership)</option>
+            <option value="7-8">L7-8 (Manager)</option>
+            <option value="5-6">L5-6 (Senior)</option>
+            <option value="3-4">L3-4 (Worker)</option>
+            <option value="1-2">L1-2 (Probation)</option>
+          </select>
+          
+          {/* Sort */}
+          <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
+            <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
+            {(["level", "name", "balance", "created"] as SortField[]).map((field) => (
+              <Button
+                key={field}
+                variant={sortField === field ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => handleSort(field)}
+                className="capitalize min-h-[44px] sm:min-h-0 shrink-0"
+              >
+                {field}
+                {sortField === field && (
+                  <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                )}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Agents"
           value={agents.length}

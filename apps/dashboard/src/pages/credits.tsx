@@ -87,40 +87,40 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                   width: "100%",
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
-                className="flex items-center justify-between rounded-lg border border-border p-3"
+                className="flex items-center justify-between gap-2 rounded-lg border border-border p-2 sm:p-3 min-h-[44px]"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {tx.type === "CREDIT" ? (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", delay: 0.1 }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10"
+                      className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-emerald-500/10 shrink-0"
                     >
-                      <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                      <ArrowUpRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
                     </motion.div>
                   ) : (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", delay: 0.1 }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10"
+                      className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-amber-500/10 shrink-0"
                     >
-                      <ArrowDownLeft className="h-4 w-4 text-amber-500" />
+                      <ArrowDownLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
                     </motion.div>
                   )}
-                  <div>
-                    <p className="text-sm font-medium">{tx.reason}</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-medium truncate">{tx.reason}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
                       {formatDate(tx.createdAt)} at {formatTime(tx.createdAt)}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`font-medium ${
+                    className={`text-sm sm:text-base font-medium ${
                       tx.type === "CREDIT"
                         ? "text-emerald-500"
                         : "text-amber-500"
@@ -129,8 +129,8 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                     {tx.type === "CREDIT" ? "+" : "-"}
                     {tx.amount.toLocaleString()}
                   </motion.p>
-                  <p className="text-xs text-muted-foreground">
-                    Balance: {tx.balanceAfter.toLocaleString()}
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    Bal: {tx.balanceAfter.toLocaleString()}
                   </p>
                 </div>
               </motion.div>
@@ -224,7 +224,7 @@ export function CreditsPage() {
       />
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Net Balance"
           value={netBalance.toLocaleString()}
@@ -256,14 +256,14 @@ export function CreditsPage() {
       </div>
 
       {/* Chart and transactions */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         {/* Balance chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Balance Over Time</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Balance Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[220px] sm:h-[300px]">
               {balanceHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={balanceHistory}>
@@ -334,7 +334,7 @@ export function CreditsPage() {
       </div>
 
       {/* Advanced Analytics Section */}
-      <div className="grid gap-6 md:grid-cols-2 mt-6">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4 sm:mt-6">
         <BudgetBurndown
           budget={25000}
           spent={totalSpent || 9250}

@@ -205,7 +205,7 @@ export function DashboardPage() {
     switch (id) {
       case "stats-overview":
         return (
-          <StaggerContainer className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <StaggerItem><StatCard
               title="Active Agents"
               value={activeAgents}
@@ -262,10 +262,10 @@ export function DashboardPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Credit Flow</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Credit Flow</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[220px] sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={creditHistory}>
                 <defs>
@@ -302,10 +302,10 @@ export function DashboardPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Tasks by Status</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Tasks by Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[220px] sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={tasksByStatus} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
@@ -363,18 +363,18 @@ export function DashboardPage() {
                     ? { duration: 0.15 }
                     : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
                   }
-                  className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-h-[44px]"
                 >
-                  <div className="flex items-center gap-3">
-                    <div>{getEventIcon(event.type)}</div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="shrink-0">{getEventIcon(event.type)}</div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{event.actor?.name || "System"}</p>
-                      <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                      <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-[300px]">
                         {event.reasoning || event.type.replace(/\./g, ' → ')}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0 pl-7 sm:pl-0">
                     <Badge variant={getEventBadgeVariant(event.type)} className="text-xs">
                       {event.type.split('.').pop()}
                     </Badge>

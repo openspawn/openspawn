@@ -22,7 +22,7 @@ export function SettingsPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8 lg:w-[1120px]">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-8 lg:w-[1120px] scrollbar-hide">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
