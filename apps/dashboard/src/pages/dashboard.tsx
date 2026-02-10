@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -140,6 +141,7 @@ function formatEventTime(dateString: string, index?: number, speed?: number) {
 }
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { agents } = useAgents();
   const { tasks } = useTasks();
   const { transactions } = useCredits();
@@ -443,10 +445,18 @@ export function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Activity</CardTitle>
-            <Badge variant="outline" className="text-xs">
-              <Zap className="h-3 w-3 mr-1" />
-              Live
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                <Zap className="h-3 w-3 mr-1" />
+                Live
+              </Badge>
+              <Link 
+                to="/events" 
+                className="text-xs text-cyan-500 hover:text-cyan-400 transition-colors whitespace-nowrap"
+              >
+                See all →
+              </Link>
+            </div>
           </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -504,6 +514,7 @@ export function DashboardPage() {
         <IdleAgentsWidget 
           maxCount={6} 
           className="lg:col-span-1"
+          onAgentClick={(agent) => navigate(`/agents?selected=${agent.agentId}`)}
         />
       </div>
     </div>
