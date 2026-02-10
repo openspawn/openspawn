@@ -1,17 +1,16 @@
 import { getApiKey, getApiUrl } from "./config.js";
 import { isDemoMode } from "./output.js";
 import { DemoClient } from "./demo-client.js";
+import type { ApiResponse, ApiError } from "./types.js";
 
-export interface ApiResponse<T = unknown> {
-  data?: T;
-  message?: string;
-  error?: string;
-  meta?: Record<string, unknown>;
-}
+export type { ApiResponse, ApiError };
 
-export interface ApiError {
-  message: string;
-  statusCode?: number;
+/** Unwrap API response data - throws if data is missing */
+export function unwrap<T>(response: ApiResponse<T>): T {
+  if (response.data === undefined) {
+    throw new Error(response.error ?? response.message ?? "No data in response");
+  }
+  return response.data;
 }
 
 export class OpenSpawnClient {

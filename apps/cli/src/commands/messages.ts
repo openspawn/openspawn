@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import pc from "picocolors";
-import { createClient } from "../lib/api.js";
+import { createClient, unwrap } from "../lib/api.js";
 import {
   output,
   outputError,
@@ -118,7 +118,7 @@ ${pc.cyan("Examples:")}
           }
         );
 
-        const messageList = ((data.data ?? data) as Message[]) || [];
+        const messageList = (unwrap(data) as Message[]) || [];
 
         if (messageList.length === 0) {
           formatEmpty("No messages in this channel", "Send the first message!");
@@ -154,7 +154,7 @@ ${pc.cyan("Examples:")}
           return client.listChannels();
         });
 
-        const channels = ((data.data ?? data) as Channel[]) || [];
+        const channels = (unwrap(data) as Channel[]) || [];
 
         if (channels.length === 0) {
           formatEmpty("No channels found", "Channels are created automatically for tasks and DMs");

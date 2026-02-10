@@ -1,6 +1,7 @@
 /**
  * Demo API client for CLI demo mode
  * Returns mock data with realistic delays
+ * All responses wrapped in { data: T } to match OpenSpawnClient
  */
 
 import {
@@ -10,14 +11,15 @@ import {
   demoMessages,
   demoUser,
 } from './demo-data.js';
+import type { ApiResponse } from './types.js';
 
 // Simulate network delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class DemoClient {
-  private async simulateRequest<T>(data: T, delayMs = 300): Promise<T> {
+  private async simulateRequest<T>(data: T, delayMs = 300): Promise<ApiResponse<T>> {
     await delay(delayMs + Math.random() * 200);
-    return data;
+    return { data };
   }
 
   // Auth
@@ -122,6 +124,31 @@ export class DemoClient {
     return this.simulateRequest({ ...task, status }, 400);
   }
 
+  async assignTask(taskId: string, assigneeId: string) {
+    const task = demoTasks.find((t) => t.identifier === taskId || t.id === taskId);
+    if (!task) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+    const agent = demoAgents.find((a) => a.identifier === assigneeId || a.id === assigneeId);
+    return this.simulateRequest({
+      ...task,
+      assigneeId,
+      assignee: agent || null,
+    }, 400);
+  }
+
+  async transitionTask(taskId: string, status: string) {
+    const task = demoTasks.find((t) => t.identifier === taskId || t.id === taskId);
+    if (!task) {
+      throw new Error(`Task not found: ${taskId}`);
+    }
+    return this.simulateRequest({
+      ...task,
+      status,
+      ...(status === 'DONE' ? { completedAt: new Date().toISOString() } : {}),
+    }, 400);
+  }
+
   // Credits
   async getBalance(_agentId?: string) {
     return this.simulateRequest({
@@ -144,6 +171,17 @@ export class DemoClient {
       remaining: demoCredits.budgetRemaining,
       resetDate: '2026-03-01T00:00:00Z',
     });
+  }
+
+  async transferCredits(fromId: string, toId: string, amount: number) {
+    return this.simulateRequest({
+      success: true,
+      fromAgentId: fromId,
+      toAgentId: toId,
+      amount,
+      newFromBalance: demoCredits.balance - amount,
+      newToBalance: 1000 + amount,
+    }, 500);
   }
 
   // Messages
