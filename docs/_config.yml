@@ -22,7 +22,7 @@ search:
 
 # Aux links (top-right)
 aux_links:
-  "GitHub":
+  "⭐ Star on GitHub":
     - "https://github.com/openspawn/openspawn"
 
 aux_links_new_tab: true

@@ -22,54 +22,94 @@ Multi-agent coordination from the deep — where your agents come together.
 
 One agent is a script. Ten agents is a distributed system. **This is your control plane.**
 
-### 😤 The Problem
-
-Your AI agents are powerful but unmanageable. Mystery bills. Zero visibility. No accountability. Runaway loops.
-
-### ✅ The Solution
-
-BikiniBottom gives you hierarchy, budgets, task management, and audit trails — everything you need to run AI agents like a real organization.
-
----
-
-## Key Features
-
-| Feature | Description |
-|:--------|:------------|
-| 🐙 **Agent Orchestration** | 10-level hierarchy, peer-to-peer messaging, self-claim task queues, and capability matching |
-| 💰 **Credit System** | Per-agent budgets, spending analytics, automatic limits, and overage alerts |
-| 📊 **Real-Time Dashboard** | Beautiful React UI with live agent network graph, task kanban, and WebSocket updates |
-| 🔗 **Integrations** | GitHub and Linear bidirectional sync, inbound/outbound webhooks, TypeScript and Python SDKs |
-| 📡 **Observability** | OpenTelemetry tracing, audit logs, performance metrics, and full event history |
-| 🎯 **Task Management** | Workflow phases, pre-approval hooks, completion rejection, and dependency chains |
-| 🔐 **Enterprise Security** | JWT + OAuth + 2FA for humans. HMAC signing for agents. API keys for integrations |
-| 🔌 **Framework Agnostic** | Works with any AI agent — Claude, GPT, local models. If it can hit an API, it works |
+<div class="feature-grid" markdown="0">
+  <div class="feature-card">
+    <h3>🎯 Task Orchestration</h3>
+    <p>Route tasks to the right agent. Priority queues, self-claim, approval workflows, and rejection handling built in.</p>
+  </div>
+  <div class="feature-card">
+    <h3>💰 Credit System</h3>
+    <p>Every agent has a budget. Track spending, set limits, prevent runaway costs. Real-time balance monitoring.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🏆 Trust & Reputation</h3>
+    <p>Agents earn trust through performance. Automated promotion, demotion, and capability gating based on track record.</p>
+  </div>
+  <div class="feature-card">
+    <h3>👥 Teams & Hierarchy</h3>
+    <p>Organize agents into teams with leads, sub-teams, and org charts. Real-time presence and activity tracking.</p>
+  </div>
+  <div class="feature-card">
+    <h3>🔌 Integrations</h3>
+    <p>GitHub sync, Linear, webhooks (in + out), OpenTelemetry, and OpenClaw. Framework adapters for LangGraph & CrewAI.</p>
+  </div>
+  <div class="feature-card">
+    <h3>📊 Live Dashboard</h3>
+    <p>Real-time React dashboard with agent network graph, timeline view, customizable widgets, and 5 ocean themes.</p>
+  </div>
+</div>
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone and install
+# Clone the repo
 git clone https://github.com/openspawn/openspawn.git
-cd openspawn && pnpm install
+cd openspawn
 
-# Start database
-docker run -d --name openspawn-postgres \
-  -e POSTGRES_DB=openspawn -e POSTGRES_USER=openspawn \
-  -e POSTGRES_PASSWORD=openspawn -p 5432:5432 postgres:16
+# Install dependencies
+pnpm install
 
-# Start services
-pnpm exec nx serve api        # API on :3000
-pnpm exec nx serve dashboard   # Dashboard on :8080
+# Start the API + Dashboard
+pnpm dev
+
+# Or try the demo (no backend needed)
+pnpm demo
 ```
+
+[Full getting started guide →](getting-started)
 
 ---
 
-## Why "BikiniBottom"?
+## Architecture
 
-Built for [**OpenClaw**](https://github.com/OpenClawAI/openclaw) — a personal AI agent framework.
+BikiniBottom is an **Nx monorepo** with a NestJS API, React dashboard, TypeScript SDK, and Python SDK.
 
-**Claw** → **Crab** 🦀 → **Underwater** 🌊 → **Bikini Bottom**
+| Component | Tech | Purpose |
+|-----------|------|---------|
+| **API** | NestJS + GraphQL | Core coordination engine |
+| **Dashboard** | React + TanStack Query | Real-time monitoring UI |
+| **TS SDK** | TypeScript | Agent integration library |
+| **Python SDK** | Python | Agent integration library |
+| **Shared Types** | TypeScript | Shared GraphQL types |
 
-It's playful, memorable, and open source. 🫧
+[Architecture deep dive →](openspawn/)
+
+---
+
+## Roadmap
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| Phases 1-8 | ✅ Complete | Core platform (auth → orchestrator mode) |
+| Phase A | ✅ Complete | SDKs + Webhooks |
+| Phase B | ✅ Complete | GitHub, Linear, OTEL, OpenClaw |
+| Phase C | 🔄 In Progress | Framework adapters (LangGraph, CrewAI) |
+| Phase D | 📋 Planned | Marketplace |
+
+---
+
+## Community
+
+BikiniBottom is built for the [OpenClaw](https://openclaw.ai) community and open to all.
+
+- [GitHub Discussions](https://github.com/openspawn/openspawn/discussions) — Questions, ideas, show & tell
+- [Discord](https://discord.com/invite/clawd) — Real-time chat
+- [Contributing Guide](https://github.com/openspawn/openspawn/blob/main/CONTRIBUTING.md) — How to get involved
+
+---
+
+<p style="text-align: center; opacity: 0.6; margin-top: 3rem;">
+  Built with 🫧 from the deep. MIT License © 2026.
+</p>
