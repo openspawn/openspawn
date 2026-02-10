@@ -1,7 +1,8 @@
 /**
  * Org Chart — ReactFlow tree layout showing teams → sub-teams → agents.
+ * Features: animated edge pulses, click-to-detail, presence glow on active agents.
  */
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -43,6 +44,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { teams, type Team, getTeamColor, getSubTeams } from '../demo/teams';
+import { useTeamStats } from '../hooks/use-teams';
 import { useAgents, type Agent } from '../hooks/use-agents';
 import { getAgentAvatarUrl } from '../lib/avatar';
 
@@ -105,19 +107,26 @@ async function layoutElements(
 // ── Team Node ───────────────────────────────────────────────────────────────
 interface TeamNodeData extends Record<string, unknown> {
   isTeam: true;
+  teamId: string;
   name: string;
   icon: string;
   color: string;
   agentCount: number;
 }
 
-function TeamNode({ data }: NodeProps) {
-  const d = data as unknown as TeamNodeData;
-  const color = getTeamColor(d.color);
-  const Icon = ICON_MAP[d.icon] ?? Users;
+function TeamNodeContent({ data }: { data: TeamNodeData }) {
+  const color = getTeamColor(data.color);
+  const Icon = ICON_MAP[data.icon] ?? Users;
+  const stats = useTeamStats(data.teamId);
+  const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="relative" style={{ width: 180, height: 72 }}>
+    <div
+      className="relative cursor-pointer"
+      style={{ width: 180, height: 72 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <Handle
         id="top"
         type="target"
@@ -128,7 +137,7 @@ function TeamNode({ data }: NodeProps) {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        className="w-full h-full flex items-center gap-3 rounded-xl border-2 px-4"
+        className="w-full h-full flex items-center gap-3 rounded-xl border-2 px-4 hover:brightness-110 transition-all"
         style={{
           borderColor: color,
           backgroundColor: `${color}15`,
@@ -142,9 +151,9 @@ function TeamNode({ data }: NodeProps) {
           <Icon className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-bold text-foreground truncate">{d.name}</div>
+          <div className="text-sm font-bold text-foreground truncate">{data.name}</div>
           <div className="text-[10px] text-zinc-400">
-            {d.agentCount} agent{d.agentCount !== 1 ? 's' : ''}
+            {data.agentCount} agent{data.agentCount !== 1 ? 's' : ''}
           </div>
         </div>
       </motion.div>
@@ -154,8 +163,31 @@ function TeamNode({ data }: NodeProps) {
         position={Position.Bottom}
         style={{ background: color, width: 10, height: 10, border: '2px solid #1e1e2e' }}
       />
+
+      {/* Hover tooltip with aggregate stats */}
+      {hovered && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute -bottom-[72px] left-1/2 -translate-x-1/2 z-50 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap pointer-events-none"
+        >
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+            <span className="text-zinc-400">Active:</span>
+            <span className="text-emerald-400 font-medium">{stats.activeCount}/{stats.agentCount}</span>
+            <span className="text-zinc-400">Credits:</span>
+            <span className="text-amber-400 font-medium">{stats.totalCredits.toLocaleString()}</span>
+            <span className="text-zinc-400">Success:</span>
+            <span className="text-cyan-400 font-medium">{stats.taskCompletionRate}%</span>
+          </div>
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-zinc-900 border-l border-t border-zinc-700" />
+        </motion.div>
+      )}
     </div>
   );
+}
+
+function TeamNode({ data }: NodeProps) {
+  return <TeamNodeContent data={data as unknown as TeamNodeData} />;
 }
 
 // ── Agent Node ──────────────────────────────────────────────────────────────
@@ -163,6 +195,7 @@ interface AgentNodeData extends Record<string, unknown> {
   isTeam: false;
   label: string;
   agentId: string;
+  agentDbId: string; // the database `id` for the detail panel
   level: number;
   status: string;
   isLead: boolean;
@@ -173,26 +206,37 @@ function AgentOrgNode({ data }: NodeProps) {
   const d = data as unknown as AgentNodeData;
   const teamColor = getTeamColor(d.teamColor);
   const avatarUrl = getAgentAvatarUrl(d.agentId, d.level, 32);
-  const statusColor =
-    d.status === 'ACTIVE'
-      ? '#22c55e'
-      : d.status === 'PENDING'
-        ? '#fbbf24'
-        : '#ef4444';
+  const isActive = d.status === 'ACTIVE';
+  const statusColor = isActive
+    ? '#22c55e'
+    : d.status === 'PENDING'
+      ? '#fbbf24'
+      : '#ef4444';
 
   return (
-    <div className="relative" style={{ width: 140, height: 64 }}>
+    <div className="relative cursor-pointer" style={{ width: 140, height: 64 }}>
       <Handle
         id="top"
         type="target"
         position={Position.Top}
         style={{ background: teamColor, width: 8, height: 8, border: '2px solid #1e1e2e' }}
       />
+
+      {/* Active glow ring */}
+      {isActive && (
+        <motion.div
+          className="absolute -inset-1 rounded-2xl pointer-events-none"
+          style={{ boxShadow: `0 0 12px 2px ${statusColor}50` }}
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
+
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
-        className="w-full h-full flex items-center gap-2 rounded-xl border px-3"
+        className="w-full h-full flex items-center gap-2 rounded-xl border px-3 hover:brightness-110 transition-all"
         style={{
           borderColor: d.isLead ? '#f59e0b' : `${teamColor}60`,
           backgroundColor: d.isLead ? 'rgba(245,158,11,0.08)' : `${teamColor}08`,
@@ -233,7 +277,7 @@ function AgentOrgNode({ data }: NodeProps) {
   );
 }
 
-// ── Custom edge ─────────────────────────────────────────────────────────────
+// ── Custom animated edge ─────────────────────────────────────────────────────
 function OrgEdge({
   id,
   sourceX,
@@ -244,6 +288,7 @@ function OrgEdge({
   targetPosition,
   style,
   markerEnd,
+  data,
 }: EdgeProps) {
   const [edgePath] = getSmoothStepPath({
     sourceX,
@@ -254,13 +299,29 @@ function OrgEdge({
     targetPosition,
   });
 
+  const isAnimated = (data as Record<string, unknown> | undefined)?.animated === true;
+  const edgeColor = (style as Record<string, unknown>)?.stroke as string || '#64748b';
+
   return (
-    <BaseEdge
-      id={id}
-      path={edgePath}
-      style={{ ...style, strokeWidth: 2, opacity: 0.5 }}
-      markerEnd={markerEnd}
-    />
+    <g>
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        style={{ ...style, strokeWidth: 2, opacity: 0.5 }}
+        markerEnd={markerEnd}
+      />
+      {/* Animated pulse particle along the edge */}
+      {isAnimated && (
+        <>
+          <circle r="3" fill={edgeColor} opacity="0.9">
+            <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} />
+          </circle>
+          <circle r="6" fill={edgeColor} opacity="0.3">
+            <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} />
+          </circle>
+        </>
+      )}
+    </g>
   );
 }
 
@@ -294,6 +355,7 @@ function buildOrgGraph(
       position: { x: 0, y: 0 },
       data: {
         isTeam: true,
+        teamId: team.id,
         name: team.name,
         icon: team.icon,
         color: team.color,
@@ -336,6 +398,7 @@ function buildOrgGraph(
           isTeam: false,
           label: agent.name,
           agentId: agent.agentId,
+          agentDbId: agent.id,
           level: agent.level,
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
@@ -375,6 +438,7 @@ function buildOrgGraph(
           isTeam: false,
           label: agent.name,
           agentId: agent.agentId,
+          agentDbId: agent.id,
           level: agent.level,
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
@@ -398,11 +462,12 @@ function buildOrgGraph(
 }
 
 // ── Inner component ─────────────────────────────────────────────────────────
-function OrgChartInner({ className }: { className?: string }) {
+function OrgChartInner({ className, onAgentClick }: { className?: string; onAgentClick?: (agentId: string) => void }) {
   const { agents, loading } = useAgents();
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   const [isLayouted, setIsLayouted] = useState(false);
+  const baseEdgesRef = useRef<Edge[]>([]);
 
   useEffect(() => {
     if (loading) return;
@@ -412,10 +477,56 @@ function OrgChartInner({ className }: { className?: string }) {
     setIsLayouted(false);
     layoutElements(rawNodes, rawEdges).then(({ nodes: ln, edges: le }) => {
       setNodes(ln);
+      baseEdgesRef.current = le;
       setEdges(le);
       setIsLayouted(true);
     });
   }, [agents, loading, setNodes, setEdges]);
+
+  // Animate random edges to simulate message flow
+  useEffect(() => {
+    if (!isLayouted || baseEdgesRef.current.length === 0) return;
+
+    const interval = setInterval(() => {
+      const base = baseEdgesRef.current;
+      // Pick 1-2 random edges to animate
+      const animatedIds = new Set<string>();
+      const count = Math.min(2, base.length);
+      while (animatedIds.size < count) {
+        animatedIds.add(base[Math.floor(Math.random() * base.length)].id);
+      }
+
+      setEdges(
+        base.map((e) => ({
+          ...e,
+          data: { ...((e.data as object) || {}), animated: animatedIds.has(e.id) },
+        })),
+      );
+
+      // Clear animation after 2s
+      setTimeout(() => {
+        setEdges(
+          base.map((e) => ({
+            ...e,
+            data: { ...((e.data as object) || {}), animated: false },
+          })),
+        );
+      }, 2000);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isLayouted, setEdges]);
+
+  // Handle node clicks → open agent detail panel
+  const handleNodeClick = useCallback(
+    (_: unknown, node: Node) => {
+      const d = node.data as Record<string, unknown>;
+      if (!d.isTeam && d.agentDbId && onAgentClick) {
+        onAgentClick(d.agentDbId as string);
+      }
+    },
+    [onAgentClick],
+  );
 
   if (loading) {
     return (
@@ -432,6 +543,7 @@ function OrgChartInner({ className }: { className?: string }) {
         edges={isLayouted ? edges : []}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
@@ -456,10 +568,10 @@ function OrgChartInner({ className }: { className?: string }) {
 }
 
 // ── Public component (wrapped in provider) ──────────────────────────────────
-export function OrgChart({ className }: { className?: string }) {
+export function OrgChart({ className, onAgentClick }: { className?: string; onAgentClick?: (agentId: string) => void }) {
   return (
     <ReactFlowProvider>
-      <OrgChartInner className={className} />
+      <OrgChartInner className={className} onAgentClick={onAgentClick} />
     </ReactFlowProvider>
   );
 }

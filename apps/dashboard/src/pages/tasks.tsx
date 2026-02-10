@@ -8,8 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ScrollArea } from "../components/ui/scroll-area";
 import { PageHeader } from "../components/ui/page-header";
 import { PhaseChip } from "../components/phase-chip";
-import { useTasks, type Task, useCurrentPhase } from "../hooks";
+import { useTasks, type Task, useCurrentPhase, useAgents } from "../hooks";
+import { useTeams } from "../hooks";
 import { SplitPanel } from "../components/ui/split-panel";
+import { TeamFilterDropdown } from "../components/team-badge";
 
 type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
@@ -542,10 +544,14 @@ export function TasksPage() {
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   
+  const { agents } = useAgents();
+  const { teams: allTeams } = useTeams();
+
   // Filter & Sort state for List view
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [teamFilterValue, setTeamFilterValue] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("created");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc"); // newest first by default
 
@@ -572,6 +578,16 @@ export function TasksPage() {
     if (priorityFilter !== "all") {
       result = result.filter(t => t.priority?.toUpperCase() === priorityFilter);
     }
+
+    // Team filter — filter tasks whose assignee belongs to the selected team
+    if (teamFilterValue !== "all") {
+      const teamAgentIds = new Set(
+        agents
+          .filter((a: any) => (a as any).teamId === teamFilterValue)
+          .map((a: any) => a.id),
+      );
+      result = result.filter(t => t.assigneeId && teamAgentIds.has(t.assigneeId));
+    }
     
     // Sort
     result.sort((a, b) => {
@@ -596,7 +612,7 @@ export function TasksPage() {
     });
     
     return result;
-  }, [tasks, searchQuery, statusFilter, priorityFilter, sortField, sortDirection]);
+  }, [tasks, agents, searchQuery, statusFilter, priorityFilter, teamFilterValue, sortField, sortDirection]);
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -706,6 +722,13 @@ export function TasksPage() {
                 <option value="LOW">Low</option>
               </select>
               
+              {/* Team Filter */}
+              <TeamFilterDropdown
+                value={teamFilterValue}
+                onChange={setTeamFilterValue}
+                teams={allTeams}
+              />
+
               {/* Sort buttons */}
               <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
                 <span className="text-sm text-muted-foreground shrink-0">Sort:</span>

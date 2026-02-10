@@ -17,6 +17,7 @@ import { ChartTooltip } from "./ui/chart-tooltip";
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
 import { TimelineView } from "./timeline-view";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
+import { TeamBadge } from "./team-badge";
 
 type Agent = AgentFieldsFragment;
 
@@ -86,6 +87,7 @@ function OverviewTab({ agent }: { agent: Agent }) {
         <Badge style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
           Level {agent.level} • {getLevelLabel(agent.level)}
         </Badge>
+        <TeamBadge teamId={(agent as any).teamId} />
         {agent.reputationLevel && (
           <Badge variant="secondary">
             🏆 {agent.reputationLevel}
@@ -633,7 +635,10 @@ export function AgentDetailPanel({ agentId, onClose, inline }: AgentDetailPanelP
                   size="lg"
                 />
                 <div>
-                  <h2 className="text-2xl font-bold">{agent.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold">{agent.name}</h2>
+                    <TeamBadge teamId={(agent as any).teamId} />
+                  </div>
                   <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
                 </div>
               </div>
