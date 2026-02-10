@@ -29,6 +29,9 @@ export const freshScenario: DemoScenario = {
   
   // No messages yet
   messages: [],
+  
+  // No webhooks yet
+  webhooks: [],
 };
 
 export default freshScenario;

@@ -160,3 +160,104 @@ export const MessagesQueryDocument = graphql(`
     }
   }
 `);
+
+export const WebhooksQueryDocument = graphql(`
+  query Webhooks($orgId: ID!) {
+    webhooks(orgId: $orgId) {
+      id
+      orgId
+      name
+      url
+      secret
+      events
+      enabled
+      hookType
+      canBlock
+      timeoutMs
+      failureCount
+      lastTriggeredAt
+      lastError
+      createdAt
+      updatedAt
+    }
+  }
+`);
+
+export const WebhookQueryDocument = graphql(`
+  query Webhook($orgId: ID!, $id: ID!) {
+    webhook(orgId: $orgId, id: $id) {
+      id
+      orgId
+      name
+      url
+      secret
+      events
+      enabled
+      hookType
+      canBlock
+      timeoutMs
+      failureCount
+      lastTriggeredAt
+      lastError
+      createdAt
+      updatedAt
+    }
+  }
+`);
+
+// Mutations
+export const CreateWebhookMutationDocument = graphql(`
+  mutation CreateWebhook($orgId: ID!, $input: CreateWebhookInput!) {
+    createWebhook(orgId: $orgId, input: $input) {
+      id
+      orgId
+      name
+      url
+      secret
+      events
+      enabled
+      hookType
+      canBlock
+      timeoutMs
+      failureCount
+      lastTriggeredAt
+      lastError
+      createdAt
+      updatedAt
+    }
+  }
+`);
+
+export const UpdateWebhookMutationDocument = graphql(`
+  mutation UpdateWebhook($orgId: ID!, $id: ID!, $input: UpdateWebhookInput!) {
+    updateWebhook(orgId: $orgId, id: $id, input: $input) {
+      id
+      orgId
+      name
+      url
+      secret
+      events
+      enabled
+      hookType
+      canBlock
+      timeoutMs
+      failureCount
+      lastTriggeredAt
+      lastError
+      createdAt
+      updatedAt
+    }
+  }
+`);
+
+export const DeleteWebhookMutationDocument = graphql(`
+  mutation DeleteWebhook($orgId: ID!, $id: ID!) {
+    deleteWebhook(orgId: $orgId, id: $id)
+  }
+`);
+
+export const TestWebhookMutationDocument = graphql(`
+  mutation TestWebhook($orgId: ID!, $id: ID!) {
+    testWebhook(orgId: $orgId, id: $id)
+  }
+`);

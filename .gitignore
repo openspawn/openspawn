@@ -54,3 +54,4 @@ yarn.lock
 e2e/screenshots/
 playwright-report/
 test-results/
+__pycache__/

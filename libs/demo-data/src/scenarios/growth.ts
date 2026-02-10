@@ -4,6 +4,7 @@ import { tasks } from '../fixtures/tasks';
 import { creditTransactions } from '../fixtures/credits';
 import { events } from '../fixtures/events';
 import { generateInitialMessages } from '../fixtures/messages';
+import { demoWebhooks } from '../fixtures/webhooks';
 
 /**
  * Growth Scenario: Scaling team
@@ -24,6 +25,7 @@ export const growthScenario: DemoScenario = {
     agents.map(a => a.id),
     tasks.map(t => t.identifier)
   ),
+  webhooks: demoWebhooks,
 };
 
 export default growthScenario;

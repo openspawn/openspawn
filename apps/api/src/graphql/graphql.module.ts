@@ -9,6 +9,7 @@ import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
+import { WebhooksModule } from "../webhooks";
 
 import { PubSubProvider } from "./pubsub.provider";
 import {
@@ -18,6 +19,7 @@ import {
   EventResolver,
   MessageResolver,
   TaskResolver,
+  WebhookResolver,
 } from "./resolvers";
 
 @Module({
@@ -38,6 +40,7 @@ import {
     CreditsModule,
     EventsModule,
     MessagesModule,
+    WebhooksModule,
   ],
   providers: [
     PubSubProvider,
@@ -47,6 +50,7 @@ import {
     DirectMessageResolver,
     EventResolver,
     MessageResolver,
+    WebhookResolver,
   ],
   exports: [PubSubProvider],
 })
