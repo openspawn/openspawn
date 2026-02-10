@@ -12,6 +12,8 @@ import { useTasks, type Task, useCurrentPhase, useAgents } from "../hooks";
 import { useTeams } from "../hooks";
 import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
+import { TaskTimeline } from "../components/task-timeline";
+import { AgentDetailPanel } from "../components/agent-detail-panel";
 
 type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
@@ -541,7 +543,7 @@ const STATUS_ORDER: Record<string, number> = {
 export function TasksPage() {
   const { tasks, loading, error } = useTasks();
   const { currentPhase } = useCurrentPhase();
-  const [view, setView] = useState<"kanban" | "list">("kanban");
+  const [view, setView] = useState<"kanban" | "list" | "timeline">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { openSidePanel, closeSidePanel } = useSidePanel();
   
@@ -632,6 +634,13 @@ export function TasksPage() {
     );
   }
 
+  function handleAgentClick(agentId: string) {
+    openSidePanel(
+      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
+      { width: 520 }
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -666,10 +675,14 @@ export function TasksPage() {
       />
 
       {/* View toggle */}
-      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "list")}>
+      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "list" | "timeline")}>
         <TabsList>
           <TabsTrigger value="kanban">Kanban</TabsTrigger>
           <TabsTrigger value="list">List</TabsTrigger>
+          <TabsTrigger value="timeline" className="flex items-center gap-1.5">
+            <History className="h-3.5 w-3.5" />
+            Timeline
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="kanban" className="mt-4">
@@ -760,6 +773,10 @@ export function TasksPage() {
             onTaskClick={handleTaskClick}
             selectedTaskId={selectedTask?.id}
           />
+        </TabsContent>
+
+        <TabsContent value="timeline" className="mt-4">
+          <TaskTimeline onAgentClick={handleAgentClick} />
         </TabsContent>
       </Tabs>
       
