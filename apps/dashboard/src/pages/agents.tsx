@@ -668,7 +668,7 @@ function AgentVirtualGrid({
                           <div className="flex flex-wrap gap-2 mb-4">
                             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
                             <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="sm" />
-                            <TeamBadge teamId={(agent as any).teamId} />
+                            <TeamBadge teamId={agent.teamId} />
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
@@ -768,7 +768,7 @@ export function AgentsPage() {
 
     // Team filter
     if (teamFilterValue !== "all") {
-      result = result.filter(a => (a as any).teamId === teamFilterValue);
+      result = result.filter(a => a.teamId === teamFilterValue);
     }
     
     // Sort

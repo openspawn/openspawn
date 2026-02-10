@@ -73,6 +73,9 @@ export class AgentType {
   @Field(() => String, { nullable: true })
   domain?: string | null;
 
+  @Field(() => String, { nullable: true })
+  teamId?: string | null;
+
   @Field(() => ID, { nullable: true })
   parentId?: string | null;
 

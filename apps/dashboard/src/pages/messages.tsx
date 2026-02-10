@@ -314,7 +314,7 @@ function MissionControlFeed({ messages, onViewThread }: { messages: Message[]; o
     if (teamFilter !== 'all') {
       const teamAgentIds = new Set(
         agents
-          .filter((a) => (a as any).teamId === teamFilter)
+          .filter((a) => a.teamId === teamFilter)
           .map((a) => a.id),
       );
       result = result.filter(
@@ -371,7 +371,7 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
   // Build a lookup map from agent id → agent data for reliable name resolution
   const agentMap = useMemo(() => {
     const map = new Map<string, { id: string; name: string; level: number; teamId?: string }>();
-    agents.forEach((a) => map.set(a.id, { id: a.id, name: a.name, level: a.level, teamId: (a as any).teamId }));
+    agents.forEach((a) => map.set(a.id, { id: a.id, name: a.name, level: a.level, teamId: a.teamId }));
     return map;
   }, [agents]);
 
