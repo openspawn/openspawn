@@ -24,7 +24,7 @@ console.log(
 );
 import { PageTransition } from "../components/page-transition";
 import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
-import { AuthProvider } from "../contexts";
+import { AuthProvider, SidePanelProvider } from "../contexts";
 import type { ReactNode } from "react";
 
 // Check for demo mode via URL param or env
@@ -86,6 +86,7 @@ export function App() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <OnboardingProvider>
+            <SidePanelProvider>
             <DemoWrapper>
               <Router>
               <OfflineIndicator />
@@ -123,6 +124,7 @@ export function App() {
               </Routes>
             </Router>
             </DemoWrapper>
+            </SidePanelProvider>
             </OnboardingProvider>
           </NotificationProvider>
         </QueryClientProvider>

@@ -38,7 +38,7 @@ import { Progress } from "../components/ui/progress";
 import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
-import { SplitPanel } from "../components/ui/split-panel";
+import { useSidePanel } from "../contexts";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 import { TeamBadge, TeamFilterDropdown } from "../components/team-badge";
 import { useTeams } from "../hooks";
@@ -711,7 +711,14 @@ export function AgentsPage() {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");
-  const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
+  const { openSidePanel, closeSidePanel } = useSidePanel();
+
+  const openAgentDetail = (agentId: string) => {
+    openSidePanel(
+      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
+      { width: 520 }
+    );
+  };
 
   // Mobile filter toggle
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -878,10 +885,7 @@ export function AgentsPage() {
 
         {/* All Agents Tab */}
         <TabsContent value="agents">
-      <SplitPanel
-        storageKey="agents"
-        rightOpen={!!detailPanelAgentId}
-        left={<div className="p-4 space-y-6">
+      <div className="p-4 space-y-6">
       {/* Filters and Search */}
       <div className="space-y-3">
         <div className="flex gap-3 items-center">
@@ -1009,7 +1013,7 @@ export function AgentsPage() {
       {/* Agents grid (virtualized) */}
       <AgentVirtualGrid
         filteredAgents={filteredAgents}
-        onCardClick={setDetailPanelAgentId}
+        onCardClick={openAgentDetail}
         onAction={handleAction}
       />
 
@@ -1057,20 +1061,12 @@ export function AgentsPage() {
       {selectedAgent && dialogMode === "credits" && (
         <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
       )}
-      </div>}
-        right={
-          <AgentDetailPanel
-            agentId={detailPanelAgentId}
-            onClose={() => setDetailPanelAgentId(null)}
-            inline
-          />
-        }
-      />
+      </div>
         </TabsContent>
 
         {/* Teams Tab */}
         <TabsContent value="teams" className="space-y-6">
-          <TeamView onAgentClick={setDetailPanelAgentId} />
+          <TeamView onAgentClick={openAgentDetail} />
         </TabsContent>
 
         {/* Reputation Tab */}
@@ -1094,7 +1090,6 @@ export function AgentsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Agent Detail Panel now integrated in SplitPanel above */}
     </div>
   );
 }
