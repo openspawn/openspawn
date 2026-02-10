@@ -23,10 +23,12 @@ import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
 import { useAgents, type Agent } from "../hooks/use-agents";
+import { useTasks } from "../hooks/use-tasks";
+import { useMessages, useConversations } from "../hooks/use-messages";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 import { AgentDetailPanel } from "./agent-detail-panel";
 
-// Context to share active delegations, speed, and avatar settings with edge/node components
+// Context to share active delegations, speed, avatar settings, and activity data
 interface TaskDelegation {
   id: string;
   fromId: string;
@@ -34,12 +36,34 @@ interface TaskDelegation {
   taskTitle: string;
   startTime: number;
 }
+
+interface AgentActivity {
+  taskCount: number;
+  messageCount: number;
+  activityLevel: 'hot' | 'warm' | 'cool' | 'idle';
+}
+
+interface EdgeMessageData {
+  count: number;
+  lastMessage?: string;
+  lastMessageTime?: string;
+}
+
 interface NetworkContextValue {
   delegations: TaskDelegation[];
   speed: number;
-  avatarVersion: number; // Increments when avatar settings change
+  avatarVersion: number;
+  agentActivity: Map<string, AgentActivity>;
+  edgeMessages: Map<string, EdgeMessageData>;
 }
-const NetworkContext = createContext<NetworkContextValue>({ delegations: [], speed: 1, avatarVersion: 0 });
+
+const NetworkContext = createContext<NetworkContextValue>({ 
+  delegations: [], 
+  speed: 1, 
+  avatarVersion: 0,
+  agentActivity: new Map(),
+  edgeMessages: new Map(),
+});
 
 // ELK instance for layout
 const elk = new ELK();
@@ -57,7 +81,6 @@ async function getLayoutedElements(
 ): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
   
-  // Must match dimensions in AgentNode component
   const nodeWidth = options.compact ? 80 : 140;
   const nodeHeight = options.compact ? 56 : 80;
   const horizontalSpacing = options.compact ? 30 : 50;
@@ -102,7 +125,7 @@ async function getLayoutedElements(
   return { nodes: layoutedNodes, edges };
 }
 
-// Level colors
+// Level colors (for fallback)
 const levelColors: Record<number, string> = {
   10: "#f472b6", // COO - pink
   9: "#a78bfa", // HR - purple
@@ -114,6 +137,15 @@ const levelColors: Record<number, string> = {
   3: "#fbbf24",
   2: "#71717a", // Probation - gray
   1: "#71717a",
+};
+
+// Heat map colors based on activity
+const heatColors = {
+  hot: "#ef4444",      // red - very busy
+  warm: "#f59e0b",     // orange - busy
+  moderate: "#fbbf24", // yellow - moderate
+  cool: "#06b6d4",     // cyan - light activity
+  idle: "#64748b",     // slate - idle
 };
 
 const roleLabels: Record<string, string> = {
@@ -137,34 +169,60 @@ interface AgentNodeData extends Record<string, unknown> {
   isSpawning?: boolean;
   isDespawning?: boolean;
   compact?: boolean;
+  activityLevel?: 'hot' | 'warm' | 'cool' | 'idle';
+  taskCount?: number;
 }
 
-// Custom node component - stable outer div for ReactFlow, animation on inner content
+// Custom node component with heat map coloring
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
-  const { avatarVersion } = useContext(NetworkContext);
-  const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
+  const { avatarVersion, agentActivity } = useContext(NetworkContext);
+  
+  // Get activity data
+  const activity = agentActivity.get(nodeData.agentId);
+  const activityLevel = activity?.activityLevel || 'idle';
+  const taskCount = activity?.taskCount || 0;
+  
+  // Determine node color based on activity (heat map)
+  let color: string;
+  if (nodeData.isHuman) {
+    color = "#06b6d4"; // Human always cyan
+  } else {
+    // Use heat map colors based on activity
+    switch (activityLevel) {
+      case 'hot':
+        color = heatColors.hot;
+        break;
+      case 'warm':
+        color = heatColors.warm;
+        break;
+      case 'cool':
+        color = heatColors.cool;
+        break;
+      default:
+        color = heatColors.idle;
+    }
+  }
+  
   const isSpawning = nodeData.isSpawning;
   const isDespawning = nodeData.isDespawning;
   const compact = nodeData.compact;
+  const isActive = nodeData.status === "active" && activityLevel !== 'idle';
+  const isIdle = activityLevel === 'idle';
   
-  // Fixed dimensions for consistent handle positioning
   const nodeWidth = compact ? 80 : 140;
   const nodeHeight = compact ? 56 : 80;
   
-  // Generate avatar URL (memoized with avatarVersion dependency for reactivity)
   const avatarUrl = useMemo(() => {
     if (nodeData.isHuman) return null;
     return getAgentAvatarUrl(nodeData.agentId, nodeData.level, compact ? 32 : 48);
   }, [nodeData.agentId, nodeData.level, nodeData.isHuman, compact, avatarVersion]);
   
   return (
-    // Stable outer container - ReactFlow measures this for handle positions
     <div 
       className="relative"
       style={{ width: nodeWidth, height: nodeHeight }}
     >
-      {/* Handles at exact top/bottom center - no CSS offsets */}
       <Handle 
         id="top"
         type="target" 
@@ -178,17 +236,33 @@ function AgentNode({ data, selected }: NodeProps) {
         }}
       />
       
-      {/* Animated content wrapper */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ 
           scale: isDespawning ? 0 : 1, 
-          opacity: isDespawning ? 0 : 1,
+          opacity: isDespawning ? 0 : (isIdle ? 0.5 : 1),
         }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className="absolute inset-0"
       >
+        {/* Pulsing glow for active/busy agents */}
+        {isActive && (
+          <motion.div
+            animate={{ 
+              scale: [1, 1.3, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: activityLevel === 'hot' ? 1 : 2,
+              ease: "easeInOut",
+            }}
+            className="absolute inset-0 rounded-xl blur-lg"
+            style={{ backgroundColor: color }}
+          />
+        )}
+        
         {isSpawning && (
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -200,17 +274,19 @@ function AgentNode({ data, selected }: NodeProps) {
         )}
         
         <motion.div
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           className={`
             w-full h-full flex flex-col items-center justify-center
-            rounded-xl border-2 px-2 py-1
+            rounded-xl border-2 px-2 py-1 transition-all
             ${selected ? "shadow-lg shadow-purple-500/30" : ""}
             ${isSpawning ? "shadow-lg shadow-green-500/50" : ""}
+            ${isActive ? "shadow-lg" : ""}
           `}
           style={{
             borderColor: color,
-            backgroundColor: `${color}15`,
+            backgroundColor: `${color}${isIdle ? '0a' : '15'}`,
+            boxShadow: isActive ? `0 0 20px ${color}40` : undefined,
           }}
         >
           {/* Level badge */}
@@ -226,13 +302,28 @@ function AgentNode({ data, selected }: NodeProps) {
             </motion.div>
           )}
 
+          {/* Task count badge */}
+          {!nodeData.isHuman && taskCount > 0 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className={`absolute rounded-full font-bold text-white bg-purple-600 ${compact ? '-bottom-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-bottom-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
+            >
+              {taskCount}
+            </motion.div>
+          )}
+
           {/* Status indicator */}
           <motion.div
             animate={{
-              scale: nodeData.status === "active" ? [1, 1.2, 1] : 1,
-              opacity: nodeData.status === "active" ? 1 : 0.5,
+              scale: isActive ? [1, 1.3, 1] : 1,
+              opacity: isActive ? 1 : 0.5,
             }}
-            transition={{ repeat: nodeData.status === "active" ? Infinity : 0, duration: 2 }}
+            transition={{ 
+              repeat: isActive ? Infinity : 0, 
+              duration: activityLevel === 'hot' ? 1.5 : 2,
+            }}
             className={`absolute rounded-full ${compact ? '-top-0.5 -left-0.5 w-2 h-2' : '-top-1 -left-1 w-2.5 h-2.5'}`}
             style={{
               backgroundColor:
@@ -296,7 +387,7 @@ function AgentNode({ data, selected }: NodeProps) {
   );
 }
 
-// Custom edge with flowing task packets
+// Custom edge with enhanced flowing particles and variable thickness
 function TaskFlowEdge({
   id,
   sourceX,
@@ -309,10 +400,10 @@ function TaskFlowEdge({
   markerEnd,
   source,
   target,
-}: EdgeProps) {
-  const { delegations, speed } = useContext(NetworkContext);
+  selected,
+}: EdgeProps & { selected?: boolean }) {
+  const { delegations, speed, edgeMessages } = useContext(NetworkContext);
   
-  // ReactFlow now provides correct handle positions (no manual offset needed)
   const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -326,33 +417,103 @@ function TaskFlowEdge({
     (d) => d.fromId === source && d.toId === target
   );
 
+  // Get message count for this edge
+  const edgeKey = `${source}-${target}`;
+  const messageData = edgeMessages.get(edgeKey);
+  const messageCount = messageData?.count || 0;
+  
+  // Calculate edge thickness based on message volume
+  const baseStrokeWidth = 2;
+  const maxStrokeWidth = 6;
+  const strokeWidth = messageCount > 0 
+    ? Math.min(baseStrokeWidth + Math.log(messageCount + 1) * 0.8, maxStrokeWidth)
+    : baseStrokeWidth;
+
   const baseDuration = 1.2;
   const duration = baseDuration / Math.sqrt(speed);
 
+  // Generate multiple particles for busy edges
+  const particleCount = Math.min(Math.max(1, Math.floor(messageCount / 5)), 3);
+  const particles = Array.from({ length: particleCount }, (_, i) => i);
+
   return (
     <>
-      <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
+      <BaseEdge 
+        id={id} 
+        path={edgePath} 
+        style={{
+          ...style,
+          strokeWidth,
+          opacity: selected ? 1 : (messageCount > 0 ? 0.8 : 0.4),
+        }} 
+        markerEnd={markerEnd} 
+      />
       
-      {activeDelegations.map((delegation, index) => (
+      {/* Animated particles along edge */}
+      {activeDelegations.map((delegation) => (
+        <motion.g key={delegation.id}>
+          {/* Main particle */}
+          <motion.circle
+            r={6}
+            fill="#22c55e"
+            filter="drop-shadow(0 0 8px rgba(34, 197, 94, 0.8))"
+            initial={{ offsetDistance: "0%", scale: 0, opacity: 0 }}
+            animate={{ 
+              offsetDistance: "100%", 
+              scale: [0, 1.2, 1, 1, 0.8],
+              opacity: [0, 1, 1, 1, 0],
+            }}
+            transition={{ 
+              duration,
+              ease: "easeInOut",
+              times: [0, 0.1, 0.3, 0.9, 1],
+            }}
+            style={{ 
+              offsetPath: `path("${edgePath}")`,
+            }}
+          />
+          {/* Trailing glow */}
+          <motion.circle
+            r={4}
+            fill="#22c55e"
+            opacity={0.4}
+            filter="blur(4px)"
+            initial={{ offsetDistance: "0%" }}
+            animate={{ 
+              offsetDistance: "100%",
+            }}
+            transition={{ 
+              duration,
+              ease: "easeInOut",
+              delay: 0.1,
+            }}
+            style={{ 
+              offsetPath: `path("${edgePath}")`,
+            }}
+          />
+        </motion.g>
+      ))}
+      
+      {/* Ambient particles for high-traffic edges */}
+      {messageCount > 10 && particles.map((i) => (
         <motion.circle
-          key={delegation.id}
-          r={6}
-          fill="#22c55e"
-          filter="drop-shadow(0 0 8px rgba(34, 197, 94, 0.8))"
-          initial={{ offsetDistance: "0%", scale: 0, opacity: 0 }}
+          key={`ambient-${i}`}
+          r={3}
+          fill="#06b6d4"
+          opacity={0.3}
+          filter="blur(2px)"
           animate={{ 
-            offsetDistance: "100%", 
-            scale: [0, 1.2, 1, 1, 0.8],
-            opacity: [0, 1, 1, 1, 0],
+            offsetDistance: ["0%", "100%"],
+            opacity: [0, 0.3, 0],
           }}
           transition={{ 
-            duration,
-            ease: "easeInOut",
-            times: [0, 0.1, 0.3, 0.9, 1],
+            duration: duration * 2,
+            ease: "linear",
+            repeat: Infinity,
+            delay: i * (duration * 0.5),
           }}
           style={{ 
             offsetPath: `path("${edgePath}")`,
-            offsetDistance: `${index * 15}%`,
           }}
         />
       ))}
@@ -367,9 +528,165 @@ interface AgentNetworkProps {
   className?: string;
 }
 
+// Edge tooltip component
+function EdgeTooltip({ 
+  edgeData, 
+  onClose,
+}: { 
+  edgeData: { source: string; target: string; sourceLabel: string; targetLabel: string } | null;
+  onClose: () => void;
+}) {
+  const { edgeMessages } = useContext(NetworkContext);
+  
+  if (!edgeData) return null;
+  
+  const edgeKey = `${edgeData.source}-${edgeData.target}`;
+  const messageData = edgeMessages.get(edgeKey);
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                 bg-zinc-900/95 backdrop-blur border border-cyan-500/50 rounded-lg p-4 
+                 shadow-xl shadow-cyan-500/20 z-50 min-w-[250px]"
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
+      >
+        ✕
+      </button>
+      
+      <div className="text-sm font-semibold text-white mb-2">
+        {edgeData.sourceLabel} → {edgeData.targetLabel}
+      </div>
+      
+      <div className="space-y-2 text-xs">
+        <div className="flex justify-between items-center">
+          <span className="text-zinc-400">Messages</span>
+          <span className="text-cyan-400 font-semibold">{messageData?.count || 0}</span>
+        </div>
+        
+        {messageData?.lastMessage && (
+          <div className="border-t border-zinc-800 pt-2 mt-2">
+            <div className="text-zinc-500 mb-1">Last message:</div>
+            <div className="text-zinc-300 italic line-clamp-2">
+              "{messageData.lastMessage}"
+            </div>
+            {messageData.lastMessageTime && (
+              <div className="text-zinc-500 text-[10px] mt-1">
+                {new Date(messageData.lastMessageTime).toLocaleString()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// Calculate agent activity levels based on tasks and messages
+function calculateAgentActivity(
+  agents: Agent[],
+  tasks: any[],
+  messages: any[],
+  conversations: any[]
+): Map<string, AgentActivity> {
+  const activityMap = new Map<string, AgentActivity>();
+  
+  // Count tasks per agent
+  const taskCounts = new Map<string, number>();
+  tasks.forEach((task) => {
+    if (task.assignedToId) {
+      taskCounts.set(task.assignedToId, (taskCounts.get(task.assignedToId) || 0) + 1);
+    }
+  });
+  
+  // Count messages per agent
+  const messageCounts = new Map<string, number>();
+  messages.forEach((msg) => {
+    if (msg.fromAgentId) {
+      messageCounts.set(msg.fromAgentId, (messageCounts.get(msg.fromAgentId) || 0) + 1);
+    }
+    if (msg.toAgentId) {
+      messageCounts.set(msg.toAgentId, (messageCounts.get(msg.toAgentId) || 0) + 1);
+    }
+  });
+  
+  // Calculate activity level for each agent
+  agents.forEach((agent) => {
+    const taskCount = taskCounts.get(agent.id) || 0;
+    const messageCount = messageCounts.get(agent.id) || 0;
+    const totalActivity = taskCount * 2 + messageCount; // Weight tasks more heavily
+    
+    let activityLevel: 'hot' | 'warm' | 'cool' | 'idle';
+    if (totalActivity === 0) {
+      activityLevel = 'idle';
+    } else if (totalActivity >= 20) {
+      activityLevel = 'hot';
+    } else if (totalActivity >= 10) {
+      activityLevel = 'warm';
+    } else {
+      activityLevel = 'cool';
+    }
+    
+    activityMap.set(agent.id, {
+      taskCount,
+      messageCount,
+      activityLevel,
+    });
+  });
+  
+  return activityMap;
+}
+
+// Calculate message counts for edges
+function calculateEdgeMessages(
+  messages: any[],
+  conversations: any[]
+): Map<string, EdgeMessageData> {
+  const edgeMap = new Map<string, EdgeMessageData>();
+  
+  // Count direct messages between agents
+  messages.forEach((msg) => {
+    if (msg.fromAgentId && msg.toAgentId) {
+      const key = `${msg.fromAgentId}-${msg.toAgentId}`;
+      const existing = edgeMap.get(key) || { count: 0 };
+      edgeMap.set(key, {
+        count: existing.count + 1,
+        lastMessage: msg.content,
+        lastMessageTime: msg.createdAt,
+      });
+    }
+  });
+  
+  // Add conversation data
+  conversations.forEach((conv) => {
+    if (conv.agents && conv.agents.length === 2) {
+      const [agent1, agent2] = conv.agents;
+      const key = `${agent1.id}-${agent2.id}`;
+      const existing = edgeMap.get(key) || { count: 0 };
+      if (conv.messageCount > existing.count) {
+        edgeMap.set(key, {
+          count: conv.messageCount,
+          lastMessage: conv.latestMessage?.content,
+          lastMessageTime: conv.latestMessage?.createdAt,
+        });
+      }
+    }
+  });
+  
+  return edgeMap;
+}
+
 // Convert API agents to ReactFlow nodes and edges
-function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
-  // Add human node at the top
+function buildNodesAndEdges(
+  agents: Agent[], 
+  compact: boolean,
+  agentActivity: Map<string, AgentActivity>
+): { nodes: Node<AgentNodeData>[]; edges: Edge[] } {
   const nodes: Node<AgentNodeData>[] = [
     {
       id: "human",
@@ -390,8 +707,9 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
 
   const edges: Edge[] = [];
 
-  // Convert agents to nodes
   agents.forEach((agent) => {
+    const activity = agentActivity.get(agent.id);
+    
     nodes.push({
       id: agent.id,
       type: "agent",
@@ -406,13 +724,31 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
         domain: agent.domain || undefined,
         tasksCompleted: 0,
         compact,
+        activityLevel: activity?.activityLevel,
+        taskCount: activity?.taskCount,
       },
     });
 
-    // Create edge from parent
     const parentId = agent.parentId || (agent.level >= 9 ? "human" : undefined);
     if (parentId) {
-      const color = levelColors[agent.level] || "#6366f1";
+      // Use activity-based color for edge
+      let color = levelColors[agent.level] || "#6366f1";
+      if (activity) {
+        switch (activity.activityLevel) {
+          case 'hot':
+            color = heatColors.hot;
+            break;
+          case 'warm':
+            color = heatColors.warm;
+            break;
+          case 'cool':
+            color = heatColors.cool;
+            break;
+          default:
+            color = heatColors.idle;
+        }
+      }
+      
       edges.push({
         id: `e-${parentId}-${agent.id}`,
         source: parentId,
@@ -432,9 +768,18 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
 // Inner component
 function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
-  const { agents, loading } = useAgents();
+  const { agents, loading: agentsLoading } = useAgents();
+  const { tasks, loading: tasksLoading } = useTasks();
+  const { messages } = useMessages(100);
+  const { conversations } = useConversations();
   const { fitView } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<{ 
+    source: string; 
+    target: string; 
+    sourceLabel: string; 
+    targetLabel: string;
+  } | null>(null);
   const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
@@ -445,7 +790,18 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   
-  // Listen for avatar style changes to trigger re-render
+  const loading = agentsLoading || tasksLoading;
+  
+  // Calculate activity metrics
+  const agentActivity = useMemo(() => {
+    return calculateAgentActivity(agents, tasks, messages, conversations);
+  }, [agents, tasks, messages, conversations]);
+  
+  const edgeMessages = useMemo(() => {
+    return calculateEdgeMessages(messages, conversations);
+  }, [messages, conversations]);
+  
+  // Listen for avatar style changes
   useEffect(() => {
     const handleAvatarChange = () => {
       setAvatarVersion(v => v + 1);
@@ -454,26 +810,24 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     return () => window.removeEventListener('avatar-style-changed', handleAvatarChange);
   }, []);
 
-  // Auto-layout: runs whenever agents or compact mode changes
+  // Auto-layout
   useEffect(() => {
     if (loading) return;
     
     setIsLayouted(false);
-    const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents, compact);
+    const { nodes: newNodes, edges: newEdges } = buildNodesAndEdges(agents, compact, agentActivity);
     
-    // Apply layout whenever agent count or compact mode changes
     getLayoutedElements(newNodes, newEdges, { compact }).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
       setIsLayouted(true);
       
-      // Fit view when nodes are added/removed or compact mode toggles
       const agentCountChanged = agents.length !== prevAgentCountRef.current;
       prevAgentCountRef.current = agents.length;
       
-      setTimeout(() => fitView({ padding: 0.15, duration: 400 }), 50);
+      setTimeout(() => fitView({ padding: 0.15, duration: 800 }), 50);
     });
-  }, [agents, loading, compact, setNodes, setEdges, fitView]);
+  }, [agents, loading, compact, agentActivity, setNodes, setEdges, fitView]);
 
   // Task delegation simulation
   useEffect(() => {
@@ -485,7 +839,6 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     ];
 
     const interval = setInterval(() => {
-      // Find edges to animate tasks along
       if (edges.length === 0) return;
       
       const randomEdge = edges[Math.floor(Math.random() * edges.length)];
@@ -512,9 +865,24 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);
-    // Open detail panel for non-human nodes
+    setSelectedEdge(null);
     if (node.id !== "human") {
       setDetailPanelAgentId(node.id);
+    }
+  }
+
+  function handleEdgeClick(_event: React.MouseEvent, edge: Edge) {
+    const sourceNode = nodes.find(n => n.id === edge.source);
+    const targetNode = nodes.find(n => n.id === edge.target);
+    
+    if (sourceNode && targetNode) {
+      setSelectedEdge({
+        source: edge.source,
+        target: edge.target,
+        sourceLabel: String((sourceNode.data as AgentNodeData).label || edge.source),
+        targetLabel: String((targetNode.data as AgentNodeData).label || edge.target),
+      });
+      setSelectedNode(null);
     }
   }
 
@@ -522,12 +890,14 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     delegations: activeDelegations,
     speed: demo.speed,
     avatarVersion,
-  }), [activeDelegations, demo.speed, avatarVersion]);
+    agentActivity,
+    edgeMessages,
+  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages]);
 
   if (loading) {
     return (
       <div className={`flex items-center justify-center ${className}`}>
-        <div className="text-zinc-400">Loading agents...</div>
+        <div className="text-zinc-400">Loading network...</div>
       </div>
     );
   }
@@ -541,6 +911,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
           edgeTypes={edgeTypes}
           nodeTypes={nodeTypes}
           fitView
@@ -561,7 +932,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
         {/* Legend */}
         <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold text-white text-xs sm:text-sm">Levels</span>
+            <span className="font-semibold text-white text-xs sm:text-sm">Activity</span>
             <button
               onClick={() => setCompact(!compact)}
               className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
@@ -576,16 +947,15 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           </div>
           <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
             {[
-              { level: "L10", label: "COO", color: "#f472b6" },
-              { level: "L9", label: "HR", color: "#a78bfa" },
-              { level: "L5-6", label: "Sr", color: "#06b6d4" },
-              { level: "L3-4", label: "Wkr", color: "#fbbf24" },
-              { level: "L1-2", label: "New", color: "#71717a" },
+              { label: "Hot", color: heatColors.hot, desc: "Very busy" },
+              { label: "Warm", color: heatColors.warm, desc: "Busy" },
+              { label: "Cool", color: heatColors.cool, desc: "Light" },
+              { label: "Idle", color: heatColors.idle, desc: "Inactive" },
             ].map((item) => (
-              <div key={item.level} className="flex items-center gap-1 sm:gap-2">
+              <div key={item.label} className="flex items-center gap-1 sm:gap-2">
                 <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-                <span className="text-zinc-400">{item.level}</span>
-                <span className="text-zinc-500 hidden sm:inline">{item.label}</span>
+                <span className="text-zinc-400">{item.label}</span>
+                <span className="text-zinc-500 hidden sm:inline text-[10px]">{item.desc}</span>
               </div>
             ))}
           </div>
@@ -617,6 +987,18 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
               {!(selectedNode.data as AgentNodeData).isHuman && (
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
+                    <span className="text-zinc-500">Activity</span>
+                    <span className="text-white capitalize">
+                      {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.activityLevel || 'idle'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Tasks</span>
+                    <span className="text-purple-400">
+                      {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.taskCount || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-zinc-500">Credits</span>
                     <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
                   </div>
@@ -635,6 +1017,13 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                 </div>
               )}
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edge tooltip */}
+        <AnimatePresence>
+          {selectedEdge && (
+            <EdgeTooltip edgeData={selectedEdge} onClose={() => setSelectedEdge(null)} />
           )}
         </AnimatePresence>
 
