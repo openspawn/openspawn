@@ -66,7 +66,7 @@ function KeyboardShortcutsWrapper({ children }: { children: ReactNode }) {
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultTheme="deep-ocean">
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>

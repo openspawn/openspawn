@@ -2,6 +2,7 @@ export * from "./layout";
 export * from "./protected-route";
 export * from "./theme-provider";
 export * from "./theme-toggle";
+export * from "./theme-picker";
 export * from "./agent-avatar";
 export * from "./agent-mode-selector";
 export * from "./agent-onboarding";

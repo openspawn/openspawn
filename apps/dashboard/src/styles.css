@@ -30,63 +30,198 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
+
+    /* Density spacing variables */
+    --spacing-unit: 1rem;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --text-scale: 1;
   }
 
-  .dark {
-    /* Deep ocean background - dark blue-black */
+  /* ========================================
+     Theme: Deep Ocean (default dark)
+     Dark navy + cyan bioluminescent tones
+     ======================================== */
+  .dark,
+  [data-theme="deep-ocean"] {
     --background: 220 35% 8%;
     --foreground: 180 30% 95%;
-    
-    /* Cards with subtle blue tint */
     --card: 220 30% 10%;
     --card-foreground: 180 25% 95%;
-    
-    /* Popovers */
     --popover: 220 30% 12%;
     --popover-foreground: 180 25% 95%;
-    
-    /* Primary - bioluminescent cyan/aqua */
     --primary: 185 85% 60%;
     --primary-foreground: 220 35% 10%;
-    
-    /* Secondary - deep teal */
     --secondary: 200 40% 20%;
     --secondary-foreground: 180 30% 95%;
-    
-    /* Muted elements */
     --muted: 210 30% 18%;
     --muted-foreground: 200 15% 60%;
-    
-    /* Accent - bright cyan for highlights */
     --accent: 190 90% 55%;
     --accent-foreground: 220 35% 10%;
-    
-    /* Success - emerald */
     --success: 160 84% 39%;
     --success-foreground: 160 84% 95%;
-    
-    /* Warning - amber */
     --warning: 38 92% 50%;
     --warning-foreground: 38 20% 10%;
-    
-    /* Destructive - rose/red */
     --destructive: 350 89% 60%;
     --destructive-foreground: 0 0% 98%;
-    
-    /* Info - cyan */
     --info: 185 85% 60%;
     --info-foreground: 220 35% 10%;
-    
-    /* Special - violet/purple */
     --special: 258 90% 66%;
     --special-foreground: 258 90% 95%;
-    
-    /* Borders with subtle cyan tint */
     --border: 210 25% 22%;
     --input: 210 25% 22%;
-    
-    /* Ring - cyan glow */
     --ring: 185 85% 60%;
+  }
+
+  /* ========================================
+     Theme: Coral Reef (warm dark)
+     Dark warm tones, coral/orange accents
+     ======================================== */
+  [data-theme="coral-reef"] {
+    --background: 15 30% 8%;
+    --foreground: 30 30% 93%;
+    --card: 15 25% 11%;
+    --card-foreground: 30 25% 93%;
+    --popover: 15 25% 13%;
+    --popover-foreground: 30 25% 93%;
+    --primary: 16 85% 62%;
+    --primary-foreground: 15 30% 8%;
+    --secondary: 20 35% 20%;
+    --secondary-foreground: 30 30% 93%;
+    --muted: 18 25% 18%;
+    --muted-foreground: 20 15% 55%;
+    --accent: 28 90% 55%;
+    --accent-foreground: 15 30% 8%;
+    --success: 155 70% 40%;
+    --success-foreground: 155 70% 95%;
+    --warning: 45 90% 52%;
+    --warning-foreground: 45 20% 10%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 16 85% 62%;
+    --info-foreground: 15 30% 8%;
+    --special: 320 70% 60%;
+    --special-foreground: 320 70% 95%;
+    --border: 18 20% 22%;
+    --input: 18 20% 22%;
+    --ring: 16 85% 62%;
+  }
+
+  /* ========================================
+     Theme: Arctic Ice (light)
+     Clean white/light blue, cool tones
+     ======================================== */
+  [data-theme="arctic-ice"] {
+    --background: 205 30% 97%;
+    --foreground: 215 25% 12%;
+    --card: 205 25% 100%;
+    --card-foreground: 215 25% 12%;
+    --popover: 205 25% 100%;
+    --popover-foreground: 215 25% 12%;
+    --primary: 205 80% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 25% 92%;
+    --secondary-foreground: 215 25% 15%;
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 15% 45%;
+    --accent: 195 85% 42%;
+    --accent-foreground: 0 0% 100%;
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 10%;
+    --destructive: 350 89% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 205 80% 45%;
+    --info-foreground: 0 0% 100%;
+    --special: 258 70% 58%;
+    --special-foreground: 0 0% 100%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 205 80% 45%;
+  }
+
+  /* ========================================
+     Theme: Bioluminescent (high contrast dark)
+     Deep black, vivid neon cyan/green accents
+     ======================================== */
+  [data-theme="bioluminescent"] {
+    --background: 220 30% 5%;
+    --foreground: 165 50% 95%;
+    --card: 220 25% 7%;
+    --card-foreground: 165 40% 95%;
+    --popover: 220 25% 9%;
+    --popover-foreground: 165 40% 95%;
+    --primary: 170 100% 50%;
+    --primary-foreground: 220 30% 5%;
+    --secondary: 195 50% 15%;
+    --secondary-foreground: 165 50% 95%;
+    --muted: 210 25% 13%;
+    --muted-foreground: 180 20% 55%;
+    --accent: 150 100% 50%;
+    --accent-foreground: 220 30% 5%;
+    --success: 150 100% 45%;
+    --success-foreground: 150 100% 95%;
+    --warning: 55 100% 50%;
+    --warning-foreground: 55 20% 10%;
+    --destructive: 340 100% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 170 100% 50%;
+    --info-foreground: 220 30% 5%;
+    --special: 280 100% 65%;
+    --special-foreground: 280 100% 95%;
+    --border: 200 30% 18%;
+    --input: 200 30% 18%;
+    --ring: 170 100% 50%;
+  }
+
+  /* ========================================
+     Theme: Midnight Abyss (OLED dark)
+     Pure black background, minimal accents
+     ======================================== */
+  [data-theme="midnight-abyss"] {
+    --background: 0 0% 0%;
+    --foreground: 220 10% 85%;
+    --card: 220 10% 4%;
+    --card-foreground: 220 10% 85%;
+    --popover: 220 10% 6%;
+    --popover-foreground: 220 10% 85%;
+    --primary: 210 50% 55%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 220 10% 85%;
+    --muted: 220 10% 10%;
+    --muted-foreground: 220 8% 45%;
+    --accent: 210 40% 50%;
+    --accent-foreground: 0 0% 0%;
+    --success: 160 60% 40%;
+    --success-foreground: 160 60% 95%;
+    --warning: 38 70% 50%;
+    --warning-foreground: 38 20% 10%;
+    --destructive: 350 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 210 50% 55%;
+    --info-foreground: 0 0% 0%;
+    --special: 258 60% 58%;
+    --special-foreground: 258 60% 95%;
+    --border: 220 10% 14%;
+    --input: 220 10% 14%;
+    --ring: 210 50% 55%;
+  }
+
+  /* ========================================
+     Density: Compact
+     ======================================== */
+  .density-compact {
+    --spacing-unit: 0.75rem;
+    --spacing-xs: 0.125rem;
+    --spacing-sm: 0.25rem;
+    --spacing-md: 0.5rem;
+    --spacing-lg: 1rem;
+    --text-scale: 0.9;
+    font-size: 90%;
   }
 }
 
@@ -97,6 +232,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  /* Smooth theme transitions */
+  html.theme-transitioning,
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease !important;
   }
 }
 
