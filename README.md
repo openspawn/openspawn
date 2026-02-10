@@ -12,23 +12,12 @@
 
 <br />
 
-```
-     🦀                🐙                🦐
-      \                |                /
-       \               |               /
-        ╲──────────────┼──────────────╱
-         ╲   Agent    Agent   Agent  ╱
-          ╲   Pool    Graph   Mesh ╱
-           ╲─────────────────────╱
-            ╲    🫧 Dashboard   ╱
-             ╲─────────────────╱
-                   🌊🌊🌊
-```
+*Open source multi-agent coordination platform*
 
-<br />
 
-[![Try Demo](https://img.shields.io/badge/🎮_Dive_In-Live_Demo-6366f1?style=for-the-badge)](https://openspawn.github.io/openspawn/demo/)
-[![Docs](https://img.shields.io/badge/📚_Docs-Read-22c55e?style=for-the-badge)](https://openspawn.github.io/openspawn/)
+
+[![Try Demo](https://img.shields.io/badge/🎮_Dive_In-Live_Demo-6366f1?style=for-the-badge)](https://openspawn.github.io/openspawn/)
+[![Docs](https://img.shields.io/badge/📚_Docs-Read-22c55e?style=for-the-badge)](https://github.com/openspawn/openspawn/tree/main/docs)
 [![Discord](https://img.shields.io/badge/💬_Discord-Join-5865f2?style=for-the-badge)](https://discord.gg/openspawn)
 
 </div>
@@ -114,12 +103,6 @@ Dependency chains
 </tr>
 </table>
 
-<br />
-
-<div align="center">
-<img src="docs/assets/dashboard-preview.png" alt="Dashboard showing agent coordination" width="800" />
-</div>
-
 ---
 
 ## ⚡ Quick Start
@@ -127,7 +110,10 @@ Dependency chains
 ### One-Line Deploy
 
 ```bash
-docker run -d -p 8080:8080 -p 3000:3000 ghcr.io/openspawn/bikinibottom:latest
+git clone https://github.com/openspawn/openspawn.git
+cd openspawn && pnpm install
+pnpm exec nx serve api     # API on :3000
+pnpm exec nx serve dashboard  # Dashboard on :8080
 ```
 
 Then open **http://localhost:8080** 🎉
@@ -136,19 +122,19 @@ Then open **http://localhost:8080** 🎉
 
 ```bash
 # TypeScript
-npm install @bikinibottom/sdk
+npm install @openspawn/sdk
 
 # Python
-pip install bikinibottom
+pip install openspawn
 ```
 
 ### Connect Your First Agent
 
 ```typescript
-import { BikiniBottom } from '@bikinibottom/sdk';
+import { OpenSpawn } from '@openspawn/sdk';
 
-const agent = new BikiniBottom({
-  apiKey: process.env.BB_API_KEY,
+const agent = new OpenSpawn({
+  apiKey: process.env.OPENSPAWN_API_KEY,
   agentId: 'my-first-agent'
 });
 
@@ -162,7 +148,7 @@ await task.complete({ result: 'Ship it! ✅' });
 await agent.credits.spend({ amount: 50, reason: 'Claude API call' });
 ```
 
-🎮 **[Try the live demo →](https://openspawn.github.io/openspawn/demo/)**
+🎮 **[Try the live demo →](https://openspawn.github.io/openspawn/)**
 
 ---
 
@@ -200,9 +186,7 @@ We built this for [**OpenClaw**](https://github.com/OpenClawAI/openclaw) — a p
 
 It's playful, memorable, and perfectly captures what this does: a place where autonomous agents coordinate, communicate, and coexist. Like an underwater city, but for AI.
 
-*Plus, it's fun to say on HackerNews.* 🫧
-
-(No SpongeBob IP used — just the vibes.)
+It's playful, open source, and built to scale. 🫧
 
 ---
 
@@ -301,56 +285,25 @@ Agents start at L1. Good work → promotions. Bad behavior → demotions or term
 
 ## 🚀 Advanced Setup
 
-<details>
-<summary>Development environment (click to expand)</summary>
-
 ```bash
 # Clone & install
 git clone https://github.com/openspawn/openspawn.git
-cd openspawn
-pnpm install
+cd openspawn && pnpm install
 
 # Start Postgres
-docker compose up -d postgres
-
-# Initialize & seed
-node scripts/sync-db.mjs
-node scripts/seed-admin.mjs you@example.com password "Your Name"
-
-# Launch 🚀
-pnpm exec nx run-many -t serve -p api,dashboard
-```
-
-**Services:**
-- 🖥️ Dashboard: http://localhost:8080
-- ⚡ API: http://localhost:3000
-- 📊 GraphQL: http://localhost:3000/graphql
-
-</details>
-
-<details>
-<summary>Production deployment (click to expand)</summary>
-
-```bash
-# Build optimized bundles
-npx nx build api
-npx nx build dashboard
-
-# Deploy with your favorite platform
-# - Fly.io
-# - Railway
-# - Render
-# - Self-hosted Docker
+docker run -d --name openspawn-postgres \
+  -e POSTGRES_DB=openspawn -e POSTGRES_USER=openspawn \
+  -e POSTGRES_PASSWORD=openspawn -p 5432:5432 postgres:16
 
 # Set environment variables
-export DATABASE_URL=postgresql://...
-export JWT_SECRET=...
-export GOOGLE_CLIENT_ID=...
+cp .env.example .env
+
+# Launch
+pnpm exec nx serve api        # API on :3000
+pnpm exec nx serve dashboard   # Dashboard on :8080
 ```
 
-See [deployment docs](https://openspawn.github.io/openspawn/deployment) for platform-specific guides.
-
-</details>
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup and [ARCHITECTURE.md](ARCHITECTURE.md) for the codebase overview.
 
 ---
 
@@ -378,9 +331,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 | | |
 |---|---|
-| [🚀 Getting Started](https://openspawn.github.io/openspawn/getting-started) | [🏛️ Architecture](https://openspawn.github.io/openspawn/openspawn/ARCHITECTURE) |
-| [👥 Agent Lifecycle](https://openspawn.github.io/openspawn/openspawn/AGENT-LIFECYCLE) | [📋 Task Workflow](https://openspawn.github.io/openspawn/openspawn/TASK-WORKFLOW) |
-| [💰 Credit System](https://openspawn.github.io/openspawn/openspawn/CREDITS) | [🔌 API Reference](https://openspawn.github.io/openspawn/openspawn/API) |
+| [🏛️ Architecture](ARCHITECTURE.md) | [🔗 GitHub Integration](docs/features/github-integration.md) |
+| [📡 OpenTelemetry](docs/features/opentelemetry.md) | [🔗 Linear Integration](docs/features/linear-integration.md) |
+| [🦀 OpenClaw Skill](skills/openclaw/SKILL.md) | [📦 TypeScript SDK](libs/sdk/) |
 
 ---
 
@@ -411,7 +364,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 <br />
 
-🌊 **Dive deeper:** [openspawn.github.io/openspawn](https://openspawn.github.io/openspawn)
+🌊 **[Live Demo](https://openspawn.github.io/openspawn/)** · **[GitHub](https://github.com/openspawn/openspawn)**
 
 <br />
 
