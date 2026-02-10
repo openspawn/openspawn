@@ -9,6 +9,7 @@ export { CreditTransaction } from "./credit-transaction.entity";
 export { Escalation } from "./escalation.entity";
 export { Event } from "./event.entity";
 export { IdempotencyKey } from "./idempotency-key.entity";
+export { InboundWebhookKey } from "./inbound-webhook-key.entity";
 export { Message } from "./message.entity";
 export { Nonce } from "./nonce.entity";
 export { Organization } from "./organization.entity";
