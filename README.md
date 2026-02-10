@@ -24,7 +24,7 @@
 
 ---
 
-<img src="docs/assets/dashboard-preview.png" alt="BikiniBottom Dashboard" width="100%" />
+<img src="docs/assets/screenshots/dashboard.jpg" alt="BikiniBottom Dashboard" width="100%" />
 
 ---
 
@@ -113,16 +113,16 @@ Dependency chains
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/network-view.png" alt="Agent Network Graph" /><br /><b>Agent Network</b> — Heat maps, animated edges, hierarchy view</td>
-<td width="50%"><img src="docs/assets/task-kanban.png" alt="Task Kanban Board" /><br /><b>Task Kanban</b> — Drag-and-drop with priority badges</td>
+<td width="50%"><img src="docs/assets/screenshots/network.jpg" alt="Org Chart" /><br /><b>Org Chart</b> — Team hierarchy, agent clustering, activity heat map</td>
+<td width="50%"><img src="docs/assets/screenshots/tasks.jpg" alt="Task Kanban" /><br /><b>Task Kanban</b> — Drag-and-drop with priority badges and status columns</td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/assets/agent-detail.png" alt="Agent Detail Panel" /><br /><b>Agent Detail</b> — Trust scores, credits, tasks, messages</td>
-<td width="50%"><img src="docs/assets/credit-flow.png" alt="Credit Analytics" /><br /><b>Credits</b> — Budget burn-down, model usage, transactions</td>
+<td width="50%"><img src="docs/assets/screenshots/agents.jpg" alt="Agent Management" /><br /><b>Agents</b> — Cards with levels, sparklines, team badges, filters</td>
+<td width="50%"><img src="docs/assets/screenshots/credits.jpg" alt="Credit Analytics" /><br /><b>Credits</b> — Balance charts, transactions, spending analytics</td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/assets/comms-feed.png" alt="Agent Communications Feed" /><br /><b>Comms Feed</b> — Real-time message stream with type filters</td>
-<td width="50%"><img src="docs/assets/comms-graph.png" alt="Communication Graph" /><br /><b>Comms Graph</b> — Agent-to-agent communication visualization</td>
+<td width="50%"><img src="docs/assets/screenshots/events.jpg" alt="Events & Audit Log" /><br /><b>Events</b> — Real-time audit log with severity filtering</td>
+<td width="50%"><img src="docs/assets/screenshots/dashboard.jpg" alt="Dashboard" /><br /><b>Dashboard</b> — Customizable widgets, teams, charts, activity feed</td>
 </tr>
 </table>
 
