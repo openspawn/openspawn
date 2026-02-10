@@ -10,7 +10,11 @@ const DialogTrigger = React.forwardRef<
 >(({ asChild, children, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
     return (
-      <BaseDialog.Trigger ref={ref} render={children} {...props} />
+      <BaseDialog.Trigger
+        ref={ref}
+        render={children}
+        {...props}
+      />
     );
   }
   return (
@@ -27,7 +31,11 @@ const DialogClose = React.forwardRef<
 >(({ asChild, children, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
     return (
-      <BaseDialog.Close ref={ref} render={children} {...props} />
+      <BaseDialog.Close
+        ref={ref}
+        render={children}
+        {...props}
+      />
     );
   }
   return (

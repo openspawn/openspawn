@@ -12,7 +12,11 @@ const DropdownMenuTrigger = React.forwardRef<
 >(({ asChild, children, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
     return (
-      <Menu.Trigger ref={ref} render={children} {...props} />
+      <Menu.Trigger
+        ref={ref}
+        render={children}
+        {...props}
+      />
     );
   }
   return (
@@ -75,10 +79,12 @@ const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof Menu.Popup> & {
     sideOffset?: number;
+    align?: 'start' | 'center' | 'end';
+    side?: 'top' | 'bottom' | 'left' | 'right';
   }
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 4, align, side, ...props }, ref) => (
   <Menu.Portal>
-    <Menu.Positioner sideOffset={sideOffset}>
+    <Menu.Positioner sideOffset={sideOffset} alignment={align === 'end' ? 'end' : align === 'start' ? 'start' : 'center'} side={side}>
       <Menu.Popup
         ref={ref}
         className={cn(
@@ -157,11 +163,11 @@ DropdownMenuRadioItem.displayName = "DropdownMenuRadioItem";
 
 const DropdownMenuLabel = React.forwardRef<
   HTMLDivElement,
-  React.ComponentPropsWithoutRef<typeof Menu.GroupLabel> & {
+  React.HTMLAttributes<HTMLDivElement> & {
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
-  <Menu.GroupLabel
+  <div
     ref={ref}
     className={cn(
       "px-2 py-1.5 text-sm font-semibold",

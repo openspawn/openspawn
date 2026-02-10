@@ -18,8 +18,8 @@ const TooltipTrigger = React.forwardRef<
     return (
       <BaseTooltip.Trigger
         ref={ref}
-        {...props}
         render={children}
+        {...props}
       />
     );
   }
