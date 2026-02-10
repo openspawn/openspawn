@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 import {
@@ -30,6 +31,105 @@ function formatDate(dateString: string) {
 function formatChartTime(dateString: string) {
   const date = new Date(dateString);
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function TransactionVirtualList({ transactions }: { transactions: ReturnType<typeof useCredits>["transactions"] }) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: transactions.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 72,
+    overscan: 5,
+  });
+
+  if (transactions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Coins className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No transactions yet</p>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={parentRef} className="h-[300px] overflow-auto">
+      <div style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}>
+        <AnimatePresence mode="popLayout">
+          {virtualizer.getVirtualItems().map((virtualRow) => {
+            const tx = transactions[virtualRow.index];
+            return (
+              <motion.div
+                key={tx.id}
+                layout
+                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                  delay: virtualRow.index < 10 ? virtualRow.index * 0.02 : 0,
+                }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="flex items-center justify-between rounded-lg border border-border p-3"
+              >
+                <div className="flex items-center gap-3">
+                  {tx.type === "CREDIT" ? (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", delay: 0.1 }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10"
+                    >
+                      <ArrowUpRight className="h-4 w-4 text-emerald-500" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", delay: 0.1 }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10"
+                    >
+                      <ArrowDownLeft className="h-4 w-4 text-amber-500" />
+                    </motion.div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium">{tx.reason}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(tx.createdAt)} at {formatTime(tx.createdAt)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className={`font-medium ${
+                      tx.type === "CREDIT"
+                        ? "text-emerald-500"
+                        : "text-amber-500"
+                    }`}
+                  >
+                    {tx.type === "CREDIT" ? "+" : "-"}
+                    {tx.amount.toLocaleString()}
+                  </motion.p>
+                  <p className="text-xs text-muted-foreground">
+                    Balance: {tx.balanceAfter.toLocaleString()}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 }
 
 export function CreditsPage() {
@@ -216,79 +316,7 @@ export function CreditsPage() {
             <CardTitle>Recent Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-3">
-                <AnimatePresence mode="popLayout">
-                  {transactions.map((tx, index) => (
-                    <motion.div
-                      key={tx.id}
-                      layout
-                      initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 400, 
-                        damping: 30,
-                        delay: index * 0.02 // Stagger effect for initial load
-                      }}
-                      className="flex items-center justify-between rounded-lg border border-border p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        {tx.type === "CREDIT" ? (
-                          <motion.div 
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", delay: 0.1 }}
-                            className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10"
-                          >
-                            <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                          </motion.div>
-                        ) : (
-                          <motion.div 
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", delay: 0.1 }}
-                            className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10"
-                          >
-                            <ArrowDownLeft className="h-4 w-4 text-amber-500" />
-                          </motion.div>
-                        )}
-                        <div>
-                          <p className="text-sm font-medium">{tx.reason}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDate(tx.createdAt)} at {formatTime(tx.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className={`font-medium ${
-                            tx.type === "CREDIT"
-                              ? "text-emerald-500"
-                              : "text-amber-500"
-                          }`}
-                        >
-                          {tx.type === "CREDIT" ? "+" : "-"}
-                          {tx.amount.toLocaleString()}
-                        </motion.p>
-                        <p className="text-xs text-muted-foreground">
-                          Balance: {tx.balanceAfter.toLocaleString()}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {transactions.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <Coins className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">No transactions yet</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+            <TransactionVirtualList transactions={transactions} />
           </CardContent>
         </Card>
       </div>
