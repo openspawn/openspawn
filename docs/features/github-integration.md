@@ -2,7 +2,7 @@
 
 ## Overview
 
-The GitHub integration enables bidirectional synchronization between GitHub (issues, PRs, comments, check suites) and OpenSpawn tasks/messages. When activity happens on GitHub, OpenSpawn automatically creates and updates tasks. When tasks change in OpenSpawn, GitHub issues are updated accordingly.
+The GitHub integration enables bidirectional synchronization between GitHub (issues, PRs, comments, check suites) and BikiniBottom tasks/messages. When activity happens on GitHub, BikiniBottom automatically creates and updates tasks. When tasks change in BikiniBottom, GitHub issues are updated accordingly.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ GitHub ──webhook──► GitHubWebhookController ──► GitHubService �
                                               GitHubConnection        IntegrationLink
                                                 (DB entity)            (DB entity)
 
-OpenSpawn Events ──@OnEvent──► GitHubService.syncOutbound ──► GitHub API
+BikiniBottom Events ──@OnEvent──► GitHubService.syncOutbound ──► GitHub API
 ```
 
 ### Key Components
@@ -40,7 +40,7 @@ OpenSpawn Events ──@OnEvent──► GitHubService.syncOutbound ──► Gi
 3. Subscribe to events: `issues`, `issue_comment`, `pull_request`, `check_suite`
 4. Set the webhook URL to: `https://your-domain.com/api/integrations/github/webhook`
 
-### 2. Create a Connection in OpenSpawn
+### 2. Create a Connection in BikiniBottom
 
 Navigate to **Settings → GitHub** in the dashboard, or use the API:
 
@@ -60,9 +60,9 @@ The response includes a `webhookSecret` — configure this in your GitHub App se
 
 Copy the `webhookSecret` from the connection and paste it into your GitHub App's webhook secret field. This enables HMAC-SHA256 signature verification.
 
-## Inbound Events (GitHub → OpenSpawn)
+## Inbound Events (GitHub → BikiniBottom)
 
-| GitHub Event | Action | OpenSpawn Result |
+| GitHub Event | Action | BikiniBottom Result |
 |-------------|--------|-----------------|
 | `issues` (opened/labeled with `agent-work`) | Create task | New task linked to issue |
 | `issues` (closed) | Update linked task | Task status updated |
@@ -74,9 +74,9 @@ Copy the `webhookSecret` from the connection and paste it into your GitHub App's
 
 By default, only issues labeled with `agent-work` trigger task creation. This is configurable per connection via `syncConfig.inbound.requiredLabel`.
 
-## Outbound Events (OpenSpawn → GitHub)
+## Outbound Events (BikiniBottom → GitHub)
 
-| OpenSpawn Event | GitHub Action |
+| BikiniBottom Event | GitHub Action |
 |----------------|---------------|
 | `task.completed` | Close linked GitHub issue |
 | `task.status_changed` | Update labels, post status comment |

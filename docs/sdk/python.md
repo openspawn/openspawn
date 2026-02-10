@@ -1,6 +1,6 @@
 # Python SDK Documentation
 
-The OpenSpawn Python SDK provides a type-safe, async-ready interface to the OpenSpawn API.
+The BikiniBottom Python SDK provides a type-safe, async-ready interface to the BikiniBottom API.
 
 ## Installation
 
@@ -10,16 +10,16 @@ pip install openspawn
 
 ## Authentication
 
-OpenSpawn supports two authentication methods:
+BikiniBottom supports two authentication methods:
 
 ### API Key Authentication
 
 Recommended for server-to-server communication and admin operations:
 
 ```python
-from openspawn import OpenSpawnClient
+from openspawn import BikiniBottomClient
 
-client = OpenSpawnClient(
+client = BikiniBottomClient(
     base_url="https://api.openspawn.dev",
     api_key="your-api-key"
 )
@@ -32,9 +32,9 @@ API keys are typically issued to HR or admin agents and provide full access to o
 Recommended for agent-to-agent communication with enhanced security:
 
 ```python
-from openspawn import OpenSpawnClient
+from openspawn import BikiniBottomClient
 
-client = OpenSpawnClient(
+client = BikiniBottomClient(
     base_url="https://api.openspawn.dev",
     agent_id="your-agent-id",
     secret="your-64-char-hex-secret"
@@ -63,16 +63,16 @@ The SDK provides both synchronous and asynchronous clients:
 Best for scripts, CLI tools, and simple automations:
 
 ```python
-from openspawn import OpenSpawnClient
+from openspawn import BikiniBottomClient
 
 # Context manager (recommended)
-with OpenSpawnClient(base_url="...", api_key="...") as client:
+with BikiniBottomClient(base_url="...", api_key="...") as client:
     agents = client.agents.list()
     for agent in agents:
         print(agent.name)
 
 # Manual cleanup
-client = OpenSpawnClient(base_url="...", api_key="...")
+client = BikiniBottomClient(base_url="...", api_key="...")
 try:
     agents = client.agents.list()
 finally:
@@ -85,10 +85,10 @@ Best for high-throughput applications, web servers, and concurrent operations:
 
 ```python
 import asyncio
-from openspawn import AsyncOpenSpawnClient
+from openspawn import AsyncBikiniBottomClient
 
 async def main():
-    async with AsyncOpenSpawnClient(base_url="...", api_key="...") as client:
+    async with AsyncBikiniBottomClient(base_url="...", api_key="...") as client:
         # Concurrent operations
         agents, tasks, balance = await asyncio.gather(
             client.agents.list(),
@@ -363,7 +363,7 @@ from openspawn.http_client import (
     APIError,
     AuthenticationError,
     RetryableError,
-    OpenSpawnError
+    BikiniBottomError
 )
 
 try:
@@ -389,7 +389,7 @@ except RetryableError as e:
     # Network errors or retryable status codes after max retries
     print(f"Request failed after retries: {e}")
     
-except OpenSpawnError as e:
+except BikiniBottomError as e:
     # Base exception for all SDK errors
     print(f"SDK error: {e}")
 ```
@@ -403,7 +403,7 @@ The SDK automatically retries failed requests with exponential backoff for:
 - Retryable HTTP status codes: 408 (timeout), 429 (rate limit), 500, 502, 503, 504
 
 ```python
-client = OpenSpawnClient(
+client = BikiniBottomClient(
     base_url="https://api.openspawn.dev",
     api_key="your-api-key",
     max_retries=3,  # Default: 3
@@ -451,11 +451,11 @@ The SDK generates a unique idempotency key for each request and includes it in t
 The SDK is fully typed with Pydantic models and type hints:
 
 ```python
-from openspawn import OpenSpawnClient
+from openspawn import BikiniBottomClient
 from openspawn.models import Agent, Task, CreditTransaction
 from openspawn.enums import TaskStatus, AgentRole
 
-client: OpenSpawnClient = OpenSpawnClient(...)
+client: BikiniBottomClient = BikiniBottomClient(...)
 
 # Type hints work throughout
 agents: list[Agent] = client.agents.list()
@@ -484,11 +484,11 @@ Always use context managers to ensure proper cleanup:
 
 ```python
 # ✅ Good - automatic cleanup
-with OpenSpawnClient(...) as client:
+with BikiniBottomClient(...) as client:
     agents = client.agents.list()
 
 # ❌ Bad - manual cleanup required
-client = OpenSpawnClient(...)
+client = BikiniBottomClient(...)
 agents = client.agents.list()
 client.close()  # Easy to forget!
 ```
@@ -520,10 +520,10 @@ When making multiple independent requests, use async for better performance:
 
 ```python
 import asyncio
-from openspawn import AsyncOpenSpawnClient
+from openspawn import AsyncBikiniBottomClient
 
 async def process_agents():
-    async with AsyncOpenSpawnClient(...) as client:
+    async with AsyncBikiniBottomClient(...) as client:
         # Fetch multiple resources concurrently
         agents, tasks, events = await asyncio.gather(
             client.agents.list(),
@@ -544,7 +544,7 @@ Never hardcode secrets. Use environment variables or secret management:
 ```python
 import os
 
-client = OpenSpawnClient(
+client = BikiniBottomClient(
     base_url=os.environ["OPENSPAWN_API_URL"],
     agent_id=os.environ["OPENSPAWN_AGENT_ID"],
     secret=os.environ["OPENSPAWN_SECRET"]
@@ -575,11 +575,11 @@ client.credits.spend(
 ### Complete Task Workflow
 
 ```python
-from openspawn import OpenSpawnClient
+from openspawn import BikiniBottomClient
 from openspawn.models import CreateTaskRequest, TransitionTaskRequest
 from openspawn.enums import TaskStatus, TaskPriority
 
-with OpenSpawnClient(...) as client:
+with BikiniBottomClient(...) as client:
     # Create task
     task = client.tasks.create(
         CreateTaskRequest(
@@ -646,17 +646,17 @@ The Python SDK follows similar patterns:
 
 ```typescript
 // TypeScript
-const client = new OpenSpawnClient({ apiKey: "..." });
+const client = new BikiniBottomClient({ apiKey: "..." });
 const agents = await client.agents.list();
 ```
 
 ```python
 # Python (sync)
-client = OpenSpawnClient(api_key="...")
+client = BikiniBottomClient(api_key="...")
 agents = client.agents.list()
 
 # Python (async)
-client = AsyncOpenSpawnClient(api_key="...")
+client = AsyncBikiniBottomClient(api_key="...")
 agents = await client.agents.list()
 ```
 
@@ -709,7 +709,7 @@ CreateTaskRequest(title="...", priority=TaskPriority.HIGH)
 import asyncio
 
 async def main():
-    async with AsyncOpenSpawnClient(...) as client:
+    async with AsyncBikiniBottomClient(...) as client:
         await client.agents.list()
 
 # ✅ Correct

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Credit System - OpenSpawn
+title: Credit System - BikiniBottom
 ---
 
 # Credit System & Economy
@@ -9,7 +9,7 @@ title: Credit System - OpenSpawn
 
 ## Overview
 
-OpenSpawn implements a credit-based economy where agents earn credits for work and spend them on resources. This creates accountability, enables cost tracking, and prevents runaway spending.
+BikiniBottom implements a credit-based economy where agents earn credits for work and spend them on resources. This creates accountability, enables cost tracking, and prevents runaway spending.
 
 ## Core Concepts
 

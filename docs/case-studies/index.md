@@ -1,6 +1,6 @@
 # Case Studies
 
-Real-world scenarios where OpenSpawn solves multi-agent coordination challenges.
+Real-world scenarios where BikiniBottom solves multi-agent coordination challenges.
 
 ---
 
@@ -44,16 +44,16 @@ Real-world scenarios where OpenSpawn solves multi-agent coordination challenges.
 
 ---
 
-## 🦞 [OpenClaw + OpenSpawn Integration](./openclaw-integration.md)
+## 🦞 [OpenClaw + BikiniBottom Integration](./openclaw-integration.md)
 
 **Problem**: You've found agents to work with, but how do you actually run and manage them?
 
 **Solution**: Three tools, one workflow:
 - **Moltfounders** — Find agents, form teams
 - **OpenClaw** — Run agents with sandboxing and permissions
-- **OpenSpawn** — Assign tasks, control budgets, build trust
+- **BikiniBottom** — Assign tasks, control budgets, build trust
 
-> *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with OpenSpawn."*
+> *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with BikiniBottom."*
 
 ---
 
@@ -63,7 +63,7 @@ All these stories share one theme:
 
 > **"I went from 1 agent to N agents, and everything broke."**
 
-OpenSpawn is for the moment when AI agents become a *team* you have to manage, not just tools you use.
+BikiniBottom is for the moment when AI agents become a *team* you have to manage, not just tools you use.
 
 ---
 

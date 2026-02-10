@@ -1,10 +1,10 @@
 # Outbound Webhooks
 
-Outbound webhooks allow OpenSpawn to send HTTP callbacks to external services when events occur in your organization. This enables integrations with third-party tools, custom workflows, and real-time notifications.
+Outbound webhooks allow BikiniBottom to send HTTP callbacks to external services when events occur in your organization. This enables integrations with third-party tools, custom workflows, and real-time notifications.
 
 ## Overview
 
-OpenSpawn supports two types of webhooks:
+BikiniBottom supports two types of webhooks:
 
 - **Post-Hooks**: Fire after an action completes (async, non-blocking)
 - **Pre-Hooks**: Fire before an action occurs and can block/approve the action
@@ -45,13 +45,13 @@ All webhooks receive a JSON payload with the following structure:
 Every webhook request includes the following headers:
 
 - `Content-Type: application/json`
-- `X-OpenSpawn-Event: <event-type>` — The event type (e.g., `task.created`)
-- `X-OpenSpawn-Delivery: <uuid>` — Unique delivery ID for idempotency
-- `X-OpenSpawn-Signature: sha256=<hmac>` — HMAC signature (if secret configured)
+- `X-BikiniBottom-Event: <event-type>` — The event type (e.g., `task.created`)
+- `X-BikiniBottom-Delivery: <uuid>` — Unique delivery ID for idempotency
+- `X-BikiniBottom-Signature: sha256=<hmac>` — HMAC signature (if secret configured)
 
 ## Signature Verification
 
-If you configure a webhook secret, OpenSpawn signs each payload with HMAC-SHA256. Verify the signature to ensure the request came from OpenSpawn:
+If you configure a webhook secret, BikiniBottom signs each payload with HMAC-SHA256. Verify the signature to ensure the request came from BikiniBottom:
 
 ### Node.js Example
 
@@ -102,7 +102,7 @@ def verify_webhook_signature(payload: str, signature: str, secret: str) -> bool:
 # Flask example
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    signature = request.headers.get('X-OpenSpawn-Signature')
+    signature = request.headers.get('X-BikiniBottom-Signature')
     payload = request.get_data(as_text=True)
     
     if not verify_webhook_signature(payload, signature, os.environ['WEBHOOK_SECRET']):
@@ -171,7 +171,7 @@ app.post('/budget-check', (req, res) => {
 
 ## Retry Logic
 
-OpenSpawn automatically retries failed webhook deliveries:
+BikiniBottom automatically retries failed webhook deliveries:
 
 - **Attempts**: 3 total attempts (1 initial + 2 retries)
 - **Backoff**: Exponential backoff (1s, 2s, 4s)
@@ -180,7 +180,7 @@ OpenSpawn automatically retries failed webhook deliveries:
 
 ## Security: SSRF Protection
 
-OpenSpawn validates webhook URLs to prevent SSRF (Server-Side Request Forgery) attacks:
+BikiniBottom validates webhook URLs to prevent SSRF (Server-Side Request Forgery) attacks:
 
 - ❌ Localhost addresses (`localhost`, `127.0.0.1`, `::1`)
 - ❌ Private IP ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`)
@@ -212,7 +212,7 @@ Click the **Test** button on any webhook to send a test payload:
   "event": "test",
   "timestamp": "2025-02-09T22:50:00.000Z",
   "data": {
-    "message": "This is a test webhook from OpenSpawn"
+    "message": "This is a test webhook from BikiniBottom"
   }
 }
 ```
@@ -399,7 +399,7 @@ const webhook = {
 ## Best Practices
 
 1. **Use Secrets**: Always configure a webhook secret and verify signatures
-2. **Idempotency**: Use the `X-OpenSpawn-Delivery` header to detect duplicate deliveries
+2. **Idempotency**: Use the `X-BikiniBottom-Delivery` header to detect duplicate deliveries
 3. **Respond Quickly**: Webhooks have a 10-second timeout; for long operations, queue the work
 4. **Monitor Failures**: Watch `failureCount` and `lastError` to detect issues early
 5. **Test Before Production**: Use the test button to verify your endpoint before going live
@@ -437,7 +437,7 @@ const webhook = {
 If you have existing webhook integrations:
 
 1. **Review Event Types**: Some event names may have changed
-2. **Update Signature Verification**: Ensure you're verifying `X-OpenSpawn-Signature`
+2. **Update Signature Verification**: Ensure you're verifying `X-BikiniBottom-Signature`
 3. **Test Pre-Hooks**: Pre-hook behavior may differ from previous versions
 4. **Check Timeouts**: Default timeout is now 10s for post-hooks, 5s for pre-hooks
 

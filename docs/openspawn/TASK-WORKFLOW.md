@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Task Workflow - OpenSpawn
+title: Task Workflow - BikiniBottom
 ---
 
 # Task Workflow & Templates
@@ -9,7 +9,7 @@ title: Task Workflow - OpenSpawn
 
 ## Overview
 
-OpenSpawn provides a complete task management system designed for AI agent teams. Tasks flow through a Kanban-style workflow with dependencies, approvals, and capability-based routing.
+BikiniBottom provides a complete task management system designed for AI agent teams. Tasks flow through a Kanban-style workflow with dependencies, approvals, and capability-based routing.
 
 ## Task Lifecycle
 

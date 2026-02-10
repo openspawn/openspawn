@@ -1,4 +1,4 @@
-# OpenSpawn — Implementation Plan
+# BikiniBottom — Implementation Plan
 
 **Product**: Self-hosted platform for multi-agent coordination, communication, and economy management
 **Repo**: `github.com/openspawn/openspawn`

@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Database Schema - OpenSpawn
+title: Database Schema - BikiniBottom
 ---
 
-# OpenSpawn — Database Schema
+# BikiniBottom — Database Schema
 
 **Version:** 1.0  
 **Date:** February 6, 2026  

@@ -1,6 +1,6 @@
 # TypeScript SDK (@openspawn/sdk)
 
-Official TypeScript/JavaScript SDK for the OpenSpawn API. Provides a clean, typed interface for interacting with agents, tasks, credits, messages, and events.
+Official TypeScript/JavaScript SDK for the BikiniBottom API. Provides a clean, typed interface for interacting with agents, tasks, credits, messages, and events.
 
 ## Installation
 
@@ -23,9 +23,9 @@ The SDK supports two authentication methods:
 Use this for human-managed API keys (created via dashboard or CLI):
 
 ```typescript
-import { OpenSpawnClient } from '@openspawn/sdk';
+import { BikiniBottomClient } from '@openspawn/sdk';
 
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'https://api.openspawn.com',
   apiKey: 'your-api-key',
 });
@@ -36,9 +36,9 @@ const client = new OpenSpawnClient({
 Use this for agent-to-agent communication with cryptographic signing:
 
 ```typescript
-import { OpenSpawnClient } from '@openspawn/sdk';
+import { BikiniBottomClient } from '@openspawn/sdk';
 
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'https://api.openspawn.com',
   hmacCredentials: {
     agentId: 'your-agent-id',
@@ -50,7 +50,7 @@ const client = new OpenSpawnClient({
 ### Configuration Options
 
 ```typescript
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'https://api.openspawn.com',
   apiKey: 'your-api-key',
   
@@ -345,7 +345,7 @@ The SDK provides typed error classes for different failure scenarios:
 
 ```typescript
 import {
-  OpenSpawnError,
+  BikiniBottomError,
   ApiError,
   AuthenticationError,
   ValidationError,
@@ -403,7 +403,7 @@ const agents = await client.agents.list({
 ### Custom Retry Configuration
 
 ```typescript
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'https://api.openspawn.com',
   apiKey: 'your-api-key',
   retryConfig: {
@@ -440,7 +440,7 @@ function processTask(task: Task): void {
 ### Development
 
 ```typescript
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'http://localhost:3000',
   apiKey: process.env.OPENSPAWN_API_KEY,
 });
@@ -449,7 +449,7 @@ const client = new OpenSpawnClient({
 ### Production
 
 ```typescript
-const client = new OpenSpawnClient({
+const client = new BikiniBottomClient({
   baseUrl: 'https://api.openspawn.com',
   hmacCredentials: {
     agentId: process.env.AGENT_ID!,

@@ -1,6 +1,6 @@
 # Inbound Webhooks
 
-Inbound webhooks allow external services to create tasks in OpenSpawn via HTTP POST requests. This enables seamless integration with tools like GitHub Actions, Zapier, n8n, and custom automation workflows.
+Inbound webhooks allow external services to create tasks in BikiniBottom via HTTP POST requests. This enables seamless integration with tools like GitHub Actions, Zapier, n8n, and custom automation workflows.
 
 ## Table of Contents
 
@@ -26,7 +26,7 @@ Inbound webhooks provide a simple HTTP API for creating tasks from external syst
 
 ### 1. Create a Webhook Key
 
-Navigate to **Settings → Inbound** in the OpenSpawn dashboard, then:
+Navigate to **Settings → Inbound** in the BikiniBottom dashboard, then:
 
 1. Click **Create Key**
 2. Enter a descriptive name (e.g., "GitHub Actions", "Zapier Automation")
@@ -88,11 +88,11 @@ For production use, verify requests using HMAC-SHA256 signatures:
    ```bash
    curl -X POST {webhook_url} \
      -H "Content-Type: application/json" \
-     -H "X-OpenSpawn-Signature: {signature}" \
+     -H "X-BikiniBottom-Signature: {signature}" \
      -d '{...}'
    ```
 
-3. **Server Verification**: OpenSpawn automatically verifies the signature if provided.
+3. **Server Verification**: BikiniBottom automatically verifies the signature if provided.
 
 ## Payload Format
 
@@ -200,7 +200,7 @@ Create multiple tasks in a single request:
 Automatically create tasks from GitHub issues, pull requests, or workflow events:
 
 ```yaml
-name: Create OpenSpawn Task
+name: Create BikiniBottom Task
 
 on:
   issues:
@@ -210,11 +210,11 @@ jobs:
   create-task:
     runs-on: ubuntu-latest
     steps:
-      - name: Create task in OpenSpawn
+      - name: Create task in BikiniBottom
         run: |
           curl -X POST ${{ secrets.OPENSPAWN_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -H "X-OpenSpawn-Signature: $(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.OPENSPAWN_SECRET }}" | sed 's/^.* //')" \
+            -H "X-BikiniBottom-Signature: $(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "${{ secrets.OPENSPAWN_SECRET }}" | sed 's/^.* //')" \
             -d "$PAYLOAD"
         env:
           PAYLOAD: |
@@ -239,7 +239,7 @@ jobs:
    - **URL**: Your webhook URL
    - **Payload Type**: JSON
    - **Data**: Map fields from your trigger
-   - **Headers**: Add `X-OpenSpawn-Signature` if using HMAC
+   - **Headers**: Add `X-BikiniBottom-Signature` if using HMAC
 
 ### n8n
 
@@ -269,7 +269,7 @@ def create_openspawn_task(webhook_url, secret, task_data):
     
     headers = {
         'Content-Type': 'application/json',
-        'X-OpenSpawn-Signature': signature
+        'X-BikiniBottom-Signature': signature
     }
     
     response = requests.post(webhook_url, data=payload, headers=headers)
@@ -299,7 +299,7 @@ print(f"Created task: {result['identifier']}")
 const crypto = require('crypto');
 const fetch = require('node-fetch');
 
-async function createOpenSpawnTask(webhookUrl, secret, taskData) {
+async function createBikiniBottomTask(webhookUrl, secret, taskData) {
   const payload = JSON.stringify(taskData);
   const signature = crypto
     .createHmac('sha256', secret)
@@ -310,7 +310,7 @@ async function createOpenSpawnTask(webhookUrl, secret, taskData) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-OpenSpawn-Signature': signature,
+      'X-BikiniBottom-Signature': signature,
     },
     body: payload,
   });
@@ -331,7 +331,7 @@ const task = {
   metadata: { script_version: '1.0' },
 };
 
-createOpenSpawnTask(
+createBikiniBottomTask(
   'https://openspawn.com/api/webhooks/inbound/iwk_...',
   'your-webhook-secret',
   task
@@ -430,7 +430,7 @@ def create_task_with_retry(url, data, max_retries=3):
 
 - Verify you're using the correct secret
 - Ensure the payload is JSON-stringified consistently
-- Check that the signature is sent in `X-OpenSpawn-Signature` header
+- Check that the signature is sent in `X-BikiniBottom-Signature` header
 
 ### Tasks Not Appearing
 

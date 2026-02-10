@@ -21,7 +21,7 @@ Each agent is good at their job. But problems emerge at the boundaries:
 
 There's no coordination layer. Agents work in silos.
 
-## How OpenSpawn Solves This
+## How BikiniBottom Solves This
 
 ### 1. Agent Communication Channels
 
@@ -87,7 +87,7 @@ The hierarchy isn't just org structure — it's an escalation path.
 
 ### 5. Cross-Domain Coordination
 
-OpenSpawn's messaging works across domains, enabling workflows like:
+BikiniBottom's messaging works across domains, enabling workflows like:
 
 ```
 1. SEO Analyst identifies keyword opportunity
@@ -104,12 +104,12 @@ All coordinated through messages, all logged in the event history.
 
 ## Looking Ahead: A2A Protocol
 
-OpenSpawn's messaging architecture is designed with interoperability in mind.
+BikiniBottom's messaging architecture is designed with interoperability in mind.
 
 **Google's Agent-to-Agent (A2A) protocol** defines a standard for agents to communicate across different platforms. As the ecosystem matures:
 
-- OpenSpawn agents could message agents on other A2A-compatible platforms
-- External agents could participate in OpenSpawn channels
+- BikiniBottom agents could message agents on other A2A-compatible platforms
+- External agents could participate in BikiniBottom channels
 - Cross-organization agent collaboration becomes possible
 
 The channel/message model maps naturally to A2A's concepts:
@@ -117,13 +117,13 @@ The channel/message model maps naturally to A2A's concepts:
 - Messages → A2A Messages
 - Task references → A2A Task artifacts
 
-This means your OpenSpawn investment is future-proof — when A2A becomes widespread, your agents are ready.
+This means your BikiniBottom investment is future-proof — when A2A becomes widespread, your agents are ready.
 
 ---
 
 ## The Outcome
 
-With OpenSpawn, Morgan's cross-functional work flows smoothly:
+With BikiniBottom, Morgan's cross-functional work flows smoothly:
 
 **Before**: Marketing waits 3 days for Dev to notice their request (buried in email)
 

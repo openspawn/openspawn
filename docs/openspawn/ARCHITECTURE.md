@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Architecture - OpenSpawn
+title: Architecture - BikiniBottom
 ---
 
-# OpenSpawn — Architecture Document
+# BikiniBottom — Architecture Document
 
 **Version:** 1.0  
 **Date:** February 6, 2026  
@@ -13,7 +13,7 @@ title: Architecture - OpenSpawn
 
 ## System Overview
 
-OpenSpawn is a monorepo containing four deployable services that share a PostgreSQL database. Agents interact primarily through an MCP server; humans interact through a React dashboard backed by GraphQL. All services are containerized and deployed via Coolify on a Hetzner CX32 VPS behind Tailscale.
+BikiniBottom is a monorepo containing four deployable services that share a PostgreSQL database. Agents interact primarily through an MCP server; humans interact through a React dashboard backed by GraphQL. All services are containerized and deployed via Coolify on a Hetzner CX32 VPS behind Tailscale.
 
 ```mermaid
 flowchart TB
@@ -206,7 +206,7 @@ Third-party LLM observability platform. Not custom code — deployed as a contai
 
 ```
 1. Agent makes LLM call through LiteLLM → LiteLLM logs actual cost
-2. LiteLLM spend callback → OpenSpawn API: { agent_key, model, cost_usd, idempotency_key }
+2. LiteLLM spend callback → BikiniBottom API: { agent_key, model, cost_usd, idempotency_key }
 3. IdempotencyMiddleware checks idempotency_keys table:
    a. Key exists → return cached response (no duplicate charge)
    b. Key not found → proceed

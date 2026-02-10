@@ -19,7 +19,7 @@ Sam wants to:
 3. Automatically track performance over time
 4. Reserve high-stakes tasks for proven agents
 
-## How OpenSpawn Solves This
+## How BikiniBottom Solves This
 
 ### 1. Trust Scores (0-100)
 
@@ -101,7 +101,7 @@ The Trust Leaderboard creates healthy visibility:
 
 ## The Outcome
 
-With OpenSpawn, Sam's new content writer:
+With BikiniBottom, Sam's new content writer:
 
 **Week 1**: Starts at 50 (TRUSTED by default)
 - Completes 3 tasks, 1 has issues

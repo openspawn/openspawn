@@ -3,9 +3,9 @@ title: CLI Reference
 nav_order: 5
 ---
 
-# OpenSpawn CLI
+# BikiniBottom CLI
 
-The OpenSpawn CLI provides command-line access to all platform features.
+The BikiniBottom CLI provides command-line access to all platform features.
 
 ## Installation
 
