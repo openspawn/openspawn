@@ -1,15 +1,15 @@
 # Linear Integration
 
-OpenSpawn integrates with Linear.app for bidirectional issue synchronization.
+BikiniBottom integrates with Linear.app for bidirectional issue synchronization.
 
 ## Features
 
-### Inbound Sync (Linear → OpenSpawn)
+### Inbound Sync (Linear → BikiniBottom)
 - Automatically create tasks from Linear issues
 - Sync comments to messages
 - Track issue status changes
 
-### Outbound Sync (OpenSpawn → Linear)
+### Outbound Sync (BikiniBottom → Linear)
 - Update Linear issues when tasks complete
 - Post comments on status changes
 - Sync assignee information
@@ -25,7 +25,7 @@ OpenSpawn integrates with Linear.app for bidirectional issue synchronization.
 ## Configuration
 
 ### Sync Settings
-- **createTaskOnIssue**: Create OpenSpawn tasks from Linear issues
+- **createTaskOnIssue**: Create BikiniBottom tasks from Linear issues
 - **createTaskOnComment**: Sync Linear comments as messages
 - **closeIssueOnComplete**: Close Linear issues when tasks complete
 - **commentOnStatusChange**: Post updates to Linear on status changes

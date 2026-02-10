@@ -41,7 +41,7 @@ Content-Type: application/json
 
 ### Pre-Hook Request Payload
 
-When a pre-hook fires, OpenSpawn sends:
+When a pre-hook fires, BikiniBottom sends:
 
 ```json
 {
@@ -61,9 +61,9 @@ When a pre-hook fires, OpenSpawn sends:
 ```
 
 Headers include:
-- `X-OpenSpawn-Event`: Event type
-- `X-OpenSpawn-Hook-Type`: "pre"
-- `X-OpenSpawn-Signature`: HMAC signature (if secret configured)
+- `X-BikiniBottom-Event`: Event type
+- `X-BikiniBottom-Hook-Type`: "pre"
+- `X-BikiniBottom-Signature`: HMAC signature (if secret configured)
 
 ### Pre-Hook Response
 
@@ -127,7 +127,7 @@ The demo mode includes simulated pre-hooks that occasionally block actions, demo
 
 1. **Keep pre-hooks fast** - Set reasonable timeouts (3-5s recommended)
 2. **Design for failure** - Pre-hooks fail-open to prevent blocking on issues
-3. **Log decisions** - OpenSpawn emits `webhook.executed` events for audit
+3. **Log decisions** - BikiniBottom emits `webhook.executed` events for audit
 4. **Test thoroughly** - Use the test button before enabling blocking
 
 ## Example: Budget Approval Hook

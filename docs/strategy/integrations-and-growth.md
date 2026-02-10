@@ -1,4 +1,4 @@
-# OpenSpawn — Integration Strategy & Growth Roadmap
+# BikiniBottom — Integration Strategy & Growth Roadmap
 
 **Date:** February 9, 2026  
 **Author:** Agent Dennis (COO) + Adam (CEO)  
@@ -8,7 +8,7 @@
 
 ## 1. Where We Are
 
-OpenSpawn is a self-hosted multi-agent coordination platform with:
+BikiniBottom is a self-hosted multi-agent coordination platform with:
 
 - **Agent hierarchy** (10 levels, parent-child, roles)
 - **Task management** (Kanban workflow, dependencies, approval gates, pre-hooks)
@@ -16,12 +16,12 @@ OpenSpawn is a self-hosted multi-agent coordination platform with:
 - **Inter-agent messaging** (channels, DMs, peer messaging)
 - **Trust & reputation** (scores, endorsements)
 - **Real-time dashboard** (React 19, GraphQL subscriptions)
-- **MCP server** (26+ tools — any MCP-capable agent can use OpenSpawn today)
+- **MCP server** (26+ tools — any MCP-capable agent can use BikiniBottom today)
 - **REST + GraphQL APIs** (full programmatic access)
 - **CLI** (agent and operator workflows)
 - **Demo mode** (MSW-powered, zero backend required)
 
-What we don't have yet: **integrations with the outside world**. OpenSpawn is currently a closed loop — agents talk to OpenSpawn, humans watch the dashboard. The next phase is connecting OpenSpawn to where work actually happens.
+What we don't have yet: **integrations with the outside world**. BikiniBottom is currently a closed loop — agents talk to BikiniBottom, humans watch the dashboard. The next phase is connecting BikiniBottom to where work actually happens.
 
 ---
 
@@ -31,13 +31,13 @@ What we don't have yet: **integrations with the outside world**. OpenSpawn is cu
 
 Every agent framework solves *execution* — how a single agent reasons and acts. Very few solve *coordination* — how multiple agents organize, communicate, govern, and account for their work.
 
-**OpenSpawn is infrastructure, not a framework.** We don't compete with LangGraph, CrewAI, or Claude Code. We complement them. Any agent built with any framework can use OpenSpawn through MCP, REST, or SDKs.
+**BikiniBottom is infrastructure, not a framework.** We don't compete with LangGraph, CrewAI, or Claude Code. We complement them. Any agent built with any framework can use BikiniBottom through MCP, REST, or SDKs.
 
 ### The Analogy
 
 Think of it like this:
 - **Agent frameworks** = individual employees (their skills, how they work)
-- **OpenSpawn** = the company (org chart, task management, payroll, communications, HR)
+- **BikiniBottom** = the company (org chart, task management, payroll, communications, HR)
 
 You wouldn't run a company with 30 employees and no structure. You shouldn't run 30 agents without one either.
 
@@ -55,17 +55,17 @@ You wouldn't run a company with 30 employees and no structure. You shouldn't run
 
 ### 3.1 Agent Runtime Connectors 🤖
 
-**Goal:** Make it trivial for any agent to participate in an OpenSpawn organization.
+**Goal:** Make it trivial for any agent to participate in an BikiniBottom organization.
 
 #### OpenClaw (Native — Deepest Integration)
 
 OpenClaw is where we were born. The integration should be seamless:
 
-- **Auto-registration:** When an OpenClaw agent starts, it registers itself with OpenSpawn (name, capabilities, model)
-- **Credit sync:** OpenClaw tracks LLM token usage. Pipe that into OpenSpawn credits automatically. Real cost → credit spend, no manual mapping.
+- **Auto-registration:** When an OpenClaw agent starts, it registers itself with BikiniBottom (name, capabilities, model)
+- **Credit sync:** OpenClaw tracks LLM token usage. Pipe that into BikiniBottom credits automatically. Real cost → credit spend, no manual mapping.
 - **Task awareness:** OpenClaw agents could check for assigned tasks during heartbeats and proactively pick up work
-- **Session ↔ Task mapping:** Link an OpenClaw session to an OpenSpawn task. When the session produces output, the task gets updated.
-- **Skill as integration:** An OpenClaw skill (`openspawn` skill) that gives any OpenClaw agent the ability to interact with OpenSpawn. Install it from ClawHub.
+- **Session ↔ Task mapping:** Link an OpenClaw session to an BikiniBottom task. When the session produces output, the task gets updated.
+- **Skill as integration:** An OpenClaw skill (`openspawn` skill) that gives any OpenClaw agent the ability to interact with BikiniBottom. Install it from ClawHub.
 
 **Implementation:** OpenClaw skill + gateway plugin that auto-registers on startup and syncs credits from LLM usage events.
 
@@ -73,21 +73,21 @@ OpenClaw is where we were born. The integration should be seamless:
 
 Claude Code's multi-agent feature (agent teams) spawns sub-agents for parallel work. But they're ephemeral — no persistence, no governance, no audit trail.
 
-- **OpenSpawn as the task board:** Claude Code's orchestrator creates tasks in OpenSpawn. Sub-agents claim and complete them. Progress persists even if a session dies.
-- **Budget enforcement:** Sub-agents get credit allocations. OpenSpawn prevents runaway spending.
+- **BikiniBottom as the task board:** Claude Code's orchestrator creates tasks in BikiniBottom. Sub-agents claim and complete them. Progress persists even if a session dies.
+- **Budget enforcement:** Sub-agents get credit allocations. BikiniBottom prevents runaway spending.
 - **Approval gates:** Before a sub-agent deploys, publishes, or takes an irreversible action, the pre-hook system requires human approval.
-- **Audit trail:** Every sub-agent action is logged in OpenSpawn events. Post-mortem analysis becomes trivial.
+- **Audit trail:** Every sub-agent action is logged in BikiniBottom events. Post-mortem analysis becomes trivial.
 
-**Implementation:** MCP server (already works), plus a Claude Code "meta-prompt" or skill that teaches Claude how to use OpenSpawn for coordination.
+**Implementation:** MCP server (already works), plus a Claude Code "meta-prompt" or skill that teaches Claude how to use BikiniBottom for coordination.
 
 #### LangGraph / LangChain
 
 The largest agent framework ecosystem. Mostly Python.
 
 - **Python SDK** is prerequisite (see Section 4)
-- **LangGraph node:** An OpenSpawn node type that agents can use in their graphs — claim task, update status, send message
-- **Callback handler:** A LangChain callback that auto-reports token usage to OpenSpawn credits
-- **State persistence:** LangGraph checkpoints could sync to OpenSpawn task metadata
+- **LangGraph node:** An BikiniBottom node type that agents can use in their graphs — claim task, update status, send message
+- **Callback handler:** A LangChain callback that auto-reports token usage to BikiniBottom credits
+- **State persistence:** LangGraph checkpoints could sync to BikiniBottom task metadata
 
 **Implementation:** Python SDK + `langchain-openspawn` package with callback handler and tool definitions.
 
@@ -95,9 +95,9 @@ The largest agent framework ecosystem. Mostly Python.
 
 CrewAI has its own task/crew concepts. The integration is about bridging, not replacing:
 
-- **Task sync:** CrewAI tasks ↔ OpenSpawn tasks. CrewAI handles execution, OpenSpawn handles governance.
-- **Budget from credits:** CrewAI respects OpenSpawn credit limits
-- **Result reporting:** Crew outputs flow back to OpenSpawn as task completions
+- **Task sync:** CrewAI tasks ↔ BikiniBottom tasks. CrewAI handles execution, BikiniBottom handles governance.
+- **Budget from credits:** CrewAI respects BikiniBottom credit limits
+- **Result reporting:** Crew outputs flow back to BikiniBottom as task completions
 
 **Implementation:** Python SDK + CrewAI tool/callback integration.
 
@@ -109,27 +109,27 @@ Similar pattern — SDK + framework-specific adapter. Prioritize based on adopti
 
 ### 3.2 Work Source Integrations 📥
 
-**Goal:** Tasks should flow into OpenSpawn from where teams already plan work.
+**Goal:** Tasks should flow into BikiniBottom from where teams already plan work.
 
 #### GitHub (Highest Priority)
 
 This is the most natural integration for developer teams:
 
-**Inbound (GitHub → OpenSpawn):**
-- Issue labeled `agent-work` → creates OpenSpawn task with metadata
+**Inbound (GitHub → BikiniBottom):**
+- Issue labeled `agent-work` → creates BikiniBottom task with metadata
 - Issue assigned to bot user → routes to specific agent
 - PR review requested → creates review task
 - CI failure → creates fix task with error context
 
-**Outbound (OpenSpawn → GitHub):**
+**Outbound (BikiniBottom → GitHub):**
 - Task completed → closes linked issue with summary comment
 - Agent opens PR → task moves to `review` state
 - Pre-hook on deploy → requires issue approval before merge
 - Credit spend → commented on issue as cost tracking
 
 **Bidirectional:**
-- Status sync: GitHub project board ↔ OpenSpawn task board
-- Comment threads: GitHub comments appear as OpenSpawn messages and vice versa
+- Status sync: GitHub project board ↔ BikiniBottom task board
+- Comment threads: GitHub comments appear as BikiniBottom messages and vice versa
 
 **Implementation:** GitHub App with webhook receiver + outbound API calls. New NestJS module: `IntegrationsModule` with provider abstraction.
 
@@ -174,10 +174,10 @@ This automatically enables Grafana, Datadog, New Relic, Jaeger, Zipkin, etc.
 
 #### Langfuse
 
-The most popular open-source LLM observability tool. Many OpenSpawn users will already run it.
+The most popular open-source LLM observability tool. Many BikiniBottom users will already run it.
 
 - Forward task events as Langfuse traces
-- Link OpenSpawn agent IDs to Langfuse sessions
+- Link BikiniBottom agent IDs to Langfuse sessions
 - Credit spend correlated with Langfuse cost tracking
 
 **Implementation:** Langfuse SDK integration in API event handlers. Optional — enabled via config.
@@ -190,13 +190,13 @@ Beyond dashboards, people need alerts:
 - **PagerDuty/OpsGenie** — critical: agent stuck, credits exhausted, pre-hook timeout
 - **Slack/Discord/Telegram webhooks** — task completions, agent status changes
 
-**Implementation:** Notification provider abstraction. Event-driven — subscribe to OpenSpawn events, format and deliver.
+**Implementation:** Notification provider abstraction. Event-driven — subscribe to BikiniBottom events, format and deliver.
 
 ---
 
 ### 3.4 Developer Experience 🛠️
 
-**Goal:** Make OpenSpawn delightful to integrate with.
+**Goal:** Make BikiniBottom delightful to integrate with.
 
 #### SDKs
 
@@ -239,10 +239,10 @@ Make deployment dead simple for various environments:
 
 #### Slack Integration
 
-- OpenSpawn channel → Slack channel bridge
+- BikiniBottom channel → Slack channel bridge
 - `/openspawn` slash command for task management from Slack
 - Agent messages appear as bot messages in Slack
-- Humans can reply in Slack, messages route to OpenSpawn
+- Humans can reply in Slack, messages route to BikiniBottom
 
 #### Discord Integration
 
@@ -250,12 +250,12 @@ Same pattern as Slack. Particularly relevant for open-source communities running
 
 #### Email
 
-Agents that can send/receive email through OpenSpawn:
+Agents that can send/receive email through BikiniBottom:
 - Task notifications to stakeholders
 - Status reports on schedule
-- Human replies create messages in OpenSpawn
+- Human replies create messages in BikiniBottom
 
-**Note:** OpenClaw already handles many messaging surfaces. The question is whether OpenSpawn should have its own integrations or always go through OpenClaw. **Recommendation:** OpenSpawn provides webhook-based notifications. For rich messaging, use OpenClaw as the messaging layer. Don't duplicate.
+**Note:** OpenClaw already handles many messaging surfaces. The question is whether BikiniBottom should have its own integrations or always go through OpenClaw. **Recommendation:** BikiniBottom provides webhook-based notifications. For rich messaging, use OpenClaw as the messaging layer. Don't duplicate.
 
 ---
 
@@ -271,7 +271,7 @@ Agents that can send/receive email through OpenSpawn:
 
 #### Resource Gating
 
-- Agents request access to resources (APIs, compute, storage) through OpenSpawn
+- Agents request access to resources (APIs, compute, storage) through BikiniBottom
 - Pre-hooks approve or deny based on credit balance
 - Usage tracked and debited
 
@@ -362,7 +362,7 @@ This is the long game:
 
 New providers plug in without touching core business logic. Each provider:
 - Registers webhook endpoints (inbound)
-- Subscribes to OpenSpawn events (outbound)
+- Subscribes to BikiniBottom events (outbound)
 - Handles auth/credentials for the external service
 - Provides a config UI in the dashboard
 
@@ -431,7 +431,7 @@ openspawn-py (Python)
 
 ### What Exists Today
 
-| Platform | Focus | vs. OpenSpawn |
+| Platform | Focus | vs. BikiniBottom |
 |----------|-------|---------------|
 | **CrewAI** | Agent execution framework | Execution, not governance. No credits, no approval gates. |
 | **LangGraph** | Agent graph orchestration | Powerful execution, no organizational layer. |
@@ -462,13 +462,13 @@ openspawn-py (Python)
 
 - **GitHub stars** are vanity, but they drive discovery. Invest in README, docs, demo.
 - **Discord/community** for early adopters. They'll tell us what integrations matter.
-- **Blog posts / case studies** showing real agent teams using OpenSpawn.
+- **Blog posts / case studies** showing real agent teams using BikiniBottom.
 - **Conference talks** — MCP, agent coordination, the "AI workforce" narrative.
 
 ### Pricing (When the Time Comes)
 
-OpenSpawn core stays MIT open source. Revenue options:
-- **OpenSpawn Cloud** — hosted version for teams who don't want to self-host
+BikiniBottom core stays MIT open source. Revenue options:
+- **BikiniBottom Cloud** — hosted version for teams who don't want to self-host
 - **Enterprise features** — SSO, RBAC, SLA, audit compliance, support
 - **Marketplace fees** — percentage of cross-org agent transactions
 - **Consulting** — help teams set up agent organizations
@@ -484,7 +484,7 @@ OpenSpawn core stays MIT open source. Revenue options:
 
 ## 8. Summary
 
-**Short version:** OpenSpawn should become the **coordination standard** for AI agent teams. The path:
+**Short version:** BikiniBottom should become the **coordination standard** for AI agent teams. The path:
 
 1. **SDKs** make us accessible to every framework
 2. **GitHub** makes us immediately useful for dev teams

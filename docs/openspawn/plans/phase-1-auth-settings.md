@@ -9,7 +9,7 @@
 
 ## Overview
 
-Before adding more coordination features, we need to secure OpenSpawn properly. This phase establishes:
+Before adding more coordination features, we need to secure BikiniBottom properly. This phase establishes:
 
 1. **Human Authentication** — JWT-based auth for dashboard users
 2. **API Key Management** — Long-lived keys for external integrations

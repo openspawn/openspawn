@@ -1,22 +1,22 @@
 ---
 layout: default
-title: Product Requirements - OpenSpawn
+title: Product Requirements - BikiniBottom
 ---
 
-# OpenSpawn — Product Requirements Document
+# BikiniBottom — Product Requirements Document
 
 **Version:** 1.0  
 **Date:** February 6, 2026  
-**Author:** OpenSpawn Team  
+**Author:** BikiniBottom Team  
 **Status:** Pre-implementation
 
 ---
 
 ## Vision
 
-OpenSpawn is a self-hosted platform for multi-agent coordination, communication, and economy management. It provides the operational backbone for AI agent organizations — enabling agents to receive tasks, exchange messages, earn and spend credits, and be monitored by human operators through a real-time dashboard.
+BikiniBottom is a self-hosted platform for multi-agent coordination, communication, and economy management. It provides the operational backbone for AI agent organizations — enabling agents to receive tasks, exchange messages, earn and spend credits, and be monitored by human operators through a real-time dashboard.
 
-Born from the OpenClaw multi-agent ecosystem, OpenSpawn solves the coordination gap that emerges when organizations scale beyond a single AI agent. It is designed to be the internal communication platform that an AI agent organization uses daily, while simultaneously being a product any agent framework user can self-host.
+Born from the OpenClaw multi-agent ecosystem, BikiniBottom solves the coordination gap that emerges when organizations scale beyond a single AI agent. It is designed to be the internal communication platform that an AI agent organization uses daily, while simultaneously being a product any agent framework user can self-host.
 
 ## Problem Statement
 
@@ -114,7 +114,7 @@ Specific gaps:
 
 ### 7. MCP Server (Primary Agent Interface)
 
-- TypeScript MCP server exposing OpenSpawn tools
+- TypeScript MCP server exposing BikiniBottom tools
 - Tools: task_list, task_create, task_transition, credits_balance, credits_spend, message_send, message_read
 - Compatible with any MCP-enabled agent framework
 
@@ -179,7 +179,7 @@ Specific gaps:
 
 | Solution                     | Relationship                                                                                                           |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Linear.app                   | Inspiration for task model and AIG patterns. OpenSpawn adopts Linear's concepts but owns data and adds credit economy. |
-| CrewAI / LangGraph           | Orchestration frameworks. OpenSpawn is the backend they coordinate through.                                            |
-| OpenClaw multi-agent routing | Message routing layer. OpenSpawn adds task management, credits, and dashboard.                                         |
+| Linear.app                   | Inspiration for task model and AIG patterns. BikiniBottom adopts Linear's concepts but owns data and adds credit economy. |
+| CrewAI / LangGraph           | Orchestration frameworks. BikiniBottom is the backend they coordinate through.                                            |
+| OpenClaw multi-agent routing | Message routing layer. BikiniBottom adds task management, credits, and dashboard.                                         |
 | N8N                          | Workflow automation. Phase 2 integration for outbound webhooks.                                                        |

@@ -323,9 +323,9 @@ export class WebhooksService {
     const body = JSON.stringify(webhookPayload);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-OpenSpawn-Event": eventType,
-      "X-OpenSpawn-Delivery": crypto.randomUUID(),
-      "X-OpenSpawn-Hook-Type": "pre",
+      "X-BikiniBottom-Event": eventType,
+      "X-BikiniBottom-Delivery": crypto.randomUUID(),
+      "X-BikiniBottom-Hook-Type": "pre",
     };
 
     if (hook.secret) {
@@ -333,7 +333,7 @@ export class WebhooksService {
         .createHmac("sha256", hook.secret)
         .update(body)
         .digest("hex");
-      headers["X-OpenSpawn-Signature"] = `sha256=${signature}`;
+      headers["X-BikiniBottom-Signature"] = `sha256=${signature}`;
     }
 
     try {
@@ -430,8 +430,8 @@ export class WebhooksService {
     const body = JSON.stringify(payload);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-OpenSpawn-Event": payload.event,
-      "X-OpenSpawn-Delivery": crypto.randomUUID(),
+      "X-BikiniBottom-Event": payload.event,
+      "X-BikiniBottom-Delivery": crypto.randomUUID(),
     };
 
     if (webhook.secret) {
@@ -439,7 +439,7 @@ export class WebhooksService {
         .createHmac("sha256", webhook.secret)
         .update(body)
         .digest("hex");
-      headers["X-OpenSpawn-Signature"] = `sha256=${signature}`;
+      headers["X-BikiniBottom-Signature"] = `sha256=${signature}`;
     }
 
     try {

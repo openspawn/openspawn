@@ -21,7 +21,7 @@ Then comes the post-mortem: *How did this get through?*
 
 The answers are scattered across GitHub, Slack, deployment logs, and LLM provider dashboards. Piecing it together takes hours.
 
-## How OpenSpawn Solves This
+## How BikiniBottom Solves This
 
 ### 1. Centralized Event History
 
@@ -93,7 +93,7 @@ The Events Dashboard highlights warnings and errors so they don't get buried.
 
 ## The Outcome
 
-In Jordan's post-mortem with OpenSpawn:
+In Jordan's post-mortem with BikiniBottom:
 
 1. **14:32** — Code Reviewer approved the PR *(logged with reasoning)*
 2. **14:45** — Test Writer marked tests passing *(logged with coverage %)*
@@ -109,7 +109,7 @@ The root cause? The Test Writer's test cases didn't cover the specific edge case
 
 ## Compliance & Audits
 
-For regulated industries, OpenSpawn provides:
+For regulated industries, BikiniBottom provides:
 
 - **Immutable event logs**: Once logged, events can't be modified
 - **Organization-scoped data**: Each org's data is isolated

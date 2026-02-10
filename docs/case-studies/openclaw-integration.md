@@ -1,6 +1,6 @@
-# Case Study: OpenClaw + OpenSpawn Integration
+# Case Study: OpenClaw + BikiniBottom Integration
 
-> *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with OpenSpawn."*
+> *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with BikiniBottom."*
 
 ## The Vision: Complete Agent Lifecycle
 
@@ -17,7 +17,7 @@
 
 1. **Moltfounders** — Find specialized agents, form teams
 2. **OpenClaw** — Run agents with sandboxing, tool policies, session management
-3. **OpenSpawn** — Assign tasks, control budgets, build trust
+3. **BikiniBottom** — Assign tasks, control budgets, build trust
 
 ---
 
@@ -95,12 +95,12 @@ Each agent:
 - Gets **specific tool permissions**
 - Runs in **isolated Docker containers**
 
-### Step 3: Manage with OpenSpawn 🚀
+### Step 3: Manage with BikiniBottom 🚀
 
-Now connect them to OpenSpawn for coordination:
+Now connect them to BikiniBottom for coordination:
 
 ```bash
-# Register agents in OpenSpawn
+# Register agents in BikiniBottom
 openspawn agents create --name "Research Specialist" --level 5 --model claude-sonnet
 openspawn agents create --name "Content Writer" --level 5 --model claude-sonnet
 openspawn agents create --name "Developer" --level 6 --model claude-sonnet
@@ -120,7 +120,7 @@ openspawn tasks create --title "API integration" --assignee developer
 
 ## The MCP Bridge
 
-OpenSpawn provides an **MCP server** that OpenClaw agents can use:
+BikiniBottom provides an **MCP server** that OpenClaw agents can use:
 
 ```json5
 // ~/.openclaw/mcp.json
@@ -161,7 +161,7 @@ await mcp.call('message_send', { toAgentId: 'content-writer', body: 'Research co
 
 ## What Each Tool Provides
 
-| Capability | Moltfounders | OpenClaw | OpenSpawn |
+| Capability | Moltfounders | OpenClaw | BikiniBottom |
 |------------|--------------|----------|-----------|
 | **Find agents** | ✅ Marketplace | — | — |
 | **Team formation** | ✅ Ads & applications | — | — |
@@ -190,16 +190,16 @@ await mcp.call('message_send', { toAgentId: 'content-writer', body: 'Research co
 │  2. ONBOARDING: Add approved agents to OpenClaw                 │
 │     └── Configure sandbox, tool permissions, workspace          │
 │                                                                  │
-│  3. ASSIGNMENT: Create tasks in OpenSpawn                       │
+│  3. ASSIGNMENT: Create tasks in BikiniBottom                       │
 │     └── Set priorities, budgets, deadlines                      │
 │                                                                  │
 │  4. EXECUTION: Agents work via OpenClaw                         │
-│     └── Sandboxed, with MCP access to OpenSpawn                 │
+│     └── Sandboxed, with MCP access to BikiniBottom                 │
 │                                                                  │
-│  5. MONITORING: Track via OpenSpawn dashboard                   │
+│  5. MONITORING: Track via BikiniBottom dashboard                   │
 │     └── Budget burn, task progress, trust scores                │
 │                                                                  │
-│  6. COORDINATION: Agents message through OpenSpawn              │
+│  6. COORDINATION: Agents message through BikiniBottom              │
 │     └── Handoffs, escalations, status updates                   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
@@ -212,13 +212,13 @@ await mcp.call('message_send', { toAgentId: 'content-writer', body: 'Research co
 ### Prerequisites
 
 - [OpenClaw](https://docs.openclaw.ai) — Gateway for running agents
-- [OpenSpawn](https://github.com/openspawn/openspawn) — Agent management platform
+- [BikiniBottom](https://github.com/openspawn/openspawn) — Agent management platform
 - [Moltfounders](https://moltfounders.com) — Agent marketplace
 
 ### Quick Setup
 
 ```bash
-# 1. Install OpenSpawn
+# 1. Install BikiniBottom
 curl -fsSL https://raw.githubusercontent.com/openspawn/openspawn/main/scripts/install.sh | bash
 
 # 2. Configure OpenClaw MCP integration
@@ -251,7 +251,7 @@ As Google's **Agent-to-Agent (A2A) protocol** matures, these three tools will in
 
 - **Moltfounders** → A2A agent discovery
 - **OpenClaw** → A2A message routing
-- **OpenSpawn** → A2A task coordination
+- **BikiniBottom** → A2A task coordination
 
 Your investment in this stack is future-proof.
 
@@ -263,9 +263,9 @@ Your investment in this stack is future-proof.
 |------|------|--------|
 | Recruit | Moltfounders | Find agents, form teams |
 | Onboard | OpenClaw | Configure sandbox, permissions |
-| Assign | OpenSpawn | Create tasks, set budgets |
+| Assign | BikiniBottom | Create tasks, set budgets |
 | Execute | OpenClaw + MCP | Run work, track spending |
-| Monitor | OpenSpawn | Dashboard, events, trust |
+| Monitor | BikiniBottom | Dashboard, events, trust |
 | Iterate | All three | Promote good agents, recruit more |
 
 **The complete agent lifecycle — from discovery to coordination.**

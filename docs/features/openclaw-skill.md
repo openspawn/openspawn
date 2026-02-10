@@ -26,7 +26,7 @@ Bridge OpenClaw and BikiniBottom to enable autonomous multi-agent orchestration 
 
 ## Overview
 
-The **OpenClaw Agent Skill** allows OpenClaw agents to interact with BikiniBottom/OpenSpawn instances, enabling powerful multi-agent orchestration workflows. Your OpenClaw agent becomes a meta-orchestrator, managing entire fleets of specialized AI agents.
+The **OpenClaw Agent Skill** allows OpenClaw agents to interact with BikiniBottom/BikiniBottom instances, enabling powerful multi-agent orchestration workflows. Your OpenClaw agent becomes a meta-orchestrator, managing entire fleets of specialized AI agents.
 
 ### What is OpenClaw?
 
@@ -34,7 +34,7 @@ The **OpenClaw Agent Skill** allows OpenClaw agents to interact with BikiniBotto
 
 ### The Integration
 
-This skill transforms OpenClaw into a control plane for BikiniBottom/OpenSpawn:
+This skill transforms OpenClaw into a control plane for BikiniBottom/BikiniBottom:
 
 ```
 ┌─────────────────┐
@@ -42,11 +42,11 @@ This skill transforms OpenClaw into a control plane for BikiniBottom/OpenSpawn:
 │   Agent         │
 └────────┬────────┘
          │
-         │ OpenSpawn Skill
+         │ BikiniBottom Skill
          │
          ▼
 ┌─────────────────────────────────┐
-│  BikiniBottom/OpenSpawn         │
+│  BikiniBottom/BikiniBottom         │
 │  ┌──────────┐  ┌──────────┐    │
 │  │ Agent 1  │  │ Agent 2  │    │  ← Specialized agents
 │  └──────────┘  └──────────┘    │
@@ -61,8 +61,8 @@ This skill transforms OpenClaw into a control plane for BikiniBottom/OpenSpawn:
 ### Prerequisites
 
 - OpenClaw installed and configured
-- BikiniBottom/OpenSpawn instance (cloud or self-hosted)
-- API key from your OpenSpawn instance
+- BikiniBottom/BikiniBottom instance (cloud or self-hosted)
+- API key from your BikiniBottom instance
 - `jq` installed (`brew install jq` on macOS)
 
 ### Setup
@@ -96,7 +96,7 @@ Or use a `.env` file in your OpenClaw workspace.
 
 ### 1. Agent Management
 
-Create and manage specialized agents within your OpenSpawn instance.
+Create and manage specialized agents within your BikiniBottom instance.
 
 **List all agents:**
 ```bash
@@ -171,7 +171,7 @@ Returns:
 Add to your OpenClaw `HEARTBEAT.md`:
 
 ```markdown
-### OpenSpawn Status Check (2x daily)
+### BikiniBottom Status Check (2x daily)
 
 **Command:** `cd ~/.openclaw/skills/openspawn/skills/openclaw && ./scripts/openspawn-cli.sh metrics`
 
@@ -183,7 +183,7 @@ Add to your OpenClaw `HEARTBEAT.md`:
 **Last checked:** Track in memory/heartbeat-state.json
 ```
 
-Your OpenClaw agent will now autonomously monitor your OpenSpawn instance and alert you to issues.
+Your OpenClaw agent will now autonomously monitor your BikiniBottom instance and alert you to issues.
 
 ### Pattern 2: Research Pipeline Orchestration
 
@@ -293,7 +293,7 @@ OpenClaw manages the pipeline, ensuring each stage completes before moving forwa
 ### Access Control
 
 - Give OpenClaw agents only the permissions they need
-- Review agent actions in OpenSpawn audit logs
+- Review agent actions in BikiniBottom audit logs
 - Set up alerts for sensitive operations
 
 ## Troubleshooting
@@ -304,12 +304,12 @@ OpenClaw manages the pipeline, ensuring each stage completes before moving forwa
 
 **Fix:**
 1. Verify `OPENSPAWN_API_KEY` is set: `echo $OPENSPAWN_API_KEY`
-2. Generate new key from OpenSpawn dashboard
+2. Generate new key from BikiniBottom dashboard
 3. Update environment variable
 
 ### "Connection refused"
 
-**Cause:** OpenSpawn instance not reachable
+**Cause:** BikiniBottom instance not reachable
 
 **Fix:**
 1. Verify URL: `echo $OPENSPAWN_URL`
@@ -343,7 +343,7 @@ sudo apt-get install jq
 
 ## API Reference
 
-The skill wraps these OpenSpawn REST endpoints:
+The skill wraps these BikiniBottom REST endpoints:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -357,7 +357,7 @@ The skill wraps these OpenSpawn REST endpoints:
 | `/api/messages` | POST | Send peer message |
 | `/api/metrics` | GET | Get system metrics |
 
-See the [OpenSpawn API documentation](/docs/api) for detailed endpoint specifications.
+See the [BikiniBottom API documentation](/docs/api) for detailed endpoint specifications.
 
 ## Examples
 

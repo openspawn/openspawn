@@ -16,7 +16,7 @@ Monday morning brought a $3,000 invoice from their LLM provider.
 - No alerts when spending spiked
 - No way to attribute costs to specific agents
 
-## How OpenSpawn Solves This
+## How BikiniBottom Solves This
 
 ### 1. Per-Agent Budget Limits
 
@@ -70,7 +70,7 @@ Agent Dennis (L10) — Org budget: 100,000 credits
 
 ## The Outcome
 
-With OpenSpawn, Alex's scenario would have played out differently:
+With BikiniBottom, Alex's scenario would have played out differently:
 
 1. **Friday 8 PM**: Agent hits 80% of budget limit
 2. **Friday 9 PM**: Agent hits 100%, spending stops automatically

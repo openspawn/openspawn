@@ -1,9 +1,9 @@
 ---
 layout: default
-title: API Reference - OpenSpawn
+title: API Reference - BikiniBottom
 ---
 
-# OpenSpawn — API Specification
+# BikiniBottom — API Specification
 
 **Version:** 1.0  
 **Date:** February 6, 2026  
@@ -133,7 +133,7 @@ GET /agents?status=active&role=worker
 // Request
 {
   "title": "Build landing page",
-  "description": "Create a responsive landing page for OpenSpawn...",
+  "description": "Create a responsive landing page for BikiniBottom...",
   "priority": "high",
   "assignee_agent_id": "builder",
   "tags": ["frontend", "react"],
@@ -379,7 +379,7 @@ The MCP server at port 3102 exposes these tools. Each tool description is optimi
 ```json
 {
   "name": "task_list",
-  "description": "Query tasks in OpenSpawn. Returns tasks filtered by status, assignee, priority, and tags. Use this to find work to pick up or check on task progress.",
+  "description": "Query tasks in BikiniBottom. Returns tasks filtered by status, assignee, priority, and tags. Use this to find work to pick up or check on task progress.",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -401,7 +401,7 @@ The MCP server at port 3102 exposes these tools. Each tool description is optimi
 ```json
 {
   "name": "task_create",
-  "description": "Create a new task in OpenSpawn. The task starts in 'backlog' status. Assign it to an agent and set priority and tags for routing.",
+  "description": "Create a new task in BikiniBottom. The task starts in 'backlog' status. Assign it to an agent and set priority and tags for routing.",
   "inputSchema": {
     "type": "object",
     "properties": {

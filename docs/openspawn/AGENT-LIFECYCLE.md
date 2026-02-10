@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Agent Lifecycle - OpenSpawn
+title: Agent Lifecycle - BikiniBottom
 ---
 
 # Agent Lifecycle & Spawning Model
@@ -9,7 +9,7 @@ title: Agent Lifecycle - OpenSpawn
 
 ## Overview
 
-OpenSpawn implements a hierarchical agent system inspired by corporate HR structures. Agents are independent entities with their own credentials, credits, and lifecycle. Parent agents have oversight but don't "own" their spawned agents.
+BikiniBottom implements a hierarchical agent system inspired by corporate HR structures. Agents are independent entities with their own credentials, credits, and lifecycle. Parent agents have oversight but don't "own" their spawned agents.
 
 ## Role Hierarchy
 
