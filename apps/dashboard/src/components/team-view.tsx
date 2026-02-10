@@ -161,12 +161,14 @@ function TeamSection({
   depth = 0,
   defaultOpen = true,
   onAgentClick,
+  onTeamClick,
 }: {
   team: Team;
   agents: Agent[];
   depth?: number;
   defaultOpen?: boolean;
   onAgentClick?: (id: string) => void;
+  onTeamClick?: (teamId: string) => void;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const subTeams = useMemo(() => getSubTeams(team.id), [team.id]);
@@ -176,9 +178,7 @@ function TeamSection({
   // Agents directly assigned to this team (not sub-teams)
   const directAgents = useMemo(
     () =>
-      agents.filter(
-        (a) => (a as Agent & { teamId?: string }).teamId === team.id,
-      ),
+      agents.filter((a) => a.teamId === team.id),
     [agents, team.id],
   );
 
@@ -193,8 +193,15 @@ function TeamSection({
         )}
       >
         <div
-          className="flex items-center justify-center rounded-md p-1.5"
+          className="flex items-center justify-center rounded-md p-1.5 hover:ring-2 hover:ring-primary/30 transition-all cursor-pointer"
           style={{ backgroundColor: `${color}20`, color }}
+          onClick={(e) => {
+            if (onTeamClick) {
+              e.stopPropagation();
+              onTeamClick(team.id);
+            }
+          }}
+          title="View team details"
         >
           <Icon className="h-4 w-4" />
         </div>
@@ -250,6 +257,7 @@ function TeamSection({
                   depth={depth + 1}
                   defaultOpen={false}
                   onAgentClick={onAgentClick}
+                  onTeamClick={onTeamClick}
                 />
               ))}
             </div>
@@ -263,8 +271,10 @@ function TeamSection({
 // ── Main export ─────────────────────────────────────────────────────────────
 export function TeamView({
   onAgentClick,
+  onTeamClick,
 }: {
   onAgentClick?: (id: string) => void;
+  onTeamClick?: (teamId: string) => void;
 }) {
   const { agents } = useAgents();
   const parentTeams = useMemo(() => getParentTeams(), []);
@@ -279,6 +289,7 @@ export function TeamView({
               agents={agents}
               defaultOpen
               onAgentClick={onAgentClick}
+              onTeamClick={onTeamClick}
             />
           </CardContent>
         </Card>

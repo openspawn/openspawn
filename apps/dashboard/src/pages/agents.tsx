@@ -38,6 +38,7 @@ import { Progress } from "../components/ui/progress";
 import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { TeamDetailPanel } from "../components/team-detail-panel";
 import { useSidePanel } from "../contexts";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 import { TeamBadge, TeamFilterDropdown } from "../components/team-badge";
@@ -720,6 +721,17 @@ export function AgentsPage() {
     );
   };
 
+  const openTeamDetail = (teamId: string) => {
+    openSidePanel(
+      <TeamDetailPanel
+        teamId={teamId}
+        onAgentClick={openAgentDetail}
+        onTeamClick={openTeamDetail}
+      />,
+      { width: 480, title: 'Team Details' }
+    );
+  };
+
   // Mobile filter toggle
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -1060,7 +1072,7 @@ export function AgentsPage() {
 
         {/* Teams Tab */}
         <TabsContent value="teams" className="space-y-6">
-          <TeamView onAgentClick={openAgentDetail} />
+          <TeamView onAgentClick={openAgentDetail} onTeamClick={openTeamDetail} />
         </TabsContent>
 
         {/* Reputation Tab */}
