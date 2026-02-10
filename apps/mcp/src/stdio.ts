@@ -5,7 +5,7 @@
  */
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createMcpServer } from "./server.js";
+import { createMcpServer } from "./server";
 
 async function main() {
   const server = createMcpServer();

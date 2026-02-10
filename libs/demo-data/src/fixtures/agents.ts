@@ -1,4 +1,4 @@
-import type { DemoAgent, ReputationLevel } from '../types.js';
+import type { DemoAgent, ReputationLevel } from '../types';
 
 // Helper to generate UUIDs
 function uuid(): string {

@@ -1,7 +1,7 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 
-import { createMcpServer } from "./server.js";
+import { createMcpServer } from "./server";
 
 const app = express();
 app.use(express.json());

@@ -1,4 +1,4 @@
-import type { DemoMessage, MessageType } from '../types.js';
+import type { DemoMessage, MessageType } from '../types';
 
 // Message templates by type
 const MESSAGE_TEMPLATES: Record<MessageType, string[]> = {

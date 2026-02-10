@@ -1,9 +1,9 @@
-import type { DemoScenario, DemoAgent, DemoTask, DemoCreditTransaction, DemoEvent } from '../types.js';
-import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents.js';
-import { tasks, generateRandomTask } from '../fixtures/tasks.js';
-import { creditTransactions, generateCreditTransaction } from '../fixtures/credits.js';
-import { events, generateEvent } from '../fixtures/events.js';
-import { generateInitialMessages } from '../fixtures/messages.js';
+import type { DemoScenario, DemoAgent, DemoTask, DemoCreditTransaction, DemoEvent } from '../types';
+import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents';
+import { tasks, generateRandomTask } from '../fixtures/tasks';
+import { creditTransactions, generateCreditTransaction } from '../fixtures/credits';
+import { events, generateEvent } from '../fixtures/events';
+import { generateInitialMessages } from '../fixtures/messages';
 
 // Additional domains for enterprise scale
 const ENTERPRISE_DOMAINS = ['Engineering', 'Finance', 'Marketing', 'Sales', 'Support', 'Research', 'Legal', 'HR'];

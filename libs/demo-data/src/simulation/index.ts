@@ -1,1 +1,1 @@
-export { SimulationEngine, createSimulation } from './engine.js';
+export { SimulationEngine, createSimulation } from './engine';

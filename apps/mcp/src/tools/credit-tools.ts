@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import type { ApiClient } from "../api-client.js";
+import type { ApiClient } from "../api-client";
 
 export function registerCreditTools(server: McpServer, client: ApiClient) {
   server.tool("credits_balance", "Get current credit balance", {}, async () => {

@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import type { ApiClient } from "../api-client.js";
+import type { ApiClient } from "../api-client";
 
 export function registerTaskTools(server: McpServer, client: ApiClient) {
   server.tool(
