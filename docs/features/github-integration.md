@@ -1,3 +1,10 @@
+---
+title: GitHub Integration
+layout: default
+parent: Features
+nav_order: 7
+---
+
 # GitHub Bidirectional Sync
 
 ## Overview

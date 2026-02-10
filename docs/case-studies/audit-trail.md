@@ -1,3 +1,10 @@
+---
+title: Audit Trail
+layout: default
+parent: Case Studies
+nav_order: 3
+---
+
 # Case Study: Which Agent Broke Production?
 
 > *"The post-mortem question: who approved this? Nobody knows."*

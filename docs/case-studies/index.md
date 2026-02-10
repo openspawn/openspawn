@@ -1,3 +1,10 @@
+---
+title: Case Studies
+layout: default
+nav_order: 7
+has_children: true
+---
+
 # Case Studies
 
 Real-world scenarios where BikiniBottom solves multi-agent coordination challenges.
@@ -86,4 +93,4 @@ docker compose up -d
 open http://localhost:4200
 ```
 
-See [Getting Started](../getting-started.md) for full setup.
+See [Getting Started]({{ site.baseurl }}/getting-started) for full setup.

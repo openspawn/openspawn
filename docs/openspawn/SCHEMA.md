@@ -1,6 +1,8 @@
 ---
+title: Schema
 layout: default
-title: Database Schema - BikiniBottom
+parent: Architecture
+nav_order: 6
 ---
 
 # BikiniBottom — Database Schema

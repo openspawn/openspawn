@@ -1,3 +1,10 @@
+---
+title: Self-Claim Tasks
+layout: default
+parent: Features
+nav_order: 2
+---
+
 # Self-Claim Task Mechanics
 
 > Phase 7.1 - Autonomous Task Claiming

@@ -1,6 +1,8 @@
 ---
 title: CLI Reference
-nav_order: 5
+layout: default
+parent: "SDK & CLI"
+nav_order: 1
 ---
 
 # BikiniBottom CLI

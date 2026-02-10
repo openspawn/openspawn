@@ -1,3 +1,9 @@
+---
+published: false
+nav_exclude: true
+search_exclude: true
+---
+
 # Viral Branding Research: Open Source Projects & Developer Tools
 
 **Research Date:** February 10, 2026  

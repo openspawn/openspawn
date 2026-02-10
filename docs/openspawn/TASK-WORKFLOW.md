@@ -1,6 +1,8 @@
 ---
+title: Task Workflow
 layout: default
-title: Task Workflow - BikiniBottom
+parent: Architecture
+nav_order: 4
 ---
 
 # Task Workflow & Templates

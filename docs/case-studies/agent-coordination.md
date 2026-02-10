@@ -1,3 +1,10 @@
+---
+title: Agent Coordination
+layout: default
+parent: Case Studies
+nav_order: 2
+---
+
 # Case Study: Too Many Cooks
 
 > *"Agents can't talk to each other. Work falls through cracks."*

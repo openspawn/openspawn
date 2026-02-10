@@ -1,3 +1,10 @@
+---
+title: Python SDK
+layout: default
+parent: "SDK & CLI"
+nav_order: 3
+---
+
 # Python SDK Documentation
 
 The BikiniBottom Python SDK provides a type-safe, async-ready interface to the BikiniBottom API.

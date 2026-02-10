@@ -1,7 +1,7 @@
 ---
-layout: default
 title: Why BikiniBottom?
-nav_order: 1
+layout: default
+nav_order: 3
 ---
 
 # Why BikiniBottom?

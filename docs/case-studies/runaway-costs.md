@@ -1,3 +1,10 @@
+---
+title: "The $3,000 Weekend"
+layout: default
+parent: Case Studies
+nav_order: 1
+---
+
 # Case Study: The $3,000 Weekend
 
 > *"I had no visibility. No alerts. No budget caps. Just a bill."*

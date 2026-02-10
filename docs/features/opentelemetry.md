@@ -1,3 +1,10 @@
+---
+title: OpenTelemetry
+layout: default
+parent: Features
+nav_order: 9
+---
+
 # OpenTelemetry Integration
 
 ## Overview

@@ -1,3 +1,10 @@
+---
+title: Linear Integration
+layout: default
+parent: Features
+nav_order: 8
+---
+
 # Linear Integration
 
 BikiniBottom integrates with Linear.app for bidirectional issue synchronization.

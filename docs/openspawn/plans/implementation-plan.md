@@ -1,3 +1,10 @@
+---
+title: Implementation Plan
+layout: default
+parent: Architecture
+nav_order: 8
+---
+
 # BikiniBottom — Implementation Plan
 
 **Product**: Self-hosted platform for multi-agent coordination, communication, and economy management

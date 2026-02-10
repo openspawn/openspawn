@@ -1,3 +1,10 @@
+---
+title: Inbound Webhooks
+layout: default
+parent: Features
+nav_order: 6
+---
+
 # Inbound Webhooks
 
 Inbound webhooks allow external services to create tasks in BikiniBottom via HTTP POST requests. This enables seamless integration with tools like GitHub Actions, Zapier, n8n, and custom automation workflows.

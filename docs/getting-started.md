@@ -1,6 +1,7 @@
 ---
-layout: home
-title: Getting Started - BikiniBottom
+title: Getting Started
+layout: default
+nav_order: 2
 ---
 
 # Getting Started

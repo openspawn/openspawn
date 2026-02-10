@@ -1,3 +1,10 @@
+---
+title: TypeScript SDK
+layout: default
+parent: "SDK & CLI"
+nav_order: 2
+---
+
 # TypeScript SDK (@openspawn/sdk)
 
 Official TypeScript/JavaScript SDK for the BikiniBottom API. Provides a clean, typed interface for interacting with agents, tasks, credits, messages, and events.

@@ -1,6 +1,8 @@
 ---
+title: Product Requirements
 layout: default
-title: Product Requirements - BikiniBottom
+parent: Architecture
+nav_order: 7
 ---
 
 # BikiniBottom — Product Requirements Document

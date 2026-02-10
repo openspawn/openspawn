@@ -1,3 +1,10 @@
+---
+title: Pre-Hooks
+layout: default
+parent: Features
+nav_order: 4
+---
+
 # Pre-Hooks with Blocking
 
 Webhooks that fire BEFORE an action occurs, with the ability to block the action based on external validation.

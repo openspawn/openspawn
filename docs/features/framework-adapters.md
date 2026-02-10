@@ -1,6 +1,8 @@
 ---
+title: Framework Adapters
 layout: default
-title: Framework Adapters — BikiniBottom
+parent: Features
+nav_order: 11
 ---
 
 # 🔌 Framework Adapters

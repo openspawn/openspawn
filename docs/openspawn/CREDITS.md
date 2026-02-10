@@ -1,6 +1,8 @@
 ---
+title: Credits System
 layout: default
-title: Credit System - BikiniBottom
+parent: Architecture
+nav_order: 5
 ---
 
 # Credit System & Economy

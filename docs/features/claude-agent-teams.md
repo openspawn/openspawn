@@ -1,3 +1,10 @@
+---
+title: Claude Agent Teams
+layout: default
+parent: Features
+nav_order: 12
+---
+
 # Claude Code Agent Teams Integration
 
 BikiniBottom provides the **persistent coordination layer** that Claude Code Agent Teams needs. While Agent Teams handles real-time collaboration between Claude Code instances, BikiniBottom adds task persistence, credit tracking, audit trails, and a visual dashboard.
