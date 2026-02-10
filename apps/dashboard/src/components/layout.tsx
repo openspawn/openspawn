@@ -98,9 +98,17 @@ export function Layout({ children }: LayoutProps) {
         {/* Sidebar */}
         <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex">
           {/* Logo */}
-          <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-            <Bot className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">OpenSpawn</span>
+          <div className="flex h-16 items-center gap-2 border-b border-border px-6 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600" />
+            <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                BikiniBottom
+              </span>
+              <span className="text-[9px] text-muted-foreground tracking-wide">
+                Multi-Agent Coordination
+              </span>
+            </div>
           </div>
 
           {/* Navigation */}
@@ -247,10 +255,18 @@ export function Layout({ children }: LayoutProps) {
           )}
         >
           {/* Drawer header */}
-          <div className="flex h-16 items-center justify-between border-b border-border px-4">
+          <div className="flex h-16 items-center justify-between border-b border-border px-4 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600" />
             <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold">OpenSpawn</span>
+              <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <div className="flex flex-col">
+              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                BikiniBottom
+              </span>
+              <span className="text-[9px] text-muted-foreground tracking-wide">
+                Multi-Agent Coordination
+              </span>
+            </div>
             </div>
             <Button
               variant="ghost"
@@ -348,7 +364,8 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Mobile header */}
         <div className="flex flex-1 flex-col min-w-0">
-          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden">
+          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden relative overflow-hidden">
+            <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600" />
             <Button
               variant="ghost"
               size="icon"
@@ -358,8 +375,15 @@ export function Layout({ children }: LayoutProps) {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold">OpenSpawn</span>
+              <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <div className="flex flex-col">
+              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                BikiniBottom
+              </span>
+              <span className="text-[9px] text-muted-foreground tracking-wide">
+                Multi-Agent Coordination
+              </span>
+            </div>
             </div>
             <div className="flex items-center gap-2">
               {isDemo && (
