@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useState, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Node,
@@ -214,43 +213,22 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 // VIEW 2: Mission Control Feed (Mobile-Optimized)
 // ============================================================
 function FeedVirtualList({ filtered }: { filtered: Message[] }) {
-  const parentRef = useRef<HTMLDivElement>(null);
-  const virtualizer = useVirtualizer({
-    count: filtered.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 120,
-    overscan: 5,
-    measureElement: (element) => element.getBoundingClientRect().height,
-  });
-
-  const totalSize = virtualizer.getTotalSize();
-
   return (
     <div className="relative">
       <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
-      <div ref={parentRef} className="overflow-auto" style={{ maxHeight: '600px', height: Math.min(totalSize + 16, 600) }}>
-        <div style={{ height: `${totalSize}px`, position: 'relative' }}>
+      <ScrollArea className="h-[600px]">
+        <div className="space-y-0">
           <AnimatePresence mode="popLayout">
-            {virtualizer.getVirtualItems().map((virtualRow) => {
-              const msg = filtered[virtualRow.index];
+            {filtered.map((msg) => {
               const sender = msg.fromAgent;
               const receiver = msg.toAgent;
               return (
                 <motion.div
                   key={msg.id}
-                  ref={virtualizer.measureElement}
-                  data-index={virtualRow.index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
                   className="flex gap-3 md:gap-4 pb-3 pl-8 md:pl-12 relative"
                 >
                   <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-card border-2 border-primary top-3" />
@@ -292,7 +270,7 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
             })}
           </AnimatePresence>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }
