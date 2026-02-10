@@ -5,7 +5,23 @@ import { cn } from "../../lib/utils";
 
 const DropdownMenu = Menu.Root;
 
-const DropdownMenuTrigger = Menu.Trigger;
+// DropdownMenuTrigger with render prop support for custom elements
+const DropdownMenuTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Menu.Trigger> & { asChild?: boolean }
+>(({ asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <Menu.Trigger ref={ref} render={children} {...props} />
+    );
+  }
+  return (
+    <Menu.Trigger ref={ref} {...props}>
+      {children}
+    </Menu.Trigger>
+  );
+});
+DropdownMenuTrigger.displayName = "DropdownMenuTrigger";
 
 const DropdownMenuGroup = Menu.Group;
 

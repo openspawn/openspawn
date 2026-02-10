@@ -9,7 +9,27 @@ TooltipProvider.displayName = "TooltipProvider";
 
 const Tooltip = BaseTooltip.Root;
 
-const TooltipTrigger = BaseTooltip.Trigger;
+// Wrap base-ui Trigger to support Radix-style `asChild` prop
+const TooltipTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof BaseTooltip.Trigger> & { asChild?: boolean }
+>(({ asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <BaseTooltip.Trigger
+        ref={ref}
+        {...props}
+        render={children}
+      />
+    );
+  }
+  return (
+    <BaseTooltip.Trigger ref={ref} {...props}>
+      {children}
+    </BaseTooltip.Trigger>
+  );
+});
+TooltipTrigger.displayName = "TooltipTrigger";
 
 const TooltipContent = React.forwardRef<
   HTMLDivElement,
