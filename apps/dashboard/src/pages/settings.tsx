@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, Shield, Key, Building2, Palette, Webhook, WebhookIcon, Github } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { PageHeader } from "../components/ui/page-header";
 import { ProfileSettings } from "../components/settings/profile-settings";
 import { SecuritySettings } from "../components/settings/security-settings";
 import { ApiKeySettings } from "../components/settings/api-key-settings";
@@ -16,12 +16,10 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account and organization settings
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage your account and organization settings"
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-8 lg:w-[1120px]">

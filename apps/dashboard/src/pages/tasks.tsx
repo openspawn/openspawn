@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Plus, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook } from "lucide-react";
+import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ScrollArea } from "../components/ui/scroll-area";
+import { PageHeader } from "../components/ui/page-header";
 import { PhaseChip } from "../components/phase-chip";
-import { EmptyState } from "../components/ui/empty-state";
 import { useTasks, type Task, useCurrentPhase } from "../hooks";
 import { SplitPanel } from "../components/ui/split-panel";
 
@@ -630,21 +630,19 @@ export function TasksPage() {
       rightOpen={!!selectedTask}
       left={<div className="p-4 space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
-            <p className="text-muted-foreground">
-              Manage and track agent tasks
-            </p>
+      <PageHeader
+        title="Tasks"
+        description="Manage and track agent tasks"
+        actions={
+          <div className="flex items-center gap-3">
+            {currentPhase && <PhaseChip phase={currentPhase} />}
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Task
+            </Button>
           </div>
-          {currentPhase && <PhaseChip phase={currentPhase} />}
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          New Task
-        </Button>
-      </div>
+        }
+      />
 
       {/* View toggle */}
       <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "list")}>

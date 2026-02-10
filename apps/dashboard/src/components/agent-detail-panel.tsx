@@ -16,6 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 import { ChartTooltip } from "./ui/chart-tooltip";
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
 import { TimelineView } from "./timeline-view";
+import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 
 type Agent = AgentFieldsFragment;
 
@@ -24,47 +25,6 @@ interface AgentDetailPanelProps {
   onClose: () => void;
   /** Render inline (for split-panel) instead of as a fixed overlay */
   inline?: boolean;
-}
-
-// Level colors matching network page
-const levelColors: Record<number, string> = {
-  10: "#f472b6", // COO - pink
-  9: "#a78bfa",  // HR - purple
-  8: "#22c55e",  // Manager - green
-  7: "#22c55e",
-  6: "#06b6d4",  // Senior - cyan
-  5: "#06b6d4",
-  4: "#fbbf24",  // Worker - yellow
-  3: "#fbbf24",
-  2: "#71717a",  // Probation - gray
-  1: "#71717a",
-};
-
-function getLevelColor(level: number): string {
-  return levelColors[level] || "#71717a";
-}
-
-function getLevelLabel(level: number): string {
-  if (level >= 10) return "COO";
-  if (level >= 9) return "HR";
-  if (level >= 7) return "Manager";
-  if (level >= 5) return "Senior";
-  if (level >= 3) return "Worker";
-  return "Probation";
-}
-
-function getStatusVariant(status: AgentStatus): "success" | "warning" | "destructive" | "secondary" {
-  switch (status) {
-    case AgentStatus.Active:
-      return "success";
-    case AgentStatus.Pending:
-      return "warning";
-    case AgentStatus.Suspended:
-    case AgentStatus.Revoked:
-      return "destructive";
-    default:
-      return "secondary";
-  }
 }
 
 function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning" | "destructive" | "secondary"; label: string } {

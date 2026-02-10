@@ -28,6 +28,7 @@ import { useMessages, useConversations } from "../hooks/use-messages";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 import { AgentDetailPanel } from "./agent-detail-panel";
 import { useAgentHealth } from "../hooks/use-agent-health";
+import { levelColors } from "../lib/status-colors";
 
 // Context to share active delegations, speed, avatar settings, and activity data
 interface TaskDelegation {
@@ -135,19 +136,7 @@ async function getLayoutedElements(
   return { nodes: layoutedNodes, edges };
 }
 
-// Level colors (for fallback)
-const levelColors: Record<number, string> = {
-  10: "#f472b6", // COO - pink
-  9: "#a78bfa", // HR - purple
-  8: "#22c55e", // Manager - green
-  7: "#22c55e",
-  6: "#06b6d4", // Senior - cyan
-  5: "#06b6d4",
-  4: "#fbbf24", // Worker - yellow
-  3: "#fbbf24",
-  2: "#71717a", // Probation - gray
-  1: "#71717a",
-};
+// Level colors from shared status-colors module
 
 // Heat map colors based on activity
 const heatColors = {

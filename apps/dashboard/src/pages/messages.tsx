@@ -6,7 +6,6 @@ import {
   Edge,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   MarkerType,
@@ -22,6 +21,7 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { cn } from '../lib/utils';
 import { EmptyState } from '../components/ui/empty-state';
+import { PageHeader } from '../components/ui/page-header';
 import { getAgentAvatarUrl } from '../lib/avatar';
 import { PhaseChip } from '../components/phase-chip';
 import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
@@ -741,10 +741,10 @@ export function MessagesPage() {
   if (!loading && messages.length === 0) {
     return (
       <div className="p-3 md:p-6 space-y-4 md:space-y-6">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold">Agent Communications</h1>
-          <p className="text-slate-400 text-xs md:text-sm">Watch your agents coordinate in real-time</p>
-        </div>
+        <PageHeader
+          title="Agent Communications"
+          description="Watch your agents coordinate in real-time"
+        />
         <Card className="bg-slate-800/30 border-slate-700">
           <CardContent>
             <EmptyState
@@ -771,16 +771,16 @@ export function MessagesPage() {
 
   return (
     <div className="p-3 md:p-6 space-y-4 md:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold">Agent Communications</h1>
-            <p className="text-slate-400 text-xs md:text-sm">Watch your agents coordinate in real-time</p>
+      <PageHeader
+        title="Agent Communications"
+        description="Watch your agents coordinate in real-time"
+        actions={
+          <div className="flex items-center gap-3">
+            {currentPhase && <PhaseChip phase={currentPhase} className="hidden sm:inline-flex" />}
+            <Badge variant="outline">{messages.length} messages</Badge>
           </div>
-          {currentPhase && <PhaseChip phase={currentPhase} className="hidden sm:inline-flex" />}
-        </div>
-        <Badge variant="outline" className="self-start sm:self-auto">{messages.length} messages</Badge>
-      </div>
+        }
+      />
 
       <Tabs defaultValue="feed" className="w-full">
         <TabsList className="grid w-full grid-cols-4 mb-4 md:mb-6 h-9 md:h-10">
