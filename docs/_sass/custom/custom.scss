@@ -1,4 +1,4 @@
-// BikiniBottom custom styling for Just the Docs
+// BikiniBottom custom styling for Just the Docs — Ocean theme
 
 // Override link color to cyan
 $link-color: #06b6d4;
@@ -18,4 +18,70 @@ $link-color: #06b6d4;
     background-color: #0891b2 !important;
     border-color: #0891b2 !important;
   }
+}
+
+// Code blocks — deeper ocean feel
+.highlight {
+  border-radius: 8px;
+  border: 1px solid rgba(6, 182, 212, 0.15);
+}
+
+// Home page feature grid
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.feature-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  background: rgba(6, 182, 212, 0.03);
+  transition: border-color 0.2s, transform 0.2s;
+
+  &:hover {
+    border-color: rgba(6, 182, 212, 0.4);
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    margin-top: 0;
+    color: #06b6d4;
+  }
+
+  p {
+    margin-bottom: 0;
+    opacity: 0.85;
+  }
+}
+
+// Stats badges on home page
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  background: rgba(6, 182, 212, 0.05);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+// Table improvements
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// Blockquote callout style
+blockquote {
+  border-left-color: #06b6d4;
+}
+
+// Smooth scrolling
+html {
+  scroll-behavior: smooth;
 }
