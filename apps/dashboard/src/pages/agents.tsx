@@ -40,6 +40,8 @@ import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-sele
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { SplitPanel } from "../components/ui/split-panel";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
+import { TeamBadge, TeamFilterDropdown } from "../components/team-badge";
+import { useTeams } from "../hooks";
 
 // Use generated types from GraphQL
 import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
@@ -666,6 +668,7 @@ function AgentVirtualGrid({
                           <div className="flex flex-wrap gap-2 mb-4">
                             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
                             <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="sm" />
+                            <TeamBadge teamId={(agent as any).teamId} />
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
@@ -725,6 +728,8 @@ export function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [teamFilterValue, setTeamFilterValue] = useState<string>("all");
+  const { teams: allTeams } = useTeams();
   
   // Sorting state
   const [sortField, setSortField] = useState<SortField>("level");
@@ -753,6 +758,11 @@ export function AgentsPage() {
       const [min, max] = levelFilter.split("-").map(Number);
       result = result.filter(a => a.level >= min && a.level <= max);
     }
+
+    // Team filter
+    if (teamFilterValue !== "all") {
+      result = result.filter(a => (a as any).teamId === teamFilterValue);
+    }
     
     // Sort
     result.sort((a, b) => {
@@ -778,7 +788,7 @@ export function AgentsPage() {
     });
     
     return result;
-  }, [agents, searchQuery, statusFilter, levelFilter, sortField, sortDirection]);
+  }, [agents, searchQuery, statusFilter, levelFilter, teamFilterValue, sortField, sortDirection]);
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -930,6 +940,13 @@ export function AgentsPage() {
             <option value="3-4">L3-4 (Worker)</option>
             <option value="1-2">L1-2 (Probation)</option>
           </select>
+
+          {/* Team Filter */}
+          <TeamFilterDropdown
+            value={teamFilterValue}
+            onChange={setTeamFilterValue}
+            teams={allTeams}
+          />
           
           {/* Sort */}
           <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
@@ -1008,6 +1025,7 @@ export function AgentsPage() {
               setSearchQuery("");
               setStatusFilter("all");
               setLevelFilter("all");
+              setTeamFilterValue("all");
             }}>
               Clear Filters
             </Button>

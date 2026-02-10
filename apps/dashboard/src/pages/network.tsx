@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { AgentNetwork } from "../components/agent-network";
 import { OrgChart } from "../components/org-chart";
+import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { useAgents } from "../hooks";
 import { EmptyState } from "../components/ui/empty-state";
 import { Card, CardContent } from "../components/ui/card";
@@ -12,6 +14,7 @@ type NetworkView = "network" | "orgchart";
 export function NetworkPage() {
   const { agents } = useAgents();
   const [view, setView] = useState<NetworkView>("network");
+  const [detailAgentId, setDetailAgentId] = useState<string | null>(null);
 
   if (agents.length === 0) {
     return (
@@ -108,8 +111,18 @@ export function NetworkPage() {
       {view === "network" ? (
         <AgentNetwork className="w-full h-full" />
       ) : (
-        <OrgChart className="w-full h-full" />
+        <OrgChart className="w-full h-full" onAgentClick={setDetailAgentId} />
       )}
+
+      {/* Agent Detail Panel (overlay, for org chart click-to-detail) */}
+      <AnimatePresence>
+        {detailAgentId && (
+          <AgentDetailPanel
+            agentId={detailAgentId}
+            onClose={() => setDetailAgentId(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

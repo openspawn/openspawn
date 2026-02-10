@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ReactFlow,
   Node,
@@ -12,7 +12,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypingIndicator } from '../components/presence';
-import { usePresence } from '../hooks';
+import { usePresence, useTeams } from '../hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -23,6 +23,8 @@ import { EmptyState } from '../components/ui/empty-state';
 import { PageHeader } from '../components/ui/page-header';
 import { getAgentAvatarUrl } from '../lib/avatar';
 import { PhaseChip } from '../components/phase-chip';
+import { TeamBadge, TeamFilterDropdown } from '../components/team-badge';
+import { ThreadView } from '../components/thread-view';
 import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
 
 const formatTime = (dateStr: string) => {
@@ -212,7 +214,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 // ============================================================
 // VIEW 2: Mission Control Feed (Mobile-Optimized)
 // ============================================================
-function FeedVirtualList({ filtered }: { filtered: Message[] }) {
+function FeedVirtualList({ filtered, allMessages, onViewThread }: { filtered: Message[]; allMessages: Message[]; onViewThread: (convoKey: string) => void }) {
   return (
     <div className="relative">
       <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
@@ -222,6 +224,7 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
             {filtered.map((msg) => {
               const sender = msg.fromAgent;
               const receiver = msg.toAgent;
+              const convoKey = [msg.fromAgentId, msg.toAgentId].sort().join('-');
               return (
                 <motion.div
                   key={msg.id}
@@ -258,11 +261,21 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
                         </div>
                       </div>
                       <p className="text-xs md:text-sm text-muted-foreground">{msg.content}</p>
-                      {msg.taskRef && (
-                        <Badge variant="outline" className="mt-2 text-[9px] md:text-[10px]">
-                          🔗 {msg.taskRef}
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        {msg.taskRef && (
+                          <Badge variant="outline" className="text-[9px] md:text-[10px]">
+                            🔗 {msg.taskRef}
+                          </Badge>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 px-1.5 text-[9px] md:text-[10px] text-primary hover:text-primary/80 ml-auto"
+                          onClick={() => onViewThread(convoKey)}
+                        >
+                          View thread →
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -289,15 +302,32 @@ function ComposingIndicators() {
   );
 }
 
-function MissionControlFeed({ messages }: { messages: Message[] }) {
+function MissionControlFeed({ messages, onViewThread }: { messages: Message[]; onViewThread: (convoKey: string) => void }) {
   const [filter, setFilter] = useState<string | null>(null);
+  const { teams: allTeams } = useTeams();
+  const [teamFilter, setTeamFilter] = useState<string>('all');
+  const { agents } = useAgents();
 
-  const filtered = filter ? messages.filter((m) => m.type === filter) : messages;
+  const filtered = useMemo(() => {
+    let result = messages;
+    if (filter) result = result.filter((m) => m.type === filter);
+    if (teamFilter !== 'all') {
+      const teamAgentIds = new Set(
+        agents
+          .filter((a) => (a as any).teamId === teamFilter)
+          .map((a) => a.id),
+      );
+      result = result.filter(
+        (m) => teamAgentIds.has(m.fromAgentId) || teamAgentIds.has(m.toAgentId),
+      );
+    }
+    return result;
+  }, [messages, filter, teamFilter, agents]);
 
   return (
     <div className="space-y-4">
       {/* Horizontally scrollable filters on mobile */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide items-center">
         <Button
           variant={filter === null ? 'default' : 'outline'}
           size="sm"
@@ -317,9 +347,16 @@ function MissionControlFeed({ messages }: { messages: Message[] }) {
             {typeIcons[type]} <span className="hidden sm:inline ml-1">{type.toLowerCase()}</span>
           </Button>
         ))}
+        <div className="w-px h-6 bg-border shrink-0" />
+        <TeamFilterDropdown
+          value={teamFilter}
+          onChange={setTeamFilter}
+          teams={allTeams.filter((t) => !t.parentTeamId)}
+          className="shrink-0 h-8 text-xs min-h-0"
+        />
       </div>
 
-      <FeedVirtualList filtered={filtered} />
+      <FeedVirtualList filtered={filtered} allMessages={messages} onViewThread={onViewThread} />
       <ComposingIndicators />
     </div>
   );
@@ -328,8 +365,15 @@ function MissionControlFeed({ messages }: { messages: Message[] }) {
 // ============================================================
 // VIEW 3: Conversation Cards (Responsive Grid)
 // ============================================================
-function ConversationCards({ messages }: { messages: Message[] }) {
+function ConversationCards({ messages, agents, onViewThread }: { messages: Message[]; agents: any[]; onViewThread: (convoKey: string) => void }) {
   const [selectedConvo, setSelectedConvo] = useState<string | null>(null);
+
+  // Build a lookup map from agent id → agent data for reliable name resolution
+  const agentMap = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; level: number; teamId?: string }>();
+    agents.forEach((a) => map.set(a.id, { id: a.id, name: a.name, level: a.level, teamId: (a as any).teamId }));
+    return map;
+  }, [agents]);
 
   // Group messages by conversation
   const conversations = useMemo(() => {
@@ -351,9 +395,10 @@ function ConversationCards({ messages }: { messages: Message[] }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
       {conversations.slice(0, 12).map(([key, msgs]) => {
         const [agent1Id, agent2Id] = key.split('-');
-        const agent1 = msgs.find(m => m.fromAgentId === agent1Id)?.fromAgent || msgs.find(m => m.toAgentId === agent1Id)?.toAgent;
-        const agent2 = msgs.find(m => m.fromAgentId === agent2Id)?.fromAgent || msgs.find(m => m.toAgentId === agent2Id)?.toAgent;
-        const latestMsg = msgs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+        // Look up from the agents list first, fall back to message-embedded data
+        const agent1 = agentMap.get(agent1Id) || msgs.find(m => m.fromAgentId === agent1Id)?.fromAgent || msgs.find(m => m.toAgentId === agent1Id)?.toAgent;
+        const agent2 = agentMap.get(agent2Id) || msgs.find(m => m.fromAgentId === agent2Id)?.fromAgent || msgs.find(m => m.toAgentId === agent2Id)?.toAgent;
+        const latestMsg = [...msgs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
         const isExpanded = selectedConvo === key;
 
         return (
@@ -377,7 +422,10 @@ function ConversationCards({ messages }: { messages: Message[] }) {
                       <p className="text-xs md:text-sm font-medium truncate">
                         {agent1?.name || 'Unknown'} ↔ {agent2?.name || 'Unknown'}
                       </p>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">{msgs.length} messages</p>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <p className="text-[10px] md:text-xs text-muted-foreground">{msgs.length} messages</p>
+                        {(agent1 as any)?.teamId && <TeamBadge teamId={(agent1 as any).teamId} compact className="text-[8px]" />}
+                      </div>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[9px] md:text-[10px] shrink-0">
@@ -392,34 +440,44 @@ function ConversationCards({ messages }: { messages: Message[] }) {
                     {latestMsg.content}
                   </p>
                 ) : (
-                  <ScrollArea className="h-48 md:h-64 mt-2">
-                    <div className="space-y-2">
-                      {msgs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).slice(-10).map((msg) => {
-                        const sender = msg.fromAgent;
-                        const isAgent1 = msg.fromAgentId === agent1Id;
-                        return (
-                          <div
-                            key={msg.id}
-                            className={cn(
-                              "flex gap-2",
-                              isAgent1 ? "flex-row" : "flex-row-reverse"
-                            )}
-                          >
-                            <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full shrink-0" />
+                  <>
+                    <ScrollArea className="h-48 md:h-64 mt-2">
+                      <div className="space-y-2">
+                        {[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).slice(-10).map((msg) => {
+                          const sender = msg.fromAgent;
+                          const isAgent1 = msg.fromAgentId === agent1Id;
+                          return (
                             <div
+                              key={msg.id}
                               className={cn(
-                                "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
-                                isAgent1 ? "bg-muted" : "bg-primary/10"
+                                "flex gap-2",
+                                isAgent1 ? "flex-row" : "flex-row-reverse"
                               )}
                             >
-                              {msg.content}
-                              <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1">{formatTime(msg.createdAt)}</p>
+                              <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full shrink-0" />
+                              <div
+                                className={cn(
+                                  "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
+                                  isAgent1 ? "bg-muted" : "bg-primary/10"
+                                )}
+                              >
+                                {msg.content}
+                                <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1">{formatTime(msg.createdAt)}</p>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </ScrollArea>
+                          );
+                        })}
+                      </div>
+                    </ScrollArea>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-2 h-7 text-xs text-primary"
+                      onClick={(e) => { e.stopPropagation(); onViewThread(key); }}
+                    >
+                      Open full thread →
+                    </Button>
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -433,12 +491,14 @@ function ConversationCards({ messages }: { messages: Message[] }) {
 // ============================================================
 // VIEW 4: Context-Linked Messages (Compact Horizontal Filters)
 // ============================================================
-function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agents: any[] }) {
+function ContextLinkedMessages({ messages, agents, onViewThread }: { messages: Message[]; agents: any[]; onViewThread: (convoKey: string) => void }) {
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [showAgentDropdown, setShowAgentDropdown] = useState(false);
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
+  const { teams: allTeams } = useTeams();
+  const [teamFilter, setTeamFilter] = useState<string>('all');
 
   // Get unique task refs from messages
   const tasks = useMemo(() => {
@@ -447,13 +507,23 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
     return Array.from(refs);
   }, [messages]);
 
+  const teamAgentIds = useMemo(() => {
+    if (teamFilter === 'all') return null;
+    return new Set(
+      agents
+        .filter((a: any) => a.teamId === teamFilter)
+        .map((a: any) => a.id),
+    );
+  }, [agents, teamFilter]);
+
   const filteredMessages = messages.filter((msg) => {
     if (selectedAgent && msg.fromAgentId !== selectedAgent && msg.toAgentId !== selectedAgent) return false;
     if (selectedTask && msg.taskRef !== selectedTask) return false;
+    if (teamAgentIds && !teamAgentIds.has(msg.fromAgentId) && !teamAgentIds.has(msg.toAgentId)) return false;
     return true;
   });
 
-  const hasFilters = selectedAgent || selectedTask;
+  const hasFilters = selectedAgent || selectedTask || teamFilter !== 'all';
   const selectedAgentData = agents.find(a => a.id === selectedAgent);
 
   return (
@@ -616,6 +686,14 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                   </div>
                 )}
 
+                {/* Team filter */}
+                <TeamFilterDropdown
+                  value={teamFilter}
+                  onChange={setTeamFilter}
+                  teams={allTeams.filter((t) => !t.parentTeamId)}
+                  className="h-7 text-xs min-h-0"
+                />
+
                 {/* Clear filters */}
                 {hasFilters && (
                   <motion.div
@@ -629,6 +707,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                       onClick={() => {
                         setSelectedAgent(null);
                         setSelectedTask(null);
+                        setTeamFilter('all');
                       }}
                       className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                     >
@@ -676,7 +755,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                           <span className="text-[10px] md:text-xs text-muted-foreground ml-auto">{formatTime(msg.createdAt)}</span>
                         </div>
                         <p className="text-xs md:text-sm text-muted-foreground">{msg.content}</p>
-                        <div className="flex gap-1 md:gap-2 mt-2 flex-wrap">
+                        <div className="flex gap-1 md:gap-2 mt-2 flex-wrap items-center">
                           <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
                             {typeIcons[msg.type] || '💬'} {msg.type?.toLowerCase()}
                           </Badge>
@@ -692,6 +771,14 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                               🔗 {msg.taskRef}
                             </Badge>
                           )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 px-1.5 text-[9px] md:text-[10px] text-primary hover:text-primary/80 ml-auto"
+                            onClick={() => onViewThread([msg.fromAgentId, msg.toAgentId].sort().join('-'))}
+                          >
+                            View thread →
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -713,8 +800,22 @@ export function MessagesPage() {
   const { messages, loading: messagesLoading } = useMessages(100);
   const { agents, loading: agentsLoading } = useAgents();
   const { currentPhase } = useCurrentPhase();
+  const [threadConvoKey, setThreadConvoKey] = useState<string | null>(null);
 
   const loading = messagesLoading || agentsLoading;
+
+  // Get messages for the selected thread
+  const threadMessages = useMemo(() => {
+    if (!threadConvoKey) return [];
+    return messages.filter((m) => {
+      const key = [m.fromAgentId, m.toAgentId].sort().join('-');
+      return key === threadConvoKey;
+    });
+  }, [messages, threadConvoKey]);
+
+  const handleViewThread = useCallback((convoKey: string) => {
+    setThreadConvoKey(convoKey);
+  }, []);
 
   if (!loading && messages.length === 0) {
     return (
@@ -780,9 +881,9 @@ export function MessagesPage() {
         <TabsContent value="feed">
           <Card className="p-3 md:p-4">
             <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
-              <strong>Mission Control:</strong> Real-time stream of all agent communications.
+              <strong>Mission Control:</strong> Real-time stream of all agent communications. Click "View thread" to see the full conversation.
             </p>
-            <MissionControlFeed messages={messages} />
+            <MissionControlFeed messages={messages} onViewThread={handleViewThread} />
           </Card>
         </TabsContent>
 
@@ -791,19 +892,29 @@ export function MessagesPage() {
             <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
               <strong>Conversations:</strong> Tap a card to expand the full thread.
             </p>
-            <ConversationCards messages={messages} />
+            <ConversationCards messages={messages} agents={agents} onViewThread={handleViewThread} />
           </Card>
         </TabsContent>
 
         <TabsContent value="context">
           <Card className="p-3 md:p-4 relative overflow-visible">
             <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
-              <strong>Context-Linked:</strong> Filter by agent or task to see related discussions.
+              <strong>Context-Linked:</strong> Filter by agent, task, or team to see related discussions.
             </p>
-            <ContextLinkedMessages messages={messages} agents={agents} />
+            <ContextLinkedMessages messages={messages} agents={agents} onViewThread={handleViewThread} />
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Thread View Modal */}
+      <AnimatePresence>
+        {threadConvoKey && threadMessages.length > 0 && (
+          <ThreadView
+            messages={threadMessages}
+            onClose={() => setThreadConvoKey(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
