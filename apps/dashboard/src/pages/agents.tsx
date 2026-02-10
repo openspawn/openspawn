@@ -602,7 +602,7 @@ function AgentVirtualGrid({
                           style={{ backgroundColor: levelColor }}
                         />
                         <div
-                          className="absolute top-3 right-12 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                          className="absolute top-3 right-12 px-2 py-0.5 rounded-full text-xs font-bold text-foreground"
                           style={{ backgroundColor: levelColor }}
                         >
                           L{agent.level}

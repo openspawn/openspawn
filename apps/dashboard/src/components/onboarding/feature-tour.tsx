@@ -227,7 +227,7 @@ export function FeatureTour() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             style={getTooltipStyle()}
-            className="absolute w-[340px] max-w-[calc(100vw-32px)] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl shadow-black/50 pointer-events-auto"
+            className="absolute w-[340px] max-w-[calc(100vw-32px)] bg-card border border-border rounded-xl shadow-2xl shadow-black/50 pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Step counter pill */}
@@ -237,7 +237,7 @@ export function FeatureTour() {
               </span>
               <button
                 onClick={skipOnboarding}
-                className="p-1 text-slate-500 hover:text-slate-300 transition-colors rounded-md hover:bg-slate-800"
+                className="p-1 text-muted-foreground/70 hover:text-muted-foreground transition-colors rounded-md hover:bg-muted"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -249,9 +249,9 @@ export function FeatureTour() {
                 <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white">
                   {step.icon}
                 </div>
-                <h3 className="text-base font-semibold text-white">{step.title}</h3>
+                <h3 className="text-base font-semibold text-foreground">{step.title}</h3>
               </div>
-              <p className="text-sm text-slate-400 leading-relaxed">{step.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
 
             {/* Navigation */}
@@ -261,7 +261,7 @@ export function FeatureTour() {
                 size="sm"
                 onClick={prevStep}
                 disabled={currentStep <= 1}
-                className="text-slate-400 hover:text-white disabled:opacity-30"
+                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back
@@ -286,7 +286,7 @@ export function FeatureTour() {
                       ? 'bg-cyan-400 w-4'
                       : i + 1 < currentStep
                         ? 'bg-cyan-600'
-                        : 'bg-slate-600'
+                        : 'bg-muted-foreground/40'
                   }`}
                   style={{ borderRadius: '9999px', transition: 'all 0.2s' }}
                 />

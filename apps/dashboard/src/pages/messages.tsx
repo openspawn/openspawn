@@ -35,12 +35,12 @@ const formatTime = (dateStr: string) => {
 };
 
 const typeColors: Record<string, string> = {
-  TASK: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  STATUS: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  REPORT: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
-  QUESTION: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  ESCALATION: 'bg-red-500/20 text-red-400 border-red-500/30',
-  GENERAL: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+  TASK: 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-500/30',
+  STATUS: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+  REPORT: 'bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-500/30',
+  QUESTION: 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',
+  ESCALATION: 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30',
+  GENERAL: 'bg-secondary text-muted-foreground border-border',
 };
 
 const typeIcons: Record<string, string> = {
@@ -99,8 +99,8 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
           ),
         },
         style: {
-          background: 'rgba(15, 23, 42, 0.9)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
+          background: 'hsl(var(--card))',
+          border: '1px solid hsl(var(--border))',
           borderRadius: '12px',
           padding: '2px',
         },
@@ -122,11 +122,11 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
         target,
         animated: pulsingEdges.has(key),
         style: { 
-          stroke: pulsingEdges.has(key) ? '#22c55e' : '#6366f1', 
+          stroke: pulsingEdges.has(key) ? '#22c55e' : 'hsl(var(--primary))', 
           strokeWidth: Math.min(count, 4),
           opacity: pulsingEdges.has(key) ? 1 : 0.6,
         },
-        markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
+        markerEnd: { type: MarkerType.ArrowClosed, color: 'hsl(var(--primary))' },
       };
     });
 
@@ -155,7 +155,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 
   return (
     <div className="flex flex-col md:flex-row gap-4">
-      <div className="flex-1 h-[350px] md:h-[500px] bg-slate-900/50 rounded-lg border border-slate-700">
+      <div className="flex-1 h-[350px] md:h-[500px] bg-muted/50 rounded-lg border border-border">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -166,8 +166,8 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
           minZoom={0.5}
           maxZoom={1.5}
         >
-          <Background color="#334155" gap={20} />
-          <Controls className="bg-slate-800 border-slate-700" />
+          <Background color="hsl(var(--border))" gap={20} />
+          <Controls className="bg-card border-border" />
         </ReactFlow>
       </div>
       
@@ -177,7 +177,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
           animate={{ opacity: 1, y: 0 }}
           className="md:w-72"
         >
-          <Card className="bg-slate-800/80 border-slate-700">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center justify-between">
                 💬 Conversation ({selectedMessages.length})
@@ -190,13 +190,13 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
                   {selectedMessages.slice(0, 20).map((msg) => {
                     const sender = msg.fromAgent;
                     return (
-                      <div key={msg.id} className="p-2 rounded-lg bg-slate-700/50">
+                      <div key={msg.id} className="p-2 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2 mb-1">
                           <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 rounded-full" />
                           <span className="text-xs font-medium">{sender?.name || 'Unknown'}</span>
-                          <span className="text-[10px] text-slate-500 ml-auto">{formatTime(msg.createdAt)}</span>
+                          <span className="text-[10px] text-muted-foreground ml-auto">{formatTime(msg.createdAt)}</span>
                         </div>
-                        <p className="text-sm text-slate-300">{msg.content}</p>
+                        <p className="text-sm text-muted-foreground">{msg.content}</p>
                       </div>
                     );
                   })}
@@ -253,10 +253,10 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
                   }}
                   className="flex gap-3 md:gap-4 pb-3 pl-8 md:pl-12 relative"
                 >
-                  <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-slate-800 border-2 border-cyan-500 top-3" />
+                  <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-card border-2 border-primary top-3" />
                   
                   <Card className={cn(
-                    "flex-1 bg-slate-800/50 border-l-4",
+                    "flex-1 border-l-4",
                     msg.type === 'TASK' && 'border-l-blue-500',
                     msg.type === 'STATUS' && 'border-l-green-500',
                     msg.type === 'REPORT' && 'border-l-purple-500',
@@ -268,7 +268,7 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
                         <div className="flex items-center gap-1.5 md:gap-2">
                           <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
                           <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{sender?.name || 'Unknown'}</span>
-                          <span className="text-slate-500 text-xs">→</span>
+                          <span className="text-muted-foreground text-xs">→</span>
                           <img src={getAgentAvatarUrl(msg.toAgentId, receiver?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
                           <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{receiver?.name || 'Unknown'}</span>
                         </div>
@@ -276,10 +276,10 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
                           <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
                             {typeIcons[msg.type] || '💬'}
                           </Badge>
-                          <span className="text-[10px] md:text-xs text-slate-500">{formatTime(msg.createdAt)}</span>
+                          <span className="text-[10px] md:text-xs text-muted-foreground">{formatTime(msg.createdAt)}</span>
                         </div>
                       </div>
-                      <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">{msg.content}</p>
                       {msg.taskRef && (
                         <Badge variant="outline" className="mt-2 text-[9px] md:text-[10px]">
                           🔗 {msg.taskRef}
@@ -382,9 +382,9 @@ function ConversationCards({ messages }: { messages: Message[] }) {
           <motion.div key={key} layout>
             <Card
               className={cn(
-                "bg-slate-800/50 border-slate-700 cursor-pointer transition-all active:scale-[0.98]",
-                "hover:border-cyan-500/50",
-                isExpanded && "sm:col-span-2 lg:col-span-2 border-cyan-500"
+                "cursor-pointer transition-all active:scale-[0.98]",
+                "hover:border-primary/50",
+                isExpanded && "sm:col-span-2 lg:col-span-2 border-primary"
               )}
               onClick={() => setSelectedConvo(isExpanded ? null : key)}
             >
@@ -392,14 +392,14 @@ function ConversationCards({ messages }: { messages: Message[] }) {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="flex -space-x-2 shrink-0">
-                      <img src={getAgentAvatarUrl(agent1Id, agent1?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-slate-800" />
-                      <img src={getAgentAvatarUrl(agent2Id, agent2?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-slate-800" />
+                      <img src={getAgentAvatarUrl(agent1Id, agent1?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-card" />
+                      <img src={getAgentAvatarUrl(agent2Id, agent2?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-card" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs md:text-sm font-medium truncate">
                         {agent1?.name || 'Unknown'} ↔ {agent2?.name || 'Unknown'}
                       </p>
-                      <p className="text-[10px] md:text-xs text-slate-500">{msgs.length} messages</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">{msgs.length} messages</p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[9px] md:text-[10px] shrink-0">
@@ -410,7 +410,7 @@ function ConversationCards({ messages }: { messages: Message[] }) {
               
               <CardContent className="p-3 md:p-4 pt-0">
                 {!isExpanded ? (
-                  <p className="text-xs md:text-sm text-slate-400 line-clamp-2">
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
                     {latestMsg.content}
                   </p>
                 ) : (
@@ -431,11 +431,11 @@ function ConversationCards({ messages }: { messages: Message[] }) {
                             <div
                               className={cn(
                                 "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
-                                isAgent1 ? "bg-slate-700" : "bg-cyan-600/30"
+                                isAgent1 ? "bg-muted" : "bg-primary/10"
                               )}
                             >
                               {msg.content}
-                              <p className="text-[9px] md:text-[10px] text-slate-500 mt-1">{formatTime(msg.createdAt)}</p>
+                              <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1">{formatTime(msg.createdAt)}</p>
                             </div>
                           </div>
                         );
@@ -486,7 +486,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
         animate={{ height: filtersExpanded ? 'auto' : '40px' }}
         className={filtersExpanded ? 'overflow-visible' : 'overflow-hidden'}
       >
-        <div className="flex items-center gap-2 flex-wrap bg-slate-800/50 border border-slate-700 rounded-lg p-2 overflow-visible">
+        <div className="flex items-center gap-2 flex-wrap bg-muted/50 border border-border rounded-lg p-2 overflow-visible">
           {/* Toggle filters button */}
           <Button
             variant="ghost"
@@ -535,7 +535,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
+                        className="absolute top-full mt-1 z-50 bg-popover border border-border rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
                       >
                         <ScrollArea className="max-h-[280px]">
                           <div className="p-1">
@@ -601,7 +601,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
+                          className="absolute top-full mt-1 z-50 bg-popover border border-border rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
                         >
                           <ScrollArea className="max-h-[280px]">
                             <div className="p-1">
@@ -652,7 +652,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                         setSelectedAgent(null);
                         setSelectedTask(null);
                       }}
-                      className="h-7 px-2 text-xs text-red-400 hover:text-red-300"
+                      className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                     >
                       ✕ Clear
                     </Button>
@@ -660,7 +660,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                 )}
 
                 {/* Message count */}
-                <span className="text-xs text-slate-400 ml-auto">
+                <span className="text-xs text-muted-foreground ml-auto">
                   {filteredMessages.length} message{filteredMessages.length !== 1 ? 's' : ''}
                 </span>
               </motion.div>
@@ -672,8 +672,8 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
       {/* Messages - Now gets majority of vertical space */}
       <div className="space-y-2 md:space-y-3">
         {filteredMessages.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700 p-6 md:p-8 text-center">
-            <p className="text-slate-400 text-sm">No messages match the current filters</p>
+          <Card className="p-6 md:p-8 text-center">
+            <p className="text-muted-foreground text-sm">No messages match the current filters</p>
           </Card>
         ) : (
           filteredMessages.slice(0, 20).map((msg) => {
@@ -686,18 +686,18 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+                <Card className="hover:border-muted-foreground/30 transition-colors">
                   <CardContent className="p-2 md:p-3">
                     <div className="flex items-start gap-2 md:gap-3">
                       <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-8 h-8 md:w-10 md:h-10 rounded-full shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1 md:gap-2 mb-1 flex-wrap">
                           <span className="font-medium text-xs md:text-sm">{sender?.name || 'Unknown'}</span>
-                          <span className="text-slate-500 text-xs">→</span>
+                          <span className="text-muted-foreground text-xs">→</span>
                           <span className="font-medium text-xs md:text-sm">{receiver?.name || 'Unknown'}</span>
-                          <span className="text-[10px] md:text-xs text-slate-500 ml-auto">{formatTime(msg.createdAt)}</span>
+                          <span className="text-[10px] md:text-xs text-muted-foreground ml-auto">{formatTime(msg.createdAt)}</span>
                         </div>
-                        <p className="text-xs md:text-sm text-slate-300">{msg.content}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">{msg.content}</p>
                         <div className="flex gap-1 md:gap-2 mt-2 flex-wrap">
                           <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
                             {typeIcons[msg.type] || '💬'} {msg.type?.toLowerCase()}
@@ -705,7 +705,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                           {msg.taskRef && (
                             <Badge
                               variant="outline"
-                              className="text-[9px] md:text-[10px] cursor-pointer hover:bg-slate-700 transition-colors"
+                              className="text-[9px] md:text-[10px] cursor-pointer hover:bg-muted transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedTask(msg.taskRef!);
@@ -745,7 +745,7 @@ export function MessagesPage() {
           title="Agent Communications"
           description="Watch your agents coordinate in real-time"
         />
-        <Card className="bg-slate-800/30 border-slate-700">
+        <Card>
           <CardContent>
             <EmptyState
               variant="messages"
@@ -791,8 +791,8 @@ export function MessagesPage() {
         </TabsList>
 
         <TabsContent value="graph">
-          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4">
-            <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+          <Card className="p-3 md:p-4">
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
               <strong>Communication Graph:</strong> Tap edges to see conversations. Edges pulse green when messages flow.
             </p>
             <CommunicationGraph messages={messages} agents={agents} />
@@ -800,8 +800,8 @@ export function MessagesPage() {
         </TabsContent>
 
         <TabsContent value="feed">
-          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4">
-            <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+          <Card className="p-3 md:p-4">
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
               <strong>Mission Control:</strong> Real-time stream of all agent communications.
             </p>
             <MissionControlFeed messages={messages} />
@@ -809,8 +809,8 @@ export function MessagesPage() {
         </TabsContent>
 
         <TabsContent value="cards">
-          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4">
-            <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+          <Card className="p-3 md:p-4">
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
               <strong>Conversations:</strong> Tap a card to expand the full thread.
             </p>
             <ConversationCards messages={messages} />
@@ -818,8 +818,8 @@ export function MessagesPage() {
         </TabsContent>
 
         <TabsContent value="context">
-          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4 relative overflow-visible">
-            <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
+          <Card className="p-3 md:p-4 relative overflow-visible">
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
               <strong>Context-Linked:</strong> Filter by agent or task to see related discussions.
             </p>
             <ContextLinkedMessages messages={messages} agents={agents} />

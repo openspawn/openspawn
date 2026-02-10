@@ -122,13 +122,13 @@ export function SplitPanel({
         <div
           onMouseDown={handleMouseDown}
           onDoubleClick={handleDoubleClick}
-          className="group relative flex-shrink-0 w-1 cursor-col-resize bg-slate-700 hover:bg-slate-500 transition-colors"
+          className="group relative flex-shrink-0 w-1 cursor-col-resize bg-muted hover:bg-muted-foreground/50 transition-colors"
           title="Drag to resize • Double-click to collapse • Cmd+[ to toggle"
         >
           {/* Grip dots */}
           <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="w-1 h-1 rounded-full bg-slate-400" />
+              <div key={i} className="w-1 h-1 rounded-full bg-muted-foreground" />
             ))}
           </div>
         </div>

@@ -58,7 +58,7 @@ export function PwaInstallPrompt() {
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           className="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 z-50"
         >
-          <div className="relative overflow-hidden rounded-xl border border-cyan-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-cyan-950/95 backdrop-blur-lg shadow-2xl shadow-cyan-500/10">
+          <div className="relative overflow-hidden rounded-xl border border-cyan-500/20 bg-card/95 backdrop-blur-lg shadow-2xl shadow-cyan-500/10">
             {/* Decorative wave accent */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400" />
 
@@ -72,14 +72,14 @@ export function PwaInstallPrompt() {
                   <h3 className="text-sm font-semibold text-cyan-50">
                     Install BikiniBottom
                   </h3>
-                  <p className="mt-0.5 text-xs text-slate-400 leading-relaxed">
+                  <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
                     Add to your home screen for the full ocean experience
                   </p>
                 </div>
 
                 <button
                   onClick={handleDismiss}
-                  className="shrink-0 rounded-md p-1 text-slate-500 hover:text-slate-300 hover:bg-slate-700/50 transition-colors"
+                  className="shrink-0 rounded-md p-1 text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted/50 transition-colors"
                   aria-label="Dismiss install prompt"
                 >
                   <X className="h-4 w-4" />
@@ -89,14 +89,14 @@ export function PwaInstallPrompt() {
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={handleInstall}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-blue-500 transition-all active:scale-[0.98]"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-medium text-foreground shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-blue-500 transition-all active:scale-[0.98]"
                 >
                   <Download className="h-4 w-4" />
                   Install
                 </button>
                 <button
                   onClick={handleDismiss}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 transition-colors"
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                 >
                   Later
                 </button>

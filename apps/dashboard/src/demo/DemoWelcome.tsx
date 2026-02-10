@@ -43,7 +43,7 @@ const SCENARIOS: { id: ScenarioName; name: string; icon: React.ReactNode; descri
     icon: <Sparkles className="w-6 h-6" />,
     description: 'Pristine waters — witness the birth of your agent ecosystem from nothing',
     stats: '0 agents • 0 tasks • Clean',
-    color: 'from-slate-600 to-cyan-700',
+    color: 'from-muted-foreground/60 to-cyan-700',
   },
 ];
 
@@ -98,28 +98,28 @@ export function DemoWelcome() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[600px] md:max-h-[85vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col"
+            className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[600px] md:max-h-[85vh] bg-card border border-border rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="p-6 pb-4 border-b border-slate-800">
+            <div className="p-6 pb-4 border-b border-border">
               <button
                 onClick={handleSkip}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white transition-colors"
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
               
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
+                  <Zap className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">Welcome to BikiniBottom</h2>
-                  <p className="text-sm text-slate-400">Multi-Agent Coordination</p>
+                  <h2 className="text-xl font-bold text-foreground">Welcome to BikiniBottom</h2>
+                  <p className="text-sm text-muted-foreground">Multi-Agent Coordination</p>
                 </div>
               </div>
               
-              <p className="text-slate-300 text-sm mt-3">
+              <p className="text-muted-foreground text-sm mt-3">
                 Dive into the depths. Pick a scenario and watch AI agents collaborate like a coordinated ocean ecosystem — managing tasks, delegating work, and flowing through projects in real-time.
               </p>
             </div>
@@ -136,7 +136,7 @@ export function DemoWelcome() {
                     className={`relative w-full p-4 rounded-xl border-2 text-left transition-all ${
                       selectedScenario === scenario.id
                         ? 'border-cyan-500 bg-cyan-500/10'
-                        : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
+                        : 'border-border bg-muted/50 hover:border-border'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -145,15 +145,15 @@ export function DemoWelcome() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-white">{scenario.name}</h3>
+                          <h3 className="font-semibold text-foreground">{scenario.name}</h3>
                           {scenario.id === 'acmetech' && (
                             <span className="px-1.5 py-0.5 text-[10px] font-medium bg-cyan-500/20 text-cyan-400 rounded">
                               RECOMMENDED
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-slate-400 mt-0.5">{scenario.description}</p>
-                        <p className="text-xs text-slate-500 mt-1">{scenario.stats}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{scenario.description}</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">{scenario.stats}</p>
                       </div>
                       {selectedScenario === scenario.id && (
                         <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center shrink-0">
@@ -169,9 +169,9 @@ export function DemoWelcome() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-900/50">
+            <div className="p-4 border-t border-border bg-card/50">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground/70">
                   💡 Use the bottom bar to switch scenarios anytime
                 </p>
                 <Button

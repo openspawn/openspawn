@@ -80,7 +80,7 @@ export function ModelUsageBreakdown() {
   });
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-muted/50 border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -95,20 +95,20 @@ export function ModelUsageBreakdown() {
       <CardContent className="space-y-6">
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-3 rounded-lg bg-slate-700/30">
+          <div className="text-center p-3 rounded-lg bg-muted/30">
             <DollarSign className="w-5 h-5 mx-auto mb-1 text-emerald-400" />
             <p className="text-2xl font-bold">${totalCost.toFixed(0)}</p>
-            <p className="text-xs text-slate-400">Total Cost</p>
+            <p className="text-xs text-muted-foreground">Total Cost</p>
           </div>
-          <div className="text-center p-3 rounded-lg bg-slate-700/30">
+          <div className="text-center p-3 rounded-lg bg-muted/30">
             <Zap className="w-5 h-5 mx-auto mb-1 text-amber-400" />
             <p className="text-2xl font-bold">{(totalCalls / 1000).toFixed(1)}k</p>
-            <p className="text-xs text-slate-400">API Calls</p>
+            <p className="text-xs text-muted-foreground">API Calls</p>
           </div>
-          <div className="text-center p-3 rounded-lg bg-slate-700/30">
+          <div className="text-center p-3 rounded-lg bg-muted/30">
             <TrendingUp className="w-5 h-5 mx-auto mb-1 text-cyan-400" />
             <p className="text-2xl font-bold">{(totalTokens / 1000000).toFixed(1)}M</p>
-            <p className="text-xs text-slate-400">Tokens</p>
+            <p className="text-xs text-muted-foreground">Tokens</p>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ export function ModelUsageBreakdown() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-lg font-bold">{sortedByUsage.length}</p>
-                <p className="text-[10px] text-slate-400">Models</p>
+                <p className="text-[10px] text-muted-foreground">Models</p>
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function ModelUsageBreakdown() {
                   style={{ backgroundColor: model.color }}
                 />
                 <span className="text-sm truncate flex-1">{model.model}</span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-muted-foreground">
                   {((model.calls / totalCalls) * 100).toFixed(0)}%
                 </span>
               </motion.div>
@@ -182,7 +182,7 @@ export function ModelUsageBreakdown() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + index * 0.05 }}
-              className="flex items-center gap-3 p-2 rounded-lg bg-slate-700/20 hover:bg-slate-700/40 transition-colors"
+              className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors"
             >
               <div
                 className="w-1 h-8 rounded-full"
@@ -193,7 +193,7 @@ export function ModelUsageBreakdown() {
                   <span className="font-medium text-sm">{model.model}</span>
                   <Badge variant="outline" className="text-[10px]">{model.provider}</Badge>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-slate-400">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span>{model.calls.toLocaleString()} calls</span>
                   <span>{(model.tokens / 1000000).toFixed(1)}M tokens</span>
                   <span>{model.avgLatency}s avg</span>
@@ -202,11 +202,11 @@ export function ModelUsageBreakdown() {
               <div className="text-right">
                 <p className={cn(
                   "font-semibold",
-                  model.cost === 0 ? "text-emerald-400" : "text-slate-200"
+                  model.cost === 0 ? "text-emerald-400" : "text-foreground"
                 )}>
                   {model.cost === 0 ? 'Free' : `$${model.cost.toFixed(2)}`}
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-muted-foreground/70">
                   {model.cost > 0 ? `$${(model.cost / model.calls * 1000).toFixed(2)}/1k` : 'Local'}
                 </p>
               </div>

@@ -64,9 +64,9 @@ const eventConfig: Record<
   },
   message: {
     icon: MessageSquare,
-    color: "text-slate-400",
-    bg: "bg-slate-400/20",
-    border: "border-slate-400/50",
+    color: "text-muted-foreground",
+    bg: "bg-muted-foreground/20",
+    border: "border-muted-foreground/50",
     label: "Message",
   },
   task_completed: {
@@ -139,19 +139,19 @@ function EventPopover({ event, onClose }: { event: TimelineEvent; onClose: () =>
       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 w-64"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className={cn("rounded-lg border p-3 shadow-xl", "bg-slate-900/95 backdrop-blur-sm border-slate-700/60")}>
+      <div className={cn("rounded-lg border p-3 shadow-xl", "bg-popover/95 backdrop-blur-sm border-border")}>
         <div className="flex items-center gap-2 mb-2">
           <div className={cn("p-1 rounded", cfg.bg)}>
             <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
           </div>
           <span className={cn("text-xs font-medium", cfg.color)}>{cfg.label}</span>
           {event.taskId && (
-            <span className="text-[10px] text-slate-500 ml-auto font-mono">{event.taskId}</span>
+            <span className="text-[10px] text-muted-foreground/70 ml-auto font-mono">{event.taskId}</span>
           )}
         </div>
-        <p className="text-sm font-medium text-slate-200">{event.title}</p>
-        <p className="text-xs text-slate-400 mt-1">{event.description}</p>
-        <p className="text-[10px] text-slate-500 mt-2 flex items-center gap-1">
+        <p className="text-sm font-medium text-foreground">{event.title}</p>
+        <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
+        <p className="text-[10px] text-muted-foreground/70 mt-2 flex items-center gap-1">
           <Clock className="h-3 w-3" />
           {event.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
         </p>
@@ -190,7 +190,7 @@ function EventNode({
           "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer transition-colors",
           cfg.bg,
           cfg.border,
-          isSelected && "ring-2 ring-offset-2 ring-offset-slate-950 ring-white/30"
+          isSelected && "ring-2 ring-offset-2 ring-offset-background ring-white/30"
         )}
       >
         {isLatest && (
@@ -204,7 +204,7 @@ function EventNode({
       </motion.button>
 
       {/* Time label */}
-      <span className="mt-2 text-[10px] text-slate-500 whitespace-nowrap">
+      <span className="mt-2 text-[10px] text-muted-foreground/70 whitespace-nowrap">
         {event.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
       </span>
     </div>
@@ -245,7 +245,7 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
 
   if (events.length === 0) {
     return (
-      <div className={cn("flex flex-col items-center justify-center py-16 text-slate-500", className)}>
+      <div className={cn("flex flex-col items-center justify-center py-16 text-muted-foreground/70", className)}>
         <Clock className="h-10 w-10 mb-3 opacity-40" />
         <p className="text-sm font-medium">No activity yet</p>
         <p className="text-xs mt-1">Events will appear here as the agent works</p>
@@ -272,14 +272,14 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
       <div className="flex items-center gap-2 justify-end">
         <button
           onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}
-          className="p-1.5 rounded-md bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors"
+          className="p-1.5 rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ZoomOut className="h-4 w-4" />
         </button>
-        <span className="text-xs text-slate-500 w-12 text-center">{Math.round(zoom * 100)}%</span>
+        <span className="text-xs text-muted-foreground/70 w-12 text-center">{Math.round(zoom * 100)}%</span>
         <button
           onClick={() => setZoom((z) => Math.min(3, z + 0.25))}
-          className="p-1.5 rounded-md bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors"
+          className="p-1.5 rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ZoomIn className="h-4 w-4" />
         </button>
@@ -288,7 +288,7 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
       {/* Horizontal scroll container — desktop */}
       <div
         ref={scrollRef}
-        className="hidden md:block overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent rounded-lg bg-slate-950/60 border border-slate-800/50"
+        className="hidden md:block overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent rounded-lg bg-muted/30 border border-border"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <div style={{ width: timelineWidth, minHeight: lanes.length * 72 + 48 }} className="relative py-4">
@@ -301,7 +301,7 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
               <div key={lane.taskId ?? "general"} className="absolute" style={{ top: y, left: 0, right: 0, height: 60 }}>
                 {/* Lane label */}
                 <div className="absolute -left-0 top-1/2 -translate-y-1/2 pl-2">
-                  <span className="text-[10px] font-mono text-slate-600 bg-slate-900/80 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-muted-foreground/60 bg-card/80 px-1.5 py-0.5 rounded">
                     {lane.taskId ?? "general"}
                   </span>
                 </div>
@@ -314,7 +314,7 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
                   return (
                     <div
                       key={`line-${ev.id}`}
-                      className="absolute top-1/2 h-px bg-slate-700/60"
+                      className="absolute top-1/2 h-px bg-border/60"
                       style={{ left: x1 + 20, width: x2 - x1 - 40, transform: "translateY(-12px)" }}
                     />
                   );
@@ -363,20 +363,20 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
                     )}
                     <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
                   </motion.div>
-                  {i < events.length - 1 && <div className="w-px flex-1 bg-slate-700/40 min-h-[16px]" />}
+                  {i < events.length - 1 && <div className="w-px flex-1 bg-border/40 min-h-[16px]" />}
                 </div>
 
                 {/* Content */}
                 <div className="pb-4 flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={cn("text-xs font-medium", cfg.color)}>{cfg.label}</span>
-                    {ev.taskId && <span className="text-[10px] text-slate-600 font-mono">{ev.taskId}</span>}
-                    <span className="text-[10px] text-slate-500 ml-auto">
+                    {ev.taskId && <span className="text-[10px] text-muted-foreground/60 font-mono">{ev.taskId}</span>}
+                    <span className="text-[10px] text-muted-foreground/70 ml-auto">
                       {ev.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-300 mt-0.5">{ev.title}</p>
-                  <p className="text-xs text-slate-500 mt-0.5 truncate">{ev.description}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{ev.title}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-0.5 truncate">{ev.description}</p>
                 </div>
               </div>
             );

@@ -34,9 +34,9 @@ export function SelfClaimButton({ agentId, size = "md", showCount = true, onClai
             </Card>
           </motion.div>
         ) : (
-          <Button onClick={() => claimNextTask()} disabled={isClaiming || !has} className={`${sizes[size]} ${has ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg" : ""}`}>
+          <Button onClick={() => claimNextTask()} disabled={isClaiming || !has} className={`${sizes[size]} ${has ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-foreground shadow-lg" : ""}`}>
             <span className="flex items-center gap-2">
-              {isClaiming ? <><Loader2 className={`${icons[size]} animate-spin`} /> Claiming...</> : has ? <><Zap className={icons[size]} /> Claim Task {showCount && <Badge variant="secondary" className="ml-1 bg-white/20 text-white border-0">{isLoadingCount ? "..." : claimableCount}</Badge>}</> : <><ClipboardList className={icons[size]} /> No Tasks</>}
+              {isClaiming ? <><Loader2 className={`${icons[size]} animate-spin`} /> Claiming...</> : has ? <><Zap className={icons[size]} /> Claim Task {showCount && <Badge variant="secondary" className="ml-1 bg-white/20 text-foreground border-0">{isLoadingCount ? "..." : claimableCount}</Badge>}</> : <><ClipboardList className={icons[size]} /> No Tasks</>}
             </span>
           </Button>
         )}
@@ -68,8 +68,8 @@ export function SelfClaimHero({ agentId, agentName, onClaimSuccess }: { agentId:
           ) : (
             <motion.div key="i" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <p className="text-sm text-muted-foreground mb-4">{has ? `${claimableCount} task${claimableCount !== 1 ? "s" : ""} available` : "No tasks available"}</p>
-              <Button size="lg" onClick={() => claimNextTask()} disabled={isClaiming || !has} className={`w-full max-w-md h-14 text-lg ${has ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl" : ""}`}>
-                {isClaiming ? <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Finding task...</> : has ? <><Zap className="h-5 w-5 mr-2" /> Claim Next Task <Badge className="ml-2 bg-white/20 text-white border-0">{claimableCount}</Badge></> : <><ClipboardList className="h-5 w-5 mr-2" /> No Tasks</>}
+              <Button size="lg" onClick={() => claimNextTask()} disabled={isClaiming || !has} className={`w-full max-w-md h-14 text-lg ${has ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-foreground shadow-xl" : ""}`}>
+                {isClaiming ? <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Finding task...</> : has ? <><Zap className="h-5 w-5 mr-2" /> Claim Next Task <Badge className="ml-2 bg-white/20 text-foreground border-0">{claimableCount}</Badge></> : <><ClipboardList className="h-5 w-5 mr-2" /> No Tasks</>}
               </Button>
             </motion.div>
           )}

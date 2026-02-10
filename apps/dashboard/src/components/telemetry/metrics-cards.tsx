@@ -16,7 +16,7 @@ interface MetricsCardsProps {
 const trendColors = {
   up: "text-emerald-400",
   down: "text-red-400",
-  stable: "text-slate-400",
+  stable: "text-muted-foreground",
 };
 
 const trendIcons = {
@@ -41,31 +41,31 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
             damping: 20,
           }}
           whileHover={{ scale: 1.02, y: -2 }}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700/50 p-5 shadow-xl backdrop-blur-sm"
+          className="relative overflow-hidden rounded-xl bg-card border border-border p-5 shadow-xl backdrop-blur-sm"
         >
           {/* Subtle glow effect */}
           <div className="absolute -top-12 -right-12 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl" />
 
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {metric.label}
               </span>
               {metric.icon && (
-                <span className="text-slate-500">{metric.icon}</span>
+                <span className="text-muted-foreground/70">{metric.icon}</span>
               )}
             </div>
 
             <div className="flex items-baseline gap-1.5">
               <motion.span
-                className="text-2xl font-bold text-white tabular-nums"
+                className="text-2xl font-bold text-foreground tabular-nums"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.08 + 0.2 }}
               >
                 {metric.value}
               </motion.span>
-              <span className="text-sm text-slate-400">{metric.unit}</span>
+              <span className="text-sm text-muted-foreground">{metric.unit}</span>
             </div>
 
             {metric.trend && (

@@ -21,13 +21,13 @@ interface TraceTimelineProps {
 const statusColors: Record<string, string> = {
   OK: "bg-emerald-500",
   ERROR: "bg-red-500",
-  UNSET: "bg-slate-400",
+  UNSET: "bg-muted-foreground",
 };
 
 const statusGlow: Record<string, string> = {
   OK: "shadow-emerald-500/30",
   ERROR: "shadow-red-500/30",
-  UNSET: "shadow-slate-400/20",
+  UNSET: "shadow-muted-foreground/20",
 };
 
 export function TraceTimeline({ spans }: TraceTimelineProps) {
@@ -38,7 +38,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center justify-center h-48 text-slate-400 text-sm"
+        className="flex items-center justify-center h-48 text-muted-foreground text-sm"
       >
         No traces recorded yet
       </motion.div>
@@ -52,10 +52,10 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
+        <h3 className="text-sm font-semibold text-foreground tracking-wide uppercase">
           Trace Timeline
         </h3>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-muted-foreground">
           {spans.length} span{spans.length !== 1 ? "s" : ""}
         </span>
       </div>
@@ -84,7 +84,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
                   )
                 }
               >
-                <div className="absolute inset-0 rounded bg-slate-800/50" />
+                <div className="absolute inset-0 rounded bg-muted/50" />
                 <motion.div
                   className={`absolute top-1 bottom-1 rounded ${statusColors[span.status]} shadow-lg ${statusGlow[span.status]}`}
                   style={{ left: `${left}%`, width: `${width}%` }}
@@ -92,10 +92,10 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
                   transition={{ type: "spring", stiffness: 400 }}
                 />
                 <div className="absolute inset-0 flex items-center px-2 pointer-events-none">
-                  <span className="text-xs text-slate-300 truncate font-mono">
+                  <span className="text-xs text-foreground/80 truncate font-mono">
                     {span.operationName}
                   </span>
-                  <span className="ml-auto text-xs text-slate-500 tabular-nums">
+                  <span className="ml-auto text-xs text-muted-foreground tabular-nums">
                     {span.durationMs}ms
                   </span>
                 </div>
@@ -111,42 +111,42 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 rounded-lg bg-slate-800/80 border border-slate-700 p-4 overflow-hidden"
+            className="mt-4 rounded-lg bg-card border border-border p-4 overflow-hidden"
           >
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <span className="text-slate-500">Operation</span>
-                <p className="text-slate-200 font-mono">
+                <span className="text-muted-foreground">Operation</span>
+                <p className="text-foreground font-mono">
                   {selectedSpan.operationName}
                 </p>
               </div>
               <div>
-                <span className="text-slate-500">Status</span>
+                <span className="text-muted-foreground">Status</span>
                 <p
-                  className={`font-semibold ${selectedSpan.status === "OK" ? "text-emerald-400" : selectedSpan.status === "ERROR" ? "text-red-400" : "text-slate-400"}`}
+                  className={`font-semibold ${selectedSpan.status === "OK" ? "text-emerald-400" : selectedSpan.status === "ERROR" ? "text-red-400" : "text-muted-foreground"}`}
                 >
                   {selectedSpan.status}
                 </p>
               </div>
               <div>
-                <span className="text-slate-500">Duration</span>
-                <p className="text-slate-200 tabular-nums">
+                <span className="text-muted-foreground">Duration</span>
+                <p className="text-foreground tabular-nums">
                   {selectedSpan.durationMs}ms
                 </p>
               </div>
               <div>
-                <span className="text-slate-500">Service</span>
-                <p className="text-slate-200">{selectedSpan.serviceName}</p>
+                <span className="text-muted-foreground">Service</span>
+                <p className="text-foreground">{selectedSpan.serviceName}</p>
               </div>
               <div className="col-span-2">
-                <span className="text-slate-500">Trace ID</span>
-                <p className="text-slate-200 font-mono text-[10px] break-all">
+                <span className="text-muted-foreground">Trace ID</span>
+                <p className="text-foreground font-mono text-[10px] break-all">
                   {selectedSpan.traceId}
                 </p>
               </div>
               {Object.entries(selectedSpan.attributes).length > 0 && (
                 <div className="col-span-2">
-                  <span className="text-slate-500">Attributes</span>
+                  <span className="text-muted-foreground">Attributes</span>
                   <div className="mt-1 space-y-0.5">
                     {Object.entries(selectedSpan.attributes).map(
                       ([k, v]) => (
@@ -154,7 +154,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
                           <span className="text-violet-400 font-mono">
                             {k}
                           </span>
-                          <span className="text-slate-300">{v}</span>
+                          <span className="text-muted-foreground">{v}</span>
                         </div>
                       ),
                     )}

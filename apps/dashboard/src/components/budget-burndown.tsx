@@ -89,7 +89,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
   const idealPath = `M 0 ${chartHeight} L ${chartWidth} ${toY(budget)}`;
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -130,7 +130,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
                 <text
                   x={-8}
                   y={toY(budget * pct)}
-                  className="text-[10px] fill-slate-500"
+                  className="text-[10px] fill-muted-foreground"
                   textAnchor="end"
                   alignmentBaseline="middle"
                 >
@@ -217,39 +217,39 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           <div className="flex items-center gap-4 mt-4 text-xs">
             <div className="flex items-center gap-1">
               <div className="w-3 h-0.5 bg-cyan-500 rounded" />
-              <span className="text-slate-400">Actual</span>
+              <span className="text-muted-foreground">Actual</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-0.5 bg-cyan-500/60 rounded" style={{ borderStyle: 'dashed' }} />
-              <span className="text-slate-400">Projected</span>
+              <span className="text-muted-foreground">Projected</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-0.5 bg-emerald-500/60 rounded" style={{ borderStyle: 'dashed' }} />
-              <span className="text-slate-400">Ideal</span>
+              <span className="text-muted-foreground">Ideal</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-0.5 bg-red-500/60 rounded" style={{ borderStyle: 'dashed' }} />
-              <span className="text-slate-400">Budget</span>
+              <span className="text-muted-foreground">Budget</span>
             </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 pt-4 border-t border-slate-700">
+        <div className="grid grid-cols-4 gap-4 pt-4 border-t border-border">
           <div>
-            <p className="text-xs text-slate-400">Spent</p>
+            <p className="text-xs text-muted-foreground">Spent</p>
             <p className="text-lg font-semibold">{spent.toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-400">Remaining</p>
+            <p className="text-xs text-muted-foreground">Remaining</p>
             <p className="text-lg font-semibold text-emerald-400">{budgetRemaining.toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-400">Daily Rate</p>
+            <p className="text-xs text-muted-foreground">Daily Rate</p>
             <p className="text-lg font-semibold">{Math.round(dailyRate)}/day</p>
           </div>
           <div>
-            <p className="text-xs text-slate-400">Runway</p>
+            <p className="text-xs text-muted-foreground">Runway</p>
             <p className={cn(
               "text-lg font-semibold",
               runwayDays < daysRemaining ? "text-red-400" : "text-emerald-400"

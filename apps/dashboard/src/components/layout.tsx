@@ -24,6 +24,7 @@ import {
   Search,
   Signal,
   ChevronLeft,
+  Star,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
@@ -689,77 +690,30 @@ export function Layout({ children }: LayoutProps) {
               <span>Search…</span>
               <kbd className="ml-2 px-1.5 py-0.5 text-[10px] bg-background border border-border rounded font-mono">⌘K</kbd>
             </button>
+            {/* Demo controls inline in header */}
+            {isDemo && <DemoControls header />}
+            {isDemo && <div className="w-px h-6 bg-border" />}
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <a
+                  href="https://github.com/openspawn/openspawn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                >
+                  <Star className="h-3.5 w-3.5" />
+                  <span className="hidden xl:inline">Star</span>
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Star on GitHub</TooltipContent>
+            </Tooltip>
             <NotificationCenter />
             <ThemeToggle />
           </div>
 
           {/* Main content */}
           <main ref={mainContentRef} className="flex-1 overflow-auto">
-            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-28 sm:pb-20 lg:pb-32 max-w-7xl">{children}</div>
-            
-            {/* Footer Badge — mobile/tablet (no sidebar offset) */}
-            <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden sm:flex lg:hidden">
-              <div className="container mx-auto flex items-center justify-between text-xs">
-                <a
-                  href="https://github.com/openspawn/openspawn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors"
-                >
-                  <span className="text-base">🌊</span>
-                  <span className="font-medium">BikiniBottom</span>
-                  <span className="hidden sm:inline">—</span>
-                  <span className="hidden sm:inline">Open Source Multi-Agent Coordination</span>
-                </a>
-                <div className="flex items-center gap-3">
-                  <a
-                    href="https://github.com/openspawn/openspawn"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 rounded-md text-slate-300 hover:text-white transition-all group"
-                  >
-                    <Github className="h-3 w-3" />
-                    <span className="font-medium">Star</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-            {/* Footer Badge — desktop (tracks sidebar width, sits above demo bar) */}
-            <motion.div
-              animate={{ left: sidebarWidth }}
-              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-              className="fixed bottom-16 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden lg:flex"
-            >
-              <div className="container mx-auto flex items-center justify-between text-xs">
-                <a
-                  href="https://github.com/openspawn/openspawn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors"
-                >
-                  <span className="text-base">🌊</span>
-                  <span className="font-medium">BikiniBottom</span>
-                  <span className="hidden sm:inline">—</span>
-                  <span className="hidden sm:inline">Open Source Multi-Agent Coordination</span>
-                </a>
-                <div className="flex items-center gap-3">
-                  <a
-                    href="https://github.com/openspawn/openspawn"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 rounded-md text-slate-300 hover:text-white transition-all group"
-                  >
-                    <Github className="h-3 w-3" />
-                    <span className="font-medium">Star</span>
-                    <img 
-                      src="https://img.shields.io/github/stars/openspawn/openspawn?style=social" 
-                      alt="GitHub stars" 
-                      className="h-3 opacity-0 group-hover:opacity-100 transition-opacity ml-1"
-                    />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
+            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-20 sm:pb-6 lg:pb-6 max-w-7xl">{children}</div>
           </main>
 
           {/* Mobile bottom navigation bar */}

@@ -15,7 +15,7 @@ type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
 
 const statusColumns = [
-  { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
+  { id: "BACKLOG", label: "Backlog", color: "bg-muted-foreground" },
   { id: "TODO", label: "To Do", color: "bg-amber-500" },
   { id: "IN_PROGRESS", label: "In Progress", color: "bg-cyan-500" },
   { id: "REVIEW", label: "Review", color: "bg-violet-500" },
@@ -47,7 +47,7 @@ function getPriorityColor(priority: string) {
     case "NORMAL":
       return "text-blue-500";
     case "LOW":
-      return "text-slate-400";
+      return "text-muted-foreground";
     default:
       return "text-muted-foreground";
   }
@@ -64,7 +64,7 @@ function getStatusColor(status: string) {
     case "TODO":
       return "text-amber-500";
     case "BACKLOG":
-      return "text-slate-400";
+      return "text-muted-foreground";
     case "BLOCKED":
       return "text-rose-500";
     default:
@@ -384,7 +384,7 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
             Close
           </Button>
           {hasRejection ? (
-            <Button className="flex-1 bg-amber-500 hover:bg-amber-600 text-white">
+            <Button className="flex-1 bg-amber-500 hover:bg-amber-600 text-foreground">
               <RefreshCw className="w-4 h-4 mr-2" />
               Resume Work
             </Button>

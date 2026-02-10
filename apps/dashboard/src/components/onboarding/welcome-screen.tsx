@@ -31,7 +31,7 @@ export function WelcomeScreen() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100]"
+            className="fixed inset-0 bg-popover/90 backdrop-blur-md z-[100]"
             onClick={skipOnboarding}
           />
 
@@ -52,7 +52,7 @@ export function WelcomeScreen() {
                 className="mx-auto mb-8 relative"
               >
                 <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                  <Bot className="w-12 h-12 text-white" />
+                  <Bot className="w-12 h-12 text-foreground" />
                 </div>
                 {/* Pulse rings */}
                 <motion.div
@@ -77,7 +77,7 @@ export function WelcomeScreen() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg text-slate-400 mb-10"
+                className="text-lg text-muted-foreground mb-10"
               >
                 Where your agents come together
               </motion.p>
@@ -95,12 +95,12 @@ export function WelcomeScreen() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + i * 0.1 }}
-                    className="flex items-center gap-3 text-left px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50"
+                    className="flex items-center gap-3 text-left px-4 py-3 rounded-xl bg-muted/50 border border-border"
                   >
                     <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center">
                       <prop.icon className="w-5 h-5 text-cyan-400" />
                     </div>
-                    <p className="text-sm text-slate-300">{prop.text}</p>
+                    <p className="text-sm text-muted-foreground">{prop.text}</p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -121,7 +121,7 @@ export function WelcomeScreen() {
                 </Button>
                 <button
                   onClick={skipOnboarding}
-                  className="text-sm text-slate-500 hover:text-slate-400 transition-colors"
+                  className="text-sm text-muted-foreground/70 hover:text-muted-foreground transition-colors"
                 >
                   Skip tour
                 </button>

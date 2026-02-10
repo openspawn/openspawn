@@ -79,7 +79,7 @@ const demoEfficiencyData: AgentEfficiency[] = [
 
 const rankIcons = [
   { icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-500/20' },
-  { icon: Medal, color: 'text-slate-300', bg: 'bg-slate-500/20' },
+  { icon: Medal, color: 'text-muted-foreground', bg: 'bg-muted' },
   { icon: Medal, color: 'text-amber-600', bg: 'bg-amber-600/20' },
 ];
 
@@ -88,7 +88,7 @@ export function AgentEfficiencyLeaderboard() {
   const maxEfficiency = Math.max(...sortedByEfficiency.map((a) => a.efficiency));
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-muted/50 border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -102,7 +102,7 @@ export function AgentEfficiencyLeaderboard() {
       </CardHeader>
       <CardContent className="space-y-3">
         {sortedByEfficiency.map((agent, index) => {
-          const rankConfig = rankIcons[index] || { icon: Star, color: 'text-slate-500', bg: 'bg-slate-700/50' };
+          const rankConfig = rankIcons[index] || { icon: Star, color: 'text-muted-foreground/70', bg: 'bg-muted/50' };
           const RankIcon = rankConfig.icon;
           const efficiencyPercent = (agent.efficiency / maxEfficiency) * 100;
 
@@ -115,9 +115,9 @@ export function AgentEfficiencyLeaderboard() {
               className={cn(
                 'flex items-center gap-3 p-3 rounded-lg',
                 index === 0 && 'bg-amber-500/10 border border-yellow-500/30',
-                index === 1 && 'bg-slate-500/10 border border-slate-500/30',
+                index === 1 && 'bg-muted border border-border',
                 index === 2 && 'bg-amber-600/10 border border-amber-600/30',
-                index > 2 && 'bg-slate-700/30'
+                index > 2 && 'bg-muted/30'
               )}
             >
               {/* Rank */}
@@ -125,7 +125,7 @@ export function AgentEfficiencyLeaderboard() {
                 {index < 3 ? (
                   <RankIcon className={cn('w-4 h-4', rankConfig.color)} />
                 ) : (
-                  <span className="text-sm font-bold text-slate-400">#{index + 1}</span>
+                  <span className="text-sm font-bold text-muted-foreground">#{index + 1}</span>
                 )}
               </div>
 
@@ -149,7 +149,7 @@ export function AgentEfficiencyLeaderboard() {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <Progress value={efficiencyPercent} className="h-1.5 flex-1" />
-                  <span className="text-xs text-slate-400 w-20">
+                  <span className="text-xs text-muted-foreground w-20">
                     {agent.tasksCompleted} tasks
                   </span>
                 </div>
@@ -162,7 +162,7 @@ export function AgentEfficiencyLeaderboard() {
                   {agent.trend === 'up' && <TrendingUp className="w-4 h-4 text-emerald-400" />}
                   {agent.trend === 'down' && <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />}
                 </div>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-muted-foreground/70">
                   {agent.creditsSpent.toLocaleString()} credits
                 </p>
               </div>

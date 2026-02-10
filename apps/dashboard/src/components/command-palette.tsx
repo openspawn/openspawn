@@ -87,81 +87,81 @@ export function CommandPalette() {
             className="fixed left-1/2 top-[20%] -translate-x-1/2 z-[101] w-full max-w-lg"
           >
             <Command
-              className="rounded-xl border border-cyan-900/50 bg-[#0a1628] shadow-2xl shadow-cyan-500/10 overflow-hidden"
+              className="rounded-xl border border-border bg-popover shadow-2xl overflow-hidden"
               onKeyDown={(e: React.KeyboardEvent) => {
                 if (e.key === 'Escape') {
                   setOpen(false);
                 }
               }}
             >
-              <div className="flex items-center border-b border-cyan-900/40 px-4">
-                <Search className="mr-2 h-4 w-4 shrink-0 text-cyan-400/60" />
+              <div className="flex items-center border-b border-border px-4">
+                <Search className="mr-2 h-4 w-4 shrink-0 text-primary/60" />
                 <Command.Input
                   placeholder="Search pages, actions, agents..."
-                  className="flex h-12 w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+                  className="flex h-12 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                 />
               </div>
               <Command.List className="max-h-[300px] overflow-y-auto p-2">
-                <Command.Empty className="py-6 text-center text-sm text-slate-500">
+                <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
                   No results found.
                 </Command.Empty>
 
                 <Command.Group
                   heading="Pages"
-                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-cyan-400/70"
+                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-primary/70"
                 >
                   {pages.map((page) => (
                     <Command.Item
                       key={page.href}
                       value={page.name}
                       onSelect={() => runCommand(() => navigate(page.href))}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 cursor-pointer aria-selected:bg-cyan-500/15 aria-selected:text-cyan-300 transition-colors"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
-                      <page.icon className="h-4 w-4 text-slate-500 aria-selected:text-cyan-400" />
+                      <page.icon className="h-4 w-4 text-muted-foreground" />
                       {page.name}
                     </Command.Item>
                   ))}
                 </Command.Group>
 
-                <Command.Separator className="my-1 h-px bg-cyan-900/30" />
+                <Command.Separator className="my-1 h-px bg-border" />
 
                 <Command.Group
                   heading="Actions"
-                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-cyan-400/70"
+                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-primary/70"
                 >
                   {actions.map((action) => (
                     <Command.Item
                       key={action.name}
                       value={`${action.name} ${action.keywords}`}
                       onSelect={() => runCommand(() => navigate(action.href))}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 cursor-pointer aria-selected:bg-cyan-500/15 aria-selected:text-cyan-300 transition-colors"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
                       {action.name === 'Create task' ? (
-                        <Plus className="h-4 w-4 text-slate-500" />
+                        <Plus className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Play className="h-4 w-4 text-slate-500" />
+                        <Play className="h-4 w-4 text-muted-foreground" />
                       )}
                       {action.name}
                     </Command.Item>
                   ))}
                 </Command.Group>
 
-                <Command.Separator className="my-1 h-px bg-cyan-900/30" />
+                <Command.Separator className="my-1 h-px bg-border" />
 
                 <Command.Group
                   heading="Agents"
-                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-cyan-400/70"
+                  className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-primary/70"
                 >
                   {demoAgents.map((agent) => (
                     <Command.Item
                       key={agent.id}
                       value={`${agent.name} ${agent.role}`}
                       onSelect={() => runCommand(() => navigate('/agents'))}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 cursor-pointer aria-selected:bg-cyan-500/15 aria-selected:text-cyan-300 transition-colors"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
-                      <Bot className="h-4 w-4 text-slate-500" />
+                      <Bot className="h-4 w-4 text-muted-foreground" />
                       <span>{agent.name}</span>
-                      <span className="ml-auto text-xs text-slate-600">
+                      <span className="ml-auto text-xs text-muted-foreground">
                         {agent.role}
                       </span>
                     </Command.Item>
@@ -169,13 +169,13 @@ export function CommandPalette() {
                 </Command.Group>
               </Command.List>
 
-              <div className="flex items-center justify-between border-t border-cyan-900/40 px-4 py-2 text-xs text-slate-600">
+              <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <kbd className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">↑↓</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">↑↓</kbd>
                   <span>navigate</span>
-                  <kbd className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">↵</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">↵</kbd>
                   <span>select</span>
-                  <kbd className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">esc</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">esc</kbd>
                   <span>close</span>
                 </div>
               </div>

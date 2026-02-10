@@ -66,9 +66,9 @@ const MODE_CONFIG: Record<
   [AgentMode.Observer]: {
     label: "Observer",
     icon: Eye,
-    color: "text-slate-400",
-    bgColor: "bg-slate-500/10",
-    borderColor: "border-slate-500/30",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted",
+    borderColor: "border-border",
     description: "Read-only access. Can observe the system but cannot make any changes.",
     shortDescription: "Read-only",
     allowedActions: ["View data", "Monitor activity"],

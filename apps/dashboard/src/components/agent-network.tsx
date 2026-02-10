@@ -306,7 +306,7 @@ function AgentNode({ data, selected }: NodeProps) {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2 }}
-              className={`absolute rounded-full font-bold text-white ${compact ? '-top-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-top-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
+              className={`absolute rounded-full font-bold text-foreground ${compact ? '-top-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-top-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
               style={{ backgroundColor: color }}
             >
               L{nodeData.level}
@@ -319,7 +319,7 @@ function AgentNode({ data, selected }: NodeProps) {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3 }}
-              className={`absolute rounded-full font-bold text-white bg-violet-600 ${compact ? '-bottom-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-bottom-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
+              className={`absolute rounded-full font-bold text-foreground bg-violet-600 ${compact ? '-bottom-1.5 -right-1.5 px-1 py-0 text-[8px]' : '-bottom-2 -right-2 px-1.5 py-0.5 text-[10px]'}`}
             >
               {taskCount}
             </motion.div>
@@ -400,7 +400,7 @@ function AgentNode({ data, selected }: NodeProps) {
 
           {/* Name — larger font on mobile for readability */}
           <div 
-            className={`font-semibold text-white text-center truncate w-full ${
+            className={`font-semibold text-foreground text-center truncate w-full ${
               compact 
                 ? (isMobileOrTouch ? 'text-xs' : 'text-[10px]') 
                 : (isMobileOrTouch ? 'text-base' : 'text-sm')
@@ -636,12 +636,12 @@ function EdgeTooltip({
     >
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
+        className="absolute top-2 right-2 text-zinc-500 hover:text-foreground p-1"
       >
         ✕
       </button>
       
-      <div className="text-sm font-semibold text-white mb-2">
+      <div className="text-sm font-semibold text-foreground mb-2">
         {edgeData.sourceLabel} → {edgeData.targetLabel}
       </div>
       
@@ -856,7 +856,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
       <button
         onClick={() => zoomIn({ duration: 200 })}
         className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
-                   text-white text-xl font-bold flex items-center justify-center
+                   text-foreground text-xl font-bold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Zoom in"
       >
@@ -865,7 +865,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
       <button
         onClick={() => zoomOut({ duration: 200 })}
         className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
-                   text-white text-xl font-bold flex items-center justify-center
+                   text-foreground text-xl font-bold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Zoom out"
       >
@@ -874,7 +874,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
       <button
         onClick={onFitView}
         className="w-12 h-12 rounded-xl bg-zinc-800/95 backdrop-blur border border-zinc-700 
-                   text-white text-sm font-semibold flex items-center justify-center
+                   text-foreground text-sm font-semibold flex items-center justify-center
                    active:bg-zinc-600 transition-colors shadow-lg"
         aria-label="Fit view"
         title="Fit all nodes"
@@ -1122,7 +1122,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
           {/* Desktop: standard controls. Mobile: hidden (replaced by MobileZoomControls) */}
           {!isMobileOrTouch && (
-            <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+            <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-foreground [&>button:hover]:!bg-zinc-700" />
           )}
         </ReactFlow>
         
@@ -1134,7 +1134,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
         {/* Legend — hidden on very small touch devices to save space */}
         <div className={`absolute top-4 left-4 bg-zinc-900/90 backdrop-blur border border-zinc-800 rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? 'hidden sm:block' : ''}`}>
           <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold text-white text-xs sm:text-sm">Activity</span>
+            <span className="font-semibold text-foreground text-xs sm:text-sm">Activity</span>
             <button
               onClick={() => setCompact(!compact)}
               className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
@@ -1174,11 +1174,11 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
             >
               <button
                 onClick={() => setSelectedNode(null)}
-                className="absolute top-2 right-2 text-zinc-500 hover:text-white p-1"
+                className="absolute top-2 right-2 text-zinc-500 hover:text-foreground p-1"
               >
                 ✕
               </button>
-              <div className="text-base sm:text-lg font-semibold text-white mb-1">
+              <div className="text-base sm:text-lg font-semibold text-foreground mb-1">
                 {(selectedNode.data as AgentNodeData).label}
               </div>
               <div className="text-xs sm:text-sm text-zinc-400 mb-3">
@@ -1190,7 +1190,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-zinc-500">Activity</span>
-                    <span className="text-white capitalize">
+                    <span className="text-foreground capitalize">
                       {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.activityLevel || 'idle'}
                     </span>
                   </div>
@@ -1202,7 +1202,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">Credits</span>
-                    <span className="text-white">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
+                    <span className="text-foreground">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-500">Status</span>
@@ -1213,7 +1213,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                   {(selectedNode.data as AgentNodeData).domain && (
                     <div className="flex justify-between">
                       <span className="text-zinc-500">Domain</span>
-                      <span className="text-white">{(selectedNode.data as AgentNodeData).domain}</span>
+                      <span className="text-foreground">{(selectedNode.data as AgentNodeData).domain}</span>
                     </div>
                   )}
                 </div>

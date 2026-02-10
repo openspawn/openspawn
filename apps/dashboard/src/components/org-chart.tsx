@@ -142,7 +142,7 @@ function TeamNode({ data }: NodeProps) {
           <Icon className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-bold text-white truncate">{d.name}</div>
+          <div className="text-sm font-bold text-foreground truncate">{d.name}</div>
           <div className="text-[10px] text-zinc-400">
             {d.agentCount} agent{d.agentCount !== 1 ? 's' : ''}
           </div>
@@ -219,7 +219,7 @@ function AgentOrgNode({ data }: NodeProps) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold text-white truncate">{d.label}</div>
+          <div className="text-xs font-semibold text-foreground truncate">{d.label}</div>
           <div className="text-[10px] text-zinc-400">L{d.level}</div>
         </div>
       </motion.div>
@@ -449,7 +449,7 @@ function OrgChartInner({ className }: { className?: string }) {
         }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#27272a" />
-        <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-white [&>button:hover]:!bg-zinc-700" />
+        <Controls className="!bg-zinc-800 !border-zinc-700 !rounded-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-foreground [&>button:hover]:!bg-zinc-700" />
       </ReactFlow>
     </div>
   );
