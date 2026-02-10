@@ -38,6 +38,8 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useDemo } from "../demo";
 import { DemoControls } from "../demo/DemoControls";
 import { useAuth } from "../contexts";
+import { usePresence } from "../hooks";
+import { ActiveAgentsBadge } from "./presence";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -62,6 +64,7 @@ export function Layout({ children }: LayoutProps) {
   const demo = useDemo();
   const isDemo = searchParams.get("demo") === "true";
   const { user, logout, isAuthenticated } = useAuth();
+  const { activeCount } = usePresence();
 
   // Close mobile menu on navigation
   useEffect(() => {
@@ -109,6 +112,9 @@ export function Layout({ children }: LayoutProps) {
                 Multi-Agent Coordination
               </span>
             </div>
+            {isDemo && activeCount > 0 && (
+              <ActiveAgentsBadge count={activeCount} className="ml-auto" />
+            )}
           </div>
 
           {/* Navigation */}
@@ -386,6 +392,9 @@ export function Layout({ children }: LayoutProps) {
             </div>
             </div>
             <div className="flex items-center gap-2">
+              {isDemo && activeCount > 0 && (
+                <ActiveAgentsBadge count={activeCount} />
+              )}
               {isDemo && (
                 <Button
                   variant="ghost"
