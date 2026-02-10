@@ -13,6 +13,7 @@ import { OrgScopeMiddleware } from "../common/middleware/org-scope.middleware";
 import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
 import { GraphqlModule } from "../graphql";
+import { InboundWebhooksModule } from "../inbound-webhooks/inbound-webhooks.module";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
 import { WebhooksModule } from "../webhooks";
@@ -53,6 +54,7 @@ import { AppService } from "./app.service";
     CreditsModule,
     MessagesModule,
     WebhooksModule,
+    InboundWebhooksModule,
 
     // GraphQL
     GraphqlModule,

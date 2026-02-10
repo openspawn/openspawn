@@ -111,6 +111,13 @@ export type ConversationType = {
   unreadCount: Scalars['Int']['output'];
 };
 
+export type CreateInboundWebhookKeyInput = {
+  defaultAgentId?: InputMaybe<Scalars['ID']['input']>;
+  defaultPriority?: InputMaybe<TaskPriority>;
+  defaultTags?: InputMaybe<Array<Scalars['String']['input']>>;
+  name: Scalars['String']['input'];
+};
+
 export type CreateWebhookInput = {
   canBlock?: InputMaybe<Scalars['Boolean']['input']>;
   events: Array<Scalars['String']['input']>;
@@ -174,6 +181,20 @@ export type EventType = {
   type: Scalars['String']['output'];
 };
 
+export type InboundWebhookKeyType = {
+  createdAt: Scalars['DateTime']['output'];
+  defaultAgentId?: Maybe<Scalars['ID']['output']>;
+  defaultPriority?: Maybe<TaskPriority>;
+  defaultTags: Array<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  key: Scalars['String']['output'];
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+  name: Scalars['String']['output'];
+  secret: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LeaderboardEntryType = {
   agentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
@@ -204,11 +225,15 @@ export enum MessageType {
 export type Mutation = {
   /** Claim the next available task */
   claimNextTask: ClaimTaskResultType;
+  createInboundWebhookKey: InboundWebhookKeyType;
   createWebhook: WebhookType;
+  deleteInboundWebhookKey: Scalars['Boolean']['output'];
   deleteWebhook: Scalars['Boolean']['output'];
   markMessagesAsRead: Scalars['Int']['output'];
+  rotateInboundWebhookKey: InboundWebhookKeyType;
   sendDirectMessage: DirectMessageType;
   testWebhook: Scalars['Boolean']['output'];
+  updateInboundWebhookKey: InboundWebhookKeyType;
   updateWebhook: WebhookType;
 };
 
@@ -219,8 +244,20 @@ export type MutationClaimNextTaskArgs = {
 };
 
 
+export type MutationCreateInboundWebhookKeyArgs = {
+  input: CreateInboundWebhookKeyInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type MutationCreateWebhookArgs = {
   input: CreateWebhookInput;
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
   orgId: Scalars['ID']['input'];
 };
 
@@ -238,6 +275,12 @@ export type MutationMarkMessagesAsReadArgs = {
 };
 
 
+export type MutationRotateInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
 export type MutationSendDirectMessageArgs = {
   input: SendDirectMessageInput;
   orgId: Scalars['ID']['input'];
@@ -246,6 +289,13 @@ export type MutationSendDirectMessageArgs = {
 
 export type MutationTestWebhookArgs = {
   id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateInboundWebhookKeyInput;
   orgId: Scalars['ID']['input'];
 };
 
@@ -276,6 +326,8 @@ export type Query = {
   creditHistory: Array<CreditTransactionType>;
   directMessages: Array<DirectMessageType>;
   events: Array<EventType>;
+  inboundWebhookKey?: Maybe<InboundWebhookKeyType>;
+  inboundWebhookKeys: Array<InboundWebhookKeyType>;
   messages: Array<MessageGqlType>;
   reputationHistory: Array<ReputationHistoryEntryType>;
   task?: Maybe<TaskType>;
@@ -341,6 +393,17 @@ export type QueryEventsArgs = {
   limit?: Scalars['Int']['input'];
   orgId: Scalars['ID']['input'];
   page?: Scalars['Int']['input'];
+};
+
+
+export type QueryInboundWebhookKeyArgs = {
+  id: Scalars['ID']['input'];
+  orgId: Scalars['ID']['input'];
+};
+
+
+export type QueryInboundWebhookKeysArgs = {
+  orgId: Scalars['ID']['input'];
 };
 
 
@@ -454,6 +517,7 @@ export type SubscriptionTaskUpdatedArgs = {
   orgId: Scalars['ID']['input'];
 };
 
+/** Task priority level */
 export enum TaskPriority {
   High = 'HIGH',
   Low = 'LOW',
@@ -504,6 +568,14 @@ export type TaskType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type UpdateInboundWebhookKeyInput = {
+  defaultAgentId?: InputMaybe<Scalars['ID']['input']>;
+  defaultPriority?: InputMaybe<TaskPriority>;
+  defaultTags?: InputMaybe<Array<Scalars['String']['input']>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateWebhookInput = {
   canBlock?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -537,6 +609,53 @@ export type WebhookType = {
   updatedAt: Scalars['DateTime']['output'];
   url: Scalars['String']['output'];
 };
+
+export type InboundWebhookKeysQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+}>;
+
+
+export type InboundWebhookKeysQuery = { inboundWebhookKeys: Array<{ id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string }> };
+
+export type AgentsForWebhookQueryVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+}>;
+
+
+export type AgentsForWebhookQuery = { agents: Array<{ id: string, name: string, agentId: string, status: AgentStatus }> };
+
+export type CreateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  input: CreateInboundWebhookKeyInput;
+}>;
+
+
+export type CreateInboundWebhookKeyMutation = { createInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type UpdateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  input: UpdateInboundWebhookKeyInput;
+}>;
+
+
+export type UpdateInboundWebhookKeyMutation = { updateInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type RotateInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RotateInboundWebhookKeyMutation = { rotateInboundWebhookKey: { id: string, name: string, key: string, secret: string, defaultAgentId?: string | null, defaultPriority?: TaskPriority | null, defaultTags: Array<string>, enabled: boolean, lastUsedAt?: string | null, createdAt: string, updatedAt: string } };
+
+export type DeleteInboundWebhookKeyMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteInboundWebhookKeyMutation = { deleteInboundWebhookKey: boolean };
 
 export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null };
 
@@ -647,6 +766,12 @@ export type TestWebhookMutationVariables = Exact<{
 export type TestWebhookMutation = { testWebhook: boolean };
 
 export const AgentFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AgentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AgentType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"model"}},{"kind":"Field","name":{"kind":"Name","value":"currentBalance"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodLimit"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodSpent"}},{"kind":"Field","name":{"kind":"Name","value":"managementFeePct"}},{"kind":"Field","name":{"kind":"Name","value":"parentId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"trustScore"}},{"kind":"Field","name":{"kind":"Name","value":"reputationLevel"}},{"kind":"Field","name":{"kind":"Name","value":"tasksCompleted"}},{"kind":"Field","name":{"kind":"Name","value":"tasksSuccessful"}},{"kind":"Field","name":{"kind":"Name","value":"lastActivityAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastPromotionAt"}},{"kind":"Field","name":{"kind":"Name","value":"lifetimeEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}}]}}]} as unknown as DocumentNode<AgentFieldsFragment, unknown>;
+export const InboundWebhookKeysDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InboundWebhookKeys"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inboundWebhookKeys"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"defaultAgentId"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPriority"}},{"kind":"Field","name":{"kind":"Name","value":"defaultTags"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<InboundWebhookKeysQuery, InboundWebhookKeysQueryVariables>;
+export const AgentsForWebhookDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AgentsForWebhook"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"agents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<AgentsForWebhookQuery, AgentsForWebhookQueryVariables>;
+export const CreateInboundWebhookKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateInboundWebhookKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateInboundWebhookKeyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createInboundWebhookKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"defaultAgentId"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPriority"}},{"kind":"Field","name":{"kind":"Name","value":"defaultTags"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<CreateInboundWebhookKeyMutation, CreateInboundWebhookKeyMutationVariables>;
+export const UpdateInboundWebhookKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateInboundWebhookKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateInboundWebhookKeyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateInboundWebhookKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"defaultAgentId"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPriority"}},{"kind":"Field","name":{"kind":"Name","value":"defaultTags"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateInboundWebhookKeyMutation, UpdateInboundWebhookKeyMutationVariables>;
+export const RotateInboundWebhookKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RotateInboundWebhookKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rotateInboundWebhookKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"defaultAgentId"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPriority"}},{"kind":"Field","name":{"kind":"Name","value":"defaultTags"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<RotateInboundWebhookKeyMutation, RotateInboundWebhookKeyMutationVariables>;
+export const DeleteInboundWebhookKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteInboundWebhookKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteInboundWebhookKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteInboundWebhookKeyMutation, DeleteInboundWebhookKeyMutationVariables>;
 export const TasksDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Tasks"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TaskStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tasks"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"assigneeId"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"approvalRequired"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"rejection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"feedback"}},{"kind":"Field","name":{"kind":"Name","value":"rejectedAt"}},{"kind":"Field","name":{"kind":"Name","value":"rejectedBy"}},{"kind":"Field","name":{"kind":"Name","value":"rejectionCount"}}]}}]}}]}}]} as unknown as DocumentNode<TasksQuery, TasksQueryVariables>;
 export const TaskDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Task"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"task"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"assigneeId"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"creatorId"}},{"kind":"Field","name":{"kind":"Name","value":"parentTaskId"}},{"kind":"Field","name":{"kind":"Name","value":"approvalRequired"}},{"kind":"Field","name":{"kind":"Name","value":"approvedAt"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"rejection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"feedback"}},{"kind":"Field","name":{"kind":"Name","value":"rejectedAt"}},{"kind":"Field","name":{"kind":"Name","value":"rejectedBy"}},{"kind":"Field","name":{"kind":"Name","value":"rejectionCount"}}]}}]}}]}}]} as unknown as DocumentNode<TaskQuery, TaskQueryVariables>;
 export const AgentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Agents"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"agents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AgentFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AgentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AgentType"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"model"}},{"kind":"Field","name":{"kind":"Name","value":"currentBalance"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodLimit"}},{"kind":"Field","name":{"kind":"Name","value":"budgetPeriodSpent"}},{"kind":"Field","name":{"kind":"Name","value":"managementFeePct"}},{"kind":"Field","name":{"kind":"Name","value":"parentId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"trustScore"}},{"kind":"Field","name":{"kind":"Name","value":"reputationLevel"}},{"kind":"Field","name":{"kind":"Name","value":"tasksCompleted"}},{"kind":"Field","name":{"kind":"Name","value":"tasksSuccessful"}},{"kind":"Field","name":{"kind":"Name","value":"lastActivityAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastPromotionAt"}},{"kind":"Field","name":{"kind":"Name","value":"lifetimeEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}}]}}]} as unknown as DocumentNode<AgentsQuery, AgentsQueryVariables>;

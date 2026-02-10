@@ -123,7 +123,7 @@ const roleLabels: Record<string, string> = {
   worker: "Worker",
 };
 
-interface AgentNodeData {
+interface AgentNodeData extends Record<string, unknown> {
   label: string;
   agentId: string;
   role: string;
@@ -139,8 +139,8 @@ interface AgentNodeData {
 }
 
 // Custom node component - stable outer div for ReactFlow, animation on inner content
-function AgentNode({ data, selected }: NodeProps<Node<AgentNodeData>>) {
-  const nodeData = data as AgentNodeData;
+function AgentNode({ data, selected }: NodeProps) {
+  const nodeData = data as unknown as AgentNodeData;
   const { avatarVersion } = useContext(NetworkContext);
   const color = nodeData.isHuman ? "#06b6d4" : levelColors[nodeData.level] || "#71717a";
   const isSpawning = nodeData.isSpawning;
@@ -400,7 +400,7 @@ function buildNodesAndEdges(agents: Agent[], compact = false): { nodes: Node<Age
         agentId: agent.agentId || agent.id,
         role: agent.role,
         level: agent.level,
-        status: agent.status as "active" | "pending" | "paused" | "suspended",
+        status: agent.status as unknown as "active" | "pending" | "paused" | "suspended",
         credits: agent.currentBalance,
         domain: agent.domain || undefined,
         tasksCompleted: 0,
@@ -433,15 +433,15 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const demo = useDemo();
   const { agents, loading } = useAgents();
   const { fitView } = useReactFlow();
-  const [selectedNode, setSelectedNode] = useState<Node<AgentNodeData> | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
   const [avatarVersion, setAvatarVersion] = useState(0);
   const prevAgentCountRef = useRef(0);
   
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   
   // Listen for avatar style changes to trigger re-render
   useEffect(() => {
@@ -543,8 +543,6 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           proOptions={{ hideAttribution: true }}
           defaultEdgeOptions={{
             type: "taskFlow",
-            sourceHandle: "bottom",
-            targetHandle: "top",
             animated: true,
             markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
             style: { stroke: "#6366f1", strokeWidth: 2 },
@@ -652,9 +650,9 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
                     style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
                   >
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-                    <span className="text-zinc-400 truncate max-w-[60px]">{fromNode?.data?.label || del.fromId}</span>
+                    <span className="text-zinc-400 truncate max-w-[60px]">{String(fromNode?.data?.label || "") || del.fromId}</span>
                     <span className="text-green-500">→</span>
-                    <span className="text-zinc-400 truncate max-w-[60px]">{toNode?.data?.label || del.toId}</span>
+                    <span className="text-zinc-400 truncate max-w-[60px]">{String(toNode?.data?.label || "") || del.toId}</span>
                   </motion.div>
                 );
               })}

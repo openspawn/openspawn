@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History } from "lucide-react";
+import { Plus, Filter, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -99,6 +99,7 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
   const dueDate = formatDate(task.dueDate);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
+  const createdViaWebhook = task.metadata?.createdViaWebhook === true;
   
   return (
     <motion.div
@@ -127,6 +128,12 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
                 {task.approvalRequired && (
                   <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">
                     approval
+                  </Badge>
+                )}
+                {createdViaWebhook && (
+                  <Badge variant="outline" className="text-xs text-blue-500 border-blue-500/30">
+                    <Webhook className="w-3 h-3 mr-1" />
+                    webhook
                   </Badge>
                 )}
                 {hasRejection && (
