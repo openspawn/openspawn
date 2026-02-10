@@ -2,7 +2,7 @@
  * TeamDetailPanel — shown in the global side panel when clicking a team.
  * Displays team info, stats, members list, and sub-teams.
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Users,
@@ -10,6 +10,8 @@ import {
   TrendingUp,
   CheckCircle,
   Crown,
+  Pencil,
+  Trash2,
   Code2,
   DollarSign,
   Megaphone,
@@ -36,11 +38,14 @@ import {
   type Team,
   getTeamById,
   getSubTeams,
+  getParentTeams,
   getTeamColor,
 } from '../demo/teams';
 import { useAgents } from '../hooks/use-agents';
 import { useTeamStats } from '../hooks/use-teams';
 import { AgentMode, AgentStatus } from '../graphql/generated/graphql';
+import { TeamDialog, DeleteTeamDialog } from './team-management';
+import { Button } from './ui/button';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Crown, Code2, DollarSign, Megaphone, Users, Headphones,
@@ -59,6 +64,9 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
   const subTeams = useMemo(() => getSubTeams(teamId), [teamId]);
   const { agents } = useAgents();
   const stats = useTeamStats(teamId);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const parentTeams = useMemo(() => getParentTeams(), []);
 
   const members = useMemo(
     () => agents.filter((a) => a.teamId === teamId),
@@ -98,7 +106,51 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
           <h2 className="text-xl font-bold">{team.name}</h2>
           <p className="text-sm text-muted-foreground">{team.description}</p>
         </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setEditOpen(true)}
+            title="Edit team"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={() => setDeleteOpen(true)}
+            title="Delete team"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </motion.div>
+
+      {/* Dialogs */}
+      <TeamDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        team={team}
+        parentTeams={parentTeams}
+        onSave={(updated) => {
+          // TODO: persist to API when available
+          console.log('Team updated:', updated);
+        }}
+      />
+      {team && (
+        <DeleteTeamDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          team={team}
+          memberCount={members.length}
+          onConfirm={() => {
+            // TODO: persist to API when available
+            console.log('Team deleted:', team.id);
+          }}
+        />
+      )}
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
