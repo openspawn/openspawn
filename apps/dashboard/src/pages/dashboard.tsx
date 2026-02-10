@@ -1,4 +1,5 @@
 import { Component, useMemo, useState, useEffect, useRef, useCallback, type ReactNode, type ErrorInfo } from "react";
+import { useContainerSize } from "../hooks/use-container-size";
 
 class ChartErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -8,29 +9,6 @@ class ChartErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
     if (this.state.hasError) return <div className="flex items-center justify-center h-full text-muted-foreground text-sm">Chart unavailable</div>;
     return this.props.children;
   }
-}
-
-/** Measures container dimensions without recharts' buggy ResponsiveContainer */
-function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
-  const [size, setSize] = useState({ width: 0, height: 0 });
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        const { width, height } = entry.contentRect;
-        setSize((prev) =>
-          prev.width === Math.round(width) && prev.height === Math.round(height)
-            ? prev
-            : { width: Math.round(width), height: Math.round(height) }
-        );
-      }
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [ref]);
-  return size;
 }
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

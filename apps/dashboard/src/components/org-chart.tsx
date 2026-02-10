@@ -511,19 +511,21 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
         animatedIds.add(base[Math.floor(Math.random() * base.length)].id);
       }
 
-      setEdges(
-        base.map((e) => ({
-          ...e,
-          data: { ...((e.data as object) || {}), animated: animatedIds.has(e.id) },
-        })),
+      setEdges((prev) =>
+        prev.map((e) => {
+          const shouldAnimate = animatedIds.has(e.id);
+          const wasAnimated = (e.data as any)?.animated;
+          if (shouldAnimate === wasAnimated) return e;
+          return { ...e, data: { ...((e.data as object) || {}), animated: shouldAnimate } };
+        }),
       );
 
       setTimeout(() => {
-        setEdges(
-          base.map((e) => ({
-            ...e,
-            data: { ...((e.data as object) || {}), animated: false },
-          })),
+        setEdges((prev) =>
+          prev.map((e) => {
+            if (!(e.data as any)?.animated) return e;
+            return { ...e, data: { ...((e.data as object) || {}), animated: false } };
+          }),
         );
       }, displayMs);
     }, intervalMs);
