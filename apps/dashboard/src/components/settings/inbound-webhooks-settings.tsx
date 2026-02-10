@@ -38,98 +38,68 @@ import {
 import { cn } from "../../lib/utils";
 import { useNotifications } from "../live-notifications";
 import { useDemo } from "../../demo";
-import { graphql } from "../../graphql";
-import { useQuery, useMutation } from "urql";
-import { TaskPriority } from "../../graphql/generated/graphql";
 
-const InboundWebhookKeysQuery = graphql(`
-  query InboundWebhookKeys($orgId: ID!) {
-    inboundWebhookKeys(orgId: $orgId) {
-      id
-      name
-      key
-      secret
-      defaultAgentId
-      defaultPriority
-      defaultTags
-      enabled
-      lastUsedAt
-      createdAt
-      updatedAt
-    }
-  }
-`);
+enum TaskPriority {
+  Low = "LOW",
+  Normal = "NORMAL",
+  High = "HIGH",
+  Urgent = "URGENT",
+}
 
-const AgentsQuery = graphql(`
-  query AgentsForWebhook($orgId: ID!) {
-    agents(orgId: $orgId) {
-      id
-      name
-      agentId
-      status
-    }
-  }
-`);
+interface InboundWebhookKeyData {
+  id: string;
+  name: string;
+  key: string;
+  secret: string;
+  defaultAgentId?: string | null;
+  defaultPriority?: TaskPriority | null;
+  defaultTags: string[];
+  enabled: boolean;
+  lastUsedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
-const CreateInboundWebhookKeyMutation = graphql(`
-  mutation CreateInboundWebhookKey($orgId: ID!, $input: CreateInboundWebhookKeyInput!) {
-    createInboundWebhookKey(orgId: $orgId, input: $input) {
-      id
-      name
-      key
-      secret
-      defaultAgentId
-      defaultPriority
-      defaultTags
-      enabled
-      lastUsedAt
-      createdAt
-      updatedAt
-    }
-  }
-`);
+interface AgentData {
+  id: string;
+  name: string;
+  agentId: string;
+  status: string;
+}
 
-const UpdateInboundWebhookKeyMutation = graphql(`
-  mutation UpdateInboundWebhookKey($orgId: ID!, $id: ID!, $input: UpdateInboundWebhookKeyInput!) {
-    updateInboundWebhookKey(orgId: $orgId, id: $id, input: $input) {
-      id
-      name
-      key
-      secret
-      defaultAgentId
-      defaultPriority
-      defaultTags
-      enabled
-      lastUsedAt
-      createdAt
-      updatedAt
-    }
-  }
-`);
+const MOCK_WEBHOOK_KEYS: InboundWebhookKeyData[] = [
+  {
+    id: "wk-1",
+    name: "GitHub Actions",
+    key: "whk_abc123def456ghi789",
+    secret: "whsec_secret_abc123def456",
+    defaultAgentId: "agent-1",
+    defaultPriority: TaskPriority.Normal,
+    defaultTags: ["webhook", "github-actions"],
+    enabled: true,
+    lastUsedAt: new Date(Date.now() - 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+  },
+  {
+    id: "wk-2",
+    name: "Zapier Integration",
+    key: "whk_xyz789abc123def456",
+    secret: "whsec_secret_xyz789abc123",
+    defaultAgentId: null,
+    defaultPriority: TaskPriority.Low,
+    defaultTags: ["zapier", "external"],
+    enabled: false,
+    lastUsedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+];
 
-const RotateInboundWebhookKeyMutation = graphql(`
-  mutation RotateInboundWebhookKey($orgId: ID!, $id: ID!) {
-    rotateInboundWebhookKey(orgId: $orgId, id: $id) {
-      id
-      name
-      key
-      secret
-      defaultAgentId
-      defaultPriority
-      defaultTags
-      enabled
-      lastUsedAt
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const DeleteInboundWebhookKeyMutation = graphql(`
-  mutation DeleteInboundWebhookKey($orgId: ID!, $id: ID!) {
-    deleteInboundWebhookKey(orgId: $orgId, id: $id)
-  }
-`);
+const MOCK_AGENTS: AgentData[] = [
+  { id: "agent-1", name: "Primary Agent", agentId: "agent-primary", status: "online" },
+  { id: "agent-2", name: "Secondary Agent", agentId: "agent-secondary", status: "offline" },
+];
 
 interface CreateFormData {
   name: string;
@@ -139,8 +109,10 @@ interface CreateFormData {
 }
 
 export function InboundWebhooksSettings() {
-  const { isDemo } = useDemo();
+  const { scenario } = useDemo();
   const { addNotification } = useNotifications();
+  const [webhookKeys, setWebhookKeys] = useState<InboundWebhookKeyData[]>(MOCK_WEBHOOK_KEYS);
+  const [agents] = useState<AgentData[]>(MOCK_AGENTS);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [showSecret, setShowSecret] = useState<Record<string, boolean>>({});
@@ -153,152 +125,87 @@ export function InboundWebhooksSettings() {
     defaultTags: "",
   });
 
-  // Get org from context (simplified for demo)
-  const orgId = "demo-org-id"; // In real app, get from auth context
+  const handleCreate = () => {
+    if (!formData.name.trim()) return;
 
-  const [webhookKeysResult, refetchWebhookKeys] = useQuery({
-    query: InboundWebhookKeysQuery,
-    variables: { orgId },
-    pause: isDemo,
-  });
+    const tags = formData.defaultTags
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
 
-  const [agentsResult] = useQuery({
-    query: AgentsQuery,
-    variables: { orgId },
-    pause: isDemo,
-  });
+    const newKey: InboundWebhookKeyData = {
+      id: `wk-${Date.now()}`,
+      name: formData.name,
+      key: `whk_${Math.random().toString(36).slice(2, 22)}`,
+      secret: `whsec_${Math.random().toString(36).slice(2, 22)}`,
+      defaultAgentId: formData.defaultAgentId || null,
+      defaultPriority: formData.defaultPriority || null,
+      defaultTags: tags,
+      enabled: true,
+      lastUsedAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-  const [, createWebhookKey] = useMutation(CreateInboundWebhookKeyMutation);
-  const [, updateWebhookKey] = useMutation(UpdateInboundWebhookKeyMutation);
-  const [, rotateWebhookKey] = useMutation(RotateInboundWebhookKeyMutation);
-  const [, deleteWebhookKey] = useMutation(DeleteInboundWebhookKeyMutation);
+    setWebhookKeys((prev) => [newKey, ...prev]);
+    setSelectedKey(newKey.id);
 
-  const webhookKeys = isDemo ? [] : webhookKeysResult.data?.inboundWebhookKeys || [];
-  const agents = isDemo ? [] : agentsResult.data?.agents || [];
+    addNotification({
+      type: "success",
+      title: "Webhook key created",
+      message: `Created webhook key: ${formData.name}`,
+    });
 
-  const handleCreate = async () => {
-    try {
-      const tags = formData.defaultTags
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
-
-      const result = await createWebhookKey({
-        orgId,
-        input: {
-          name: formData.name,
-          defaultAgentId: formData.defaultAgentId || undefined,
-          defaultPriority: formData.defaultPriority || undefined,
-          defaultTags: tags.length > 0 ? tags : undefined,
-        },
-      });
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      addNotification({
-        type: "success",
-        title: "Webhook key created",
-        message: `Created webhook key: ${formData.name}`,
-      });
-
-      setFormData({
-        name: "",
-        defaultAgentId: undefined,
-        defaultPriority: undefined,
-        defaultTags: "",
-      });
-      setShowCreateDialog(false);
-      setSelectedKey(result.data?.createInboundWebhookKey.id || null);
-      refetchWebhookKeys();
-    } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Failed to create webhook key",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+    setFormData({
+      name: "",
+      defaultAgentId: undefined,
+      defaultPriority: undefined,
+      defaultTags: "",
+    });
+    setShowCreateDialog(false);
   };
 
-  const handleRotate = async (id: string, name: string) => {
-    try {
-      const result = await rotateWebhookKey({ orgId, id });
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      addNotification({
-        type: "success",
-        title: "Key rotated",
-        message: `Rotated webhook key: ${name}`,
-      });
-
-      refetchWebhookKeys();
-    } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Failed to rotate key",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  const handleRotate = (id: string, name: string) => {
+    setWebhookKeys((prev) =>
+      prev.map((k) =>
+        k.id === id
+          ? {
+              ...k,
+              key: `whk_${Math.random().toString(36).slice(2, 22)}`,
+              secret: `whsec_${Math.random().toString(36).slice(2, 22)}`,
+              updatedAt: new Date().toISOString(),
+            }
+          : k
+      )
+    );
+    addNotification({
+      type: "success",
+      title: "Key rotated",
+      message: `Rotated webhook key: ${name}`,
+    });
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    try {
-      const result = await deleteWebhookKey({ orgId, id });
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      addNotification({
-        type: "success",
-        title: "Webhook key deleted",
-        message: `Deleted webhook key: ${name}`,
-      });
-
-      if (selectedKey === id) {
-        setSelectedKey(null);
-      }
-
-      refetchWebhookKeys();
-    } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Failed to delete webhook key",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
+  const handleDelete = (id: string, name: string) => {
+    setWebhookKeys((prev) => prev.filter((k) => k.id !== id));
+    if (selectedKey === id) {
+      setSelectedKey(null);
     }
+    addNotification({
+      type: "success",
+      title: "Webhook key deleted",
+      message: `Deleted webhook key: ${name}`,
+    });
   };
 
-  const handleToggleEnabled = async (id: string, enabled: boolean) => {
-    try {
-      const result = await updateWebhookKey({
-        orgId,
-        id,
-        input: { enabled: !enabled },
-      });
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      addNotification({
-        type: "success",
-        title: enabled ? "Webhook key disabled" : "Webhook key enabled",
-        message: `Webhook key is now ${enabled ? "disabled" : "enabled"}`,
-      });
-
-      refetchWebhookKeys();
-    } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Failed to update webhook key",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  const handleToggleEnabled = (id: string, enabled: boolean) => {
+    setWebhookKeys((prev) =>
+      prev.map((k) => (k.id === id ? { ...k, enabled: !enabled, updatedAt: new Date().toISOString() } : k))
+    );
+    addNotification({
+      type: "success",
+      title: enabled ? "Webhook key disabled" : "Webhook key enabled",
+      message: `Webhook key is now ${enabled ? "disabled" : "enabled"}`,
+    });
   };
 
   const copyToClipboard = (text: string, field: string) => {
