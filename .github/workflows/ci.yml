@@ -43,15 +43,21 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      # Nx cache
-      - name: Cache Nx
-        uses: actions/cache@v4
+      # Nx cache — use restore/save to avoid per-commit key growth
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v4
         with:
           path: .nx/cache
-          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
             nx-${{ runner.os }}-
+
+      - name: Save Nx cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
