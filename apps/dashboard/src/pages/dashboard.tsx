@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -120,7 +120,13 @@ function getEventBadgeVariant(type: string) {
   return "secondary";
 }
 
-function formatEventTime(dateString: string) {
+function formatEventTime(dateString: string, index?: number, speed?: number) {
+  // At high speeds, timestamps cluster as "Just now" — show order instead
+  if (speed && speed > 1 && index !== undefined) {
+    if (index === 0) return "Latest";
+    return `#${index + 1}`;
+  }
+
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -138,7 +144,28 @@ export function DashboardPage() {
   const { tasks } = useTasks();
   const { transactions } = useCredits();
   const { events } = useEvents();
-  const { isDemo, scenario } = useDemo();
+  const { isDemo, scenario, speed } = useDemo();
+
+  // Debounced events: at high speeds, batch updates to avoid render thrashing
+  const [displayEvents, setDisplayEvents] = useState(events);
+  const batchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isHighSpeed = speed > 1;
+  
+  useEffect(() => {
+    if (!isHighSpeed) {
+      // Normal speed: update immediately
+      setDisplayEvents(events);
+      return;
+    }
+    // High speed: debounce updates (~200ms)
+    if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+    batchTimerRef.current = setTimeout(() => {
+      setDisplayEvents(events);
+    }, 200);
+    return () => {
+      if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+    };
+  }, [events, isHighSpeed]);
 
   // Determine current phase based on task progress (for NovaTech scenario)
   const currentPhase = useMemo(() => {
@@ -423,30 +450,24 @@ export function DashboardPage() {
           </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <AnimatePresence mode="popLayout">
-              {events.slice(0, 8).map((event, index) => (
+            <AnimatePresence mode="popLayout" initial={false}>
+              {displayEvents.slice(0, 8).map((event, index) => (
                 <motion.div
                   key={event.id}
-                  layout
-                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                  layout={!isHighSpeed}
+                  initial={isHighSpeed ? false : { opacity: 0, x: -20, scale: 0.95 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 400, 
-                    damping: 30,
-                    delay: index * 0.03
-                  }}
+                  transition={isHighSpeed 
+                    ? { duration: 0.15 }
+                    : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
+                  }
                   className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", delay: 0.1 }}
-                    >
+                    <div>
                       {getEventIcon(event.type)}
-                    </motion.div>
+                    </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">
                         {event.actor?.name || "System"}
@@ -461,7 +482,7 @@ export function DashboardPage() {
                       {event.type.split('.').pop()}
                     </Badge>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatEventTime(event.createdAt)}
+                      {formatEventTime(event.createdAt, index, speed)}
                     </span>
                   </div>
                 </motion.div>
