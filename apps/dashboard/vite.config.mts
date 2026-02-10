@@ -1,6 +1,7 @@
 /// <reference types='vitest' />
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { VitePWA } from "vite-plugin-pwa";
 import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
 import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
 import { copyFileSync, existsSync } from "node:fs";
@@ -65,6 +66,58 @@ export default defineConfig(() => ({
     nxViteTsPaths(),
     nxCopyAssetsPlugin(["*.md"]),
     fixBaseHref(),
+    VitePWA({
+      registerType: "autoUpdate",
+      // We supply our own manifest.json in public/
+      manifest: false,
+      workbox: {
+        // Precache built assets (raise limit for large SPA bundles)
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
+        // Navigation fallback for SPA
+        navigateFallback: "index.html",
+        navigateFallbackAllowlist: [/^(?!\/__).*/],
+        // Runtime caching strategies
+        runtimeCaching: [
+          {
+            // Cache-first for static assets (images, fonts, css)
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff|woff2|ttf|eot|css)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets",
+              expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // Network-first for API calls
+            urlPattern: /\/api\//,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 },
+            },
+          },
+          {
+            // Network-first for GraphQL
+            urlPattern: /\/graphql/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "graphql-cache",
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 },
+            },
+          },
+        ],
+        // Offline fallback page
+        offlineGoogleAnalytics: false,
+      },
+      // Include offline.html in the build
+      includeAssets: ["offline.html", "favicon.ico", "favicon.svg", "apple-touch-icon.png"],
+      devOptions: {
+        enabled: false, // Don't run service worker in dev
+      },
+    }),
   ],
   // Uncomment this if you are using workers.
   // worker: {
