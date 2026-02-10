@@ -2,6 +2,10 @@
 
 # 🌊 BikiniBottom
 
+[![CI](https://github.com/openspawn/openspawn/actions/workflows/ci.yml/badge.svg)](https://github.com/openspawn/openspawn/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 **Where your agents come together**
 
 *Multi-agent coordination from the deep*
