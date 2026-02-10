@@ -1,9 +1,9 @@
-import type { DemoScenario } from '../types.js';
-import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents.js';
-import { tasks, generateRandomTask } from '../fixtures/tasks.js';
-import { creditTransactions } from '../fixtures/credits.js';
-import { events } from '../fixtures/events.js';
-import { generateInitialMessages } from '../fixtures/messages.js';
+import type { DemoScenario } from '../types';
+import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents';
+import { tasks, generateRandomTask } from '../fixtures/tasks';
+import { creditTransactions } from '../fixtures/credits';
+import { events } from '../fixtures/events';
+import { generateInitialMessages } from '../fixtures/messages';
 
 /**
  * Startup Scenario: Small team, early stage

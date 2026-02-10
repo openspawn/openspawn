@@ -1,6 +1,6 @@
-export { registerTaskTools } from "./task-tools.js";
-export { registerCreditTools } from "./credit-tools.js";
-export { registerMessageTools } from "./message-tools.js";
-export { registerAgentTools } from "./agent-tools.js";
-export { registerTrustTools } from "./trust-tools.js";
-export { registerEscalationTools } from "./escalation-tools.js";
+export { registerTaskTools } from "./task-tools";
+export { registerCreditTools } from "./credit-tools";
+export { registerMessageTools } from "./message-tools";
+export { registerAgentTools } from "./agent-tools";
+export { registerTrustTools } from "./trust-tools";
+export { registerEscalationTools } from "./escalation-tools";

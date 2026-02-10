@@ -1,5 +1,5 @@
-import type { DemoScenario } from '../types.js';
-import { agents, AGENT_IDS } from '../fixtures/agents.js';
+import type { DemoScenario } from '../types';
+import { agents, AGENT_IDS } from '../fixtures/agents';
 
 /**
  * Fresh Scenario: Brand new tenant

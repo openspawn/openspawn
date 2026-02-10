@@ -1,4 +1,4 @@
-import type { DemoScenario, DemoAgent, DemoTask, DemoMessage, DemoCreditTransaction, DemoEvent } from '../types.js';
+import type { DemoScenario, DemoAgent, DemoTask, DemoMessage, DemoCreditTransaction, DemoEvent } from '../types';
 
 /**
  * NovaTech AI - Realistic Startup Simulation

@@ -9,8 +9,8 @@ import type {
   DemoMessage,
   TaskStatus,
   AgentStatus,
-} from '../types.js';
-import { generateRandomAgent, generateRandomTask, generateCreditTransaction, generateEvent, generateMessage } from '../fixtures/index.js';
+} from '../types';
+import { generateRandomAgent, generateRandomTask, generateCreditTransaction, generateEvent, generateMessage } from '../fixtures/index';
 
 // Probability distributions for different events (per tick)
 const PROBABILITIES = {

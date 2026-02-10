@@ -1,15 +1,15 @@
-export { freshScenario } from './fresh.js';
-export { startupScenario } from './startup.js';
-export { growthScenario } from './growth.js';
-export { enterpriseScenario } from './enterprise.js';
-export { acmetechScenario, PROJECT_PHASES, acmetechTasks, ACMETECH_AGENTS } from './acmetech.js';
+export { freshScenario } from './fresh';
+export { startupScenario } from './startup';
+export { growthScenario } from './growth';
+export { enterpriseScenario } from './enterprise';
+export { acmetechScenario, PROJECT_PHASES, acmetechTasks, ACMETECH_AGENTS } from './acmetech';
 
-import { freshScenario } from './fresh.js';
-import { startupScenario } from './startup.js';
-import { growthScenario } from './growth.js';
-import { enterpriseScenario } from './enterprise.js';
-import { acmetechScenario } from './acmetech.js';
-import type { DemoScenario } from '../types.js';
+import { freshScenario } from './fresh';
+import { startupScenario } from './startup';
+import { growthScenario } from './growth';
+import { enterpriseScenario } from './enterprise';
+import { acmetechScenario } from './acmetech';
+import type { DemoScenario } from '../types';
 
 export const scenarios: Record<string, DemoScenario> = {
   acmetech: acmetechScenario,  // Default - realistic product launch

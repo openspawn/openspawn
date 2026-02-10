@@ -1,6 +1,6 @@
-import type { DemoEvent, EventSeverity } from '../types.js';
-import { AGENT_IDS } from './agents.js';
-import { TASK_IDS } from './tasks.js';
+import type { DemoEvent, EventSeverity } from '../types';
+import { AGENT_IDS } from './agents';
+import { TASK_IDS } from './tasks';
 
 // Helper to generate UUIDs
 function uuid(): string {

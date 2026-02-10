@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import { ApiClient } from "./api-client.js";
+import { ApiClient } from "./api-client";
 import {
   registerAgentTools,
   registerCreditTools,
@@ -8,7 +8,7 @@ import {
   registerMessageTools,
   registerTaskTools,
   registerTrustTools,
-} from "./tools/index.js";
+} from "./tools/index";
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({

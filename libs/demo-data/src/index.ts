@@ -1,11 +1,11 @@
 // Types
-export * from './types.js';
+export * from './types';
 
 // Fixtures
-export * from './fixtures/index.js';
+export * from './fixtures/index';
 
 // Scenarios
-export * from './scenarios/index.js';
+export * from './scenarios/index';
 
 // Simulation
-export * from './simulation/index.js';
+export * from './simulation/index';

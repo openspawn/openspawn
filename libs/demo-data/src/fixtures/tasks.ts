@@ -1,5 +1,5 @@
-import type { DemoTask, TaskStatus, TaskPriority } from '../types.js';
-import { AGENT_IDS } from './agents.js';
+import type { DemoTask, TaskStatus, TaskPriority } from '../types';
+import { AGENT_IDS } from './agents';
 
 // Helper to generate UUIDs
 function uuid(): string {
