@@ -61,7 +61,7 @@ export function NetworkPage() {
         w-auto max-w-[calc(100%-4rem)]">
         <div className="flex gap-4 sm:gap-6 items-center">
           <div className="hidden sm:block">
-            <h1 className="text-sm sm:text-base font-bold text-foreground leading-tight">
+            <h1 className="text-sm sm:text-base font-bold text-foreground leading-tight whitespace-nowrap">
               {view === "network" ? "Agent Network" : "Org Chart"}
             </h1>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
