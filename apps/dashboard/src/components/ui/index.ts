@@ -8,3 +8,4 @@ export * from "./progress";
 export * from "./scroll-area";
 export * from "./tabs";
 export * from "./tooltip";
+export * from "./empty-state";

@@ -13,6 +13,7 @@ import { useCredits } from "../hooks/use-credits";
 import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { ChartTooltip } from "./ui/chart-tooltip";
 
 type Agent = AgentFieldsFragment;
 
@@ -67,7 +68,7 @@ function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning
     case TaskStatus.Completed:
       return { variant: "success", label: "Completed" };
     case TaskStatus.InProgress:
-      return { variant: "warning", label: "In Progress" };
+      return { variant: "info", label: "In Progress" };
     case TaskStatus.Blocked:
     case TaskStatus.Rejected:
       return { variant: "destructive", label: status };
@@ -381,23 +382,20 @@ function CreditsTab({ agent }: { agent: Agent }) {
           <BarChart data={chartData}>
             <XAxis 
               dataKey="date" 
-              stroke="#71717a"
-              fontSize={12}
+              tick={{ fill: '#64748b', fontSize: 12 }}
+              axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
+              tickLine={false}
             />
             <YAxis 
-              stroke="#71717a"
-              fontSize={12}
+              tick={{ fill: '#64748b', fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#27272a', 
-                border: '1px solid #3f3f46',
-                borderRadius: '8px',
-              }}
-              labelStyle={{ color: '#fafafa' }}
+            <Tooltip
+              content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
             />
-            <Bar dataKey="earned" fill="#22c55e" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="spent" fill="#ef4444" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="earned" fill="#10b981" radius={[6, 6, 0, 0]} animationDuration={800} />
+            <Bar dataKey="spent" fill="#f43f5e" radius={[6, 6, 0, 0]} animationDuration={800} />
           </BarChart>
         </ResponsiveContainer>
       </div>

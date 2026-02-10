@@ -47,10 +47,10 @@ function generateDemoActivity(agentId: string, weeks: number): ActivityData[] {
 
 const intensityColors = [
   'bg-slate-800', // 0
-  'bg-green-900/50', // 1-3
-  'bg-green-700/60', // 4-6
-  'bg-green-500/70', // 7-9
-  'bg-green-400', // 10+
+  'bg-cyan-900/50', // 1-3
+  'bg-cyan-700/60', // 4-6
+  'bg-cyan-500/70', // 7-9
+  'bg-cyan-400', // 10+
 ];
 
 function getIntensityColor(count: number): string {

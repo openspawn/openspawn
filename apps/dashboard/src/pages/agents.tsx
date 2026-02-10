@@ -32,6 +32,7 @@ import { CapabilityManager } from "../components/capability-manager";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { ReputationCard } from "../components/reputation-card";
 import { Progress } from "../components/ui/progress";
+import { EmptyState } from "../components/ui/empty-state";
 import { AgentModeBadge, AgentModeSelector, AgentModeCard } from "../components/agent-mode-selector";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 
@@ -999,16 +1000,14 @@ export function AgentsPage() {
 
       {agents.length === 0 && (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Bot className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No agents yet</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Register your first agent to get started with the multi-agent system.
-            </p>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Register Agent
-            </Button>
+          <CardContent>
+            <EmptyState
+              variant="agents"
+              title="No agents registered yet"
+              description="Register your first agent to get started with the multi-agent system."
+              ctaLabel="Register your first agent →"
+              onCta={() => {}}
+            />
           </CardContent>
         </Card>
       )}

@@ -1,6 +1,29 @@
 import { AgentNetwork } from "../components/agent-network";
+import { useAgents } from "../hooks";
+import { EmptyState } from "../components/ui/empty-state";
+import { Card, CardContent } from "../components/ui/card";
 
 export function NetworkPage() {
+  const { agents } = useAgents();
+
+  if (agents.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-theme(spacing.16))]">
+        <Card className="max-w-md w-full bg-slate-800/30 border-slate-700">
+          <CardContent>
+            <EmptyState
+              variant="network"
+              title="No agent network yet"
+              description="Register agents to see their connections and hierarchy visualized here."
+              ctaLabel="Register agents to get started →"
+              onCta={() => {}}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="h-[calc(100vh-theme(spacing.16))] -m-6 lg:-m-6 -mx-4 sm:-mx-6">
       {/* Header overlay - hidden on mobile/landscape, shown on larger screens */}
