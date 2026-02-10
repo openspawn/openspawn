@@ -1,3 +1,10 @@
+---
+title: Integration Strategy & Growth
+layout: default
+parent: Strategy
+nav_order: 1
+---
+
 # BikiniBottom — Integration Strategy & Growth Roadmap
 
 **Date:** February 9, 2026  

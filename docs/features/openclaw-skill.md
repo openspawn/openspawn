@@ -1,8 +1,8 @@
 ---
+title: OpenClaw Skill
 layout: default
-title: OpenClaw Integration
-nav_order: 8
 parent: Features
+nav_order: 10
 ---
 
 # OpenClaw Integration

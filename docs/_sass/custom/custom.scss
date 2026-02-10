@@ -1,0 +1,21 @@
+// BikiniBottom custom styling for Just the Docs
+
+// Override link color to cyan
+$link-color: #06b6d4;
+
+// Sidebar active item
+.site-nav .nav-list-item.active > .nav-list-link {
+  color: #06b6d4;
+}
+
+// Button primary styling
+.btn-primary {
+  background-color: #06b6d4 !important;
+  border-color: #06b6d4 !important;
+  color: #fff !important;
+
+  &:hover {
+    background-color: #0891b2 !important;
+    border-color: #0891b2 !important;
+  }
+}

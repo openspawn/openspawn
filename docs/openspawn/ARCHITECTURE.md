@@ -1,6 +1,8 @@
 ---
+title: Architecture Overview
 layout: default
-title: Architecture - BikiniBottom
+parent: Architecture
+nav_order: 1
 ---
 
 # BikiniBottom — Architecture Document

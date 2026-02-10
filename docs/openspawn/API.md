@@ -1,6 +1,8 @@
 ---
+title: API Reference
 layout: default
-title: API Reference - BikiniBottom
+parent: Architecture
+nav_order: 2
 ---
 
 # BikiniBottom — API Specification

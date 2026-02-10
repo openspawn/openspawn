@@ -1,3 +1,10 @@
+---
+title: OpenClaw Integration
+layout: default
+parent: Case Studies
+nav_order: 5
+---
+
 # Case Study: OpenClaw + BikiniBottom Integration
 
 > *"Find agents on Moltfounders. Run them on OpenClaw. Manage them with BikiniBottom."*

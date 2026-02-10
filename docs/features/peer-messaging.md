@@ -1,3 +1,10 @@
+---
+title: Peer Messaging
+layout: default
+parent: Features
+nav_order: 3
+---
+
 # Peer-to-Peer Agent Messaging
 
 Enables agents to message each other directly (not just parent-child).

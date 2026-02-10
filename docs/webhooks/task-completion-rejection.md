@@ -1,3 +1,10 @@
+---
+title: Task Completion Rejection
+layout: default
+parent: Features
+nav_order: 13
+---
+
 # Task Completion Rejection
 
 Phase 8.3 introduces the ability for pre-hooks to reject task completion with feedback. When a task attempts to transition to DONE, a `task.complete` pre-hook can block it and provide actionable feedback to the assignee.

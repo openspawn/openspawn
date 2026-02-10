@@ -1,3 +1,10 @@
+---
+title: "Phase 1: Auth & Settings"
+layout: default
+parent: Architecture
+nav_order: 9
+---
+
 # Phase 1: Authentication & Settings Foundation
 
 **Status:** Planning  

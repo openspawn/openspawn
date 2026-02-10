@@ -1,3 +1,10 @@
+---
+title: Outbound Webhooks
+layout: default
+parent: Features
+nav_order: 5
+---
+
 # Outbound Webhooks
 
 Outbound webhooks allow BikiniBottom to send HTTP callbacks to external services when events occur in your organization. This enables integrations with third-party tools, custom workflows, and real-time notifications.

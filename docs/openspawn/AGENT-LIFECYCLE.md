@@ -1,6 +1,8 @@
 ---
+title: Agent Lifecycle
 layout: default
-title: Agent Lifecycle - BikiniBottom
+parent: Architecture
+nav_order: 3
 ---
 
 # Agent Lifecycle & Spawning Model

@@ -1,3 +1,10 @@
+---
+title: Trust & Reputation
+layout: default
+parent: Case Studies
+nav_order: 4
+---
+
 # Case Study: The New Agent Problem
 
 > *"Every agent has the same permissions. No way to ramp up trust gradually."*
