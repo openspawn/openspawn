@@ -27,6 +27,7 @@ import { useTasks } from "../hooks/use-tasks";
 import { useMessages, useConversations } from "../hooks/use-messages";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 import { AgentDetailPanel } from "./agent-detail-panel";
+import { useAgentHealth } from "../hooks/use-agent-health";
 
 // Context to share active delegations, speed, avatar settings, and activity data
 interface TaskDelegation {
@@ -49,12 +50,19 @@ interface EdgeMessageData {
   lastMessageTime?: string;
 }
 
+interface AgentHealthData {
+  completionRate: number;
+  creditUsage: number;
+  ringStatus: 'active' | 'idle' | 'busy' | 'error';
+}
+
 interface NetworkContextValue {
   delegations: TaskDelegation[];
   speed: number;
   avatarVersion: number;
   agentActivity: Map<string, AgentActivity>;
   edgeMessages: Map<string, EdgeMessageData>;
+  agentHealth: Map<string, AgentHealthData>;
 }
 
 const NetworkContext = createContext<NetworkContextValue>({ 
@@ -63,6 +71,7 @@ const NetworkContext = createContext<NetworkContextValue>({
   avatarVersion: 0,
   agentActivity: new Map(),
   edgeMessages: new Map(),
+  agentHealth: new Map(),
 });
 
 // ELK instance for layout
@@ -177,7 +186,7 @@ interface AgentNodeData extends Record<string, unknown> {
 // Custom node component with heat map coloring
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
-  const { avatarVersion, agentActivity } = useContext(NetworkContext);
+  const { avatarVersion, agentActivity, agentHealth } = useContext(NetworkContext);
   
   // Get activity data
   const activity = agentActivity.get(nodeData.agentId);
@@ -334,22 +343,59 @@ function AgentNode({ data, selected }: NodeProps) {
             }}
           />
 
-          {/* Avatar/Icon */}
-          {!compact && (
-            <div className="mb-0.5">
-              {nodeData.isHuman ? (
-                <span className="text-lg leading-none">👤</span>
-              ) : avatarUrl ? (
-                <img 
-                  src={avatarUrl} 
-                  alt={nodeData.label}
-                  className="w-8 h-8 rounded-full ring-2 ring-white/20"
-                />
-              ) : (
-                <span className="text-lg leading-none">🤖</span>
-              )}
-            </div>
-          )}
+          {/* Avatar/Icon with status rings */}
+          {!compact && (() => {
+            const health = agentHealth.get(nodeData.agentId);
+            const avatarImg = nodeData.isHuman ? (
+              <span className="text-lg leading-none">👤</span>
+            ) : avatarUrl ? (
+              <img 
+                src={avatarUrl} 
+                alt={nodeData.label}
+                className="w-8 h-8 rounded-full"
+              />
+            ) : (
+              <span className="text-lg leading-none">🤖</span>
+            );
+
+            if (!nodeData.isHuman && health) {
+              const r1 = 18, r2 = 15, sw = 2;
+              const c1 = 2 * Math.PI * r1, c2 = 2 * Math.PI * r2;
+              const o1 = c1 * (1 - health.completionRate);
+              const o2 = c2 * (1 - health.creditUsage);
+              const col = (v: number) => v >= 0.85 ? '#f43f5e' : v >= 0.6 ? '#f59e0b' : '#10b981';
+              return (
+                <div className="relative mb-0.5" style={{ width: 40, height: 40 }}>
+                  <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
+                    <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                    <motion.circle
+                      cx={20} cy={20} r={r1} fill="none"
+                      stroke={col(health.completionRate)} strokeWidth={sw} strokeLinecap="round"
+                      strokeDasharray={c1}
+                      initial={{ strokeDashoffset: c1 }}
+                      animate={{ strokeDashoffset: o1 }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                      transform="rotate(-90 20 20)"
+                    />
+                    <circle cx={20} cy={20} r={r2} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                    <motion.circle
+                      cx={20} cy={20} r={r2} fill="none"
+                      stroke={col(health.creditUsage)} strokeWidth={sw} strokeLinecap="round"
+                      strokeDasharray={c2}
+                      initial={{ strokeDashoffset: c2 }}
+                      animate={{ strokeDashoffset: o2 }}
+                      transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+                      transform="rotate(-90 20 20)"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {avatarImg}
+                  </div>
+                </div>
+              );
+            }
+            return <div className="mb-0.5">{avatarImg}</div>;
+          })()}
 
           {/* Name */}
           <div 
@@ -803,6 +849,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const [compact, setCompact] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
   const [avatarVersion, setAvatarVersion] = useState(0);
+  const agentHealth = useAgentHealth();
   const prevAgentCountRef = useRef(0);
   
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
@@ -910,7 +957,8 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     avatarVersion,
     agentActivity,
     edgeMessages,
-  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages]);
+    agentHealth,
+  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth]);
 
   if (loading) {
     return (
