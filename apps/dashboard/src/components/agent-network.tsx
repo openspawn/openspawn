@@ -26,7 +26,6 @@ import { useAgents, type Agent } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useMessages, useConversations } from "../hooks/use-messages";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
-import { AgentDetailPanel } from "./agent-detail-panel";
 import { useAgentHealth } from "../hooks/use-agent-health";
 import { useTouchDevice } from "../hooks/use-touch-device";
 import { levelColors } from "../lib/status-colors";
@@ -608,6 +607,7 @@ const edgeTypes = { taskFlow: TaskFlowEdge };
 
 interface AgentNetworkProps {
   className?: string;
+  onAgentClick?: (agentId: string) => void;
 }
 
 // Edge tooltip component
@@ -886,7 +886,7 @@ function MobileZoomControls({ onFitView }: { onFitView: () => void }) {
 }
 
 // Inner component
-function AgentNetworkInner({ className }: AgentNetworkProps) {
+function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const demo = useDemo();
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
@@ -901,7 +901,6 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     sourceLabel: string; 
     targetLabel: string;
   } | null>(null);
-  const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
@@ -1025,7 +1024,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     setSelectedNode(node as Node<AgentNodeData>);
     setSelectedEdge(null);
     if (node.id !== "human") {
-      setDetailPanelAgentId(node.id);
+      onAgentClick?.(node.id);
     }
   }
   
@@ -1035,7 +1034,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
     longPressNodeRef.current = node.id;
     longPressTimerRef.current = setTimeout(() => {
       if (longPressNodeRef.current === node.id && node.id !== "human") {
-        setDetailPanelAgentId(node.id);
+        onAgentClick?.(node.id);
         setSelectedNode(node as Node<AgentNodeData>);
       }
     }, 500); // 500ms long-press
@@ -1257,21 +1256,16 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
           </div>
         )}
 
-        {/* Agent Detail Panel */}
-        <AgentDetailPanel 
-          agentId={detailPanelAgentId} 
-          onClose={() => setDetailPanelAgentId(null)} 
-        />
       </div>
     </NetworkContext.Provider>
   );
 }
 
 // Wrapper with ReactFlowProvider
-export function AgentNetwork({ className }: AgentNetworkProps) {
+export function AgentNetwork({ className, onAgentClick }: AgentNetworkProps) {
   return (
     <ReactFlowProvider>
-      <AgentNetworkInner className={className} />
+      <AgentNetworkInner className={className} onAgentClick={onAgentClick} />
     </ReactFlowProvider>
   );
 }
