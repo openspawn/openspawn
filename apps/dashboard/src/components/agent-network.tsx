@@ -24,6 +24,7 @@ import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
 import { useAgents, type Agent } from "../hooks/use-agents";
 import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
+import { AgentDetailPanel } from "./agent-detail-panel";
 
 // Context to share active delegations, speed, and avatar settings with edge/node components
 interface TaskDelegation {
@@ -434,6 +435,7 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
   const { agents, loading } = useAgents();
   const { fitView } = useReactFlow();
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
   const [compact, setCompact] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
@@ -510,6 +512,10 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
     setSelectedNode(node as Node<AgentNodeData>);
+    // Open detail panel for non-human nodes
+    if (node.id !== "human") {
+      setDetailPanelAgentId(node.id);
+    }
   }
 
   const contextValue = useMemo(() => ({
@@ -659,6 +665,12 @@ function AgentNetworkInner({ className }: AgentNetworkProps) {
             </AnimatePresence>
           </div>
         )}
+
+        {/* Agent Detail Panel */}
+        <AgentDetailPanel 
+          agentId={detailPanelAgentId} 
+          onClose={() => setDetailPanelAgentId(null)} 
+        />
       </div>
     </NetworkContext.Provider>
   );
