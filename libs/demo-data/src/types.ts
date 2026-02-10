@@ -110,6 +110,7 @@ export interface DemoScenario {
   credits: DemoCreditTransaction[];
   events: DemoEvent[];
   messages: DemoMessage[];
+  webhooks: DemoWebhook[];
 }
 
 export interface SimulationState {

@@ -4,6 +4,7 @@ import { tasks, generateRandomTask } from '../fixtures/tasks';
 import { creditTransactions } from '../fixtures/credits';
 import { events } from '../fixtures/events';
 import { generateInitialMessages } from '../fixtures/messages';
+import { demoWebhooks } from '../fixtures/webhooks';
 
 /**
  * Startup Scenario: Small team, early stage
@@ -42,6 +43,9 @@ export const startupScenario: DemoScenario = {
      AGENT_IDS.codeReviewer, AGENT_IDS.copywriter],
     tasks.slice(0, 10).map(t => t.identifier)
   ),
+  
+  // Include demo webhooks for startup scenario
+  webhooks: demoWebhooks.slice(0, 3),
 };
 
 export default startupScenario;

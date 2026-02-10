@@ -1,4 +1,5 @@
 import type { DemoScenario, DemoAgent, DemoTask, DemoMessage, DemoCreditTransaction, DemoEvent } from '../types';
+import { demoWebhooks } from '../fixtures/webhooks';
 
 /**
  * NovaTech AI - Realistic Startup Simulation
@@ -1110,6 +1111,7 @@ export const acmetechScenario: DemoScenario = {
   credits,
   events,
   messages,
+  webhooks: demoWebhooks,
 };
 
 // Export phase info for UI

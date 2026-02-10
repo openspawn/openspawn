@@ -4,6 +4,7 @@ import { tasks, generateRandomTask } from '../fixtures/tasks';
 import { creditTransactions, generateCreditTransaction } from '../fixtures/credits';
 import { events, generateEvent } from '../fixtures/events';
 import { generateInitialMessages } from '../fixtures/messages';
+import { demoWebhooks } from '../fixtures/webhooks';
 
 // Additional domains for enterprise scale
 const ENTERPRISE_DOMAINS = ['Engineering', 'Finance', 'Marketing', 'Sales', 'Support', 'Research', 'Legal', 'HR'];
@@ -160,6 +161,7 @@ export const enterpriseScenario: DemoScenario = {
     allEnterpriseAgents.map(a => a.id),
     allEnterpriseTasks.map(t => t.identifier)
   ),
+  webhooks: demoWebhooks,
 };
 
 export default enterpriseScenario;
