@@ -1,5 +1,5 @@
 /**
- * Confetti celebration effects for OpenSpawn dashboard
+ * Confetti celebration effects for BikiniBottom dashboard
  * Uses canvas-confetti for lightweight, performant animations
  */
 
