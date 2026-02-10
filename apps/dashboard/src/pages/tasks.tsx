@@ -112,10 +112,10 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
       onClick={onClick}
     >
-      <Card className={`cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20 ${
+      <Card className={`cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20 min-h-[44px] ${
         hasRejection ? 'border-amber-500/50 bg-amber-500/5' : ''
       }`}>
-        <CardContent className="p-3">
+        <CardContent className={compact ? "p-2 sm:p-3" : "p-3"}>
           <div className="flex items-start gap-2">
             <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50 flex-shrink-0" />
             <div className="flex-1 min-w-0 space-y-2">
@@ -401,11 +401,11 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
 
 function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
   return (
-    <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none">
+    <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-3 px-3 sm:-mx-4 sm:px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide">
       {statusColumns.map((column) => {
         const columnTasks = tasks.filter((t) => t.status?.toUpperCase() === column.id);
         return (
-          <div key={column.id} className="flex-shrink-0 w-[280px] sm:w-72 snap-start">
+          <div key={column.id} className="flex-shrink-0 w-[75vw] sm:w-[280px] md:w-72 snap-center sm:snap-start">
             <div className="flex items-center gap-2 mb-3 sticky top-0 bg-background/95 backdrop-blur-sm py-1 z-10">
               <div className={`w-2 h-2 rounded-full ${column.color}`} />
               <h3 className="font-medium text-sm">{column.label}</h3>
@@ -413,11 +413,11 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
                 {columnTasks.length}
               </Badge>
             </div>
-            <ScrollArea className="h-[calc(100vh-360px)] sm:h-[calc(100vh-320px)]">
+            <ScrollArea className="h-[calc(100vh-400px)] sm:h-[calc(100vh-360px)] md:h-[calc(100vh-320px)]">
               <div className="space-y-2 pr-2">
                 <AnimatePresence mode="popLayout">
                   {columnTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
+                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} compact />
                   ))}
                 </AnimatePresence>
                 {columnTasks.length === 0 && (
@@ -459,44 +459,49 @@ function ListView({ tasks, onTaskClick, selectedTaskId }: ListViewProps) {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 onClick={() => onTaskClick(task)}
-                className={`flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors cursor-pointer ${
+                className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 hover:bg-accent/50 transition-colors cursor-pointer min-h-[44px] ${
                   isSelected ? "bg-accent/70 border-l-2 border-l-primary" : ""
                 }`}
               >
-                <span className="font-mono text-sm text-muted-foreground w-20 flex-shrink-0">
-                  {task.identifier}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{task.title}</p>
+                {/* Mobile: stacked layout */}
+                <div className="flex items-center gap-2 sm:contents">
+                  <span className="font-mono text-xs sm:text-sm text-muted-foreground sm:w-20 flex-shrink-0">
+                    {task.identifier}
+                  </span>
+                  <Badge variant={getPriorityVariant(task.priority)} className="flex-shrink-0 sm:order-3">
+                    {task.priority?.toLowerCase()}
+                  </Badge>
+                  <Badge
+                    variant={task.status === "DONE" ? "success" : "secondary"}
+                    className="sm:w-24 sm:justify-center flex-shrink-0 sm:order-4"
+                  >
+                    {task.status?.replace("_", " ").toLowerCase()}
+                  </Badge>
                 </div>
-                <Badge variant={getPriorityVariant(task.priority)} className="flex-shrink-0">
-                  {task.priority?.toLowerCase()}
-                </Badge>
-                <Badge
-                  variant={task.status === "DONE" ? "success" : "secondary"}
-                  className="w-24 justify-center flex-shrink-0"
-                >
-                  {task.status?.replace("_", " ").toLowerCase()}
-                </Badge>
-                {task.assignee ? (
-                  <div className="flex items-center gap-1 w-28 flex-shrink-0">
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-xs">
-                      🤖
+                <div className="flex-1 min-w-0 sm:order-2">
+                  <p className="font-medium truncate text-sm sm:text-base">{task.title}</p>
+                </div>
+                <div className="flex items-center gap-3 sm:contents text-xs sm:text-sm pl-0 sm:pl-0">
+                  {task.assignee ? (
+                    <div className="flex items-center gap-1 sm:w-28 flex-shrink-0 sm:order-5">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+                        🤖
+                      </div>
+                      <span className="text-muted-foreground truncate">
+                        {task.assignee.name}
+                      </span>
                     </div>
-                    <span className="text-sm text-muted-foreground truncate">
-                      {task.assignee.name}
+                  ) : (
+                    <span className="text-muted-foreground/50 sm:w-28 flex-shrink-0 italic sm:order-5 hidden sm:inline">
+                      Unassigned
                     </span>
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground/50 w-28 flex-shrink-0 italic">
-                    Unassigned
-                  </span>
-                )}
-                {dueDate && (
-                  <span className={`text-xs w-16 flex-shrink-0 ${isOverdue ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {dueDate}
-                  </span>
-                )}
+                  )}
+                  {dueDate && (
+                    <span className={`sm:w-16 flex-shrink-0 sm:order-6 ${isOverdue ? 'text-red-500' : 'text-muted-foreground'}`}>
+                      {dueDate}
+                    </span>
+                  )}
+                </div>
               </motion.div>
             );
           })}
@@ -657,64 +662,68 @@ export function TasksPage() {
         
         <TabsContent value="list" className="mt-4 space-y-4">
           {/* Filters and Sort for List view */}
-          <div className="flex flex-wrap gap-3 items-center">
-            {/* Search */}
-            <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-              />
+          <div className="space-y-3">
+            <div className="flex gap-3 items-center">
+              {/* Search */}
+              <div className="relative flex-1 min-w-0 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search tasks..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+                />
+              </div>
             </div>
             
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="all">All Status</option>
-              <option value="BACKLOG">Backlog</option>
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="REVIEW">Review</option>
-              <option value="DONE">Done</option>
-              <option value="BLOCKED">Blocked</option>
-            </select>
-            
-            {/* Priority Filter */}
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="all">All Priority</option>
-              <option value="URGENT">Urgent</option>
-              <option value="HIGH">High</option>
-              <option value="NORMAL">Normal</option>
-              <option value="LOW">Low</option>
-            </select>
-            
-            {/* Sort buttons */}
-            <div className="flex items-center gap-1 ml-auto">
-              <span className="text-sm text-muted-foreground">Sort:</span>
-              {(["created", "priority", "status", "title"] as SortField[]).map((field) => (
-                <Button
-                  key={field}
-                  variant={sortField === field ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => handleSort(field)}
-                  className="capitalize"
-                >
-                  {field === "created" ? "Date" : field}
-                  {sortField === field && (
-                    <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
-                  )}
-                </Button>
-              ))}
+            <div className="flex flex-wrap gap-3 items-center">
+              {/* Status Filter */}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+              >
+                <option value="all">All Status</option>
+                <option value="BACKLOG">Backlog</option>
+                <option value="TODO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="REVIEW">Review</option>
+                <option value="DONE">Done</option>
+                <option value="BLOCKED">Blocked</option>
+              </select>
+              
+              {/* Priority Filter */}
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
+              >
+                <option value="all">All Priority</option>
+                <option value="URGENT">Urgent</option>
+                <option value="HIGH">High</option>
+                <option value="NORMAL">Normal</option>
+                <option value="LOW">Low</option>
+              </select>
+              
+              {/* Sort buttons */}
+              <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
+                <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
+                {(["created", "priority", "status", "title"] as SortField[]).map((field) => (
+                  <Button
+                    key={field}
+                    variant={sortField === field ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => handleSort(field)}
+                    className="capitalize min-h-[44px] sm:min-h-0 shrink-0"
+                  >
+                    {field === "created" ? "Date" : field}
+                    {sortField === field && (
+                      <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                    )}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
           

@@ -27,20 +27,20 @@ export function StatCard({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-6 sm:pb-2">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+        {Icon && <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />}
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
         <div className="flex items-center justify-between gap-2">
           <motion.div
             key={String(value)}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="text-2xl font-bold"
+            className="text-xl sm:text-2xl font-bold"
           >
             {value}
           </motion.div>

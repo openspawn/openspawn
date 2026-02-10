@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -61,6 +61,14 @@ const navigation: { name: string; href: string; icon: typeof LayoutDashboard; to
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
+// Bottom nav items for mobile (subset of main nav)
+const bottomNavItems: { name: string; href: string; icon: typeof LayoutDashboard }[] = [
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Agents", href: "/agents", icon: Users },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare },
+  { name: "Messages", href: "/messages", icon: MessageSquare },
+];
+
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -70,6 +78,30 @@ export function Layout({ children }: LayoutProps) {
   const { user, logout, isAuthenticated } = useAuth();
   const { activeCount } = usePresence();
   const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
+
+  // Scroll direction tracking for hiding mobile header
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const mainContentRef = useRef<HTMLElement>(null);
+
+  const handleScroll = useCallback(() => {
+    const el = mainContentRef.current;
+    if (!el) return;
+    const currentScrollY = el.scrollTop;
+    if (currentScrollY > lastScrollY.current && currentScrollY > 64) {
+      setHeaderVisible(false); // scrolling down
+    } else {
+      setHeaderVisible(true); // scrolling up
+    }
+    lastScrollY.current = currentScrollY;
+  }, []);
+
+  useEffect(() => {
+    const el = mainContentRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   // Close mobile menu on navigation
   useEffect(() => {
@@ -314,11 +346,11 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
-                        "w-full justify-start gap-3",
+                        "w-full justify-start gap-3 min-h-[44px]",
                         isActive && "bg-secondary text-primary"
                       )}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-5 w-5" />
                       {item.name}
                     </Button>
                   </Link>
@@ -403,7 +435,10 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Mobile header */}
         <div className="flex flex-1 flex-col min-w-0">
-          <header className="flex h-16 items-center justify-between border-b border-border px-4 lg:hidden relative overflow-hidden">
+          <header className={cn(
+            "flex h-14 sm:h-16 items-center justify-between border-b border-border px-4 lg:hidden relative overflow-hidden sticky top-0 z-30 bg-background transition-transform duration-300",
+            !headerVisible && "-translate-y-full"
+          )}>
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <Button
               variant="ghost"
@@ -468,11 +503,11 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Main content */}
-          <main className="flex-1 overflow-auto">
-            <div className="container mx-auto px-4 py-4 sm:p-6 pb-20">{children}</div>
+          <main ref={mainContentRef} className="flex-1 overflow-auto">
+            <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-28 sm:pb-20 max-w-7xl">{children}</div>
             
             {/* Footer Badge */}
-            <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30">
+            <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 lg:left-64 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden sm:flex lg:flex">
               <div className="container mx-auto flex items-center justify-between text-xs">
                 <a
                   href="https://github.com/openspawn/openspawn"
@@ -504,6 +539,28 @@ export function Layout({ children }: LayoutProps) {
               </div>
             </div>
           </main>
+
+          {/* Mobile bottom navigation bar */}
+          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden">
+            <div className="flex items-center justify-around h-14">
+              {bottomNavItems.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-[44px] min-h-[44px] transition-colors",
+                      isActive ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="text-[10px] font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
         </div>
       </div>
     </TooltipProvider>

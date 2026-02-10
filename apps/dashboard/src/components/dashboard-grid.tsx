@@ -224,18 +224,19 @@ export function DashboardToolbar({
   const [showPresets, setShowPresets] = useState(false);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
       {/* Edit mode toggle */}
       <button
         onClick={() => setEditMode(!editMode)}
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+        className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition-colors min-h-[36px] sm:min-h-0 ${
           editMode
             ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
             : "border-border text-muted-foreground hover:text-foreground hover:bg-accent"
         }`}
       >
         <LayoutGrid className="h-3.5 w-3.5" />
-        {editMode ? "Done" : "Edit layout"}
+        <span className="hidden sm:inline">{editMode ? "Done" : "Edit layout"}</span>
+        <span className="sm:hidden">{editMode ? "Done" : "Edit"}</span>
       </button>
 
       {/* Widget picker */}
@@ -367,7 +368,7 @@ export function DashboardGrid({
         items={visibleWidgets.map((w) => w.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <AnimatePresence mode="popLayout">
             {visibleWidgets.map((widget) => (
               <motion.div
