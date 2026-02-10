@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { EmptyState } from "../components/ui/empty-state";
+import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { useCredits } from "../hooks/use-credits";
 import { BudgetBurndown } from "../components/budget-burndown";
 import { ModelUsageBreakdown } from "../components/model-usage";
@@ -148,6 +149,14 @@ export function CreditsPage() {
 
   const netBalance = totalEarned - totalSpent;
 
+  // Sparkline data for credit stats
+  const creditSparklines = useMemo(() => ({
+    balance: generateSparklineData(7, "up"),
+    earned: generateSparklineData(7, "up"),
+    spent: generateSparklineData(7, "up"),
+    burnRate: generateSparklineData(7, "down"),
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Compute balance history from transactions (sorted chronologically)
   const balanceHistory = useMemo(() => {
     if (transactions.length === 0) return [];
@@ -220,7 +229,10 @@ export function CreditsPage() {
             <Coins className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{netBalance.toLocaleString()}</div>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{netBalance.toLocaleString()}</div>
+              <Sparkline data={creditSparklines.balance} color="#06b6d4" showDot showArea showTrend />
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -231,8 +243,11 @@ export function CreditsPage() {
             <ArrowUpRight className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-500">
-              +{totalEarned.toLocaleString()}
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-emerald-500">
+                +{totalEarned.toLocaleString()}
+              </div>
+              <Sparkline data={creditSparklines.earned} color="#10b981" showDot showArea />
             </div>
           </CardContent>
         </Card>
@@ -244,8 +259,11 @@ export function CreditsPage() {
             <ArrowDownLeft className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-500">
-              -{totalSpent.toLocaleString()}
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-amber-500">
+                -{totalSpent.toLocaleString()}
+              </div>
+              <Sparkline data={creditSparklines.spent} color="#f59e0b" showDot showArea />
             </div>
           </CardContent>
         </Card>
@@ -257,7 +275,10 @@ export function CreditsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{transactions.length}</div>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{transactions.length}</div>
+              <Sparkline data={creditSparklines.burnRate} color="#f43f5e" showDot showTrend />
+            </div>
           </CardContent>
         </Card>
       </div>

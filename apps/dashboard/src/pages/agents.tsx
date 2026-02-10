@@ -5,6 +5,7 @@ import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Se
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
+import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 import { AgentAvatar } from "../components/agent-avatar";
 import {
@@ -691,8 +692,15 @@ function AgentVirtualGrid({
                               </p>
                             </div>
                             <div>
-                              <p className="text-muted-foreground">Model</p>
-                              <p className="font-medium truncate text-xs">{agent.model}</p>
+                              <p className="text-muted-foreground">Activity</p>
+                              <Sparkline
+                                data={generateSparklineData(7, agent.status === AgentStatus.Active ? "up" : "stable")}
+                                width={56}
+                                height={18}
+                                color={levelColor}
+                                showDot
+                                showTrend
+                              />
                             </div>
                           </div>
                         </CardContent>
@@ -717,6 +725,14 @@ export function AgentsPage() {
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");
   const [detailPanelAgentId, setDetailPanelAgentId] = useState<string | null>(null);
+
+  // Sparkline mock data for stat cards
+  const agentSparklines = useMemo(() => ({
+    total: generateSparklineData(7, "up"),
+    active: generateSparklineData(7, "up"),
+    balance: generateSparklineData(7, "stable"),
+    level: generateSparklineData(7, "up"),
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Filtering state
   const [searchQuery, setSearchQuery] = useState("");
@@ -932,7 +948,10 @@ export function AgentsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{agents.length}</div>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">{agents.length}</div>
+              <Sparkline data={agentSparklines.total} color="#06b6d4" showDot showArea />
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -942,8 +961,11 @@ export function AgentsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-500">
-              {agents.filter((a) => a.status === AgentStatus.Active).length}
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-emerald-500">
+                {agents.filter((a) => a.status === AgentStatus.Active).length}
+              </div>
+              <Sparkline data={agentSparklines.active} color="#10b981" showDot showArea />
             </div>
           </CardContent>
         </Card>
@@ -954,8 +976,11 @@ export function AgentsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {agents.reduce((sum, a) => sum + a.currentBalance, 0).toLocaleString()}
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">
+                {agents.reduce((sum, a) => sum + a.currentBalance, 0).toLocaleString()}
+              </div>
+              <Sparkline data={agentSparklines.balance} color="#f59e0b" showDot showArea />
             </div>
           </CardContent>
         </Card>
@@ -966,10 +991,13 @@ export function AgentsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {agents.length
-                ? (agents.reduce((sum, a) => sum + a.level, 0) / agents.length).toFixed(1)
-                : "—"}
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold">
+                {agents.length
+                  ? (agents.reduce((sum, a) => sum + a.level, 0) / agents.length).toFixed(1)
+                  : "—"}
+              </div>
+              <Sparkline data={agentSparklines.level} color="#8b5cf6" showDot />
             </div>
           </CardContent>
         </Card>

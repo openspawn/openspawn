@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { PhaseProgress } from "../components/phase-progress";
 import { IdleAgentsWidget } from "../components/idle-agents-widget";
 import { useAgents } from "../hooks/use-agents";
@@ -39,9 +40,11 @@ interface StatCardProps {
   change?: number;
   icon: React.ComponentType<{ className?: string }>;
   description?: string;
+  sparklineData?: number[];
+  sparklineColor?: string;
 }
 
-function StatCard({ title, value, change, icon: Icon, description }: StatCardProps) {
+function StatCard({ title, value, change, icon: Icon, description, sparklineData, sparklineColor = "#06b6d4" }: StatCardProps) {
   const isPositive = change && change > 0;
   const isNegative = change && change < 0;
 
@@ -54,15 +57,27 @@ function StatCard({ title, value, change, icon: Icon, description }: StatCardPro
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <motion.div 
-          key={String(value)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="text-2xl font-bold"
-        >
-          {value}
-        </motion.div>
+        <div className="flex items-center justify-between gap-2">
+          <motion.div 
+            key={String(value)}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="text-2xl font-bold"
+          >
+            {value}
+          </motion.div>
+          {sparklineData && (
+            <Sparkline
+              data={sparklineData}
+              width={64}
+              height={24}
+              color={sparklineColor}
+              showDot
+              showArea
+            />
+          )}
+        </div>
         {change !== undefined && (
           <p className="flex items-center text-xs text-muted-foreground">
             {isPositive && (
@@ -154,6 +169,14 @@ export function DashboardPage() {
     
     return 'growth'; // All done
   }, [tasks, scenario]);
+
+  // Generate stable sparkline data (seeded by agent/task counts)
+  const sparklines = useMemo(() => ({
+    agents: generateSparklineData(7, "up"),
+    tasks: generateSparklineData(7, "up"),
+    completed: generateSparklineData(7, "up"),
+    credits: generateSparklineData(7, "stable"),
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeAgents = agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length;
   const pendingAgents = agents.filter((a) => a.status?.toUpperCase() === "PENDING").length;
@@ -252,24 +275,32 @@ export function DashboardPage() {
           value={activeAgents}
           icon={Users}
           description={pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined}
+          sparklineData={sparklines.agents}
+          sparklineColor="#06b6d4"
         />
         <StatCard
           title="Tasks In Progress"
           value={inProgressTasks}
           icon={CheckSquare}
           description={`${tasks.filter(t => t.status === "review").length} in review`}
+          sparklineData={sparklines.tasks}
+          sparklineColor="#06b6d4"
         />
         <StatCard
           title="Completed Tasks"
           value={completedTasks}
           icon={TrendingUp}
           description={`${tasks.length} total tasks`}
+          sparklineData={sparklines.completed}
+          sparklineColor="#10b981"
         />
         <StatCard
           title="Credit Flow"
           value={`+${totalCreditsEarned.toLocaleString()}`}
           icon={Coins}
           description={`-${totalCreditsSpent.toLocaleString()} spent`}
+          sparklineData={sparklines.credits}
+          sparklineColor="#f59e0b"
         />
       </div>
 

@@ -14,6 +14,7 @@ import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartTooltip } from "./ui/chart-tooltip";
+import { Sparkline, generateSparklineData } from "./ui/sparkline";
 
 type Agent = AgentFieldsFragment;
 
@@ -143,7 +144,10 @@ function OverviewTab({ agent }: { agent: Agent }) {
             <Coins className="h-4 w-4" />
             <span className="text-sm">Balance</span>
           </div>
-          <p className="text-2xl font-bold">{agent.currentBalance.toLocaleString()}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-2xl font-bold">{agent.currentBalance.toLocaleString()}</p>
+            <Sparkline data={generateSparklineData(7, "stable")} color="#f59e0b" width={48} height={18} showDot />
+          </div>
         </div>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -158,7 +162,10 @@ function OverviewTab({ agent }: { agent: Agent }) {
             <Zap className="h-4 w-4" />
             <span className="text-sm">Success Rate</span>
           </div>
-          <p className="text-2xl font-bold">{successRate}%</p>
+          <div className="flex items-center justify-between">
+            <p className="text-2xl font-bold">{successRate}%</p>
+            <Sparkline data={generateSparklineData(7, successRate > 70 ? "up" : "down")} color={successRate > 70 ? "#10b981" : "#f43f5e"} width={48} height={18} showDot showTrend />
+          </div>
           <p className="text-xs text-muted-foreground mt-1">
             {agent.tasksSuccessful ?? 0}/{agent.tasksCompleted ?? 0} tasks
           </p>
