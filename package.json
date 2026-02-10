@@ -61,6 +61,7 @@
     "graphql-subscriptions": "^3.0.0",
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^6.0.7",
+    "helmet": "^8.1.0",
     "lucide-react": "^0.563.0",
     "msw": "^2.12.9",
     "nodemailer": "^8.0.1",
@@ -80,10 +81,10 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "typeorm": "^0.3.28",
-    "urql": "^5.0.1",
-    "helmet": "^8.1.0"
+    "urql": "^5.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
     "@graphql-codegen/cli": "^6.1.1",
     "@graphql-codegen/client-preset": "^5.2.2",
     "@graphql-codegen/typescript": "^5.0.7",
@@ -91,6 +92,8 @@
     "@graphql-codegen/typescript-react-query": "^6.1.1",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
+    "@nx/eslint": "22.4.5",
+    "@nx/eslint-plugin": "22.4.5",
     "@nx/js": "^22.4.5",
     "@nx/nest": "^22.4.5",
     "@nx/node": "22.4.5",
@@ -100,6 +103,7 @@
     "@nx/web": "22.4.5",
     "@nx/webpack": "22.4.5",
     "@playwright/test": "^1.58.2",
+    "@swc-contrib/plugin-graphql-codegen-client-preset": "^0.17.0",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
@@ -117,19 +121,24 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react-swc": "^4.2.3",
-    "@swc-contrib/plugin-graphql-codegen-client-preset": "^0.17.0",
     "@vitest/coverage-v8": "^4.0.0",
     "@vitest/ui": "^4.0.0",
     "esbuild": "^0.27.3",
+    "eslint": "^9.8.0",
+    "eslint-config-prettier": "^10.0.0",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
+    "jsonc-eslint-parser": "^2.1.0",
     "nx": "22.4.5",
     "oxfmt": "^0.28.0",
     "oxlint": "^1.43.0",
+    "prettier": "~3.6.2",
     "ts-node": "^10.9.2",
     "tslib": "^2.3.0",
     "tsx": "^4.21.0",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.40.0",
+    "verdaccio": "^6.0.5",
     "vite": "^7.0.0",
     "vitest": "^4.0.0",
     "webpack-cli": "^5.1.4"
@@ -142,5 +151,8 @@
     "workerDirectory": [
       "apps/dashboard/public"
     ]
+  },
+  "nx": {
+    "includedScripts": []
   }
 }
