@@ -26,7 +26,7 @@ import {
 } from "../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PhaseChip } from "../components/phase-chip";
-import { useAgents, useCurrentPhase, usePresence } from "../hooks";
+import { useAgents, useCurrentPhase, usePresence, useAgentHealth } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
@@ -284,6 +284,8 @@ const REPUTATION_EMOJI: Record<string, string> = {
 };
 
 function ReputationTab({ agents }: { agents: Agent[] }) {
+  const { presenceMap } = usePresence();
+  const healthMap = useAgentHealth();
   // Sort agents by trust score for leaderboard
   const leaderboardData = useMemo(() => {
     return [...agents]
@@ -434,6 +436,8 @@ function ReputationTab({ agents }: { agents: Agent[] }) {
                         level={agent.level}
                         size="md"
                         presenceStatus={presenceMap.get(agent.id)?.status}
+                        completionRate={healthMap.get(agent.id)?.completionRate}
+                        creditUsage={healthMap.get(agent.id)?.creditUsage}
                       />
                       <div>
                         <div className="font-medium">{agent.name}</div>
@@ -566,6 +570,8 @@ function AgentVirtualGrid({
   onCardClick: (id: string) => void;
   onAction: (agent: Agent, mode: DialogMode) => void;
 }) {
+  const { presenceMap } = usePresence();
+  const healthMap = useAgentHealth();
   const parentRef = useRef<HTMLDivElement>(null);
   // Chunk agents into rows of 3 (matching lg:grid-cols-3)
   const rows = useMemo(() => {
@@ -634,6 +640,8 @@ function AgentVirtualGrid({
                               level={agent.level}
                               size="md"
                               presenceStatus={presenceMap.get(agent.id)?.status}
+                              completionRate={healthMap.get(agent.id)?.completionRate}
+                              creditUsage={healthMap.get(agent.id)?.creditUsage}
                             />
                             <div>
                               <CardTitle className="text-base">{agent.name}</CardTitle>

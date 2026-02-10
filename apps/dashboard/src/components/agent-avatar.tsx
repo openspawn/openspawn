@@ -9,6 +9,7 @@ import { getAgentAvatarUrl, getAvatarSettings } from '../lib/avatar';
 import { Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { PresenceGlow, StatusDot } from './presence';
+import { StatusRing } from './ui/status-ring';
 import type { PresenceStatus } from '../hooks/use-presence';
 
 interface AgentAvatarProps {
@@ -20,6 +21,9 @@ interface AgentAvatarProps {
   showRing?: boolean;
   /** When provided, wraps the avatar with a presence glow ring and status dot */
   presenceStatus?: PresenceStatus;
+  /** StatusRing health data — when provided, uses ring instead of glow */
+  completionRate?: number;
+  creditUsage?: number;
 }
 
 const SIZE_MAP = {
@@ -51,6 +55,8 @@ export function AgentAvatar({
   className,
   showRing = true,
   presenceStatus,
+  completionRate,
+  creditUsage,
 }: AgentAvatarProps) {
   const sizeConfig = SIZE_MAP[size];
   const levelColor = LEVEL_COLORS[level] || '#71717a';
@@ -89,6 +95,27 @@ export function AgentAvatar({
       </AvatarFallback>
     </Avatar>
   );
+
+  if (presenceStatus && completionRate != null && creditUsage != null) {
+    const ringSize = size === 'xl' ? 'lg' : size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'md';
+    return (
+      <div className="relative inline-flex">
+        <StatusRing
+          completionRate={completionRate}
+          creditUsage={creditUsage}
+          status={presenceStatus}
+          size={ringSize}
+        >
+          {avatar}
+        </StatusRing>
+        <StatusDot
+          status={presenceStatus}
+          size="sm"
+          className="absolute -bottom-0.5 -right-0.5 z-10"
+        />
+      </div>
+    );
+  }
 
   if (presenceStatus) {
     return (
