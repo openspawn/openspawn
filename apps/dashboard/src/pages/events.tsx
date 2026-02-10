@@ -12,6 +12,7 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { EmptyState } from "../components/ui/empty-state";
 import { useEvents } from "../hooks/use-events";
 import { useState, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -75,10 +76,12 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
 
   if (filteredEvents.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-muted-foreground">No events found</p>
-      </div>
+      <EmptyState
+        variant="events"
+        title="No events recorded"
+        description="Events appear as agents work. Start a simulation or assign tasks to generate activity."
+        compact
+      />
     );
   }
 

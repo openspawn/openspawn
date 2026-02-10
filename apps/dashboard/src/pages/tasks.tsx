@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { PhaseChip } from "../components/phase-chip";
+import { EmptyState } from "../components/ui/empty-state";
 import { useTasks, type Task, useCurrentPhase } from "../hooks";
 
 type SortField = "created" | "priority" | "status" | "title";
@@ -14,11 +15,11 @@ type SortDirection = "asc" | "desc";
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
-  { id: "TODO", label: "To Do", color: "bg-yellow-500" },
-  { id: "IN_PROGRESS", label: "In Progress", color: "bg-purple-500" },
-  { id: "REVIEW", label: "Review", color: "bg-orange-500" },
+  { id: "TODO", label: "To Do", color: "bg-amber-500" },
+  { id: "IN_PROGRESS", label: "In Progress", color: "bg-cyan-500" },
+  { id: "REVIEW", label: "Review", color: "bg-violet-500" },
   { id: "DONE", label: "Done", color: "bg-emerald-500" },
-  { id: "BLOCKED", label: "Blocked", color: "bg-red-500" },
+  { id: "BLOCKED", label: "Blocked", color: "bg-rose-500" },
 ];
 
 function getPriorityVariant(priority: string) {
@@ -56,15 +57,15 @@ function getStatusColor(status: string) {
     case "DONE":
       return "text-emerald-500";
     case "IN_PROGRESS":
-      return "text-purple-500";
+      return "text-cyan-500";
     case "REVIEW":
-      return "text-orange-500";
+      return "text-violet-500";
     case "TODO":
-      return "text-yellow-500";
+      return "text-amber-500";
     case "BACKLOG":
       return "text-slate-400";
     case "BLOCKED":
-      return "text-red-500";
+      return "text-rose-500";
     default:
       return "text-muted-foreground";
   }

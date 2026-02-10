@@ -25,12 +25,15 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { ChartTooltip } from "../components/ui/chart-tooltip";
+import { OceanGradients, OCEAN_COLORS } from "../components/ui/chart-gradients";
 import { PhaseProgress } from "../components/phase-progress";
 import { IdleAgentsWidget } from "../components/idle-agents-widget";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
+import { EmptyState } from "../components/ui/empty-state";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 
 interface StatCardProps {
@@ -90,8 +93,8 @@ function StatCard({ title, value, change, icon: Icon, description }: StatCardPro
 }
 
 function getEventIcon(type: string) {
-  if (type.includes('agent')) return <Bot className="h-4 w-4 text-purple-500" />;
-  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-blue-500" />;
+  if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
+  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-cyan-500" />;
   if (type.includes('credit')) return <Coins className="h-4 w-4 text-amber-500" />;
   return <Activity className="h-4 w-4 text-muted-foreground" />;
 }
@@ -171,10 +174,10 @@ export function DashboardPage() {
   // Real task status counts from simulation (normalized to uppercase)
   const tasksByStatus = useMemo(() => [
     { status: "Backlog", count: tasks.filter(t => t.status?.toUpperCase() === "BACKLOG").length, fill: "#64748b" },
-    { status: "To Do", count: tasks.filter(t => t.status?.toUpperCase() === "TODO").length, fill: "#fbbf24" },
-    { status: "In Progress", count: tasks.filter(t => t.status?.toUpperCase() === "IN_PROGRESS").length, fill: "#a855f7" },
-    { status: "Review", count: tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, fill: "#f97316" },
-    { status: "Done", count: tasks.filter(t => t.status?.toUpperCase() === "DONE").length, fill: "#22c55e" },
+    { status: "To Do", count: tasks.filter(t => t.status?.toUpperCase() === "TODO").length, fill: "#f59e0b" },
+    { status: "In Progress", count: tasks.filter(t => t.status?.toUpperCase() === "IN_PROGRESS").length, fill: "#06b6d4" },
+    { status: "Review", count: tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, fill: "#8b5cf6" },
+    { status: "Done", count: tasks.filter(t => t.status?.toUpperCase() === "DONE").length, fill: "#10b981" },
   ], [tasks]);
 
   // Real credit flow - aggregate last N transactions into buckets
@@ -285,48 +288,47 @@ export function DashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={creditHistory}>
                   <defs>
-                    <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="spent" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                    </linearGradient>
+                    <OceanGradients />
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    className="stroke-border"
+                    stroke="rgba(148,163,184,0.08)"
+                    vertical={false}
                   />
                   <XAxis
                     dataKey="period"
-                    className="text-xs fill-muted-foreground"
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
+                    tickLine={false}
                   />
-                  <YAxis className="text-xs fill-muted-foreground" />
+                  <YAxis
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
+                  />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.5rem",
-                    }}
+                    content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
                   />
                   <Area
                     type="monotone"
                     dataKey="earned"
-                    stroke="#10b981"
-                    strokeWidth={2}
+                    stroke={OCEAN_COLORS.emerald.stroke}
+                    strokeWidth={2.5}
                     fillOpacity={1}
-                    fill="url(#earned)"
-                    isAnimationActive={true}
+                    fill={OCEAN_COLORS.emerald.fill}
+                    animationDuration={1200}
+                    animationEasing="ease-out"
                   />
                   <Area
                     type="monotone"
                     dataKey="spent"
-                    stroke="#f59e0b"
-                    strokeWidth={2}
+                    stroke={OCEAN_COLORS.amber.stroke}
+                    strokeWidth={2.5}
                     fillOpacity={1}
-                    fill="url(#spent)"
-                    isAnimationActive={true}
+                    fill={OCEAN_COLORS.amber.fill}
+                    animationDuration={1200}
+                    animationEasing="ease-out"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -436,12 +438,12 @@ export function DashboardPage() {
               ))}
             </AnimatePresence>
             {events.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Activity className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  No activity yet. Start the simulation to see events.
-                </p>
-              </div>
+              <EmptyState
+                variant="events"
+                title="No activity yet"
+                description="Start the simulation to see events appear here in real-time."
+                compact
+              />
             )}
           </div>
         </CardContent>

@@ -102,7 +102,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           className={cn(
             'absolute inset-0 rounded-full border-2 border-transparent',
-            'border-t-green-400 border-r-green-400/50'
+            'border-t-emerald-400 border-r-emerald-400/50'
           )}
         />
       )}
@@ -120,7 +120,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute inset-0 rounded-full bg-emerald-400/30"
+            className="absolute inset-0 rounded-full bg-slate-400/30"
           />
           <motion.span
             animate={{
@@ -132,7 +132,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
               repeat: Infinity,
               ease: 'easeOut',
             }}
-            className="absolute inset-0 rounded-full border-2 border-emerald-400"
+            className="absolute inset-0 rounded-full border-2 border-slate-400"
           />
         </>
       )}

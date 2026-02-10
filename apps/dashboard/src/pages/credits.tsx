@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { ScrollArea } from "../components/ui/scroll-area";
+import { EmptyState } from "../components/ui/empty-state";
 import { useCredits } from "../hooks/use-credits";
 import { BudgetBurndown } from "../components/budget-burndown";
 import { ModelUsageBreakdown } from "../components/model-usage";
@@ -44,10 +45,12 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
 
   if (transactions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <Coins className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-muted-foreground">No transactions yet</p>
-      </div>
+      <EmptyState
+        variant="credits"
+        title="No credit transactions"
+        description="Credits track agent resource usage. Transactions appear as agents earn and spend."
+        compact
+      />
     );
   }
 
@@ -270,32 +273,48 @@ export function CreditsPage() {
             <div className="h-[300px]">
               {balanceHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={balanceHistory}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <AreaChart data={balanceHistory}>
+                    <defs>
+                      <OceanGradients />
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(148,163,184,0.08)"
+                      vertical={false}
+                    />
                     <XAxis
                       dataKey="time"
-                      className="text-xs fill-muted-foreground"
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                      axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
+                      tickLine={false}
                       interval="preserveStartEnd"
                     />
-                    <YAxis className="text-xs fill-muted-foreground" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "0.5rem",
-                      }}
-                      labelFormatter={(label) => `Time: ${label}`}
-                      formatter={(value: number) => [`${value.toLocaleString()} credits`, "Balance"]}
+                    <YAxis
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
                     />
-                    <Line
+                    <Tooltip
+                      content={
+                        <ChartTooltip
+                          labelFormatter={(l) => `Time: ${l}`}
+                          valueFormatter={(v) => `${v.toLocaleString()} credits`}
+                        />
+                      }
+                    />
+                    <Area
                       type="monotone"
                       dataKey="balance"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
+                      stroke={OCEAN_COLORS.cyan.stroke}
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill={OCEAN_COLORS.cyan.fill}
                       dot={balanceHistory.length < 15}
-                      animationDuration={500}
+                      animationDuration={1200}
+                      animationEasing="ease-out"
                     />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="flex h-full items-center justify-center">
