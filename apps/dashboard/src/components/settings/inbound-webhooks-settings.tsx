@@ -37,10 +37,10 @@ import {
 } from "../ui/select";
 import { cn } from "../../lib/utils";
 import { useNotifications } from "../live-notifications";
-import { useDemoMode } from "../../demo/demo-context";
+import { useDemo } from "../../demo";
 import { graphql } from "../../graphql";
 import { useQuery, useMutation } from "urql";
-import { TaskPriority } from "../../graphql/graphql";
+import { TaskPriority } from "../../graphql/generated/graphql";
 
 const InboundWebhookKeysQuery = graphql(`
   query InboundWebhookKeys($orgId: ID!) {
@@ -139,7 +139,7 @@ interface CreateFormData {
 }
 
 export function InboundWebhooksSettings() {
-  const { isDemoMode } = useDemoMode();
+  const { isDemo } = useDemo();
   const { addNotification } = useNotifications();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -159,13 +159,13 @@ export function InboundWebhooksSettings() {
   const [webhookKeysResult, refetchWebhookKeys] = useQuery({
     query: InboundWebhookKeysQuery,
     variables: { orgId },
-    pause: isDemoMode,
+    pause: isDemo,
   });
 
   const [agentsResult] = useQuery({
     query: AgentsQuery,
     variables: { orgId },
-    pause: isDemoMode,
+    pause: isDemo,
   });
 
   const [, createWebhookKey] = useMutation(CreateInboundWebhookKeyMutation);
@@ -173,8 +173,8 @@ export function InboundWebhooksSettings() {
   const [, rotateWebhookKey] = useMutation(RotateInboundWebhookKeyMutation);
   const [, deleteWebhookKey] = useMutation(DeleteInboundWebhookKeyMutation);
 
-  const webhookKeys = isDemoMode ? [] : webhookKeysResult.data?.inboundWebhookKeys || [];
-  const agents = isDemoMode ? [] : agentsResult.data?.agents || [];
+  const webhookKeys = isDemo ? [] : webhookKeysResult.data?.inboundWebhookKeys || [];
+  const agents = isDemo ? [] : agentsResult.data?.agents || [];
 
   const handleCreate = async () => {
     try {
