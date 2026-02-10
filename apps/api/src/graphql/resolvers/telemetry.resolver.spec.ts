@@ -1,4 +1,3 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { TelemetryResolver } from "./telemetry.resolver";
 import { TelemetryService } from "../../telemetry";
 
@@ -6,13 +5,9 @@ describe("TelemetryResolver", () => {
   let resolver: TelemetryResolver;
   let service: TelemetryService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [TelemetryResolver, TelemetryService],
-    }).compile();
-
-    resolver = module.get<TelemetryResolver>(TelemetryResolver);
-    service = module.get<TelemetryService>(TelemetryService);
+  beforeEach(() => {
+    service = new TelemetryService();
+    resolver = new TelemetryResolver(service);
   });
 
   afterEach(() => {
