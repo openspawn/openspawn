@@ -63,8 +63,8 @@ const MOCK_MATCHES: CapabilityMatch[] = [
 
 const proficiencyColors: Record<Proficiency, string> = {
   basic: "bg-gray-500",
-  standard: "bg-blue-500",
-  expert: "bg-purple-500",
+  standard: "bg-cyan-500",
+  expert: "bg-violet-500",
 };
 
 const proficiencyLabels: Record<Proficiency, string> = {
@@ -193,7 +193,7 @@ export function CapabilityManager({ agentId }: { agentId?: string }) {
                           </div>
                           <div className="flex items-center gap-1">
                             {Array.from({ length: match.score }).map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                              <Star key={i} className="h-4 w-4 fill-amber-500 text-amber-500" />
                             ))}
                           </div>
                         </div>
@@ -250,7 +250,7 @@ export function CapabilityManager({ agentId }: { agentId?: string }) {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+                <TrendingUp className="h-5 w-5 text-emerald-500" />
                 <CardTitle>Agent Capabilities</CardTitle>
               </div>
               <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>

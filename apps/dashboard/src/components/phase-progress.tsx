@@ -56,8 +56,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                   <motion.div
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all relative z-10",
-                      isComplete && "bg-slate-900 border-green-500 text-green-400",
-                      isCurrent && "bg-slate-900 border-blue-500 text-blue-400 ring-4 ring-blue-500/20",
+                      isComplete && "bg-slate-900 border-emerald-500 text-emerald-400",
+                      isCurrent && "bg-slate-900 border-cyan-500 text-cyan-400 ring-4 ring-cyan-500/20",
                       isFuture && "bg-slate-900 border-slate-600 text-slate-500"
                     )}
                     initial={{ scale: 0 }}
@@ -71,8 +71,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                   <div className="text-center">
                     <p className={cn(
                       "text-sm font-medium transition-colors",
-                      isCurrent && "text-blue-400",
-                      isComplete && "text-green-400",
+                      isCurrent && "text-cyan-400",
+                      isComplete && "text-emerald-400",
                       isFuture && "text-slate-500"
                     )}>
                       {phase.name}
@@ -98,7 +98,7 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
               <h3 className="font-semibold text-lg">{phases[currentIndex]?.name}</h3>
               <p className="text-slate-400 text-sm">{phases[currentIndex]?.description}</p>
             </div>
-            <span className="ml-auto px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium">
+            <span className="ml-auto px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm font-medium">
               {phases[currentIndex]?.week}
             </span>
           </div>
@@ -122,8 +122,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                 transition={{ delay: index * 0.05 }}
                 className={cn(
                   "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
-                  isCurrent && "bg-blue-500/10 border-blue-500/50",
-                  isComplete && "bg-green-500/5 border-green-500/30",
+                  isCurrent && "bg-cyan-500/10 border-cyan-500/50",
+                  isComplete && "bg-emerald-500/5 border-emerald-500/30",
                   isFuture && "bg-slate-800/30 border-slate-700",
                   onPhaseClick && "active:scale-[0.98]"
                 )}
@@ -131,8 +131,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                 {/* Icon */}
                 <div className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0",
-                  isComplete && "bg-green-500/20 text-green-400",
-                  isCurrent && "bg-blue-500/20 text-blue-400",
+                  isComplete && "bg-emerald-500/20 text-emerald-400",
+                  isCurrent && "bg-cyan-500/20 text-cyan-400",
                   isFuture && "bg-slate-700 text-slate-500"
                 )}>
                   {isComplete ? '✓' : phase.icon}
@@ -143,8 +143,8 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                   <div className="flex items-center gap-2">
                     <p className={cn(
                       "font-medium text-sm",
-                      isCurrent && "text-blue-400",
-                      isComplete && "text-green-400",
+                      isCurrent && "text-cyan-400",
+                      isComplete && "text-emerald-400",
                       isFuture && "text-slate-500"
                     )}>
                       {phase.name}
@@ -158,7 +158,7 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
 
                 {/* Progress indicator */}
                 {isCurrent && (
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
                 )}
               </motion.button>
             );

@@ -79,8 +79,8 @@ export function BudgetManager() {
     if (percent === null) return "bg-muted";
     if (percent >= 90) return "bg-red-500";
     if (percent >= 80) return "bg-amber-500";
-    if (percent >= 60) return "bg-yellow-500";
-    return "bg-green-500";
+    if (percent >= 60) return "bg-amber-500";
+    return "bg-emerald-500";
   };
 
   return (
@@ -245,7 +245,7 @@ export function BudgetManager() {
                     )}
                   </div>
                   <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-1 text-green-500">
+                    <span className="flex items-center gap-1 text-emerald-500">
                       <TrendingUp className="h-3 w-3" />
                       {budget.currentBalance.toLocaleString()}
                     </span>

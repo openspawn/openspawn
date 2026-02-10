@@ -93,7 +93,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-400" />
+            <Calendar className="w-5 h-5 text-cyan-400" />
             Budget Burn-down
           </CardTitle>
           <Badge variant={projectedOver ? 'destructive' : 'default'} className="text-xs">
@@ -216,15 +216,15 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           {/* Legend */}
           <div className="flex items-center gap-4 mt-4 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-indigo-500 rounded" />
+              <div className="w-3 h-0.5 bg-cyan-500 rounded" />
               <span className="text-slate-400">Actual</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-indigo-500/60 rounded" style={{ borderStyle: 'dashed' }} />
+              <div className="w-3 h-0.5 bg-cyan-500/60 rounded" style={{ borderStyle: 'dashed' }} />
               <span className="text-slate-400">Projected</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-green-500/60 rounded" style={{ borderStyle: 'dashed' }} />
+              <div className="w-3 h-0.5 bg-emerald-500/60 rounded" style={{ borderStyle: 'dashed' }} />
               <span className="text-slate-400">Ideal</span>
             </div>
             <div className="flex items-center gap-1">
@@ -242,7 +242,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           </div>
           <div>
             <p className="text-xs text-slate-400">Remaining</p>
-            <p className="text-lg font-semibold text-green-400">{budgetRemaining.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-emerald-400">{budgetRemaining.toLocaleString()}</p>
           </div>
           <div>
             <p className="text-xs text-slate-400">Daily Rate</p>
@@ -252,7 +252,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
             <p className="text-xs text-slate-400">Runway</p>
             <p className={cn(
               "text-lg font-semibold",
-              runwayDays < daysRemaining ? "text-red-400" : "text-green-400"
+              runwayDays < daysRemaining ? "text-red-400" : "text-emerald-400"
             )}>
               {Math.round(runwayDays)} days
             </p>

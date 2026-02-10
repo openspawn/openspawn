@@ -15,16 +15,16 @@ export function PhaseChip({ phase, className }: PhaseChipProps) {
     <div
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-        "bg-blue-500/10 text-blue-400 border border-blue-500/20",
-        "transition-colors hover:bg-blue-500/15",
+        "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
+        "transition-colors hover:bg-cyan-500/15",
         className
       )}
       title={`${phase.name}: ${phase.description}`}
     >
       <span>{phase.icon}</span>
       <span>{phase.name}</span>
-      <span className="text-blue-400/60">•</span>
-      <span className="text-blue-400/80">{phase.week}</span>
+      <span className="text-cyan-400/60">•</span>
+      <span className="text-cyan-400/80">{phase.week}</span>
     </div>
   );
 }

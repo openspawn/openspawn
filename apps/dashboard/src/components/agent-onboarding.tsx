@@ -135,7 +135,7 @@ export function AgentOnboarding() {
         <CardContent>
           {pending.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Check className="h-12 w-12 text-green-500/50 mb-4" />
+              <Check className="h-12 w-12 text-emerald-500/50 mb-4" />
               <p className="text-muted-foreground">No pending agents</p>
             </div>
           ) : (

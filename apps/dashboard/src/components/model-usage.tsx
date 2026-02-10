@@ -84,7 +84,7 @@ export function ModelUsageBreakdown() {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-purple-400" />
+            <Cpu className="w-5 h-5 text-violet-400" />
             Model Usage
           </CardTitle>
           <Badge variant="outline" className="text-xs">
@@ -96,17 +96,17 @@ export function ModelUsageBreakdown() {
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center p-3 rounded-lg bg-slate-700/30">
-            <DollarSign className="w-5 h-5 mx-auto mb-1 text-green-400" />
+            <DollarSign className="w-5 h-5 mx-auto mb-1 text-emerald-400" />
             <p className="text-2xl font-bold">${totalCost.toFixed(0)}</p>
             <p className="text-xs text-slate-400">Total Cost</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-slate-700/30">
-            <Zap className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
+            <Zap className="w-5 h-5 mx-auto mb-1 text-amber-400" />
             <p className="text-2xl font-bold">{(totalCalls / 1000).toFixed(1)}k</p>
             <p className="text-xs text-slate-400">API Calls</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-slate-700/30">
-            <TrendingUp className="w-5 h-5 mx-auto mb-1 text-blue-400" />
+            <TrendingUp className="w-5 h-5 mx-auto mb-1 text-cyan-400" />
             <p className="text-2xl font-bold">{(totalTokens / 1000000).toFixed(1)}M</p>
             <p className="text-xs text-slate-400">Tokens</p>
           </div>
@@ -202,7 +202,7 @@ export function ModelUsageBreakdown() {
               <div className="text-right">
                 <p className={cn(
                   "font-semibold",
-                  model.cost === 0 ? "text-green-400" : "text-slate-200"
+                  model.cost === 0 ? "text-emerald-400" : "text-slate-200"
                 )}>
                   {model.cost === 0 ? 'Free' : `$${model.cost.toFixed(2)}`}
                 </p>

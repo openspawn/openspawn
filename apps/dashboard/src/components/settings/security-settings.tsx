@@ -160,7 +160,7 @@ export function SecuritySettings() {
             <div
               className={`flex items-center gap-2 rounded-md p-3 text-sm ${
                 passwordStatus.type === "success"
-                  ? "bg-green-500/10 text-green-500"
+                  ? "bg-emerald-500/10 text-emerald-500"
                   : "bg-red-500/10 text-red-500"
               }`}
             >
@@ -197,9 +197,9 @@ export function SecuritySettings() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`rounded-full p-2 ${user?.totpEnabled ? 'bg-green-500/10' : 'bg-muted'}`}>
+              <div className={`rounded-full p-2 ${user?.totpEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}>
                 {user?.totpEnabled ? (
-                  <Check className="h-5 w-5 text-green-500" />
+                  <Check className="h-5 w-5 text-emerald-500" />
                 ) : (
                   <X className="h-5 w-5 text-muted-foreground" />
                 )}
@@ -233,7 +233,7 @@ export function SecuritySettings() {
             <div
               className={`mt-4 flex items-center gap-2 rounded-md p-3 text-sm ${
                 twoFaStatus.type === "success"
-                  ? "bg-green-500/10 text-green-500"
+                  ? "bg-emerald-500/10 text-emerald-500"
                   : "bg-red-500/10 text-red-500"
               }`}
             >
@@ -265,7 +265,7 @@ export function SecuritySettings() {
                   This browser · Last active now
                 </p>
               </div>
-              <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-medium text-green-500">
+              <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-500">
                 Active
               </span>
             </div>

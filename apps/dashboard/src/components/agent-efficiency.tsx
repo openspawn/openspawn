@@ -78,7 +78,7 @@ const demoEfficiencyData: AgentEfficiency[] = [
 ];
 
 const rankIcons = [
-  { icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-500/20' },
+  { icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-500/20' },
   { icon: Medal, color: 'text-slate-300', bg: 'bg-slate-500/20' },
   { icon: Medal, color: 'text-amber-600', bg: 'bg-amber-600/20' },
 ];
@@ -92,7 +92,7 @@ export function AgentEfficiencyLeaderboard() {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-400" />
+            <Trophy className="w-5 h-5 text-amber-400" />
             Efficiency Leaderboard
           </CardTitle>
           <Badge variant="outline" className="text-xs">
@@ -114,7 +114,7 @@ export function AgentEfficiencyLeaderboard() {
               transition={{ delay: index * 0.1 }}
               className={cn(
                 'flex items-center gap-3 p-3 rounded-lg',
-                index === 0 && 'bg-yellow-500/10 border border-yellow-500/30',
+                index === 0 && 'bg-amber-500/10 border border-yellow-500/30',
                 index === 1 && 'bg-slate-500/10 border border-slate-500/30',
                 index === 2 && 'bg-amber-600/10 border border-amber-600/30',
                 index > 2 && 'bg-slate-700/30'
@@ -159,7 +159,7 @@ export function AgentEfficiencyLeaderboard() {
               <div className="text-right">
                 <div className="flex items-center gap-1">
                   <span className="text-lg font-bold">{agent.efficiency.toFixed(2)}</span>
-                  {agent.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-400" />}
+                  {agent.trend === 'up' && <TrendingUp className="w-4 h-4 text-emerald-400" />}
                   {agent.trend === 'down' && <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />}
                 </div>
                 <p className="text-[10px] text-slate-500">
@@ -178,9 +178,9 @@ export function AgentEfficiencyLeaderboard() {
 export function AgentEfficiencyBadge({ efficiency, trend }: { efficiency: number; trend: 'up' | 'down' | 'stable' }) {
   return (
     <div className="flex items-center gap-1">
-      <Zap className="w-3 h-3 text-yellow-400" />
+      <Zap className="w-3 h-3 text-amber-400" />
       <span className="text-xs font-medium">{efficiency.toFixed(2)}</span>
-      {trend === 'up' && <TrendingUp className="w-3 h-3 text-green-400" />}
+      {trend === 'up' && <TrendingUp className="w-3 h-3 text-emerald-400" />}
       {trend === 'down' && <TrendingUp className="w-3 h-3 text-red-400 rotate-180" />}
     </div>
   );

@@ -244,7 +244,7 @@ function TasksTab({ agent }: { agent: Agent }) {
           <div className="text-2xl font-bold text-amber-500">{tasksByStatus.inProgress.length}</div>
           <div className="text-xs text-muted-foreground">In Progress</div>
         </div>
-        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+        <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
           <div className="text-2xl font-bold text-blue-500">{tasksByStatus.pending.length}</div>
           <div className="text-xs text-muted-foreground">Pending</div>
         </div>

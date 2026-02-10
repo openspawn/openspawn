@@ -89,7 +89,7 @@ export function ReputationHistory({
                     </div>
                     <div
                       className={`text-sm font-semibold ${
-                        event.impact >= 0 ? "text-green-500" : "text-red-500"
+                        event.impact >= 0 ? "text-emerald-500" : "text-red-500"
                       }`}
                     >
                       {event.impact >= 0 ? "+" : ""}

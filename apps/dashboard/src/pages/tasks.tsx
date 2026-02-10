@@ -40,9 +40,9 @@ function getPriorityVariant(priority: string) {
 function getPriorityColor(priority: string) {
   switch (priority?.toUpperCase()) {
     case "URGENT":
-      return "text-red-500";
+      return "text-rose-500";
     case "HIGH":
-      return "text-orange-500";
+      return "text-violet-500";
     case "NORMAL":
       return "text-blue-500";
     case "LOW":
@@ -132,7 +132,7 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
                   </Badge>
                 )}
                 {createdViaWebhook && (
-                  <Badge variant="outline" className="text-xs text-blue-500 border-blue-500/30">
+                  <Badge variant="outline" className="text-xs text-cyan-500 border-cyan-500/30">
                     <Webhook className="w-3 h-3 mr-1" />
                     webhook
                   </Badge>

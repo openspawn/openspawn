@@ -487,9 +487,9 @@ export function GitHubSettings() {
                   >
                     <div className="flex items-center gap-3">
                       {link.sourceType === "github_pr" ? (
-                        <GitPullRequest className="h-4 w-4 text-purple-500" />
+                        <GitPullRequest className="h-4 w-4 text-violet-500" />
                       ) : (
-                        <AlertCircle className="h-4 w-4 text-green-500" />
+                        <AlertCircle className="h-4 w-4 text-emerald-500" />
                       )}
                       <div>
                         <p className="text-sm font-medium">

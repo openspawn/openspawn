@@ -25,15 +25,12 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { ChartTooltip } from "../components/ui/chart-tooltip";
-import { OceanGradients, OCEAN_COLORS } from "../components/ui/chart-gradients";
 import { PhaseProgress } from "../components/phase-progress";
 import { IdleAgentsWidget } from "../components/idle-agents-widget";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
-import { EmptyState } from "../components/ui/empty-state";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 
 interface StatCardProps {
@@ -94,7 +91,7 @@ function StatCard({ title, value, change, icon: Icon, description }: StatCardPro
 
 function getEventIcon(type: string) {
   if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
-  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-cyan-500" />;
+  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-blue-500" />;
   if (type.includes('credit')) return <Coins className="h-4 w-4 text-amber-500" />;
   return <Activity className="h-4 w-4 text-muted-foreground" />;
 }
@@ -288,47 +285,48 @@ export function DashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={creditHistory}>
                   <defs>
-                    <OceanGradients />
+                    <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="spent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(148,163,184,0.08)"
-                    vertical={false}
+                    className="stroke-border"
                   />
                   <XAxis
                     dataKey="period"
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
-                    tickLine={false}
+                    className="text-xs fill-muted-foreground"
                   />
-                  <YAxis
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
-                  />
+                  <YAxis className="text-xs fill-muted-foreground" />
                   <Tooltip
-                    content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "0.5rem",
+                    }}
                   />
                   <Area
                     type="monotone"
                     dataKey="earned"
-                    stroke={OCEAN_COLORS.emerald.stroke}
-                    strokeWidth={2.5}
+                    stroke="#10b981"
+                    strokeWidth={2}
                     fillOpacity={1}
-                    fill={OCEAN_COLORS.emerald.fill}
-                    animationDuration={1200}
-                    animationEasing="ease-out"
+                    fill="url(#earned)"
+                    isAnimationActive={true}
                   />
                   <Area
                     type="monotone"
                     dataKey="spent"
-                    stroke={OCEAN_COLORS.amber.stroke}
-                    strokeWidth={2.5}
+                    stroke="#f59e0b"
+                    strokeWidth={2}
                     fillOpacity={1}
-                    fill={OCEAN_COLORS.amber.fill}
-                    animationDuration={1200}
-                    animationEasing="ease-out"
+                    fill="url(#spent)"
+                    isAnimationActive={true}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -438,12 +436,12 @@ export function DashboardPage() {
               ))}
             </AnimatePresence>
             {events.length === 0 && (
-              <EmptyState
-                variant="events"
-                title="No activity yet"
-                description="Start the simulation to see events appear here in real-time."
-                compact
-              />
+              <div className="flex flex-col items-center justify-center py-8">
+                <Activity className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No activity yet. Start the simulation to see events.
+                </p>
+              </div>
             )}
           </div>
         </CardContent>
