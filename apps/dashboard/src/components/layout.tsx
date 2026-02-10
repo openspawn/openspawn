@@ -409,7 +409,40 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Main content */}
           <main className="flex-1 overflow-auto">
-            <div className="container mx-auto px-4 py-4 sm:p-6">{children}</div>
+            <div className="container mx-auto px-4 py-4 sm:p-6 pb-20">{children}</div>
+            
+            {/* Footer Badge */}
+            <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30">
+              <div className="container mx-auto flex items-center justify-between text-xs">
+                <a
+                  href="https://github.com/openspawn/openspawn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors"
+                >
+                  <span className="text-base">🌊</span>
+                  <span className="font-medium">BikiniBottom</span>
+                  <span className="hidden sm:inline">—</span>
+                  <span className="hidden sm:inline">Open Source Multi-Agent Coordination</span>
+                </a>
+                <div className="flex items-center gap-3">
+                  <a
+                    href="https://github.com/openspawn/openspawn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 rounded-md text-slate-300 hover:text-white transition-all group"
+                  >
+                    <Github className="h-3 w-3" />
+                    <span className="font-medium">Star</span>
+                    <img 
+                      src="https://img.shields.io/github/stars/openspawn/openspawn?style=social" 
+                      alt="GitHub stars" 
+                      className="h-3 opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                    />
+                  </a>
+                </div>
+              </div>
+            </div>
           </main>
         </div>
       </div>
