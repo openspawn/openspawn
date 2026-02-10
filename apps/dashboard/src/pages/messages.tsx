@@ -19,6 +19,7 @@ import { Button } from '../components/ui/button';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { cn } from '../lib/utils';
+import { EmptyState } from '../components/ui/empty-state';
 import { getAgentAvatarUrl } from '../lib/avatar';
 import { PhaseChip } from '../components/phase-chip';
 import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
@@ -714,6 +715,26 @@ export function MessagesPage() {
   const { currentPhase } = useCurrentPhase();
 
   const loading = messagesLoading || agentsLoading;
+
+  if (!loading && messages.length === 0) {
+    return (
+      <div className="p-3 md:p-6 space-y-4 md:space-y-6">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold">Agent Communications</h1>
+          <p className="text-slate-400 text-xs md:text-sm">Watch your agents coordinate in real-time</p>
+        </div>
+        <Card className="bg-slate-800/30 border-slate-700">
+          <CardContent>
+            <EmptyState
+              variant="messages"
+              title="No messages yet"
+              description="Agents will communicate here once tasks begin. Start a task to see real-time coordination."
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading && messages.length === 0) {
     return (
