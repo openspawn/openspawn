@@ -220,13 +220,16 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
     getScrollElement: () => parentRef.current,
     estimateSize: () => 120,
     overscan: 5,
+    measureElement: (element) => element.getBoundingClientRect().height,
   });
+
+  const totalSize = virtualizer.getTotalSize();
 
   return (
     <div className="relative">
       <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
-      <div ref={parentRef} className="h-[600px] overflow-auto">
-        <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
+      <div ref={parentRef} className="overflow-auto" style={{ maxHeight: '600px', height: Math.min(totalSize + 16, 600) }}>
+        <div style={{ height: `${totalSize}px`, position: 'relative' }}>
           <AnimatePresence mode="popLayout">
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const msg = filtered[virtualRow.index];
@@ -235,6 +238,8 @@ function FeedVirtualList({ filtered }: { filtered: Message[] }) {
               return (
                 <motion.div
                   key={msg.id}
+                  ref={virtualizer.measureElement}
+                  data-index={virtualRow.index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
@@ -479,9 +484,9 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
       <motion.div
         initial={false}
         animate={{ height: filtersExpanded ? 'auto' : '40px' }}
-        className="overflow-hidden"
+        className={filtersExpanded ? 'overflow-visible' : 'overflow-hidden'}
       >
-        <div className="flex items-center gap-2 flex-wrap bg-slate-800/50 border border-slate-700 rounded-lg p-2">
+        <div className="flex items-center gap-2 flex-wrap bg-slate-800/50 border border-slate-700 rounded-lg p-2 overflow-visible">
           {/* Toggle filters button */}
           <Button
             variant="ghost"
@@ -530,7 +535,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full mt-1 z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
+                        className="absolute top-full mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
                       >
                         <ScrollArea className="max-h-[280px]">
                           <div className="p-1">
@@ -596,7 +601,7 @@ function ContextLinkedMessages({ messages, agents }: { messages: Message[]; agen
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute top-full mt-1 z-20 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
+                          className="absolute top-full mt-1 z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] max-h-[280px] overflow-hidden"
                         >
                           <ScrollArea className="max-h-[280px]">
                             <div className="p-1">
@@ -813,7 +818,7 @@ export function MessagesPage() {
         </TabsContent>
 
         <TabsContent value="context">
-          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4 relative">
+          <Card className="bg-slate-800/30 border-slate-700 p-3 md:p-4 relative overflow-visible">
             <p className="text-xs md:text-sm text-slate-400 mb-3 md:mb-4">
               <strong>Context-Linked:</strong> Filter by agent or task to see related discussions.
             </p>

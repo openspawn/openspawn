@@ -81,10 +81,10 @@ async function getLayoutedElements(
 ): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
   
-  const nodeWidth = options.compact ? 80 : 140;
-  const nodeHeight = options.compact ? 56 : 80;
-  const horizontalSpacing = options.compact ? 30 : 50;
-  const verticalSpacing = options.compact ? 80 : 120;
+  const nodeWidth = options.compact ? 90 : 160;
+  const nodeHeight = options.compact ? 64 : 96;
+  const horizontalSpacing = options.compact ? 40 : 70;
+  const verticalSpacing = options.compact ? 100 : 150;
   
   const elkGraph = {
     id: "root",
@@ -95,7 +95,8 @@ async function getLayoutedElements(
       "elk.layered.spacing.nodeNodeBetweenLayers": String(verticalSpacing),
       "elk.layered.spacing.edgeNodeBetweenLayers": "25",
       "elk.spacing.componentComponent": String(horizontalSpacing),
-      "elk.layered.nodePlacement.strategy": "SIMPLE",
+      "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+      "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
     },
     children: nodes.map((node) => ({
       id: node.id,
@@ -210,8 +211,8 @@ function AgentNode({ data, selected }: NodeProps) {
   const isActive = nodeData.status === "active" && activityLevel !== 'idle';
   const isIdle = activityLevel === 'idle';
   
-  const nodeWidth = compact ? 80 : 140;
-  const nodeHeight = compact ? 56 : 80;
+  const nodeWidth = compact ? 90 : 160;
+  const nodeHeight = compact ? 64 : 96;
   
   const avatarUrl = useMemo(() => {
     if (nodeData.isHuman) return null;
@@ -342,7 +343,7 @@ function AgentNode({ data, selected }: NodeProps) {
                 <img 
                   src={avatarUrl} 
                   alt={nodeData.label}
-                  className="w-6 h-6 rounded-full ring-1 ring-white/20"
+                  className="w-8 h-8 rounded-full ring-2 ring-white/20"
                 />
               ) : (
                 <span className="text-lg leading-none">🤖</span>
@@ -351,7 +352,10 @@ function AgentNode({ data, selected }: NodeProps) {
           )}
 
           {/* Name */}
-          <div className={`font-semibold text-white text-center truncate w-full ${compact ? 'text-[9px]' : 'text-xs'}`}>
+          <div 
+            className={`font-semibold text-white text-center truncate w-full ${compact ? 'text-[10px]' : 'text-sm'}`}
+            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
+          >
             {compact ? (nodeData.isHuman ? "👤 " : "") + nodeData.label.split(' ')[0] : nodeData.label}
           </div>
 
@@ -438,13 +442,27 @@ function TaskFlowEdge({
 
   return (
     <>
+      {/* Glow underlay for active edges */}
+      {messageCount > 0 && (
+        <BaseEdge
+          id={`${id}-glow`}
+          path={edgePath}
+          style={{
+            ...style,
+            strokeWidth: strokeWidth + 4,
+            opacity: 0.15,
+            filter: 'blur(4px)',
+          }}
+        />
+      )}
       <BaseEdge 
         id={id} 
         path={edgePath} 
         style={{
           ...style,
           strokeWidth,
-          opacity: selected ? 1 : (messageCount > 0 ? 0.8 : 0.4),
+          strokeDasharray: messageCount > 0 ? undefined : '6 4',
+          opacity: selected ? 1 : (messageCount > 0 ? 0.85 : 0.35),
         }} 
         markerEnd={markerEnd} 
       />
