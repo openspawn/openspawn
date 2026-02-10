@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 /* ------------------------------------------------------------------ */
-/*  Lightweight native <select> wrappers (no Radix dependency)        */
+/*  Lightweight native <select> wrappers (semantic theme colors)      */
 /* ------------------------------------------------------------------ */
 
 const Select = React.forwardRef<
@@ -12,8 +12,8 @@ const Select = React.forwardRef<
   <select
     ref={ref}
     className={cn(
-      "flex h-9 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1 text-sm shadow-sm transition-colors",
-      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500",
+      "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors",
+      "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       "disabled:cursor-not-allowed disabled:opacity-50",
       className
     )}
@@ -24,7 +24,7 @@ const Select = React.forwardRef<
 ));
 Select.displayName = "Select";
 
-/* Re-export pieces that inbound-webhooks-settings.tsx imports */
+/* Re-export pieces for compatibility */
 
 const SelectTrigger = React.forwardRef<
   HTMLDivElement,
@@ -33,8 +33,8 @@ const SelectTrigger = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex h-9 w-full items-center justify-between rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm",
-      "focus:outline-none focus:ring-1 focus:ring-blue-500",
+      "flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
+      "focus:outline-none focus:ring-1 focus:ring-ring",
       className
     )}
     {...props}
@@ -45,14 +45,14 @@ const SelectTrigger = React.forwardRef<
 SelectTrigger.displayName = "SelectTrigger";
 
 function SelectValue({ placeholder }: { placeholder?: string }) {
-  return <span className="text-zinc-400">{placeholder}</span>;
+  return <span className="text-muted-foreground">{placeholder}</span>;
 }
 
 function SelectContent({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-md border border-zinc-700 bg-zinc-900 p-1 shadow-md",
+        "rounded-md border border-border bg-popover p-1 shadow-md text-popover-foreground",
         className
       )}
       {...props}
