@@ -27,6 +27,7 @@ export const AgentFieldsFragmentDocument = graphql(`
     lastPromotionAt
     lifetimeEarnings
     domain
+    teamId
   }
 `);
 

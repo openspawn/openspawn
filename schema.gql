@@ -42,6 +42,7 @@ type AgentType {
   domain: String
   id: ID!
   lastActivityAt: DateTime
+  teamId: String
   lastPromotionAt: DateTime
   level: Int!
   lifetimeEarnings: Int!
