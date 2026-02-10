@@ -23,12 +23,13 @@ import {
   Github,
   Search,
   Signal,
+  ChevronLeft,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { ThemeToggle } from "./theme-toggle";
-import { TooltipProvider } from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,6 +72,30 @@ const bottomNavItems: { name: string; href: string; icon: typeof LayoutDashboard
   { name: "Messages", href: "/messages", icon: MessageSquare },
 ];
 
+const SIDEBAR_EXPANDED_W = 256; // 16rem = w-64
+const SIDEBAR_COLLAPSED_W = 64;
+const SIDEBAR_STORAGE_KEY = "bb-sidebar-collapsed";
+
+function useSidebarCollapsed() {
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const toggle = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  return { collapsed, toggle } as const;
+}
+
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -80,6 +105,9 @@ export function Layout({ children }: LayoutProps) {
   const { user, logout, isAuthenticated } = useAuth();
   const { activeCount } = usePresence();
   const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
+  const { collapsed: sidebarCollapsed, toggle: toggleSidebar } = useSidebarCollapsed();
+
+  const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
   // Scroll direction tracking for hiding mobile header
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -138,31 +166,43 @@ export function Layout({ children }: LayoutProps) {
     <TooltipProvider>
       <div className="flex h-screen bg-background">
         {/* Sidebar */}
-        <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-border lg:flex">
+        <motion.aside
+          className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden"
+          animate={{ width: sidebarWidth }}
+          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+        >
           {/* Logo */}
-          <div className="flex h-16 items-center gap-2 border-b border-border px-6 relative overflow-hidden">
+          <div className="flex h-16 items-center gap-2 border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
-            <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                BikiniBottom
-              </span>
-              <span className="text-[9px] text-muted-foreground tracking-wide">
-                Multi-Agent Coordination
-              </span>
-            </div>
-            {isDemo && activeCount > 0 && (
+            <Bot className="h-6 w-6 flex-shrink-0 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+            {!sidebarCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col overflow-hidden whitespace-nowrap"
+              >
+                <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  BikiniBottom
+                </span>
+                <span className="text-[9px] text-muted-foreground tracking-wide">
+                  Multi-Agent Coordination
+                </span>
+              </motion.div>
+            )}
+            {!sidebarCollapsed && isDemo && activeCount > 0 && (
               <ActiveAgentsBadge count={activeCount} className="ml-auto" />
             )}
           </div>
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 px-3 py-4">
+          <ScrollArea className="flex-1 px-2 py-4">
             <nav className="flex flex-col gap-1">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
-                return (
-                  <Link key={item.name} to={item.href} className="relative" {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
+                const linkContent = (
+                  <Link key={item.name} to={item.href} className="relative block" {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active"
@@ -173,132 +213,281 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start gap-3 relative z-10",
+                        "w-full relative z-10",
+                        sidebarCollapsed ? "justify-center px-0" : "justify-start gap-3",
                         isActive && "text-primary hover:bg-transparent"
                       )}
                     >
-                      <item.icon className="h-4 w-4" />
-                      {item.name}
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      {!sidebarCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden whitespace-nowrap"
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
                     </Button>
                   </Link>
                 );
+
+                if (sidebarCollapsed) {
+                  return (
+                    <Tooltip key={item.name} delayDuration={0}>
+                      <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+                      <TooltipContent side="right" sideOffset={8}>
+                        {item.name}
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }
+                return linkContent;
               })}
             </nav>
           </ScrollArea>
 
           {/* Demo Toggle */}
-          <div className="border-t border-border p-3">
-            <Button
-              onClick={handleToggleDemo}
-              variant={isDemo ? "default" : "outline"}
-              size="sm"
-              className="w-full gap-2"
-            >
-              {isDemo ? (
-                <>
-                  <Square className="h-3 w-3" />
-                  Exit Demo
-                </>
-              ) : (
-                <>
-                  <Play className="h-3 w-3" />
-                  Demo Mode
-                </>
+          {!sidebarCollapsed ? (
+            <div className="border-t border-border p-3">
+              <Button
+                onClick={handleToggleDemo}
+                variant={isDemo ? "default" : "outline"}
+                size="sm"
+                className="w-full gap-2"
+              >
+                {isDemo ? (
+                  <>
+                    <Square className="h-3 w-3" />
+                    Exit Demo
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-3 w-3" />
+                    Demo Mode
+                  </>
+                )}
+              </Button>
+              {isDemo && (
+                <div className="mt-2">
+                  <DemoControls compact />
+                </div>
               )}
-            </Button>
-            {isDemo && (
-              <div className="mt-2">
-                <DemoControls compact />
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="border-t border-border p-2 flex justify-center">
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleToggleDemo}
+                    variant={isDemo ? "default" : "outline"}
+                    size="icon"
+                    className="h-8 w-8"
+                  >
+                    {isDemo ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>
+                  {isDemo ? "Exit Demo" : "Demo Mode"}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          )}
 
           {/* Help Links */}
-          <div className="border-t border-border px-3 py-2">
-            <div className="flex flex-col gap-1">
-              <a
-                href="https://openspawn.github.io/openspawn/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-              >
-                <BookOpen className="h-4 w-4" />
-                Documentation
-                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
-              </a>
-              <a
-                href="https://github.com/openspawn/openspawn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-              >
-                <Github className="h-4 w-4" />
-                GitHub
-                <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
-              </a>
-              {hasCompletedOnboarding && (
-                <button
-                  onClick={resetOnboarding}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+          {!sidebarCollapsed ? (
+            <div className="border-t border-border px-3 py-2">
+              <div className="flex flex-col gap-1">
+                <a
+                  href="https://openspawn.github.io/openspawn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
                 >
-                  <HelpCircle className="h-4 w-4" />
-                  Restart Tour
-                </button>
-              )}
+                  <BookOpen className="h-4 w-4" />
+                  Documentation
+                  <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                </a>
+                <a
+                  href="https://github.com/openspawn/openspawn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                >
+                  <Github className="h-4 w-4" />
+                  GitHub
+                  <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
+                </a>
+                {hasCompletedOnboarding && (
+                  <button
+                    onClick={resetOnboarding}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    Restart Tour
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="border-t border-border py-2 flex flex-col items-center gap-1">
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <a
+                    href="https://openspawn.github.io/openspawn/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>Documentation</TooltipContent>
+              </Tooltip>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <a
+                    href="https://github.com/openspawn/openspawn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                  >
+                    <Github className="h-4 w-4" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>GitHub</TooltipContent>
+              </Tooltip>
+            </div>
+          )}
 
           {/* User & Footer */}
-          <div className="border-t border-border p-4 space-y-3">
-            {isAuthenticated && user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start gap-3 h-auto py-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-xs">
-                        {getInitials(user.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col items-start text-left">
-                      <span className="text-sm font-medium">{user.name}</span>
-                      <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
-                    </div>
+          {!sidebarCollapsed ? (
+            <div className="border-t border-border p-4 space-y-3">
+              {isAuthenticated && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-start gap-3 h-auto py-2">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarFallback className="text-xs">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col items-start text-left overflow-hidden">
+                        <span className="text-sm font-medium truncate">{user.name}</span>
+                        <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span>{user.name}</span>
+                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings/profile" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : !isDemo ? (
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Sign in
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                      <span>{user.name}</span>
-                      <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings/profile" className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Profile
+                </Link>
+              ) : null}
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>v0.1.0</span>
+                <ThemeToggle />
+              </div>
+            </div>
+          ) : (
+            <div className="border-t border-border py-3 flex flex-col items-center gap-2">
+              {isAuthenticated && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="right" align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span>{user.name}</span>
+                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings/profile" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : !isDemo ? (
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link to="/login">
+                      <Button variant="outline" size="icon" className="h-8 w-8">
+                        <User className="h-4 w-4" />
+                      </Button>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : !isDemo ? (
-              <Link to="/login">
-                <Button variant="outline" size="sm" className="w-full">
-                  Sign in
-                </Button>
-              </Link>
-            ) : null}
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>v0.1.0</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={8}>Sign in</TooltipContent>
+                </Tooltip>
+              ) : null}
               <ThemeToggle />
             </div>
+          )}
+
+          {/* Collapse toggle */}
+          <div className="border-t border-border p-2 flex justify-center">
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={toggleSidebar}
+                  aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                >
+                  <motion.div
+                    animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
+                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </motion.div>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={8}>
+                {sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              </TooltipContent>
+            </Tooltip>
           </div>
-        </aside>
+        </motion.aside>
 
         {/* Mobile drawer overlay */}
         {mobileMenuOpen && (
@@ -508,8 +697,39 @@ export function Layout({ children }: LayoutProps) {
           <main ref={mainContentRef} className="flex-1 overflow-auto">
             <div className="mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 pb-28 sm:pb-20 max-w-7xl">{children}</div>
             
-            {/* Footer Badge */}
-            <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 lg:left-64 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden sm:flex lg:flex">
+            {/* Footer Badge — mobile/tablet (no sidebar offset) */}
+            <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden sm:flex lg:hidden">
+              <div className="container mx-auto flex items-center justify-between text-xs">
+                <a
+                  href="https://github.com/openspawn/openspawn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors"
+                >
+                  <span className="text-base">🌊</span>
+                  <span className="font-medium">BikiniBottom</span>
+                  <span className="hidden sm:inline">—</span>
+                  <span className="hidden sm:inline">Open Source Multi-Agent Coordination</span>
+                </a>
+                <div className="flex items-center gap-3">
+                  <a
+                    href="https://github.com/openspawn/openspawn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 rounded-md text-slate-300 hover:text-white transition-all group"
+                  >
+                    <Github className="h-3 w-3" />
+                    <span className="font-medium">Star</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {/* Footer Badge — desktop (tracks sidebar width) */}
+            <motion.div
+              animate={{ left: sidebarWidth }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="fixed bottom-0 right-0 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-900/95 backdrop-blur-sm border-t border-slate-800/50 px-4 py-2 z-30 hidden lg:flex"
+            >
               <div className="container mx-auto flex items-center justify-between text-xs">
                 <a
                   href="https://github.com/openspawn/openspawn"
@@ -539,7 +759,7 @@ export function Layout({ children }: LayoutProps) {
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </main>
 
           {/* Mobile bottom navigation bar */}
