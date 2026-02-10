@@ -22,6 +22,8 @@ type Agent = AgentFieldsFragment;
 interface AgentDetailPanelProps {
   agentId: string | null;
   onClose: () => void;
+  /** Render inline (for split-panel) instead of as a fixed overlay */
+  inline?: boolean;
 }
 
 // Level colors matching network page
@@ -631,7 +633,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
   );
 }
 
-export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
+export function AgentDetailPanel({ agentId, onClose, inline }: AgentDetailPanelProps) {
   const { agents } = useAgents();
   const [activeTab, setActiveTab] = useState("overview");
   
@@ -653,26 +655,8 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
 
   const levelColor = getLevelColor(agent.level);
 
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-end">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        />
-
-        {/* Panel */}
-        <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="relative h-full w-full max-w-2xl bg-background border-l border-border shadow-2xl flex flex-col"
-        >
+  const panelContent = (
+    <>
           {/* Header */}
           <div 
             className="flex-shrink-0 p-6 border-b border-border"
@@ -779,6 +763,31 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
               </div>
             </ScrollArea>
           </Tabs>
+    </>
+  );
+
+  if (inline) {
+    return <div className="h-full flex flex-col bg-background">{panelContent}</div>;
+  }
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-end">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        />
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          className="relative h-full w-full max-w-2xl bg-background border-l border-border shadow-2xl flex flex-col"
+        >
+          {panelContent}
         </motion.div>
       </div>
     </AnimatePresence>

@@ -9,6 +9,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { PhaseChip } from "../components/phase-chip";
 import { EmptyState } from "../components/ui/empty-state";
 import { useTasks, type Task, useCurrentPhase } from "../hooks";
+import { SplitPanel } from "../components/ui/split-panel";
 
 type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
@@ -203,13 +204,8 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
   const hasRejection = task.rejection && task.status === "REVIEW";
   
   return (
-    <motion.div
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed right-0 top-0 h-full w-full sm:w-[400px] bg-background border-l border-border shadow-xl z-30 flex flex-col"
-    >
+    <div className="h-full bg-background flex flex-col">
+
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
@@ -399,7 +395,7 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -628,7 +624,11 @@ export function TasksPage() {
   }
 
   return (
-    <div className={`space-y-6 transition-all ${selectedTask ? "mr-0 sm:mr-[400px]" : ""}`}>
+    <SplitPanel
+      storageKey="tasks"
+      defaultLeftWidth={55}
+      rightOpen={!!selectedTask}
+      left={<div className="p-4 space-y-6">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -733,15 +733,15 @@ export function TasksPage() {
         </TabsContent>
       </Tabs>
       
-      {/* Task Detail Sidebar - no backdrop, stays open */}
-      <AnimatePresence>
-        {selectedTask && (
+    </div>}
+      right={
+        selectedTask ? (
           <TaskDetailSidebar 
             task={selectedTask} 
             onClose={() => setSelectedTask(null)} 
           />
-        )}
-      </AnimatePresence>
-    </div>
+        ) : null
+      }
+    />
   );
 }
