@@ -106,7 +106,7 @@ export function SplitPanel({
       {/* Desktop: side-by-side */}
       <div
         ref={containerRef}
-        className="hidden md:flex h-[calc(100vh-12rem)] w-full overflow-hidden rounded-lg border border-border"
+        className="hidden md:flex h-[calc(100vh-12rem)] w-full overflow-hidden"
       >
         {/* Left panel */}
         <motion.div
