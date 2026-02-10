@@ -7,3 +7,4 @@ export { MessageResolver } from "./message.resolver";
 export { DirectMessageResolver } from "./direct-message.resolver";
 export { WebhookResolver } from "./webhook.resolver";
 export { GitHubConnectionResolver } from "./github-connection.resolver";
+export { LinearConnectionResolver } from "./linear-connection.resolver";

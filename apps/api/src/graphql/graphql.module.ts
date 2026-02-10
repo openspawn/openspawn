@@ -8,6 +8,7 @@ import { AgentsModule } from "../agents";
 import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
 import { GitHubModule } from "../github";
+import { LinearModule } from "../linear";
 import { InboundWebhooksModule } from "../inbound-webhooks/inbound-webhooks.module";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
@@ -20,6 +21,7 @@ import {
   DirectMessageResolver,
   EventResolver,
   GitHubConnectionResolver,
+  LinearConnectionResolver,
   InboundWebhookKeyResolver,
   MessageResolver,
   TaskResolver,
@@ -47,6 +49,7 @@ import {
     WebhooksModule,
     InboundWebhooksModule,
     GitHubModule,
+    LinearModule,
   ],
   providers: [
     PubSubProvider,
@@ -56,6 +59,7 @@ import {
     DirectMessageResolver,
     EventResolver,
     GitHubConnectionResolver,
+    LinearConnectionResolver,
     InboundWebhookKeyResolver,
     MessageResolver,
     WebhookResolver,
