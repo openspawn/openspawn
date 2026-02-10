@@ -40,10 +40,10 @@ vi.mock("../graphql/generated/hooks", () => ({
 }));
 
 describe("App", () => {
-  it("renders the dashboard with OpenSpawn branding", () => {
+  it("renders the dashboard with BikiniBottom branding", () => {
     render(<App />);
-    // Multiple OpenSpawn elements exist (desktop + mobile header)
-    const openSpawnElements = screen.getAllByText("OpenSpawn");
+    // Multiple BikiniBottom elements exist (desktop + mobile header)
+    const openSpawnElements = screen.getAllByText("BikiniBottom");
     expect(openSpawnElements.length).toBeGreaterThan(0);
   });
 
