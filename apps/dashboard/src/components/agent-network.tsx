@@ -243,7 +243,7 @@ function AgentNode({ data, selected }: NodeProps) {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ 
           scale: isDespawning ? 0 : 1, 
-          opacity: isDespawning ? 0 : (isIdle ? 0.5 : 1),
+          opacity: isDespawning ? 0 : (isIdle ? 0.75 : 1),
         }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -295,7 +295,7 @@ function AgentNode({ data, selected }: NodeProps) {
           `}
           style={{
             borderColor: color,
-            backgroundColor: `${color}${isIdle ? '0a' : '15'}`,
+            backgroundColor: `${color}${isIdle ? '18' : '20'}`,
             boxShadow: isActive ? `0 0 20px ${color}40` : undefined,
           }}
         >
