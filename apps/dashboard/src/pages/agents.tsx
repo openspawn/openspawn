@@ -567,7 +567,7 @@ function AgentVirtualGrid({
   });
 
   return (
-    <div ref={parentRef} className="h-[600px] overflow-auto">
+    <div ref={parentRef} className="h-[calc(100vh-26rem)] min-h-[400px] overflow-auto">
       <div style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}>
         {virtualizer.getVirtualItems().map((virtualRow) => {
           const rowAgents = rows[virtualRow.index];
@@ -885,7 +885,7 @@ export function AgentsPage() {
 
         {/* All Agents Tab */}
         <TabsContent value="agents">
-      <div className="p-4 space-y-6">
+      <div className="space-y-6">
       {/* Filters and Search */}
       <div className="space-y-3">
         <div className="flex gap-3 items-center">
@@ -1018,37 +1018,31 @@ export function AgentsPage() {
       />
 
       {filteredAgents.length === 0 && agents.length > 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Filter className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No matching agents</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Try adjusting your filters or search query.
-            </p>
-            <Button variant="outline" onClick={() => {
-              setSearchQuery("");
-              setStatusFilter("all");
-              setLevelFilter("all");
-              setTeamFilterValue("all");
-            }}>
-              Clear Filters
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center py-12 rounded-lg border border-dashed border-border">
+          <Filter className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No matching agents</h3>
+          <p className="text-muted-foreground text-center mb-4">
+            Try adjusting your filters or search query.
+          </p>
+          <Button variant="outline" onClick={() => {
+            setSearchQuery("");
+            setStatusFilter("all");
+            setLevelFilter("all");
+            setTeamFilterValue("all");
+          }}>
+            Clear Filters
+          </Button>
+        </div>
       )}
 
       {agents.length === 0 && (
-        <Card>
-          <CardContent>
-            <EmptyState
-              variant="agents"
-              title="No agents registered yet"
-              description="Register your first agent to get started with the multi-agent system."
-              ctaLabel="Register your first agent →"
-              onCta={() => { /* noop */ }}
-            />
-          </CardContent>
-        </Card>
+        <EmptyState
+          variant="agents"
+          title="No agents registered yet"
+          description="Register your first agent to get started with the multi-agent system."
+          ctaLabel="Register your first agent →"
+          onCta={() => { /* noop */ }}
+        />
       )}
 
       {/* Dialogs */}
