@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Layers, Wallet, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useOnboarding } from './onboarding-provider';
+import { useDemo } from '../../demo/DemoProvider';
 
 const VALUE_PROPS = [
   {
@@ -20,6 +21,10 @@ const VALUE_PROPS = [
 
 export function WelcomeScreen() {
   const { showWelcome, startOnboarding, skipOnboarding } = useOnboarding();
+  const { isDemo } = useDemo();
+
+  // In demo mode, DemoWelcome handles the intro — skip the generic welcome
+  if (isDemo) return null;
 
   return (
     <AnimatePresence>
