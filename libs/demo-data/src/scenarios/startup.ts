@@ -5,6 +5,7 @@ import { creditTransactions } from '../fixtures/credits';
 import { events } from '../fixtures/events';
 import { generateInitialMessages } from '../fixtures/messages';
 import { demoWebhooks } from '../fixtures/webhooks';
+import { demoGitHubConnections, demoIntegrationLinks } from '../fixtures/github';
 
 /**
  * Startup Scenario: Small team, early stage
@@ -46,6 +47,10 @@ export const startupScenario: DemoScenario = {
   
   // Include demo webhooks for startup scenario
   webhooks: demoWebhooks.slice(0, 3),
+  
+  // GitHub integration demo data
+  githubConnections: demoGitHubConnections.slice(0, 1),
+  integrationLinks: demoIntegrationLinks.slice(0, 2),
 };
 
 export default startupScenario;

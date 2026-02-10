@@ -4,3 +4,4 @@ export { ApiKeySettings } from "./api-key-settings";
 export { OrgSettings } from "./org-settings";
 export { AppearanceSettings } from "./appearance-settings";
 export { WebhooksSettings } from "./webhooks-settings";
+export { GitHubSettings } from "./github-settings";

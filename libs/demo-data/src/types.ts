@@ -102,6 +102,41 @@ export interface DemoMessage {
   createdAt: string;
 }
 
+export interface DemoGitHubConnection {
+  id: string;
+  name: string;
+  installationId: string;
+  repoFilter: string[];
+  enabled: boolean;
+  syncConfig: {
+    inbound: {
+      createTaskOnIssue: boolean;
+      createTaskOnPR: boolean;
+      createTaskOnCheckFailure: boolean;
+      requiredLabel?: string;
+    };
+    outbound: {
+      closeIssueOnComplete: boolean;
+      commentOnStatusChange: boolean;
+      updateLabels: boolean;
+    };
+  };
+  lastSyncAt?: string;
+  lastError?: string;
+  createdAt: string;
+}
+
+export interface DemoIntegrationLink {
+  id: string;
+  provider: string;
+  sourceType: string;
+  sourceId: string;
+  targetType: string;
+  targetId: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
 export interface DemoScenario {
   name: string;
   description: string;
@@ -111,6 +146,8 @@ export interface DemoScenario {
   events: DemoEvent[];
   messages: DemoMessage[];
   webhooks: DemoWebhook[];
+  githubConnections?: DemoGitHubConnection[];
+  integrationLinks?: DemoIntegrationLink[];
 }
 
 export interface SimulationState {

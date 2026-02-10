@@ -11,7 +11,9 @@ import {
   CreditTransaction,
   Escalation,
   Event,
+  GitHubConnection,
   IdempotencyKey,
+  IntegrationLink,
   Message,
   Nonce,
   Organization,
@@ -48,6 +50,8 @@ export const entities = [
   ConsensusRequest,
   ConsensusVote,
   Webhook,
+  GitHubConnection,
+  IntegrationLink,
 ];
 
 export function createDataSourceOptions(

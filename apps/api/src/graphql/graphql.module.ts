@@ -7,6 +7,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { AgentsModule } from "../agents";
 import { CreditsModule } from "../credits";
 import { EventsModule } from "../events";
+import { GitHubModule } from "../github";
 import { InboundWebhooksModule } from "../inbound-webhooks/inbound-webhooks.module";
 import { MessagesModule } from "../messages";
 import { TasksModule } from "../tasks";
@@ -18,6 +19,7 @@ import {
   CreditResolver,
   DirectMessageResolver,
   EventResolver,
+  GitHubConnectionResolver,
   InboundWebhookKeyResolver,
   MessageResolver,
   TaskResolver,
@@ -44,6 +46,7 @@ import {
     MessagesModule,
     WebhooksModule,
     InboundWebhooksModule,
+    GitHubModule,
   ],
   providers: [
     PubSubProvider,
@@ -52,6 +55,7 @@ import {
     CreditResolver,
     DirectMessageResolver,
     EventResolver,
+    GitHubConnectionResolver,
     InboundWebhookKeyResolver,
     MessageResolver,
     WebhookResolver,
