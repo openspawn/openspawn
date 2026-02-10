@@ -4,7 +4,14 @@ import react from "@vitejs/plugin-react-swc";
 import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
 import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
 import { copyFileSync, existsSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { resolve, join } from "node:path";
+
+const commitSha = (() => {
+  try { return execSync('git rev-parse --short HEAD').toString().trim(); }
+  catch { return 'unknown'; }
+})();
+const buildTime = new Date().toISOString();
 
 const isDemo = process.env.VITE_DEMO_MODE === 'true';
 const basePath = isDemo ? '/openspawn/demo/' : '/';
@@ -63,6 +70,10 @@ export default defineConfig(() => ({
   // worker: {
   //   plugins: () => [ nxViteTsPaths() ],
   // },
+  define: {
+    __COMMIT_SHA__: JSON.stringify(commitSha),
+    __BUILD_TIME__: JSON.stringify(buildTime),
+  },
   build: {
     outDir: "../../dist/apps/dashboard",
     emptyOutDir: true,
