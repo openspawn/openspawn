@@ -103,7 +103,7 @@ export function generateMessage(
 export function generateConversation(
   agent1Id: string,
   agent2Id: string,
-  messageCount: number = 4,
+  messageCount = 4,
   taskRef?: string
 ): DemoMessage[] {
   const messages: DemoMessage[] = [];

@@ -22,7 +22,7 @@ import {
 import { debug } from '../lib/debug';
 
 // Extract operation name from a DocumentNode at runtime
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function getOperationName(doc: { definitions: Array<{ name?: { value: string } }> }): string {
   return doc.definitions[0]?.name?.value ?? 'Unknown';
 }

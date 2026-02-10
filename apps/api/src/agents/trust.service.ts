@@ -406,7 +406,7 @@ export class TrustService {
    * Apply inactivity decay to all agents who haven't been active
    * Run this as a scheduled task (e.g., weekly)
    */
-  async applyInactivityDecay(daysThreshold: number = 14): Promise<number> {
+  async applyInactivityDecay(daysThreshold = 14): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysThreshold);
 
@@ -434,7 +434,7 @@ export class TrustService {
    */
   async getLeaderboard(
     orgId: string,
-    limit: number = 10
+    limit = 10
   ): Promise<
     Array<{
       id: string;

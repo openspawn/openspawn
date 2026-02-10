@@ -89,7 +89,7 @@ function useSidebarCollapsed() {
   const toggle = useCallback(() => {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch {}
+      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch { /* noop */ }
       return next;
     });
   }, []);

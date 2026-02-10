@@ -101,7 +101,7 @@ export interface Conversation {
   createdAt: string;
 }
 
-export function useMessages(limit: number = 50) {
+export function useMessages(limit = 50) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['messages', limit],
     queryFn: fetcher<{ messages: Message[] }, { limit: number }>(

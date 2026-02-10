@@ -226,7 +226,7 @@ export function getEventsByType(type: string): DemoEvent[] {
   return events.filter(e => e.type === type);
 }
 
-export function getRecentEvents(count: number = 10): DemoEvent[] {
+export function getRecentEvents(count = 10): DemoEvent[] {
   return [...events]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, count);

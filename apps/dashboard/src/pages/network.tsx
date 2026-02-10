@@ -26,7 +26,7 @@ export function NetworkPage() {
               title="No agent network yet"
               description="Register agents to see their connections and hierarchy visualized here."
               ctaLabel="Register agents to get started →"
-              onCta={() => {}}
+              onCta={() => { /* noop */ }}
             />
           </CardContent>
         </Card>

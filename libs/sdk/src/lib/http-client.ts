@@ -116,12 +116,13 @@ export class HttpClient {
         throw new ForbiddenError(message);
       case 404:
         throw new NotFoundError(message);
-      case 429:
+      case 429: {
         const retryAfter = response.headers.get('Retry-After');
         throw new RateLimitError(
           message,
           retryAfter ? parseInt(retryAfter, 10) : undefined
         );
+      }
       default:
         throw new ApiError(message, response.status, errorData);
     }

@@ -12,7 +12,7 @@
 import { DataSource } from "typeorm";
 
 // Direct import from built lib
-import { createDataSourceOptions } from "../../../../libs/database/src/data-source";
+import { createDataSourceOptions } from '@openspawn/database';
 
 async function syncSchema() {
   console.log("\n⚠️  Syncing database schema (development only)...\n");
