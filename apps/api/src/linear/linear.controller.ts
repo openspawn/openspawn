@@ -5,7 +5,7 @@ import { IntegrationLinkService } from "../github/integration-link.service";
 import { CreateLinearConnectionDto } from "./dto/create-linear-connection.dto";
 import { UpdateLinearConnectionDto } from "./dto/update-linear-connection.dto";
 
-@Controller("linear/connections")
+@Controller("integrations/linear/connections")
 @UseGuards(AuthGuard)
 export class LinearController {
   constructor(private readonly linearService: LinearService, private readonly linkService: IntegrationLinkService) {}

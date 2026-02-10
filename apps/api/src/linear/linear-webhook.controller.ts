@@ -2,7 +2,7 @@ import { Controller, Post, Body, Headers, RawBodyRequest, Req, BadRequestExcepti
 import { Request } from "express";
 import { LinearService } from "./linear.service";
 
-@Controller("linear/webhook")
+@Controller("integrations/linear/webhook")
 export class LinearWebhookController {
   private readonly logger = new Logger(LinearWebhookController.name);
   constructor(private readonly linearService: LinearService) {}
