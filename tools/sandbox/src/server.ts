@@ -360,7 +360,12 @@ export function startServer(sim: Simulation): void {
             timestamp: Date.now(),
           });
 
-          json(res, { ok: true, message: 'Order delivered to Mr. Krabs' });
+          // Deterministic mode: trigger processOrder directly
+          if ('processOrder' in sim && typeof (sim as any).processOrder === 'function') {
+            (sim as any).processOrder(message);
+          }
+
+          json(res, { ok: true, message: `Order delivered to ${coo.name}` });
         } catch {
           json(res, { error: 'Invalid JSON' });
         }
