@@ -307,23 +307,26 @@ export function startServer(sim: Simulation): void {
           const { message } = JSON.parse(body);
           if (!message) { json(res, { error: 'message required' }); return; }
           
-          const dennis = sim.agents.find(a => a.id === 'dennis');
+          const dennis = sim.agents.find(a => a.role === 'coo' || a.id === 'dennis' || a.level === 10);
           if (!dennis) { json(res, { error: 'COO not found' }); return; }
           
-          dennis.recentMessages.push({
+          const orderMsg = {
             id: `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            type: 'delegation',
+            type: 'delegation' as const,
             from: 'human-principal',
-            to: 'dennis',
+            to: dennis.id,
             taskId: '',
             body: `[PRIORITY ORDER FROM HUMAN PRINCIPAL]: ${message}`,
             timestamp: Date.now(),
-          });
+          };
+          dennis.recentMessages.push(orderMsg);
+          // Also push to inbox so event-driven COO wakes up
+          dennis.inbox.push(orderMsg);
 
           // Also log as event
           sim.events.push({
             type: 'human_order',
-            agentId: 'dennis',
+            agentId: dennis.id,
             message: `📢 Human Principal: ${message}`,
             timestamp: Date.now(),
           });

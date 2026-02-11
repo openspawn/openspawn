@@ -116,6 +116,24 @@ export class Simulation {
     this.parsedOrg = parsedOrg;
     this.log('🌊 BikiniBottom Sandbox started');
     this.log(`   ${agents.length} agents | ${this.tasks.length} seed tasks | model: ${config.model}`);
+
+    // Kick the COO to start delegating seed tasks
+    if (!skipSeedTasks) {
+      const coo = agents.find(a => a.role === 'coo' || a.level === 10);
+      if (coo) {
+        const kickMsg: ACPMessage = {
+          id: `acp-boot-${Date.now()}`,
+          type: 'delegation',
+          from: 'system',
+          to: coo.id,
+          taskId: '',
+          body: `You have ${this.tasks.length} tasks in the backlog. Delegate them to your department leads by domain. Start with critical priority.`,
+          timestamp: Date.now(),
+        };
+        coo.inbox.push(kickMsg);
+        coo.recentMessages.push(kickMsg);
+      }
+    }
   }
 
   private log(msg: string): void {
@@ -439,9 +457,11 @@ export class Simulation {
     console.log(`${'═'.repeat(60)}`);
 
     const actingAgents = this.agents.filter(agent => {
-      // Event-driven agents: only act if inbox has messages
+      // Event-driven agents: only act if inbox has messages or recentMessages
       if (agent.trigger === 'event-driven') {
-        return agent.inbox.length > 0;
+        const hasWork = agent.inbox.length > 0 || agent.recentMessages.length > 0;
+        if (hasWork) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length}, recentMsgs: ${agent.recentMessages.length} → WILL ACT`);
+        return hasWork;
       }
       // Polling agents: existing level-based frequency
       if (agent.level >= 9) return true;
@@ -450,6 +470,11 @@ export class Simulation {
       return this.tick % 5 === 0;
     });
 
+    // Debug: show inbox state for event-driven agents
+    const eventAgents = this.agents.filter(a => a.trigger === 'event-driven');
+    for (const ea of eventAgents) {
+      if (ea.inbox.length > 0) console.log(`  📬 ${ea.name} has ${ea.inbox.length} inbox messages`);
+    }
     console.log(`  ${actingAgents.length} agents acting this tick\n`);
 
     const promises = actingAgents.map(async (agent) => {

@@ -244,6 +244,11 @@ export function buildContext(
     lines.push(`\nAll tasks assigned. You can CREATE a new task or send a MESSAGE to check on progress.`);
   } else if (pendingDelegation.length > 0) {
     lines.push(`\nDELEGATE a pending task to a direct report.`);
+  } else if (agent.level >= 7 && !hasReports && myMessages.length > 0) {
+    lines.push(`\nYou received a message. You have NO direct reports — SPAWN agents to build your team first!`);
+    lines.push(`Example: {"action":"spawn_agent","name":"Engineering Lead","domain":"Engineering","role":"lead","reason":"Need lead to handle engineering tasks"}`);
+  } else if (myMessages.length > 0) {
+    lines.push(`\nYou have messages. Read them and take action.`);
   } else {
     lines.push(`\nNo tasks for you right now. Reply {"action":"idle"}`);
   }
