@@ -486,10 +486,11 @@ export class Simulation {
     console.log(`${'═'.repeat(60)}`);
 
     const actingAgents = this.agents.filter(agent => {
-      // Event-driven agents: only act if inbox has messages or recentMessages
+      // Event-driven agents: only act if inbox has NEW messages
+      // (recentMessages is history — don't wake just because history exists)
       if (agent.trigger === 'event-driven') {
-        const hasWork = agent.inbox.length > 0 || agent.recentMessages.length > 0;
-        if (hasWork) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length}, recentMsgs: ${agent.recentMessages.length} → WILL ACT`);
+        const hasWork = agent.inbox.length > 0;
+        if (hasWork) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length} → WILL ACT`);
         return hasWork;
       }
       // Polling agents: existing level-based frequency

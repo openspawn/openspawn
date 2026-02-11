@@ -98,7 +98,7 @@ function makeAgent(
 ): SandboxAgent {
   const canSpawn = level >= 7;
   const roleInstruction = level >= 7
-    ? 'You DELEGATE tasks to your direct reports. If you have no reports, SPAWN agents first.'
+    ? 'You DELEGATE tasks to your direct reports. Only SPAWN new agents if explicitly asked to hire.'
     : level >= 5
     ? 'You do complex work and can delegate to juniors.'
     : 'You do assigned tasks. Escalate if stuck.';
