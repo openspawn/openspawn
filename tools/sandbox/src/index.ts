@@ -44,12 +44,21 @@ initOllama(config);
 const cooOnly = process.env.COO_ONLY === '1' || process.argv.includes('--coo-only');
 const cleanSlate = process.env.CLEAN === '1' || process.argv.includes('--clean');
 
-// Check for --org CLI arg or default ORG.md location
-const orgArgIdx = process.argv.indexOf('--org');
+// Theme / org file selection
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const themesDir = resolve(__dirname, '..', 'themes');
+const themeArgIdx = process.argv.indexOf('--theme');
+const themeName = themeArgIdx !== -1 && process.argv[themeArgIdx + 1]
+  ? process.argv[themeArgIdx + 1]
+  : process.env.SANDBOX_THEME || 'bikini-bottom'; // default theme
+
+// Check for --org CLI arg, then theme, then default ORG.md
+const orgArgIdx = process.argv.indexOf('--org');
+const themePath = resolve(themesDir, `${themeName}.md`);
 const defaultOrgPath = resolve(__dirname, '..', 'ORG.md');
 const orgPath = orgArgIdx !== -1 && process.argv[orgArgIdx + 1]
   ? resolve(process.argv[orgArgIdx + 1])
+  : existsSync(themePath) ? themePath
   : defaultOrgPath;
 
 let parsedOrg: ParsedOrg | undefined;

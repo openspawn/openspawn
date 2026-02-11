@@ -3,7 +3,7 @@
 // The dashboard polls this instead of using the in-memory SimulationEngine
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Simulation } from './simulation.js';
@@ -567,6 +567,20 @@ export function startServer(sim: Simulation): void {
           json(res, { ok: true });
         } catch { json(res, { error: 'Invalid JSON' }); }
       });
+      return;
+    }
+
+    // List available themes
+    if (path === '/api/themes') {
+      try {
+        const themesDir = join(dirname(__filename), '..', 'themes');
+        const themes = readdirSync(themesDir)
+          .filter(f => f.endsWith('.md'))
+          .map(f => f.replace('.md', ''));
+        json(res, { themes, current: process.env.SANDBOX_THEME || 'bikini-bottom' });
+      } catch {
+        json(res, { themes: [], current: 'unknown' });
+      }
       return;
     }
 
