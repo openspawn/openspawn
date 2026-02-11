@@ -31,6 +31,7 @@ import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
 import { useAgentHealth } from "../hooks/use-agent-health";
 import { useTouchDevice } from "../hooks/use-touch-device";
 import { levelColors } from "../lib/status-colors";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 // Context to share active delegations, speed, avatar settings, and activity data
 interface TaskDelegation {
@@ -354,7 +355,7 @@ function AgentNode({ data, selected }: NodeProps) {
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
             ) : nodeData.avatar ? (
-              <span className="text-2xl leading-none select-none">{nodeData.avatar}</span>
+              <span className="text-xl leading-none select-none flex items-center justify-center w-8 h-8">{nodeData.avatar}</span>
             ) : avatarUrl ? (
               <img 
                 src={avatarUrl} 
@@ -371,37 +372,53 @@ function AgentNode({ data, selected }: NodeProps) {
               const o1 = c1 * (1 - health.completionRate);
               const o2 = c2 * (1 - health.creditUsage);
               const col = (v: number) => v >= 0.85 ? '#f43f5e' : v >= 0.6 ? '#f59e0b' : '#10b981';
+              const completionPct = Math.round(health.completionRate * 100);
+              const creditPct = Math.round(health.creditUsage * 100);
               return (
-                <div className="relative mb-0.5" style={{ width: 40, height: 40 }}>
-                  <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
-                    <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
-                    <motion.circle
-                      cx={20} cy={20} r={r1} fill="none"
-                      stroke={col(health.completionRate)} strokeWidth={sw} strokeLinecap="round"
-                      strokeDasharray={c1}
-                      initial={{ strokeDashoffset: c1 }}
-                      animate={{ strokeDashoffset: o1 }}
-                      transition={{ duration: 0.8, ease: 'easeOut' }}
-                      transform="rotate(-90 20 20)"
-                    />
-                    <circle cx={20} cy={20} r={r2} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
-                    <motion.circle
-                      cx={20} cy={20} r={r2} fill="none"
-                      stroke={col(health.creditUsage)} strokeWidth={sw} strokeLinecap="round"
-                      strokeDasharray={c2}
-                      initial={{ strokeDashoffset: c2 }}
-                      animate={{ strokeDashoffset: o2 }}
-                      transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
-                      transform="rotate(-90 20 20)"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {avatarImg}
-                  </div>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="relative mb-0.5" style={{ width: 40, height: 40 }}>
+                      <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
+                        <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                        <motion.circle
+                          cx={20} cy={20} r={r1} fill="none"
+                          stroke={col(health.completionRate)} strokeWidth={sw} strokeLinecap="round"
+                          strokeDasharray={c1}
+                          initial={{ strokeDashoffset: c1 }}
+                          animate={{ strokeDashoffset: o1 }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          transform="rotate(-90 20 20)"
+                        />
+                        <circle cx={20} cy={20} r={r2} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                        <motion.circle
+                          cx={20} cy={20} r={r2} fill="none"
+                          stroke={col(health.creditUsage)} strokeWidth={sw} strokeLinecap="round"
+                          strokeDasharray={c2}
+                          initial={{ strokeDashoffset: c2 }}
+                          animate={{ strokeDashoffset: o2 }}
+                          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+                          transform="rotate(-90 20 20)"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center leading-none">
+                        {avatarImg}
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="text-xs space-y-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: col(health.completionRate) }} />
+                      <span>Completion: {completionPct}%</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ background: col(health.creditUsage) }} />
+                      <span>Budget used: {creditPct}%</span>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
               );
             }
-            return <div className="mb-0.5">{avatarImg}</div>;
+            return <div className="mb-0.5 flex items-center justify-center">{avatarImg}</div>;
           })()}
 
           {/* Name — larger font on mobile for readability */}
