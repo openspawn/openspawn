@@ -378,8 +378,8 @@ function AgentNode({ data, selected }: NodeProps) {
               return (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="mb-0.5" style={{ width: 40, height: 40 }}>
-                      <svg width={40} height={40} viewBox="0 0 40 40">
+                    <div className="relative mb-0.5" style={{ width: 40, height: 40, willChange: 'transform' }}>
+                      <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
                         <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
                         <motion.circle
                           cx={20} cy={20} r={r1} fill="none"
@@ -400,18 +400,10 @@ function AgentNode({ data, selected }: NodeProps) {
                           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
                           transform="rotate(-90 20 20)"
                         />
-                        <foreignObject x={0} y={0} width={40} height={40}>
-                          <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {nodeData.avatar ? (
-                              <span style={{ fontSize: 18, lineHeight: 1, userSelect: 'none' }}>{nodeData.avatar}</span>
-                            ) : avatarUrl ? (
-                              <img src={avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%' }} />
-                            ) : (
-                              <span style={{ fontSize: 16, lineHeight: 1 }}>🤖</span>
-                            )}
-                          </div>
-                        </foreignObject>
                       </svg>
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ willChange: 'transform' }}>
+                        {avatarImg}
+                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs space-y-0.5">
