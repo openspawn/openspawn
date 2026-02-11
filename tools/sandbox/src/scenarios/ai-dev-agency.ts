@@ -1,0 +1,820 @@
+// ── AI Dev Agency Scenario ───────────────────────────────────────────────────
+// First scenario: BikiniBottom AI takes on two client projects + internal upgrade.
+// ~1800 decisions over 400 ticks across 4 phases.
+
+import type { ScenarioDefinition } from '../scenario-types.js';
+
+export const aiDevAgencyScenario: ScenarioDefinition = {
+  meta: {
+    id: 'ai-dev-agency',
+    name: 'AI Dev Agency Sprint',
+    industry: 'AI Dev Agency',
+    description: 'BikiniBottom AI takes on two client projects and an internal platform upgrade simultaneously. Ship features, fight fires, bill hours.',
+    duration: '20 minutes',
+    targetDecisions: 1800,
+    tickIntervalMs: 500,
+    seed: 'random',
+    difficulty: 'normal',
+    totalTicks: 400,
+  },
+
+  // ── Phases ───────────────────────────────────────────────────────────────
+
+  phases: [
+    {
+      id: 'client-intake',
+      name: 'Client Intake',
+      tickRange: [1, 40],
+      tickIntervalMs: 500,
+      unlocksEpics: ['client-alpha-onboarding', 'client-beta-onboarding', 'internal-platform-upgrade'],
+      enabledEvents: ['requirement-change'],
+      difficultyMod: 1.0,
+      transition: { type: 'hybrid', tick: 40, condition: { epicCompletionPct: 60 } },
+      narrative: 'New quarter, new clients. Mr. Krabs smells money.',
+    },
+    {
+      id: 'parallel-sprints',
+      name: 'Parallel Sprints',
+      tickRange: [41, 200],
+      unlocksEpics: ['alpha-model-eval', 'beta-prompt-suite', 'internal-cicd', 'marketing-case-study'],
+      enabledEvents: ['model-api-outage', 'billing-dispute', 'intern-breaks-prod', 'scope-creep', 'team-sick', 'p0-bug'],
+      difficultyMod: 1.0,
+      transition: { type: 'hybrid', tick: 200, condition: { epicsDone: 4 } },
+      narrative: 'Three workstreams, one engineering team. The fun begins.',
+    },
+    {
+      id: 'demo-day-prep',
+      name: 'Demo Day Prep',
+      tickRange: [201, 320],
+      unlocksEpics: ['alpha-demo-env', 'beta-demo-env', 'shared-infra'],
+      enabledEvents: ['model-api-outage', 'billing-dispute', 'scope-creep', 'team-sick', 'p0-bug'],
+      difficultyMod: 1.5,
+      transition: { type: 'hybrid', tick: 320, condition: { specificEpics: ['alpha-demo-env', 'beta-demo-env'] } },
+      narrative: 'Client Alpha wants a demo. Client Beta wants a different demo. Both next week.',
+    },
+    {
+      id: 'ship-celebrate',
+      name: 'Ship & Celebrate',
+      tickRange: [321, 400],
+      unlocksEpics: ['deployment', 'billing-final', 'retrospective'],
+      enabledEvents: ['p0-bug', 'billing-dispute'],
+      difficultyMod: 1.0,
+      transition: { type: 'tick', tick: 400 },
+      narrative: 'Deploy to production, send invoices, write postmortem.',
+    },
+  ],
+
+  // ── Epics ────────────────────────────────────────────────────────────────
+
+  epics: [
+    // Phase 1: Client Intake
+    {
+      id: 'client-alpha-onboarding',
+      title: 'Client Alpha Onboarding',
+      phase: 'client-intake',
+      domains: ['operations', 'engineering'],
+      priority: 'high',
+      description: 'Onboard Client Alpha — scope, environment, data pipeline.',
+      taskTemplates: [
+        {
+          id: 'alpha-scope',
+          title: 'Scope Definition — Client Alpha',
+          domain: 'operations',
+          subtasks: [
+            { title: 'Review RFP', durationRange: [3, 5] },
+            { title: 'Draft SOW', durationRange: [4, 6] },
+            { title: 'Client review & sign-off', durationRange: [3, 5] },
+          ],
+          durationRange: [3, 6],
+          reviewRequired: true,
+          reviewLoop: { maxIterations: 2, weights: [60, 30, 10, 0] },
+          crossDeptTriggers: [
+            { action: 'unlock_epic', target: 'alpha-model-eval' },
+          ],
+        },
+        {
+          id: 'alpha-env-setup',
+          title: 'Environment Setup — Alpha',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Provision GPU cluster', durationRange: [3, 5] },
+            { title: 'Configure model registry', durationRange: [2, 4] },
+            { title: 'Set up eval harness', durationRange: [3, 5] },
+            { title: 'Test pipeline end-to-end', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+          dependsOnTasks: ['alpha-scope'],
+        },
+        {
+          id: 'alpha-data-pipeline',
+          title: 'Data Pipeline — Alpha',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Audit client data', durationRange: [3, 5] },
+            { title: 'Build ingestion pipeline', durationRange: [4, 7] },
+            { title: 'Validate transforms', durationRange: [3, 5] },
+            { title: 'Load test', durationRange: [2, 4] },
+          ],
+          durationRange: [3, 7],
+          reviewRequired: true,
+          dependsOnTasks: ['alpha-scope'],
+        },
+      ],
+    },
+    {
+      id: 'client-beta-onboarding',
+      title: 'Client Beta Onboarding',
+      phase: 'client-intake',
+      domains: ['operations', 'engineering'],
+      priority: 'high',
+      description: 'Onboard Client Beta — prompt engineering engagement.',
+      taskTemplates: [
+        {
+          id: 'beta-scope',
+          title: 'Scope Definition — Client Beta',
+          domain: 'operations',
+          subtasks: [
+            { title: 'Requirements gathering', durationRange: [3, 5] },
+            { title: 'Draft SOW', durationRange: [3, 5] },
+            { title: 'Client sign-off', durationRange: [2, 4] },
+          ],
+          durationRange: [3, 5],
+          reviewRequired: true,
+          crossDeptTriggers: [
+            { action: 'unlock_epic', target: 'beta-prompt-suite' },
+          ],
+        },
+        {
+          id: 'beta-env-setup',
+          title: 'Environment Setup — Beta',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Set up prompt testing environment', durationRange: [2, 4] },
+            { title: 'Configure API keys & rate limits', durationRange: [2, 3] },
+            { title: 'Deploy evaluation framework', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+          dependsOnTasks: ['beta-scope'],
+        },
+      ],
+    },
+    {
+      id: 'internal-platform-upgrade',
+      title: 'Internal: Platform Upgrade',
+      phase: 'client-intake',
+      domains: ['engineering', 'security'],
+      priority: 'normal',
+      description: 'Upgrade internal platform — dependency audit, core upgrade, perf baseline.',
+      taskTemplates: [
+        {
+          id: 'dep-audit',
+          title: 'Dependency Audit',
+          domain: 'security',
+          subtasks: [
+            { title: 'Scan packages', durationRange: [2, 4] },
+            { title: 'Flag CVEs', durationRange: [2, 3] },
+            { title: 'Prioritize fixes', durationRange: [2, 4] },
+            { title: 'Document exceptions', durationRange: [1, 3] },
+          ],
+          durationRange: [2, 4],
+          reviewRequired: true,
+        },
+        {
+          id: 'upgrade-core',
+          title: 'Upgrade Core Runtime',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Upgrade runtime', durationRange: [3, 5] },
+            { title: 'Update dependencies', durationRange: [3, 6] },
+            { title: 'Migration scripts', durationRange: [4, 7] },
+            { title: 'Integration tests', durationRange: [3, 5] },
+          ],
+          durationRange: [3, 7],
+          reviewRequired: true,
+          dependsOnTasks: ['dep-audit'],
+        },
+        {
+          id: 'perf-baseline',
+          title: 'Performance Baseline',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Benchmark before', durationRange: [2, 3] },
+            { title: 'Optimize bottlenecks', durationRange: [4, 7] },
+            { title: 'Benchmark after', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 7],
+          reviewRequired: false,
+          dependsOnTasks: ['upgrade-core'],
+        },
+      ],
+    },
+
+    // Phase 2: Parallel Sprints
+    {
+      id: 'alpha-model-eval',
+      title: 'Alpha: Model Evaluation Pipeline',
+      phase: 'parallel-sprints',
+      domains: ['engineering'],
+      priority: 'critical',
+      description: 'Build model evaluation pipeline for Client Alpha.',
+      dependsOnEpics: ['client-alpha-onboarding'],
+      taskTemplates: [
+        {
+          id: 'eval-framework',
+          title: 'Eval Framework',
+          domain: 'backend',
+          subtasks: [
+            { title: 'Design eval metrics', durationRange: [3, 5] },
+            { title: 'Implement scoring', durationRange: [4, 6] },
+            { title: 'Build comparison UI', durationRange: [4, 7] },
+            { title: 'Backtest with sample data', durationRange: [3, 5] },
+          ],
+          durationRange: [3, 7],
+          reviewRequired: true,
+          crossDeptTriggers: [
+            { action: 'create_task', target: 'Write Eval Methodology Doc', domain: 'marketing', priority: 'normal' },
+          ],
+        },
+        {
+          id: 'model-integration',
+          title: 'Model Integration',
+          domain: 'backend',
+          subtasks: [
+            { title: 'Integrate OpenAI API', durationRange: [3, 5] },
+            { title: 'Integrate Anthropic API', durationRange: [3, 5] },
+            { title: 'Integrate local models', durationRange: [4, 6] },
+            { title: 'A/B test harness', durationRange: [3, 5] },
+          ],
+          durationRange: [3, 6],
+          reviewRequired: true,
+          dependsOnTasks: ['eval-framework'],
+        },
+        {
+          id: 'client-dashboard',
+          title: 'Client Dashboard',
+          domain: 'frontend',
+          subtasks: [
+            { title: 'Model comparison view', durationRange: [4, 6] },
+            { title: 'Cost tracking', durationRange: [3, 5] },
+            { title: 'Latency charts', durationRange: [3, 5] },
+            { title: 'Export reports', durationRange: [2, 4] },
+          ],
+          durationRange: [3, 6],
+          reviewRequired: true,
+          dependsOnTasks: ['eval-framework', 'model-integration'],
+          crossDeptTriggers: [
+            { action: 'create_task', target: 'Security Review: Client Dashboard', domain: 'security', priority: 'high' },
+          ],
+        },
+        {
+          id: 'prompt-optimization',
+          title: 'Prompt Optimization Runs',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Baseline prompts', durationRange: [2, 3] },
+            { title: 'Systematic variation', durationRange: [3, 5] },
+            { title: 'Eval run batch', durationRange: [4, 7] },
+            { title: 'Report best performers', durationRange: [2, 4] },
+          ],
+          durationRange: [2, 7],
+          reviewRequired: true,
+          dependsOnTasks: ['model-integration'],
+          resourceCost: { 'gpu-budget': 50 },
+        },
+      ],
+    },
+    {
+      id: 'beta-prompt-suite',
+      title: 'Beta: Prompt Engineering Suite',
+      phase: 'parallel-sprints',
+      domains: ['engineering'],
+      priority: 'high',
+      description: 'Build prompt engineering tools for Client Beta.',
+      dependsOnEpics: ['client-beta-onboarding'],
+      taskTemplates: [
+        {
+          id: 'prompt-editor',
+          title: 'Prompt Editor',
+          domain: 'frontend',
+          subtasks: [
+            { title: 'Editor UI', durationRange: [4, 6] },
+            { title: 'Version history', durationRange: [3, 5] },
+            { title: 'Template library', durationRange: [3, 5] },
+          ],
+          durationRange: [3, 6],
+          reviewRequired: true,
+        },
+        {
+          id: 'prompt-testing',
+          title: 'Prompt Testing Pipeline',
+          domain: 'backend',
+          subtasks: [
+            { title: 'Test runner', durationRange: [4, 6] },
+            { title: 'Assertion framework', durationRange: [3, 5] },
+            { title: 'Regression detection', durationRange: [4, 7] },
+          ],
+          durationRange: [3, 7],
+          reviewRequired: true,
+          dependsOnTasks: ['prompt-editor'],
+        },
+        {
+          id: 'prompt-analytics',
+          title: 'Prompt Analytics Dashboard',
+          domain: 'frontend',
+          subtasks: [
+            { title: 'Token usage tracking', durationRange: [3, 5] },
+            { title: 'Quality score trends', durationRange: [3, 5] },
+            { title: 'Cost breakdown view', durationRange: [2, 4] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+          dependsOnTasks: ['prompt-testing'],
+        },
+      ],
+    },
+    {
+      id: 'internal-cicd',
+      title: 'Internal: CI/CD Overhaul',
+      phase: 'parallel-sprints',
+      domains: ['engineering'],
+      priority: 'normal',
+      description: 'Overhaul CI/CD pipeline.',
+      taskTemplates: [
+        {
+          id: 'cicd-audit',
+          title: 'Pipeline Audit',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Map current pipeline', durationRange: [2, 3] },
+            { title: 'Identify bottlenecks', durationRange: [2, 4] },
+            { title: 'Design new pipeline', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: false,
+        },
+        {
+          id: 'cicd-impl',
+          title: 'Pipeline Implementation',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Build new CI config', durationRange: [4, 6] },
+            { title: 'Add caching layers', durationRange: [3, 5] },
+            { title: 'Parallel test execution', durationRange: [3, 6] },
+            { title: 'Deploy pipeline', durationRange: [2, 4] },
+          ],
+          durationRange: [2, 6],
+          reviewRequired: true,
+          dependsOnTasks: ['cicd-audit'],
+        },
+      ],
+    },
+    {
+      id: 'marketing-case-study',
+      title: 'Marketing: Case Study',
+      phase: 'parallel-sprints',
+      domains: ['marketing'],
+      priority: 'normal',
+      description: 'Write case study for marketing.',
+      taskTemplates: [
+        {
+          id: 'case-study-draft',
+          title: 'Draft Case Study',
+          domain: 'marketing',
+          subtasks: [
+            { title: 'Interview stakeholders', durationRange: [2, 4] },
+            { title: 'Write draft', durationRange: [3, 5] },
+            { title: 'Design graphics', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+          reviewLoop: { maxIterations: 3, weights: [50, 35, 15, 0] },
+        },
+        {
+          id: 'case-study-publish',
+          title: 'Publish Case Study',
+          domain: 'marketing',
+          subtasks: [
+            { title: 'SEO optimization', durationRange: [2, 3] },
+            { title: 'Publish to website', durationRange: [1, 2] },
+            { title: 'Social media push', durationRange: [2, 3] },
+          ],
+          durationRange: [1, 3],
+          reviewRequired: false,
+          dependsOnTasks: ['case-study-draft'],
+        },
+      ],
+    },
+
+    // Phase 3: Demo Day Prep
+    {
+      id: 'alpha-demo-env',
+      title: 'Alpha: Demo Environment',
+      phase: 'demo-day-prep',
+      domains: ['engineering'],
+      priority: 'critical',
+      description: 'Prepare demo environment for Client Alpha.',
+      taskTemplates: [
+        {
+          id: 'alpha-demo-data',
+          title: 'Demo Data Setup',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Generate sample datasets', durationRange: [3, 5] },
+            { title: 'Load demo data', durationRange: [2, 4] },
+            { title: 'Validate demo flows', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+        },
+        {
+          id: 'alpha-demo-script',
+          title: 'Demo Script & Rehearsal',
+          domain: 'operations',
+          subtasks: [
+            { title: 'Write demo script', durationRange: [3, 5] },
+            { title: 'Rehearse demo', durationRange: [2, 4] },
+            { title: 'Prepare backup plan', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: false,
+          dependsOnTasks: ['alpha-demo-data'],
+        },
+      ],
+    },
+    {
+      id: 'beta-demo-env',
+      title: 'Beta: Demo Environment',
+      phase: 'demo-day-prep',
+      domains: ['engineering'],
+      priority: 'critical',
+      description: 'Prepare demo environment for Client Beta.',
+      taskTemplates: [
+        {
+          id: 'beta-demo-data',
+          title: 'Beta Demo Setup',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Configure prompt playground', durationRange: [3, 5] },
+            { title: 'Load sample prompts', durationRange: [2, 3] },
+            { title: 'Test demo flow', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+        },
+        {
+          id: 'beta-demo-script',
+          title: 'Beta Demo Script',
+          domain: 'operations',
+          subtasks: [
+            { title: 'Write demo narrative', durationRange: [2, 4] },
+            { title: 'Dry run', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 4],
+          reviewRequired: false,
+          dependsOnTasks: ['beta-demo-data'],
+        },
+      ],
+    },
+    {
+      id: 'shared-infra',
+      title: 'Cross-Client: Shared Infrastructure',
+      phase: 'demo-day-prep',
+      domains: ['engineering', 'security'],
+      priority: 'high',
+      description: 'Shared infra optimizations for both client demos.',
+      taskTemplates: [
+        {
+          id: 'shared-api-gateway',
+          title: 'API Gateway Optimization',
+          domain: 'backend',
+          subtasks: [
+            { title: 'Rate limiting config', durationRange: [2, 4] },
+            { title: 'Caching layer', durationRange: [3, 5] },
+            { title: 'Load testing', durationRange: [3, 5] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+        },
+        {
+          id: 'shared-monitoring',
+          title: 'Monitoring & Alerting',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Set up dashboards', durationRange: [3, 5] },
+            { title: 'Configure alerts', durationRange: [2, 4] },
+            { title: 'Runbook documentation', durationRange: [2, 4] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: false,
+        },
+      ],
+    },
+
+    // Phase 4: Ship & Celebrate
+    {
+      id: 'deployment',
+      title: 'Production Deployment',
+      phase: 'ship-celebrate',
+      domains: ['engineering', 'security'],
+      priority: 'critical',
+      description: 'Deploy everything to production.',
+      taskTemplates: [
+        {
+          id: 'deploy-alpha',
+          title: 'Deploy Client Alpha',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Final security review', durationRange: [3, 5] },
+            { title: 'Production deploy', durationRange: [2, 4] },
+            { title: 'Smoke tests', durationRange: [2, 3] },
+            { title: 'Client handoff', durationRange: [2, 4] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+        },
+        {
+          id: 'deploy-beta',
+          title: 'Deploy Client Beta',
+          domain: 'engineering',
+          subtasks: [
+            { title: 'Final security review', durationRange: [3, 5] },
+            { title: 'Production deploy', durationRange: [2, 4] },
+            { title: 'Smoke tests', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 5],
+          reviewRequired: true,
+          dependsOnTasks: ['deploy-alpha'],
+        },
+      ],
+    },
+    {
+      id: 'billing-final',
+      title: 'Final Billing',
+      phase: 'ship-celebrate',
+      domains: ['finance'],
+      priority: 'high',
+      description: 'Prepare and send final invoices.',
+      taskTemplates: [
+        {
+          id: 'invoice-prep',
+          title: 'Invoice Preparation',
+          domain: 'finance',
+          subtasks: [
+            { title: 'Compile hours', durationRange: [2, 4] },
+            { title: 'Review with leads', durationRange: [2, 3] },
+            { title: 'Send invoices', durationRange: [1, 2] },
+          ],
+          durationRange: [1, 4],
+          reviewRequired: true,
+        },
+      ],
+    },
+    {
+      id: 'retrospective',
+      title: 'Sprint Retrospective',
+      phase: 'ship-celebrate',
+      domains: ['operations'],
+      priority: 'normal',
+      description: 'Run retrospective and document learnings.',
+      taskTemplates: [
+        {
+          id: 'retro',
+          title: 'Run Retrospective',
+          domain: 'operations',
+          subtasks: [
+            { title: 'Gather feedback', durationRange: [2, 4] },
+            { title: 'Run retro meeting', durationRange: [2, 3] },
+            { title: 'Document action items', durationRange: [2, 3] },
+          ],
+          durationRange: [2, 4],
+          reviewRequired: false,
+        },
+      ],
+    },
+  ],
+
+  // ── Events ───────────────────────────────────────────────────────────────
+
+  events: [
+    {
+      id: 'model-api-outage',
+      name: 'Model API Outage',
+      type: 'interrupt',
+      probability: 0.06,
+      cooldownTicks: 30,
+      narrative: '🔥 OpenAI API is down. Eval pipeline halted. Sandy is wiring up local fallbacks.',
+      effect: {
+        createTasks: [
+          {
+            title: 'Wire up local model fallback',
+            domain: 'engineering',
+            priority: 'critical',
+            subtaskCount: 2,
+            durationRange: [3, 5],
+          },
+          {
+            title: 'Notify Client Alpha of delay',
+            domain: 'operations',
+            priority: 'high',
+            subtaskCount: 1,
+            durationRange: [1, 2],
+          },
+        ],
+        blockAgents: { domain: 'backend', count: 1, durationTicks: 8 },
+      },
+    },
+    {
+      id: 'billing-dispute',
+      name: 'Billing Dispute',
+      type: 'interrupt',
+      probability: 0.03,
+      cooldownTicks: 40,
+      narrative: 'Client Beta is disputing last month\'s GPU charges. Mr. Krabs is NOT happy.',
+      effect: {
+        createTasks: [
+          {
+            title: 'Billing Reconciliation',
+            domain: 'finance',
+            priority: 'high',
+            subtaskCount: 3,
+            durationRange: [2, 4],
+          },
+        ],
+      },
+    },
+    {
+      id: 'intern-breaks-prod',
+      name: 'Intern Breaks Production',
+      type: 'interrupt',
+      probability: 0.04,
+      cooldownTicks: 100,
+      maxOccurrences: 1,
+      narrative: '🦠 Plankton Jr. pushed to prod. Again. Karen is adding deploy gates.',
+      effect: {
+        createTasks: [
+          {
+            title: 'Rollback & Fix Production',
+            domain: 'engineering',
+            priority: 'critical',
+            subtaskCount: 4,
+            durationRange: [2, 4],
+          },
+          {
+            title: 'Audit Deploy Permissions',
+            domain: 'security',
+            priority: 'high',
+            subtaskCount: 2,
+            durationRange: [2, 3],
+          },
+        ],
+      },
+    },
+    {
+      id: 'scope-creep',
+      name: 'Scope Creep',
+      type: 'expansion',
+      probability: 0.04,
+      cooldownTicks: 25,
+      narrative: 'New requirements just came in. Adding to the backlog.',
+      effect: {
+        expandEpic: {
+          taskCount: 3,
+          domain: 'engineering',
+          priority: 'high',
+        },
+      },
+    },
+    {
+      id: 'team-sick',
+      name: 'Team Member Sick',
+      type: 'disruption',
+      probability: 0.03,
+      cooldownTicks: 40,
+      durationTicks: 20,
+      narrative: 'A team member is out sick. Redistributing workload.',
+      effect: {
+        blockAgents: { count: 1, durationTicks: 20 },
+      },
+    },
+    {
+      id: 'p0-bug',
+      name: 'P0 Bug',
+      type: 'interrupt',
+      probability: 0.05,
+      cooldownTicks: 25,
+      narrative: '🚨 Critical bug found in production. All hands on deck.',
+      effect: {
+        createTasks: [
+          {
+            title: 'Fix critical production bug',
+            domain: 'engineering',
+            priority: 'critical',
+            subtaskCount: 5,
+            durationRange: [2, 4],
+          },
+        ],
+        elevatePriority: 1,
+      },
+    },
+    {
+      id: 'requirement-change',
+      name: 'Requirement Change',
+      type: 'expansion',
+      probability: 0.05,
+      cooldownTicks: 20,
+      narrative: 'Client changed requirements. Adjusting scope.',
+      effect: {
+        createTasks: [
+          {
+            title: 'Update requirements document',
+            domain: 'operations',
+            priority: 'high',
+            subtaskCount: 2,
+            durationRange: [2, 4],
+          },
+        ],
+      },
+    },
+  ],
+
+  // ── Resources ────────────────────────────────────────────────────────────
+
+  resources: [
+    {
+      id: 'senior-eng-time',
+      name: 'Senior Engineering Time',
+      type: 'agent-hours',
+      initial: 200,
+      burnRate: 0.5,
+      alertThresholdPct: 20,
+      depletedEffect: 'pause-non-critical',
+    },
+    {
+      id: 'qa-capacity',
+      name: 'QA Capacity',
+      type: 'agent-hours',
+      initial: 100,
+      burnRate: 0.3,
+      alertThresholdPct: 25,
+      depletedEffect: 'none',
+    },
+    {
+      id: 'client-meeting-slots',
+      name: 'Client Meeting Slots',
+      type: 'calendar',
+      initial: 8,
+      burnRate: 0,
+      alertThresholdPct: 25,
+      depletedEffect: 'none',
+    },
+    {
+      id: 'budget',
+      name: 'Budget',
+      type: 'credits',
+      initial: 5000,
+      burnRate: 12,
+      alertThresholdPct: 20,
+      depletedEffect: 'pause-non-critical',
+    },
+    {
+      id: 'gpu-budget',
+      name: 'GPU Compute Budget',
+      type: 'compute',
+      initial: 500,
+      burnRate: 1,
+      alertThresholdPct: 15,
+      depletedEffect: 'pause-non-critical',
+    },
+  ],
+
+  // ── Scoring ──────────────────────────────────────────────────────────────
+
+  scoring: {
+    dimensions: [
+      { id: 'velocity', name: 'Velocity', description: 'Tasks completed per tick' },
+      { id: 'quality', name: 'Quality', description: 'Review pass rate' },
+      { id: 'efficiency', name: 'Efficiency', description: 'Resource utilization' },
+      { id: 'resilience', name: 'Resilience', description: 'Recovery from events' },
+      { id: 'morale', name: 'Morale', description: 'Team health' },
+      { id: 'deadline', name: 'Deadline', description: 'On-time delivery' },
+    ],
+    weights: {
+      velocity: 20,
+      quality: 25,
+      efficiency: 15,
+      resilience: 20,
+      morale: 10,
+      deadline: 10,
+    },
+    grades: [
+      { grade: 'S', minScore: 90, label: 'Legendary org. Screenshot this.' },
+      { grade: 'A', minScore: 80, label: 'Well-oiled machine.' },
+      { grade: 'B', minScore: 70, label: 'Solid. Room to optimize.' },
+      { grade: 'C', minScore: 60, label: 'Growing pains.' },
+      { grade: 'D', minScore: 50, label: 'Dysfunction junction.' },
+      { grade: 'F', minScore: 0, label: 'Total organizational collapse.' },
+    ],
+  },
+};

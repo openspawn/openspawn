@@ -61,6 +61,11 @@ export interface SandboxTask {
   activityLog: ACPMessage[];
   acked: boolean;
   blockedReason?: string;
+  /** Scenario engine fields */
+  epicId?: string;
+  parentTaskId?: string;
+  dependsOn?: string[];
+  subtaskIds?: string[];
 }
 
 export interface SandboxEvent {

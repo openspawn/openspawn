@@ -11,6 +11,7 @@
 import type { SandboxAgent, SandboxTask, SandboxEvent, SandboxConfig, ACPMessage } from './types.js';
 import type { ParsedOrg } from './org-parser.js';
 import { makeAgentPublic } from './agents.js';
+import type { ScenarioEngine } from './scenario-engine.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -222,6 +223,7 @@ export class DeterministicSimulation {
     totalCreditsEarned: number; totalCreditsSpent: number; messageCount: number;
   }> = [];
   parsedOrg?: ParsedOrg;
+  scenarioEngine?: ScenarioEngine;
 
   private sseListeners: Array<(event: SandboxEvent) => void> = [];
   /** Pending hires queue: domains the COO needs to fill */
@@ -543,6 +545,11 @@ export class DeterministicSimulation {
     console.log(`   Agents: ${this.agents.length} | Tasks: ${this.tasks.length} (${done} done, ${active} active)`);
     console.log(`${'═'.repeat(60)}`);
 
+    // Scenario engine pre-tick
+    if (this.scenarioEngine) {
+      this.scenarioEngine.preTick();
+    }
+
     // Process agents by level (top-down)
     const sortedAgents = [...this.agents].sort((a, b) => b.level - a.level);
 
@@ -556,6 +563,11 @@ export class DeterministicSimulation {
       } else {
         this.tickWorker(agent);
       }
+    }
+
+    // Scenario engine post-tick
+    if (this.scenarioEngine) {
+      this.scenarioEngine.postTick();
     }
 
     // Metrics
