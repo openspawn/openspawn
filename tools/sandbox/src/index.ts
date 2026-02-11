@@ -12,6 +12,7 @@ const __filename2 = fileURLToPath(import.meta.url);
 const __sandboxRoot = resolve(dirname(__filename2), '..');
 const envPath = join(__sandboxRoot, '.env');
 if (existsSync(envPath)) {
+  let envCount = 0;
   for (const line of readFileSync(envPath, 'utf8').split('\n')) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
@@ -19,8 +20,11 @@ if (existsSync(envPath)) {
     if (eq < 0) continue;
     const key = trimmed.slice(0, eq).trim();
     const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
-    if (!process.env[key]) process.env[key] = val;
+    if (!process.env[key]) { process.env[key] = val; envCount++; }
   }
+  if (envCount > 0) console.log(`  📋 Loaded ${envCount} vars from ${envPath}`);
+} else {
+  console.log(`  ⚠ No .env file found at ${envPath}`);
 }
 import { createAgents, createCOO } from './agents.js';
 import { parseOrgMd, type ParsedOrg } from './org-parser.js';
@@ -32,7 +36,7 @@ import type { SandboxConfig } from './types.js';
 
 const config: SandboxConfig = {
   model: process.env.SANDBOX_MODEL || 'qwen3:0.6b',
-  tickIntervalMs: Number(process.env.TICK_INTERVAL) || (process.env.OPENROUTER_API_KEY ? 5000 : 2000),
+  tickIntervalMs: Number(process.env.TICK_INTERVAL) || (process.env.LLM_PROVIDER === 'ollama' ? 2000 : (process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY) ? 5000 : 2000),
   maxTicks: Number(process.env.MAX_TICKS) || 0, // 0 = run forever
   maxConcurrentInferences: Number(process.env.MAX_CONCURRENT) || 4,
   contextWindowTokens: 2048,
