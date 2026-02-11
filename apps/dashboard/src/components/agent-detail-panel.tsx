@@ -67,37 +67,6 @@ function OverviewTab({ agent }: { agent: Agent }) {
       transition={{ duration: 0.2 }}
       className="space-y-6"
     >
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <AgentAvatar 
-          agentId={agent.agentId} 
-          name={agent.name} 
-          level={agent.level} 
-          size="lg"
-          avatar={(agent as any).avatar}
-          avatarColor={(agent as any).avatarColor}
-        />
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold">{agent.name}</h2>
-          <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
-        </div>
-      </div>
-
-      {/* Status Badges */}
-      <div className="flex flex-wrap gap-2">
-        <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
-        <Badge variant="outline">{agent.role}</Badge>
-        <Badge style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
-          Level {agent.level} • {getLevelLabel(agent.level)}
-        </Badge>
-        <TeamBadge teamId={agent.teamId} />
-        {agent.reputationLevel && (
-          <Badge variant="secondary">
-            🏆 {agent.reputationLevel}
-          </Badge>
-        )}
-      </div>
-
       {/* Key Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
@@ -767,13 +736,22 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                   name={agent.name} 
                   level={agent.level} 
                   size="lg"
+                  avatar={(agent as any).avatar}
+                  avatarColor={(agent as any).avatarColor}
                 />
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">{agent.name}</h2>
-                    <TeamBadge teamId={agent.teamId} />
                   </div>
                   <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">{agent.status}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{agent.role}</Badge>
+                    <Badge className="text-[10px]" style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
+                      L{agent.level} • {getLevelLabel(agent.level)}
+                    </Badge>
+                    <TeamBadge teamId={agent.teamId} />
+                  </div>
                 </div>
               </div>
               <Button 
@@ -789,7 +767,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <div className="flex-shrink-0 border-b border-border px-6">
+            <div className="flex-shrink-0 border-b border-border px-6 pt-3">
               <TabsList className="w-full justify-start bg-transparent h-auto p-0 gap-6">
                 <TabsTrigger 
                   value="overview"
