@@ -252,8 +252,9 @@ function AgentNode({ data, selected }: NodeProps) {
           opacity: isDespawning ? 0 : (isIdle && dimIdle ? 0.35 : isIdle ? 0.9 : 1),
         }}
         exit={{ scale: 0, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
         className="absolute inset-0"
+        style={{ transformOrigin: 'center center' }}
       >
         {/* Pulsing glow for active/busy agents — disabled on mobile for performance */}
         {isActive && !isMobileOrTouch && (
