@@ -400,7 +400,7 @@ function AgentNode({ data, selected }: NodeProps) {
                           transform="rotate(-90 20 20)"
                         />
                         {nodeData.avatar ? (
-                          <text x={20} y={20} textAnchor="middle" dominantBaseline="central" fontSize={18} className="select-none">{nodeData.avatar}</text>
+                          <text x={20.5} y={21} textAnchor="middle" dominantBaseline="central" fontSize={18} className="select-none">{nodeData.avatar}</text>
                         ) : avatarUrl ? (
                           <image href={avatarUrl} x={8} y={8} width={24} height={24} clipPath="circle(12px at 12px 12px)" />
                         ) : (
