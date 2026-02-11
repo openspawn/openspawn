@@ -2,7 +2,7 @@
 # Multi-stage build: dashboard (static) + sandbox server (Node)
 
 # Stage 1: Install dependencies + build dashboard
-FROM node:22-slim AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -25,7 +25,7 @@ ENV VITE_SANDBOX_MODE=true
 RUN pnpm nx run dashboard:build --configuration=production
 
 # Stage 2: Production runtime
-FROM node:22-slim AS runtime
+FROM node:24-alpine AS runtime
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
