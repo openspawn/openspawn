@@ -12,7 +12,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
     description: 'BikiniBottom AI takes on two client projects and an internal platform upgrade simultaneously. Ship features, fight fires, bill hours.',
     duration: '20 minutes',
     targetDecisions: 1800,
-    tickIntervalMs: 500,
+    tickIntervalMs: 800,
     seed: 'random',
     difficulty: 'normal',
     totalTicks: 400,

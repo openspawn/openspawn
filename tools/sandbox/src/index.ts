@@ -148,9 +148,10 @@ if (!useLLM) {
 // Start HTTP API server for dashboard integration
 startServer(sim as any);
 
-// Auto-start scenario if SCENARIO env var is set
-const scenarioId = process.env.SCENARIO;
-if (scenarioId && !useLLM) {
+// Auto-start scenario — defaults to ai-dev-agency in deterministic mode
+// Set SCENARIO=none to disable, or SCENARIO=<id> to pick a specific one
+const scenarioId = process.env.SCENARIO ?? (useLLM ? 'none' : 'ai-dev-agency');
+if (scenarioId !== 'none' && !useLLM) {
   const { ScenarioEngine } = await import('./scenario-engine.js');
   const { aiDevAgencyScenario } = await import('./scenarios/ai-dev-agency.js');
 
@@ -162,9 +163,16 @@ if (scenarioId && !useLLM) {
   if (scenarioDef) {
     const engine = new ScenarioEngine(scenarioDef);
     const detSim = sim as DeterministicSimulation;
+
+    // Use scenario's tick interval (overrides default config)
+    if (scenarioDef.meta.tickIntervalMs) {
+      detSim.config = { ...detSim.config, tickIntervalMs: scenarioDef.meta.tickIntervalMs };
+      console.log(`\n⏱️  Tick interval: ${scenarioDef.meta.tickIntervalMs}ms (from scenario)`);
+    }
+
     detSim.scenarioEngine = engine;
     engine.attach(detSim);
-    console.log(`\n🎬 Auto-started scenario: ${scenarioDef.meta.name}`);
+    console.log(`🎬 Auto-started scenario: ${scenarioDef.meta.name}`);
   } else {
     console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(scenarioMap).join(', ')}`);
   }
