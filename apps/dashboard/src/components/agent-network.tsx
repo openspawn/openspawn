@@ -377,8 +377,8 @@ function AgentNode({ data, selected }: NodeProps) {
               return (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="relative mb-0.5" style={{ width: 40, height: 40 }}>
-                      <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
+                    <div className="mb-0.5" style={{ width: 40, height: 40 }}>
+                      <svg width={40} height={40} viewBox="0 0 40 40">
                         <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
                         <motion.circle
                           cx={20} cy={20} r={r1} fill="none"
@@ -399,10 +399,14 @@ function AgentNode({ data, selected }: NodeProps) {
                           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
                           transform="rotate(-90 20 20)"
                         />
+                        {nodeData.avatar ? (
+                          <text x={20} y={20} textAnchor="middle" dominantBaseline="central" fontSize={18} className="select-none">{nodeData.avatar}</text>
+                        ) : avatarUrl ? (
+                          <image href={avatarUrl} x={8} y={8} width={24} height={24} clipPath="circle(12px at 12px 12px)" />
+                        ) : (
+                          <text x={20} y={20} textAnchor="middle" dominantBaseline="central" fontSize={16}>🤖</text>
+                        )}
                       </svg>
-                      <div className="absolute inset-0 grid place-items-center leading-none">
-                        {avatarImg}
-                      </div>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs space-y-0.5">
