@@ -725,6 +725,37 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
+    // Speed control
+    if (path === '/api/speed' && req.method === 'PUT') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const { tickIntervalMs, speed } = JSON.parse(body);
+          const detSim = sim as unknown as DeterministicSimulation;
+          if (tickIntervalMs) {
+            detSim.config = { ...detSim.config, tickIntervalMs: Math.max(100, Math.min(10000, tickIntervalMs)) };
+          } else if (speed) {
+            // speed multiplier: 1x = scenario default, 2x = half interval, etc.
+            const baseInterval = detSim.scenarioEngine
+              ? 800  // scenario base
+              : 5000; // default base
+            detSim.config = { ...detSim.config, tickIntervalMs: Math.max(100, Math.round(baseInterval / speed)) };
+          }
+          json(res, { ok: true, tickIntervalMs: detSim.config.tickIntervalMs });
+        } catch (err) {
+          json(res, { error: String(err) });
+        }
+      });
+      return;
+    }
+
+    // Get current speed
+    if (path === '/api/speed' && req.method === 'GET') {
+      json(res, { tickIntervalMs: (sim as any).config?.tickIntervalMs ?? 5000 });
+      return;
+    }
+
     res.writeHead(404);
     res.end('Not found');
   });
