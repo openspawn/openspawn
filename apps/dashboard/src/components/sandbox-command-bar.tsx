@@ -2,8 +2,8 @@
  * Command bar for sending orders to the org in sandbox mode.
  * Fixed at the bottom of the viewport with order input + restart button.
  */
-import { useState, useRef } from 'react';
-import { Send, Crown, CheckCircle, RotateCcw } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Crown, CheckCircle, RotateCcw, Pause, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { isSandboxMode } from '../graphql/fetcher';
 import { SANDBOX_URL } from '../lib/sandbox-url';
@@ -21,9 +21,53 @@ export function SandboxCommandBar() {
   const [restarting, setRestarting] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
   const [history, setHistory] = useState<OrderHistoryItem[]>([]);
+  const [currentSpeed, setCurrentSpeed] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const prePauseSpeed = useRef(1);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Fetch current speed on mount
+  useEffect(() => {
+    if (!isSandboxMode) return;
+    fetch(`${SANDBOX_URL}/api/speed`)
+      .then(r => r.json())
+      .then(data => {
+        const ms = data.tickIntervalMs ?? 800;
+        const speed = Math.round(800 / ms) || 1;
+        setCurrentSpeed(speed);
+      })
+      .catch(() => {});
+  }, []);
+
   if (!isSandboxMode) return null;
+
+  const setSpeed = async (speed: number) => {
+    try {
+      await fetch(`${SANDBOX_URL}/api/speed`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ speed }),
+      });
+      setCurrentSpeed(speed);
+      setPaused(false);
+    } catch {}
+  };
+
+  const togglePause = async () => {
+    if (paused) {
+      await setSpeed(prePauseSpeed.current);
+    } else {
+      prePauseSpeed.current = currentSpeed;
+      try {
+        await fetch(`${SANDBOX_URL}/api/speed`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tickIntervalMs: 999999 }),
+        });
+        setPaused(true);
+      } catch {}
+    }
+  };
 
   const showFlash = (msg: string) => {
     setFlash(msg);
@@ -124,6 +168,30 @@ export function SandboxCommandBar() {
           <Send className={`w-4 h-4 ${sending ? 'animate-pulse' : ''}`} />
           Send
         </Button>
+
+        {/* Speed controls */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={togglePause}
+            className={`p-1.5 rounded-md transition-colors ${paused ? 'bg-amber-500/20 text-amber-400' : 'text-zinc-400 hover:bg-zinc-800'}`}
+            title={paused ? 'Resume' : 'Pause'}
+          >
+            {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+          </button>
+          {[1, 2, 5, 10].map(s => (
+            <button
+              key={s}
+              onClick={() => setSpeed(s)}
+              className={`px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                currentSpeed === s && !paused
+                  ? 'bg-cyan-600 text-white'
+                  : 'text-zinc-400 hover:bg-zinc-800'
+              }`}
+            >
+              {s}x
+            </button>
+          ))}
+        </div>
 
         {/* Restart button */}
         <Button

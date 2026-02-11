@@ -51,6 +51,10 @@ import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
 import { SandboxCommandBar } from "./sandbox-command-bar";
+import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-banner";
+import { PhaseTransitionOverlay } from "./phase-transition-overlay";
+import { ScenarioEventToasts } from "./scenario-event-toasts";
+import { FirstVisitOverlay } from "./first-visit-overlay";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -112,6 +116,7 @@ export function Layout({ children }: LayoutProps) {
   const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
   const { collapsed: sidebarCollapsed, toggle: toggleSidebar } = useSidebarCollapsed();
   const sidePanel = useSidePanel();
+  const { status: scenarioStatus, phaseTransition, setPhaseTransition } = useScenarioStatus();
 
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 
@@ -794,6 +799,15 @@ export function Layout({ children }: LayoutProps) {
         {/* Sandbox command bar — fixed at bottom */}
         <SandboxCommandBar />
       </div>
+
+      {/* Scenario experience overlays */}
+      <ScenarioContextBanner status={scenarioStatus} />
+      <PhaseTransitionOverlay
+        transition={phaseTransition}
+        onDismiss={() => setPhaseTransition(null)}
+      />
+      <ScenarioEventToasts />
+      <FirstVisitOverlay />
     </TooltipProvider>
   );
 }
