@@ -75,6 +75,7 @@ function OverviewTab({ agent }: { agent: Agent }) {
           level={agent.level} 
           size="lg"
           avatar={(agent as any).avatar}
+          avatarColor={(agent as any).avatarColor}
         />
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{agent.name}</h2>

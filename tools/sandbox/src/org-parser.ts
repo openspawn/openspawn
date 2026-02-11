@@ -95,6 +95,7 @@ function makeAgent(
   systemPrompt: string,
   triggerConfig?: { trigger?: 'polling' | 'event-driven'; triggerOn?: ACPMessage['type'][] },
   avatar?: string,
+  avatarColor?: string,
 ): SandboxAgent {
   const canSpawn = level >= 7;
   const roleInstruction = level >= 7
@@ -130,6 +131,7 @@ Respond with JSON ONLY. Actions:
     level,
     domain,
     avatar,
+    avatarColor,
     parentId,
     status: 'active',
     systemPrompt: fullPrompt,
@@ -312,7 +314,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
           for (let i = 0; i < count; i++) {
             const agentName = count > 1 ? `${dept.heading} ${i + 1}` : dept.heading;
             const agentId = count > 1 ? `${id}-${i + 1}` : id;
-            const agent = makeAgent(agentId, agentName, deptRole, deptLevel, domain, parentId, context, triggerInfo, deptMeta['avatar']);
+            const agent = makeAgent(agentId, agentName, deptRole, deptLevel, domain, parentId, context, triggerInfo, deptMeta['avatar'], deptMeta['avatar_color']);
             agents.push(agent);
             if (isCLevel) cooId = agentId;
           }
@@ -352,7 +354,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
           for (let i = 0; i < count; i++) {
             const agentName = count > 1 ? `${sub.heading} ${i + 1}` : sub.heading;
             const agentId = count > 1 ? `${id}-${i + 1}` : id;
-            const agent = makeAgent(agentId, agentName, subRole, subLevel, domain, parentId, context, triggerInfo, subMeta['avatar']);
+            const agent = makeAgent(agentId, agentName, subRole, subLevel, domain, parentId, context, triggerInfo, subMeta['avatar'], subMeta['avatar_color']);
             agents.push(agent);
           }
         }

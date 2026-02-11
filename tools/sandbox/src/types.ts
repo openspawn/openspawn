@@ -22,6 +22,7 @@ export interface SandboxAgent {
   level: number;
   domain: string;
   avatar?: string;
+  avatarColor?: string;
   parentId?: string;
   status: 'active' | 'idle' | 'busy';
   systemPrompt: string;

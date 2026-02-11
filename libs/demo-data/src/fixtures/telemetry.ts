@@ -58,7 +58,7 @@ export const mockTraces: MockTraceSpan[] = [
     attributes: {
       "task.id": "task-001",
       "task.phase": "assigned",
-      "agent.id": "agent-spongebob",
+      "agent.id": "agent-alpha",
     },
   },
   {
