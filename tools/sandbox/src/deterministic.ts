@@ -231,13 +231,32 @@ export class DeterministicSimulation {
   /** Pending task assignments: tasks waiting for a lead in matching domain */
   private pendingTaskDefs: Array<{ title: string; domain: string; priority: SandboxTask['priority'] }> = [];
 
+  /** Queue of agents waiting to be revealed (staggered spawn) */
+  private spawnQueue: SandboxAgent[] = [];
+
   constructor(agents: SandboxAgent[], config: SandboxConfig, skipSeedTasks = false, parsedOrg?: ParsedOrg) {
     this.agents = agents;
     this.tasks = [];
     this.config = config;
     this.parsedOrg = parsedOrg;
+
+    // Staggered spawn: only COO starts active, rest are queued
+    const coo = agents.find(a => a.role === 'coo' || a.level >= 9);
+    const others = agents.filter(a => a !== coo);
+    // Shuffle others for visual variety, then queue them
+    for (let i = others.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [others[i], others[j]] = [others[j], others[i]];
+    }
+    // Set non-COO agents to pending
+    for (const agent of others) {
+      agent.status = 'pending';
+    }
+    this.spawnQueue = others;
+
     this.log('🌊 BikiniBottom Sandbox started (deterministic mode)');
     this.log(`   ${agents.length} agents | model: ${config.model} (flavor text only)`);
+    this.log(`   🦀 COO online — ${others.length} agents joining over the next ${Math.ceil(others.length / 2)} ticks`);
   }
 
   // ── Event system ────────────────────────────────────────────────────────
@@ -537,6 +556,14 @@ export class DeterministicSimulation {
   async runTick(): Promise<void> {
     this.tick++;
 
+    // Staggered spawn: activate 2 agents per tick from the queue
+    for (let i = 0; i < 2 && this.spawnQueue.length > 0; i++) {
+      const agent = this.spawnQueue.shift()!;
+      agent.status = 'active';
+      this.log(`✨ ${agent.name} has joined the organization`);
+      this.emit({ type: 'agent_spawned', message: `${agent.name} joined`, timestamp: Date.now() });
+    }
+
     const done = this.tasks.filter(t => t.status === 'done').length;
     const active = this.tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
 
@@ -550,8 +577,8 @@ export class DeterministicSimulation {
       this.scenarioEngine.preTick();
     }
 
-    // Process agents by level (top-down)
-    const sortedAgents = [...this.agents].sort((a, b) => b.level - a.level);
+    // Process agents by level (top-down) — only active agents
+    const sortedAgents = [...this.agents].filter(a => a.status === 'active').sort((a, b) => b.level - a.level);
 
     for (const agent of sortedAgents) {
       if (agent.role === 'coo' || agent.level >= 9) {

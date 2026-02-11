@@ -283,8 +283,8 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </ScrollArea>
 
-          {/* Demo Toggle */}
-          {!sidebarCollapsed ? (
+          {/* Demo Toggle — hidden in sandbox mode (bikinibottom.ai) */}
+          {!isSandboxMode && (!sidebarCollapsed ? (
             <div className="border-t border-border p-3">
               <Button
                 onClick={handleToggleDemo}
@@ -328,7 +328,7 @@ export function Layout({ children }: LayoutProps) {
                 </TooltipContent>
               </Tooltip>
             </div>
-          )}
+          ))}
 
           {/* Help Links */}
           {!sidebarCollapsed ? (
@@ -560,7 +560,8 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </ScrollArea>
 
-          {/* Drawer demo toggle */}
+          {/* Drawer demo toggle — hidden in sandbox mode */}
+          {!isSandboxMode && (
           <div className="border-t border-border p-3">
             <Button
               onClick={handleToggleDemo}
@@ -586,6 +587,7 @@ export function Layout({ children }: LayoutProps) {
               </div>
             )}
           </div>
+          )}
 
           {/* Drawer help links */}
           <div className="border-t border-border px-3 py-2">
