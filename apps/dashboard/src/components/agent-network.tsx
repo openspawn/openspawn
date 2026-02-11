@@ -355,7 +355,7 @@ function AgentNode({ data, selected }: NodeProps) {
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
             ) : nodeData.avatar ? (
-              <span className="text-xl leading-none select-none flex items-center justify-center w-8 h-8">{nodeData.avatar}</span>
+              <span className="select-none" style={{ fontSize: '20px', lineHeight: 1 }}>{nodeData.avatar}</span>
             ) : avatarUrl ? (
               <img 
                 src={avatarUrl} 
@@ -400,7 +400,7 @@ function AgentNode({ data, selected }: NodeProps) {
                           transform="rotate(-90 20 20)"
                         />
                       </svg>
-                      <div className="absolute inset-0 flex items-center justify-center leading-none">
+                      <div className="absolute inset-0 grid place-items-center leading-none">
                         {avatarImg}
                       </div>
                     </div>
