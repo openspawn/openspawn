@@ -476,6 +476,7 @@ export function DashboardPage() {
             : 'Overview of your multi-agent system'
         }
         actions={
+          !isSandboxMode ? (
           <DashboardToolbar
             editMode={layout.editMode}
             setEditMode={layout.setEditMode}
@@ -484,6 +485,7 @@ export function DashboardPage() {
             applyPreset={layout.applyPreset}
             resetLayout={layout.resetLayout}
           />
+          ) : undefined
         }
       />
 

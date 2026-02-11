@@ -435,7 +435,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : !isDemo ? (
+              ) : (!isDemo && !isSandboxMode) ? (
                 <Link to="/login">
                   <Button variant="outline" size="sm" className="w-full">
                     Sign in
@@ -481,7 +481,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : !isDemo ? (
+              ) : (!isDemo && !isSandboxMode) ? (
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                     <Link to="/login">
@@ -776,7 +776,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Mobile bottom navigation bar */}
-          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden">
+          <nav className={`fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden ${isSandboxMode ? 'bottom-[52px]' : ''}`}>
             <div className="flex items-center justify-around h-14">
               {bottomNavItems.map((item) => {
                 const isActive = location.pathname === item.href;
