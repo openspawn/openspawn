@@ -1,12 +1,11 @@
 # ── BikiniBottom Live Demo ────────────────────────────────────────────────────
-# Multi-stage build: dashboard (static) + sandbox server (Node)
+# Lean build: dashboard static files + sandbox server only
 
-# Stage 1: Install dependencies + build dashboard
+# Stage 1: Build dashboard
 FROM node:24-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy everything needed for install
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
 COPY apps/ ./apps/
 COPY libs/ ./libs/
@@ -14,30 +13,28 @@ COPY tools/sandbox/package.json tools/sandbox/tsconfig.json tools/sandbox/
 
 RUN pnpm install --frozen-lockfile
 
-# Copy sandbox source
 COPY tools/sandbox/src/ ./tools/sandbox/src/
 COPY tools/sandbox/ORG.md ./tools/sandbox/
 COPY tools/sandbox/org/ ./tools/sandbox/org/
-# scenarios are inside src/
 
-# Build dashboard
 ENV VITE_SANDBOX_MODE=true
 RUN pnpm nx run dashboard:build --configuration=production
 
-# Stage 2: Production runtime
+# Stage 2: Minimal runtime
 FROM node:24-alpine AS runtime
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy workspace root
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/tsconfig.base.json ./
-COPY --from=build /app/node_modules ./node_modules
+# Install only what the sandbox needs (no monorepo overhead)
+COPY tools/sandbox/package.json ./package.json
+COPY tools/sandbox/tsconfig.json ./
+RUN corepack enable && corepack prepare pnpm@latest --activate \
+    && pnpm install --prod --no-frozen-lockfile \
+    && pnpm add tsx unified remark-parse remark-frontmatter
 
-# Copy sandbox
-COPY --from=build /app/tools/sandbox ./tools/sandbox
-
-# Copy libs (needed for imports)
-COPY --from=build /app/libs ./libs
+# Copy sandbox source
+COPY tools/sandbox/src/ ./src/
+COPY tools/sandbox/ORG.md ./
+COPY tools/sandbox/org/ ./org/
 
 # Copy built dashboard
 COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
@@ -49,4 +46,4 @@ ENV SANDBOX_READONLY=1
 
 EXPOSE 3333
 
-CMD ["node", "--import", "tsx", "tools/sandbox/src/index.ts"]
+CMD ["node", "--import", "tsx", "src/index.ts"]
