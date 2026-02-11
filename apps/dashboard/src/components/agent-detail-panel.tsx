@@ -14,9 +14,9 @@ import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+// recharts v3 has infinite-loop bug — using custom bars instead
 import { useContainerSize } from "../hooks/use-container-size";
-import { ChartTooltip } from "./ui/chart-tooltip";
+// ChartTooltip removed — using custom bars
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
 import { TimelineView } from "./timeline-view";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
@@ -74,6 +74,7 @@ function OverviewTab({ agent }: { agent: Agent }) {
           name={agent.name} 
           level={agent.level} 
           size="lg"
+          avatar={(agent as any).avatar}
         />
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{agent.name}</h2>
@@ -283,8 +284,7 @@ function TasksTab({ agent }: { agent: Agent }) {
 // Credits Tab Content
 function CreditsTab({ agent }: { agent: Agent }) {
   const { transactions: creditHistory, loading } = useCredits(undefined, agent.id, 20);
-  const chartRef = useRef<HTMLDivElement>(null);
-  const chartSize = useContainerSize(chartRef);
+  // chartRef/chartSize removed — no longer using recharts
 
   // Prepare chart data for last 7 days
   const chartData = useMemo(() => {
@@ -353,27 +353,19 @@ function CreditsTab({ agent }: { agent: Agent }) {
       {/* Usage Chart */}
       <div className="p-4 rounded-lg bg-muted/50 border border-border">
         <h3 className="text-sm font-medium mb-4">7-Day Activity</h3>
-        <div ref={chartRef} className="w-full" style={{ height: 200 }}>
-          {chartSize.width > 0 && (
-            <BarChart data={chartData} width={chartSize.width} height={200}>
-              <XAxis 
-                dataKey="date" 
-                tick={{ fill: '#64748b', fontSize: 12 }}
-                axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
-                tickLine={false}
-              />
-              <YAxis 
-                tick={{ fill: '#64748b', fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                content={<ChartTooltip valueFormatter={(v) => `${v.toLocaleString()} credits`} />}
-              />
-              <Bar dataKey="earned" fill="#10b981" radius={[6, 6, 0, 0]} animationDuration={800} />
-              <Bar dataKey="spent" fill="#f43f5e" radius={[6, 6, 0, 0]} animationDuration={800} />
-            </BarChart>
-          )}
+        <div className="w-full space-y-2" style={{ height: 200 }}>
+          {chartData.map((d: { date: string; earned: number; spent: number }) => {
+            const max = Math.max(...chartData.map((x: { earned: number; spent: number }) => Math.max(x.earned, x.spent)), 1);
+            return (
+              <div key={d.date} className="flex items-center gap-2 text-xs">
+                <span className="w-10 text-muted-foreground shrink-0">{d.date}</span>
+                <div className="flex-1 flex gap-1 h-5">
+                  <div className="bg-emerald-500 rounded-sm" style={{ width: `${(d.earned / max) * 50}%` }} title={`Earned: ${d.earned}`} />
+                  <div className="bg-rose-500 rounded-sm" style={{ width: `${(d.spent / max) * 50}%` }} title={`Spent: ${d.spent}`} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

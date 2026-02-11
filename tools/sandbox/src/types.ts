@@ -21,6 +21,7 @@ export interface SandboxAgent {
   role: 'coo' | 'talent' | 'lead' | 'senior' | 'worker' | 'intern';
   level: number;
   domain: string;
+  avatar?: string;
   parentId?: string;
   status: 'active' | 'idle' | 'busy';
   systemPrompt: string;

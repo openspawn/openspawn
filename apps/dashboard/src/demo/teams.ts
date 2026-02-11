@@ -1,6 +1,9 @@
 /**
  * Team data model for organizational structure.
  * Teams form a hierarchy: parent teams → sub-teams → agents.
+ *
+ * In sandbox mode, team IDs are generated as `team-{domain}` from agent domains.
+ * This file defines the canonical teams that match both demo-data and sandbox.
  */
 
 export interface Team {
@@ -13,130 +16,101 @@ export interface Team {
   leadAgentId?: string;
 }
 
-// Agent IDs for lead assignments (mirrors libs/demo-data agent IDs)
-const AGENT_IDS = {
-  agentDennis: 'a0000000-0000-0000-0000-000000000001',
-  techTalent: 'a0000000-0000-0000-0000-000000000010',
-  financeTalent: 'a0000000-0000-0000-0000-000000000011',
-  marketingTalent: 'a0000000-0000-0000-0000-000000000012',
-  salesTalent: 'a0000000-0000-0000-0000-000000000013',
-  codeReviewer: 'a0000000-0000-0000-0000-000000000020',
-  copywriter: 'a0000000-0000-0000-0000-000000000022',
-  analyst: 'a0000000-0000-0000-0000-000000000021',
-  hrCoordinator: 'a0000000-0000-0000-0000-000000000050',
-  recruiterBot: 'a0000000-0000-0000-0000-000000000051',
-  onboardingAgent: 'a0000000-0000-0000-0000-000000000052',
-  supportLead: 'a0000000-0000-0000-0000-000000000060',
-  tier1Agent: 'a0000000-0000-0000-0000-000000000061',
-  tier2Agent: 'a0000000-0000-0000-0000-000000000063',
-  frontendDev: 'a0000000-0000-0000-0000-000000000070',
-  qaEngineer: 'a0000000-0000-0000-0000-000000000071',
-  accountManager: 'a0000000-0000-0000-0000-000000000080',
-  analyticsBot: 'a0000000-0000-0000-0000-000000000090',
-};
-
 // ── Team IDs ────────────────────────────────────────────────────────────────
 export const TEAM_IDS = {
-  // Top-level
-  executive: 'team-executive',
-  epd: 'team-epd',
-  sales: 'team-sales',
+  // Top-level departments
+  operations: 'team-operations',
+  engineering: 'team-engineering',
+  security: 'team-security',
   marketing: 'team-marketing',
-  hr: 'team-hr',
+  finance: 'team-finance',
   support: 'team-support',
 
-  // EPD sub-teams
+  // Engineering sub-teams
   backend: 'team-backend',
   frontend: 'team-frontend',
-  qa: 'team-qa',
+  qa: 'team-testing',
 
-  // Sales sub-teams
-  outbound: 'team-outbound',
-  accountMgmt: 'team-account-mgmt',
+  // Security sub-teams
+  appsec: 'team-appsec',
+  infrasec: 'team-infrastructure security',
 
   // Marketing sub-teams
-  content: 'team-content',
-  analytics: 'team-analytics',
+  content: 'team-content strategy',
+  copywriting: 'team-copywriting',
+  seo: 'team-seo',
 
-  // HR sub-teams
-  recruiting: 'team-recruiting',
-  peopleOps: 'team-people-ops',
+  // Finance sub-teams
+  analytics: 'team-analytics',
+  accounting: 'team-accounting',
 
   // Support sub-teams
-  tier1: 'team-tier1',
-  tier2: 'team-tier2',
+  tier1: 'team-support', // same as parent — tier 1 is core support
+  tier2: 'team-technical support',
 } as const;
 
 // ── Teams ───────────────────────────────────────────────────────────────────
 export const teams: Team[] = [
-  // ─── Top-Level Teams ───
+  // ─── Top-Level Departments ───
   {
-    id: TEAM_IDS.executive,
-    name: 'Executive',
-    description: 'C-suite leadership and strategy',
+    id: TEAM_IDS.operations,
+    name: 'Operations',
+    description: 'Executive leadership and coordination',
     color: 'slate',
     icon: 'Crown',
-    leadAgentId: AGENT_IDS.agentDennis,
   },
   {
-    id: TEAM_IDS.epd,
-    name: 'EPD',
-    description: 'Engineering, Product & Design',
+    id: TEAM_IDS.engineering,
+    name: 'Engineering',
+    description: 'Core product, infrastructure, testing, and deployment',
     color: 'cyan',
     icon: 'Code2',
-    leadAgentId: AGENT_IDS.techTalent,
   },
   {
-    id: TEAM_IDS.sales,
-    name: 'Sales',
-    description: 'Revenue generation and client acquisition',
-    color: 'emerald',
-    icon: 'DollarSign',
-    leadAgentId: AGENT_IDS.financeTalent,
+    id: TEAM_IDS.security,
+    name: 'Security',
+    description: 'Application security, infrastructure hardening, compliance',
+    color: 'red',
+    icon: 'Shield',
   },
   {
     id: TEAM_IDS.marketing,
     name: 'Marketing',
-    description: 'Brand, content, and growth marketing',
+    description: 'Content, campaigns, brand voice, and public presence',
     color: 'pink',
     icon: 'Megaphone',
-    leadAgentId: AGENT_IDS.marketingTalent,
   },
   {
-    id: TEAM_IDS.hr,
-    name: 'HR',
-    description: 'Human resources and talent management',
-    color: 'orange',
-    icon: 'Users',
-    leadAgentId: AGENT_IDS.hrCoordinator,
+    id: TEAM_IDS.finance,
+    name: 'Finance',
+    description: 'Budget allocation, forecasting, expense management',
+    color: 'emerald',
+    icon: 'DollarSign',
   },
   {
     id: TEAM_IDS.support,
-    name: 'Customer Support',
-    description: 'Customer success and technical support',
+    name: 'Support',
+    description: 'Customer-facing ticket queue and issue resolution',
     color: 'teal',
     icon: 'Headphones',
-    leadAgentId: AGENT_IDS.supportLead,
   },
 
-  // ─── EPD Sub-Teams ───
+  // ─── Engineering Sub-Teams ───
   {
     id: TEAM_IDS.backend,
     name: 'Backend',
-    description: 'Server-side architecture and APIs',
+    description: 'API layer, database, and server infrastructure',
     color: 'blue',
     icon: 'Server',
-    parentTeamId: TEAM_IDS.epd,
-    leadAgentId: AGENT_IDS.codeReviewer,
+    parentTeamId: TEAM_IDS.engineering,
   },
   {
     id: TEAM_IDS.frontend,
     name: 'Frontend',
-    description: 'UI/UX implementation and web apps',
+    description: 'Dashboard UI and marketing site',
     color: 'violet',
     icon: 'Monitor',
-    parentTeamId: TEAM_IDS.epd,
-    leadAgentId: AGENT_IDS.frontendDev,
+    parentTeamId: TEAM_IDS.engineering,
   },
   {
     id: TEAM_IDS.qa,
@@ -144,88 +118,79 @@ export const teams: Team[] = [
     description: 'Quality assurance and testing',
     color: 'amber',
     icon: 'ShieldCheck',
-    parentTeamId: TEAM_IDS.epd,
-    leadAgentId: AGENT_IDS.qaEngineer,
+    parentTeamId: TEAM_IDS.engineering,
   },
 
-  // ─── Sales Sub-Teams ───
+  // ─── Security Sub-Teams ───
   {
-    id: TEAM_IDS.outbound,
-    name: 'Outbound',
-    description: 'Outbound sales and lead generation',
-    color: 'emerald',
-    icon: 'Send',
-    parentTeamId: TEAM_IDS.sales,
-    leadAgentId: AGENT_IDS.salesTalent,
+    id: TEAM_IDS.appsec,
+    name: 'AppSec',
+    description: 'Application security and deploy review',
+    color: 'red',
+    icon: 'Lock',
+    parentTeamId: TEAM_IDS.security,
   },
   {
-    id: TEAM_IDS.accountMgmt,
-    name: 'Account Management',
-    description: 'Client retention and expansion',
-    color: 'emerald',
-    icon: 'Handshake',
-    parentTeamId: TEAM_IDS.sales,
-    leadAgentId: AGENT_IDS.accountManager,
+    id: TEAM_IDS.infrasec,
+    name: 'Infra Security',
+    description: 'Vulnerability scans, alerts, and incident response',
+    color: 'orange',
+    icon: 'AlertTriangle',
+    parentTeamId: TEAM_IDS.security,
   },
 
   // ─── Marketing Sub-Teams ───
   {
     id: TEAM_IDS.content,
-    name: 'Content',
-    description: 'Content strategy and creation',
+    name: 'Content Strategy',
+    description: 'Content strategy and campaign direction',
     color: 'pink',
     icon: 'PenTool',
     parentTeamId: TEAM_IDS.marketing,
-    leadAgentId: AGENT_IDS.copywriter,
   },
+  {
+    id: TEAM_IDS.copywriting,
+    name: 'Copywriting',
+    description: 'Docs, blogs, and social copy',
+    color: 'pink',
+    icon: 'FileText',
+    parentTeamId: TEAM_IDS.marketing,
+  },
+  {
+    id: TEAM_IDS.seo,
+    name: 'SEO',
+    description: 'Search optimization, keywords, metadata',
+    color: 'pink',
+    icon: 'Search',
+    parentTeamId: TEAM_IDS.marketing,
+  },
+
+  // ─── Finance Sub-Teams ───
   {
     id: TEAM_IDS.analytics,
     name: 'Analytics',
-    description: 'Marketing analytics and reporting',
-    color: 'pink',
+    description: 'Dashboards, trends, and actionable insights',
+    color: 'emerald',
     icon: 'BarChart3',
-    parentTeamId: TEAM_IDS.marketing,
-    leadAgentId: AGENT_IDS.analyst,
-  },
-
-  // ─── HR Sub-Teams ───
-  {
-    id: TEAM_IDS.recruiting,
-    name: 'Recruiting',
-    description: 'Talent acquisition and hiring',
-    color: 'orange',
-    icon: 'UserPlus',
-    parentTeamId: TEAM_IDS.hr,
-    leadAgentId: AGENT_IDS.recruiterBot,
+    parentTeamId: TEAM_IDS.finance,
   },
   {
-    id: TEAM_IDS.peopleOps,
-    name: 'People Ops',
-    description: 'Employee experience and operations',
-    color: 'orange',
-    icon: 'Heart',
-    parentTeamId: TEAM_IDS.hr,
-    leadAgentId: AGENT_IDS.onboardingAgent,
+    id: TEAM_IDS.accounting,
+    name: 'Accounting',
+    description: 'Expenses, invoices, and financial records',
+    color: 'emerald',
+    icon: 'Calculator',
+    parentTeamId: TEAM_IDS.finance,
   },
 
   // ─── Support Sub-Teams ───
   {
-    id: TEAM_IDS.tier1,
-    name: 'Tier 1',
-    description: 'First-response customer support',
-    color: 'teal',
-    icon: 'MessageCircle',
-    parentTeamId: TEAM_IDS.support,
-    leadAgentId: AGENT_IDS.tier1Agent,
-  },
-  {
     id: TEAM_IDS.tier2,
     name: 'Tier 2 Technical',
-    description: 'Escalated technical support',
+    description: 'Complex technical issues and escalations',
     color: 'teal',
     icon: 'Wrench',
     parentTeamId: TEAM_IDS.support,
-    leadAgentId: AGENT_IDS.tier2Agent,
   },
 ];
 
@@ -254,6 +219,7 @@ export const TEAM_COLOR_MAP: Record<string, string> = {
   pink: '#ec4899',
   orange: '#f97316',
   teal: '#14b8a6',
+  red: '#ef4444',
 };
 
 export function getTeamColor(colorName: string): string {

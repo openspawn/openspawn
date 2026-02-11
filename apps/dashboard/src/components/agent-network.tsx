@@ -171,6 +171,7 @@ interface AgentNodeData extends Record<string, unknown> {
   isHuman?: boolean;
   domain?: string;
   tasksCompleted?: number;
+  avatar?: string;
   isSpawning?: boolean;
   isDespawning?: boolean;
   compact?: boolean;
@@ -352,6 +353,8 @@ function AgentNode({ data, selected }: NodeProps) {
             const health = agentHealth.get(nodeData.agentId);
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
+            ) : nodeData.avatar ? (
+              <span className="text-2xl leading-none select-none">{nodeData.avatar}</span>
             ) : avatarUrl ? (
               <img 
                 src={avatarUrl} 
@@ -808,6 +811,7 @@ function buildNodesAndEdges(
         status: agent.status as unknown as "active" | "pending" | "paused" | "suspended",
         credits: agent.currentBalance,
         domain: agent.domain || undefined,
+        avatar: (agent as any).avatar || undefined,
         tasksCompleted: 0,
         compact,
         activityLevel: activity?.activityLevel,

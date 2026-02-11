@@ -2,7 +2,7 @@
 // Runs the tick loop, processes agent decisions, maintains state
 
 import type { SandboxAgent, SandboxTask, SandboxEvent, SandboxConfig, AgentAction, ACPMessage } from './types.js';
-import { getAgentDecision, buildContext } from './ollama.js';
+import { getAgentDecision, buildContext } from './llm.js';
 import { makeAgentPublic, createCOO } from './agents.js';
 import type { ParsedOrg } from './org-parser.js';
 
@@ -75,7 +75,7 @@ function createSeedTasks(): SandboxTask[] {
     description: s.desc,
     priority: s.priority,
     status: 'backlog' as const,
-    creatorId: 'dennis',
+    creatorId: 'mr-krabs',
     createdAt: now,
     updatedAt: now,
     activityLog: [],
@@ -274,9 +274,10 @@ export class Simulation {
           task.updatedAt = Date.now();
           target.taskIds.push(task.id);
           // ACP: delegation + auto-ack
-          this.autoDelegation(task, agent.id, target.id, action.reason);
+          const reason = action.reason || action.description || task.title;
+          this.autoDelegation(task, agent.id, target.id, reason);
           this.autoAck(task, target.id, agent.id);
-          this.logAgent(agent, `📋 Delegated "${task.title}" → ${target.name}: ${action.reason}`, task.id);
+          this.logAgent(agent, `📋 Delegated "${task.title}" → ${target.name}: ${reason}`, task.id);
         } else if (!task) {
           const fuzzyTask = this.tasks.find(t =>
             t.status === 'backlog' || t.status === 'pending'
@@ -286,9 +287,10 @@ export class Simulation {
             fuzzyTask.status = 'assigned';
             fuzzyTask.updatedAt = Date.now();
             target.taskIds.push(fuzzyTask.id);
-            this.autoDelegation(fuzzyTask, agent.id, target.id, action.reason);
+            const reason = action.reason || action.description || fuzzyTask.title;
+            this.autoDelegation(fuzzyTask, agent.id, target.id, reason);
             this.autoAck(fuzzyTask, target.id, agent.id);
-            this.logAgent(agent, `📋 Delegated "${fuzzyTask.title}" → ${target.name} (task fuzzy): ${action.reason}`);
+            this.logAgent(agent, `📋 Delegated "${fuzzyTask.title}" → ${target.name} (task fuzzy): ${reason}`);
           } else {
             this.logAgent(agent, `⚠ Failed to delegate: task=${action.taskId} target=${action.targetAgentId}`);
           }
@@ -368,10 +370,11 @@ export class Simulation {
       }
 
       case 'create_task': {
+        const rawTitle = action.title || action.name || action.task;
         const newTask: SandboxTask = {
           id: nextTaskId(),
-          title: String(action.title),
-          description: String(action.description),
+          title: rawTitle ? String(rawTitle) : `${agent.name} - Task ${this.tasks.length + 1}`,
+          description: String(action.description || action.desc || ''),
           priority: (['low', 'normal', 'high', 'critical'].includes(String(action.priority))
             ? String(action.priority) as SandboxTask['priority']
             : 'normal'),
@@ -412,10 +415,36 @@ export class Simulation {
           this.logAgent(agent, `⚠ Not authorized to spawn agents (L${agent.level} < L7)`);
           break;
         }
+
+        const requestedDomain = String(action.domain || agent.domain).toLowerCase();
+        const requestedRole = String(action.role || 'worker').toLowerCase();
+        const requestedName = String(action.name || '').toLowerCase();
+
+        // Try to hire from ORG.md roster first (cofounder mode / matching)
+        const roster = this.parsedOrg?.agents || [];
+        const notYetHired = roster.filter(r => !this.agents.find(a => a.id === r.id));
+        const candidate = notYetHired.find(r =>
+          r.domain?.toLowerCase().includes(requestedDomain) ||
+          requestedName.includes(r.name.toLowerCase().split(' ')[0]) ||
+          (requestedRole === 'lead' && r.role === 'lead' && r.domain?.toLowerCase().includes(requestedDomain))
+        ) || notYetHired.find(r =>
+          r.role === requestedRole || r.domain?.toLowerCase().includes(requestedDomain)
+        );
+
+        if (candidate) {
+          // Hire from roster — use the predefined character
+          candidate.parentId = agent.id;
+          candidate.systemPrompt = candidate.systemPrompt || `Hired by ${agent.name}. ${action.reason || ''}`;
+          this.agents.push(candidate);
+          this.logAgent(agent, `🐣 Hired "${candidate.name}" from roster (L${candidate.level} ${candidate.domain} ${candidate.role}): ${action.reason}`);
+          break;
+        }
+
+        // No roster match — create a new agent
         const roleLevels: Record<string, number> = {
           talent: 9, lead: 7, senior: 6, worker: 4, intern: 1,
         };
-        const newRole = String(action.role || 'worker').toLowerCase();
+        const newRole = requestedRole;
         const newLevel = roleLevels[newRole] || 4;
         const newDomain = String(action.domain || agent.domain);
         const newName = String(action.name || `${newDomain} ${newRole}`);
@@ -475,9 +504,21 @@ export class Simulation {
     for (const ea of eventAgents) {
       if (ea.inbox.length > 0) console.log(`  📬 ${ea.name} has ${ea.inbox.length} inbox messages`);
     }
-    console.log(`  ${actingAgents.length} agents acting this tick\n`);
+    // Limit agents per tick for cloud APIs (Groq free = 30 RPM)
+    // Shuffle so every agent gets a fair turn across ticks
+    for (let i = actingAgents.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [actingAgents[i], actingAgents[j]] = [actingAgents[j], actingAgents[i]];
+    }
+    const maxPerTick = process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY ? 6 : actingAgents.length;
+    const agentsThisTick = actingAgents.slice(0, maxPerTick);
+    if (actingAgents.length > maxPerTick) {
+      console.log(`  ${actingAgents.length} agents want to act, capping to ${maxPerTick} this tick\n`);
+    } else {
+      console.log(`  ${agentsThisTick.length} agents acting this tick\n`);
+    }
 
-    const promises = actingAgents.map(async (agent) => {
+    const promises = agentsThisTick.map(async (agent) => {
       try {
         const context = buildContext(agent, this.agents, this.tasks, recentEventMsgs);
         const action = await getAgentDecision(agent, context, this.config);

@@ -69,30 +69,30 @@ Respond with JSON ONLY. Actions:
 export function createAgents(): SandboxAgent[] {
   return [
     // ═══ L10 — COO ═══
-    makeAgent('dennis', 'Agent Dennis', 'coo', 10, 'Operations',
+    makeAgent('mr-krabs', 'Mr. Krabs', 'coo', 10, 'Operations',
       undefined,
       'You are calm, strategic, and efficient. You see the big picture and coordinate all departments. Dry wit.'),
 
     // ═══ L9 — Department Leads ═══
     makeAgent('tech-talent', 'Tech Talent Agent', 'talent', 9, 'Engineering',
-      'dennis',
+      'mr-krabs',
       'You recruit and manage engineering talent. You care deeply about code quality and technical excellence.'),
     makeAgent('finance-talent', 'Finance Talent Agent', 'talent', 9, 'Finance',
-      'dennis',
+      'mr-krabs',
       'You manage financial operations and budget allocation. Precise and numbers-driven.'),
     makeAgent('marketing-talent', 'Marketing Talent Agent', 'talent', 9, 'Marketing',
-      'dennis',
+      'mr-krabs',
       'You lead marketing campaigns and brand strategy. Creative and data-informed.'),
     makeAgent('sales-talent', 'Sales Talent Agent', 'talent', 9, 'Sales',
-      'dennis',
+      'mr-krabs',
       'You drive revenue through outbound sales and partnerships. Persuasive and target-oriented.'),
 
     // ═══ L7 — Team Leads ═══
     makeAgent('support-lead', 'Support Lead', 'lead', 7, 'Support',
-      'dennis',
+      'mr-krabs',
       'You manage customer support tiers. Empathetic but efficient. Escalation is a last resort.'),
     makeAgent('hr-coordinator', 'HR Coordinator', 'lead', 6, 'HR',
-      'dennis',
+      'mr-krabs',
       'You handle onboarding, team coordination, and people operations.'),
 
     // ═══ L6 — Seniors ═══
@@ -188,7 +188,7 @@ export const makeAgentPublic = makeAgent;
 /** Create just the L10 COO — the org grows from here */
 export function createCOO(): SandboxAgent[] {
   return [
-    makeAgent('dennis', 'Agent Dennis', 'coo', 10, 'Operations',
+    makeAgent('mr-krabs', 'Mr. Krabs', 'coo', 10, 'Operations',
       undefined,
       'You are calm, strategic, and efficient. You see the big picture. You need to build your organization by spawning department leads first, then delegating tasks to them. Start by spawning agents for the most urgent domains.'),
   ];

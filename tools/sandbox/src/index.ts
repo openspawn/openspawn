@@ -3,12 +3,28 @@
 // Runs AI agents in a simulated organization using local Ollama models
 // Supports loading org structure from ORG.md or using hardcoded agents
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// Load .env from sandbox directory (won't override existing env vars)
+const __filename2 = fileURLToPath(import.meta.url);
+const __sandboxRoot = resolve(dirname(__filename2), '..');
+const envPath = join(__sandboxRoot, '.env');
+if (existsSync(envPath)) {
+  for (const line of readFileSync(envPath, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    if (!process.env[key]) process.env[key] = val;
+  }
+}
 import { createAgents, createCOO } from './agents.js';
 import { parseOrgMd, type ParsedOrg } from './org-parser.js';
-import { initOllama } from './ollama.js';
+import { initLLM, getProvider, getProviderInfo } from './llm.js';
 import { Simulation } from './simulation.js';
 import { startServer } from './server.js';
 import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
@@ -16,7 +32,7 @@ import type { SandboxConfig } from './types.js';
 
 const config: SandboxConfig = {
   model: process.env.SANDBOX_MODEL || 'qwen3:0.6b',
-  tickIntervalMs: Number(process.env.TICK_INTERVAL) || 2000,
+  tickIntervalMs: Number(process.env.TICK_INTERVAL) || (process.env.OPENROUTER_API_KEY ? 5000 : 2000),
   maxTicks: Number(process.env.MAX_TICKS) || 0, // 0 = run forever
   maxConcurrentInferences: Number(process.env.MAX_CONCURRENT) || 4,
   contextWindowTokens: 2048,
@@ -38,11 +54,11 @@ console.log(`  Max concurrent: ${config.maxConcurrentInferences}`);
 console.log(`  Verbose: ${config.verbose}`);
 
 // Init
-initOllama(config);
+await initLLM(config);
 
 // Determine org source
-const cooOnly = process.env.COO_ONLY === '1' || process.argv.includes('--coo-only');
-const cleanSlate = process.env.CLEAN === '1' || process.argv.includes('--clean');
+const cofounderMode = process.env.COFOUNDER === '1' || process.argv.includes('--cofounder');
+const cleanSlate = process.env.CLEAN === '1' || process.argv.includes('--clean') || cofounderMode;
 
 // Check for --org CLI arg or default ORG.md location
 const orgArgIdx = process.argv.indexOf('--org');
@@ -55,21 +71,30 @@ const orgPath = orgArgIdx !== -1 && process.argv[orgArgIdx + 1]
 let parsedOrg: ParsedOrg | undefined;
 let agents;
 
-if (!cooOnly && !cleanSlate && existsSync(orgPath)) {
+// Always load ORG.md if it exists — it defines who works here
+if (existsSync(orgPath)) {
   try {
     parsedOrg = parseOrgMd(orgPath);
-    agents = parsedOrg.agents;
-    console.log(`\n📄 Loaded org from ORG.md (${agents.length} agents)`);
+
+    if (cofounderMode) {
+      // Cofounder mode: just the COO, but ORG.md is the "hiring plan"
+      // Mr. Krabs starts alone and spawns from the roster as needed
+      agents = parsedOrg.agents.filter(a => a.role === 'coo' || a.level >= 9);
+      console.log(`\n🦀 Cofounder mode — Mr. Krabs starts alone`);
+      console.log(`   ${parsedOrg.agents.length} candidates in the hiring plan (ORG.md)`);
+    } else {
+      agents = parsedOrg.agents;
+    }
+
+    console.log(`📄 Loaded org from ORG.md (${agents.length} active agents)`);
     console.log(`   Org: ${parsedOrg.name}`);
     if (parsedOrg.culture.preset) console.log(`   Culture: ${parsedOrg.culture.preset}`);
+    if (cleanSlate) console.log(`   🧹 Clean slate — fresh tasks/events`);
   } catch (err) {
     console.error(`⚠ Failed to parse ORG.md: ${err instanceof Error ? err.message : String(err)}`);
     console.log(`📦 Falling back to built-in agents`);
     agents = createAgents();
   }
-} else if (cooOnly || cleanSlate) {
-  agents = createCOO();
-  console.log(`\n📦 Using COO-only mode`);
 } else {
   agents = createAgents();
   console.log(`\n📦 Using built-in agents (${agents.length} agents)`);

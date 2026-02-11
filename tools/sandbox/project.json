@@ -8,20 +8,15 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx tsx tools/sandbox/src/index.ts",
-        "cwd": "{workspaceRoot}",
-        "env": {
-          "COO_ONLY": "1"
-        }
+        "command": "CLEAN=1 npx tsx tools/sandbox/src/index.ts",
+        "cwd": "{workspaceRoot}"
       },
       "configurations": {
         "full": {
-          "env": {}
+          "command": "npx tsx tools/sandbox/src/index.ts"
         },
-        "clean": {
-          "env": {
-            "CLEAN": "1"
-          }
+        "cofounder": {
+          "command": "COFOUNDER=1 npx tsx tools/sandbox/src/index.ts"
         }
       }
     },
@@ -29,7 +24,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "COO_ONLY=1 npx tsx tools/sandbox/src/index.ts",
+          "CLEAN=1 npx tsx tools/sandbox/src/index.ts",
           "VITE_SANDBOX_MODE=true nx serve dashboard"
         ],
         "cwd": "{workspaceRoot}",
@@ -42,9 +37,9 @@
             "VITE_SANDBOX_MODE=true nx serve dashboard"
           ]
         },
-        "clean": {
+        "cofounder": {
           "commands": [
-            "CLEAN=1 npx tsx tools/sandbox/src/index.ts",
+            "COFOUNDER=1 npx tsx tools/sandbox/src/index.ts",
             "VITE_SANDBOX_MODE=true nx serve dashboard"
           ]
         }

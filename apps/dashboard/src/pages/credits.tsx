@@ -1,23 +1,14 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+// recharts v3 has infinite-loop bug — using custom SVG chart instead
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { EmptyState } from "../components/ui/empty-state";
 import { generateSparklineData } from "../components/ui/sparkline";
 import { StatCard } from "../components/ui/stat-card";
 import { PageHeader } from "../components/ui/page-header";
-import { OceanGradients, OCEAN_COLORS } from "../components/ui/chart-gradients";
-import { ChartTooltip } from "../components/ui/chart-tooltip";
+// OceanGradients/ChartTooltip removed — using custom SVG chart
 import { useCredits } from "../hooks/use-credits";
 import { BudgetBurndown } from "../components/budget-burndown";
 import { ModelUsageBreakdown } from "../components/model-usage";
@@ -116,11 +107,11 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                     </p>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
+                <div className="text-right shrink-0 min-w-[90px]">
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`text-sm sm:text-base font-medium ${
+                    className={`text-sm sm:text-base font-medium tabular-nums ${
                       tx.type === "CREDIT"
                         ? "text-emerald-500"
                         : "text-amber-500"
@@ -129,7 +120,7 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                     {tx.type === "CREDIT" ? "+" : "-"}
                     {tx.amount.toLocaleString()}
                   </motion.p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground tabular-nums">
                     Bal: {tx.balanceAfter.toLocaleString()}
                   </p>
                 </div>
@@ -142,8 +133,25 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
   );
 }
 
+function useStableSize(ref: React.RefObject<HTMLElement | null>) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      if (width > 0 && height > 0) setSize((prev) => (prev.width === Math.round(width) && prev.height === Math.round(height) ? prev : { width: Math.round(width), height: Math.round(height) }));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return size;
+}
+
 export function CreditsPage() {
   const { transactions, loading, error } = useCredits();
+  const balanceChartRef = useRef<HTMLDivElement>(null);
+  const balanceChartSize = useStableSize(balanceChartRef);
 
   const totalEarned = transactions
     .filter((t) => t.type === "CREDIT")
@@ -263,53 +271,38 @@ export function CreditsPage() {
             <CardTitle className="text-base sm:text-lg">Balance Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[220px] sm:h-[300px]">
-              {balanceHistory.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={balanceHistory}>
+            <div ref={balanceChartRef} className="h-[220px] sm:h-[300px]">
+              {balanceHistory.length > 0 && balanceChartSize.width > 0 ? (() => {
+                const w = balanceChartSize.width;
+                const h = balanceChartSize.height;
+                const maxVal = Math.max(...balanceHistory.map((d: { balance?: number }) => d.balance ?? 0), 1);
+                const minVal = Math.min(...balanceHistory.map((d: { balance?: number }) => d.balance ?? 0), 0);
+                const range = maxVal - minVal || 1;
+                const pad = { top: 20, right: 10, bottom: 30, left: 10 };
+                const points = balanceHistory.map((d: { balance?: number }, i: number) => ({
+                  x: pad.left + (i / Math.max(balanceHistory.length - 1, 1)) * (w - pad.left - pad.right),
+                  y: pad.top + (1 - ((d.balance ?? 0) - minVal) / range) * (h - pad.top - pad.bottom),
+                }));
+                const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+                const area = line + ` L${points[points.length - 1].x},${h - pad.bottom} L${points[0].x},${h - pad.bottom} Z`;
+                return (
+                  <svg width={w} height={h}>
                     <defs>
-                      <OceanGradients />
+                      <linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.02} />
+                      </linearGradient>
                     </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="rgba(148,163,184,0.08)"
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="time"
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                      axisLine={{ stroke: 'rgba(148,163,184,0.1)' }}
-                      tickLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
-                    />
-                    <Tooltip
-                      content={
-                        <ChartTooltip
-                          labelFormatter={(l) => `Time: ${l}`}
-                          valueFormatter={(v) => `${v.toLocaleString()} credits`}
-                        />
-                      }
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="balance"
-                      stroke={OCEAN_COLORS.cyan.stroke}
-                      strokeWidth={2.5}
-                      fillOpacity={1}
-                      fill={OCEAN_COLORS.cyan.fill}
-                      dot={balanceHistory.length < 15}
-                      animationDuration={1200}
-                      animationEasing="ease-out"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
+                    <path d={area} fill="url(#balGrad)" />
+                    <path d={line} fill="none" stroke="#06b6d4" strokeWidth={2.5} />
+                    {balanceHistory.map((d: { time?: string }, i: number) => (
+                      i % Math.max(1, Math.floor(balanceHistory.length / 6)) === 0 ? (
+                        <text key={i} x={points[i].x} y={h - 8} textAnchor="middle" className="fill-muted-foreground text-[10px]">{d.time}</text>
+                      ) : null
+                    ))}
+                  </svg>
+                );
+              })() : (
                 <div className="flex h-full items-center justify-center">
                   <div className="text-center">
                     <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
