@@ -1,5 +1,6 @@
 /**
- * Phase Transition Overlay — cinematic full-screen banner when phases change.
+ * Phase Transition Banner — compact slide-down notification when phases change.
+ * Non-intrusive: appears below scenario bar, auto-dismisses in 4s.
  */
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +20,7 @@ interface PhaseTransitionProps {
 export function PhaseTransitionOverlay({ transition, onDismiss }: PhaseTransitionProps) {
   useEffect(() => {
     if (!transition) return;
-    const timer = setTimeout(onDismiss, 5000);
+    const timer = setTimeout(onDismiss, 4000);
     return () => clearTimeout(timer);
   }, [transition, onDismiss]);
 
@@ -27,43 +28,40 @@ export function PhaseTransitionOverlay({ transition, onDismiss }: PhaseTransitio
     <AnimatePresence>
       {transition && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-          className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-md bg-black/60"
+          initial={{ opacity: 0, y: -60 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -60 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="fixed top-12 left-1/2 -translate-x-1/2 z-[65] w-[90vw] max-w-md"
           onClick={onDismiss}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-center px-6 max-w-lg"
-          >
-            <div className="text-5xl mb-4">
-              {PHASE_ICONS[transition.phaseIndex] ?? '🎯'}
+          <div className="bg-slate-800/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg shadow-lg shadow-cyan-500/10 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl shrink-0">
+                {PHASE_ICONS[transition.phaseIndex] ?? '🎯'}
+              </span>
+              <div className="min-w-0">
+                <div className="font-semibold text-white text-sm tracking-wide">
+                  Phase {transition.phaseIndex + 1}: {transition.phaseName}
+                </div>
+                {transition.epics.length > 0 && (
+                  <div className="text-xs text-slate-400 mt-0.5 truncate">
+                    {transition.epics.length} new epic{transition.epics.length !== 1 ? 's' : ''}: {transition.epics.slice(0, 2).join(', ')}
+                    {transition.epics.length > 2 ? ` +${transition.epics.length - 2} more` : ''}
+                  </div>
+                )}
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide mb-2">
-              PHASE {transition.phaseIndex + 1}: {transition.phaseName.toUpperCase()}
-            </h1>
-            {transition.narrative && (
-              <p className="text-slate-300 text-sm sm:text-base mb-4">
-                {transition.narrative}
-              </p>
-            )}
-            {transition.epics.length > 0 && (
-              <ul className="text-left mx-auto max-w-sm space-y-1 text-sm text-slate-400">
-                {transition.epics.map((epic, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span className="text-cyan-400 mt-0.5">•</span>
-                    <span>{epic}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="text-xs text-slate-600 mt-4">Click to dismiss</p>
-          </motion.div>
+            {/* Progress shimmer */}
+            <div className="mt-2 h-0.5 bg-slate-700 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 4, ease: 'linear' }}
+              />
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
