@@ -16,7 +16,7 @@ import { setDemoEngine } from './mock-fetcher';
 import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
 import { debug } from '../lib/debug';
 
-export type ScenarioName = 'acmetech' | 'fresh' | 'startup' | 'growth' | 'enterprise';
+export type ScenarioName = 'acmetech' | 'fresh' | 'startup' | 'growth' | 'enterprise' | 'sandbox';
 
 // Re-export phase info for UI components
 export { PROJECT_PHASES };

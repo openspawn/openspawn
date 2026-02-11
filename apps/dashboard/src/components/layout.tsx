@@ -50,6 +50,7 @@ import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
+import { SandboxCommandBar } from "./sandbox-command-bar";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -789,6 +790,9 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </nav>
         </div>
+
+        {/* Sandbox command bar — fixed at bottom */}
+        <SandboxCommandBar />
       </div>
     </TooltipProvider>
   );

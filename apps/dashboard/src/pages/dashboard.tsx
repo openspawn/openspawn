@@ -20,6 +20,10 @@ import {
   Activity,
   Bot,
   Zap,
+  Clock,
+  AlertTriangle,
+  Layers,
+  CheckCircle,
 } from "lucide-react";
 import {
   AreaChart,
@@ -47,6 +51,11 @@ import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
+import { useSparklines } from "../hooks/use-sandbox-metrics";
+import { useACPMetrics } from "../hooks/use-acp-metrics";
+import { isSandboxMode } from "../graphql/fetcher";
+import { SandboxControls } from "../components/sandbox-controls";
+import { SandboxCommandBar } from "../components/sandbox-command-bar";
 
 function getEventIcon(type: string) {
   if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
@@ -90,6 +99,7 @@ export function DashboardPage() {
   const { events } = useEvents();
   const { isDemo, scenario, speed } = useDemo();
   const layout = useDashboardLayout();
+  const { data: acpMetrics } = useACPMetrics();
 
   const creditChartRef = useRef<HTMLDivElement>(null);
   const tasksChartRef = useRef<HTMLDivElement>(null);
@@ -148,13 +158,17 @@ export function DashboardPage() {
     return 'growth'; // All done
   }, [tasks, scenario]);
 
-  // Generate stable sparkline data (seeded by agent/task counts)
-  const sparklines = useMemo(() => ({
-    agents: generateSparklineData(7, "up"),
-    tasks: generateSparklineData(7, "up"),
-    completed: generateSparklineData(7, "up"),
-    credits: generateSparklineData(7, "stable"),
-  }), []);
+  // Use real metrics from sandbox API when available, otherwise generate mock data
+  const sandboxSparklines = useSparklines();
+  const sparklines = useMemo(() => {
+    if (sandboxSparklines) return sandboxSparklines;
+    return {
+      agents: generateSparklineData(7, "up"),
+      tasks: generateSparklineData(7, "up"),
+      completed: generateSparklineData(7, "up"),
+      credits: generateSparklineData(7, "stable"),
+    };
+  }, [sandboxSparklines]);
 
   const activeAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length, [agents]);
   const pendingAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "PENDING").length, [agents]);
@@ -416,7 +430,7 @@ export function DashboardPage() {
               <div className="flex flex-col items-center justify-center py-8">
                 <Activity className="h-8 w-8 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  No activity yet. Start the simulation to see events.
+                  {isSandboxMode ? "Waiting for agent activity..." : "No activity yet. Start the simulation to see events."}
                 </p>
               </div>
             )}
@@ -447,6 +461,56 @@ export function DashboardPage() {
           />
         }
       />
+
+      {/* Sandbox controls + command bar */}
+      <SandboxControls />
+      <SandboxCommandBar />
+
+      {/* ACP Metrics (sandbox mode only) */}
+      {isSandboxMode && acpMetrics && (() => {
+        const escColor = acpMetrics.escalationRate < 0.1
+          ? "#10b981"
+          : acpMetrics.escalationRate < 0.3
+            ? "#f59e0b"
+            : "#ef4444";
+        const escLabel = acpMetrics.escalationRate < 0.1
+          ? "Healthy"
+          : acpMetrics.escalationRate < 0.3
+            ? "Elevated"
+            : "High";
+        return (
+          <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <StaggerItem><StatCard
+              title="Ack Latency"
+              value={`${acpMetrics.ackLatencyMs}ms`}
+              icon={Clock}
+              description={`${acpMetrics.totalAcks} acks received`}
+              sparklineColor="#06b6d4"
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Escalation Rate"
+              value={`${Math.round(acpMetrics.escalationRate * 100)}%`}
+              icon={AlertTriangle}
+              description={`${escLabel} · ${acpMetrics.totalEscalations} escalations`}
+              sparklineColor={escColor}
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Avg Delegation Depth"
+              value={acpMetrics.avgDelegationDepth.toFixed(1)}
+              icon={Layers}
+              description={`${acpMetrics.totalDelegations} total delegations`}
+              sparklineColor="#8b5cf6"
+            /></StaggerItem>
+            <StaggerItem><StatCard
+              title="Completion Rate"
+              value={`${Math.round(acpMetrics.completionRate * 100)}%`}
+              icon={CheckCircle}
+              description={`${acpMetrics.totalCompletions} completed`}
+              sparklineColor="#10b981"
+            /></StaggerItem>
+          </StaggerContainer>
+        );
+      })()}
 
       {/* Phase Progress (NovaTech scenario only) */}
       {isDemo && scenario === 'novatech' && PROJECT_PHASES && (

@@ -83,6 +83,10 @@ export interface Message {
   toAgent: { id: string; name: string; level: number } | null;
   content: string;
   type: string;
+  acpType?: string;
+  reason?: string;
+  summary?: string;
+  pct?: number;
   taskRef: string | null;
   read: boolean;
   createdAt: string;

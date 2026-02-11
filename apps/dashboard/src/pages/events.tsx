@@ -15,6 +15,7 @@ import { EmptyState } from "../components/ui/empty-state";
 import { PageHeader } from "../components/ui/page-header";
 import { StatCard } from "../components/ui/stat-card";
 import { useEvents } from "../hooks/use-events";
+import { isSandboxMode } from "../graphql/fetcher";
 import { useState, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -81,7 +82,7 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
       <EmptyState
         variant="events"
         title="No events recorded"
-        description="Events appear as agents work. Start a simulation or assign tasks to generate activity."
+        description={isSandboxMode ? "Waiting for agent activity..." : "Events appear as agents work. Start a simulation or assign tasks to generate activity."}
         compact
       />
     );

@@ -1,5 +1,7 @@
-import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { isSandboxMode } from '../graphql/fetcher';
+import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
 
 export type NotificationType = 'agent' | 'task' | 'message' | 'credit' | 'system';
 
@@ -64,8 +66,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
-  // Seed demo notifications on mount
+  // In sandbox mode: create notifications from real SSE events
+  useSandboxSSE(useCallback((event: SandboxSSEEvent) => {
+    if (!isSandboxMode) return;
+    if (event.type === 'connected') return;
+
+    const typeMap: Record<string, NotificationType> = {
+      agent_action: 'agent',
+      system: 'system',
+      human_order: 'system',
+    };
+
+    addNotification({
+      type: typeMap[event.type] || 'task',
+      title: event.agentName
+        ? `${event.agentName} — ${event.type.replace(/_/g, ' ')}`
+        : event.type.replace(/_/g, ' '),
+      description: event.message || 'Activity detected',
+    });
+  }, [addNotification]));
+
+  // Seed demo notifications on mount (non-sandbox only)
   useEffect(() => {
+    if (isSandboxMode) return;
     const now = Date.now();
     const seeded = demoNotifications.map((n, i) => ({
       ...n,

@@ -13,6 +13,8 @@ import { useTeams } from "../hooks";
 import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
 import { TaskTimeline } from "../components/task-timeline";
+import { SandboxActivityFeed } from "../components/sandbox-activity-feed";
+import { TaskCascade } from "../components/task-cascade";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 
 type SortField = "created" | "priority" | "status" | "title";
@@ -364,6 +366,12 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
             )}
           </div>
           
+          {/* Live Activity Stream (sandbox mode) */}
+          <SandboxActivityFeed taskId={task.identifier ?? task.id} />
+
+          {/* ACP Message Cascade (sandbox mode) */}
+          <TaskCascade taskId={task.identifier ?? task.id} />
+
           {/* Approval Info */}
           {task.approvalRequired && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 space-y-2">

@@ -19,6 +19,15 @@ interface ThreadViewProps {
   onClose: () => void;
 }
 
+// ACP message type styling
+const acpStyles: Record<string, { icon: string; label: string; className: string; compact?: boolean }> = {
+  ack: { icon: '👍', label: 'Acknowledged', className: 'bg-muted/60 text-muted-foreground', compact: true },
+  delegation: { icon: '📋', label: 'Delegated', className: 'border-l-4 border-l-blue-500 bg-blue-500/5' },
+  progress: { icon: '📊', label: 'Progress', className: 'bg-muted/40' },
+  escalation: { icon: '⚠️', label: 'Escalated', className: 'bg-red-500/10 border border-red-500/20' },
+  completion: { icon: '✅', label: 'Completed', className: 'bg-emerald-500/10 border border-emerald-500/20' },
+};
+
 const typeColors: Record<string, string> = {
   TASK: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
   STATUS: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
@@ -124,6 +133,26 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
               const showAvatar =
                 idx === 0 || sorted[idx - 1].fromAgentId !== msg.fromAgentId;
 
+              const acpType = (msg as any).acpType as string | undefined;
+              const acpStyle = acpType ? acpStyles[acpType] : undefined;
+
+              // Compact ack chip
+              if (acpStyle?.compact) {
+                return (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.03 }}
+                    className="flex justify-center my-0.5"
+                  >
+                    <span className="text-[10px] text-muted-foreground bg-muted/60 rounded-full px-2.5 py-0.5">
+                      {acpStyle.icon} {acpStyle.label}
+                    </span>
+                  </motion.div>
+                );
+              }
+
               return (
                 <motion.div
                   key={msg.id}
@@ -143,13 +172,15 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                     )}
                   </div>
 
-                  {/* Bubble */}
+                  {/* Bubble — ACP-styled or default */}
                   <div
                     className={cn(
                       'max-w-[75%] rounded-xl px-3 py-2',
-                      isLeft
-                        ? 'bg-muted rounded-tl-sm'
-                        : 'bg-primary/10 rounded-tr-sm',
+                      acpStyle
+                        ? acpStyle.className
+                        : isLeft
+                          ? 'bg-muted rounded-tl-sm'
+                          : 'bg-primary/10 rounded-tr-sm',
                     )}
                   >
                     {showAvatar && (
@@ -167,6 +198,26 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                           {typeIcons[msg.type] || '💬'}
                         </Badge>
                       </div>
+                    )}
+                    {acpType === 'delegation' && (
+                      <p className="text-xs font-medium text-blue-400 mb-0.5">
+                        📋 Delegated: {msg.taskRef || 'task'}
+                      </p>
+                    )}
+                    {acpType === 'escalation' && (
+                      <p className="text-xs font-medium text-red-400 mb-0.5">
+                        ⚠️ Escalated: {(msg as any).reason || 'unknown'}
+                      </p>
+                    )}
+                    {acpType === 'completion' && (
+                      <p className="text-xs font-medium text-emerald-400 mb-0.5">
+                        ✅ Completed
+                      </p>
+                    )}
+                    {acpType === 'progress' && (
+                      <p className="text-xs font-medium text-muted-foreground mb-0.5">
+                        📊 Progress{(msg as any).pct != null ? ` (${(msg as any).pct}%)` : ''}
+                      </p>
                     )}
                     <p className="text-xs md:text-sm text-foreground/90 leading-relaxed">
                       {msg.content}

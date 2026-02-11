@@ -14,9 +14,18 @@ interface AgentHeartbeatProps {
 export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse = true }: AgentHeartbeatProps) {
   const [isWorking, setIsWorking] = useState(status === 'ACTIVE');
 
-  // Simulate activity changes in demo mode
+  // Simulate activity changes in demo mode (not sandbox mode)
   useEffect(() => {
-    const isDemo = window.location.search.includes('demo=true');
+    const href = window.location.href;
+    const isDemo = href.includes('demo=true');
+    const isSandbox = href.includes('sandbox=true');
+    
+    // In sandbox mode, use actual status directly
+    if (isSandbox) {
+      setIsWorking(status === 'ACTIVE');
+      return;
+    }
+    
     if (!isDemo || status !== 'ACTIVE') return;
 
     const interval = setInterval(() => {

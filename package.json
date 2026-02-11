@@ -14,7 +14,12 @@
     "typecheck": "nx run-many -t typecheck",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
-    "screenshots": "node scripts/capture-screenshots.mjs"
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "dev": "nx run-many -t serve --projects=api,dashboard --parallel",
+    "dev:dashboard": "nx serve dashboard",
+    "dev:sandbox": "nx run sandbox:dev",
+    "dev:sandbox:full": "nx run sandbox:dev:full",
+    "dev:sandbox:clean": "nx run sandbox:dev:clean"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
@@ -121,6 +126,7 @@
     "@vitejs/plugin-react-swc": "^4.2.3",
     "@vitest/coverage-v8": "^4.0.0",
     "@vitest/ui": "^4.0.0",
+    "concurrently": "^9.2.1",
     "esbuild": "^0.27.3",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",

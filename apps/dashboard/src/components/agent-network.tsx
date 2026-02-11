@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
+import { isSandboxMode } from "../graphql/fetcher";
+import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import { useAgents, type Agent } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useMessages, useConversations } from "../hooks/use-messages";
@@ -976,7 +978,34 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const edgesRef = useRef(edges);
   edgesRef.current = edges;
 
+  // In sandbox mode: create real delegation animations from SSE events
+  useSandboxSSE(useCallback((event: SandboxSSEEvent) => {
+    if (!isSandboxMode) return;
+    if (!event.message?.includes('Delegated') && event.type !== 'agent_action') return;
+    if (!event.agentId) return;
+
+    // Find an edge from this agent
+    const currentEdges = edgesRef.current;
+    const edge = currentEdges.find(e => e.source === event.agentId || e.target === event.agentId);
+    if (!edge) return;
+
+    const delegation: TaskDelegation = {
+      id: `del-${Date.now()}-${Math.random()}`,
+      fromId: edge.source,
+      toId: edge.target,
+      taskTitle: event.message || 'Task delegation',
+      startTime: Date.now(),
+    };
+
+    setActiveDelegations((prev) => [...prev, delegation]);
+    setTimeout(() => {
+      setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id));
+    }, 1200);
+  }, []));
+
+  // Random delegation animation for demo mode (not sandbox)
   useEffect(() => {
+    if (isSandboxMode) return;
     if (!demo.isPlaying || nodes.length === 0) return;
 
     const taskTitles = [

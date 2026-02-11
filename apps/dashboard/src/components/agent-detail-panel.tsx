@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock } from "lucide-react";
+import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock, Terminal } from "lucide-react";
+import { isSandboxMode } from "../graphql/fetcher";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -424,30 +426,133 @@ function CreditsTab({ agent }: { agent: Agent }) {
   );
 }
 
+// ACP message type styling
+const acpTypeStyles: Record<string, { icon: string; accent: string; bg: string }> = {
+  ack: { icon: '👍', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
+  delegation: { icon: '📋', accent: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/30' },
+  progress: { icon: '📊', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
+  escalation: { icon: '⚠️', accent: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/30' },
+  completion: { icon: '✅', accent: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  status_request: { icon: '💬', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
+};
+
 // Messages Tab Content
 function MessagesTab({ agent }: { agent: Agent }) {
-  // Mock messages for now - would integrate with real messages API
-  const messages = useMemo(() => [
-    {
-      id: "1",
-      type: "sent",
-      body: "Task completed successfully. Ready for next assignment.",
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: "2",
-      type: "received",
-      body: "Great work! Please proceed with the code review task.",
-      createdAt: new Date(Date.now() - 7200000).toISOString(),
-    },
-    {
-      id: "3",
-      type: "sent",
-      body: "Requesting approval for PR #123",
-      createdAt: new Date(Date.now() - 10800000).toISOString(),
-    },
-  ], []);
+  const { agents: allAgents } = useAgents();
+  const parent = allAgents.find((a) => a.id === agent.parentId);
+  const reports = allAgents.filter((a) => a.parentId === agent.id);
+  const firstReport = reports[0];
 
+  // Fetch real messages from sandbox API when in sandbox mode
+  const { data: sandboxMessages } = useQuery({
+    queryKey: ['sandbox-agent-messages', agent.agentId],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:3333/api/agent/${agent.agentId}/messages`);
+      return res.json();
+    },
+    enabled: isSandboxMode,
+    refetchInterval: 5000,
+  });
+
+  // Generate contextual messages based on agent properties (fallback for non-sandbox)
+  const generatedMessages = useMemo(() => {
+    if (isSandboxMode) return [];
+    const domain = agent.domain ?? 'operations';
+    const parentName = parent?.name ?? 'Manager';
+    const reportName = firstReport?.name;
+    const now = Date.now();
+
+    const pool: Array<{ type: string; body: string; offset: number }> = [];
+
+    if (parent) {
+      pool.push({ type: "received", body: `${agent.name}, please prioritize the ${domain} backlog items.`, offset: 1 });
+      pool.push({ type: "sent", body: `Acknowledged. Working on ${domain} tasks now.`, offset: 2 });
+    }
+    if (agent.tasksCompleted > 0) {
+      pool.push({ type: "sent", body: `Completed ${agent.tasksCompleted} task${agent.tasksCompleted > 1 ? 's' : ''} so far. Ready for more.`, offset: 3 });
+    }
+    if (reportName) {
+      pool.push({ type: "sent", body: `Delegated the latest ${domain} task to ${reportName}.`, offset: 4 });
+      pool.push({ type: "received", body: `${reportName} finished the subtask. Results look good.`, offset: 5 });
+    }
+    if (domain === 'engineering' || domain === 'code') {
+      pool.push({ type: "sent", body: "PR review complete. All checks passing.", offset: 6 });
+    } else if (domain === 'security') {
+      pool.push({ type: "sent", body: "Security scan finished. No critical vulnerabilities found.", offset: 7 });
+    } else {
+      pool.push({ type: "sent", body: `${domain.charAt(0).toUpperCase() + domain.slice(1)} tasks are on track.`, offset: 6 });
+    }
+    if (agent.trustScore >= 90) {
+      pool.push({ type: "received", body: `Great reliability, ${agent.name}. Keep it up.`, offset: 10 });
+    } else if (agent.trustScore < 50) {
+      pool.push({ type: "received", body: "Please improve task completion rate. Let me know if you need support.", offset: 11 });
+    }
+
+    return pool.slice(0, 5).map((m, i) => ({
+      id: String(i + 1),
+      type: m.type,
+      body: m.body,
+      createdAt: new Date(now - m.offset * 3600000).toISOString(),
+    }));
+  }, [agent, parent, firstReport]);
+
+  // Render sandbox messages with ACP type styling
+  if (isSandboxMode) {
+    const msgs = sandboxMessages || [];
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.2 }}
+        className="space-y-3"
+      >
+        {msgs.length === 0 ? (
+          <div className="text-center text-muted-foreground py-12 border border-dashed border-border rounded-lg">
+            <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>No messages yet</p>
+          </div>
+        ) : (
+          msgs.map((msg: any, index: number) => {
+            const isSent = msg.from === agent.agentId;
+            const style = acpTypeStyles[msg.type] || acpTypeStyles.ack;
+            const fromAgent = allAgents.find(a => a.agentId === msg.from);
+            const toAgent = allAgents.find(a => a.agentId === msg.to);
+            return (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, x: isSent ? 20 : -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`flex ${isSent ? "justify-end" : "justify-start"}`}
+              >
+                <div className={`max-w-[85%] p-3 rounded-lg border ${style.bg}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-base">{style.icon}</span>
+                    <span className={`text-xs font-medium ${style.accent}`}>
+                      {msg.type}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {isSent ? `→ ${toAgent?.name || msg.to}` : `← ${fromAgent?.name || msg.from}`}
+                    </span>
+                  </div>
+                  <p className="text-sm">{msg.body || msg.summary || msg.type}</p>
+                  {msg.pct !== undefined && msg.pct !== null && (
+                    <div className="mt-1 text-xs text-muted-foreground">Progress: {msg.pct}%</div>
+                  )}
+                  <p className="text-xs mt-2 text-muted-foreground">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })
+        )}
+      </motion.div>
+    );
+  }
+
+  // Non-sandbox: use generated messages
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -456,13 +561,13 @@ function MessagesTab({ agent }: { agent: Agent }) {
       transition={{ duration: 0.2 }}
       className="space-y-3"
     >
-      {messages.length === 0 ? (
+      {generatedMessages.length === 0 ? (
         <div className="text-center text-muted-foreground py-12 border border-dashed border-border rounded-lg">
           <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p>No messages yet</p>
         </div>
       ) : (
-        messages.map((message, index) => (
+        generatedMessages.map((message, index) => (
           <motion.div
             key={message.id}
             initial={{ opacity: 0, x: message.type === "sent" ? 20 : -20 }}
@@ -484,6 +589,46 @@ function MessagesTab({ agent }: { agent: Agent }) {
             </div>
           </motion.div>
         ))
+      )}
+    </motion.div>
+  );
+}
+
+// Prompt Tab Content
+function PromptTab({ agent }: { agent: Agent }) {
+  const { data: sandboxAgents } = useQuery({
+    queryKey: ['sandbox-agents-for-prompt'],
+    queryFn: async () => {
+      const res = await fetch('http://localhost:3333/api/agents');
+      return res.json();
+    },
+    enabled: isSandboxMode,
+  });
+
+  const systemPrompt = useMemo(() => {
+    if (!isSandboxMode || !sandboxAgents) return null;
+    const match = sandboxAgents.find((a: any) => a.agentId === agent.agentId || a.id === agent.agentId);
+    return match?.systemPrompt || null;
+  }, [sandboxAgents, agent.agentId]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.2 }}
+    >
+      {isSandboxMode && systemPrompt ? (
+        <div className="rounded-lg bg-zinc-900 border border-zinc-700 p-4 overflow-auto max-h-[500px]">
+          <pre className="text-sm text-zinc-300 font-mono whitespace-pre-wrap break-words">
+            {systemPrompt}
+          </pre>
+        </div>
+      ) : (
+        <div className="text-center text-muted-foreground py-12 border border-dashed border-border rounded-lg">
+          <Terminal className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          <p>System prompt not available in this mode</p>
+        </div>
       )}
     </motion.div>
   );
@@ -661,6 +806,13 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                   Overview
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="prompt"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+                >
+                  <Terminal className="h-4 w-4 mr-2" />
+                  Prompt
+                </TabsTrigger>
+                <TabsTrigger 
                   value="tasks"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
@@ -704,6 +856,9 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                 <AnimatePresence mode="wait">
                   <TabsContent value="overview" className="mt-0">
                     <OverviewTab agent={agent} />
+                  </TabsContent>
+                  <TabsContent value="prompt" className="mt-0">
+                    <PromptTab agent={agent} />
                   </TabsContent>
                   <TabsContent value="tasks" className="mt-0">
                     <TasksTab agent={agent} />

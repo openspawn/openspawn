@@ -48,6 +48,8 @@ import { teams, type Team, getTeamColor, getSubTeams } from '../demo/teams';
 import { useTeamStats } from '../hooks/use-teams';
 import { useAgents, type Agent } from '../hooks/use-agents';
 import { getAgentAvatarUrl } from '../lib/avatar';
+import { isSandboxMode } from '../graphql/fetcher';
+import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
 
 // ── Icon map ────────────────────────────────────────────────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -204,10 +206,11 @@ interface AgentNodeData extends Record<string, unknown> {
 }
 
 function AgentOrgNode({ data }: NodeProps) {
-  const d = data as unknown as AgentNodeData;
+  const d = data as unknown as AgentNodeData & { isNew?: boolean };
   const teamColor = getTeamColor(d.teamColor);
   const avatarUrl = getAgentAvatarUrl(d.agentId, d.level, 32);
   const isActive = d.status === 'ACTIVE';
+  const isNew = d.isNew === true;
   const statusColor = isActive
     ? '#22c55e'
     : d.status === 'PENDING'
@@ -223,8 +226,19 @@ function AgentOrgNode({ data }: NodeProps) {
         style={{ background: teamColor, width: 8, height: 8, border: '2px solid #1e1e2e' }}
       />
 
+      {/* New agent spawn glow */}
+      {isNew && (
+        <motion.div
+          className="absolute -inset-2 rounded-2xl pointer-events-none"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: [0, 1, 0.6, 0], scale: [0.5, 1.1, 1.05, 1] }}
+          transition={{ duration: 2, ease: 'easeOut' }}
+          style={{ boxShadow: '0 0 24px 8px rgba(34,211,238,0.5), 0 0 48px 16px rgba(34,211,238,0.2)' }}
+        />
+      )}
+
       {/* Active glow ring */}
-      {isActive && (
+      {isActive && !isNew && (
         <motion.div
           className="absolute -inset-1 rounded-2xl pointer-events-none"
           style={{ boxShadow: `0 0 12px 2px ${statusColor}50` }}
@@ -234,9 +248,12 @@ function AgentOrgNode({ data }: NodeProps) {
       )}
 
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={isNew ? { scale: 0, opacity: 0 } : { scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
+        transition={isNew
+          ? { type: 'spring', stiffness: 300, damping: 15, delay: 0.05 }
+          : { type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }
+        }
         className="w-full h-full flex items-center gap-2 rounded-xl border px-3 hover:brightness-110 transition-all"
         style={{
           borderColor: d.isLead ? '#f59e0b' : `${teamColor}60`,
@@ -469,6 +486,8 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
   const [isLayouted, setIsLayouted] = useState(false);
   const baseEdgesRef = useRef<Edge[]>([]);
+  const previousAgentIdsRef = useRef<Set<string>>(new Set());
+  const [newAgentIds, setNewAgentIds] = useState<Set<string>>(new Set());
 
   // Only re-layout when agent IDs change (add/remove), not on every data update
   const agentIds = useMemo(
@@ -479,10 +498,35 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
   useEffect(() => {
     if (loading) return;
 
+    // Detect new agents
+    const currentIds = new Set(agents.map(a => a.id));
+    const prevIds = previousAgentIdsRef.current;
+    if (prevIds.size > 0) {
+      const freshIds = new Set<string>();
+      currentIds.forEach(id => {
+        if (!prevIds.has(id)) freshIds.add(id);
+      });
+      if (freshIds.size > 0) {
+        setNewAgentIds(freshIds);
+        // Clear highlight after 2.5s
+        setTimeout(() => setNewAgentIds(new Set()), 2500);
+      }
+    }
+    previousAgentIdsRef.current = currentIds;
+
     const { nodes: rawNodes, edges: rawEdges } = buildOrgGraph(teams, agents);
 
+    // Mark new agent nodes
+    const markedNodes = rawNodes.map(n => {
+      const d = n.data as Record<string, unknown>;
+      if (!d.isTeam && d.agentDbId && currentIds.has(d.agentDbId as string) && !prevIds.has(d.agentDbId as string) && prevIds.size > 0) {
+        return { ...n, data: { ...d, isNew: true } };
+      }
+      return n;
+    });
+
     setIsLayouted(false);
-    layoutElements(rawNodes, rawEdges).then(({ nodes: ln, edges: le }) => {
+    layoutElements(markedNodes, rawEdges).then(({ nodes: ln, edges: le }) => {
       setNodes(ln);
       baseEdgesRef.current = le;
       setEdges(le);
@@ -491,10 +535,52 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentIds, loading, setNodes, setEdges]);
 
-  // Animate random edges to simulate message flow (scales with demo speed)
+  // Animate edges — sandbox mode uses real SSE events, demo mode uses random
   const { speed } = useDemo();
 
+  // Sandbox mode: animate edges based on real SSE events
+  useSandboxSSE(useCallback((event: SandboxSSEEvent) => {
+    if (!isSandboxMode || !isLayouted || baseEdgesRef.current.length === 0) return;
+    if (event.type === 'connected') return;
+
+    // Find edge involving this agent
+    const agentId = event.agentId;
+    if (!agentId) return;
+
+    const base = baseEdgesRef.current;
+    const matchingEdge = base.find(e =>
+      e.source.includes(agentId) || e.target.includes(agentId) ||
+      e.id.includes(agentId)
+    );
+    // Also try matching by agent node id pattern "agent-<id>"
+    const nodeId = `agent-${agents.find(a => a.agentId === agentId || a.id === agentId)?.id || agentId}`;
+    const matchingEdge2 = matchingEdge || base.find(e =>
+      e.source === nodeId || e.target === nodeId
+    );
+
+    if (matchingEdge2) {
+      setEdges((prev) =>
+        prev.map((e) =>
+          e.id === matchingEdge2.id
+            ? { ...e, data: { ...((e.data as object) || {}), animated: true } }
+            : e
+        ),
+      );
+      setTimeout(() => {
+        setEdges((prev) =>
+          prev.map((e) =>
+            e.id === matchingEdge2.id
+              ? { ...e, data: { ...((e.data as object) || {}), animated: false } }
+              : e
+          ),
+        );
+      }, 2000);
+    }
+  }, [isLayouted, agents, setEdges]));
+
+  // Demo mode: random edge animation (non-sandbox only)
   useEffect(() => {
+    if (isSandboxMode) return;
     if (!isLayouted || baseEdgesRef.current.length === 0) return;
 
     // Scale animation timing with speed — faster speed = more frequent + shorter animations

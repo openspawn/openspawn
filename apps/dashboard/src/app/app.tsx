@@ -8,6 +8,7 @@ import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { MobileStatusPage } from "../pages/mobile-status";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
+import { isSandboxMode } from "../graphql/fetcher";
 import { CommandPalette } from "../components/command-palette";
 import { PwaInstallPrompt } from "../components/pwa-install-prompt";
 import { OfflineIndicator } from "../components/offline-indicator";
@@ -27,21 +28,23 @@ import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration }
 import { AuthProvider, SidePanelProvider } from "../contexts";
 import type { ReactNode } from "react";
 
-// Check for demo mode via URL param or env
+// Check for demo/sandbox mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 const scenarioParam = urlParams.get('scenario') || 'acmetech';
 
-// Use HashRouter for static demo deployment (GitHub Pages), BrowserRouter otherwise
-const Router = isDemoMode ? HashRouter : BrowserRouter;
+// Use HashRouter for demo/sandbox (preserves query params across navigation)
+const Router = (isDemoMode || isSandboxMode) ? HashRouter : BrowserRouter;
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: isDemoMode ? 1000 * 5 : 1000 * 60, // 5s in demo (refreshed by simulation ticks)
-      gcTime: isDemoMode ? 1000 * 30 : 1000 * 60 * 5, // 30s in demo
+      staleTime: (isDemoMode || isSandboxMode) ? 1000 * 5 : 1000 * 60, // 5s in demo/sandbox
+      gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5, // 30s in demo/sandbox
       refetchOnWindowFocus: false,
       refetchOnMount: true,
+      // In sandbox mode, poll every 3s for live updates from Ollama agents
+      ...(isSandboxMode ? { refetchInterval: 3000 } : {}),
     },
   },
 });
@@ -61,9 +64,9 @@ function DemoWrapper({ children }: { children: ReactNode }) {
   );
 }
 
-// In demo mode, skip auth protection
+// In demo/sandbox mode, skip auth protection
 function MaybeProtectedRoute({ children }: { children: ReactNode }) {
-  if (isDemoMode) {
+  if (isDemoMode || isSandboxMode) {
     return <>{children}</>;
   }
   return <ProtectedRoute>{children}</ProtectedRoute>;

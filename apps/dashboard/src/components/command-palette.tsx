@@ -97,6 +97,7 @@ export function CommandPalette() {
               <div className="flex items-center border-b border-border px-4">
                 <Search className="mr-2 h-4 w-4 shrink-0 text-primary/60" />
                 <Command.Input
+                  autoFocus
                   placeholder="Search pages, actions, agents..."
                   className="flex h-12 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                 />

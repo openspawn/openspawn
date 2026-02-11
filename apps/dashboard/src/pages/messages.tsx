@@ -26,6 +26,8 @@ import { PhaseChip } from '../components/phase-chip';
 import { TeamBadge, TeamFilterDropdown } from '../components/team-badge';
 import { ThreadView } from '../components/thread-view';
 import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
+import { isSandboxMode } from '../graphql/fetcher';
+import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
 
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -51,6 +53,15 @@ const typeIcons: Record<string, string> = {
   QUESTION: '❓',
   ESCALATION: '🚨',
   GENERAL: '💬',
+};
+
+// ACP message rendering for sandbox mode
+const acpTypeRenderers: Record<string, (msg: Message) => { label: string; className: string; compact?: boolean }> = {
+  ack: () => ({ label: '👍 Acknowledged', className: 'bg-muted/60 text-muted-foreground text-[10px] rounded-full px-2 py-0.5 inline-block', compact: true }),
+  delegation: (msg) => ({ label: `📋 Delegated: ${msg.taskRef || 'task'}`, className: 'border-l-4 border-l-blue-500 bg-blue-500/5 pl-2' }),
+  progress: (msg) => ({ label: `📊 ${msg.content}`, className: 'bg-muted/30' }),
+  escalation: (msg) => ({ label: `⚠️ Escalated: ${(msg as any).reason || 'unknown'} — ${msg.content}`, className: 'bg-red-500/10 border border-red-500/20' }),
+  completion: (msg) => ({ label: `✅ Completed: ${(msg as any).summary || msg.content}`, className: 'bg-emerald-500/10 border border-emerald-500/20' }),
 };
 
 // ============================================================
@@ -138,8 +149,26 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
     setEdges(edgeList);
   }, [agents, messages, pulsingEdges, isMobile, setNodes, setEdges]);
 
-  // Simulate live message flow
+  // In sandbox mode: pulse edges from real SSE events
+  useSandboxSSE(useCallback((event: SandboxSSEEvent) => {
+    if (!isSandboxMode) return;
+    if (event.agentId) {
+      // Try to find fromAgentId/toAgentId from event data
+      const fromId = event.agentId;
+      // Look for a matching agent in the message about delegation/communication
+      // The SSE event has agentId but not always toAgentId, so we pulse any edge involving this agent
+      const relevantEdge = edges.find(e => e.source === fromId || e.target === fromId);
+      if (relevantEdge) {
+        const key = [relevantEdge.source, relevantEdge.target].sort().join('::');
+        setPulsingEdges(new Set([key]));
+        setTimeout(() => setPulsingEdges(new Set()), 1000);
+      }
+    }
+  }, [edges]));
+
+  // Simulate live message flow (non-sandbox/demo mode only)
   useEffect(() => {
+    if (isSandboxMode) return;
     if (messages.length === 0) return;
     const interval = setInterval(() => {
       const randomMsg = messages[Math.floor(Math.random() * messages.length)];
@@ -241,11 +270,18 @@ function FeedVirtualList({ filtered, allMessages, onViewThread }: { filtered: Me
                   
                   <Card className={cn(
                     "flex-1 border-l-4",
-                    msg.type === 'TASK' && 'border-l-blue-500',
-                    msg.type === 'STATUS' && 'border-l-green-500',
-                    msg.type === 'REPORT' && 'border-l-purple-500',
-                    msg.type === 'QUESTION' && 'border-l-yellow-500',
-                    msg.type === 'ESCALATION' && 'border-l-red-500',
+                    // ACP-specific styling in sandbox mode
+                    isSandboxMode && (msg as any).acpType === 'delegation' && 'border-l-blue-500',
+                    isSandboxMode && (msg as any).acpType === 'escalation' && 'border-l-red-500 bg-red-500/5',
+                    isSandboxMode && (msg as any).acpType === 'completion' && 'border-l-emerald-500 bg-emerald-500/5',
+                    isSandboxMode && (msg as any).acpType === 'progress' && 'border-l-slate-400',
+                    isSandboxMode && (msg as any).acpType === 'ack' && 'border-l-transparent',
+                    // Default styling for non-sandbox
+                    !isSandboxMode && msg.type === 'TASK' && 'border-l-blue-500',
+                    !isSandboxMode && msg.type === 'STATUS' && 'border-l-green-500',
+                    !isSandboxMode && msg.type === 'REPORT' && 'border-l-purple-500',
+                    !isSandboxMode && msg.type === 'QUESTION' && 'border-l-yellow-500',
+                    !isSandboxMode && msg.type === 'ESCALATION' && 'border-l-red-500',
                   )}>
                     <CardContent className="p-2 md:p-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
@@ -449,6 +485,19 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
                         {[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).slice(-10).map((msg) => {
                           const sender = msg.fromAgent;
                           const isAgent1 = msg.fromAgentId === agent1Id;
+                          const acpType = (msg as any).acpType as string | undefined;
+                          const acpRenderer = acpType && isSandboxMode ? acpTypeRenderers[acpType] : undefined;
+                          const acpResult = acpRenderer?.(msg);
+
+                          // Compact ack chip
+                          if (acpResult?.compact) {
+                            return (
+                              <div key={msg.id} className="flex justify-center my-0.5">
+                                <span className={acpResult.className}>{acpResult.label}</span>
+                              </div>
+                            );
+                          }
+
                           return (
                             <div
                               key={msg.id}
@@ -461,10 +510,12 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
                               <div
                                 className={cn(
                                   "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
-                                  isAgent1 ? "bg-muted" : "bg-primary/10"
+                                  acpResult
+                                    ? acpResult.className
+                                    : isAgent1 ? "bg-muted" : "bg-primary/10"
                                 )}
                               >
-                                {msg.content}
+                                {acpResult ? acpResult.label : msg.content}
                                 <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1">{formatTime(msg.createdAt)}</p>
                               </div>
                             </div>

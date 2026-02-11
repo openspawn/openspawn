@@ -1,12 +1,19 @@
 import { GraphQLClient } from "graphql-request";
 import { demoFetcher } from "../demo/mock-fetcher";
+import { sandboxFetcher } from "../demo/sandbox-fetcher";
 
-// Check if we're in demo mode
+// Check if we're in demo mode or sandbox mode
+// Check both search params and full URL (HashRouter can move params around)
+const _href = typeof window !== 'undefined' ? window.location.href : '';
 const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-export const isDemoMode = urlParams?.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
+export const isDemoMode = urlParams?.get('demo') === 'true' || _href.includes('demo=true') || import.meta.env.VITE_DEMO_MODE === 'true';
+export const isSandboxMode = urlParams?.get('sandbox') === 'true' || _href.includes('sandbox=true') || import.meta.env.VITE_SANDBOX_MODE === 'true';
 
 if (isDemoMode) {
   console.log("[GraphQL] Demo mode enabled - using mock fetcher (no network requests)");
+}
+if (isSandboxMode) {
+  console.log("[GraphQL] Sandbox mode enabled - fetching from sandbox API (localhost:3333)");
 }
 
 // Use the same host as the dashboard, but port 3000 for the API
@@ -49,6 +56,11 @@ export function fetcher<TData, TVariables extends Record<string, unknown>>(
   query: string,
   variables?: TVariables
 ): () => Promise<TData> {
+  // Use sandbox fetcher (real LLM agents via Ollama)
+  if (isSandboxMode) {
+    return sandboxFetcher<TData, TVariables>(query, variables);
+  }
+
   // Use mock fetcher in demo mode (no network requests!)
   if (isDemoMode) {
     return demoFetcher<TData, TVariables>(query, variables);
