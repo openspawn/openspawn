@@ -183,6 +183,7 @@ interface AgentNodeData extends Record<string, unknown> {
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
   const { avatarVersion, agentActivity, agentHealth, isMobileOrTouch, dimIdle } = useContext(NetworkContext);
+  const hasAnimated = useRef(false);
   
   // Get activity data
   const activity = agentActivity.get(nodeData.agentId);
@@ -245,12 +246,13 @@ function AgentNode({ data, selected }: NodeProps) {
       />
       
       <motion.div
-        initial={{ scale: 0, opacity: 0 }}
+        initial={hasAnimated.current ? false : { scale: 0, opacity: 0 }}
         animate={{ 
           scale: isDespawning ? 0 : 1, 
           opacity: isDespawning ? 0 : (isIdle && dimIdle ? 0.35 : isIdle ? 0.9 : 1),
         }}
         exit={{ scale: 0, opacity: 0 }}
+        onAnimationComplete={() => { hasAnimated.current = true; }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className="absolute inset-0"
       >
