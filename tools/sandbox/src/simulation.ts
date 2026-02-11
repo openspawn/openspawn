@@ -486,11 +486,18 @@ export class Simulation {
     console.log(`${'═'.repeat(60)}`);
 
     const actingAgents = this.agents.filter(agent => {
-      // Event-driven agents: only act if inbox has messages or recentMessages
+      // Cooldown: skip agents that acted recently (prevent nag loops)
+      const cooldownTicks = agent.level >= 7 ? 3 : 2;
+      if (agent.lastActedTick && (this.tick - agent.lastActedTick) < cooldownTicks) {
+        return false;
+      }
+
+      // Event-driven agents: ONLY act on new inbox messages
       if (agent.trigger === 'event-driven') {
-        const hasWork = agent.inbox.length > 0 || agent.recentMessages.length > 0;
-        if (hasWork) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length}, recentMsgs: ${agent.recentMessages.length} → WILL ACT`);
-        return hasWork;
+        const hasInbox = agent.inbox.length > 0;
+        if (hasInbox) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length} → WILL ACT`);
+        else if (this.tick % 10 === 0) console.log(`    💤 ${agent.name} (event-driven) — inbox empty, sleeping`);
+        return hasInbox;
       }
       // Polling agents: existing level-based frequency
       if (agent.level >= 9) return true;
@@ -498,19 +505,13 @@ export class Simulation {
       if (agent.level >= 3) return this.tick % 3 === 0;
       return this.tick % 5 === 0;
     });
-
-    // Debug: show inbox state for event-driven agents
-    const eventAgents = this.agents.filter(a => a.trigger === 'event-driven');
-    for (const ea of eventAgents) {
-      if (ea.inbox.length > 0) console.log(`  📬 ${ea.name} has ${ea.inbox.length} inbox messages`);
-    }
     // Limit agents per tick for cloud APIs (Groq free = 30 RPM)
     // Shuffle so every agent gets a fair turn across ticks
     for (let i = actingAgents.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [actingAgents[i], actingAgents[j]] = [actingAgents[j], actingAgents[i]];
     }
-    const maxPerTick = process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY ? 6 : actingAgents.length;
+    const maxPerTick = process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY ? 3 : actingAgents.length;
     const agentsThisTick = actingAgents.slice(0, maxPerTick);
     if (actingAgents.length > maxPerTick) {
       console.log(`  ${actingAgents.length} agents want to act, capping to ${maxPerTick} this tick\n`);
@@ -523,9 +524,26 @@ export class Simulation {
         const context = buildContext(agent, this.agents, this.tasks, recentEventMsgs);
         const action = await getAgentDecision(agent, context, this.config);
         this.processAction(agent, action);
+        agent.lastActedTick = this.tick;
         // Clear inbox after event-driven agent processes its turn
+        // BUT if agent took a productive action (not idle), re-queue so they continue next tick
         if (agent.trigger === 'event-driven') {
-          agent.inbox = [];
+          const productiveActions = ['spawn_agent', 'create_task', 'delegate', 'escalate'];
+          if (!productiveActions.includes(action.action)) {
+            agent.inbox = [];
+          } else {
+            // Keep a continuation message so agent wakes again next tick
+            const continuation: ACPMessage = {
+              id: `acp-continue-${Date.now()}`,
+              type: 'delegation',
+              from: 'system',
+              to: agent.id,
+              taskId: '',
+              body: 'Continue with remaining work from your original order. Do NOT repeat actions you already took. If nothing left to do, respond {"action":"idle"}.',
+              timestamp: Date.now(),
+            };
+            agent.inbox = [continuation];
+          }
         }
       } catch (err) {
         this.logAgent(agent, `💥 Error: ${err instanceof Error ? err.message : String(err)}`);

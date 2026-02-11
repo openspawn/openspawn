@@ -1,0 +1,24 @@
+# ── BikiniBottom — Caddy Reverse Proxy ────────────────────────────────────────
+# Auto-HTTPS via Let's Encrypt for bikinibottom.ai
+
+bikinibottom.ai {
+	reverse_proxy sandbox:3333
+
+	encode gzip zstd
+
+	header {
+		# Security headers
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		# Cache static assets
+		Cache-Control "public, max-age=3600" {
+			path /assets/*
+		}
+	}
+}
+
+# Redirect www to apex
+www.bikinibottom.ai {
+	redir https://bikinibottom.ai{uri} permanent
+}

@@ -36,6 +36,8 @@ export interface SandboxAgent {
   triggerOn?: ACPMessage['type'][];
   /** Inbox queue — pending ACP messages that haven't been processed */
   inbox: ACPMessage[];
+  /** Tick number when this agent last took an LLM action */
+  lastActedTick?: number;
   /** Stats */
   stats: {
     tasksCompleted: number;

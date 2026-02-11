@@ -55,3 +55,6 @@ e2e/screenshots/
 playwright-report/
 test-results/
 __pycache__/
+
+# Production secrets
+.env.production

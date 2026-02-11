@@ -209,16 +209,23 @@ export function buildContext(
     }
   }
 
-  // Recent ACP messages to you
+  // Recent ACP messages (deduplicated — skip repeated nag messages)
   const myMessages = agent.recentMessages.slice(-5);
   if (myMessages.length > 0) {
     lines.push(`\n== RECENT MESSAGES ==`);
+    const seen = new Set<string>();
     for (const m of myMessages) {
       const fromAgent = allAgents.find(a => a.id === m.from);
       const prefix = m.type === 'ack' ? '👍' : m.type === 'completion' ? '✅' : m.type === 'escalation' ? '⚠' : m.type === 'delegation' ? '📋' : m.type === 'progress' ? '📊' : '💬';
       const content = m.body || m.summary || '';
-      lines.push(`- ${prefix} [${m.type}] From ${fromAgent?.name || m.from}: "${content}"`);
+      // Deduplicate similar messages from same sender
+      const dedupeKey = `${m.from}:${m.type}:${m.taskId}`;
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      const age = Math.round((Date.now() - m.timestamp) / 1000);
+      lines.push(`- ${prefix} [${m.type}] From ${fromAgent?.name || m.from} (${age}s ago): "${content}"`);
     }
+    lines.push(`\n⚠ Do NOT send the same message twice. If you already asked for an update, WAIT for a reply. Use {"action":"idle"} if nothing new to do.`);
   }
 
   // Recent org events

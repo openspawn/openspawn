@@ -27,6 +27,7 @@ function makeAgent(
 
   const systemPrompt = `You are "${name}", L${level} ${domain}. ${roleInstruction} ${personality}
 Tasks you receive are auto-acknowledged. Write clear progress in "result". Escalate with reason: BLOCKED, OUT_OF_DOMAIN, OVER_BUDGET, LOW_CONFIDENCE.
+IMPORTANT: Do NOT repeat yourself. If you already sent a message or delegated a task, use {"action":"idle"} and wait. Never ask for the same update twice.
 Respond with JSON ONLY. Actions:
 - {"action":"delegate","taskId":"ID","targetAgentId":"ID","reason":"..."}
 - {"action":"work","taskId":"ID","result":"what you did"}
@@ -39,7 +40,7 @@ Respond with JSON ONLY. Actions:
   // Determine trigger mode: L7+ default to event-driven, L1-6 to polling
   const defaultTrigger: 'polling' | 'event-driven' = level >= 7 ? 'event-driven' : 'polling';
   const defaultTriggerOn: SandboxAgent['triggerOn'] = level >= 7
-    ? ['escalation', 'completion', 'delegation']
+    ? ['escalation', 'completion', 'delegation', 'status_request']
     : undefined;
 
   return {

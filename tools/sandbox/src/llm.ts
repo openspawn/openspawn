@@ -7,37 +7,40 @@ import type { SandboxAgent, AgentAction, SandboxConfig } from './types.js';
 
 // ── Provider detection ──────────────────────────────────────────────────────
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const GROQ_URL = 'https://api.groq.com/openai/v1';
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
-const OPENROUTER_URL = process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1';
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'google/gemma-3n-e2b-it:free';
-const OPENROUTER_MANAGER_MODEL = process.env.OPENROUTER_MANAGER_MODEL || OPENROUTER_MODEL;
-
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+// Read env vars lazily (ES module imports are hoisted before .env loader runs)
+const env = () => ({
+  GROQ_API_KEY: process.env.GROQ_API_KEY || '',
+  GROQ_URL: 'https://api.groq.com/openai/v1',
+  GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
+  OPENROUTER_URL: process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1',
+  OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || 'google/gemma-3n-e2b-it:free',
+  OPENROUTER_MANAGER_MODEL: process.env.OPENROUTER_MANAGER_MODEL || process.env.OPENROUTER_MODEL || 'google/gemma-3n-e2b-it:free',
+  OLLAMA_URL: process.env.OLLAMA_URL || 'http://localhost:11434',
+});
 
 export type Provider = 'groq' | 'openrouter' | 'ollama';
 
 export function getProvider(): Provider {
-  if (GROQ_API_KEY) return 'groq';
-  if (OPENROUTER_API_KEY) return 'openrouter';
+  const forced = process.env.LLM_PROVIDER as Provider | undefined;
+  if (forced && ['groq', 'openrouter', 'ollama'].includes(forced)) return forced;
+  if (env().GROQ_API_KEY) return 'groq';
+  if (env().OPENROUTER_API_KEY) return 'openrouter';
   return 'ollama';
 }
 
 export function getProviderInfo(): string {
   switch (getProvider()) {
-    case 'groq': return `Groq (model: ${GROQ_MODEL}, free tier, 14.4K req/day)`;
-    case 'openrouter': return `OpenRouter (workers: ${OPENROUTER_MODEL}, managers: ${OPENROUTER_MANAGER_MODEL})`;
+    case 'groq': return `Groq (model: ${env().GROQ_MODEL}, free tier, 14.4K req/day)`;
+    case 'openrouter': return `OpenRouter (workers: ${env().OPENROUTER_MODEL}, managers: ${env().OPENROUTER_MANAGER_MODEL})`;
     case 'ollama': return `Ollama (local)`;
   }
 }
 
 export function getModelName(): string {
   switch (getProvider()) {
-    case 'groq': return GROQ_MODEL;
-    case 'openrouter': return OPENROUTER_MODEL;
+    case 'groq': return env().GROQ_MODEL;
+    case 'openrouter': return env().OPENROUTER_MODEL;
     case 'ollama': return process.env.SANDBOX_MODEL || 'qwen3:0.6b';
   }
 }
@@ -90,14 +93,14 @@ export async function initLLM(config: SandboxConfig): Promise<void> {
   if (provider === 'groq') {
     // Quick validation — make sure the key works
     try {
-      const res = await fetch(`${GROQ_URL}/models`, {
-        headers: { 'Authorization': `Bearer ${GROQ_API_KEY}` },
+      const res = await fetch(`${env().GROQ_URL}/models`, {
+        headers: { 'Authorization': `Bearer ${env().GROQ_API_KEY}` },
       });
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json() as { data: { id: string }[] };
-      const modelExists = data.data.some(m => m.id === GROQ_MODEL);
+      const modelExists = data.data.some(m => m.id === env().GROQ_MODEL);
       if (!modelExists) {
-        console.warn(`  ⚠ Model "${GROQ_MODEL}" not found on Groq. Available: ${data.data.map(m => m.id).slice(0, 5).join(', ')}...`);
+        console.warn(`  ⚠ Model "${env().GROQ_MODEL}" not found on Groq. Available: ${data.data.map(m => m.id).slice(0, 5).join(', ')}...`);
       }
       console.log(`  ✅ Groq API key valid`);
       console.log(`  💰 Cost: FREE (rate-limited, not credit-limited)`);
@@ -144,14 +147,14 @@ async function withRetry(
 
 async function callGroq(messages: ChatMessage[], agent: SandboxAgent): Promise<LLMResponse> {
   const response = await withRetry(agent, () =>
-    fetch(`${GROQ_URL}/chat/completions`, {
+    fetch(`${env().GROQ_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${env().GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: GROQ_MODEL,
+        model: env().GROQ_MODEL,
         messages,
         temperature: 0.7,
         max_tokens: 256,
@@ -182,14 +185,14 @@ async function callGroq(messages: ChatMessage[], agent: SandboxAgent): Promise<L
 // ── OpenRouter inference ────────────────────────────────────────────────────
 
 async function callOpenRouter(messages: ChatMessage[], agent: SandboxAgent): Promise<LLMResponse> {
-  const model = agent.level >= 7 ? OPENROUTER_MANAGER_MODEL : OPENROUTER_MODEL;
+  const model = agent.level >= 7 ? env().OPENROUTER_MANAGER_MODEL : env().OPENROUTER_MODEL;
 
   const response = await withRetry(agent, () =>
-    fetch(`${OPENROUTER_URL}/chat/completions`, {
+    fetch(`${env().OPENROUTER_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Authorization': `Bearer ${env().OPENROUTER_API_KEY}`,
         'HTTP-Referer': 'https://bikinibottom.ai',
         'X-Title': 'BikiniBottom Sandbox',
       },
@@ -225,7 +228,7 @@ async function callOpenRouter(messages: ChatMessage[], agent: SandboxAgent): Pro
 // ── Ollama inference ────────────────────────────────────────────────────────
 
 async function callOllama(messages: ChatMessage[], config: SandboxConfig): Promise<LLMResponse> {
-  const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+  const response = await fetch(`${env().OLLAMA_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

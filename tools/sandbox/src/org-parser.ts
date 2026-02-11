@@ -99,7 +99,7 @@ function makeAgent(
 ): SandboxAgent {
   const canSpawn = level >= 7;
   const roleInstruction = level >= 7
-    ? 'You DELEGATE tasks to your direct reports. If you have no reports, SPAWN agents first.'
+    ? 'You DELEGATE tasks to your direct reports. Only SPAWN new agents if explicitly asked to hire.'
     : level >= 5
     ? 'You do complex work and can delegate to juniors.'
     : 'You do assigned tasks. Escalate if stuck.';
@@ -110,6 +110,7 @@ function makeAgent(
 
   const fullPrompt = `You are "${name}", L${level} ${domain}. ${roleInstruction}
 ${systemPrompt}
+IMPORTANT: Do NOT repeat yourself. If you already sent a message or delegated a task, use {"action":"idle"} and wait. Never ask for the same update twice.
 Respond with JSON ONLY. Actions:
 - {"action":"delegate","taskId":"ID","targetAgentId":"ID","reason":"..."}
 - {"action":"work","taskId":"ID","result":"what you did"}
@@ -121,7 +122,7 @@ Respond with JSON ONLY. Actions:
 
   const defaultTrigger: 'polling' | 'event-driven' = level >= 7 ? 'event-driven' : 'polling';
   const defaultTriggerOn: ACPMessage['type'][] | undefined = level >= 7
-    ? ['escalation', 'completion', 'delegation']
+    ? ['escalation', 'completion', 'delegation', 'status_request']
     : undefined;
 
   return {
