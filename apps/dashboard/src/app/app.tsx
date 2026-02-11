@@ -93,7 +93,7 @@ export function App() {
             <DemoWrapper>
               <Router>
               <OfflineIndicator />
-              <PwaInstallPrompt />
+              {/* <PwaInstallPrompt /> — disabled for public demo */}
               <CommandPalette />
               <WelcomeScreen />
               <FeatureTour />

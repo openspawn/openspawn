@@ -7,7 +7,7 @@ import { sandboxFetcher } from "../demo/sandbox-fetcher";
 const _href = typeof window !== 'undefined' ? window.location.href : '';
 const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
 export const isDemoMode = urlParams?.get('demo') === 'true' || _href.includes('demo=true') || import.meta.env.VITE_DEMO_MODE === 'true';
-export const isSandboxMode = urlParams?.get('sandbox') === 'true' || _href.includes('sandbox=true') || import.meta.env.VITE_SANDBOX_MODE === 'true';
+export const isSandboxMode = urlParams?.get('sandbox') === 'true' || _href.includes('sandbox=true') || import.meta.env.VITE_SANDBOX_MODE === 'true' || _href.includes('bikinibottom.ai');
 
 if (isDemoMode) {
   console.log("[GraphQL] Demo mode enabled - using mock fetcher (no network requests)");
