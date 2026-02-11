@@ -30,6 +30,7 @@ import { createAgents, createCOO } from './agents.js';
 import { parseOrgMd, type ParsedOrg } from './org-parser.js';
 import { initLLM, getProvider, getProviderInfo } from './llm.js';
 import { Simulation } from './simulation.js';
+import { DeterministicSimulation } from './deterministic.js';
 import { startServer } from './server.js';
 import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
 import type { SandboxConfig } from './types.js';
@@ -134,11 +135,18 @@ for (const a of agents) {
   console.log(`${indent}L${a.level} ${a.name} (${a.id}) — ${a.domain}`);
 }
 
-// Run
-const sim = new Simulation(agents, config, cleanSlate, parsedOrg);
+// Run — deterministic mode by default, LLM mode with SIMULATION_MODE=llm
+const useLLM = process.env.SIMULATION_MODE === 'llm';
+const sim = useLLM
+  ? new Simulation(agents, config, cleanSlate, parsedOrg)
+  : new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
+
+if (!useLLM) {
+  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=llm for LLM-driven agents)`);
+}
 
 // Start HTTP API server for dashboard integration
-startServer(sim);
+startServer(sim as any);
 
 sim.run().catch(err => {
   console.error('💥 Simulation crashed:', err);
