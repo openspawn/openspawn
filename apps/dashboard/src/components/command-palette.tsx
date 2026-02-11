@@ -34,14 +34,14 @@ const actions = [
 ];
 
 const demoAgents = [
-  { name: 'SpongeBob', role: 'Task Runner', id: 'spongebob' },
-  { name: 'Patrick', role: 'Load Balancer', id: 'patrick' },
-  { name: 'Squidward', role: 'Code Reviewer', id: 'squidward' },
-  { name: 'Sandy', role: 'Security Analyst', id: 'sandy' },
-  { name: 'Mr. Krabs', role: 'Cost Optimizer', id: 'mrkrabs' },
-  { name: 'Plankton', role: 'Data Scraper', id: 'plankton' },
-  { name: 'Gary', role: 'Log Monitor', id: 'gary' },
-  { name: 'Karen', role: 'AI Assistant', id: 'karen' },
+  { name: 'Alpha', role: 'Task Runner', id: 'alpha' },
+  { name: 'Bravo', role: 'Load Balancer', id: 'bravo' },
+  { name: 'Charlie', role: 'Code Reviewer', id: 'charlie' },
+  { name: 'Delta', role: 'Security Analyst', id: 'delta' },
+  { name: 'Echo', role: 'Cost Optimizer', id: 'echo' },
+  { name: 'Foxtrot', role: 'Data Analyst', id: 'foxtrot' },
+  { name: 'Golf', role: 'Log Monitor', id: 'golf' },
+  { name: 'Hotel', role: 'AI Assistant', id: 'hotel' },
 ];
 
 export function CommandPalette() {

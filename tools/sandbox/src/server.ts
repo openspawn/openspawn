@@ -83,6 +83,7 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     lastPromotionAt: null,
     teamId: domainToTeamId(agent.domain),
     avatar: agent.avatar ?? null,
+    avatarColor: agent.avatarColor ?? null,
     systemPrompt: agent.systemPrompt,
     trigger: agent.trigger,
     triggerOn: agent.triggerOn ?? null,
