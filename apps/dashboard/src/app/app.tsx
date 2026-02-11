@@ -33,9 +33,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 const scenarioParam = urlParams.get('scenario') || 'acmetech';
 
-// Use HashRouter for local demo (preserves query params), BrowserRouter for production sandbox
-const isProduction = typeof window !== 'undefined' && !window.location.port;
-const Router = (isDemoMode && !isProduction) ? HashRouter : BrowserRouter;
+// Use HashRouter everywhere — BrowserRouter causes blank page with nested Routes in PageTransition
+const Router = HashRouter;
 
 const queryClient = new QueryClient({
   defaultOptions: {
