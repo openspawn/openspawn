@@ -148,6 +148,28 @@ if (!useLLM) {
 // Start HTTP API server for dashboard integration
 startServer(sim as any);
 
+// Auto-start scenario if SCENARIO env var is set
+const scenarioId = process.env.SCENARIO;
+if (scenarioId && !useLLM) {
+  const { ScenarioEngine } = await import('./scenario-engine.js');
+  const { aiDevAgencyScenario } = await import('./scenarios/ai-dev-agency.js');
+
+  const scenarioMap: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
+    'ai-dev-agency': aiDevAgencyScenario,
+  };
+
+  const scenarioDef = scenarioMap[scenarioId];
+  if (scenarioDef) {
+    const engine = new ScenarioEngine(scenarioDef);
+    const detSim = sim as DeterministicSimulation;
+    detSim.scenarioEngine = engine;
+    engine.attach(detSim);
+    console.log(`\n🎬 Auto-started scenario: ${scenarioDef.meta.name}`);
+  } else {
+    console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(scenarioMap).join(', ')}`);
+  }
+}
+
 sim.run().catch(err => {
   console.error('💥 Simulation crashed:', err);
   process.exit(1);

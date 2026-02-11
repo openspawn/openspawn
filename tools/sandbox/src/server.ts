@@ -10,6 +10,13 @@ import { fileURLToPath } from 'node:url';
 import type { Simulation } from './simulation.js';
 import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from './types.js';
 import { loadAgentConfig, type AgentConfig } from './config-loader.js';
+import { ScenarioEngine } from './scenario-engine.js';
+import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
+import type { DeterministicSimulation } from './deterministic.js';
+
+const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
+  'ai-dev-agency': aiDevAgencyScenario,
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -648,6 +655,74 @@ export function startServer(sim: Simulation): void {
         res.end(content);
         return;
       }
+    }
+
+    // ── Scenario Engine Endpoints ──────────────────────────────────────
+
+    // List available scenarios
+    if (path === '/api/scenarios' && req.method === 'GET') {
+      const scenarios = Object.values(SCENARIO_REGISTRY).map(s => ({
+        id: s.meta.id,
+        name: s.meta.name,
+        industry: s.meta.industry,
+        description: s.meta.description,
+        duration: s.meta.duration,
+        targetDecisions: s.meta.targetDecisions,
+        difficulty: s.meta.difficulty,
+      }));
+      json(res, { scenarios });
+      return;
+    }
+
+    // Start a scenario
+    if (path === '/api/scenario/start' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const { scenarioId, difficulty, seed } = JSON.parse(body);
+          const scenarioDef = SCENARIO_REGISTRY[scenarioId];
+          if (!scenarioDef) { json(res, { error: `Unknown scenario: ${scenarioId}` }); return; }
+
+          const def = { ...scenarioDef, meta: { ...scenarioDef.meta } };
+          if (difficulty) def.meta.difficulty = difficulty;
+          if (seed !== undefined) def.meta.seed = seed;
+
+          const engine = new ScenarioEngine(def);
+          const detSim = sim as unknown as DeterministicSimulation;
+          detSim.scenarioEngine = engine;
+          engine.attach(detSim);
+
+          json(res, { ok: true, message: `Scenario "${def.meta.name}" started` });
+        } catch (err) {
+          json(res, { error: String(err) });
+        }
+      });
+      return;
+    }
+
+    // Scenario status
+    if (path === '/api/scenario/status' && req.method === 'GET') {
+      const detSim = sim as unknown as DeterministicSimulation;
+      if (!detSim.scenarioEngine || !detSim.scenarioEngine.isActive) {
+        json(res, { active: false });
+        return;
+      }
+      json(res, detSim.scenarioEngine.getStatus());
+      return;
+    }
+
+    // Stop scenario
+    if (path === '/api/scenario/stop' && req.method === 'POST') {
+      const detSim = sim as unknown as DeterministicSimulation;
+      if (!detSim.scenarioEngine) {
+        json(res, { error: 'No active scenario' });
+        return;
+      }
+      const scoreCard = detSim.scenarioEngine.stop();
+      detSim.scenarioEngine = undefined;
+      json(res, { ok: true, scoreCard });
+      return;
     }
 
     res.writeHead(404);
