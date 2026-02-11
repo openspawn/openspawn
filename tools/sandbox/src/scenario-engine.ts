@@ -361,24 +361,51 @@ export class ScenarioEngine {
   }
 
   private assignBacklogTasks(): void {
+    // Pass 1: Assign parent tasks to leads first
     for (const task of this.sim.tasks) {
       if (task.status !== 'backlog' || task.assigneeId) continue;
-      if ((task as any).parentTaskId) continue; // subtasks assigned by leads
+      if ((task as any).parentTaskId) continue; // skip subtasks in pass 1
 
-      // Find the appropriate lead
       const epicId = (task as any).epicId;
       if (!epicId) continue;
-
-      const epic = this.epics.find(e => e.id === epicId);
-      if (!epic) continue;
 
       const domain = this.getDomainFromTask(task);
       const lead = this.findLeadForDomain(domain);
       if (lead) {
         task.assigneeId = lead.id;
+        const hasSubtasks = (task as any).subtaskIds && (task as any).subtaskIds.length > 0;
+        task.status = hasSubtasks ? 'in_progress' : 'assigned';
+        lead.taskIds.push(task.id);
+        this.decisionCount++;
+      }
+    }
+
+    // Pass 2: Assign subtasks to the lead who owns the parent
+    for (const task of this.sim.tasks) {
+      if (task.status !== 'backlog' || task.assigneeId) continue;
+      if (!(task as any).parentTaskId) continue; // only subtasks in pass 2
+
+      const parent = this.sim.tasks.find(t => t.id === (task as any).parentTaskId);
+      let lead: SandboxAgent | undefined;
+
+      if (parent?.assigneeId) {
+        const parentAssignee = this.sim.agents.find(a => a.id === parent.assigneeId);
+        lead = parentAssignee && (parentAssignee.role === 'lead' || parentAssignee.level >= 7)
+          ? parentAssignee
+          : this.sim.agents.find(a => a.id === parentAssignee?.parentId && (a.role === 'lead' || a.level >= 7));
+      }
+
+      // Fallback: find lead by domain from the task description
+      if (!lead) {
+        const domain = this.getDomainFromTask(task);
+        lead = this.findLeadForDomain(domain);
+      }
+
+      if (lead) {
+        task.assigneeId = lead.id;
         task.status = 'assigned';
         lead.taskIds.push(task.id);
-        this.decisionCount++; // assignment = 1 decision
+        this.decisionCount++;
       }
     }
   }
