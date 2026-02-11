@@ -1,14 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <defs>
-    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00e5ff"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#22c55e"/>
     </linearGradient>
   </defs>
-  <path d="M16 4L9 11v13a3 3 0 003 3h8a3 3 0 003-3V11L16 4z" fill="url(#fg)"/>
-  <rect x="13" y="17" width="6" height="8" rx="3" fill="#0f172a" opacity="0.7"/>
-  <circle cx="17" cy="21.5" r="0.7" fill="#00e5ff"/>
-  <path d="M16 4V1.5" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round"/>
-  <path d="M16 4C15 2 13 1 12 1.5s0 3 1 3.5" stroke="#00e5ff" stroke-width="1" fill="none" stroke-linecap="round"/>
-  <path d="M16 4C17 2 19 1 20 1.5s0 3-1 3.5" stroke="#00e5ff" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <!-- Pineapple body -->
+  <ellipse cx="16" cy="19" rx="9" ry="10" fill="url(#body)"/>
+  <!-- Diamond texture -->
+  <path d="M10 15l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.4"/>
+  <path d="M16 15l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.4"/>
+  <path d="M13 19l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.4"/>
+  <path d="M19 19l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.4"/>
+  <path d="M10 23l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.3"/>
+  <path d="M16 23l3-3 3 3-3 3z" fill="#ca8a04" opacity="0.3"/>
+  <!-- Leaves -->
+  <path d="M16 9C14 5 11 3 10 4s1 4 3 5" stroke="url(#leaf)" stroke-width="1.5" fill="#22c55e" stroke-linecap="round"/>
+  <path d="M16 9C18 5 21 3 22 4s-1 4-3 5" stroke="url(#leaf)" stroke-width="1.5" fill="#16a34a" stroke-linecap="round"/>
+  <path d="M16 9V5" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16 9C14.5 6.5 13 5.5 12.5 6.5" stroke="#16a34a" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <path d="M16 9C17.5 6.5 19 5.5 19.5 6.5" stroke="#22c55e" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <!-- Door -->
+  <rect x="13.5" y="21" width="5" height="6" rx="2.5" fill="#92400e" opacity="0.6"/>
+  <!-- Window glow -->
+  <circle cx="16" cy="15" r="1.2" fill="#fef3c7" opacity="0.7"/>
 </svg>
