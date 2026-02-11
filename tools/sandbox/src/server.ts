@@ -3,6 +3,7 @@
 // The dashboard polls this instead of using the in-memory SimulationEngine
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { getProvider, getProviderInfo, getModelName } from './llm.js';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,31 @@ const __dirname = dirname(__filename);
 const ORG_DIR = join(__dirname, '..', 'org');
 
 const PORT = Number(process.env.SANDBOX_PORT) || 3333;
+
+// Map agent domain → dashboard team ID (must match apps/dashboard/src/demo/teams.ts)
+const DOMAIN_TEAM_MAP: Record<string, string> = {
+  'operations': 'team-operations',
+  'engineering': 'team-engineering',
+  'backend': 'team-backend',
+  'frontend': 'team-frontend',
+  'testing': 'team-testing',
+  'appsec': 'team-appsec',
+  'infrastructure security': 'team-infrastructure security',
+  'content strategy': 'team-content strategy',
+  'copywriting': 'team-copywriting',
+  'seo': 'team-seo',
+  'marketing': 'team-marketing',
+  'analytics': 'team-analytics',
+  'accounting': 'team-accounting',
+  'support': 'team-support',
+  'technical support': 'team-technical support',
+  'finance': 'team-finance',
+};
+
+function domainToTeamId(domain: string): string {
+  const key = domain.toLowerCase();
+  return DOMAIN_TEAM_MAP[key] ?? `team-${key}`;
+}
 
 // Map sandbox types to demo-data types (what the dashboard expects)
 function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
@@ -36,9 +62,10 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     agentId: agent.id,
     name: agent.name,
     role: agent.domain?.toUpperCase() ?? levelToRole[agent.role] ?? 'WORKER',
+    mode: agent.level >= 7 ? 'ORCHESTRATOR' : 'WORKER',
     status: agent.status === 'busy' ? 'ACTIVE' : agent.status.toUpperCase(),
     level: agent.level,
-    model: 'qwen3:0.6b',
+    model: getModelName(),
     currentBalance: Math.max(0, agent.stats.creditsEarned - agent.stats.creditsSpent),
     lifetimeEarnings: agent.stats.creditsEarned,
     budgetPeriodLimit: 10000,
@@ -46,7 +73,7 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     managementFeePct: agent.level >= 9 ? 5 : 10,
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString(),
-    parentId: agent.parentId ?? null,
+    parentId: agent.parentId === 'human-principal' ? null : (agent.parentId ?? null),
     domain: agent.domain ?? null,
     trustScore,
     reputationLevel: levelToReputation(agent.level),
@@ -54,7 +81,8 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     tasksSuccessful: agent.stats.tasksCompleted, // simplified
     lastActivityAt: new Date().toISOString(),
     lastPromotionAt: null,
-    teamId: `team-${agent.domain.toLowerCase()}`,
+    teamId: domainToTeamId(agent.domain),
+    avatar: agent.avatar ?? null,
     systemPrompt: agent.systemPrompt,
     trigger: agent.trigger,
     triggerOn: agent.triggerOn ?? null,
@@ -298,7 +326,7 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
-    // Send order — inject a message from the Human Principal into Dennis's inbox
+    // Send order — inject a message from the Human Principal into COO's inbox
     if (path === '/api/order' && req.method === 'POST') {
       let body = '';
       req.on('data', chunk => body += chunk);
@@ -307,31 +335,31 @@ export function startServer(sim: Simulation): void {
           const { message } = JSON.parse(body);
           if (!message) { json(res, { error: 'message required' }); return; }
           
-          const dennis = sim.agents.find(a => a.role === 'coo' || a.id === 'dennis' || a.level === 10);
-          if (!dennis) { json(res, { error: 'COO not found' }); return; }
+          const coo = sim.agents.find(a => a.role === 'coo' || a.id.includes('mr-krabs') || a.id.includes('krabs') || a.level === 10);
+          if (!coo) { json(res, { error: 'COO not found' }); return; }
           
           const orderMsg = {
             id: `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             type: 'delegation' as const,
             from: 'human-principal',
-            to: dennis.id,
+            to: coo.id,
             taskId: '',
             body: `[PRIORITY ORDER FROM HUMAN PRINCIPAL]: ${message}`,
             timestamp: Date.now(),
           };
-          dennis.recentMessages.push(orderMsg);
+          coo.recentMessages.push(orderMsg);
           // Also push to inbox so event-driven COO wakes up
-          dennis.inbox.push(orderMsg);
+          coo.inbox.push(orderMsg);
 
           // Also log as event
           sim.events.push({
             type: 'human_order',
-            agentId: dennis.id,
+            agentId: coo.id,
             message: `📢 Human Principal: ${message}`,
             timestamp: Date.now(),
           });
 
-          json(res, { ok: true, message: 'Order delivered to Agent Dennis' });
+          json(res, { ok: true, message: 'Order delivered to Mr. Krabs' });
         } catch {
           json(res, { error: 'Invalid JSON' });
         }
@@ -422,6 +450,23 @@ export function startServer(sim: Simulation): void {
     // Metrics time-series for sparklines / charts
     if (path === '/api/metrics') {
       json(res, sim.metricsHistory);
+      return;
+    }
+
+    // LLM provider info (read-only — model cannot be changed via API)
+    if (path === '/api/models') {
+      json(res, {
+        provider: getProvider(),
+        providerInfo: getProviderInfo(),
+        currentModel: getModelName(),
+        locked: true, // Users cannot change models via the dashboard
+        availableModels: getProvider() === 'groq' ? [
+          { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant', rpm: 30, rpd: '14.4K', active: getModelName() === 'llama-3.1-8b-instant' },
+          { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', rpm: 30, rpd: '1K', active: getModelName() === 'llama-3.3-70b-versatile' },
+          { id: 'meta-llama/llama-4-scout-17b-16e-instruct', name: 'Llama 4 Scout 17B', rpm: 30, rpd: '1K', active: getModelName() === 'meta-llama/llama-4-scout-17b-16e-instruct' },
+          { id: 'qwen/qwen3-32b', name: 'Qwen3 32B', rpm: 60, rpd: '1K', active: getModelName() === 'qwen/qwen3-32b' },
+        ] : [],
+      });
       return;
     }
 

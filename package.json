@@ -19,7 +19,7 @@
     "dev:dashboard": "nx serve dashboard",
     "dev:sandbox": "nx run sandbox:dev",
     "dev:sandbox:full": "nx run sandbox:dev:full",
-    "dev:sandbox:clean": "nx run sandbox:dev:clean"
+    "dev:sandbox:cofounder": "nx run sandbox:dev:cofounder"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",

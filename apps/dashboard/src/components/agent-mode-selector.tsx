@@ -87,7 +87,7 @@ export function AgentModeBadge({
   size?: "sm" | "md" | "lg";
   showTooltip?: boolean;
 }) {
-  const config = MODE_CONFIG[mode];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
   const Icon = config.icon;
 
   const sizeClasses = {
@@ -265,7 +265,7 @@ export function AgentModeCard({
   mode: AgentMode;
   className?: string;
 }) {
-  const config = MODE_CONFIG[mode];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
   const Icon = config.icon;
 
   return (
@@ -315,7 +315,7 @@ export function AgentModeCard({
  * Compact mode indicator for lists/tables
  */
 export function AgentModeIndicator({ mode }: { mode: AgentMode }) {
-  const config = MODE_CONFIG[mode];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
   const Icon = config.icon;
 
   return (

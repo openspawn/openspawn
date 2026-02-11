@@ -1,14 +1,19 @@
-import { Component, useMemo, useState, useEffect, useRef, useCallback, type ReactNode, type ErrorInfo } from "react";
-import { useContainerSize } from "../hooks/use-container-size";
+import { useMemo, useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 
-class ChartErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  state = { hasError: false };
-  static getDerivedStateFromError() { return { hasError: true }; }
-  componentDidCatch(error: Error, info: ErrorInfo) { console.error('[Chart Error]', error, info); }
-  render() {
-    if (this.state.hasError) return <div className="flex items-center justify-center h-full text-muted-foreground text-sm">Chart unavailable</div>;
-    return this.props.children;
-  }
+/** Stable container size hook — avoids recharts ResponsiveContainer infinite loop */
+function useStableSize(ref: React.RefObject<HTMLElement | null>) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      if (width > 0 && height > 0) setSize((prev) => (prev.width === Math.round(width) && prev.height === Math.round(height) ? prev : { width: Math.round(width), height: Math.round(height) }));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return size;
 }
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,17 +30,7 @@ import {
   Layers,
   CheckCircle,
 } from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  BarChart,
-  Bar,
-  Cell,
-} from "recharts";
+// recharts v3 has infinite-loop bug in ChartDataContextProvider — using custom SVG charts instead
 import { StaggerContainer, StaggerItem } from "../components/stagger";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -55,7 +50,7 @@ import { useSparklines } from "../hooks/use-sandbox-metrics";
 import { useACPMetrics } from "../hooks/use-acp-metrics";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SandboxControls } from "../components/sandbox-controls";
-import { SandboxCommandBar } from "../components/sandbox-command-bar";
+// SandboxCommandBar rendered in layout.tsx (not here to avoid duplicate)
 
 function getEventIcon(type: string) {
   if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
@@ -102,9 +97,7 @@ export function DashboardPage() {
   const { data: acpMetrics } = useACPMetrics();
 
   const creditChartRef = useRef<HTMLDivElement>(null);
-  const tasksChartRef = useRef<HTMLDivElement>(null);
-  const creditChartSize = useContainerSize(creditChartRef);
-  const tasksChartSize = useContainerSize(tasksChartRef);
+  const creditChartSize = useStableSize(creditChartRef);
 
   // Debounced events: at high speeds, batch updates to avoid render thrashing
   const [displayEvents, setDisplayEvents] = useState(events);
@@ -296,6 +289,7 @@ export function DashboardPage() {
   }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, reviewTasks, tasks.length, totalCreditsEarned, totalCreditsSpent, sparklines, navigate]);
 
   function renderCreditChart() {
+    const maxVal = Math.max(...creditHistory.map(d => Math.max(d.earned ?? 0, d.spent ?? 0)), 1);
     return (
       <Card>
         <CardHeader>
@@ -303,34 +297,70 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div ref={creditChartRef} className="h-[220px] sm:h-[300px]">
-            <ChartErrorBoundary>
-              {creditChartSize.width > 0 && creditChartSize.height > 0 && (
-              <AreaChart data={creditHistory} width={creditChartSize.width} height={creditChartSize.height}>
+            {creditChartSize.width > 0 && (
+              <svg width={creditChartSize.width} height={creditChartSize.height} className="overflow-visible">
                 <defs>
-                  <linearGradient id="earned" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <linearGradient id="earnedGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
                   </linearGradient>
-                  <linearGradient id="spent" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                  <linearGradient id="spentGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="period" className="text-xs fill-muted-foreground" />
-                <YAxis className="text-xs fill-muted-foreground" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "0.5rem",
-                  }}
-                />
-                <Area type="monotone" dataKey="earned" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#earned)" isAnimationActive={true} />
-                <Area type="monotone" dataKey="spent" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#spent)" isAnimationActive={true} />
-              </AreaChart>
-              )}
-            </ChartErrorBoundary>
+                {/* Area fills */}
+                {creditHistory.length > 1 && (
+                  <>
+                    <path
+                      d={creditHistory.map((d, i) => {
+                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
+                        const y = creditChartSize.height - 30 - ((d.earned ?? 0) / maxVal) * (creditChartSize.height - 50);
+                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+                      }).join(' ') + ` L${creditChartSize.width - 20},${creditChartSize.height - 30} L20,${creditChartSize.height - 30} Z`}
+                      fill="url(#earnedGrad)"
+                    />
+                    <path
+                      d={creditHistory.map((d, i) => {
+                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
+                        const y = creditChartSize.height - 30 - ((d.spent ?? 0) / maxVal) * (creditChartSize.height - 50);
+                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+                      }).join(' ') + ` L${creditChartSize.width - 20},${creditChartSize.height - 30} L20,${creditChartSize.height - 30} Z`}
+                      fill="url(#spentGrad)"
+                    />
+                    {/* Lines */}
+                    <path
+                      d={creditHistory.map((d, i) => {
+                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
+                        const y = creditChartSize.height - 30 - ((d.earned ?? 0) / maxVal) * (creditChartSize.height - 50);
+                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+                      }).join(' ')}
+                      fill="none" stroke="#10b981" strokeWidth={2}
+                    />
+                    <path
+                      d={creditHistory.map((d, i) => {
+                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
+                        const y = creditChartSize.height - 30 - ((d.spent ?? 0) / maxVal) * (creditChartSize.height - 50);
+                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
+                      }).join(' ')}
+                      fill="none" stroke="#f59e0b" strokeWidth={2}
+                    />
+                  </>
+                )}
+                {/* X axis labels */}
+                {creditHistory.map((d, i) => {
+                  const x = creditHistory.length > 1 ? (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20 : creditChartSize.width / 2;
+                  return i % Math.max(1, Math.floor(creditHistory.length / 6)) === 0 ? (
+                    <text key={i} x={x} y={creditChartSize.height - 8} textAnchor="middle" className="fill-muted-foreground text-[10px]">{d.period}</text>
+                  ) : null;
+                })}
+                {/* Legend */}
+                <circle cx={creditChartSize.width - 120} cy={12} r={4} fill="#10b981" />
+                <text x={creditChartSize.width - 112} y={16} className="fill-muted-foreground text-[11px]">Earned</text>
+                <circle cx={creditChartSize.width - 60} cy={12} r={4} fill="#f59e0b" />
+                <text x={creditChartSize.width - 52} y={16} className="fill-muted-foreground text-[11px]">Spent</text>
+              </svg>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -338,34 +368,29 @@ export function DashboardPage() {
   }
 
   function renderTasksChart() {
+    const maxCount = Math.max(...tasksByStatus.map(d => d.count), 1);
     return (
       <Card>
         <CardHeader>
           <CardTitle className="text-base sm:text-lg">Tasks by Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div ref={tasksChartRef} className="h-[220px] sm:h-[300px]">
-            <ChartErrorBoundary>
-              {tasksChartSize.width > 0 && tasksChartSize.height > 0 && (
-              <BarChart data={tasksByStatus} layout="vertical" width={tasksChartSize.width} height={tasksChartSize.height}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
-                <XAxis type="number" className="text-xs fill-muted-foreground" />
-                <YAxis type="category" dataKey="status" className="text-xs fill-muted-foreground" width={85} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "0.5rem",
-                  }}
-                />
-                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive={true} animationDuration={500}>
-                  {tasksByStatus.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-              )}
-            </ChartErrorBoundary>
+          <div className="space-y-3">
+            {tasksByStatus.map((item) => (
+              <div key={item.status} className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground w-24 text-right shrink-0">{item.status}</span>
+                <div className="flex-1 h-8 bg-muted/30 rounded overflow-hidden">
+                  <div
+                    className="h-full rounded transition-all duration-500"
+                    style={{
+                      width: `${Math.max((item.count / maxCount) * 100, item.count > 0 ? 8 : 0)}%`,
+                      backgroundColor: item.fill,
+                    }}
+                  />
+                </div>
+                <span className="text-sm font-mono w-8 text-right">{item.count}</span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -464,7 +489,6 @@ export function DashboardPage() {
 
       {/* Sandbox controls + command bar */}
       <SandboxControls />
-      <SandboxCommandBar />
 
       {/* ACP Metrics (sandbox mode only) */}
       {isSandboxMode && acpMetrics && (() => {
