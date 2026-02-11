@@ -1,226 +1,82 @@
 /**
- * Command bar for sending orders to the org in sandbox mode.
- * Fixed at the bottom of the viewport with order input + restart button.
+ * Ghost-typing command bar — showcases the command interface for visitors.
+ * Cycles through demo commands with a typewriter effect.
+ * Disabled/non-interactive for the public demo.
  */
-import { useState, useRef, useEffect } from 'react';
-import { Send, Crown, CheckCircle, RotateCcw, Pause, Play } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { Crown } from 'lucide-react';
 import { isSandboxMode } from '../graphql/fetcher';
-import { SANDBOX_URL } from '../lib/sandbox-url';
-import { Button } from './ui/button';
 
-interface OrderHistoryItem {
-  message: string;
-  timestamp: number;
-  status: 'sent' | 'sending' | 'error';
-}
+const DEMO_COMMANDS = [
+  'Build a user authentication system',
+  'Hire two more frontend engineers',
+  'What\'s the status of the API integration?',
+  'Prioritize the security audit over new features',
+  'Scale up the QA team for launch prep',
+];
+
+const TYPE_SPEED = 45;    // ms per character
+const PAUSE_AFTER = 2500; // ms to show completed text
+const PAUSE_BEFORE = 800; // ms before typing next
 
 export function SandboxCommandBar() {
-  const [input, setInput] = useState('');
-  const [sending, setSending] = useState(false);
-  const [restarting, setRestarting] = useState(false);
-  const [flash, setFlash] = useState<string | null>(null);
-  const [history, setHistory] = useState<OrderHistoryItem[]>([]);
-  const [currentSpeed, setCurrentSpeed] = useState(1);
-  const [paused, setPaused] = useState(false);
-  const prePauseSpeed = useRef(1);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [displayText, setDisplayText] = useState('');
+  const [commandIndex, setCommandIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Fetch current speed on mount
   useEffect(() => {
     if (!isSandboxMode) return;
-    fetch(`${SANDBOX_URL}/api/speed`)
-      .then(r => r.json())
-      .then(data => {
-        const ms = data.tickIntervalMs ?? 800;
-        const speed = Math.round(800 / ms) || 1;
-        setCurrentSpeed(speed);
-      })
-      .catch(() => {});
-  }, []);
+
+    const command = DEMO_COMMANDS[commandIndex % DEMO_COMMANDS.length];
+    let charIndex = 0;
+    setIsTyping(true);
+    setDisplayText('');
+
+    const typeNext = () => {
+      if (charIndex <= command.length) {
+        setDisplayText(command.slice(0, charIndex));
+        charIndex++;
+        timeoutRef.current = setTimeout(typeNext, TYPE_SPEED);
+      } else {
+        setIsTyping(false);
+        // Pause, then move to next command
+        timeoutRef.current = setTimeout(() => {
+          setDisplayText('');
+          timeoutRef.current = setTimeout(() => {
+            setCommandIndex(i => i + 1);
+          }, PAUSE_BEFORE);
+        }, PAUSE_AFTER);
+      }
+    };
+
+    timeoutRef.current = setTimeout(typeNext, PAUSE_BEFORE);
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, [commandIndex]);
 
   if (!isSandboxMode) return null;
 
-  const setSpeed = async (speed: number) => {
-    try {
-      await fetch(`${SANDBOX_URL}/api/speed`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ speed }),
-      });
-      setCurrentSpeed(speed);
-      setPaused(false);
-    } catch {}
-  };
-
-  const togglePause = async () => {
-    if (paused) {
-      await setSpeed(prePauseSpeed.current);
-    } else {
-      prePauseSpeed.current = currentSpeed;
-      try {
-        await fetch(`${SANDBOX_URL}/api/speed`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tickIntervalMs: 999999 }),
-        });
-        setPaused(true);
-      } catch {}
-    }
-  };
-
-  const showFlash = (msg: string) => {
-    setFlash(msg);
-    setTimeout(() => setFlash(null), 3000);
-  };
-
-  const sendOrder = async () => {
-    const message = input.trim();
-    if (!message || sending) return;
-
-    setSending(true);
-    setHistory(prev => [...prev, { message, timestamp: Date.now(), status: 'sending' }]);
-    setInput('');
-
-    try {
-      const res = await fetch(`${SANDBOX_URL}/api/order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-
-      if (res.ok) {
-        setHistory(prev =>
-          prev.map((h, i) => i === prev.length - 1 ? { ...h, status: 'sent' } : h)
-        );
-        showFlash('📢 Order delivered to the COO');
-      } else {
-        setHistory(prev =>
-          prev.map((h, i) => i === prev.length - 1 ? { ...h, status: 'error' } : h)
-        );
-      }
-    } catch {
-      setHistory(prev =>
-        prev.map((h, i) => i === prev.length - 1 ? { ...h, status: 'error' } : h)
-      );
-    } finally {
-      setSending(false);
-      inputRef.current?.focus();
-    }
-  };
-
-  const restartOrg = async () => {
-    if (restarting) return;
-    setRestarting(true);
-    try {
-      const res = await fetch(`${SANDBOX_URL}/api/restart`, { method: 'POST' });
-      if (res.ok) {
-        showFlash('🔄 Org reset — COO will rebuild from scratch');
-      }
-    } catch {
-      // ignore
-    } finally {
-      setRestarting(false);
-    }
-  };
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-zinc-950/95 backdrop-blur-sm">
-      {/* Flash message */}
-      <AnimatePresence>
-        {flash && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute -top-10 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-medium whitespace-nowrap"
-          >
-            {flash}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-        {/* Order input */}
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700/50 bg-slate-950/90 backdrop-blur-sm">
+      <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3">
         <div className="flex-1 relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2">
-            <Crown className="w-4 h-4 text-amber-500" />
+            <Crown className="w-3.5 h-3.5 text-amber-500/60" />
           </div>
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && sendOrder()}
-            placeholder="Give an order to the COO..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700 text-sm text-foreground placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/50 transition-all"
-            disabled={sending}
-          />
-        </div>
-
-        {/* Send button */}
-        <Button
-          onClick={sendOrder}
-          disabled={!input.trim() || sending}
-          size="sm"
-          className="bg-cyan-600 hover:bg-cyan-700 text-white gap-2"
-        >
-          <Send className={`w-4 h-4 ${sending ? 'animate-pulse' : ''}`} />
-          Send
-        </Button>
-
-        {/* Speed controls */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={togglePause}
-            className={`p-1.5 rounded-md transition-colors ${paused ? 'bg-amber-500/20 text-amber-400' : 'text-zinc-400 hover:bg-zinc-800'}`}
-            title={paused ? 'Resume' : 'Pause'}
-          >
-            {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-          </button>
-          {[1, 2, 5, 10].map(s => (
-            <button
-              key={s}
-              onClick={() => setSpeed(s)}
-              className={`px-2 py-1 rounded-full text-xs font-medium transition-colors ${
-                currentSpeed === s && !paused
-                  ? 'bg-cyan-600 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-800'
+          <div className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-900/60 border border-slate-700/40 text-sm text-slate-400 select-none cursor-default min-h-[38px] flex items-center">
+            {displayText}
+            {/* Blinking cursor */}
+            <span
+              className={`inline-block w-[2px] h-4 ml-[1px] rounded-sm ${
+                isTyping ? 'bg-cyan-400' : 'bg-slate-500 animate-pulse'
               }`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
-
-        {/* Restart button */}
-        <Button
-          onClick={restartOrg}
-          disabled={restarting}
-          variant="outline"
-          size="sm"
-          className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-2"
-        >
-          <RotateCcw className={`w-4 h-4 ${restarting ? 'animate-spin' : ''}`} />
-          🔄 Restart Org
-        </Button>
-      </div>
-
-      {/* Recent orders (compact) */}
-      {history.length > 0 && (
-        <div className="max-w-5xl mx-auto px-4 pb-2">
-          <div className="flex gap-3 overflow-x-auto text-xs text-zinc-500">
-            {history.slice(-3).reverse().map((item) => (
-              <span key={item.timestamp} className="flex items-center gap-1 shrink-0">
-                {item.status === 'sending' && '⏳'}
-                {item.status === 'sent' && <CheckCircle className="w-3 h-3 text-emerald-500" />}
-                {item.status === 'error' && '✗'}
-                <span className="truncate max-w-[200px]">{item.message}</span>
-              </span>
-            ))}
+            />
           </div>
         </div>
-      )}
+        <span className="text-[10px] text-slate-600 hidden sm:block whitespace-nowrap">
+          Command your org →
+        </span>
+      </div>
     </div>
   );
 }
