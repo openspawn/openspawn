@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Logo } from "./ui/logo";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -7,7 +8,6 @@ import {
   CheckSquare,
   Coins,
   Activity,
-  Bot,
   Network,
   Play,
   Square,
@@ -180,7 +180,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Logo + collapse toggle */}
           <div className="flex h-16 items-center gap-2 border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
-            <Bot className="h-6 w-6 flex-shrink-0 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+            <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
             {!sidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
@@ -513,7 +513,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex h-16 items-center justify-between border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
               <div className="flex flex-col">
               <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 BikiniBottom
@@ -645,7 +645,7 @@ export function Layout({ children }: LayoutProps) {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Bot className="h-6 w-6 text-primary" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
               <div className="flex flex-col">
               <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 BikiniBottom

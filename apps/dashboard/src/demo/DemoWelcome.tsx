@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Users, Zap, Building2, Rocket, TrendingUp, Sparkles, Layers, Wallet, Eye, Compass } from 'lucide-react';
+import { X, Play, Users, Building2, Rocket, TrendingUp, Sparkles, Layers, Wallet, Eye, Compass } from 'lucide-react';
+import { Logo } from '../components/ui/logo';
 import { Button } from '../components/ui/button';
 import { useDemo, type ScenarioName } from './DemoProvider';
 import { useOnboarding } from '../components/onboarding/onboarding-provider';
@@ -138,8 +139,8 @@ export function DemoWelcome() {
                     transition={{ type: 'spring', damping: 20, stiffness: 200, delay: 0.1 }}
                     className="relative mb-6"
                   >
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                      <Zap className="w-10 h-10 text-white" />
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 flex items-center justify-center shadow-lg shadow-cyan-500/25 border border-cyan-500/20">
+                      <Logo size="xl" />
                     </div>
                     <motion.div
                       animate={{ scale: [1, 1.4], opacity: [0.3, 0] }}
