@@ -152,13 +152,9 @@ startServer(sim as any);
 const scenarioId = process.env.SCENARIO;
 if (scenarioId && !useLLM) {
   const { ScenarioEngine } = await import('./scenario-engine.js');
-  const { aiDevAgencyScenario } = await import('./scenarios/ai-dev-agency.js');
+  const { SCENARIO_REGISTRY } = await import('./scenarios/index.js');
 
-  const scenarioMap: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
-    'ai-dev-agency': aiDevAgencyScenario,
-  };
-
-  const scenarioDef = scenarioMap[scenarioId];
+  const scenarioDef = SCENARIO_REGISTRY[scenarioId];
   if (scenarioDef) {
     const engine = new ScenarioEngine(scenarioDef);
     const detSim = sim as DeterministicSimulation;
@@ -166,7 +162,7 @@ if (scenarioId && !useLLM) {
     engine.attach(detSim);
     console.log(`\n🎬 Auto-started scenario: ${scenarioDef.meta.name}`);
   } else {
-    console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(scenarioMap).join(', ')}`);
+    console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(SCENARIO_REGISTRY).join(', ')}`);
   }
 }
 

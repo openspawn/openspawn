@@ -11,12 +11,8 @@ import type { Simulation } from './simulation.js';
 import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from './types.js';
 import { loadAgentConfig, type AgentConfig } from './config-loader.js';
 import { ScenarioEngine } from './scenario-engine.js';
-import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
+import { SCENARIO_REGISTRY } from './scenarios/index.js';
 import type { DeterministicSimulation } from './deterministic.js';
-
-const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
-  'ai-dev-agency': aiDevAgencyScenario,
-};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

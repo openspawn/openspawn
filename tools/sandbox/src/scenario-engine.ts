@@ -12,10 +12,24 @@ import type {
 } from './scenario-types.js';
 import { SeededRandom, DIFFICULTY_PRESETS } from './scenario-types.js';
 
+// ── Fix #5: Use STASK- prefix to avoid collision with deterministic.ts TASK- IDs
 let scenarioTaskCounter = 1000;
 function nextScenarioTaskId(): string {
-  return `TASK-${String(++scenarioTaskCounter).padStart(4, '0')}`;
+  return `STASK-${String(++scenarioTaskCounter).padStart(4, '0')}`;
 }
+
+// ── Fix #2: Domain alias map for matching task domains to ORG.md agent domains
+const DOMAIN_ALIASES: Record<string, string[]> = {
+  'backend': ['engineering', 'backend'],
+  'frontend': ['engineering', 'frontend'],
+  'engineering': ['engineering'],
+  'operations': ['operations', 'management'],
+  'security': ['security', 'appsec', 'infrastructure security'],
+  'marketing': ['marketing', 'content', 'content strategy', 'copywriting', 'seo'],
+  'finance': ['finance', 'billing', 'accounting', 'analytics'],
+  'support': ['support', 'customer', 'technical support'],
+  'testing': ['testing', 'qa'],
+};
 
 // ── Scenario Engine ──────────────────────────────────────────────────────────
 
@@ -38,6 +52,7 @@ export class ScenarioEngine {
   // Scoring accumulators
   private tasksCompletedCount = 0;
   private reviewRejectCount = 0;
+  private reviewPassCount = 0;
   private reviewTotalCount = 0;
   private blockedTicksTotal = 0;
   private eventRecoveryTicks = 0;
@@ -137,6 +152,9 @@ export class ScenarioEngine {
 
     // 6. Update resource pools
     this.updateResources();
+
+    // Fix #3: Assign backlog tasks every tick (not just during epic expansion)
+    this.assignBacklogTasks();
   }
 
   // ── Post-tick: count decisions, handle triggers ────────────────────────
@@ -146,6 +164,12 @@ export class ScenarioEngine {
 
     // Count new decisions (agent actions this tick)
     this.countDecisions();
+
+    // Fix #1: Check if subtask completion should cascade to parent tasks
+    this.updateParentTaskCompletion();
+
+    // Fix #4: Process review loops for tasks in review status
+    this.processReviewLoops();
 
     // Check for completed tasks that have cross-dept triggers
     this.processTriggers();
@@ -345,6 +369,11 @@ export class ScenarioEngine {
         epic.taskIds.push(subtaskId);
       }
 
+      // Fix #4: Store reviewLoop data on the task for postTick processing
+      if (taskTpl.reviewLoop) {
+        (task as any)._reviewLoop = { ...taskTpl.reviewLoop, iterations: 0 };
+      }
+
       // Store trigger info on the task for postTick processing
       if (taskTpl.crossDeptTriggers) {
         (task as any)._crossDeptTriggers = taskTpl.crossDeptTriggers;
@@ -355,23 +384,38 @@ export class ScenarioEngine {
         (task as any)._resourceCost = taskTpl.resourceCost;
       }
     }
-
-    // Auto-assign backlog tasks to appropriate leads
-    this.assignBacklogTasks();
   }
+
+  // ── Fix #3 & #7: Assign backlog tasks (called every tick from preTick) ─
 
   private assignBacklogTasks(): void {
     for (const task of this.sim.tasks) {
       if (task.status !== 'backlog' || task.assigneeId) continue;
-      if ((task as any).parentTaskId) continue; // subtasks assigned by leads
 
-      // Find the appropriate lead
+      // Fix #7: Handle subtasks — assign them to the lead (so tickLead picks them up)
+      if ((task as any).parentTaskId) {
+        const parentTask = this.sim.tasks.find(t => t.id === (task as any).parentTaskId);
+        if (parentTask && parentTask.assigneeId) {
+          // Find the lead who owns the parent task (or the assignee's parent)
+          const assignee = this.sim.agents.find(a => a.id === parentTask.assigneeId);
+          if (assignee) {
+            // Set creatorId to the lead so tickLead finds it
+            const lead = assignee.role === 'lead' ? assignee :
+              this.sim.agents.find(a => a.id === assignee.parentId && a.role === 'lead');
+            if (lead) {
+              task.creatorId = lead.id;
+              task.assigneeId = lead.id;
+              task.status = 'assigned';
+              lead.taskIds.push(task.id);
+              this.decisionCount++;
+            }
+          }
+        }
+        continue;
+      }
+
+      // Parent tasks: find the appropriate lead
       const epicId = (task as any).epicId;
-      if (!epicId) continue;
-
-      const epic = this.epics.find(e => e.id === epicId);
-      if (!epic) continue;
-
       const domain = this.getDomainFromTask(task);
       const lead = this.findLeadForDomain(domain);
       if (lead) {
@@ -389,14 +433,117 @@ export class ScenarioEngine {
     return match ? match[1].toLowerCase() : 'engineering';
   }
 
+  // ── Fix #2: Domain matching with aliases and case-insensitive comparison ─
+
   private findLeadForDomain(domain: string): SandboxAgent | undefined {
     const d = domain.toLowerCase();
+    const aliases = DOMAIN_ALIASES[d] ?? [d];
+
     return this.sim.agents.find(a =>
       (a.role === 'lead' || a.level >= 7) &&
-      a.domain.toLowerCase().includes(d)
+      aliases.some(alias => a.domain.toLowerCase().includes(alias))
     ) || this.sim.agents.find(a =>
       a.role === 'lead'
     );
+  }
+
+  // ── Fix #1: Parent task completion when all subtasks are done ───────────
+
+  private updateParentTaskCompletion(): void {
+    for (const task of this.sim.tasks) {
+      const subtaskIds = (task as any).subtaskIds as string[] | undefined;
+      if (!subtaskIds || subtaskIds.length === 0) continue;
+      if (task.status === 'done') continue;
+
+      const allDone = subtaskIds.every(subId => {
+        const sub = this.sim.tasks.find(t => t.id === subId);
+        return sub && sub.status === 'done';
+      });
+
+      if (allDone) {
+        task.status = 'done';
+        task.updatedAt = Date.now();
+        this.log(`✅ Parent task complete (all subtasks done): "${task.title}"`);
+
+        // Generate completion ACP message
+        if (task.assigneeId) {
+          const assignee = this.sim.agents.find(a => a.id === task.assigneeId);
+          if (assignee) {
+            assignee.stats.tasksCompleted++;
+            assignee.stats.creditsEarned += task.priority === 'critical' ? 100 : task.priority === 'high' ? 50 : 25;
+          }
+          const parent = assignee ? this.sim.agents.find(a => a.id === assignee.parentId) : undefined;
+          if (parent) {
+            this.emitEvent({
+              type: 'agent_action',
+              agentId: task.assigneeId,
+              taskId: task.id,
+              message: `✅ All subtasks complete for "${task.title}"`,
+              timestamp: Date.now(),
+            });
+          }
+        }
+
+        this.decisionCount += 2;
+      }
+    }
+  }
+
+  // ── Fix #4: Review loop processing ─────────────────────────────────────
+
+  private processReviewLoops(): void {
+    for (const task of this.sim.tasks) {
+      if (task.status !== 'review') continue;
+      const reviewLoop = (task as any)._reviewLoop as { maxIterations: number; weights: number[]; iterations: number } | undefined;
+      if (!reviewLoop) continue;
+
+      this.reviewTotalCount++;
+
+      // Use seeded PRNG with weights: [pass, minor-revise, major-revise, escalate]
+      const outcome = this.prng.weighted(reviewLoop.weights);
+
+      switch (outcome) {
+        case 0: // Pass — let existing flow complete
+          this.reviewPassCount++;
+          // Don't interfere — deterministic.ts advanceWork will handle review → done
+          break;
+
+        case 1: // Minor revise
+          reviewLoop.iterations++;
+          if (reviewLoop.iterations >= reviewLoop.maxIterations) {
+            // Max iterations reached, pass anyway
+            this.reviewPassCount++;
+            break;
+          }
+          task.status = 'in_progress';
+          (task as any)._stageTickCount = 0;
+          this.reviewRejectCount++;
+          this.log(`🔄 Minor revision requested: "${task.title}" (iteration ${reviewLoop.iterations})`);
+          this.decisionCount++;
+          break;
+
+        case 2: // Major revise
+          reviewLoop.iterations++;
+          if (reviewLoop.iterations >= reviewLoop.maxIterations) {
+            this.reviewPassCount++;
+            break;
+          }
+          task.status = 'in_progress';
+          (task as any)._stageTickCount = 0;
+          this.reviewRejectCount++;
+          this.log(`🔄 Major revision requested: "${task.title}" (iteration ${reviewLoop.iterations})`);
+          this.decisionCount += 2;
+          break;
+
+        case 3: // Escalate
+          task.status = 'blocked';
+          task.blockedReason = 'Review escalation — needs senior review';
+          this.reviewRejectCount++;
+          this.log(`⬆️ Review escalated: "${task.title}"`);
+          this.decisionCount += 2;
+          break;
+      }
+    }
   }
 
   // ── DAG Resolution ─────────────────────────────────────────────────────
@@ -491,6 +638,7 @@ export class ScenarioEngine {
         this.sim.tasks.push(task);
 
         // Create subtasks
+        const subtaskIds: string[] = [];
         for (let i = 0; i < taskDef.subtaskCount; i++) {
           const subId = nextScenarioTaskId();
           const sub: SandboxTask = {
@@ -509,7 +657,10 @@ export class ScenarioEngine {
           const dur = this.prng.int(taskDef.durationRange[0], taskDef.durationRange[1]);
           (sub as any)._targetDuration = dur;
           this.sim.tasks.push(sub);
+          subtaskIds.push(subId);
         }
+        // Store subtask IDs on parent for completion linkage
+        (task as any).subtaskIds = subtaskIds;
 
         this.decisionCount += 2; // event response decisions
       }
@@ -518,7 +669,7 @@ export class ScenarioEngine {
     // Block agents
     if (effect.blockAgents) {
       const candidates = this.sim.agents.filter(a => {
-        if (effect.blockAgents!.domain && !a.domain.toLowerCase().includes(effect.blockAgents!.domain)) return false;
+        if (effect.blockAgents!.domain && !this.agentMatchesDomain(a, effect.blockAgents!.domain)) return false;
         if (effect.blockAgents!.role && a.role !== effect.blockAgents!.role) return false;
         return a.role !== 'coo';
       });
@@ -584,6 +735,12 @@ export class ScenarioEngine {
         this.log(`   📋 Added ${effect.expandEpic.taskCount} tasks to "${epic.title}"`);
       }
     }
+  }
+
+  /** Helper: check if an agent's domain matches a target domain using aliases */
+  private agentMatchesDomain(agent: SandboxAgent, domain: string): boolean {
+    const aliases = DOMAIN_ALIASES[domain.toLowerCase()] ?? [domain.toLowerCase()];
+    return aliases.some(alias => agent.domain.toLowerCase().includes(alias));
   }
 
   // ── Resource Management ────────────────────────────────────────────────
@@ -721,8 +878,11 @@ export class ScenarioEngine {
     // Velocity: tasks completed per tick, normalized to 0-100
     const velocity = Math.min(100, (doneTasks / Math.max(1, tick)) * 200);
 
-    // Quality: inverse of block/reject rate
-    const quality = Math.max(0, 100 - (blockedTasks / totalTasks) * 200);
+    // Fix #8: Quality based on review pass rate instead of just blocked ratio
+    const reviewTotal = this.reviewPassCount + this.reviewRejectCount;
+    const quality = reviewTotal > 0
+      ? Math.min(100, (this.reviewPassCount / reviewTotal) * 100)
+      : Math.max(0, 100 - (blockedTasks / totalTasks) * 200); // fallback
 
     // Efficiency: resource remaining ratio
     const totalResourcePct = this.resources.reduce((sum, r) => {
@@ -733,10 +893,11 @@ export class ScenarioEngine {
     // Resilience: how quickly events were recovered from (approximation)
     const resilience = Math.max(0, 100 - this.eventsFired * 5);
 
-    // Morale: based on block time and agent utilization
-    const busyAgents = (this.sim?.agents ?? []).filter(a => a.status === 'busy' || a.taskIds.length > 0).length;
-    const totalAgents = Math.max(1, (this.sim?.agents ?? []).length);
-    const morale = Math.min(100, (busyAgents / totalAgents) * 100 + 20);
+    // Fix #8: Morale based on agent utilization (taskIds.length > 0) instead of 'busy' status
+    const agents = this.sim?.agents ?? [];
+    const utilizedAgents = agents.filter(a => a.taskIds.length > 0).length;
+    const totalAgents = Math.max(1, agents.length);
+    const morale = Math.min(100, (utilizedAgents / totalAgents) * 100 + 20);
 
     // Deadline: completion percentage
     const deadline = Math.min(100, (doneTasks / totalTasks) * 100);
