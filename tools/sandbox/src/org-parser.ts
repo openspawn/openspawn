@@ -1,7 +1,12 @@
 // ── ORG.md Parser ────────────────────────────────────────────────────────────
 // Parses an ORG.md file into a ParsedOrg structure for the sandbox
+// Uses unified/remark to parse markdown into an AST, then walks the tree.
 
 import { readFileSync } from 'node:fs';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkFrontmatter from 'remark-frontmatter';
+import type { Root, Heading, Content, List, ListItem, Paragraph, Text, Strong, PhrasingContent } from 'mdast';
 import type { SandboxAgent, ACPMessage } from './types.js';
 
 export interface ParsedOrg {
@@ -34,14 +39,31 @@ function inferLevelAndRole(name: string): { level: number; role: SandboxAgent['r
   if (/\b(lead|manager)\b/.test(n)) return { level: 7, role: 'lead' };
   if (/\b(senior|principal)\b/.test(n)) return { level: 6, role: 'senior' };
   if (/\b(junior|intern|assistant)\b/.test(n)) return { level: 1, role: 'intern' };
-  // default: worker
   return { level: 4, role: 'worker' };
 }
 
-function extractMeta(lines: string[]): Record<string, string> {
+/** Extract text content from a phrasing node tree */
+function phrasingToText(nodes: PhrasingContent[]): string {
+  return nodes.map(n => {
+    if (n.type === 'text') return (n as Text).value;
+    if ('children' in n) return phrasingToText((n as any).children);
+    return '';
+  }).join('');
+}
+
+/** Extract text from any mdast node */
+function nodeToText(node: Content): string {
+  if (node.type === 'text') return (node as Text).value;
+  if ('children' in node) return (node as any).children.map((c: Content) => nodeToText(c)).join('');
+  return '';
+}
+
+/** Extract bold-key: value pairs from a list in mdast */
+function extractMetaFromList(items: ListItem[]): Record<string, string> {
   const meta: Record<string, string> = {};
-  for (const line of lines) {
-    const m = line.match(/^-\s+\*\*(.+?):\*\*\s*(.+)$/);
+  for (const item of items) {
+    const text = item.children.map(c => nodeToText(c)).join('').trim();
+    const m = text.match(/^(.+?):\s*(.+)$/);
     if (m) {
       const key = m[1].trim().toLowerCase().replace(/\s+/g, '_');
       meta[key] = m[2].trim();
@@ -50,12 +72,46 @@ function extractMeta(lines: string[]): Record<string, string> {
   return meta;
 }
 
-function extractProse(lines: string[]): string {
-  return lines
-    .filter(l => !l.match(/^-\s+\*\*.+:\*\*/) && l.trim().length > 0)
-    .map(l => l.trim())
-    .join(' ')
-    .trim();
+/** Extract bold-key metadata from list items: **Key:** Value */
+function extractMetaFromNodes(nodes: Content[]): Record<string, string> {
+  const meta: Record<string, string> = {};
+  for (const node of nodes) {
+    if (node.type === 'list') {
+      const list = node as List;
+      for (const item of list.children) {
+        // Get the paragraph inside the list item
+        for (const child of item.children) {
+          if (child.type === 'paragraph') {
+            const para = child as Paragraph;
+            // Check if first child is Strong (bold)
+            if (para.children.length >= 1 && para.children[0].type === 'strong') {
+              const strong = para.children[0] as Strong;
+              const keyText = phrasingToText(strong.children);
+              // Key ends with ':'
+              const key = keyText.replace(/:$/, '').trim().toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
+              // Value is the rest of the paragraph text
+              const restText = phrasingToText(para.children.slice(1)).trim().replace(/^\s*/, '');
+              if (key && restText) {
+                meta[key] = restText;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return meta;
+}
+
+/** Extract prose (non-meta text) from content nodes */
+function extractProseFromNodes(nodes: Content[]): string {
+  const parts: string[] = [];
+  for (const node of nodes) {
+    if (node.type === 'paragraph') {
+      parts.push(phrasingToText((node as Paragraph).children));
+    }
+  }
+  return parts.join(' ').trim();
 }
 
 const wakeOnMap: Record<string, ACPMessage['type']> = {
@@ -151,40 +207,44 @@ Respond with JSON ONLY. Actions:
   };
 }
 
-// ── Section splitter ─────────────────────────────────────────────────────────
+// ── AST Section Extraction ───────────────────────────────────────────────────
 
-interface Section {
+interface AstSection {
   heading: string;
   level: number;
-  lines: string[];
-  children: Section[];
+  /** Content nodes between this heading and the next heading of same or higher level */
+  content: Content[];
+  children: AstSection[];
 }
 
-function splitSections(text: string, minLevel = 1): Section[] {
-  const lines = text.split('\n');
-  const sections: Section[] = [];
-  let current: Section | null = null;
+/** Walk the flat mdast children and build a nested section tree */
+function buildSectionTree(nodes: Content[]): AstSection[] {
+  const root: AstSection[] = [];
+  const stack: AstSection[] = [];
 
-  for (const line of lines) {
-    const hMatch = line.match(/^(#{1,6})\s+(.+)$/);
-    if (hMatch) {
-      const level = hMatch[1].length;
-      if (level >= minLevel) {
-        const section: Section = { heading: hMatch[2].trim(), level, lines: [], children: [] };
-        if (current && level > current.level) {
-          current.children.push(section);
-          // Keep collecting into parent too (we'll also collect into child)
-        }
-        sections.push(section);
-        current = section;
-        continue;
+  for (const node of nodes) {
+    if (node.type === 'heading') {
+      const h = node as Heading;
+      const heading = phrasingToText(h.children);
+      const section: AstSection = { heading, level: h.depth, content: [], children: [] };
+
+      // Pop stack until we find a parent with lower level
+      while (stack.length > 0 && stack[stack.length - 1].level >= h.depth) {
+        stack.pop();
       }
-    }
-    if (current) {
-      current.lines.push(line);
+
+      if (stack.length > 0) {
+        stack[stack.length - 1].children.push(section);
+      } else {
+        root.push(section);
+      }
+      stack.push(section);
+    } else if (stack.length > 0) {
+      stack[stack.length - 1].content.push(node);
     }
   }
-  return sections;
+
+  return root;
 }
 
 // ── Main parser ──────────────────────────────────────────────────────────────
@@ -195,25 +255,32 @@ export function parseOrgMd(filePath: string): ParsedOrg {
 }
 
 export function parseOrgMdContent(raw: string): ParsedOrg {
-  const allSections = splitSections(raw, 1);
+  const tree = unified()
+    .use(remarkParse)
+    .use(remarkFrontmatter, ['yaml'])
+    .parse(raw) as Root;
+
+  const sections = buildSectionTree(tree.children as Content[]);
 
   // Extract org name from first H1
-  const h1 = allSections.find(s => s.level === 1);
+  const h1 = sections.find(s => s.level === 1);
   const orgName = h1?.heading ?? 'Unnamed Org';
 
-  // Find top-level (H2) sections
-  const h2Sections = splitSections(raw, 2).filter(s => s.level === 2);
+  // All H2 sections (either top-level or children of H1)
+  const h2Sections = h1 ? h1.children.filter(s => s.level === 2) : sections.filter(s => s.level === 2);
+
   const findSection = (name: string) =>
     h2Sections.find(s => s.heading.toLowerCase().includes(name.toLowerCase()));
 
   // ── Identity ───────────────────────────────────────────────────────────
   const identitySection = findSection('Identity');
-  const identityContext = identitySection ? extractProse(identitySection.lines) : '';
+  const identityContext = identitySection ? extractProseFromNodes(identitySection.content) : '';
 
   // ── Culture ────────────────────────────────────────────────────────────
   const cultureSection = findSection('Culture');
-  const cultureMeta = cultureSection ? extractMeta(cultureSection.lines) : {};
-  const cultureText = cultureSection ? cultureSection.lines.join('\n') : '';
+  const cultureMeta = cultureSection ? extractMetaFromNodes(cultureSection.content) : {};
+  // Also check for bare "preset: xxx" in paragraph text
+  const cultureText = cultureSection ? cultureSection.content.map(n => nodeToText(n)).join('\n') : '';
   const presetMatch = cultureText.match(/preset:\s*(\w+)/i);
   const culture: ParsedOrg['culture'] = {
     preset: presetMatch?.[1] ?? cultureMeta['preset'],
@@ -229,135 +296,109 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
   const policiesSection = findSection('Policies');
   const policies: ParsedOrg['policies'] = {};
   if (policiesSection) {
-    const allPolicyLines = policiesSection.lines;
-    const pMeta = extractMeta(allPolicyLines);
-    if (pMeta['per-agent_limit'] || pMeta['per_agent_limit']) {
-      policies.perAgentBudget = parseInt((pMeta['per-agent_limit'] ?? pMeta['per_agent_limit']).replace(/\D/g, '')) || undefined;
+    // Policies has H3 subsections: Budget, Department Caps, Permissions
+    const allPolicyContent = [
+      ...policiesSection.content,
+      ...policiesSection.children.flatMap(c => c.content),
+    ];
+    const pMeta = extractMetaFromNodes(allPolicyContent);
+    if (pMeta['per_agent_limit']) {
+      policies.perAgentBudget = parseInt(pMeta['per_agent_limit'].replace(/\D/g, '')) || undefined;
     }
     if (pMeta['alert_threshold']) {
       policies.alertThreshold = parseInt(pMeta['alert_threshold'].replace(/\D/g, '')) || undefined;
     }
-    // Parse department caps
+    // Parse department caps from list items like "Engineering: max 12 agents"
     const caps: Record<string, number> = {};
-    for (const line of allPolicyLines) {
-      const capMatch = line.match(/^\s*-\s+(\w[\w\s]*?):\s*max\s+(\d+)/i);
-      if (capMatch) {
-        caps[capMatch[1].trim().toLowerCase()] = parseInt(capMatch[2]);
+    for (const child of policiesSection.children) {
+      if (child.heading.toLowerCase().includes('department cap')) {
+        for (const node of child.content) {
+          if (node.type === 'list') {
+            for (const item of (node as List).children) {
+              const text = item.children.map(c => nodeToText(c)).join('').trim();
+              const capMatch = text.match(/^(\w[\w\s]*?):\s*max\s+(\d+)/i);
+              if (capMatch) {
+                caps[capMatch[1].trim().toLowerCase()] = parseInt(capMatch[2]);
+              }
+            }
+          }
+        }
       }
     }
     if (Object.keys(caps).length > 0) policies.departmentCaps = caps;
   }
-
-  // ── Playbooks ──────────────────────────────────────────────────────────
-  const playbooksSection = findSection('Playbooks');
-  const playbookText = playbooksSection
-    ? playbooksSection.lines.join('\n').trim()
-    : '';
 
   // ── Structure ──────────────────────────────────────────────────────────
   const structureSection = findSection('Structure');
   const agents: SandboxAgent[] = [];
 
   if (structureSection) {
-    // Re-parse just the structure section to get nested headings
-    const structStart = raw.indexOf('## Structure');
-    if (structStart !== -1) {
-      // Find next H2 or end
-      const afterStruct = raw.slice(structStart + '## Structure'.length);
-      const nextH2 = afterStruct.search(/\n## [^#]/);
-      const structText = nextH2 !== -1 ? afterStruct.slice(0, nextH2) : afterStruct;
+    let cooId: string | undefined;
 
-      const h3Sections: Array<{ heading: string; lines: string[]; h4s: Array<{ heading: string; lines: string[] }> }> = [];
-      let curH3: typeof h3Sections[0] | null = null;
-      let curH4: { heading: string; lines: string[] } | null = null;
+    for (const dept of structureSection.children) {
+      if (dept.level !== 3) continue;
 
-      for (const line of structText.split('\n')) {
-        const h3Match = line.match(/^###\s+(.+)$/);
-        const h4Match = line.match(/^####\s+(.+)$/);
+      const deptMeta = extractMetaFromNodes(dept.content);
+      const deptProse = extractProseFromNodes(dept.content);
+      const { level: deptLevel, role: deptRole } = inferLevelAndRole(dept.heading);
 
-        if (h3Match) {
-          curH3 = { heading: h3Match[1].trim(), lines: [], h4s: [] };
-          h3Sections.push(curH3);
-          curH4 = null;
-        } else if (h4Match && curH3) {
-          curH4 = { heading: h4Match[1].trim(), lines: [] };
-          curH3.h4s.push(curH4);
-        } else if (curH4) {
-          curH4.lines.push(line);
-        } else if (curH3) {
-          curH3.lines.push(line);
+      const isCLevel = deptLevel >= 10;
+
+      if (isCLevel || dept.children.length === 0) {
+        // Direct agent at ### level (C-level or solo)
+        const id = makeId(deptMeta['id'] ?? dept.heading);
+        const domain = deptMeta['domain'] ?? dept.heading;
+        const count = parseInt(deptMeta['count'] ?? '1') || 1;
+        const reportsTo = deptMeta['reports_to'];
+        const parentId = reportsTo ? makeId(reportsTo) : undefined;
+
+        const context = [identityContext, deptProse].filter(Boolean).join(' ').slice(0, 300);
+        const triggerInfo = parseTriggerMeta(deptMeta);
+
+        for (let i = 0; i < count; i++) {
+          const agentName = count > 1 ? `${dept.heading} ${i + 1}` : dept.heading;
+          const agentId = count > 1 ? `${id}-${i + 1}` : id;
+          const agent = makeAgent(agentId, agentName, deptRole, deptLevel, domain, parentId, context, triggerInfo, deptMeta['avatar'], deptMeta['avatar_color']);
+          agents.push(agent);
+          if (isCLevel) cooId = agentId;
         }
+        continue;
       }
 
-      // Find the COO-level agent (if any)
-      let cooId: string | undefined;
+      // Department with sub-roles (H4 children)
+      let deptLeadId: string | undefined;
 
-      for (const dept of h3Sections) {
-        const deptMeta = extractMeta(dept.lines);
-        const deptProse = extractProse(dept.lines);
-        const { level: deptLevel, role: deptRole } = inferLevelAndRole(dept.heading);
+      for (let ri = 0; ri < dept.children.length; ri++) {
+        const sub = dept.children[ri];
+        if (sub.level !== 4) continue;
 
-        // Is this a C-level role (not a department)?
-        const isCLevel = deptLevel >= 10;
+        const subMeta = extractMetaFromNodes(sub.content);
+        const subProse = extractProseFromNodes(sub.content);
+        const { level: subLevel, role: subRole } = inferLevelAndRole(sub.heading);
 
-        if (isCLevel || dept.h4s.length === 0) {
-          // This is a direct agent at ### level
-          const id = makeId(deptMeta['id'] ?? dept.heading);
-          const domain = deptMeta['domain'] ?? dept.heading;
-          const model = deptMeta['model'];
-          const count = parseInt(deptMeta['count'] ?? '1') || 1;
-          const reportsTo = deptMeta['reports_to'];
-          const parentId = reportsTo ? makeId(reportsTo) : undefined;
+        const id = makeId(subMeta['id'] ?? sub.heading);
+        const domain = subMeta['domain'] ?? dept.heading;
+        const count = parseInt(subMeta['count'] ?? '1') || 1;
+        const reportsTo = subMeta['reports_to'];
 
-          const context = [identityContext, deptProse].filter(Boolean).join(' ').slice(0, 300);
-          const triggerInfo = parseTriggerMeta(deptMeta);
-
-          for (let i = 0; i < count; i++) {
-            const agentName = count > 1 ? `${dept.heading} ${i + 1}` : dept.heading;
-            const agentId = count > 1 ? `${id}-${i + 1}` : id;
-            const agent = makeAgent(agentId, agentName, deptRole, deptLevel, domain, parentId, context, triggerInfo, deptMeta['avatar'], deptMeta['avatar_color']);
-            agents.push(agent);
-            if (isCLevel) cooId = agentId;
-          }
-          continue;
+        let parentId: string | undefined;
+        if (reportsTo) {
+          parentId = makeId(reportsTo);
+        } else if (ri === 0) {
+          parentId = cooId;
+          deptLeadId = count === 1 ? id : `${id}-1`;
+        } else {
+          parentId = deptLeadId;
         }
 
-        // This is a department with sub-roles
-        let deptLeadId: string | undefined;
+        const context = [identityContext, deptProse, subProse].filter(Boolean).join(' ').slice(0, 300);
+        const triggerInfo = parseTriggerMeta(subMeta);
 
-        for (let ri = 0; ri < dept.h4s.length; ri++) {
-          const sub = dept.h4s[ri];
-          const subMeta = extractMeta(sub.lines);
-          const subProse = extractProse(sub.lines);
-          const { level: subLevel, role: subRole } = inferLevelAndRole(sub.heading);
-
-          const id = makeId(subMeta['id'] ?? sub.heading);
-          const domain = subMeta['domain'] ?? dept.heading;
-          const count = parseInt(subMeta['count'] ?? '1') || 1;
-          const reportsTo = subMeta['reports_to'];
-
-          // Parent inference
-          let parentId: string | undefined;
-          if (reportsTo) {
-            parentId = makeId(reportsTo);
-          } else if (ri === 0) {
-            // First role = department lead, reports to COO or top-level
-            parentId = cooId;
-            deptLeadId = count === 1 ? id : `${id}-1`;
-          } else {
-            // Subsequent roles report to department lead
-            parentId = deptLeadId;
-          }
-
-          const context = [identityContext, deptProse, subProse].filter(Boolean).join(' ').slice(0, 300);
-          const triggerInfo = parseTriggerMeta(subMeta);
-
-          for (let i = 0; i < count; i++) {
-            const agentName = count > 1 ? `${sub.heading} ${i + 1}` : sub.heading;
-            const agentId = count > 1 ? `${id}-${i + 1}` : id;
-            const agent = makeAgent(agentId, agentName, subRole, subLevel, domain, parentId, context, triggerInfo, subMeta['avatar'], subMeta['avatar_color']);
-            agents.push(agent);
-          }
+        for (let i = 0; i < count; i++) {
+          const agentName = count > 1 ? `${sub.heading} ${i + 1}` : sub.heading;
+          const agentId = count > 1 ? `${id}-${i + 1}` : id;
+          const agent = makeAgent(agentId, agentName, subRole, subLevel, domain, parentId, context, triggerInfo, subMeta['avatar'], subMeta['avatar_color']);
+          agents.push(agent);
         }
       }
     }
