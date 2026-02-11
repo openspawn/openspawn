@@ -356,7 +356,7 @@ function AgentNode({ data, selected }: NodeProps) {
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
             ) : nodeData.avatar ? (
-              <span className="select-none" style={{ fontSize: '20px', lineHeight: 1 }}>{nodeData.avatar}</span>
+              <span className="select-none" style={{ fontSize: '18px', lineHeight: 1, marginTop: 4 }}>{nodeData.avatar}</span>
             ) : avatarUrl ? (
               <img 
                 src={avatarUrl} 
