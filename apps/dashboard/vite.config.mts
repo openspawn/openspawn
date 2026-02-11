@@ -67,6 +67,8 @@ export default defineConfig(() => ({
     nxCopyAssetsPlugin(["*.md"]),
     fixBaseHref(),
     VitePWA({
+      // Disable SW in sandbox mode to prevent stale cache issues
+      selfDestroying: process.env.VITE_SANDBOX_MODE === 'true',
       registerType: "autoUpdate",
       // We supply our own manifest.json in public/
       manifest: false,

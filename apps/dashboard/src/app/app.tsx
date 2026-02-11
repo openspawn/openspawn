@@ -33,8 +33,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 const scenarioParam = urlParams.get('scenario') || 'acmetech';
 
-// Use HashRouter for demo/sandbox (preserves query params across navigation)
-const Router = (isDemoMode || isSandboxMode) ? HashRouter : BrowserRouter;
+// Use HashRouter for local demo (preserves query params), BrowserRouter for production sandbox
+const isProduction = typeof window !== 'undefined' && !window.location.port;
+const Router = (isDemoMode && !isProduction) ? HashRouter : BrowserRouter;
 
 const queryClient = new QueryClient({
   defaultOptions: {
