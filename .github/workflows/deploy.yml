@@ -35,22 +35,48 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1
+      - name: Copy deploy files to VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          source: "deploy/docker-compose.yml,deploy/Caddyfile"
+          target: /opt/bikinibottom
+          strip_components: 1
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GH_TOKEN
           script: |
+            set -e
             cd /opt/bikinibottom
+
+            # Create .env.production if it doesn't exist
+            touch .env.production
+
+            # Log in to GHCR to pull the image
+            echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
+
+            # Pull and restart
             docker compose pull
             docker compose up -d --remove-orphans
+
+            # Prune old images
+            docker image prune -f
+
             # Health check
-            sleep 5
+            sleep 10
             if curl -sf http://localhost:3333/api/state > /dev/null; then
               echo "✅ Deploy successful"
             else
-              echo "❌ Health check failed — rolling back"
-              docker compose up -d --remove-orphans
+              echo "❌ Health check failed"
+              docker compose logs --tail=50 app
               exit 1
             fi
