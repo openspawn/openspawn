@@ -99,9 +99,13 @@ export function App() {
               <FeatureTour />
               <CompletionCelebration />
               <Routes>
-                {/* Public routes */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                {/* Public routes — hidden in demo/sandbox mode */}
+                {!isDemoMode && !isSandboxMode && (
+                  <>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  </>
+                )}
                 
                 {/* Protected routes */}
                 <Route
