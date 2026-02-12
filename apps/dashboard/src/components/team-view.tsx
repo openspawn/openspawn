@@ -105,6 +105,8 @@ function TeamAgentCard({
         name={agent.name}
         level={agent.level}
         size="md"
+        avatar={(agent as any).avatar}
+        avatarColor={(agent as any).avatarColor}
         presenceStatus={presenceMap.get(agent.id)?.status}
         completionRate={healthMap.get(agent.id)?.completionRate}
         creditUsage={healthMap.get(agent.id)?.creditUsage}

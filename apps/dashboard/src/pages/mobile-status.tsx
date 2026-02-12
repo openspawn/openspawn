@@ -110,6 +110,8 @@ function AgentRow({ agent, presence, currentTask, health, expanded, onToggle }: 
           name={agent.name}
           level={agent.level}
           size="sm"
+          avatar={(agent as any).avatar}
+          avatarColor={(agent as any).avatarColor}
           presenceStatus={presence}
           completionRate={health?.completionRate}
           creditUsage={health?.creditUsage}
