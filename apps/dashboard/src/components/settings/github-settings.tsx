@@ -505,7 +505,7 @@ export function GitHubSettings() {
                       <Badge variant="outline" className="text-xs">
                         {(link.metadata.repo as string) || "unknown"}
                       </Badge>
-                      {link.metadata.url && (
+                      {typeof link.metadata.url === 'string' && (
                         <a
                           href={link.metadata.url as string}
                           target="_blank"

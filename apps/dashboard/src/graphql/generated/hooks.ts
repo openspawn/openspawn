@@ -619,7 +619,7 @@ export type TasksQueryVariables = Exact<{
 }>;
 
 
-export type TasksQuery = { tasks: Array<{ id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, approvalRequired: boolean, dueDate?: string | null, completedAt?: string | null, createdAt: string, assignee?: { id: string, name: string } | null, rejection?: { feedback: string, rejectedAt: string, rejectedBy: string, rejectionCount: number } | null }> };
+export type TasksQuery = { tasks: Array<{ id: string, identifier: string, title: string, description?: string | null, status: TaskStatus, priority: TaskPriority, assigneeId?: string | null, creatorId: string, approvalRequired: boolean, dueDate?: string | null, completedAt?: string | null, createdAt: string, updatedAt: string, approvedAt?: string | null, assignee?: { id: string, name: string } | null, rejection?: { feedback: string, rejectedAt: string, rejectedBy: string, rejectionCount: number } | null }> };
 
 export type TaskQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -767,6 +767,8 @@ export const TasksDocument = `
     dueDate
     completedAt
     createdAt
+    updatedAt
+    approvedAt
     rejection {
       feedback
       rejectedAt

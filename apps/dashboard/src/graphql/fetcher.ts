@@ -54,7 +54,8 @@ function getClient(): GraphQLClient {
  */
 export function fetcher<TData, TVariables extends Record<string, unknown>>(
   query: string,
-  variables?: TVariables
+  variables?: TVariables,
+  _options?: RequestInit['headers']
 ): () => Promise<TData> {
   // Use sandbox fetcher (real LLM agents via Ollama)
   if (isSandboxMode) {

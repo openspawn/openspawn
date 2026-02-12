@@ -7,6 +7,7 @@
 import { useMemo } from 'react';
 import { useAgents } from './use-agents';
 import { useTasks } from './use-tasks';
+import { AgentStatus } from '../graphql/generated/graphql';
 
 export type PresenceStatus = 'active' | 'busy' | 'idle' | 'error';
 
@@ -54,7 +55,7 @@ export function usePresence(): {
 
     // Pick up to 4 active agents (agents with active status + tasks)
     // Mark 1 as error for visual variety
-    const activeAgents = agents.filter((a: any) => a.status === 'active');
+    const activeAgents = agents.filter((a: any) => a.status === AgentStatus.Active);
     let activeCount = 0;
     let errorSet = false;
 
@@ -62,14 +63,14 @@ export function usePresence(): {
       const id = agent.id;
 
       // Suspended/revoked → error
-      if (agent.status === 'suspended' || agent.status === 'revoked') {
+      if (agent.status === AgentStatus.Suspended || agent.status === AgentStatus.Revoked) {
         map.set(id, { agentId: id, status: 'error' });
         if (!errorSet) errorSet = true;
         continue;
       }
 
       // Has in-progress task → active
-      if (busyAgentIds.has(id) && agent.status === 'active') {
+      if (busyAgentIds.has(id) && agent.status === AgentStatus.Active) {
         activeCount++;
         map.set(id, {
           agentId: id,
@@ -82,7 +83,7 @@ export function usePresence(): {
       }
 
       // Paused → busy
-      if (agent.status === 'paused') {
+      if (agent.status === AgentStatus.Pending) {
         map.set(id, { agentId: id, status: 'busy' });
         continue;
       }

@@ -7,8 +7,11 @@ import { cn } from "../../lib/utils";
 
 const Select = React.forwardRef<
   HTMLSelectElement,
-  React.SelectHTMLAttributes<HTMLSelectElement> & { children?: React.ReactNode }
->(({ className, children, ...props }, ref) => (
+  React.SelectHTMLAttributes<HTMLSelectElement> & {
+    children?: React.ReactNode;
+    onValueChange?: (value: string) => void;
+  }
+>(({ className, children, onValueChange, onChange, ...props }, ref) => (
   <select
     ref={ref}
     className={cn(
@@ -17,6 +20,10 @@ const Select = React.forwardRef<
       "disabled:cursor-not-allowed disabled:opacity-50",
       className
     )}
+    onChange={(e) => {
+      onChange?.(e);
+      onValueChange?.(e.target.value);
+    }}
     {...props}
   >
     {children}

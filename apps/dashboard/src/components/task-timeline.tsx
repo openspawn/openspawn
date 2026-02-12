@@ -26,7 +26,8 @@ import { cn } from '../lib/utils';
 import { useAgents, useTasks, useMessages, useEvents } from '../hooks';
 import type { Task } from '../hooks/use-tasks';
 import type { Message } from '../hooks/use-messages';
-import { getStatusVariant } from '../lib/status-colors';
+import { getStatusVariant, getTaskStatusVariant } from '../lib/status-colors';
+import { TaskStatus } from '../graphql/generated/graphql';
 
 // ── Timeline event types ────────────────────────────────────────────────────
 
@@ -75,7 +76,7 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   }
 
   // Started (infer from status being beyond 'pending')
-  if (task.status !== 'pending' && task.status !== 'open') {
+  if (task.status !== TaskStatus.Backlog && task.status !== TaskStatus.Todo) {
     const startTime = new Date(new Date(task.createdAt).getTime() + 60000).toISOString();
     events.push({
       id: `${task.id}-started`,
@@ -120,7 +121,7 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   }
 
   // Review
-  if (task.status === 'review') {
+  if (task.status === TaskStatus.Review) {
     events.push({
       id: `${task.id}-review`,
       type: 'review',
@@ -150,7 +151,7 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
       type: 'rejected',
       timestamp: task.updatedAt,
       label: 'Rejected',
-      detail: task.rejection.reason || undefined,
+      detail: task.rejection.feedback || undefined,
       icon: XCircle,
       color: '#ef4444',
     });
@@ -292,7 +293,7 @@ function TaskTimelineRow({
 
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-xs text-muted-foreground hidden sm:inline">{duration}</span>
-          <Badge variant={getStatusVariant(task.status)} className="text-[10px]">
+          <Badge variant={getTaskStatusVariant(task.status)} className="text-[10px]">
             {task.status}
           </Badge>
           {task.assigneeId && (
@@ -300,7 +301,7 @@ function TaskTimelineRow({
               agentId={agentMap.get(task.assigneeId)?.name || task.assigneeId}
               name={agentMap.get(task.assigneeId)?.name || '?'}
               level={agentMap.get(task.assigneeId)?.level || 1}
-              size="xs"
+              size="sm"
               avatar={(agentMap.get(task.assigneeId) as any)?.avatar}
               avatarColor={(agentMap.get(task.assigneeId) as any)?.avatarColor}
             />

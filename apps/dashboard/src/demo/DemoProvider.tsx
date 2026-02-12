@@ -31,9 +31,11 @@ interface DemoContextValue {
   recentEvents: SimulationEvent[];
   play: () => void;
   pause: () => void;
+  setIsPlaying: (playing: boolean) => void;
   setSpeed: (speed: number) => void;
   setScenario: (name: ScenarioName, autoPlay?: boolean) => void;
   reset: () => void;
+  engine: SimulationEngine | null;
 }
 
 const DemoContext = createContext<DemoContextValue | null>(null);
@@ -52,9 +54,11 @@ export function useDemo(): DemoContextValue {
       recentEvents: [],
       play: () => { /* noop */ },
       pause: () => { /* noop */ },
+      setIsPlaying: () => { /* noop */ },
       setSpeed: () => { /* noop */ },
       setScenario: () => { /* noop */ },
       reset: () => { /* noop */ },
+      engine: null,
     };
   }
   return ctx;
@@ -66,10 +70,11 @@ const SCENARIOS: Record<ScenarioName, DemoScenario> = {
   startup: startupScenario,
   growth: growthScenario,
   enterprise: enterpriseScenario,
+  sandbox: freshScenario, // Sandbox reuses fresh scenario as base
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (s === 'acmetech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise') return s;
+  if (s === 'acmetech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise' || s === 'sandbox') return s;
   return 'acmetech'; // Default to AcmeTech product launch
 }
 
@@ -247,9 +252,11 @@ export function DemoProvider({
     recentEvents,
     play,
     pause,
+    setIsPlaying: (playing: boolean) => playing ? play() : pause(),
     setSpeed,
     setScenario,
     reset,
+    engine: engineRef.current,
   };
 
   if (!isReady) {

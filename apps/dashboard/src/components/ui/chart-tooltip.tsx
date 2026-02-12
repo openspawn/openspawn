@@ -1,9 +1,13 @@
-import type { TooltipProps } from 'recharts';
+import type { ReactNode } from 'react';
+import type { Payload } from 'recharts/types/component/DefaultTooltipContent';
 
-interface ChartTooltipProps extends TooltipProps<number, string> {
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: readonly Payload<number, string>[];
+  label?: ReactNode;
   valueFormatter?: (value: number) => string;
   labelFormatter?: (label: string) => string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }
 
 export function ChartTooltip({
@@ -25,7 +29,7 @@ export function ChartTooltip({
         </span>
       </div>
       <div className="space-y-1.5">
-        {payload.map((entry, i) => (
+        {payload.map((entry: Payload<number, string>, i: number) => (
           <div key={i} className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <div
@@ -33,7 +37,7 @@ export function ChartTooltip({
                 style={{ backgroundColor: entry.color }}
               />
               <span className="text-xs text-muted-foreground capitalize">
-                {entry.name ?? entry.dataKey}
+                {entry.name ?? String(entry.dataKey)}
               </span>
             </div>
             <span className="text-sm font-semibold text-foreground">

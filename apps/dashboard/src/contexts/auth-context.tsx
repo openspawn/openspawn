@@ -31,6 +31,10 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   getAccessToken: () => string | null;
+  /** Convenience alias for getAccessToken() — used by settings pages */
+  token: string | null;
+  /** Re-fetch user info from the server */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -226,6 +230,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         refreshSession,
         getAccessToken,
+        token: getAccessToken(),
+        refreshUser: async () => { await refreshSession(); },
       }}
     >
       {children}

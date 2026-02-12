@@ -108,7 +108,7 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
   const dueDate = formatDate(task.dueDate);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
-  const createdViaWebhook = task.metadata?.createdViaWebhook === true;
+  const createdViaWebhook = false; // TODO: Add metadata field to GraphQL schema when needed
   
   return (
     <motion.div

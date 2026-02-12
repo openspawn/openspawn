@@ -123,7 +123,7 @@ export function DashboardPage() {
 
   // Determine current phase based on task progress (for NovaTech scenario)
   const currentPhase = useMemo(() => {
-    if (scenario !== 'novatech') return 'development';
+    if (scenario !== 'acmetech') return 'development';
     
     // Count completed tasks per phase (based on task identifiers)
     const taskPhases = {
@@ -168,7 +168,7 @@ export function DashboardPage() {
   const pendingAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "PENDING").length, [agents]);
   const completedTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "DONE").length, [tasks]);
   const inProgressTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length, [tasks]);
-  const reviewTasks = useMemo(() => tasks.filter(t => t.status === "review").length, [tasks]);
+  const reviewTasks = useMemo(() => tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, [tasks]);
 
   const totalCreditsEarned = useMemo(() => transactions
     .filter((t) => t.type === "CREDIT")
@@ -472,7 +472,7 @@ export function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description={
-          isDemo && scenario === 'novatech'
+          isDemo && scenario === 'acmetech'
             ? 'NovaTech AI — Product Launch Lifecycle'
             : 'Overview of your multi-agent system'
         }
@@ -540,7 +540,7 @@ export function DashboardPage() {
       })()}
 
       {/* Phase Progress (NovaTech scenario only) */}
-      {isDemo && scenario === 'novatech' && PROJECT_PHASES && (
+      {isDemo && scenario === 'acmetech' && PROJECT_PHASES && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">

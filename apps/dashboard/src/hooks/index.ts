@@ -8,3 +8,4 @@ export { usePresence, type AgentPresence, type PresenceStatus } from "./use-pres
 export { useAgentHealth, type AgentHealth } from "./use-agent-health";
 export { useTouchDevice } from "./use-touch-device";
 export { useTeams, useTeamAgents, useTeamStats, type Team, type TeamStats } from "./use-teams";
+export { useSelfClaim, type ClaimResult } from "./use-self-claim";

@@ -1,4 +1,4 @@
-import { AgentStatus } from "../graphql/generated/graphql";
+import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 
 /**
  * Shared status → badge variant mapping for agent statuses.
@@ -44,6 +44,26 @@ export const levelColors: Record<number, string> = {
 
 export function getLevelColor(level: number): string {
   return levelColors[level] || "#71717a";
+}
+
+/**
+ * Task status → badge variant mapping.
+ */
+export function getTaskStatusVariant(
+  status: TaskStatus,
+): "success" | "warning" | "destructive" | "secondary" {
+  switch (status) {
+    case TaskStatus.Done:
+      return "success";
+    case TaskStatus.Review:
+    case TaskStatus.InProgress:
+      return "warning";
+    case TaskStatus.Cancelled:
+    case TaskStatus.Blocked:
+      return "destructive";
+    default:
+      return "secondary";
+  }
 }
 
 export function getLevelLabel(level: number): string {

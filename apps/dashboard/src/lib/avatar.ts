@@ -158,8 +158,10 @@ export function getAvatarSettings() {
 }
 
 // Get the DiceBear style object
-function getStyle(styleKey: AvatarStyleKey) {
-  return AVATAR_STYLES[styleKey]?.style || AVATAR_STYLES.bottts.style;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- DiceBear style types are incompatible across packages
+function getStyle(styleKey: AvatarStyleKey): import('@dicebear/core').Style<Record<string, unknown>> {
+  const s = AVATAR_STYLES[styleKey]?.style || AVATAR_STYLES.bottts.style;
+  return s as import('@dicebear/core').Style<Record<string, unknown>>;
 }
 
 // Level-based background colors (matching the level color scheme)
@@ -180,9 +182,9 @@ const LEVEL_BACKGROUNDS: Record<number, string[]> = {
 function getBackgroundColors(level: number): string[] {
   const bgColorKey = getBackgroundColor();
   if (bgColorKey === 'levelBased') {
-    return LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5];
+    return [...(LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5])];
   }
-  return BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'];
+  return [...(BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'])];
 }
 
 export interface AvatarOptions {
@@ -259,9 +261,9 @@ export function generateBackgroundPreview(
   
   let backgrounds: string[];
   if (bgColorKey === 'levelBased') {
-    backgrounds = LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5];
+    backgrounds = [...(LEVEL_BACKGROUNDS[level] || LEVEL_BACKGROUNDS[5])];
   } else {
-    backgrounds = BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'];
+    backgrounds = [...(BACKGROUND_COLORS[bgColorKey]?.colors || ['transparent'])];
   }
   
   const avatar = createAvatar(style, {
