@@ -2,8 +2,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "composite": true,
-    "declaration": true,
     "module": "commonjs",
     "types": ["node"],
     "experimentalDecorators": true,
@@ -17,13 +15,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
-  "references": [
-    {
-      "path": "../../libs/shared-types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/database/tsconfig.lib.json"
-    }
-  ]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
 }
