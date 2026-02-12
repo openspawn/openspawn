@@ -16,11 +16,11 @@ const variants = reduceMotion
 
 const transition = reduceMotion
   ? { duration: 0 }
-  : { duration: 0.25, ease: [0, 0, 0.2, 1] };
+  : { duration: 0.25, ease: [0, 0, 0.2, 1] as [number, number, number, number] };
 
 const exitTransition = reduceMotion
   ? { duration: 0 }
-  : { duration: 0.15, ease: [0.4, 0, 1, 1] };
+  : { duration: 0.15, ease: [0.4, 0, 1, 1] as [number, number, number, number] };
 
 interface PageTransitionProps {
   children: ReactNode;

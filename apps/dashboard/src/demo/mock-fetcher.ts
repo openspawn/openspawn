@@ -23,8 +23,14 @@ import { debug } from '../lib/debug';
 
 // Extract operation name from a DocumentNode at runtime
  
-function getOperationName(doc: { definitions: Array<{ name?: { value: string } }> }): string {
-  return doc.definitions[0]?.name?.value ?? 'Unknown';
+import type { DocumentNode } from 'graphql';
+
+function getOperationName(doc: DocumentNode): string {
+  const def = doc.definitions[0];
+  if ('name' in def && def.name) {
+    return def.name.value;
+  }
+  return 'Unknown';
 }
 
 // Operation names derived from generated documents (type-safe)

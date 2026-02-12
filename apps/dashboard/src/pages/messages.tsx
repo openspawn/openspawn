@@ -68,8 +68,8 @@ const acpTypeRenderers: Record<string, (msg: Message) => { label: string; classN
 // VIEW 1: Communication Graph (Mobile-Responsive)
 // ============================================================
 function CommunicationGraph({ messages, agents }: { messages: Message[]; agents: any[] }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedEdge, setSelectedEdge] = useState<string | null>(null);
   const [pulsingEdges, setPulsingEdges] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);

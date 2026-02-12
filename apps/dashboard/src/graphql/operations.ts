@@ -51,6 +51,8 @@ export const TasksQueryDocument = graphql(`
       dueDate
       completedAt
       createdAt
+      updatedAt
+      approvedAt
       rejection {
         feedback
         rejectedAt

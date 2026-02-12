@@ -10,7 +10,7 @@ export function useCurrentPhase() {
   
   const currentPhase = useMemo(() => {
     // Only show phase info for NovaTech scenario
-    if (!isDemo || scenario !== 'novatech') {
+    if (!isDemo || scenario !== 'acmetech') {
       return null;
     }
     
@@ -21,7 +21,7 @@ export function useCurrentPhase() {
   }, [isDemo, scenario]);
   
   const phases = useMemo(() => {
-    if (!isDemo || scenario !== 'novatech') {
+    if (!isDemo || scenario !== 'acmetech') {
       return [];
     }
     return PROJECT_PHASES;
@@ -30,6 +30,6 @@ export function useCurrentPhase() {
   return {
     currentPhase,
     phases,
-    isNovaTech: scenario === 'novatech',
+    isNovaTech: scenario === 'acmetech',
   };
 }

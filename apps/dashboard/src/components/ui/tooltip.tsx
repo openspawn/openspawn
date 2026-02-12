@@ -7,7 +7,10 @@ const TooltipProvider = ({ children }: { children: React.ReactNode }) => (
 );
 TooltipProvider.displayName = "TooltipProvider";
 
-const Tooltip = BaseTooltip.Root;
+function Tooltip({ delayDuration, ...props }: React.ComponentPropsWithoutRef<typeof BaseTooltip.Root> & { delayDuration?: number }) {
+  return <BaseTooltip.Root {...(delayDuration != null ? { delay: delayDuration } : {})} {...props} />;
+}
+Tooltip.displayName = "Tooltip";
 
 // Wrap base-ui Trigger to support Radix-style `asChild` prop
 const TooltipTrigger = React.forwardRef<
@@ -35,10 +38,11 @@ const TooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof BaseTooltip.Popup> & {
     sideOffset?: number;
+    side?: 'top' | 'bottom' | 'left' | 'right';
   }
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 4, side, ...props }, ref) => (
   <BaseTooltip.Portal>
-    <BaseTooltip.Positioner sideOffset={sideOffset}>
+    <BaseTooltip.Positioner sideOffset={sideOffset} side={side}>
       <BaseTooltip.Popup
         ref={ref}
         className={cn(

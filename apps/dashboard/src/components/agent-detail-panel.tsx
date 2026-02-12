@@ -12,7 +12,7 @@ import { Progress } from "./ui/progress";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
-import { AgentStatus, TaskStatus } from "../graphql/generated/graphql";
+import { AgentRole, AgentStatus, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 // recharts v3 has infinite-loop bug — using custom bars instead
 import { useContainerSize } from "../hooks/use-container-size";
@@ -31,14 +31,15 @@ interface AgentDetailPanelProps {
 
 function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning" | "destructive" | "secondary"; label: string } {
   switch (status) {
-    case TaskStatus.Completed:
+    case TaskStatus.Done:
       return { variant: "success", label: "Completed" };
     case TaskStatus.InProgress:
-      return { variant: "info", label: "In Progress" };
+      return { variant: "warning", label: "In Progress" };
     case TaskStatus.Blocked:
-    case TaskStatus.Rejected:
+    case TaskStatus.Cancelled:
       return { variant: "destructive", label: status };
-    case TaskStatus.Pending:
+    case TaskStatus.Backlog:
+    case TaskStatus.Todo:
       return { variant: "secondary", label: "Pending" };
     default:
       return { variant: "secondary", label: status };
@@ -158,11 +159,11 @@ function TasksTab({ agent }: { agent: Agent }) {
   );
 
   const tasksByStatus = useMemo(() => ({
-    completed: agentTasks.filter(t => t.status === TaskStatus.Completed),
+    completed: agentTasks.filter(t => t.status === TaskStatus.Done),
     inProgress: agentTasks.filter(t => t.status === TaskStatus.InProgress),
-    pending: agentTasks.filter(t => t.status === TaskStatus.Pending),
+    pending: agentTasks.filter(t => t.status === TaskStatus.Backlog || t.status === TaskStatus.Todo),
     failed: agentTasks.filter(t => 
-      t.status === TaskStatus.Rejected || t.status === TaskStatus.Blocked
+      t.status === TaskStatus.Cancelled || t.status === TaskStatus.Blocked
     ),
   }), [agentTasks]);
 
@@ -641,7 +642,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
           <input
             type="text"
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => setRole(e.target.value as AgentRole)}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>

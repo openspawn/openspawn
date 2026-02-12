@@ -7,7 +7,9 @@
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts",
       "vite/client"
-    ]
+    ],
+    "composite": true,
+    "declaration": true
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -26,7 +28,7 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../libs/demo-data"
+      "path": "../../libs/demo-data/tsconfig.lib.json"
     }
   ]
 }

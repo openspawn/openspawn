@@ -84,7 +84,7 @@ const DropdownMenuContent = React.forwardRef<
   }
 >(({ className, sideOffset = 4, align, side, ...props }, ref) => (
   <Menu.Portal>
-    <Menu.Positioner sideOffset={sideOffset} alignment={align === 'end' ? 'end' : align === 'start' ? 'start' : 'center'} side={side}>
+    <Menu.Positioner sideOffset={sideOffset} align={align === 'end' ? 'end' : align === 'start' ? 'start' : 'center'} side={side}>
       <Menu.Popup
         ref={ref}
         className={cn(
@@ -103,18 +103,37 @@ const DropdownMenuItem = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof Menu.Item> & {
     inset?: boolean;
+    asChild?: boolean;
   }
->(({ className, inset, ...props }, ref) => (
-  <Menu.Item
-    ref={ref}
-    className={cn(
-      "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
-      inset && "pl-8",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, inset, asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <Menu.Item
+        ref={ref}
+        render={children}
+        className={cn(
+          "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+          inset && "pl-8",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+  return (
+    <Menu.Item
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+        inset && "pl-8",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Menu.Item>
+  );
+});
 DropdownMenuItem.displayName = "DropdownMenuItem";
 
 const DropdownMenuCheckboxItem = React.forwardRef<

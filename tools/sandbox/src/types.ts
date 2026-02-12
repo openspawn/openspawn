@@ -24,7 +24,7 @@ export interface SandboxAgent {
   avatar?: string;
   avatarColor?: string;
   parentId?: string;
-  status: 'active' | 'idle' | 'busy';
+  status: 'active' | 'idle' | 'busy' | 'pending';
   systemPrompt: string;
   /** Current tasks assigned to this agent */
   taskIds: string[];
@@ -86,11 +86,11 @@ export interface ToolCall {
 
 // Actions an agent can take
 export type AgentAction =
-  | { action: 'delegate'; taskId: string; targetAgentId: string; reason: string }
+  | { action: 'delegate'; taskId: string; targetAgentId: string; reason: string; description?: string }
   | { action: 'work'; taskId: string; result: string }
   | { action: 'message'; to: string; content: string }
   | { action: 'escalate'; taskId: string; reason: EscalationReason; body: string }
-  | { action: 'create_task'; title: string; description: string; priority: string }
+  | { action: 'create_task'; title: string; description: string; priority: string; name?: string; task?: string; desc?: string }
   | { action: 'review'; taskId: string; verdict: 'approve' | 'reject'; feedback: string }
   | { action: 'spawn_agent'; name: string; domain: string; role: string; reason: string }
   | { action: 'idle' };

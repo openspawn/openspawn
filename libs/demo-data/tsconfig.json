@@ -4,12 +4,16 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "declaration": true,
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ]
   },
   "files": [],
   "include": [],
   "references": [
-    { "path": "./tsconfig.lib.json" },
-    { "path": "./tsconfig.spec.json" }
+    {
+      "path": "./tsconfig.lib.json"
+    }
   ]
 }

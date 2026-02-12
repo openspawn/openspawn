@@ -23,7 +23,7 @@ export function SandboxCommandBar() {
   const [displayText, setDisplayText] = useState('');
   const [commandIndex, setCommandIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (!isSandboxMode) return;

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AgentsResource } from './agents';
 import { HttpClient } from '../http-client';
 import { AuthHandler } from '../auth';
+import { AgentRole } from '../shared-types';
 
 describe('AgentsResource', () => {
   let agentsResource: AgentsResource;
@@ -20,7 +21,7 @@ describe('AgentsResource', () => {
           id: '1',
           agentId: 'agent-1',
           name: 'Agent 1',
-          role: 'WORKER' as const,
+          role: AgentRole.WORKER as const,
           level: 1,
           status: 'ACTIVE' as const,
           currentBalance: 100,
@@ -49,7 +50,7 @@ describe('AgentsResource', () => {
         id: '1',
         agentId: 'agent-1',
         name: 'Agent 1',
-        role: 'WORKER' as const,
+        role: AgentRole.WORKER as const,
         level: 1,
         status: 'ACTIVE' as const,
         currentBalance: 100,
@@ -77,7 +78,7 @@ describe('AgentsResource', () => {
         id: '1',
         agentId: 'agent-1',
         name: 'New Agent',
-        role: 'WORKER' as const,
+        role: AgentRole.WORKER as const,
         level: 1,
         status: 'ACTIVE' as const,
         currentBalance: 0,
@@ -92,7 +93,7 @@ describe('AgentsResource', () => {
 
       const result = await agentsResource.create({
         name: 'New Agent',
-        role: 'WORKER',
+        role: AgentRole.WORKER,
         level: 1,
       });
 
@@ -116,7 +117,7 @@ describe('AgentsResource', () => {
         level: 2,
         status: 'PENDING' as const,
         parentId: '1',
-        role: 'WORKER' as const,
+        role: AgentRole.WORKER as const,
         currentBalance: 0,
         createdAt: '2024-01-01',
       };
@@ -201,7 +202,7 @@ describe('AgentsResource', () => {
           id: '1',
           agentId: 'agent-1',
           name: 'Skilled Agent',
-          role: 'WORKER' as const,
+          role: AgentRole.WORKER as const,
           level: 3,
           status: 'ACTIVE' as const,
           currentBalance: 100,

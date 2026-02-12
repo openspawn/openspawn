@@ -3,13 +3,16 @@ import type { ReactNode } from 'react';
 import { isSandboxMode } from '../graphql/fetcher';
 import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
 
-export type NotificationType = 'agent' | 'task' | 'message' | 'credit' | 'system';
+export type NotificationType = 'agent' | 'task' | 'message' | 'credit' | 'system' | 'success' | 'info' | 'warning';
 
 export interface Notification {
   id: string;
   type: NotificationType;
   title: string;
-  description: string;
+  /** Display text for the notification */
+  description?: string;
+  /** Alias for description — used by settings pages */
+  message?: string;
   timestamp: Date;
   read: boolean;
 }

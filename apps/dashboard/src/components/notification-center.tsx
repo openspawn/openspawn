@@ -11,6 +11,9 @@ const typeConfig: Record<NotificationType, { icon: typeof Bell; label: string; a
   message: { icon: MessageSquare,  label: 'Message', accent: 'text-violet-400',  border: 'border-l-violet-500',  bg: 'bg-violet-500/5' },
   credit:  { icon: Coins,          label: 'Credit',  accent: 'text-amber-400',   border: 'border-l-amber-500',   bg: 'bg-amber-500/5' },
   system:  { icon: AlertTriangle,  label: 'System',  accent: 'text-rose-400',    border: 'border-l-rose-500',    bg: 'bg-rose-500/5' },
+  success: { icon: CheckSquare,    label: 'Success', accent: 'text-emerald-400', border: 'border-l-emerald-500', bg: 'bg-emerald-500/5' },
+  info:    { icon: Bell,           label: 'Info',    accent: 'text-blue-400',    border: 'border-l-blue-500',    bg: 'bg-blue-500/5' },
+  warning: { icon: AlertTriangle,  label: 'Warning', accent: 'text-amber-400',   border: 'border-l-amber-500',   bg: 'bg-amber-500/5' },
 };
 
 function relativeTime(date: Date): string {
@@ -146,7 +149,7 @@ export function NotificationCenter() {
                                 </span>
                               </div>
                               <p className={cn('text-xs mt-0.5 line-clamp-2', notification.read ? 'text-muted-foreground/70' : 'text-muted-foreground')}>
-                                {notification.description}
+                                {notification.description || notification.message}
                               </p>
                             </div>
                           </div>
