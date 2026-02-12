@@ -64,19 +64,28 @@ jobs:
             # Log in to GHCR to pull the image
             echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
 
-            # Pull and restart
+            # Pull latest image
             docker compose pull
+
+            # Start app first, then caddy (caddy depends on app health)
             docker compose up -d --remove-orphans
 
-            # Prune old images
-            docker image prune -f
+            # Wait for app to be healthy (up to 60s)
+            echo "⏳ Waiting for app to start..."
+            for i in $(seq 1 12); do
+              if curl -sf http://localhost:3333/api/state > /dev/null 2>&1; then
+                echo "✅ Deploy successful!"
+                docker image prune -f
+                exit 0
+              fi
+              echo "  Attempt $i/12 — waiting 5s..."
+              sleep 5
+            done
 
-            # Health check
-            sleep 10
-            if curl -sf http://localhost:3333/api/state > /dev/null; then
-              echo "✅ Deploy successful"
-            else
-              echo "❌ Health check failed"
-              docker compose logs --tail=50 app
-              exit 1
-            fi
+            # Failed — dump logs
+            echo "❌ Health check failed after 60s"
+            echo "=== App logs ==="
+            docker compose logs --tail=100 app
+            echo "=== Container status ==="
+            docker compose ps
+            exit 1

@@ -19,10 +19,10 @@ services:
       - "3333"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3333/api/state"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 30s
 
   caddy:
     image: caddy:2-alpine
