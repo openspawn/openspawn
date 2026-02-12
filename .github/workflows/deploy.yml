@@ -67,8 +67,12 @@ jobs:
             # Pull latest image
             docker compose pull
 
-            # Start app first, then caddy (caddy depends on app health)
-            docker compose up -d --remove-orphans
+            # Stop any native sandbox process that might hold port 3333
+            fuser -k 3333/tcp 2>/dev/null || true
+            sleep 1
+
+            # Start app container (system Caddy handles HTTPS)
+            docker compose up -d app --remove-orphans
 
             # Wait for app to be healthy (up to 60s)
             echo "⏳ Waiting for app to start..."

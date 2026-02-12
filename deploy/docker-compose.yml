@@ -1,5 +1,6 @@
 # ── BikiniBottom VPS Docker Compose ───────────────────────────────────────────
-# Lean demo: sandbox server + dashboard (single container) behind Caddy reverse proxy
+# Lean demo: sandbox server + dashboard (single container)
+# System Caddy handles HTTPS reverse proxy (see /etc/caddy/Caddyfile on VPS)
 #
 # Expected at /opt/bikinibottom/docker-compose.yml on the VPS
 
@@ -15,30 +16,11 @@ services:
       - NODE_ENV=production
     env_file:
       - .env.production
-    expose:
-      - "3333"
+    ports:
+      - "3333:3333"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3333/api/state"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-
-  caddy:
-    image: caddy:2-alpine
-    container_name: bikinibottom-caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      app:
-        condition: service_healthy
-
-volumes:
-  caddy_data:
-  caddy_config:
