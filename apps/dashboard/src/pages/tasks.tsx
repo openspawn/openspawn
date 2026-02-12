@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ScrollArea } from "../components/ui/scroll-area";
 import { PageHeader } from "../components/ui/page-header";
 import { PhaseChip } from "../components/phase-chip";
+import { EmptyState } from "../components/ui/empty-state";
 import { useTasks, type Task, useCurrentPhase, useAgents } from "../hooks";
 import { useTeams } from "../hooks";
 import { useSidePanel } from "../contexts";
@@ -21,7 +22,7 @@ type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
 
 const statusColumns = [
-  { id: "BACKLOG", label: "Backlog", color: "bg-muted-foreground" },
+  { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
   { id: "TODO", label: "To Do", color: "bg-amber-500" },
   { id: "IN_PROGRESS", label: "In Progress", color: "bg-cyan-500" },
   { id: "REVIEW", label: "Review", color: "bg-violet-500" },
@@ -661,6 +662,31 @@ export function TasksPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-destructive">Error loading tasks</div>
+      </div>
+    );
+  }
+
+  if (tasks.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
+            <p className="text-muted-foreground">Manage and track agent tasks</p>
+          </div>
+          <Button><Plus className="mr-2 h-4 w-4" />New Task</Button>
+        </div>
+        <Card>
+          <CardContent>
+            <EmptyState
+              variant="tasks"
+              title="No tasks in the queue"
+              description="Create your first task to start assigning work to your agents."
+              ctaLabel="Create your first task →"
+              onCta={() => {}}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }

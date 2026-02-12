@@ -45,6 +45,7 @@ import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
+import { EmptyState } from "../components/ui/empty-state";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 import { useSparklines } from "../hooks/use-sandbox-metrics";
 import { useACPMetrics } from "../hooks/use-acp-metrics";
@@ -54,7 +55,7 @@ import { SandboxControls } from "../components/sandbox-controls";
 
 function getEventIcon(type: string) {
   if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
-  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-blue-500" />;
+  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-cyan-500" />;
   if (type.includes('credit')) return <Coins className="h-4 w-4 text-amber-500" />;
   return <Activity className="h-4 w-4 text-muted-foreground" />;
 }
