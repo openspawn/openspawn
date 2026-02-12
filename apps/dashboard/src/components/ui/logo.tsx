@@ -1,5 +1,3 @@
-import logoSvg from '../../assets/logo.svg';
-
 const sizes = {
   sm: 24,
   md: 32,
@@ -18,13 +16,13 @@ interface LogoProps {
 export function Logo({ size = 'md', className = '', style }: LogoProps) {
   const px = sizes[size];
   return (
-    <img
-      src={logoSvg}
-      alt="BikiniBottom"
-      width={px}
-      height={px}
-      className={`flex-shrink-0 ${className}`}
-      style={style}
-    />
+    <span
+      role="img"
+      aria-label="BikiniBottom"
+      className={`flex-shrink-0 leading-none select-none ${className}`}
+      style={{ fontSize: px, lineHeight: 1, ...style }}
+    >
+      🍍
+    </span>
   );
 }
