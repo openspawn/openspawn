@@ -67,12 +67,14 @@ jobs:
             # Pull latest image
             docker compose pull
 
-            # Stop any native sandbox process that might hold port 3333
+            # Stop native sandbox service if running (port 3333 conflict)
+            systemctl stop sandbox 2>/dev/null || true
+            systemctl disable sandbox 2>/dev/null || true
             fuser -k 3333/tcp 2>/dev/null || true
-            sleep 1
+            sleep 2
 
-            # Start app container (system Caddy handles HTTPS)
-            docker compose up -d app --remove-orphans
+            # Force recreate to pick up compose changes + new image
+            docker compose up -d app --force-recreate --remove-orphans
 
             # Wait for app to be healthy (up to 60s)
             echo "⏳ Waiting for app to start..."
