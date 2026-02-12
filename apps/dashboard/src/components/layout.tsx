@@ -50,6 +50,7 @@ import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
+import { isSandboxMode } from "../graphql/fetcher";
 import { SandboxCommandBar } from "./sandbox-command-bar";
 import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-banner";
 import { PhaseTransitionOverlay } from "./phase-transition-overlay";
