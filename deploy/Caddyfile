@@ -1,0 +1,23 @@
+# ── BikiniBottom Caddy Config ─────────────────────────────────────────────────
+# Auto-HTTPS via Let's Encrypt. Place at /opt/bikinibottom/Caddyfile
+
+bikinibottom.ai {
+	reverse_proxy app:3333
+
+	header {
+		# Security headers
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		# Remove server identity
+		-Server
+	}
+
+	# Cache hashed assets forever (Vite fingerprints them)
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# Don't cache HTML (so deploys are picked up immediately)
+	@html path /
+	header @html Cache-Control "no-cache"
+}

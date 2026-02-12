@@ -1,0 +1,44 @@
+# ── BikiniBottom VPS Docker Compose ───────────────────────────────────────────
+# Lean demo: sandbox server + dashboard (single container) behind Caddy reverse proxy
+#
+# Expected at /opt/bikinibottom/docker-compose.yml on the VPS
+
+services:
+  app:
+    image: ghcr.io/openspawn/openspawn:latest
+    container_name: bikinibottom
+    restart: unless-stopped
+    environment:
+      - SANDBOX_PORT=3333
+      - SERVE_DASHBOARD=1
+      - SANDBOX_READONLY=1
+      - NODE_ENV=production
+    env_file:
+      - .env.production
+    expose:
+      - "3333"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3333/api/state"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: bikinibottom-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:
