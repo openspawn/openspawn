@@ -767,8 +767,8 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <div className="flex-shrink-0 border-b border-border px-6 pt-3">
-              <TabsList className="w-full justify-start bg-transparent h-auto p-0 gap-6">
+            <div className="flex-shrink-0 border-b border-border px-6 pt-3 overflow-x-auto">
+              <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-6">
                 <TabsTrigger 
                   value="overview"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
