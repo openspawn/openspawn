@@ -767,7 +767,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
           </div>
 
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-w-0">
             <div className="flex-shrink-0 border-b border-border px-4 md:px-6 pt-3 overflow-x-auto scrollbar-none">
               <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-3 md:gap-6">
                 <TabsTrigger 
@@ -854,5 +854,5 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
     </>
   );
 
-  return <div className="h-full flex flex-col bg-background">{panelContent}</div>;
+  return <div className="h-full flex flex-col bg-background overflow-x-hidden">{panelContent}</div>;
 }
