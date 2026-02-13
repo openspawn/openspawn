@@ -1,6 +1,5 @@
 import { useRef, useCallback, type ReactNode } from "react";
-import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ChevronLeft } from "lucide-react";
 import { Button } from "./button";
 import { ScrollArea } from "./scroll-area";
 
@@ -48,7 +47,7 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
   }, [width, onWidthChange]);
 
   return (
-    <div className="h-full flex flex-col bg-background relative">
+    <div className="h-full flex flex-col bg-background relative overflow-x-hidden w-full md:w-auto">
       {/* Drag handle on left edge */}
       <div
         onMouseDown={handleMouseDown}
@@ -61,23 +60,35 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
         </div>
       </div>
 
-      {/* Header */}
-      {title && (
-        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold truncate">{title}</h2>
+      {/* Header — always visible with prominent close button */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border"
+           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Back button for mobile */}
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+            className="md:hidden min-w-[44px] min-h-[44px] hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+            aria-label="Close panel"
           >
-            <X className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
+          {title && <h2 className="text-lg font-semibold truncate">{title}</h2>}
         </div>
-      )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
+          aria-label="Close panel"
+        >
+          <X className="h-5 w-5" />
+        </Button>
+      </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 overflow-x-hidden">
         {children}
       </ScrollArea>
     </div>
