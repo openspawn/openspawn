@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 // recharts v3 has infinite-loop bug — using custom SVG chart instead
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -53,24 +53,13 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
   return (
     <div ref={parentRef} className="h-[300px] overflow-auto">
       <div style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}>
-        <AnimatePresence mode="popLayout">
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const tx = transactions[virtualRow.index];
             return (
-              <motion.div
+              <div
                 key={tx.id}
                 ref={virtualizer.measureElement}
                 data-index={virtualRow.index}
-                layout
-                initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 30,
-                  delay: virtualRow.index < 10 ? virtualRow.index * 0.02 : 0,
-                }}
                 style={{
                   position: "absolute",
                   top: 0,
@@ -124,10 +113,9 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                     Bal: {tx.balanceAfter.toLocaleString()}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
-        </AnimatePresence>
       </div>
     </div>
   );
