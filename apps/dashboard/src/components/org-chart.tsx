@@ -47,7 +47,7 @@ import {
 import { teams, type Team, getTeamColor, getSubTeams } from '../demo/teams';
 import { useTeamStats } from '../hooks/use-teams';
 import { useAgents, type Agent } from '../hooks/use-agents';
-import { getAgentAvatarUrl } from '../lib/avatar';
+import { darkenForBackground } from '../lib/avatar-utils';
 import { isSandboxMode } from '../graphql/fetcher';
 import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
 
@@ -203,12 +203,15 @@ interface AgentNodeData extends Record<string, unknown> {
   status: string;
   isLead: boolean;
   teamColor: string;
+  avatar?: string;
+  avatarColor?: string;
 }
 
 function AgentOrgNode({ data }: NodeProps) {
   const d = data as unknown as AgentNodeData & { isNew?: boolean };
   const teamColor = getTeamColor(d.teamColor);
-  const avatarUrl = getAgentAvatarUrl(d.agentId, d.level, 32);
+  const avatarEmoji = d.avatar || '🤖';
+  const avatarBg = darkenForBackground(d.avatarColor || '#71717a');
   const isActive = d.status === 'ACTIVE';
   const isNew = d.isNew === true;
   const statusColor = isActive
@@ -273,13 +276,12 @@ function AgentOrgNode({ data }: NodeProps) {
           </div>
         )}
 
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={d.label} className="w-8 h-8 rounded-full flex-shrink-0" />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs flex-shrink-0">
-            🤖
-          </div>
-        )}
+        <span
+          className="w-8 h-8 rounded-full flex-shrink-0 inline-flex items-center justify-center text-base"
+          style={{ backgroundColor: avatarBg }}
+        >
+          {avatarEmoji}
+        </span>
         <div className="min-w-0 flex-1">
           <div className="text-xs font-semibold text-foreground truncate">{d.label}</div>
           <div className="text-[10px] text-zinc-400">L{d.level}</div>
@@ -421,6 +423,8 @@ function buildOrgGraph(
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
           teamColor: team.color,
+          avatar: (agent as any).avatar,
+          avatarColor: (agent as any).avatarColor,
         } as AgentNodeData,
       });
 
@@ -461,6 +465,8 @@ function buildOrgGraph(
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
           teamColor: team.color,
+          avatar: (agent as any).avatar,
+          avatarColor: (agent as any).avatarColor,
         } as AgentNodeData,
       });
 

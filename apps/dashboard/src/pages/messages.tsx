@@ -21,13 +21,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { cn } from '../lib/utils';
 import { EmptyState } from '../components/ui/empty-state';
 import { PageHeader } from '../components/ui/page-header';
-import { getAgentAvatarUrl } from '../lib/avatar';
+import { darkenForBackground } from '../lib/avatar-utils';
 import { PhaseChip } from '../components/phase-chip';
 import { TeamBadge, TeamFilterDropdown } from '../components/team-badge';
 import { ThreadView } from '../components/thread-view';
 import { useMessages, useAgents, useCurrentPhase, type Message } from '../hooks';
 import { isSandboxMode } from '../graphql/fetcher';
 import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';
+
+// Inline emoji avatar for lightweight rendering in message views
+function InlineAvatar({ agentId, agents, className = 'w-5 h-5', fontSize = 'text-xs' }: { agentId: string; agents: any[]; className?: string; fontSize?: string }) {
+  const agent = agents.find((a: any) => a.id === agentId);
+  const avatar = (agent as any)?.avatar;
+  const avatarColor = (agent as any)?.avatarColor || '#71717a';
+  return (
+    <span
+      className={`inline-flex items-center justify-center rounded-full ${fontSize} ${className}`}
+      style={{ backgroundColor: darkenForBackground(avatarColor) }}
+    >
+      {avatar || '🤖'}
+    </span>
+  );
+}
 
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -100,11 +115,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
         data: { 
           label: (
             <div className="flex flex-col items-center gap-0.5 p-1 md:p-2">
-              <img 
-                src={getAgentAvatarUrl(agent.id, agent.level)} 
-                alt={agent.name}
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full"
-              />
+              <InlineAvatar agentId={agent.id} agents={agents} className="w-8 h-8 md:w-10 md:h-10" fontSize="text-base md:text-lg" />
               <span className="text-[10px] md:text-xs font-medium truncate max-w-[60px] md:max-w-[80px]">{agent.name}</span>
               <Badge variant="outline" className="text-[8px] md:text-[10px] px-1">L{agent.level}</Badge>
             </div>
@@ -225,7 +236,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
                     return (
                       <div key={msg.id} className="p-2 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2 mb-1">
-                          <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 rounded-full" />
+                          <InlineAvatar agentId={msg.fromAgentId} agents={agents} className="w-5 h-5" />
                           <span className="text-xs font-medium">{sender?.name || 'Unknown'}</span>
                           <span className="text-[10px] text-muted-foreground ml-auto">{formatTime(msg.createdAt)}</span>
                         </div>
@@ -246,7 +257,7 @@ function CommunicationGraph({ messages, agents }: { messages: Message[]; agents:
 // ============================================================
 // VIEW 2: Mission Control Feed (Mobile-Optimized)
 // ============================================================
-function FeedVirtualList({ filtered, allMessages, onViewThread }: { filtered: Message[]; allMessages: Message[]; onViewThread: (convoKey: string) => void }) {
+function FeedVirtualList({ filtered, allMessages, onViewThread, agents }: { filtered: Message[]; allMessages: Message[]; onViewThread: (convoKey: string) => void; agents: any[] }) {
   return (
     <div className="relative">
       <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
@@ -286,10 +297,10 @@ function FeedVirtualList({ filtered, allMessages, onViewThread }: { filtered: Me
                     <CardContent className="p-2 md:p-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                         <div className="flex items-center gap-1.5 md:gap-2">
-                          <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
+                          <InlineAvatar agentId={msg.fromAgentId} agents={agents} className="w-5 h-5 md:w-6 md:h-6" />
                           <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{sender?.name || 'Unknown'}</span>
                           <span className="text-muted-foreground text-xs">→</span>
-                          <img src={getAgentAvatarUrl(msg.toAgentId, receiver?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full" />
+                          <InlineAvatar agentId={msg.toAgentId} agents={agents} className="w-5 h-5 md:w-6 md:h-6" />
                           <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{receiver?.name || 'Unknown'}</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -395,7 +406,7 @@ function MissionControlFeed({ messages, onViewThread }: { messages: Message[]; o
         />
       </div>
 
-      <FeedVirtualList filtered={filtered} allMessages={messages} onViewThread={onViewThread} />
+      <FeedVirtualList filtered={filtered} allMessages={messages} onViewThread={onViewThread} agents={agents} />
       <ComposingIndicators />
     </div>
   );
@@ -454,8 +465,8 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="flex -space-x-2 shrink-0">
-                      <img src={getAgentAvatarUrl(agent1Id, agent1?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-card" />
-                      <img src={getAgentAvatarUrl(agent2Id, agent2?.level || 5)} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-card" />
+                      <InlineAvatar agentId={agent1Id} agents={agents} className="w-7 h-7 md:w-8 md:h-8 border-2 border-card" fontSize="text-sm md:text-base" />
+                      <InlineAvatar agentId={agent2Id} agents={agents} className="w-7 h-7 md:w-8 md:h-8 border-2 border-card" fontSize="text-sm md:text-base" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs md:text-sm font-medium truncate">
@@ -506,7 +517,7 @@ function ConversationCards({ messages, agents, onViewThread }: { messages: Messa
                                 isAgent1 ? "flex-row" : "flex-row-reverse"
                               )}
                             >
-                              <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-5 h-5 md:w-6 md:h-6 rounded-full shrink-0" />
+                              <InlineAvatar agentId={msg.fromAgentId} agents={agents} className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                               <div
                                 className={cn(
                                   "max-w-[80%] p-2 rounded-lg text-xs md:text-sm",
@@ -621,7 +632,7 @@ function ContextLinkedMessages({ messages, agents, onViewThread }: { messages: M
                   >
                     {selectedAgentData ? (
                       <>
-                        <img src={getAgentAvatarUrl(selectedAgent!, selectedAgentData.level)} className="w-4 h-4 rounded-full" />
+                        <InlineAvatar agentId={selectedAgent!} agents={agents} className="w-4 h-4" fontSize="text-[8px]" />
                         <span className="max-w-[100px] truncate">{selectedAgentData.name}</span>
                       </>
                     ) : (
@@ -663,7 +674,7 @@ function ContextLinkedMessages({ messages, agents, onViewThread }: { messages: M
                                   setShowAgentDropdown(false);
                                 }}
                               >
-                                <img src={getAgentAvatarUrl(agent.id, agent.level)} className="w-4 h-4 rounded-full" />
+                                <InlineAvatar agentId={agent.id} agents={agents} className="w-4 h-4" fontSize="text-[8px]" />
                                 <span className="truncate">{agent.name}</span>
                               </Button>
                             ))}
@@ -800,7 +811,7 @@ function ContextLinkedMessages({ messages, agents, onViewThread }: { messages: M
                 <Card className="hover:border-muted-foreground/30 transition-colors">
                   <CardContent className="p-2 md:p-3">
                     <div className="flex items-start gap-2 md:gap-3">
-                      <img src={getAgentAvatarUrl(msg.fromAgentId, sender?.level || 5)} className="w-8 h-8 md:w-10 md:h-10 rounded-full shrink-0" />
+                      <InlineAvatar agentId={msg.fromAgentId} agents={agents} className="w-8 h-8 md:w-10 md:h-10 shrink-0" fontSize="text-lg md:text-xl" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1 md:gap-2 mb-1 flex-wrap">
                           <span className="font-medium text-xs md:text-sm">{sender?.name || 'Unknown'}</span>
