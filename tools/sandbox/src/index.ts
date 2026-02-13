@@ -135,14 +135,24 @@ for (const a of agents) {
   console.log(`${indent}L${a.level} ${a.name} (${a.id}) — ${a.domain}`);
 }
 
-// Run — deterministic mode by default, LLM mode with SIMULATION_MODE=llm
-const useLLM = process.env.SIMULATION_MODE === 'llm';
-const sim = useLLM
-  ? new Simulation(agents, config, cleanSlate, parsedOrg)
-  : new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
+// Run — deterministic mode by default, LLM/hybrid/record modes available
+const simMode = process.env.SIMULATION_MODE || 'deterministic';
+const useLLM = simMode === 'llm';
+const useHybrid = simMode === 'hybrid' || simMode === 'record';
+const useRecording = simMode === 'record';
 
-if (!useLLM) {
-  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=llm for LLM-driven agents)`);
+let sim: DeterministicSimulation | Simulation;
+if (useHybrid || useRecording) {
+  const { LLMSimulation } = await import('./llm-simulation.js');
+  sim = new LLMSimulation(agents, config, cleanSlate, parsedOrg, useRecording);
+} else if (useLLM) {
+  sim = new Simulation(agents, config, cleanSlate, parsedOrg);
+} else {
+  sim = new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
+}
+
+if (!useLLM && !useHybrid && !useRecording) {
+  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=hybrid|record|llm for LLM-driven agents)`);
 }
 
 // Start HTTP API server for dashboard integration
