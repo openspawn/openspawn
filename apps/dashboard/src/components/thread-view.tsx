@@ -9,8 +9,8 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '../lib/utils';
-import { getAgentAvatarUrl } from '../lib/avatar';
-import type { Message } from '../hooks';
+import { darkenForBackground } from '../lib/avatar-utils';
+import { useAgents, type Message } from '../hooks';
 
 interface ThreadViewProps {
   /** All messages in this conversation (between two agents) */
@@ -54,6 +54,13 @@ function formatThreadTime(dateStr: string) {
 }
 
 export function ThreadView({ messages, onClose }: ThreadViewProps) {
+  const { agents } = useAgents();
+  const agentMap = useMemo(() => {
+    const map = new Map<string, any>();
+    agents.forEach((a: any) => map.set(a.id, a));
+    return map;
+  }, [agents]);
+
   const sorted = useMemo(
     () =>
       [...messages].sort(
@@ -163,13 +170,19 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                 >
                   {/* Avatar (only when sender changes) */}
                   <div className="w-7 shrink-0">
-                    {showAvatar && sender && (
-                      <img
-                        src={getAgentAvatarUrl(msg.fromAgentId, sender.level)}
-                        className="w-7 h-7 rounded-full"
-                        alt={sender.name}
-                      />
-                    )}
+                    {showAvatar && sender && (() => {
+                      const agentData = agentMap.get(msg.fromAgentId);
+                      const emoji = agentData?.avatar || '🤖';
+                      const color = agentData?.avatarColor || '#71717a';
+                      return (
+                        <span
+                          className="w-7 h-7 rounded-full inline-flex items-center justify-center text-sm"
+                          style={{ backgroundColor: darkenForBackground(color) }}
+                        >
+                          {emoji}
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   {/* Bubble — ACP-styled or default */}

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { cn } from '../lib/utils';
-import { getAgentAvatarUrl } from '../lib/avatar';
+import { darkenForBackground } from '../lib/avatar-utils';
 
 interface AgentEfficiency {
   id: string;
@@ -130,11 +130,12 @@ export function AgentEfficiencyLeaderboard() {
               </div>
 
               {/* Avatar */}
-              <img
-                src={getAgentAvatarUrl(agent.id, agent.level)}
-                alt={agent.name}
-                className="w-10 h-10 rounded-full ring-2 ring-white/10"
-              />
+              <span
+                className="w-10 h-10 rounded-full ring-2 ring-white/10 inline-flex items-center justify-center text-xl"
+                style={{ backgroundColor: darkenForBackground('#71717a') }}
+              >
+                🤖
+              </span>
 
               {/* Info */}
               <div className="flex-1 min-w-0">

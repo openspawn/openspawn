@@ -27,7 +27,7 @@ import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import { useAgents, type Agent } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useMessages, useConversations } from "../hooks/use-messages";
-import { getAgentAvatarUrl, getAvatarSettings } from "../lib/avatar";
+import { darkenForBackground } from "../lib/avatar-utils";
 import { useAgentHealth } from "../hooks/use-agent-health";
 import { useTouchDevice } from "../hooks/use-touch-device";
 import { levelColors } from "../lib/status-colors";
@@ -62,7 +62,6 @@ interface AgentHealthData {
 interface NetworkContextValue {
   delegations: TaskDelegation[];
   speed: number;
-  avatarVersion: number;
   agentActivity: Map<string, AgentActivity>;
   edgeMessages: Map<string, EdgeMessageData>;
   agentHealth: Map<string, AgentHealthData>;
@@ -73,7 +72,6 @@ interface NetworkContextValue {
 const NetworkContext = createContext<NetworkContextValue>({ 
   delegations: [], 
   speed: 1, 
-  avatarVersion: 0,
   agentActivity: new Map(),
   edgeMessages: new Map(),
   agentHealth: new Map(),
@@ -172,6 +170,7 @@ interface AgentNodeData extends Record<string, unknown> {
   domain?: string;
   tasksCompleted?: number;
   avatar?: string;
+  avatarColor?: string;
   isSpawning?: boolean;
   isDespawning?: boolean;
   compact?: boolean;
@@ -182,7 +181,7 @@ interface AgentNodeData extends Record<string, unknown> {
 // Custom node component with heat map coloring
 function AgentNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as AgentNodeData;
-  const { avatarVersion, agentActivity, agentHealth, isMobileOrTouch, dimIdle } = useContext(NetworkContext);
+  const { agentActivity, agentHealth, isMobileOrTouch, dimIdle } = useContext(NetworkContext);
   const hasAnimated = useRef(false);
   
   // Get activity data
@@ -222,10 +221,8 @@ function AgentNode({ data, selected }: NodeProps) {
   const nodeWidth = (compact ? 90 : 160) * mobileScale;
   const nodeHeight = (compact ? 64 : 96) * mobileScale;
   
-  const avatarUrl = useMemo(() => {
-    if (nodeData.isHuman) return null;
-    return getAgentAvatarUrl(nodeData.agentId, nodeData.level, compact ? 32 : 48);
-  }, [nodeData.agentId, nodeData.level, nodeData.isHuman, compact, avatarVersion]);
+  const avatarEmoji = nodeData.avatar || '🤖';
+  const avatarColor = (nodeData as any).avatarColor || '#71717a';
   
   return (
     <div 
@@ -355,16 +352,13 @@ function AgentNode({ data, selected }: NodeProps) {
             const health = agentHealth.get(nodeData.agentId);
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
-            ) : nodeData.avatar ? (
-              <span className="text-2xl leading-none select-none">{nodeData.avatar}</span>
-            ) : avatarUrl ? (
-              <img 
-                src={avatarUrl} 
-                alt={nodeData.label}
-                className="w-8 h-8 rounded-full"
-              />
             ) : (
-              <span className="text-lg leading-none">🤖</span>
+              <span
+                className="w-8 h-8 rounded-full inline-flex items-center justify-center text-xl leading-none select-none"
+                style={{ backgroundColor: darkenForBackground(avatarColor) }}
+              >
+                {avatarEmoji}
+              </span>
             );
 
             if (!nodeData.isHuman && health) {
@@ -814,6 +808,7 @@ function buildNodesAndEdges(
         credits: agent.currentBalance,
         domain: agent.domain || undefined,
         avatar: (agent as any).avatar || undefined,
+        avatarColor: (agent as any).avatarColor || undefined,
         tasksCompleted: 0,
         compact,
         activityLevel: activity?.activityLevel,
@@ -915,7 +910,6 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const [compact, setCompact] = useState(false);
   const [dimIdle, setDimIdle] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
-  const [avatarVersion, setAvatarVersion] = useState(0);
   const agentHealth = useAgentHealth();
   const prevAgentCountRef = useRef(0);
   
@@ -944,14 +938,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     return calculateEdgeMessages(messages, conversations);
   }, [messages, conversations]);
   
-  // Listen for avatar style changes
-  useEffect(() => {
-    const handleAvatarChange = () => {
-      setAvatarVersion(v => v + 1);
-    };
-    window.addEventListener('avatar-style-changed', handleAvatarChange);
-    return () => window.removeEventListener('avatar-style-changed', handleAvatarChange);
-  }, []);
+  // Avatar version no longer needed (emoji avatars don't depend on DiceBear settings)
 
   // Only re-layout when agent IDs change (add/remove), not on every data update
   const agentIds = useMemo(
@@ -1114,13 +1101,12 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const contextValue = useMemo(() => ({
     delegations: activeDelegations,
     speed: demo.speed,
-    avatarVersion,
     agentActivity,
     edgeMessages,
     agentHealth,
     isMobileOrTouch,
     dimIdle,
-  }), [activeDelegations, demo.speed, avatarVersion, agentActivity, edgeMessages, agentHealth, isMobileOrTouch, dimIdle]);
+  }), [activeDelegations, demo.speed, agentActivity, edgeMessages, agentHealth, isMobileOrTouch, dimIdle]);
 
   if (loading) {
     return (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { getAgentAvatarUrl } from '../lib/avatar';
+import { darkenForBackground } from '../lib/avatar-utils';
 
 interface AgentHeartbeatProps {
   agentId: string;
@@ -9,9 +9,11 @@ interface AgentHeartbeatProps {
   status: 'ACTIVE' | 'IDLE' | 'PENDING' | 'SUSPENDED';
   size?: 'sm' | 'md' | 'lg';
   showPulse?: boolean;
+  avatar?: string | null;
+  avatarColor?: string | null;
 }
 
-export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse = true }: AgentHeartbeatProps) {
+export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse = true, avatar, avatarColor }: AgentHeartbeatProps) {
   const [isWorking, setIsWorking] = useState(status === 'ACTIVE');
 
   // Simulate activity changes in demo mode (not sandbox mode)
@@ -58,14 +60,14 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
   return (
     <div className="relative inline-block">
       {/* Avatar */}
-      <motion.img
-        src={getAgentAvatarUrl(agentId, level)}
-        alt=""
+      <motion.span
         className={cn(
-          'rounded-full ring-2 transition-all',
+          'rounded-full ring-2 transition-all inline-flex items-center justify-center',
           sizeClasses[size],
+          size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl',
           isWorking && status === 'ACTIVE' ? ringColors[status] : 'ring-border'
         )}
+        style={{ backgroundColor: darkenForBackground(avatarColor || '#71717a') }}
         animate={isWorking && status === 'ACTIVE' ? {
           scale: [1, 1.05, 1],
         } : {}}
@@ -74,7 +76,9 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-      />
+      >
+        {avatar || '🤖'}
+      </motion.span>
 
       {/* Status indicator dot */}
       <span
@@ -150,7 +154,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
 }
 
 // Row of agent heartbeats for overview
-export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: number; status: string; name: string }[] }) {
+export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: number; status: string; name: string; avatar?: string; avatarColor?: string }[] }) {
   return (
     <div className="flex items-center gap-2">
       {agents.map((agent) => (
@@ -160,6 +164,8 @@ export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: num
             level={agent.level}
             status={agent.status as AgentHeartbeatProps['status']}
             size="sm"
+            avatar={agent.avatar}
+            avatarColor={agent.avatarColor}
           />
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-muted rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             {agent.name}
