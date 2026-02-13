@@ -26,7 +26,7 @@ export function StatCard({
   const isNegative = change && change < 0;
 
   return (
-    <Card>
+    <Card data-testid="stat-card">
       <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 sm:p-6 sm:pb-2">
         <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
           {title}
