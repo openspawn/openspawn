@@ -154,7 +154,9 @@ function generateCredits(sim: Simulation) {
   const credits: Array<Record<string, unknown>> = [];
   let runningBalance = 0;
 
-  for (const snap of sim.metricsHistory) {
+  // Only use last 100 ticks to keep response size bounded
+  const recentHistory = sim.metricsHistory.slice(-100);
+  for (const snap of recentHistory) {
     const earned = snap.totalCreditsEarned;
     const spent = snap.totalCreditsSpent;
     runningBalance = earned - spent;
@@ -842,8 +844,16 @@ function handleGraphQL(
     }
 
     case 'CreditHistory':
-    case 'Credits':
-      return { creditHistory: generateCredits(sim) };
+    case 'Credits': {
+      let credits = generateCredits(sim);
+      const agentId = variables.agentId as string | undefined;
+      if (agentId) credits = credits.filter(c => c.agentId === agentId);
+      // Sort newest first, then apply offset/limit
+      credits.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+      const offset = (variables.offset as number) ?? 0;
+      const limit = (variables.limit as number) ?? 50;
+      return { creditHistory: credits.slice(offset, offset + limit) };
+    }
 
     case 'Events': {
       const limit = (variables.limit as number) ?? 50;
