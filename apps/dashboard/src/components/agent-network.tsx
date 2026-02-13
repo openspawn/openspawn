@@ -222,7 +222,7 @@ function AgentNode({ data, selected }: NodeProps) {
   const nodeHeight = (compact ? 64 : 96) * mobileScale;
   
   const avatarEmoji = nodeData.avatar || '🤖';
-  const avatarColor = (nodeData as any).avatarColor || '#71717a';
+  const avatarColor = nodeData.avatarColor || '#71717a';
   
   return (
     <div 
@@ -807,8 +807,8 @@ function buildNodesAndEdges(
         status: agent.status as unknown as "active" | "pending" | "paused" | "suspended",
         credits: agent.currentBalance,
         domain: agent.domain || undefined,
-        avatar: (agent as any).avatar || undefined,
-        avatarColor: (agent as any).avatarColor || undefined,
+        avatar: agent.avatar || undefined,
+        avatarColor: agent.avatarColor || undefined,
         tasksCompleted: 0,
         compact,
         activityLevel: activity?.activityLevel,

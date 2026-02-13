@@ -58,6 +58,8 @@ type AgentType {
   tasksSuccessful: Int!
   trustScore: Int!
   updatedAt: DateTime!
+  avatar: String
+  avatarColor: String
 }
 
 type ChannelGqlType {
