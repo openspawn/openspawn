@@ -725,98 +725,98 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
     <>
           {/* Header */}
           <div 
-            className="flex-shrink-0 p-6 border-b border-border"
+            className="flex-shrink-0 p-4 md:p-6 border-b border-border"
             style={{ 
               background: `linear-gradient(135deg, ${levelColor}15 0%, transparent 100%)`,
             }}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <AgentAvatar 
-                  agentId={agent.agentId} 
-                  name={agent.name} 
-                  level={agent.level} 
-                  size="lg"
-                  avatar={(agent as any).avatar}
-                  avatarColor={(agent as any).avatarColor}
-                />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-bold">{agent.name}</h2>
+            <div className="flex items-start gap-3">
+              <AgentAvatar 
+                agentId={agent.agentId} 
+                name={agent.name} 
+                level={agent.level} 
+                size="lg"
+                avatar={(agent as any).avatar}
+                avatarColor={(agent as any).avatarColor}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h2 className="text-xl md:text-2xl font-bold truncate">{agent.name}</h2>
+                    <p className="text-sm text-muted-foreground truncate">@{agent.agentId}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">@{agent.agentId}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">{agent.status}</Badge>
-                    <Badge variant="outline" className="text-[10px]">{agent.role}</Badge>
-                    <Badge className="text-[10px]" style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
-                      L{agent.level} • {getLevelLabel(agent.level)}
-                    </Badge>
-                    <TeamBadge teamId={agent.teamId} />
-                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={onClose}
+                    className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">{agent.status}</Badge>
+                  <Badge variant="outline" className="text-[10px]">{agent.role}</Badge>
+                  <Badge className="text-[10px]" style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
+                    L{agent.level} • {getLevelLabel(agent.level)}
+                  </Badge>
+                  <TeamBadge teamId={agent.teamId} />
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={onClose}
-                className="hover:bg-destructive/10 hover:text-destructive"
-              >
-                <X className="h-5 w-5" />
-              </Button>
             </div>
           </div>
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <div className="flex-shrink-0 border-b border-border px-6 pt-3 overflow-x-auto">
-              <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-6">
+            <div className="flex-shrink-0 border-b border-border px-4 md:px-6 pt-3 overflow-x-auto scrollbar-none">
+              <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-3 md:gap-6">
                 <TabsTrigger 
                   value="overview"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Activity className="h-4 w-4 mr-2" />
+                  <Activity className="h-4 w-4 mr-2 hidden sm:block" />
                   Overview
                 </TabsTrigger>
                 <TabsTrigger 
                   value="prompt"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Terminal className="h-4 w-4 mr-2" />
+                  <Terminal className="h-4 w-4 mr-2 hidden sm:block" />
                   Prompt
                 </TabsTrigger>
                 <TabsTrigger 
                   value="tasks"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Zap className="h-4 w-4 mr-2" />
+                  <Zap className="h-4 w-4 mr-2 hidden sm:block" />
                   Tasks
                 </TabsTrigger>
                 <TabsTrigger 
                   value="credits"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Coins className="h-4 w-4 mr-2" />
+                  <Coins className="h-4 w-4 mr-2 hidden sm:block" />
                   Credits
                 </TabsTrigger>
                 <TabsTrigger 
                   value="messages"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <MessageSquare className="h-4 w-4 mr-2" />
+                  <MessageSquare className="h-4 w-4 mr-2 hidden sm:block" />
                   Messages
                 </TabsTrigger>
                 <TabsTrigger 
                   value="timeline"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Clock className="h-4 w-4 mr-2" />
+                  <Clock className="h-4 w-4 mr-2 hidden sm:block" />
                   Timeline
                 </TabsTrigger>
                 <TabsTrigger 
                   value="settings"
                   className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
                 >
-                  <Settings className="h-4 w-4 mr-2" />
+                  <Settings className="h-4 w-4 mr-2 hidden sm:block" />
                   Settings
                 </TabsTrigger>
               </TabsList>
@@ -824,7 +824,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
 
             {/* Tab Content with ScrollArea */}
             <ScrollArea className="flex-1">
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 <AnimatePresence mode="wait">
                   <TabsContent value="overview" className="mt-0">
                     <OverviewTab agent={agent} />

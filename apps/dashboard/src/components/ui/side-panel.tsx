@@ -60,32 +60,33 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
         </div>
       </div>
 
-      {/* Header — always visible with prominent close button */}
-      <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border"
-           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Back button for mobile */}
+      {/* Header — only render if title is provided (panels with their own header skip this) */}
+      {title && (
+        <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border"
+             style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+          <div className="flex items-center gap-2 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="md:hidden min-w-[44px] min-h-[44px] hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+              aria-label="Close panel"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <h2 className="text-lg font-semibold truncate">{title}</h2>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="md:hidden min-w-[44px] min-h-[44px] hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+            className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
             aria-label="Close panel"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <X className="h-5 w-5" />
           </Button>
-          {title && <h2 className="text-lg font-semibold truncate">{title}</h2>}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
-          aria-label="Close panel"
-        >
-          <X className="h-5 w-5" />
-        </Button>
-      </div>
+      )}
 
       {/* Content */}
       <ScrollArea className="flex-1 overflow-x-hidden">
