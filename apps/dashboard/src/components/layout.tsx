@@ -729,8 +729,8 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Main content + side panel */}
           <div className="flex flex-1 min-h-0">
-            <main ref={mainContentRef} className="flex-1 overflow-auto min-w-0">
-              <div className={`${fullBleedRoutes.has(location.pathname) ? 'h-full' : 'mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl'} ${scenarioStatus ? 'pt-12' : ''} pb-24 sm:pb-20`}>{children}</div>
+            <main ref={mainContentRef} className="flex-1 overflow-y-auto overflow-x-hidden min-w-0">
+              <div className={`${fullBleedRoutes.has(location.pathname) ? 'h-full' : 'mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl w-full'} ${scenarioStatus ? 'pt-12' : ''} pb-24 sm:pb-20`}>{children}</div>
             </main>
 
             {/* Global Side Panel - desktop: inline, mobile: full-screen overlay */}

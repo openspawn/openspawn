@@ -547,18 +547,19 @@ function AgentVirtualGrid({
   const { presenceMap } = usePresence();
   const healthMap = useAgentHealth();
   const parentRef = useRef<HTMLDivElement>(null);
-  // Chunk agents into rows of 3 (matching lg:grid-cols-3)
-  // Responsive columns: 1 on mobile, 2 on tablet, 3 on desktop
+  // Responsive columns based on container width (not viewport — so side panel shrinks grid)
   const [colCount, setColCount] = useState(3);
   useEffect(() => {
-    const update = () => {
-      if (window.innerWidth < 640) setColCount(1);
-      else if (window.innerWidth < 1024) setColCount(2);
+    const el = parentRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0].contentRect.width;
+      if (w < 500) setColCount(1);
+      else if (w < 800) setColCount(2);
       else setColCount(3);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
   const rows = useMemo(() => {
@@ -590,8 +591,9 @@ function AgentVirtualGrid({
                 left: 0,
                 width: "100%",
                 transform: `translateY(${virtualRow.start}px)`,
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
               }}
-              className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pb-4"
+              className="grid gap-3 sm:gap-4 pb-4"
             >
               <AnimatePresence mode="popLayout">
                 {rowAgents.map((agent) => {
