@@ -31,6 +31,22 @@ interface AgentAvatarProps {
   creditUsage?: number;
 }
 
+/**
+ * Darken a hex color to ~20% brightness so emoji avatars pop against the background.
+ * Keeps the hue but drops saturation and lightness significantly.
+ */
+function darkenForBackground(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  // Mix toward near-black: keep ~15% of the original color
+  const factor = 0.15;
+  const dr = Math.round(r * factor);
+  const dg = Math.round(g * factor);
+  const db = Math.round(b * factor);
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
 const SIZE_MAP = {
   sm: { class: 'h-8 w-8', px: 32 },
   md: { class: 'h-10 w-10', px: 40 },
@@ -62,7 +78,9 @@ export function AgentAvatar({
 }: AgentAvatarProps) {
   const sizeConfig = SIZE_MAP[size];
   const levelColor = LEVEL_COLORS[level] || '#71717a';
-  const bgColor = avatarColor || levelColor;
+  const accentColor = avatarColor || levelColor;
+  // Dark background so emoji is always visible (no red-on-red etc.)
+  const bgColor = darkenForBackground(accentColor);
   
   // Track avatar settings changes (style, background color, background type)
   const [avatarSettings, setAvatarSettings] = useState(getAvatarSettings);
@@ -92,7 +110,7 @@ export function AgentAvatar({
       )}
       style={{
         backgroundColor: bgColor,
-        ...(showRing && !presenceStatus ? { '--tw-ring-color': bgColor } as React.CSSProperties : {}),
+        ...(showRing && !presenceStatus ? { '--tw-ring-color': accentColor } as React.CSSProperties : {}),
       }}
     >
       <AvatarFallback
