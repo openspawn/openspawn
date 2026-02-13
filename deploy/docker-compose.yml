@@ -13,6 +13,7 @@ services:
       - SANDBOX_PORT=3333
       - SERVE_DASHBOARD=1
       - SANDBOX_READONLY=1
+      - DASHBOARD_DIR=/app/dashboard-dist
       - NODE_ENV=production
     env_file:
       - .env.production
