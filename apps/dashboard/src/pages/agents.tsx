@@ -396,6 +396,7 @@ function ReputationTab({ agents, onAgentClick }: { agents: Agent[]; onAgentClick
                     key={agent.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    data-testid="agent-card"
                     className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => onAgentClick?.(agent.id)}
                   >
@@ -604,6 +605,7 @@ function AgentVirtualGrid({
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     >
                       <Card
+                        data-testid="agent-card"
                         className="relative overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
                         onClick={() => onCardClick(agent.id)}
                       >

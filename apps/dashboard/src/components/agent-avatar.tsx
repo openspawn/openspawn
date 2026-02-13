@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getAgentAvatarUrl, getAvatarSettings } from '../lib/avatar';
 import { Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { darkenForBackground } from '../lib/avatar-utils';
 import { PresenceGlow, StatusDot } from './presence';
 import { StatusRing } from './ui/status-ring';
 import type { PresenceStatus } from '../hooks/use-presence';
@@ -29,22 +30,6 @@ interface AgentAvatarProps {
   /** StatusRing health data — when provided, uses ring instead of glow */
   completionRate?: number;
   creditUsage?: number;
-}
-
-/**
- * Darken a hex color to ~20% brightness so emoji avatars pop against the background.
- * Keeps the hue but drops saturation and lightness significantly.
- */
-function darkenForBackground(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  // Mix toward near-black: keep ~15% of the original color
-  const factor = 0.15;
-  const dr = Math.round(r * factor);
-  const dg = Math.round(g * factor);
-  const db = Math.round(b * factor);
-  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
 }
 
 const SIZE_MAP = {
@@ -141,7 +126,7 @@ export function AgentAvatar({
   if (presenceStatus && completionRate != null && creditUsage != null) {
     const ringSize = size === 'xl' ? 'lg' : size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'md';
     return (
-      <div className="relative inline-flex">
+      <div className="relative inline-flex" data-testid="agent-avatar">
         <StatusRing
           completionRate={completionRate}
           creditUsage={creditUsage}
@@ -161,7 +146,7 @@ export function AgentAvatar({
 
   if (presenceStatus) {
     return (
-      <div className="relative inline-flex">
+      <div className="relative inline-flex" data-testid="agent-avatar">
         <PresenceGlow status={presenceStatus}>
           {avatar}
         </PresenceGlow>
@@ -174,5 +159,5 @@ export function AgentAvatar({
     );
   }
 
-  return avatar;
+  return <span data-testid="agent-avatar">{avatar}</span>;
 }

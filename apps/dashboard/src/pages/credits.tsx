@@ -13,16 +13,7 @@ import { useCredits } from "../hooks/use-credits";
 import { BudgetBurndown } from "../components/budget-burndown";
 import { ModelUsageBreakdown } from "../components/model-usage";
 import { AgentEfficiencyLeaderboard } from "../components/agent-efficiency";
-
-function formatTime(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString([], { month: "short", day: "numeric" });
-}
+import { formatTime, formatDate } from "../lib/date-format";
 
 function formatChartTime(dateString: string) {
   const date = new Date(dateString);
@@ -67,6 +58,7 @@ function TransactionVirtualList({ transactions }: { transactions: ReturnType<typ
                   width: "100%",
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
+                data-testid="transaction-row"
                 className="flex items-center justify-between gap-2 rounded-lg border border-border p-2 sm:p-3 min-h-[44px]"
               >
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">

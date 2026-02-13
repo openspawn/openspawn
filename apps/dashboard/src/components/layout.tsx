@@ -240,7 +240,7 @@ export function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 const linkContent = (
-                  <Link key={item.name} to={item.href} className="relative block" {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
+                  <Link key={item.name} to={item.href} className="relative block" data-testid={`nav-link-${item.name.toLowerCase()}`} {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active"
