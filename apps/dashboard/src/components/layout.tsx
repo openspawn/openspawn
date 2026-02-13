@@ -744,7 +744,7 @@ export function Layout({ children }: LayoutProps) {
                     animate={{ x: 0 }}
                     exit={{ x: "100%" }}
                     transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                    className="fixed inset-0 z-50 bg-background md:hidden overflow-hidden"
+                    className="fixed inset-0 z-[70] bg-background md:hidden overflow-hidden"
                     style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
                   >
                     <SidePanelShell
