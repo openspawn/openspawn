@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, MessageSquare } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
 import { cn } from '../lib/utils';
 import { darkenForBackground } from '../lib/avatar-utils';
 import { useAgents, type Message } from '../hooks';
@@ -132,7 +131,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="p-4 space-y-1">
             {sorted.map((msg, idx) => {
               const isLeft = msg.fromAgentId === leftId;
@@ -248,7 +247,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
       </motion.div>
     </motion.div>
   );
