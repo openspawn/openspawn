@@ -423,8 +423,8 @@ function buildOrgGraph(
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
           teamColor: team.color,
-          avatar: (agent as any).avatar,
-          avatarColor: (agent as any).avatarColor,
+          avatar: agent.avatar,
+          avatarColor: agent.avatarColor,
         } as AgentNodeData,
       });
 
@@ -465,8 +465,8 @@ function buildOrgGraph(
           status: agent.status,
           isLead: agent.id === team.leadAgentId,
           teamColor: team.color,
-          avatar: (agent as any).avatar,
-          avatarColor: (agent as any).avatarColor,
+          avatar: agent.avatar,
+          avatarColor: agent.avatarColor,
         } as AgentNodeData,
       });
 

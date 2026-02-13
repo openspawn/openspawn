@@ -79,6 +79,12 @@ export class AgentType {
   @Field(() => ID, { nullable: true })
   parentId?: string | null;
 
+  @Field(() => String, { nullable: true })
+  avatar?: string | null;
+
+  @Field(() => String, { nullable: true })
+  avatarColor?: string | null;
+
   @Field(() => Date)
   createdAt!: Date;
 

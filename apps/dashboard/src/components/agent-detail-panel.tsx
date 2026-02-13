@@ -737,8 +737,8 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                 name={agent.name} 
                 level={agent.level} 
                 size="lg"
-                avatar={(agent as any).avatar}
-                avatarColor={(agent as any).avatarColor}
+                avatar={agent.avatar}
+                avatarColor={agent.avatarColor}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">

@@ -5,7 +5,6 @@ import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 // recharts v3 has infinite-loop bug — using custom SVG chart instead
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { EmptyState } from "../components/ui/empty-state";
-import { generateSparklineData } from "../components/ui/sparkline";
 import { StatCard } from "../components/ui/stat-card";
 import { PageHeader } from "../components/ui/page-header";
 // OceanGradients/ChartTooltip removed — using custom SVG chart
@@ -143,13 +142,35 @@ export function CreditsPage() {
 
   const netBalance = totalEarned - totalSpent;
 
-  // Sparkline data for credit stats
-  const creditSparklines = useMemo(() => ({
-    balance: generateSparklineData(7, "up"),
-    earned: generateSparklineData(7, "up"),
-    spent: generateSparklineData(7, "up"),
-    burnRate: generateSparklineData(7, "down"),
-  }), []);
+  // Derive sparkline-like data from transaction history
+  const creditSparklines = useMemo(() => {
+    if (transactions.length === 0) return { balance: [], earned: [], spent: [], burnRate: [] };
+    const sorted = [...transactions].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    let running = 0;
+    const balancePts: number[] = [];
+    const earnedPts: number[] = [];
+    const spentPts: number[] = [];
+    for (const tx of sorted) {
+      running += tx.type === "CREDIT" ? tx.amount : -tx.amount;
+      balancePts.push(running);
+      earnedPts.push(tx.type === "CREDIT" ? tx.amount : 0);
+      spentPts.push(tx.type === "DEBIT" ? tx.amount : 0);
+    }
+    // Sample to ~7 points
+    const sample = (arr: number[]) => {
+      if (arr.length <= 7) return arr;
+      const step = Math.ceil(arr.length / 7);
+      return arr.filter((_, i) => i % step === 0).slice(0, 7);
+    };
+    return {
+      balance: sample(balancePts),
+      earned: sample(earnedPts),
+      spent: sample(spentPts),
+      burnRate: sample(spentPts).reverse(),
+    };
+  }, [transactions]);
 
   // Compute balance history from transactions (sorted chronologically)
   const balanceHistory = useMemo(() => {
@@ -310,9 +331,13 @@ export function CreditsPage() {
       <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4 sm:mt-6">
         <BudgetBurndown
           budget={25000}
-          spent={totalSpent || 9250}
+          spent={totalSpent}
           periodDays={30}
-          daysElapsed={12}
+          daysElapsed={(() => {
+            if (transactions.length === 0) return 0;
+            const oldest = Math.min(...transactions.map(t => new Date(t.createdAt).getTime()));
+            return Math.max(1, Math.ceil((Date.now() - oldest) / (1000 * 60 * 60 * 24)));
+          })()}
         />
         <ModelUsageBreakdown />
       </div>

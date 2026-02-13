@@ -28,6 +28,8 @@ export const AgentFieldsFragmentDocument = graphql(`
     lifetimeEarnings
     domain
     teamId
+    avatar
+    avatarColor
   }
 `);
 

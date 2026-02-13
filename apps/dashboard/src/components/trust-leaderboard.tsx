@@ -10,6 +10,8 @@ interface LeaderboardEntry {
   trustScore: number;
   reputationLevel: string;
   tasksCompleted: number;
+  avatar?: string | null;
+  avatarColor?: string | null;
 }
 
 interface TrustLeaderboardProps {
@@ -59,8 +61,8 @@ export function TrustLeaderboard({
                   level={entry.level}
                   size="sm"
                   showRing={false}
-                  avatar={(entry as any).avatar}
-                  avatarColor={(entry as any).avatarColor}
+                  avatar={entry.avatar}
+                  avatarColor={entry.avatarColor}
                 />
                 <div>
                   <div className="font-medium">{entry.name}</div>

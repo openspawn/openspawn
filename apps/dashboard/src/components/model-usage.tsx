@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, DollarSign, TrendingUp, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { cn } from '../lib/utils';
+import { useAgents } from '../hooks/use-agents';
 
 interface ModelUsage {
   model: string;
@@ -14,70 +16,69 @@ interface ModelUsage {
   color: string;
 }
 
-const demoModelUsage: ModelUsage[] = [
-  {
-    model: 'claude-3-opus',
-    provider: 'Anthropic',
-    calls: 1247,
-    tokens: 2450000,
-    cost: 147.50,
-    avgLatency: 2.3,
-    color: '#d97706', // Amber for Claude
-  },
-  {
-    model: 'claude-3-sonnet',
-    provider: 'Anthropic',
-    calls: 3892,
-    tokens: 4200000,
-    cost: 84.00,
-    avgLatency: 1.1,
-    color: '#f59e0b',
-  },
-  {
-    model: 'gpt-4-turbo',
-    provider: 'OpenAI',
-    calls: 892,
-    tokens: 1800000,
-    cost: 72.00,
-    avgLatency: 1.8,
-    color: '#10b981', // Green for OpenAI
-  },
-  {
-    model: 'gpt-3.5-turbo',
-    provider: 'OpenAI',
-    calls: 5421,
-    tokens: 3200000,
-    cost: 16.00,
-    avgLatency: 0.5,
-    color: '#34d399',
-  },
-  {
-    model: 'llama-3-70b',
-    provider: 'Local',
-    calls: 2103,
-    tokens: 1900000,
-    cost: 0,
-    avgLatency: 0.8,
-    color: '#8b5cf6', // Purple for local
-  },
+const MODEL_COLORS = [
+  '#d97706', '#f59e0b', '#10b981', '#34d399', '#8b5cf6',
+  '#6366f1', '#ec4899', '#f43f5e', '#14b8a6', '#0ea5e9',
 ];
 
+function inferProvider(model: string): string {
+  const m = model.toLowerCase();
+  if (m.includes('claude') || m.includes('anthropic')) return 'Anthropic';
+  if (m.includes('gpt') || m.includes('openai')) return 'OpenAI';
+  if (m.includes('gemini')) return 'Google';
+  if (m.includes('llama') || m.includes('mistral')) return 'Open Source';
+  return 'Other';
+}
+
 export function ModelUsageBreakdown() {
-  const totalCost = demoModelUsage.reduce((sum, m) => sum + m.cost, 0);
-  const totalCalls = demoModelUsage.reduce((sum, m) => sum + m.calls, 0);
-  const totalTokens = demoModelUsage.reduce((sum, m) => sum + m.tokens, 0);
-  
-  // Sort by cost for pie chart
-  const sortedByUsage = [...demoModelUsage].sort((a, b) => b.calls - a.calls);
-  
-  // Calculate pie chart segments
+  const { agents } = useAgents();
+
+  const modelUsage: ModelUsage[] = useMemo(() => {
+    if (!agents.length) return [];
+    const counts = new Map<string, number>();
+    for (const agent of agents) {
+      counts.set(agent.model, (counts.get(agent.model) ?? 0) + 1);
+    }
+    return Array.from(counts.entries()).map(([model, count], i) => ({
+      model,
+      provider: inferProvider(model),
+      calls: count,
+      tokens: 0,
+      cost: 0,
+      avgLatency: 0,
+      color: MODEL_COLORS[i % MODEL_COLORS.length],
+    }));
+  }, [agents]);
+
+  const totalCalls = modelUsage.reduce((sum, m) => sum + m.calls, 0);
+  const totalCost = modelUsage.reduce((sum, m) => sum + m.cost, 0);
+  const totalTokens = modelUsage.reduce((sum, m) => sum + m.tokens, 0);
+
+  const sortedByUsage = [...modelUsage].sort((a, b) => b.calls - a.calls);
+
   let startAngle = 0;
   const pieSegments = sortedByUsage.map((model) => {
-    const angle = (model.calls / totalCalls) * 360;
+    const angle = totalCalls > 0 ? (model.calls / totalCalls) * 360 : 0;
     const segment = { ...model, startAngle, endAngle: startAngle + angle };
     startAngle += angle;
     return segment;
   });
+
+  if (!modelUsage.length) {
+    return (
+      <Card className="bg-muted/50 border-border">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-violet-400" />
+            Model Usage
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-8">No agent data available</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-muted/50 border-border">
@@ -88,7 +89,7 @@ export function ModelUsageBreakdown() {
             Model Usage
           </CardTitle>
           <Badge variant="outline" className="text-xs">
-            Last 30 days
+            {agents.length} agents
           </Badge>
         </div>
       </CardHeader>
@@ -102,19 +103,18 @@ export function ModelUsageBreakdown() {
           </div>
           <div className="text-center p-3 rounded-lg bg-muted/30">
             <Zap className="w-5 h-5 mx-auto mb-1 text-amber-400" />
-            <p className="text-2xl font-bold">{(totalCalls / 1000).toFixed(1)}k</p>
-            <p className="text-xs text-muted-foreground">API Calls</p>
+            <p className="text-2xl font-bold">{totalCalls}</p>
+            <p className="text-xs text-muted-foreground">Agents</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-muted/30">
             <TrendingUp className="w-5 h-5 mx-auto mb-1 text-cyan-400" />
-            <p className="text-2xl font-bold">{(totalTokens / 1000000).toFixed(1)}M</p>
-            <p className="text-xs text-muted-foreground">Tokens</p>
+            <p className="text-2xl font-bold">{sortedByUsage.length}</p>
+            <p className="text-xs text-muted-foreground">Models</p>
           </div>
         </div>
 
         {/* Pie chart + legend */}
         <div className="flex items-center gap-6">
-          {/* Pie chart */}
           <div className="relative w-32 h-32 shrink-0">
             <svg viewBox="0 0 100 100" className="transform -rotate-90">
               {pieSegments.map((segment, index) => {
@@ -151,7 +151,6 @@ export function ModelUsageBreakdown() {
             </div>
           </div>
 
-          {/* Legend */}
           <div className="flex-1 space-y-2">
             {sortedByUsage.map((model, index) => (
               <motion.div
@@ -167,7 +166,7 @@ export function ModelUsageBreakdown() {
                 />
                 <span className="text-sm truncate flex-1">{model.model}</span>
                 <span className="text-xs text-muted-foreground">
-                  {((model.calls / totalCalls) * 100).toFixed(0)}%
+                  {totalCalls > 0 ? ((model.calls / totalCalls) * 100).toFixed(0) : 0}%
                 </span>
               </motion.div>
             ))}
@@ -194,20 +193,14 @@ export function ModelUsageBreakdown() {
                   <Badge variant="outline" className="text-[10px]">{model.provider}</Badge>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{model.calls.toLocaleString()} calls</span>
-                  <span>{(model.tokens / 1000000).toFixed(1)}M tokens</span>
-                  <span>{model.avgLatency}s avg</span>
+                  <span>{model.calls} {model.calls === 1 ? 'agent' : 'agents'}</span>
                 </div>
               </div>
               <div className="text-right">
                 <p className={cn(
-                  "font-semibold",
-                  model.cost === 0 ? "text-emerald-400" : "text-foreground"
+                  "font-semibold text-muted-foreground"
                 )}>
-                  {model.cost === 0 ? 'Free' : `$${model.cost.toFixed(2)}`}
-                </p>
-                <p className="text-[10px] text-muted-foreground/70">
-                  {model.cost > 0 ? `$${(model.cost / model.calls * 1000).toFixed(2)}/1k` : 'Local'}
+                  {((model.calls / totalCalls) * 100).toFixed(0)}%
                 </p>
               </div>
             </motion.div>

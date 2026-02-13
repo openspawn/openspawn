@@ -200,7 +200,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
             onClick={() => onAgentClick?.(lead.id)}
             className="w-full flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left"
           >
-            <AgentAvatar agentId={lead.agentId} name={lead.name} level={lead.level} size="md" avatar={(lead as any).avatar} avatarColor={(lead as any).avatarColor} />
+            <AgentAvatar agentId={lead.agentId} name={lead.name} level={lead.level} size="md" avatar={lead.avatar} avatarColor={lead.avatarColor} />
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{lead.name}</p>
               <p className="text-xs text-muted-foreground">
@@ -274,8 +274,8 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
                   name={agent.name}
                   level={agent.level}
                   size="sm"
-                  avatar={(agent as any).avatar}
-                  avatarColor={(agent as any).avatarColor}
+                  avatar={agent.avatar}
+                  avatarColor={agent.avatarColor}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{agent.name}</p>

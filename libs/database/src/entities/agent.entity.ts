@@ -100,6 +100,12 @@ export class Agent {
   @Column({ type: "varchar", length: 100, nullable: true })
   domain!: string | null;
 
+  @Column({ type: "varchar", length: 500, nullable: true })
+  avatar!: string | null;
+
+  @Column({ name: "avatar_color", type: "varchar", length: 20, nullable: true })
+  avatarColor!: string | null;
+
   @DeleteDateColumn({ name: "deleted_at", type: "timestamptz", nullable: true })
   deletedAt!: Date | null;
 

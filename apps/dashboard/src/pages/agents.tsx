@@ -74,8 +74,8 @@ function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => v
               name={agent.name} 
               level={agent.level} 
               size="lg"
-              avatar={(agent as any).avatar}
-                        avatarColor={(agent as any).avatarColor}
+              avatar={agent.avatar}
+                        avatarColor={agent.avatarColor}
             />
             <div>
               <DialogTitle>{agent.name}</DialogTitle>
@@ -407,8 +407,8 @@ function ReputationTab({ agents, onAgentClick }: { agents: Agent[]; onAgentClick
                         name={agent.name}
                         level={agent.level}
                         size="md"
-                        avatar={(agent as any).avatar}
-                        avatarColor={(agent as any).avatarColor}
+                        avatar={agent.avatar}
+                        avatarColor={agent.avatarColor}
                         presenceStatus={presenceMap.get(agent.id)?.status}
                         completionRate={healthMap.get(agent.id)?.completionRate}
                         creditUsage={healthMap.get(agent.id)?.creditUsage}
@@ -629,8 +629,8 @@ function AgentVirtualGrid({
                               name={agent.name}
                               level={agent.level}
                               size="md"
-                              avatar={(agent as any).avatar}
-                              avatarColor={(agent as any).avatarColor}
+                              avatar={agent.avatar}
+                              avatarColor={agent.avatarColor}
                               presenceStatus={presenceMap.get(agent.id)?.status}
                               completionRate={healthMap.get(agent.id)?.completionRate}
                               creditUsage={healthMap.get(agent.id)?.creditUsage}
