@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { isSandboxMode } from '../graphql/fetcher';
+import { SANDBOX_URL } from '../lib/sandbox-url';
 
 export interface SandboxSSEEvent {
   type: string;
@@ -36,7 +37,7 @@ export function useSandboxSSE(callback: SSECallback) {
 
     function connect() {
       if (disposed) return;
-      es = new EventSource('http://localhost:3333/api/stream');
+      es = new EventSource(`${SANDBOX_URL}/api/stream`);
 
       es.onmessage = (ev) => {
         try {
