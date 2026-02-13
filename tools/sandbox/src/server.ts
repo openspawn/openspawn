@@ -13,6 +13,7 @@ import { loadAgentConfig, type AgentConfig } from './config-loader.js';
 import { ScenarioEngine } from './scenario-engine.js';
 import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
 import type { DeterministicSimulation } from './deterministic.js';
+import { makeAgentPublic } from './agents.js';
 
 const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
   'ai-dev-agency': aiDevAgencyScenario,
@@ -388,6 +389,52 @@ export function startServer(sim: Simulation): void {
           ? `Full reset with ${sim.agents.length} agents from ORG.md.`
           : 'Reset to COO only. Org will grow organically.';
         json(res, { ok: true, message: msg, agentCount: sim.agents.length, mode });
+      });
+      return;
+    }
+
+    // Spawn a new agent via user request
+    if (path === '/api/agents/spawn' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: Buffer | string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const { name, role, domain, level, avatar, avatarColor } = JSON.parse(body);
+          if (!name) { json(res, { error: 'name required' }); return; }
+
+          const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          if (sim.agents.find(a => a.id === id)) {
+            json(res, { error: `Agent "${id}" already exists` });
+            return;
+          }
+
+          // Determine parent: leads report to COO, others report to a lead in same domain or COO
+          const coo = sim.agents.find(a => a.role === 'coo' || a.level === 10);
+          let parentId: string | undefined;
+          if (role === 'lead') {
+            parentId = coo?.id;
+          } else {
+            const domainLead = sim.agents.find(a => a.role === 'lead' && a.domain?.toLowerCase() === domain?.toLowerCase());
+            parentId = domainLead?.id ?? coo?.id;
+          }
+
+          const agent = makeAgentPublic(id, name, role, level ?? 4, domain ?? 'Engineering', parentId, undefined);
+          agent.avatar = avatar;
+          agent.avatarColor = avatarColor;
+          agent.status = 'active';
+          sim.agents.push(agent);
+
+          // Emit SSE event
+          const event = { type: 'agent_spawned' as const, agentId: agent.id, message: `🐣 ${agent.name} has joined the team!`, timestamp: Date.now() };
+          sim.events.push(event);
+          if ('onEvent' in sim && typeof (sim as any).sseListeners !== 'undefined') {
+            ((sim as any).sseListeners as Array<(e: SandboxEvent) => void>).forEach(l => l(event));
+          }
+
+          json(res, { ok: true, agent: mapAgent(agent, sim.agents) });
+        } catch {
+          json(res, { error: 'Invalid JSON' });
+        }
       });
       return;
     }

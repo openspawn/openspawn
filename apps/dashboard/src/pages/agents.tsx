@@ -28,6 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PhaseChip } from "../components/phase-chip";
 import { cn } from "../lib/utils";
+import { SpawnAgentModal } from "../components/spawn-agent-modal";
 import { useAgents, useCurrentPhase, usePresence, useAgentHealth } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
@@ -724,6 +725,7 @@ export function AgentsPage() {
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [activeTab, setActiveTab] = useState("agents");
   const { openSidePanel, closeSidePanel } = useSidePanel();
+  const [spawnModalOpen, setSpawnModalOpen] = useState(false);
 
   const openAgentDetail = (agentId: string) => {
     openSidePanel(
@@ -868,7 +870,7 @@ export function AgentsPage() {
         actions={
           <div className="flex items-center gap-3">
             {currentPhase && <PhaseChip phase={currentPhase} />}
-            <Button>
+            <Button onClick={() => setSpawnModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Spawn Agent
             </Button>
@@ -1126,6 +1128,14 @@ export function AgentsPage() {
         </TabsContent>
       </Tabs>
 
+      <SpawnAgentModal
+        open={spawnModalOpen}
+        onOpenChange={setSpawnModalOpen}
+        onSpawned={(agent) => {
+          // SSE will auto-update, but we can show feedback
+          console.log(`🐣 ${agent.name} has joined the team!`);
+        }}
+      />
     </div>
   );
 }
