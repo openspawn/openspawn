@@ -636,7 +636,7 @@ export function startServer(sim: Simulation): void {
         '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
         '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
       };
-      const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', '..', '..', 'dashboard-dist');
+      const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', 'dashboard-dist');
       
       // Try to serve the file
       let filePath = join(dashboardDir, path === '/' ? 'index.html' : path);
