@@ -140,9 +140,13 @@ const simMode = process.env.SIMULATION_MODE || 'deterministic';
 const useLLM = simMode === 'llm';
 const useHybrid = simMode === 'hybrid' || simMode === 'record';
 const useRecording = simMode === 'record';
+const useReplay = simMode === 'replay';
 
 let sim: DeterministicSimulation | Simulation;
-if (useHybrid || useRecording) {
+if (useReplay) {
+  const { ReplaySimulation } = await import('./replay-engine.js');
+  sim = new ReplaySimulation(agents, config, cleanSlate, parsedOrg);
+} else if (useHybrid || useRecording) {
   const { LLMSimulation } = await import('./llm-simulation.js');
   sim = new LLMSimulation(agents, config, cleanSlate, parsedOrg, useRecording);
 } else if (useLLM) {
@@ -151,8 +155,8 @@ if (useHybrid || useRecording) {
   sim = new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
 }
 
-if (!useLLM && !useHybrid && !useRecording) {
-  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=hybrid|record|llm for LLM-driven agents)`);
+if (!useLLM && !useHybrid && !useRecording && !useReplay) {
+  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=replay|hybrid|record|llm for other modes)`);
 }
 
 // Start HTTP API server for dashboard integration
