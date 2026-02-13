@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock, Terminal } from "lucide-react";
 import { isSandboxMode } from "../graphql/fetcher";
+import { SANDBOX_URL } from "../lib/sandbox-url";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -410,7 +411,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
   const { data: sandboxMessages } = useQuery({
     queryKey: ['sandbox-agent-messages', agent.agentId],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:3333/api/agent/${agent.agentId}/messages`);
+      const res = await fetch(`${SANDBOX_URL}/api/agent/${agent.agentId}/messages`);
       return res.json();
     },
     enabled: isSandboxMode,
@@ -562,7 +563,7 @@ function PromptTab({ agent }: { agent: Agent }) {
   const { data: sandboxAgents } = useQuery({
     queryKey: ['sandbox-agents-for-prompt'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:3333/api/agents');
+      const res = await fetch(`${SANDBOX_URL}/api/agents`);
       return res.json();
     },
     enabled: isSandboxMode,
