@@ -1,0 +1,246 @@
+---
+title: A2A Protocol
+description: BikiniBottom implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom implements [Google's A2A protocol](https://a2a-protocol.org) v0.3. Every agent org exposes discovery, task sending, streaming, and task management endpoints.
+
+<Aside type="tip">
+Try it live: `curl https://bikinibottom.ai/.well-known/agent.json`
+</Aside>
+
+## Agent Discovery
+
+Every BikiniBottom instance publishes an Agent Card at `/.well-known/agent.json`:
+
+<Tabs>
+  <TabItem label="bash">
+    ```bash
+    curl https://bikinibottom.ai/.well-known/agent.json
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import httpx
+    card = httpx.get("https://bikinibottom.ai/.well-known/agent.json").json()
+    print(f"Agent: {card['name']} — {len(card['skills'])} skills")
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    const card = await fetch("https://bikinibottom.ai/.well-known/agent.json").then(r => r.json());
+    console.log(`Agent: ${card.name} — ${card.skills.length} skills`);
+    ```
+  </TabItem>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "name": "BikiniBottom HQ",
+  "description": "Multi-agent coordination control plane",
+  "url": "https://bikinibottom.ai",
+  "version": "1.0.0",
+  "protocolVersion": "0.3",
+  "capabilities": { "streaming": true, "pushNotifications": false, "extendedAgentCard": true },
+  "skills": [
+    { "id": "task-delegation", "name": "Task Delegation", "description": "Delegate tasks to specialized agent teams" },
+    { "id": "agent-coordination", "name": "Agent Coordination", "description": "Coordinate multi-agent workflows" }
+  ],
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"]
+}
+```
+
+### Per-agent cards
+
+Each agent has its own card:
+
+```bash
+curl https://bikinibottom.ai/agents/tech-lead/.well-known/agent.json
+```
+
+---
+
+## Sending Tasks
+
+### `POST /a2a/message/send`
+
+Send a task to the org. BikiniBottom routes it to the right agent based on domain keywords.
+
+<Tabs>
+  <TabItem label="bash">
+    ```bash
+    curl -X POST https://bikinibottom.ai/a2a/message/send \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "message": {
+          "role": "user",
+          "parts": [{ "kind": "text", "text": "Build a REST API for user management" }]
+        }
+      }'
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import httpx
+    response = httpx.post("https://bikinibottom.ai/a2a/message/send", json={
+        "message": {
+            "role": "user",
+            "parts": [{"kind": "text", "text": "Build a REST API for user management"}]
+        }
+    })
+    task = response.json()
+    print(f"Task {task['id']} — {task['status']['state']}")
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    const task = await fetch("https://bikinibottom.ai/a2a/message/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: { role: "user", parts: [{ kind: "text", text: "Build a REST API" }] },
+      }),
+    }).then(r => r.json());
+    console.log(`Task ${task.id} — ${task.status.state}`);
+    ```
+  </TabItem>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "a2a-1707900000000-x7k2m9",
+  "contextId": "ctx-1707900000000-p3n8j4",
+  "status": {
+    "state": "submitted",
+    "message": {
+      "role": "agent",
+      "parts": [{ "kind": "text", "text": "Task routed to engineering team" }]
+    },
+    "timestamp": "2026-02-14T15:00:00.000Z"
+  }
+}
+```
+
+### Message parts
+
+| Kind | Description | Example |
+|------|-------------|---------|
+| `text` | Plain text | `{ "kind": "text", "text": "Build an API" }` |
+| `file` | File with bytes or URI | `{ "kind": "file", "file": { "name": "spec.pdf", "uri": "..." } }` |
+| `data` | Structured JSON | `{ "kind": "data", "data": { "priority": "high" } }` |
+
+---
+
+## Streaming Updates
+
+### `POST /a2a/message/stream`
+
+Send a task and receive real-time SSE updates:
+
+```bash
+curl -N -X POST https://bikinibottom.ai/a2a/message/stream \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+      "role": "user",
+      "parts": [{ "kind": "text", "text": "Design a landing page" }]
+    }
+  }'
+```
+
+**SSE events:**
+
+```
+data: {"kind":"status-update","taskId":"a2a-...","status":{"state":"submitted"},"final":false}
+data: {"kind":"status-update","taskId":"a2a-...","status":{"state":"working","message":{"role":"agent","parts":[{"kind":"text","text":"Agent picked up the task"}]}},"final":false}
+data: {"kind":"artifact-update","taskId":"a2a-...","artifact":{"artifactId":"art-001","name":"Design","parts":[{"kind":"text","text":"..."}]}}
+data: {"kind":"status-update","taskId":"a2a-...","status":{"state":"completed"},"final":true}
+```
+
+| Event | Description |
+|-------|-------------|
+| `status-update` | Task state changed (submitted → working → completed) |
+| `artifact-update` | New artifact produced (code, designs, docs) |
+
+---
+
+## Task Management
+
+```bash
+# Get a task
+curl https://bikinibottom.ai/a2a/tasks/a2a-1707900000000-x7k2m9
+
+# List tasks (filterable)
+curl "https://bikinibottom.ai/a2a/tasks?limit=10&state=working"
+
+# Cancel a task
+curl -X POST https://bikinibottom.ai/a2a/tasks/a2a-1707900000000-x7k2m9/cancel
+
+# Subscribe to updates (SSE)
+curl -N https://bikinibottom.ai/a2a/tasks/a2a-1707900000000-x7k2m9/subscribe
+```
+
+---
+
+## Task Lifecycle
+
+```
+submitted → working → completed
+                   → failed
+                   → input-required → working → completed
+              → canceled
+              → rejected
+```
+
+| State | Description |
+|-------|-------------|
+| `submitted` | Task received, pending assignment |
+| `working` | Agent actively working |
+| `input-required` | Agent needs more information |
+| `completed` | Finished successfully |
+| `failed` | Task failed |
+| `canceled` | Canceled by client |
+| `rejected` | Rejected by the org |
+
+---
+
+## Domain Routing
+
+BikiniBottom routes tasks automatically by keywords:
+
+| Domain | Keywords |
+|--------|----------|
+| Engineering | api, backend, frontend, code, build, deploy, test |
+| Marketing | landing, campaign, blog, seo, brand, content |
+| Finance | pricing, projection, revenue, budget, invoice |
+| Sales | demo, lead, outreach, pipeline, prospect |
+| Support | ticket, support, customer, help, resolve |
+| HR | onboard, hire, recruit, team, culture |
+
+---
+
+## API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/.well-known/agent.json` | Control plane Agent Card |
+| `GET` | `/agents/{id}/.well-known/agent.json` | Per-agent Agent Card |
+| `POST` | `/a2a/message/send` | Send a task (sync) |
+| `POST` | `/a2a/message/stream` | Send a task (SSE streaming) |
+| `GET` | `/a2a/tasks` | List tasks |
+| `GET` | `/a2a/tasks/{id}` | Get task details |
+| `POST` | `/a2a/tasks/{id}/cancel` | Cancel a task |
+| `GET` | `/a2a/tasks/{id}/subscribe` | Subscribe to updates (SSE) |
+
+---
+
+## Next steps
+
+<LinkCard title="MCP Tools →" href="/openspawn/protocols/mcp/" description="7 tools via JSON-RPC for LLM integration" />

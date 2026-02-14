@@ -1,0 +1,130 @@
+---
+title: REST API
+description: Complete REST API reference for BikiniBottom — agents, tasks, router, and org endpoints.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom exposes a REST API alongside its A2A and MCP protocol endpoints.
+
+<Aside type="tip">
+All endpoints work against the live demo: `https://bikinibottom.ai`
+</Aside>
+
+## Base URL
+
+```
+Local:  http://localhost:3333
+Live:   https://bikinibottom.ai
+```
+
+## Endpoints
+
+### Organization
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/org/stats` | Organization statistics |
+
+```bash
+curl https://bikinibottom.ai/api/org/stats
+```
+
+```json
+{
+  "agentCount": 32,
+  "activeTaskCount": 5,
+  "completedTaskCount": 147,
+  "totalCreditsUsed": 2450
+}
+```
+
+### Agents
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/agents` | List all agents |
+| `GET` | `/api/agents/:id` | Get agent details |
+
+<Tabs>
+  <TabItem label="bash">
+    ```bash
+    curl https://bikinibottom.ai/api/agents
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import httpx
+    agents = httpx.get("https://bikinibottom.ai/api/agents").json()
+    for a in agents:
+        print(f"L{a['level']} {a['name']} ({a['domain']}) — {a['status']}")
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    const agents = await fetch("https://bikinibottom.ai/api/agents").then(r => r.json());
+    agents.forEach((a: any) => console.log(`L${a.level} ${a.name} (${a.domain}) — ${a.status}`));
+    ```
+  </TabItem>
+</Tabs>
+
+### Tasks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tasks` | List tasks |
+| `GET` | `/api/tasks/:id` | Get task details |
+
+```bash
+curl "https://bikinibottom.ai/api/tasks?limit=5"
+```
+
+### Router
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/router/metrics` | Router metrics and costs |
+| `GET` | `/api/router/config` | Provider configuration |
+| `GET` | `/api/router/decisions` | Recent routing decisions |
+
+```bash
+curl https://bikinibottom.ai/api/router/metrics
+```
+
+```json
+{
+  "totalRequests": 1247,
+  "totalCost": 12.15,
+  "requestsByProvider": { "ollama": 748, "groq": 412, "openrouter": 87 },
+  "fallbacksTriggered": 23,
+  "localRoutedCount": 748,
+  "cloudOnlyCostEstimate": 47.82
+}
+```
+
+### A2A Protocol
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/.well-known/agent.json` | Agent Card |
+| `GET` | `/agents/:id/.well-known/agent.json` | Per-agent card |
+| `POST` | `/a2a/message/send` | Send task |
+| `POST` | `/a2a/message/stream` | Send task (SSE) |
+| `GET` | `/a2a/tasks` | List A2A tasks |
+| `GET` | `/a2a/tasks/:id` | Get A2A task |
+| `POST` | `/a2a/tasks/:id/cancel` | Cancel task |
+| `GET` | `/a2a/tasks/:id/subscribe` | SSE updates |
+
+### MCP
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/mcp` | JSON-RPC 2.0 endpoint |
+
+See [MCP Tools](/openspawn/protocols/mcp/) for full JSON-RPC method reference.
+
+---
+
+## Next steps
+
+<LinkCard title="GraphQL →" href="/openspawn/api/graphql/" description="GraphQL schema for flexible querying" />

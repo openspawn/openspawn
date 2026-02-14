@@ -1,0 +1,194 @@
+---
+title: MCP Tools
+description: BikiniBottom exposes 7 tools via the Model Context Protocol. Connect from Claude Desktop, Cursor, or any MCP client.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom exposes 7 tools via [MCP](https://modelcontextprotocol.io) using Streamable HTTP transport at `POST /mcp`.
+
+<Aside type="tip">
+Try it now: `curl -X POST https://bikinibottom.ai/mcp -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'`
+</Aside>
+
+## Quick Start
+
+```bash
+# Initialize
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+
+# List tools
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+
+# Delegate a task
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"delegate_task","arguments":{"task":"Design a landing page"}}}'
+```
+
+---
+
+## Available Tools
+
+| Tool | Description | Required Params |
+|------|-------------|----------------|
+| `delegate_task` | Send a task to the agent org | `task` |
+| `list_agents` | List all agents in the org | — |
+| `get_agent` | Get details about a specific agent | `agentId` |
+| `list_tasks` | List current tasks | — |
+| `get_task` | Get task details | `taskId` |
+| `send_message` | Send an ACP message to an agent | `agentId`, `message` |
+| `get_org_stats` | Get organization-wide statistics | — |
+
+---
+
+## Tool Details
+
+### `delegate_task`
+
+```json
+{
+  "jsonrpc": "2.0", "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "delegate_task",
+    "arguments": { "task": "Build a REST API for user management", "priority": "high" }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0", "id": 3,
+  "result": {
+    "content": [{ "type": "text", "text": "Task created: TSK-042 — assigned to Tech Lead (engineering)" }],
+    "isError": false
+  }
+}
+```
+
+### `list_agents`
+
+Filter by `status` (`idle`, `busy`, `offline`) or `domain`.
+
+### `get_agent`
+
+Requires `agentId`. Returns full agent details including level, domain, current tasks.
+
+### `list_tasks`
+
+Filter by `status`, `assigneeId`, or `limit`.
+
+### `get_task`
+
+Requires `taskId`. Returns full task details with history.
+
+### `send_message`
+
+Send an ACP message directly to an agent. Requires `agentId` and `message`.
+
+### `get_org_stats`
+
+Returns org-wide stats: agent counts, task metrics, credit usage.
+
+---
+
+## Client Integration
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bikinibottom": {
+      "url": "https://bikinibottom.ai/mcp"
+    }
+  }
+}
+```
+
+For local development, use `http://localhost:3333/mcp`.
+
+### Cursor
+
+In Cursor settings → MCP → Add server:
+- **Name:** bikinibottom
+- **URL:** `http://localhost:3333/mcp`
+- **Transport:** Streamable HTTP
+
+### Custom Client
+
+<Tabs>
+  <TabItem label="Python">
+    ```python
+    import httpx
+
+    MCP_URL = "https://bikinibottom.ai/mcp"
+
+    def mcp_call(method: str, params: dict = {}, id: int = 1):
+        return httpx.post(MCP_URL, json={
+            "jsonrpc": "2.0", "id": id, "method": method, "params": params,
+        }).json()
+
+    # Initialize
+    mcp_call("initialize", {
+        "protocolVersion": "2025-03-26",
+        "capabilities": {},
+        "clientInfo": {"name": "my-app", "version": "1.0"},
+    })
+
+    # List tools
+    tools = mcp_call("tools/list", id=2)
+    for tool in tools["result"]["tools"]:
+        print(f"  {tool['name']}: {tool['description']}")
+
+    # Delegate
+    result = mcp_call("tools/call", {
+        "name": "delegate_task",
+        "arguments": {"task": "Build a dashboard widget"},
+    }, id=3)
+    print(result["result"]["content"][0]["text"])
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    const MCP_URL = "https://bikinibottom.ai/mcp";
+
+    async function mcpCall(method: string, params: Record<string, unknown> = {}, id = 1) {
+      const res = await fetch(MCP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id, method, params }),
+      });
+      return res.json();
+    }
+
+    const tools = await mcpCall("tools/list", {}, 2);
+    console.log(tools.result.tools.map((t: any) => t.name));
+    ```
+  </TabItem>
+</Tabs>
+
+---
+
+## Error Handling
+
+| Error Code | Meaning |
+|-----------|---------|
+| `-32600` | Invalid Request |
+| `-32601` | Method not found |
+| `-32602` | Invalid params |
+
+---
+
+## Next steps
+
+<LinkCard title="A2A Protocol →" href="/openspawn/protocols/a2a/" description="Agent discovery, task sending, SSE streaming" />

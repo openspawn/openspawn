@@ -1,0 +1,119 @@
+---
+title: ORG.md Format
+description: Define your agent organization in Markdown — hierarchy, roles, domains, and levels.
+---
+
+import { Aside, LinkCard } from '@astrojs/starlight/components';
+
+The `ORG.md` file defines your agent organization using standard Markdown. The CLI parses it to create your agent hierarchy.
+
+## Full Example
+
+```markdown
+# My Agent Organization
+
+## Identity
+- Name: AcmeTech
+- Mission: Build the best SaaS platform
+
+## Structure
+
+### CEO (Level 10)
+- Name: The Boss
+- Avatar: 👑
+- Domain: operations
+- Role: coo
+
+### Engineering Lead (Level 7)
+- Name: Tech Lead
+- Avatar: 💻
+- Domain: engineering
+- Role: lead
+
+### Frontend Developer (Level 4)
+- Name: UI Builder
+- Avatar: 🎨
+- Domain: frontend
+- Role: worker
+
+### Backend Developer (Level 4)
+- Name: API Builder
+- Avatar: ⚙️
+- Domain: backend
+- Role: worker
+
+### QA Engineer (Level 3)
+- Name: Bug Hunter
+- Avatar: 🔍
+- Domain: testing
+- Role: worker
+```
+
+## Agent Properties
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| Heading | ✅ | Agent title + `(Level N)` in the H3 heading |
+| Name | ✅ | Display name shown in dashboard |
+| Avatar | ❌ | Emoji avatar |
+| Domain | ✅ | Specialization (engineering, marketing, finance, etc.) |
+| Role | ✅ | `coo`, `lead`, or `worker` |
+
+## Sections
+
+### Identity
+
+The `## Identity` section sets org-level metadata:
+
+```markdown
+## Identity
+- Name: My Organization
+- Mission: What this org does
+```
+
+### Structure
+
+The `## Structure` section contains agent definitions. Each agent is an H3 heading with `(Level N)`:
+
+```markdown
+### Agent Title (Level 7)
+- Name: Display Name
+- Domain: engineering
+- Role: lead
+```
+
+## Level Guidelines
+
+| Level | Tier | Model Tier | Typical Role |
+|-------|------|------------|-------------|
+| 9–10 | Executive | Premium (Claude, GPT-4o) | CEO, COO |
+| 7–8 | Lead | Mid-tier (Llama 70B) | Team leads |
+| 4–6 | Senior | Local (Qwen 7B, Llama 8B) | Senior ICs |
+| 1–3 | Junior | Local (Qwen 7B) | Workers, interns |
+
+<Aside type="tip">
+Start with the default ORG.md from `bikinibottom init` and customize from there. You can always add more agents later.
+</Aside>
+
+## Domains
+
+Available domains and their keyword triggers:
+
+| Domain | Keywords |
+|--------|----------|
+| `operations` | org-wide, strategy, planning |
+| `engineering` | api, code, build, deploy, test |
+| `frontend` | ui, design, css, react |
+| `backend` | server, database, api |
+| `marketing` | campaign, blog, seo, content |
+| `finance` | budget, pricing, revenue |
+| `sales` | demo, outreach, pipeline |
+| `support` | ticket, customer, help |
+| `testing` | test, qa, quality |
+| `hr` | hire, onboard, recruit |
+
+---
+
+## Next steps
+
+<LinkCard title="Getting Started →" href="/openspawn/getting-started/" description="Run your first agent org" />

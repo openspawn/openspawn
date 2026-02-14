@@ -1,0 +1,65 @@
+---
+title: Protocols Overview
+description: BikiniBottom speaks two open protocols — A2A for agent-to-agent communication and MCP for LLM tool integration.
+---
+
+import { Tabs, TabItem, Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+BikiniBottom is protocol-native. Every agent org speaks **A2A** and **MCP** out of the box — no adapters, no plugins.
+
+## Why two protocols?
+
+| | A2A Protocol | MCP Tools |
+|---|---|---|
+| **Purpose** | Agent-to-agent communication | LLM-to-tool integration |
+| **Who talks** | Agents ↔ Agents | LLMs → Tools |
+| **Transport** | HTTP REST + SSE | JSON-RPC 2.0 over HTTP |
+| **Discovery** | `/.well-known/agent.json` | `initialize` → `tools/list` |
+| **Spec** | [a2a-protocol.org](https://a2a-protocol.org) | [modelcontextprotocol.io](https://modelcontextprotocol.io) |
+| **Use when** | Another agent needs to delegate work | An LLM needs to take action |
+
+### A2A = Agents talking to agents
+
+The [A2A protocol](https://a2a-protocol.org) by Google defines how autonomous agents discover each other, send tasks, and stream updates. Every deployed BikiniBottom org publishes an Agent Card at a well-known URL.
+
+### MCP = LLMs using tools
+
+[MCP](https://modelcontextprotocol.io) by Anthropic defines how LLMs discover and call tools. BikiniBottom exposes **7 tools** via MCP — connect Claude Desktop, Cursor, or any MCP client.
+
+## How they work together
+
+Both protocols feed into the same control plane. A task sent via A2A and one delegated via MCP follow the same internal path:
+
+```
+External Agent → A2A Server ─┐
+                              ├→ Control Plane → Agent Runtime
+Claude Desktop → MCP Server ──┘
+```
+
+## Try it now
+
+<Tabs>
+  <TabItem label="A2A Discovery">
+    ```bash
+    curl https://bikinibottom.ai/.well-known/agent.json
+    ```
+  </TabItem>
+  <TabItem label="MCP Tools">
+    ```bash
+    curl -X POST https://bikinibottom.ai/mcp \
+      -H 'Content-Type: application/json' \
+      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+Both protocols are enabled by default when you run `npx bikinibottom init`.
+</Aside>
+
+## Next steps
+
+<CardGrid>
+  <LinkCard title="A2A Protocol" href="/openspawn/protocols/a2a/" description="Full A2A guide with discovery, tasks, and streaming" />
+  <LinkCard title="MCP Tools" href="/openspawn/protocols/mcp/" description="All 7 tools, JSON-RPC examples, client setup" />
+</CardGrid>

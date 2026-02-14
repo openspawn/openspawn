@@ -1,0 +1,113 @@
+---
+title: Model Router
+description: Smart LLM routing across Ollama, Groq, and OpenRouter with automatic fallbacks and cost tracking.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+The model router intelligently routes LLM requests across providers based on agent level, task type, and cost constraints — with automatic fallback chains.
+
+<Aside type="tip">
+Check live router metrics: `curl https://bikinibottom.ai/api/router/metrics`
+</Aside>
+
+## Overview
+
+Not every agent needs GPT-4. A Level 3 worker writing unit tests uses a local 7B model. A Level 10 executive making strategic decisions gets Claude 3.5 Sonnet.
+
+```
+Agent Level → Tier Selection → Provider → Model → Fallback if needed
+```
+
+## Routing Tiers
+
+| Agent Level | Tier | Default Provider | Model | Cost |
+|-------------|------|-------------------|-------|------|
+| L9–L10 | Executive | OpenRouter | Claude 3.5 Sonnet, GPT-4o | $$$ |
+| L7–L8 | Lead | Groq | Llama 3.1 70B | $ |
+| L1–L6 | Worker | Ollama (local) | Qwen 2.5 7B | Free |
+
+## Providers
+
+### Ollama (Local)
+- **Cost:** $0 — runs on your hardware
+- **Latency:** 40–150ms
+- **Models:** Qwen 2.5 7B (32K context)
+- **Best for:** L1–L6 workers, high-volume tasks
+
+### Groq
+- **Cost:** $0.05–$0.79 per 1K tokens
+- **Latency:** 80–300ms
+- **Models:** Llama 3.1 8B (fast), Llama 3.1 70B (capable)
+- **Best for:** L7–L8 leads, function calling
+
+### OpenRouter
+- **Cost:** $2.50–$15.00 per 1K tokens
+- **Latency:** 200–800ms
+- **Models:** Claude 3.5 Sonnet (200K), GPT-4o (128K)
+- **Best for:** L9–L10 executives, complex reasoning
+
+## Fallback Chains
+
+When a provider is unavailable, the router automatically falls back:
+
+```
+L9-10: OpenRouter → Groq (70B) → Ollama
+L7-8:  Groq (70B) → OpenRouter → Ollama
+L1-6:  Ollama (60%) / Groq 8B (40%) → OpenRouter (cheapest)
+```
+
+## Cost Tracking
+
+```bash
+curl https://bikinibottom.ai/api/router/metrics
+```
+
+```json
+{
+  "totalRequests": 1247,
+  "totalCost": 12.15,
+  "requestsByProvider": { "ollama": 748, "groq": 412, "openrouter": 87 },
+  "costByProvider": { "ollama": 0, "groq": 4.23, "openrouter": 7.92 },
+  "fallbacksTriggered": 23,
+  "localRoutedCount": 748,
+  "cloudOnlyCostEstimate": 47.82
+}
+```
+
+<Aside type="tip">
+The `cloudOnlyCostEstimate` shows what you'd pay without local routing. Compare with `totalCost` to see savings — typically 74%.
+</Aside>
+
+## Configuration
+
+```json
+{
+  "router": {
+    "preferLocal": true,
+    "providers": ["ollama", "groq", "openrouter"]
+  }
+}
+```
+
+### Environment Variables
+
+```bash
+GROQ_API_KEY=gsk_...
+OPENROUTER_API_KEY=sk-or-...
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/router/metrics` | GET | Current router metrics |
+| `/api/router/config` | GET | Provider configuration |
+| `/api/router/decisions` | GET | Recent routing decisions |
+
+---
+
+## Next steps
+
+<LinkCard title="Cost Tracking →" href="/openspawn/features/cost-tracking/" description="Per-agent budgets and spending controls" />

@@ -1,0 +1,164 @@
+---
+title: Getting Started
+description: Get BikiniBottom running in 2 minutes with the live demo or locally via CLI.
+---
+
+import { Tabs, TabItem, Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="tip">
+Visit [bikinibottom.ai](https://bikinibottom.ai) — 32 agents running right now. No setup required.
+</Aside>
+
+## Quick Start (Local)
+
+### 1. Scaffold your project
+
+```bash
+npx bikinibottom init my-reef
+cd my-reef
+```
+
+This creates `ORG.md` (your agent org definition) and `bikinibottom.config.json` (server config).
+
+### 2. Start the server
+
+```bash
+npx bikinibottom start
+```
+
+Open [http://localhost:3333](http://localhost:3333) — your dashboard is live.
+
+### 3. Discover your agents via A2A
+
+<Tabs>
+  <TabItem label="bash">
+    ```bash
+    curl http://localhost:3333/.well-known/agent.json
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import httpx
+    card = httpx.get("http://localhost:3333/.well-known/agent.json").json()
+    print(f"Agent: {card['name']} — {len(card['skills'])} skills")
+    ```
+  </TabItem>
+  <TabItem label="TypeScript">
+    ```typescript
+    const card = await fetch("http://localhost:3333/.well-known/agent.json").then(r => r.json());
+    console.log(`Agent: ${card.name} — ${card.skills.length} skills`);
+    ```
+  </TabItem>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "name": "My Reef",
+  "url": "http://localhost:3333",
+  "protocolVersion": "0.3",
+  "capabilities": { "streaming": true },
+  "skills": [{ "id": "task-delegation", "name": "Task Delegation" }]
+}
+```
+
+### 4. Send a task
+
+```bash
+curl -X POST http://localhost:3333/a2a/message/send \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+      "role": "user",
+      "parts": [{ "kind": "text", "text": "Build a REST API for user management" }]
+    }
+  }'
+```
+
+### 5. Use as MCP tool server
+
+```bash
+curl -X POST http://localhost:3333/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+---
+
+## Try the live demo
+
+```bash
+# Works right now against the live deployment
+curl https://bikinibottom.ai/.well-known/agent.json
+```
+
+---
+
+## Customize your organization
+
+Edit `ORG.md` to define your agents:
+
+```markdown
+# My Agent Organization
+
+## Identity
+- Name: My Org
+- Mission: AI-powered operations
+
+## Structure
+
+### CEO (Level 10)
+- Name: The Boss
+- Avatar: 👑
+- Domain: operations
+- Role: coo
+
+### Engineering Lead (Level 7)
+- Name: Tech Lead
+- Avatar: 💻
+- Domain: engineering
+- Role: lead
+```
+
+See the [ORG.md format reference](/openspawn/cli/org-format/) for all options.
+
+---
+
+## Configuration
+
+`bikinibottom.config.json` controls your server:
+
+```json
+{
+  "port": 3333,
+  "orgFile": "ORG.md",
+  "simulation": { "mode": "deterministic", "tickInterval": 3000 },
+  "router": { "preferLocal": true, "providers": ["ollama", "groq"] },
+  "protocols": { "a2a": true, "mcp": true }
+}
+```
+
+---
+
+## Troubleshooting
+
+**Port already in use?** Change it in `bikinibottom.config.json`: `{ "port": 3334 }`
+
+**Ollama not available?** BikiniBottom falls back to Groq or OpenRouter automatically:
+
+```bash
+export GROQ_API_KEY=your_key
+export OPENROUTER_API_KEY=your_key
+```
+
+---
+
+## Next steps
+
+<CardGrid>
+  <LinkCard title="A2A Protocol" href="/openspawn/protocols/a2a/" description="Agent discovery, task sending, streaming" />
+  <LinkCard title="MCP Tools" href="/openspawn/protocols/mcp/" description="7 tools, JSON-RPC, Claude Desktop setup" />
+  <LinkCard title="Model Router" href="/openspawn/features/model-router/" description="Provider routing, fallbacks, cost tracking" />
+  <LinkCard title="Architecture" href="/openspawn/architecture/overview/" description="System design and data flows" />
+</CardGrid>

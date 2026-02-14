@@ -1,0 +1,121 @@
+---
+title: Architecture Overview
+description: BikiniBottom's layered architecture — protocol interfaces, control plane, and agent runtime.
+---
+
+import { Tabs, TabItem, Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+BikiniBottom is a layered system: protocol interfaces on top, a control plane in the middle, and agent runtimes at the bottom.
+
+<Aside type="tip">
+Explore the live system: `curl https://bikinibottom.ai/.well-known/agent.json`
+</Aside>
+
+## System Overview
+
+```
+┌──────────────────────────────────────────┐
+│           Protocol Layer                  │
+│  A2A Server (REST+SSE)  MCP Server (RPC) │
+└──────────────┬───────────────────────────┘
+               ↓
+┌──────────────────────────────────────────┐
+│           Control Plane                   │
+│  Task Scheduler · Model Router · ACP     │
+└──────────────┬───────────────────────────┘
+               ↓
+┌──────────────────────────────────────────┐
+│           Agent Runtime                   │
+│  L10 CEO · L7 Leads · L4 Devs · L3 QA   │
+└──────────────┬───────────────────────────┘
+               ↓
+┌──────────────────────────────────────────┐
+│           Dashboard (React)               │
+│  Real-time UI, network graph, metrics    │
+└──────────────────────────────────────────┘
+```
+
+## Layers
+
+### Protocol Layer
+
+Handles external communication via two open protocols:
+
+- **A2A Server** — Google's Agent-to-Agent protocol v0.3. Discovery at `/.well-known/agent.json`, task sending, SSE streaming, task management.
+- **MCP Server** — Anthropic's Model Context Protocol. 7 tools via JSON-RPC 2.0 at `POST /mcp`.
+
+Both feed into the same control plane — a task via A2A and one via MCP follow the same internal path.
+
+### Control Plane
+
+- **Task Scheduler** — Routes tasks to the right agent by domain keywords, level, and availability. Manages full lifecycle: submitted → working → completed.
+- **Model Router** — Routes LLM requests to optimal provider by agent level. Manages fallbacks and cost tracking.
+- **ACP** — Agent Communication Protocol. Internal messaging for delegation, status updates, and coordination.
+
+### Agent Runtime
+
+- Hierarchy of levels L1–L10
+- Each agent has a domain specialization
+- Delegates down, escalates up
+- Configurable tick-based simulation engine
+
+## Data Flow
+
+### External Task (A2A)
+
+```
+1. Client POSTs to /a2a/message/send
+2. A2A Server extracts text, detects domain
+3. Scheduler assigns to best agent
+4. Agent processes (via Model Router for LLM)
+5. Status updates flow back via SSE
+6. Client receives completed task
+```
+
+### External Task (MCP)
+
+```
+1. LLM calls tools/call with delegate_task
+2. MCP Server creates task via Scheduler
+3. Same flow as A2A from step 3
+4. Result returned as MCP tool response
+```
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Server | Node.js (raw HTTP, no framework) |
+| Simulation | Deterministic engine with configurable ticks |
+| Dashboard | React + TanStack Query |
+| CLI | Node.js with zero dependencies |
+| Protocols | A2A v0.3, MCP (2025-03-26) |
+| Build | Nx monorepo, TypeScript |
+
+## Monorepo Structure
+
+```
+openspawn/
+├── packages/cli/          # bikinibottom CLI
+│   ├── src/commands/      # init, start, status, demo
+│   └── templates/ORG.md
+├── tools/sandbox/         # Server + protocols
+│   └── src/
+│       ├── server.ts      # HTTP server
+│       ├── a2a-server.ts  # A2A implementation
+│       ├── mcp-server.ts  # MCP tool server
+│       ├── model-router.ts # Multi-provider routing
+│       └── deterministic.ts # Simulation engine
+├── docs/                  # Legacy Jekyll docs
+├── docs-site/             # Astro Starlight docs (this site)
+└── nx.json
+```
+
+---
+
+## Next steps
+
+<CardGrid>
+  <LinkCard title="Agent Communication (ACP)" href="/openspawn/architecture/acp/" description="Internal messaging between agents" />
+  <LinkCard title="A2A Protocol" href="/openspawn/protocols/a2a/" description="External agent-to-agent protocol" />
+</CardGrid>

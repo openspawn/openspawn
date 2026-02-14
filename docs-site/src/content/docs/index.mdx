@@ -1,0 +1,327 @@
+---
+title: BikiniBottom
+description: The control plane your AI agents deserve. A2A + MCP native orchestration with real-time dashboard.
+template: splash
+hero:
+  tagline: ""
+  actions: []
+---
+
+import { Tabs, TabItem, Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<div style="text-align: center; padding: 2rem 0;">
+  <div style="font-size: 4rem; margin-bottom: 1rem;">🍍</div>
+  <div class="hero-gradient">BikiniBottom</div>
+  <p style="font-size: 1.3rem; color: #94a3b8; max-width: 600px; margin: 1rem auto;">
+    The control plane your AI agents deserve.
+  </p>
+</div>
+
+<div class="terminal-demo">
+  <span class="prompt">$</span> npx bikinibottom init my-reef<br/>
+  <span class="success">🍍 Created ORG.md, config, .gitignore</span><br/>
+  <span class="prompt">$</span> npx bikinibottom start<br/>
+  <span class="output">🌐 Server running at http://localhost:3333</span><br/>
+  <span class="output">🔗 A2A: /.well-known/agent.json</span><br/>
+  <span class="output">🔌 MCP: /mcp (7 tools)</span><br/>
+  <span class="output">🔀 Router: 3 providers configured</span>
+</div>
+
+<div class="hero-buttons" style="justify-content: center;">
+  <a href="https://bikinibottom.ai" class="primary">🤿 Launch Live Demo</a>
+  <a href="/openspawn/getting-started/" class="secondary">Get Started</a>
+  <a href="https://github.com/openspawn/openspawn" class="secondary">GitHub ⭐</a>
+</div>
+
+<div class="protocol-badges" style="justify-content: center;">
+  <span class="badge badge-protocol">A2A Protocol</span>
+  <span class="badge badge-protocol">MCP</span>
+  <span class="badge badge-core">TypeScript</span>
+  <span class="badge badge-core">Python</span>
+</div>
+
+---
+
+## Try it right now — no setup needed
+
+<Tabs>
+  <TabItem label="A2A Discovery">
+    ```bash
+    # Discover the live agent org
+    curl https://bikinibottom.ai/.well-known/agent.json
+    ```
+
+    ```json
+    {
+      "name": "BikiniBottom HQ",
+      "description": "Multi-agent coordination control plane",
+      "url": "https://bikinibottom.ai",
+      "version": "1.0.0",
+      "protocolVersion": "0.3",
+      "capabilities": { "streaming": true },
+      "skills": [
+        { "id": "task-delegation", "name": "Task Delegation" },
+        { "id": "agent-coordination", "name": "Agent Coordination" }
+      ]
+    }
+    ```
+  </TabItem>
+  <TabItem label="MCP Tools">
+    ```bash
+    # List all 7 MCP tools
+    curl -X POST https://bikinibottom.ai/mcp \
+      -H 'Content-Type: application/json' \
+      -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+    ```
+
+    ```json
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "tools": [
+          { "name": "delegate_task", "description": "Send a task to the agent org" },
+          { "name": "list_agents", "description": "List all agents" },
+          { "name": "get_agent", "description": "Get agent details" },
+          { "name": "list_tasks", "description": "List current tasks" },
+          { "name": "get_task", "description": "Get task details" },
+          { "name": "send_message", "description": "Send ACP message to agent" },
+          { "name": "get_org_stats", "description": "Get org statistics" }
+        ]
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Send Task">
+    ```bash
+    # Delegate a task to the live org
+    curl -X POST https://bikinibottom.ai/a2a/message/send \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "message": {
+          "role": "user",
+          "parts": [{ "kind": "text", "text": "Build a REST API for user management" }]
+        }
+      }'
+    ```
+
+    ```json
+    {
+      "id": "a2a-1707900000000-x7k2m9",
+      "status": {
+        "state": "submitted",
+        "message": {
+          "role": "agent",
+          "parts": [{ "kind": "text", "text": "Task routed to engineering team" }]
+        }
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<p style="text-align: center; color: #64748b; margin-top: 1rem;">
+  ↑ These are live endpoints. Try them in your terminal right now.
+</p>
+
+---
+
+## Capabilities
+
+<div class="capability-grid">
+  <div class="capability-card">
+    <div class="category">Protocol</div>
+    <h3>🔗 A2A Native</h3>
+    <p>Google's Agent-to-Agent protocol v0.3. Discovery, task sending, SSE streaming. 32 agents live on bikinibottom.ai.</p>
+  </div>
+  <div class="capability-card">
+    <div class="category">Protocol</div>
+    <h3>🔌 MCP Tools</h3>
+    <p>7 tools for any MCP-compatible LLM host. Connect Claude Desktop, Cursor, or any JSON-RPC 2.0 client.</p>
+  </div>
+  <div class="capability-card">
+    <div class="category">Core</div>
+    <h3>🔀 Model Router</h3>
+    <p>Smart routing across Ollama, Groq, and OpenRouter. Automatic fallback chains. 74% cost savings with local routing.</p>
+  </div>
+  <div class="capability-card">
+    <div class="category">Core</div>
+    <h3>💰 Cost Control</h3>
+    <p>Budget per agent, per-provider cost tracking, runaway prevention. See exactly where every token goes.</p>
+  </div>
+  <div class="capability-card">
+    <div class="category">Core</div>
+    <h3>🏆 Trust System</h3>
+    <p>Agents earn trust through performance. Auto-promotion, reputation scoring, level-based access control.</p>
+  </div>
+  <div class="capability-card">
+    <div class="category">Orchestration</div>
+    <h3>📊 Dashboard</h3>
+    <p>Real-time React dashboard with network graph, task timeline, cost charts, and agent status monitoring.</p>
+  </div>
+</div>
+
+---
+
+## Architecture
+
+<p class="section-subtitle">Layered by design, scalable by default</p>
+
+<div class="arch-diagram">
+  <div class="arch-layer">
+    <div class="layer-title">CLI & SDKs</div>
+    <div class="layer-items">npx bikinibottom · Python · TypeScript</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="layer-title">Protocol Layer</div>
+    <div class="layer-items">A2A (JSON-RPC + SSE) · MCP · REST API</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="layer-title">Control Plane</div>
+    <div class="layer-items">Router · Scheduler · Trust · Credits</div>
+  </div>
+  <div class="arch-arrow">↓</div>
+  <div class="arch-layer">
+    <div class="layer-title">Agent Runtime</div>
+    <div class="layer-items">Deterministic · Hybrid · LLM-backed</div>
+  </div>
+</div>
+
+<div style="text-align: center;">
+  <LinkCard title="Deep dive into architecture →" href="/openspawn/architecture/overview/" />
+</div>
+
+---
+
+## Ocean Vocabulary
+
+Our branding speaks underwater 🌊
+
+<table class="vocab-table">
+  <tr>
+    <td class="vocab-emoji">🪸</td>
+    <td class="vocab-term">Reef</td>
+    <td>An agent organization — your fleet of agents working together</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">🌊</td>
+    <td class="vocab-term">Current</td>
+    <td>A task flowing through the system — from delegation to completion</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">🔱</td>
+    <td class="vocab-term">Depth</td>
+    <td>Agent level (1–10) — deeper agents handle more complex work</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">☀️</td>
+    <td class="vocab-term">Surface</td>
+    <td>The dashboard — your view into the reef from above</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">🤿</td>
+    <td class="vocab-term">Dive</td>
+    <td>Start a simulation or demo — "Dive In"</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">🫧</td>
+    <td class="vocab-term">Bubble</td>
+    <td>An ACP message between agents — communication rises up</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">⚓</td>
+    <td class="vocab-term">Anchor</td>
+    <td>The control plane — keeps everything in place</td>
+  </tr>
+  <tr>
+    <td class="vocab-emoji">🌅</td>
+    <td class="vocab-term">Tide</td>
+    <td>A simulation tick — the rhythm of agent activity</td>
+  </tr>
+</table>
+
+---
+
+## Get swimming in 60 seconds
+
+```bash
+npx bikinibottom init my-reef
+cd my-reef
+npx bikinibottom start
+```
+
+Your reef is alive at `http://localhost:3333`
+- A2A discovery: `http://localhost:3333/.well-known/agent.json`
+- MCP tools: `http://localhost:3333/mcp`
+- Dashboard: `http://localhost:3333`
+
+<div style="text-align: center; margin-top: 1rem;">
+  <LinkCard title="Full getting started guide →" href="/openspawn/getting-started/" />
+</div>
+
+---
+
+## How we compare
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>BikiniBottom</th>
+      <th>AgentOven</th>
+      <th>LangGraph</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A2A Protocol</td>
+      <td>✅ Live</td>
+      <td>✅ Types only</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>MCP Integration</td>
+      <td>✅ 7 tools</td>
+      <td>🔧 Stub</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Live Demo</td>
+      <td>✅ bikinibottom.ai</td>
+      <td>❌</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Model Router</td>
+      <td>✅ 3 providers</td>
+      <td>✅ Config</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Real-time Dashboard</td>
+      <td>✅ Full</td>
+      <td>🔧 Basic</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>CLI</td>
+      <td>✅ npx</td>
+      <td>✅ cargo</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Cost Tracking</td>
+      <td>✅ Per-agent</td>
+      <td>✅ Per-agent</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Running Agents</td>
+      <td>✅ 32 live</td>
+      <td>❌</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>

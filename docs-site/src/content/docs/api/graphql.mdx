@@ -1,0 +1,74 @@
+---
+title: GraphQL API
+description: GraphQL schema for flexible querying of agents, tasks, and organization data.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+<Aside type="note">
+The GraphQL API is planned for a future release. The REST API and protocol endpoints (A2A + MCP) cover all current functionality.
+</Aside>
+
+## Planned Schema
+
+```graphql
+type Query {
+  agents(status: AgentStatus, domain: String): [Agent!]!
+  agent(id: ID!): Agent
+  tasks(status: TaskStatus, limit: Int): [Task!]!
+  task(id: ID!): Task
+  orgStats: OrgStats!
+  routerMetrics: RouterMetrics!
+}
+
+type Agent {
+  id: ID!
+  name: String!
+  level: Int!
+  domain: String!
+  role: AgentRole!
+  status: AgentStatus!
+  avatar: String
+  currentTask: Task
+  trustScore: Float!
+}
+
+type Task {
+  id: ID!
+  description: String!
+  status: TaskStatus!
+  assignee: Agent
+  delegatedBy: Agent
+  artifacts: [Artifact!]!
+  createdAt: DateTime!
+  completedAt: DateTime
+}
+
+enum AgentStatus { IDLE, BUSY, OFFLINE }
+enum AgentRole { COO, LEAD, WORKER }
+enum TaskStatus { SUBMITTED, WORKING, COMPLETED, FAILED, CANCELED }
+```
+
+## Current Alternatives
+
+Until GraphQL is available, use:
+
+- **REST API** — `/api/agents`, `/api/tasks`, `/api/router/metrics`
+- **MCP Tools** — `list_agents`, `list_tasks`, `get_org_stats`
+- **A2A** — `/a2a/tasks` for task management
+
+```bash
+# Get all agents via REST
+curl https://bikinibottom.ai/api/agents
+
+# Or via MCP
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_agents","arguments":{}}}'
+```
+
+---
+
+## Next steps
+
+<LinkCard title="REST API →" href="/openspawn/api/rest/" description="Currently available REST endpoints" />
