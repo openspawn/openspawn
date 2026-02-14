@@ -11,7 +11,13 @@ const features = [
  { emoji: "💻", title: "CLI", description: "npx bikinibottom init — zero config, instant setup. Scaffold, start, and deploy in seconds.", color: "text-cyan-400" },
 ];
 
-const frameworks = ["CrewAI", "LangGraph", "AutoGen", "OpenClaw", "Custom"];
+const frameworks = [
+ { name: "OpenClaw", highlight: true },
+ { name: "CrewAI" },
+ { name: "LangGraph" },
+ { name: "AutoGen" },
+ { name: "Custom" },
+];
 
 const orgMdSnippet = `# 🍍 BikiniBottom Inc.
 > Mission: Protect Bikini Bottom
@@ -23,6 +29,32 @@ const orgMdSnippet = `# 🍍 BikiniBottom Inc.
 ## Policies
 - All tasks require peer review
 - Escalate critical issues to Patrick`;
+
+const openclawJsonSnippet = `{
+  "agents": {
+    "list": [
+      { "id": "sandy", "model": "opus" },
+      { "id": "spongebob", "model": "sonnet" },
+      { "id": "squidward", "model": "sonnet" }
+    ]
+  },
+  "tools": {
+    "agentToAgent": { "enabled": true }
+  }
+}`;
+
+const orgMdPivotSnippet = `# 🍍 BikiniBottom Inc.
+
+## Structure
+- 🔬 Science (lead: Sandy, model: opus)
+  - Patrick (research), Gary (data)
+- 🍔 Operations (lead: SpongeBob)
+  - Squidward (quality), Larry (logistics)
+
+## Policies
+- L7+ agents: event-driven (Opus)
+- L1-6: polling (Sonnet, budget-capped)
+- All PRs require peer review`;
 
 export function LandingPage() {
  const [agentCount, setAgentCount] = useState(22);
@@ -53,9 +85,9 @@ export function LandingPage() {
       <span className="gradient-text">BikiniBottom</span>
      </h1>
      <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-xl text-lg text-slate-400 md:text-xl">
-      The control plane your AI agents deserve.
+      The org chart your AI agents deserve.
       <br />
-      <span className="text-slate-500">A2A + MCP native orchestration with real-time dashboard.</span>
+      <span className="text-slate-500">Define teams, hierarchy, and policies in markdown. Watch agents coordinate.</span>
      </p>
      <div className="animate-fade-in-up animate-delay-300 mb-10 flex flex-wrap items-center justify-center gap-4">
       <a href="/app/" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">Launch Live Demo →</a>
@@ -74,10 +106,42 @@ export function LandingPage() {
     </div>
    </section>
 
-   {/* Built on OpenClaw */}
-   <section className="border-y border-white/5 py-4 text-center text-sm text-slate-400">
-    Built on <a href="https://openclaw.ai" target="_blank" rel="noopener" className="text-cyan-400 hover:text-cyan-300 transition">OpenClaw</a> — the AI agent runtime{" "}
-    <a href="https://openclaw.ai" target="_blank" rel="noopener" className="text-slate-500 hover:text-slate-300 transition">openclaw.ai →</a>
+   {/* From Config to Coordination */}
+   <section className="py-20">
+    <div className="mx-auto max-w-5xl text-center">
+     <h2 className="mb-4 text-3xl font-bold text-slate-100">Your agents can talk. <span className="gradient-text">Now give them structure.</span></h2>
+     <p className="mx-auto mb-12 max-w-2xl text-slate-400">
+      OpenClaw handles routing and isolation. BikiniBottom adds the org chart — teams, hierarchy, policies, and coordination.
+     </p>
+     <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
+      {/* Left panel: openclaw.json */}
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-navy-900/80">
+       <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
+        <div className="h-3 w-3 rounded-full bg-red-500/70" />
+        <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
+        <div className="h-3 w-3 rounded-full bg-green-500/70" />
+        <span className="ml-2 text-xs text-slate-500">openclaw.json</span>
+       </div>
+       <pre className="overflow-x-auto p-4 text-left text-sm leading-relaxed text-slate-300"><code>{openclawJsonSnippet}</code></pre>
+      </div>
+      {/* Arrow */}
+      <div className="hidden text-4xl text-cyan-500/60 md:block">→</div>
+      <div className="text-2xl text-cyan-500/60 md:hidden">↓</div>
+      {/* Right panel: ORG.md */}
+      <div className="overflow-hidden rounded-xl border border-cyan-500/20 bg-navy-900/80 ring-1 ring-cyan-500/10">
+       <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
+        <div className="h-3 w-3 rounded-full bg-red-500/70" />
+        <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
+        <div className="h-3 w-3 rounded-full bg-green-500/70" />
+        <span className="ml-2 text-xs text-slate-500">ORG.md</span>
+       </div>
+       <pre className="overflow-x-auto p-4 text-left text-sm leading-relaxed text-slate-300"><code>{orgMdPivotSnippet}</code></pre>
+      </div>
+     </div>
+     <p className="mt-8 text-sm text-slate-500">
+      Made for <a href="https://openclaw.ai" target="_blank" rel="noopener" className="text-cyan-400 hover:text-cyan-300 transition">OpenClaw</a>. Works with any agent.
+     </p>
+    </div>
    </section>
 
    {/* Dashboard Preview */}
@@ -103,11 +167,11 @@ export function LandingPage() {
     <div className="mx-auto max-w-4xl text-center">
      <h2 className="mb-4 text-3xl font-bold text-slate-100">Works with your stack</h2>
      <p className="mx-auto mb-10 max-w-2xl text-slate-400">
-      BikiniBottom is infrastructure, not a framework. Bring your CrewAI crews, LangGraph graphs, or roll your own — BikiniBottom coordinates them all via A2A + MCP.
+      Made for OpenClaw. Works with CrewAI, LangGraph, AutoGen, and any agent framework.
      </p>
      <div className="flex flex-wrap items-center justify-center gap-3">
       {frameworks.map((f) => (
-       <span key={f} className="rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-slate-300">{f}</span>
+       <span key={f.name} className={`rounded-xl px-5 py-2 text-sm font-medium ${f.highlight ? "ring-1 ring-cyan-500/30 bg-cyan-500/10 text-cyan-400" : "border border-white/10 bg-white/5 text-slate-300"}`}>{f.name}</span>
       ))}
      </div>
     </div>
