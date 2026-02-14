@@ -10,14 +10,13 @@
   <body>
     <div id="root"></div>
     <script>
-      // Unregister any stale service workers at root scope
-      // (dashboard SW was previously registered at / before moving to /app/)
+      // Kill any stale service workers at root scope.
+      // Dashboard PWA was previously registered at / before moving to /app/.
+      // Register a self-destroying SW that replaces the old one and nukes caches.
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          regs.forEach(function(r) {
-            if (r.scope === location.origin + '/') r.unregister();
-          });
-        });
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(function(reg) { reg.update(); })
+          .catch(function() {});
       }
     </script>
     <script type="module" src="/app/main.tsx"></script>
