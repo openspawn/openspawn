@@ -126,36 +126,33 @@ export function generateMockTimeline(agentId: string): TimelineEvent[] {
 
 // ── Popover ────────────────────────────────────────────────────────────────
 
-function EventPopover({ event, onClose }: { event: TimelineEvent; onClose: () => void }) {
+function EventDetail({ event }: { event: TimelineEvent }) {
   const cfg = eventConfig[event.type];
   const Icon = cfg.icon;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.15 }}
-      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 w-64"
-      onClick={(e) => e.stopPropagation()}
+      className="p-3 rounded-lg border border-border bg-muted/30"
     >
-      <div className={cn("rounded-lg border p-3 shadow-xl", "bg-popover/95 backdrop-blur-sm border-border")}>
-        <div className="flex items-center gap-2 mb-2">
-          <div className={cn("p-1 rounded", cfg.bg)}>
-            <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
-          </div>
-          <span className={cn("text-xs font-medium", cfg.color)}>{cfg.label}</span>
-          {event.taskId && (
-            <span className="text-[10px] text-muted-foreground/70 ml-auto font-mono">{event.taskId}</span>
-          )}
+      <div className="flex items-center gap-2 mb-1">
+        <div className={cn("p-1 rounded", cfg.bg)}>
+          <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
         </div>
-        <p className="text-sm font-medium text-foreground">{event.title}</p>
-        <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
-        <p className="text-[10px] text-muted-foreground/70 mt-2 flex items-center gap-1">
+        <span className={cn("text-xs font-medium", cfg.color)}>{cfg.label}</span>
+        {event.taskId && (
+          <span className="text-[10px] text-muted-foreground/70 font-mono">{event.taskId}</span>
+        )}
+        <span className="text-[10px] text-muted-foreground/70 ml-auto flex items-center gap-1">
           <Clock className="h-3 w-3" />
           {event.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-        </p>
+        </span>
       </div>
+      <p className="text-sm font-medium text-foreground mt-1">{event.title}</p>
+      <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
     </motion.div>
   );
 }
@@ -178,10 +175,6 @@ function EventNode({
 
   return (
     <div className="relative flex flex-col items-center" onClick={onClick}>
-      <AnimatePresence>
-        {isSelected && <EventPopover event={event} onClose={() => onClick()} />}
-      </AnimatePresence>
-
       {/* Node */}
       <motion.button
         whileHover={{ scale: 1.2 }}
@@ -336,6 +329,14 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
           })}
         </div>
       </div>
+
+      {/* Selected event detail — rendered outside the scroll area so it never clips */}
+      <AnimatePresence mode="wait">
+        {selectedId && (() => {
+          const ev = events.find((e) => e.id === selectedId);
+          return ev ? <EventDetail key={ev.id} event={ev} /> : null;
+        })()}
+      </AnimatePresence>
 
       {/* Vertical mobile layout */}
       <div className="md:hidden flex flex-col gap-3">
