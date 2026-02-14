@@ -365,37 +365,55 @@ function AgentNode({ data, selected }: NodeProps) {
             );
 
             if (!nodeData.isHuman && health) {
-              const r1 = 18, r2 = 15, sw = 2;
+              const size = 44;
+              const sw = 3;
+              const r1 = (size - sw) / 2;       // outer ring
+              const gap = 1;
+              const r2 = r1 - sw - gap;          // inner ring
               const c1 = 2 * Math.PI * r1, c2 = 2 * Math.PI * r2;
               const o1 = c1 * (1 - health.completionRate);
               const o2 = c2 * (1 - health.creditUsage);
               const col = (v: number) => v >= 0.85 ? '#f43f5e' : v >= 0.6 ? '#f59e0b' : '#10b981';
+              const cx = size / 2;
+              // Avatar fits inside inner ring
+              const avatarSize = Math.floor((r2 - sw / 2) * 2) - 2;
               return (
-                <div className="relative mb-0.5" style={{ width: 40, height: 40 }}>
-                  <svg className="absolute inset-0" width={40} height={40} viewBox="0 0 40 40">
-                    <circle cx={20} cy={20} r={r1} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                <div className="relative mb-0.5" style={{ width: size, height: size }}>
+                  <svg className="absolute inset-0" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                    <circle cx={cx} cy={cx} r={r1} fill="none" stroke="white" strokeOpacity={0.08} strokeWidth={sw} />
                     <motion.circle
-                      cx={20} cy={20} r={r1} fill="none"
-                      stroke={col(health.completionRate)} strokeWidth={sw} strokeLinecap="round"
+                      cx={cx} cy={cx} r={r1} fill="none"
+                      stroke={col(health.completionRate)} strokeWidth={sw} strokeLinecap="butt"
                       strokeDasharray={c1}
                       initial={{ strokeDashoffset: c1 }}
                       animate={{ strokeDashoffset: o1 }}
                       transition={{ duration: 0.8, ease: 'easeOut' }}
-                      transform="rotate(-90 20 20)"
+                      transform={`rotate(-90 ${cx} ${cx})`}
                     />
-                    <circle cx={20} cy={20} r={r2} fill="none" stroke="white" strokeOpacity={0.1} strokeWidth={sw} />
+                    <circle cx={cx} cy={cx} r={r2} fill="none" stroke="white" strokeOpacity={0.08} strokeWidth={sw} />
                     <motion.circle
-                      cx={20} cy={20} r={r2} fill="none"
-                      stroke={col(health.creditUsage)} strokeWidth={sw} strokeLinecap="round"
+                      cx={cx} cy={cx} r={r2} fill="none"
+                      stroke={col(health.creditUsage)} strokeWidth={sw} strokeLinecap="butt"
                       strokeDasharray={c2}
                       initial={{ strokeDashoffset: c2 }}
                       animate={{ strokeDashoffset: o2 }}
                       transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
-                      transform="rotate(-90 20 20)"
+                      transform={`rotate(-90 ${cx} ${cx})`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {avatarImg}
+                    <div className="rounded-full overflow-hidden" style={{ width: avatarSize, height: avatarSize }}>
+                      {nodeData.avatarUrl ? (
+                        <img src={nodeData.avatarUrl} alt={nodeData.label} className="w-full h-full object-cover" />
+                      ) : (
+                        <span
+                          className="w-full h-full inline-flex items-center justify-center text-lg leading-none select-none"
+                          style={{ backgroundColor: darkenForBackground(avatarColor) }}
+                        >
+                          {avatarEmoji}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
