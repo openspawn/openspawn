@@ -1,0 +1,85 @@
+---
+title: Commands
+description: Complete reference for all BikiniBottom CLI commands.
+---
+
+import { Aside, LinkCard } from '@astrojs/starlight/components';
+
+## `bikinibottom init [name]`
+
+Scaffold a new agent organization.
+
+```bash
+npx bikinibottom init my-reef
+```
+
+**Creates:**
+
+| File | Purpose |
+|------|---------|
+| `ORG.md` | Agent organization definition |
+| `bikinibottom.config.json` | Server configuration |
+| `.gitignore` | Standard ignores |
+
+**Output:**
+
+```
+🍍 BikiniBottom initialized!
+
+Created:
+  ORG.md                    — Define your agent organization
+  bikinibottom.config.json  — Configuration
+  .gitignore
+
+Next steps:
+  cd my-reef
+  1. Edit ORG.md to customize your agents
+  2. Run: bikinibottom start
+  3. Open: http://localhost:3333
+```
+
+## `bikinibottom start`
+
+Start the BikiniBottom server. Reads `bikinibottom.config.json` and `ORG.md` from the current directory.
+
+```bash
+npx bikinibottom start
+```
+
+Starts:
+- Dashboard at `http://localhost:3333`
+- A2A protocol at `/.well-known/agent.json`
+- MCP tool server at `/mcp`
+
+## `bikinibottom status`
+
+Show server status.
+
+```bash
+npx bikinibottom status
+```
+
+## `bikinibottom demo`
+
+Start with a built-in demo scenario — 32 agents, pre-configured tasks.
+
+```bash
+npx bikinibottom demo
+```
+
+<Aside type="tip">
+`bikinibottom demo` is the fastest way to see the full system in action — no ORG.md needed.
+</Aside>
+
+## Global Options
+
+| Flag | Description |
+|------|-------------|
+| `-h, --help` | Show help |
+| `-v, --version` | Show version |
+
+---
+
+## Next steps
+
+<LinkCard title="ORG.md Format →" href="/openspawn/cli/org-format/" description="Define your agent organization in Markdown" />

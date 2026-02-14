@@ -1,0 +1,272 @@
+/* Ocean Theme for BikiniBottom Docs */
+:root {
+  --sl-color-accent-low: #083344;
+  --sl-color-accent: #06b6d4;
+  --sl-color-accent-high: #a5f3fc;
+  --sl-color-white: #e2e8f0;
+  --sl-color-gray-1: #cbd5e1;
+  --sl-color-gray-2: #94a3b8;
+  --sl-color-gray-3: #64748b;
+  --sl-color-gray-4: #334155;
+  --sl-color-gray-5: #1e293b;
+  --sl-color-gray-6: #0f172a;
+  --sl-color-black: #020617;
+  --sl-font-system: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --sl-font-system-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+[data-theme='dark'] {
+  --sl-color-bg: #0a1929;
+  --sl-color-bg-nav: #0d1f36;
+  --sl-color-bg-sidebar: #0d1f36;
+  --sl-color-hairline-light: #1a2942;
+  --sl-color-hairline: #1e3a5f;
+}
+
+/* Custom hero section styling */
+.hero-gradient {
+  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* Terminal animation block */
+.terminal-demo {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-family: var(--sl-font-system-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 2rem 0;
+}
+
+.terminal-demo .prompt {
+  color: #06b6d4;
+}
+
+.terminal-demo .output {
+  color: #8b949e;
+}
+
+.terminal-demo .success {
+  color: #10b981;
+}
+
+/* Capability cards */
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.capability-card {
+  background: #0d1f36;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+
+.capability-card:hover {
+  border-color: #06b6d4;
+}
+
+.capability-card .category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #06b6d4;
+  margin-bottom: 0.5rem;
+}
+
+.capability-card h3 {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.capability-card p {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Architecture diagram */
+.arch-diagram {
+  background: #0d1f36;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.arch-layer {
+  background: #1a2942;
+  border: 1px solid #2d4a6f;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 0.75rem auto;
+  max-width: 500px;
+  font-size: 0.9rem;
+}
+
+.arch-layer .layer-title {
+  font-weight: 600;
+  color: #06b6d4;
+  margin-bottom: 0.25rem;
+}
+
+.arch-layer .layer-items {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.arch-arrow {
+  color: #64748b;
+  font-size: 1.5rem;
+  margin: 0.25rem 0;
+}
+
+/* Ocean vocabulary table */
+.vocab-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 2rem 0;
+}
+
+.vocab-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+.vocab-table .vocab-emoji {
+  font-size: 1.5rem;
+  width: 50px;
+  text-align: center;
+}
+
+.vocab-table .vocab-term {
+  font-weight: 600;
+  color: #06b6d4;
+  width: 100px;
+}
+
+/* Comparison table styling */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+}
+
+.comparison-table th {
+  background: #1a2942;
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid #06b6d4;
+}
+
+.comparison-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #1e3a5f;
+}
+
+.comparison-table td:not(:first-child) {
+  text-align: center;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-protocol { background: #083344; color: #06b6d4; }
+.badge-core { background: #1a1a2e; color: #8b5cf6; }
+.badge-enterprise { background: #1c1917; color: #f59e0b; }
+
+/* Hero CTA buttons */
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.hero-buttons a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.hero-buttons .primary {
+  background: #06b6d4;
+  color: #020617;
+}
+
+.hero-buttons .primary:hover {
+  background: #22d3ee;
+}
+
+.hero-buttons .secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+.hero-buttons .secondary:hover {
+  border-color: #06b6d4;
+}
+
+/* Protocol badges row */
+.protocol-badges {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.protocol-badges .badge {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 4rem 0 1rem;
+}
+
+.section-subtitle {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* Quick start section */
+.quickstart-box {
+  background: #0d1f36;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}

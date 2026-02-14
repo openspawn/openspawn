@@ -1,0 +1,71 @@
+---
+title: Dashboard
+description: Real-time React dashboard with network graph, task timeline, cost charts, and agent monitoring.
+---
+
+import { Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom includes a full real-time dashboard built with React and TanStack Query, accessible at the server root.
+
+<Aside type="tip">
+See it live at [bikinibottom.ai](https://bikinibottom.ai) — 32 agents running now.
+</Aside>
+
+## Overview
+
+The dashboard starts automatically when you run `npx bikinibottom start`. It provides:
+
+- **Agent network graph** — Visualize the org hierarchy and active connections
+- **Task timeline** — Real-time feed of task creation, delegation, and completion
+- **Cost charts** — Per-provider spending, savings calculator
+- **Agent status** — Idle, busy, offline for every agent
+- **Router metrics** — Provider health, latency, fallback frequency
+
+## Pages
+
+### Home
+The main view shows the agent network graph with live task flows. Agents light up when working, and connections animate when delegating.
+
+### Tasks
+Lists all tasks with filtering by state (submitted, working, completed, failed). Click any task to see its full delegation chain and artifacts.
+
+### Agents
+Grid view of all agents showing level, domain, status, and current task. Sortable by any column.
+
+### Router
+Provider status dashboard: which providers are online, rate limit usage, cost breakdown, and latency distribution.
+
+## Accessing the Dashboard
+
+```bash
+# Local
+npx bikinibottom start
+# Open http://localhost:3333
+
+# Live demo
+open https://bikinibottom.ai
+```
+
+## API Endpoints
+
+The dashboard reads from these REST endpoints:
+
+```bash
+# Org stats
+curl https://bikinibottom.ai/api/org/stats
+
+# Agent list
+curl https://bikinibottom.ai/api/agents
+
+# Task list
+curl https://bikinibottom.ai/api/tasks
+
+# Router metrics
+curl https://bikinibottom.ai/api/router/metrics
+```
+
+---
+
+## Next steps
+
+<LinkCard title="Architecture →" href="/openspawn/architecture/overview/" description="System design and how all the pieces fit together" />

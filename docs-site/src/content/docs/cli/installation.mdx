@@ -1,0 +1,62 @@
+---
+title: Installation
+description: Install the BikiniBottom CLI via npx or npm global install.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+## Quick Install
+
+<Tabs>
+  <TabItem label="npx (no install)">
+    ```bash
+    npx bikinibottom --help
+    ```
+  </TabItem>
+  <TabItem label="Global install">
+    ```bash
+    npm install -g bikinibottom
+    bikinibottom --help
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+We recommend `npx` — always runs the latest version with no install step.
+</Aside>
+
+## Requirements
+
+- **Node.js** 18+ (for the CLI and server)
+- **npm** or **pnpm** (for package management)
+- **Ollama** (optional, for free local LLM routing)
+
+## Verify Installation
+
+```bash
+npx bikinibottom --version
+```
+
+```
+bikinibottom v1.0.0
+```
+
+## Environment Variables
+
+Set these for cloud LLM providers:
+
+```bash
+export GROQ_API_KEY=gsk_...          # For Groq (L7-L8 agents)
+export OPENROUTER_API_KEY=sk-or-...  # For OpenRouter (L9-L10 agents)
+export OLLAMA_BASE_URL=http://localhost:11434  # Custom Ollama URL
+```
+
+<Aside type="note">
+BikiniBottom works without any API keys — it defaults to deterministic simulation mode. Add provider keys to enable LLM-backed agents.
+</Aside>
+
+---
+
+## Next steps
+
+<LinkCard title="Commands →" href="/openspawn/cli/commands/" description="All CLI commands and options" />

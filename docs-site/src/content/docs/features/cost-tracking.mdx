@@ -1,0 +1,86 @@
+---
+title: Cost Tracking
+description: Per-agent budget limits, real-time cost attribution, and runaway prevention for LLM spending.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom tracks every token spent across all providers, attributing costs to individual agents.
+
+<Aside type="tip">
+Check live costs: `curl https://bikinibottom.ai/api/router/metrics`
+</Aside>
+
+## How It Works
+
+Every LLM request passes through the model router, which logs:
+- **Which agent** made the request
+- **Which provider** handled it
+- **Token count** (input + output)
+- **Estimated cost** based on provider pricing
+
+## Credit System
+
+Agents operate on a credit budget. Credits map to estimated token costs:
+
+| Tier | Default Budget | Replenishment |
+|------|---------------|---------------|
+| Executive (L9–L10) | Unlimited | — |
+| Lead (L7–L8) | 1000 credits/day | Daily reset |
+| Worker (L1–L6) | 100 credits/day | Daily reset |
+
+<Aside type="caution">
+When an agent exhausts credits, their requests are queued until replenishment. Executives can override.
+</Aside>
+
+## Cost Attribution
+
+```bash
+curl https://bikinibottom.ai/api/router/metrics
+```
+
+```json
+{
+  "totalCost": 12.15,
+  "costByProvider": {
+    "ollama": 0,
+    "groq": 4.23,
+    "openrouter": 7.92
+  },
+  "localRoutedCount": 748,
+  "cloudOnlyCostEstimate": 47.82
+}
+```
+
+The `cloudOnlyCostEstimate` shows what you'd pay without local routing — typically 3–5x more.
+
+## Budget Limits
+
+Set per-agent budgets in your configuration to prevent runaway costs:
+
+```json
+{
+  "router": {
+    "preferLocal": true,
+    "providers": ["ollama", "groq"]
+  }
+}
+```
+
+Using `preferLocal: true` ensures L1–L6 agents use Ollama (free) whenever available.
+
+## Savings Calculator
+
+The dashboard shows a real-time savings calculator comparing actual spend vs cloud-only:
+
+```
+Cloud-only estimate: $47.82
+Actual cost:         $12.15
+Saved:               $35.67 (74%)
+```
+
+---
+
+## Next steps
+
+<LinkCard title="Dashboard →" href="/openspawn/features/dashboard/" description="Real-time cost charts and provider monitoring" />

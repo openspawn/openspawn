@@ -1,0 +1,76 @@
+---
+title: Agent Hierarchy
+description: Agents are organized in levels 1–10 with roles, domains, delegation, and trust-based promotion.
+---
+
+import { Aside, LinkCard } from '@astrojs/starlight/components';
+
+BikiniBottom organizes agents in a 10-level hierarchy. Higher-level agents delegate to lower levels; lower levels escalate when needed.
+
+<Aside type="tip">
+See live agent hierarchy: `curl https://bikinibottom.ai/mcp -X POST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_agents","arguments":{}}}'`
+</Aside>
+
+## Levels
+
+| Level | Tier | Model Tier | Typical Role |
+|-------|------|------------|-------------|
+| L9–L10 | Executive | Premium (Claude, GPT-4o) | CEO, COO |
+| L7–L8 | Lead | Mid-tier (Llama 70B) | Team leads, directors |
+| L4–L6 | Senior | Local/cheap (Qwen 7B) | Senior ICs |
+| L1–L3 | Junior | Local (Qwen 7B) | Workers, interns |
+
+## Roles
+
+| Role | Description | Delegation |
+|------|-------------|-----------|
+| `coo` | Chief Operating Officer — top of the hierarchy | Delegates to all leads |
+| `lead` | Team lead — manages a domain | Delegates to workers in their domain |
+| `worker` | Individual contributor — executes tasks | Can escalate to their lead |
+
+## Domains
+
+Agents specialize in domains. The task scheduler routes work to the right domain based on keywords:
+
+- **engineering** — code, APIs, infrastructure
+- **marketing** — content, campaigns, SEO
+- **finance** — budgets, projections, billing
+- **sales** — outreach, demos, pipeline
+- **support** — tickets, customer issues
+- **hr** — hiring, onboarding, culture
+- **operations** — cross-domain coordination
+
+## Delegation Flow
+
+```
+L10 CEO receives "Build and launch new product"
+  ├→ L7 Engineering Lead: "Build the API"
+  │    ├→ L4 Backend Dev: "Implement endpoints"
+  │    └→ L3 QA: "Write tests"
+  ├→ L7 Marketing Lead: "Create landing page"
+  │    └→ L5 Content Writer: "Write copy"
+  └→ L8 Finance Lead: "Project costs"
+```
+
+## Trust & Promotion
+
+Agents build trust through successful task completion:
+
+| Metric | Impact |
+|--------|--------|
+| Tasks completed | +trust per completion |
+| Task quality | Rated by delegator |
+| Speed | Faster = more trust |
+| Failures | -trust per failure |
+
+When trust exceeds a threshold, agents are eligible for level promotion. The control plane handles this automatically.
+
+<Aside type="caution">
+Demotion also happens — repeated failures lower trust and can reduce an agent's level, restricting their model tier.
+</Aside>
+
+---
+
+## Next steps
+
+<LinkCard title="Model Router →" href="/openspawn/features/model-router/" description="How agent levels map to LLM providers" />

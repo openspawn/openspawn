@@ -1,0 +1,93 @@
+---
+title: Agent Communication Protocol (ACP)
+description: BikiniBottom's internal messaging system for agent-to-agent delegation, status updates, and coordination.
+---
+
+import { Tabs, TabItem, Aside, LinkCard } from '@astrojs/starlight/components';
+
+ACP (Agent Communication Protocol) is BikiniBottom's internal messaging layer. While A2A handles external communication, ACP handles how agents talk to each other inside the org.
+
+<Aside type="tip">
+Send an ACP message via MCP: `curl -X POST https://bikinibottom.ai/mcp -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"send_message","arguments":{"agentId":"tech-lead","message":"Status update please"}}}'`
+</Aside>
+
+## Overview
+
+ACP messages are the "bubbles" 🫧 that flow between agents. They carry:
+
+- **Task delegations** — "Here's a subtask for you"
+- **Status updates** — "I'm 50% done"
+- **Escalations** — "I need help from a higher level"
+- **Results** — "Task complete, here's the output"
+
+## Message Flow
+
+```
+CEO (L10) sends delegation → ACP → Engineering Lead (L7)
+Engineering Lead delegates → ACP → Backend Dev (L4)
+Backend Dev completes → ACP → Engineering Lead (result)
+Engineering Lead reports → ACP → CEO (aggregated result)
+```
+
+## Message Types
+
+| Type | Direction | Description |
+|------|-----------|-------------|
+| `delegation` | Down (higher → lower) | Assign a subtask |
+| `status` | Up (lower → higher) | Report progress |
+| `escalation` | Up (lower → higher) | Request help or approval |
+| `result` | Up (lower → higher) | Return completed work |
+| `broadcast` | Lateral | Org-wide announcements |
+
+## Observing ACP Messages
+
+ACP messages are visible in:
+- The **dashboard** task detail view
+- The **SSE stream** when streaming a task
+- The MCP `send_message` tool for direct messaging
+
+```bash
+# Send a direct ACP message to an agent
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "send_message",
+      "arguments": {
+        "agentId": "tech-lead",
+        "message": "What is your current task status?"
+      }
+    }
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [{ "type": "text", "text": "Message delivered to Tech Lead" }],
+    "isError": false
+  }
+}
+```
+
+## ACP vs A2A
+
+| | ACP (Internal) | A2A (External) |
+|---|---|---|
+| Scope | Within the org | Between orgs/clients |
+| Transport | In-memory event bus | HTTP REST + SSE |
+| Discovery | Automatic (org hierarchy) | `/.well-known/agent.json` |
+| Use case | Delegation chains | Cross-system integration |
+
+---
+
+## Next steps
+
+<LinkCard title="Architecture Overview →" href="/openspawn/architecture/overview/" description="Full system architecture" />
