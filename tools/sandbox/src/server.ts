@@ -912,6 +912,47 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
+    // ── Model Router Endpoints ──────────────────────────────────────────────
+
+    if (path === '/api/router/config' && req.method === 'GET') {
+      json(res, { providers: router.getConfig() });
+      return;
+    }
+
+    if (path === '/api/router/config' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const { providerId, enabled, priority } = JSON.parse(body);
+          if (!providerId) { json(res, { error: 'providerId required' }); return; }
+          const ok = router.updateProvider(providerId, { enabled, priority });
+          json(res, ok ? { ok: true } : { error: 'Provider not found' });
+        } catch { json(res, { error: 'Invalid JSON' }); }
+      });
+      return;
+    }
+
+    if (path === '/api/router/metrics' && req.method === 'GET') {
+      json(res, router.getMetrics());
+      return;
+    }
+
+    if (path === '/api/router/route' && req.method === 'GET') {
+      const agentLevel = parseInt(url.searchParams.get('agentLevel') || '5', 10);
+      const taskType = (url.searchParams.get('taskType') || 'simple') as 'delegation' | 'coding' | 'analysis' | 'simple';
+      const preferLocal = url.searchParams.get('preferLocal') === 'true';
+      const decision = router.route({ agentLevel, taskType, preferLocal });
+      json(res, decision);
+      return;
+    }
+
+    if (path === '/api/router/decisions' && req.method === 'GET') {
+      const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+      json(res, router.getRecentDecisions(limit));
+      return;
+    }
+
     // ── Static file serving (production: serve built dashboard) ──────────
     if (process.env.SERVE_DASHBOARD === '1') {
       const MIME_TYPES: Record<string, string> = {
@@ -1037,47 +1078,6 @@ export function startServer(sim: Simulation): void {
     // Get current speed
     if (path === '/api/speed' && req.method === 'GET') {
       json(res, { tickIntervalMs: (sim as any).config?.tickIntervalMs ?? 5000 });
-      return;
-    }
-
-    // ── Model Router Endpoints ──────────────────────────────────────────────
-
-    if (path === '/api/router/config' && req.method === 'GET') {
-      json(res, { providers: router.getConfig() });
-      return;
-    }
-
-    if (path === '/api/router/config' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
-        try {
-          const { providerId, enabled, priority } = JSON.parse(body);
-          if (!providerId) { json(res, { error: 'providerId required' }); return; }
-          const ok = router.updateProvider(providerId, { enabled, priority });
-          json(res, ok ? { ok: true } : { error: 'Provider not found' });
-        } catch { json(res, { error: 'Invalid JSON' }); }
-      });
-      return;
-    }
-
-    if (path === '/api/router/metrics' && req.method === 'GET') {
-      json(res, router.getMetrics());
-      return;
-    }
-
-    if (path === '/api/router/route' && req.method === 'GET') {
-      const agentLevel = parseInt(url.searchParams.get('agentLevel') || '5', 10);
-      const taskType = (url.searchParams.get('taskType') || 'simple') as 'delegation' | 'coding' | 'analysis' | 'simple';
-      const preferLocal = url.searchParams.get('preferLocal') === 'true';
-      const decision = router.route({ agentLevel, taskType, preferLocal });
-      json(res, decision);
-      return;
-    }
-
-    if (path === '/api/router/decisions' && req.method === 'GET') {
-      const limit = parseInt(url.searchParams.get('limit') || '20', 10);
-      json(res, router.getRecentDecisions(limit));
       return;
     }
 
