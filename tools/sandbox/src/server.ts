@@ -962,23 +962,49 @@ export function startServer(sim: Simulation): void {
         '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
       };
       const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', 'dashboard-dist');
-      
-      // Try to serve the file
-      let filePath = join(dashboardDir, path === '/' ? 'index.html' : path);
-      
-      // If path doesn't have extension or file doesn't exist, serve index.html (SPA fallback)
-      if (!existsSync(filePath) || (!extname(filePath) && !statSync(filePath).isFile())) {
-        filePath = join(dashboardDir, 'index.html');
-      }
-      
-      if (existsSync(filePath) && statSync(filePath).isFile()) {
-        const ext = extname(filePath);
-        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-        const content = readFileSync(filePath);
-        const cacheControl = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
-        res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
-        res.end(content);
+      const websiteDir = process.env.WEBSITE_DIR || join(__dirname, '..', 'website-dist');
+
+      // Root redirect → /app/ (until website is built)
+      if (path === '/') {
+        res.writeHead(302, { Location: '/app/' });
+        res.end();
         return;
+      }
+
+      // Dashboard: /app/* routes
+      if (path.startsWith('/app')) {
+        const subPath = path.replace(/^\/app\/?/, '') || 'index.html';
+        let filePath = join(dashboardDir, subPath);
+
+        // SPA fallback: non-asset paths → index.html
+        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith('index.html'))) {
+          filePath = join(dashboardDir, 'index.html');
+        }
+
+        if (existsSync(filePath) && statSync(filePath).isFile()) {
+          const ext = extname(filePath);
+          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          const content = readFileSync(filePath);
+          const cacheControl = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
+          res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
+          res.end(content);
+          return;
+        }
+      }
+
+      // Website: /* routes (future — serve from website-dist when available)
+      if (existsSync(websiteDir)) {
+        const subPath = path === '/' ? 'index.html' : path.slice(1);
+        const filePath = join(websiteDir, subPath);
+        if (existsSync(filePath) && statSync(filePath).isFile()) {
+          const ext = extname(filePath);
+          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          const content = readFileSync(filePath);
+          const cacheControl = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
+          res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
+          res.end(content);
+          return;
+        }
       }
     }
 
