@@ -18,7 +18,7 @@ export function IntroPage() {
       {/* Bikini Bottom backdrop — higher opacity here than dashboard */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/bikini-bottom-bg.jpg)', opacity: 0.15 }}
+        style={{ backgroundImage: 'url(/app/bikini-bottom-bg.jpg)', opacity: 0.15 }}
         aria-hidden="true"
       />
       {/* Gradient overlay for depth */}
