@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 export function Nav() {
   return (
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-navy-950/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8 sm:px-6">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold">
           <span className="text-2xl">🍍</span>
           <span className="gradient-text">BikiniBottom</span>

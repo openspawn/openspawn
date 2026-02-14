@@ -21,9 +21,9 @@ export function LandingPage() {
           <div className="absolute right-1/4 top-20 h-[400px] w-[400px] rounded-full bg-violet-500/5 blur-[100px]" />
         </div>
 
-        <div className="relative mx-auto max-w-4xl px-6 text-center">
-          <div className="animate-fade-in-up mb-6 text-7xl md:text-8xl">🍍</div>
-          <h1 className="animate-fade-in-up animate-delay-100 mb-6 text-5xl font-extrabold tracking-tight md:text-7xl">
+        <div className="relative mx-auto max-w-4xl px-8 sm:px-6 text-center">
+          <div className="animate-fade-in-up mb-6 text-6xl md:text-8xl">🍍</div>
+          <h1 className="animate-fade-in-up animate-delay-100 mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
             <span className="gradient-text">BikiniBottom</span>
           </h1>
           <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-xl text-lg text-slate-400 md:text-xl">
@@ -47,7 +47,7 @@ export function LandingPage() {
             </a>
           </div>
 
-          <div className="animate-fade-in-up animate-delay-400 mb-16 flex flex-wrap items-center justify-center gap-3">
+          <div className="animate-fade-in-up animate-delay-400 mb-16 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <ProtocolBadge label="A2A Protocol" />
             <ProtocolBadge label="MCP" />
             <ProtocolBadge label="Model Router" />
@@ -63,7 +63,7 @@ export function LandingPage() {
 
       {/* Features */}
       <section className="py-20">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-6xl px-8 sm:px-6">
           <h2 className="mb-4 text-center text-3xl font-bold text-slate-100 md:text-4xl">
             Everything you need for{" "}
             <span className="gradient-text">multi-agent orchestration</span>
@@ -81,7 +81,7 @@ export function LandingPage() {
 
       {/* Stats */}
       <section className="border-y border-white/5 py-16">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-12 px-6 text-center">
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-8 sm:gap-12 px-8 sm:px-6 text-center">
           <div>
             <div className="text-4xl font-bold text-cyan-400">22</div>
             <div className="mt-1 text-sm text-slate-500">Agents</div>
@@ -106,7 +106,7 @@ export function LandingPage() {
 
       {/* Open Source */}
       <section className="py-20 text-center">
-        <div className="mx-auto max-w-2xl px-6">
+        <div className="mx-auto max-w-2xl px-8 sm:px-6">
           <h2 className="mb-4 text-3xl font-bold text-slate-100">Open Source</h2>
           <p className="mb-8 text-slate-400">
             BikiniBottom is MIT licensed. Star us on GitHub, contribute, or fork and build your own.
