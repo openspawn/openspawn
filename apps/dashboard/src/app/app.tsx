@@ -35,7 +35,8 @@ const queryClient = new QueryClient({
       gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      ...(isSandboxMode ? { refetchInterval: 3000 } : {}),
+      // No global refetchInterval — SSE tick_complete events drive invalidation
+      // (see useSandboxTickInvalidation in layout.tsx)
     },
   },
 });

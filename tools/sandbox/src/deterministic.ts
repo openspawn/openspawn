@@ -642,6 +642,13 @@ export class DeterministicSimulation {
       messageCount: this.agents.reduce((s, a) => s + a.stats.messagessSent, 0),
     });
 
+    // Emit tick_complete so SSE clients can invalidate caches
+    this.emit({
+      type: 'tick_complete',
+      message: `Tick ${this.tick} complete`,
+      timestamp: Date.now(),
+    });
+
     // Summary every 5 ticks
     if (this.tick % 5 === 0) this.printSummary();
   }

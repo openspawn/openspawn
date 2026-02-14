@@ -29,6 +29,6 @@ export function useACPMetrics() {
     queryKey: ['acp-metrics'],
     queryFn: fetchACPMetrics,
     enabled: isSandboxMode,
-    refetchInterval: 3000,
+    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
 }
