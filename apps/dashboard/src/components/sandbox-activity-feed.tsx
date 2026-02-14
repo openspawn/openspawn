@@ -39,7 +39,7 @@ export function SandboxActivityFeed({ taskId, agentId, maxEvents = 50 }: Sandbox
       fetch(`${SANDBOX_URL}/api/task/${taskId}/activity`)
         .then(r => r.json())
         .then((history: ActivityEvent[]) => setEvents(history))
-        .catch(() => {});
+        .catch(() => { /* ignore fetch errors */ });
     }
   }, [taskId]);
 

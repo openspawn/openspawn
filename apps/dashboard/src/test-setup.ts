@@ -2,9 +2,9 @@ import "@testing-library/jest-dom";
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { /* noop */ }
+  unobserve() { /* noop */ }
+  disconnect() { /* noop */ }
 };
 import { vi } from "vitest";
 
