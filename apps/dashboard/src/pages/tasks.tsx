@@ -17,6 +17,7 @@ import { TaskTimeline } from "../components/task-timeline";
 import { SandboxActivityFeed } from "../components/sandbox-activity-feed";
 import { TaskCascade } from "../components/task-cascade";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { darkenForBackground } from "../lib/avatar-utils";
 
 type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
@@ -170,9 +171,11 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 {task.assignee ? (
                   <div className="flex items-center gap-1">
-                    <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[10px]">
-                      🤖
-                    </div>
+                    {(() => { const a = agentMap.get(task.assigneeId); return (
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
+                      style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
+                      {a?.avatar || '🤖'}
+                    </div>); })()}
                     <span className="truncate max-w-[100px]">{task.assignee.name}</span>
                   </div>
                 ) : (
@@ -325,9 +328,11 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
               </div>
               {task.assignee ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-sm">
-                    🤖
-                  </div>
+                  {(() => { const a = agentMap.get(task.assigneeId); return (
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
+                    style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
+                    {a?.avatar || '🤖'}
+                  </div>); })()}
                   <span className="text-sm font-medium">{task.assignee.name}</span>
                 </div>
               ) : (
@@ -497,9 +502,11 @@ function ListView({ tasks, onTaskClick, selectedTaskId }: ListViewProps) {
                 <div className="flex items-center gap-3 sm:contents text-xs sm:text-sm pl-0 sm:pl-0">
                   {task.assignee ? (
                     <div className="flex items-center gap-1 sm:w-28 flex-shrink-0 sm:order-5">
-                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-xs">
-                        🤖
-                      </div>
+                      {(() => { const a = agentMap.get(task.assigneeId); return (
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
+                        style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
+                        {a?.avatar || '🤖'}
+                      </div>); })()}
                       <span className="text-muted-foreground truncate">
                         {task.assignee.name}
                       </span>
@@ -557,6 +564,11 @@ export function TasksPage() {
   const { openSidePanel, closeSidePanel } = useSidePanel();
   
   const { agents } = useAgents();
+  const agentMap = useMemo(() => {
+    const m = new Map<string, { avatar?: string | null; avatarColor?: string | null }>();
+    agents.forEach((a: any) => m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor }));
+    return m;
+  }, [agents]);
   const { teams: allTeams } = useTeams();
 
   // Filter & Sort state for List view
