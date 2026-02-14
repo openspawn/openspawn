@@ -95,3 +95,20 @@ jobs:
             echo "=== Container status ==="
             docker compose ps
             exit 1
+
+      - name: Purge Cloudflare cache
+        if: success()
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/bikinibottom
+            source .env
+            curl -sf -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CLOUDFLARE_PURGE_CACHE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d '{"purge_everything":true}' > /dev/null
+            echo "✅ Cloudflare cache purged"
