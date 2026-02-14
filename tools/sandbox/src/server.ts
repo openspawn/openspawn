@@ -688,6 +688,12 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
+    // Health check
+    if (path === '/api/health') {
+      json(res, { status: 'ok', tick: (sim as any).tick ?? 0, agents: sim.agents.length, tasks: sim.tasks.length });
+      return;
+    }
+
     if (path === '/api/agents') {
       json(res, sim.agents.map(a => mapAgent(a, sim.agents)));
       return;
@@ -964,13 +970,6 @@ export function startServer(sim: Simulation): void {
       const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', 'dashboard-dist');
       const websiteDir = process.env.WEBSITE_DIR || join(__dirname, '..', 'website-dist');
 
-      // Root redirect → /app/ (until website is built)
-      if (path === '/') {
-        res.writeHead(302, { Location: '/app/' });
-        res.end();
-        return;
-      }
-
       // Dashboard: /app/* routes
       if (path.startsWith('/app')) {
         const subPath = path.replace(/^\/app\/?/, '') || 'index.html';
@@ -992,10 +991,16 @@ export function startServer(sim: Simulation): void {
         }
       }
 
-      // Website: /* routes (future — serve from website-dist when available)
+      // Website: /* routes — serve from website-dist (SPA with fallback to index.html)
       if (existsSync(websiteDir)) {
         const subPath = path === '/' ? 'index.html' : path.slice(1);
-        const filePath = join(websiteDir, subPath);
+        let filePath = join(websiteDir, subPath);
+
+        // SPA fallback: non-asset paths → index.html
+        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith('index.html'))) {
+          filePath = join(websiteDir, 'index.html');
+        }
+
         if (existsSync(filePath) && statSync(filePath).isFile()) {
           const ext = extname(filePath);
           const contentType = MIME_TYPES[ext] || 'application/octet-stream';
