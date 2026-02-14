@@ -921,7 +921,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const { conversations } = useConversations();
   const { fitView, zoomIn, setCenter, getNode } = useReactFlow();
   const { isMobileOrTouch, isMobile } = useTouchDevice();
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  // selectedNode state removed — side panel handles agent detail on click
   const [selectedEdge, setSelectedEdge] = useState<{ 
     source: string; 
     target: string; 
@@ -1077,7 +1077,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     
     lastTapRef.current = { time: now, nodeId: node.id };
     
-    setSelectedNode(node as Node<AgentNodeData>);
+    
     setSelectedEdge(null);
     if (node.id !== "human") {
       onAgentClick?.(node.id);
@@ -1091,7 +1091,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     longPressTimerRef.current = setTimeout(() => {
       if (longPressNodeRef.current === node.id && node.id !== "human") {
         onAgentClick?.(node.id);
-        setSelectedNode(node as Node<AgentNodeData>);
+        
       }
     }, 500); // 500ms long-press
   }
@@ -1115,7 +1115,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
         sourceLabel: String((sourceNode.data as AgentNodeData).label || edge.source),
         targetLabel: String((targetNode.data as AgentNodeData).label || edge.target),
       });
-      setSelectedNode(null);
+      
     }
   }
 
@@ -1231,64 +1231,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
           </div>
         </div>
 
-        {/* Selected node details */}
-        <AnimatePresence>
-          {selectedNode && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="absolute bottom-20 sm:bottom-auto sm:top-4 left-4 right-4 sm:left-auto sm:right-4 bg-card/95 backdrop-blur border border-border rounded-lg p-4 sm:w-64"
-            >
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="absolute top-2 right-2 text-muted-foreground hover:text-foreground p-1"
-              >
-                ✕
-              </button>
-              <div className="text-base sm:text-lg font-semibold text-foreground mb-1">
-                {(selectedNode.data as AgentNodeData).label}
-              </div>
-              <div className="text-xs sm:text-sm text-muted-foreground mb-3">
-                {(selectedNode.data as AgentNodeData).isHuman
-                  ? "Human Operator"
-                  : `Level ${(selectedNode.data as AgentNodeData).level} ${roleLabels[(selectedNode.data as AgentNodeData).role] || (selectedNode.data as AgentNodeData).role}`}
-              </div>
-              {!(selectedNode.data as AgentNodeData).isHuman && (
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Activity</span>
-                    <span className="text-foreground capitalize">
-                      {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.activityLevel || 'idle'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Tasks</span>
-                    <span className="text-violet-400">
-                      {agentActivity.get((selectedNode.data as AgentNodeData).agentId)?.taskCount || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Credits</span>
-                    <span className="text-foreground">{(selectedNode.data as AgentNodeData).credits.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Status</span>
-                    <span className={(selectedNode.data as AgentNodeData).status === "active" ? "text-emerald-500" : "text-amber-500"}>
-                      {(selectedNode.data as AgentNodeData).status}
-                    </span>
-                  </div>
-                  {(selectedNode.data as AgentNodeData).domain && (
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500">Domain</span>
-                      <span className="text-foreground">{(selectedNode.data as AgentNodeData).domain}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Agent detail card removed — side panel provides full detail on click */}
 
         {/* Edge tooltip */}
         <AnimatePresence>

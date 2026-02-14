@@ -53,7 +53,7 @@ export function NetworkPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-theme(spacing.16))]">
+    <div className="h-[calc(100vh-theme(spacing.16))] overflow-hidden relative">
       {/* Header bar with title + stats + view toggle */}
       <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-10
         bg-card/90 backdrop-blur border border-border
