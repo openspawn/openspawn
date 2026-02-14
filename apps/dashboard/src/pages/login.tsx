@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { useAuth } from "../contexts";
 import { Button } from "../components/ui/button";
@@ -18,7 +18,7 @@ export function LoginPage() {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate("/");
+    navigate({ to: "/" });
     return null;
   }
 
@@ -36,7 +36,7 @@ export function LoginPage() {
         return;
       }
 
-      navigate("/");
+      navigate({ to: "/" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
       setIsLoading(false);

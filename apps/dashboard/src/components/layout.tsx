@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Logo } from "./ui/logo";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearch, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -115,10 +115,11 @@ function useSidebarCollapsed() {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string | undefined>;
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const demo = useDemo();
-  const isDemo = searchParams.get("demo") === "true";
+  const isDemo = searchParams?.demo === "true";
   const { user, logout, isAuthenticated } = useAuth();
   const { activeCount } = usePresence();
   const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
@@ -159,7 +160,7 @@ export function Layout({ children }: LayoutProps) {
 
   const handleLogout = async () => {
     await logout();
-    window.location.href = "/login";
+    window.location.href = "/app/login";
   };
 
   const getInitials = (name: string) => {
@@ -172,13 +173,13 @@ export function Layout({ children }: LayoutProps) {
   };
 
   function handleToggleDemo() {
+    const url = new URL(window.location.href);
     if (isDemo) {
-      searchParams.delete("demo");
+      url.searchParams.delete("demo");
     } else {
-      searchParams.set("demo", "true");
+      url.searchParams.set("demo", "true");
     }
-    setSearchParams(searchParams);
-    window.location.reload();
+    window.location.href = url.toString();
   }
 
   return (
@@ -430,7 +431,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/settings/profile" className="flex items-center gap-2">
+                      <Link to={"/settings/profile" as any} className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Profile
                       </Link>
@@ -476,7 +477,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/settings/profile" className="flex items-center gap-2">
+                      <Link to={"/settings/profile" as any} className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Profile
                       </Link>

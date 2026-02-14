@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { Command } from 'cmdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -115,7 +115,7 @@ export function CommandPalette() {
                     <Command.Item
                       key={page.href}
                       value={page.name}
-                      onSelect={() => runCommand(() => navigate(page.href))}
+                      onSelect={() => runCommand(() => navigate({ to: page.href }))}
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
                       <page.icon className="h-4 w-4 text-muted-foreground" />
@@ -134,7 +134,7 @@ export function CommandPalette() {
                     <Command.Item
                       key={action.name}
                       value={`${action.name} ${action.keywords}`}
-                      onSelect={() => runCommand(() => navigate(action.href))}
+                      onSelect={() => runCommand(() => navigate({ to: action.href }))}
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
                       {action.name === 'Create task' ? (
@@ -157,7 +157,7 @@ export function CommandPalette() {
                     <Command.Item
                       key={agent.id}
                       value={`${agent.name} ${agent.role}`}
-                      onSelect={() => runCommand(() => navigate('/agents'))}
+                      onSelect={() => runCommand(() => navigate({ to: '/agents' }))}
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
                       <Bot className="h-4 w-4 text-muted-foreground" />

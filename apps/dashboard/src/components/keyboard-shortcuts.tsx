@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Command, X } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -17,14 +17,14 @@ export function useKeyboardShortcuts() {
 
   const shortcuts: Shortcut[] = [
     // Navigation (g + key)
-    { key: 'g d', description: 'Go to Dashboard', action: () => navigate('/'), category: 'navigation' },
-    { key: 'g n', description: 'Go to Network', action: () => navigate('/network'), category: 'navigation' },
-    { key: 'g t', description: 'Go to Tasks', action: () => navigate('/tasks'), category: 'navigation' },
-    { key: 'g a', description: 'Go to Agents', action: () => navigate('/agents'), category: 'navigation' },
-    { key: 'g m', description: 'Go to Messages', action: () => navigate('/messages'), category: 'navigation' },
-    { key: 'g c', description: 'Go to Credits', action: () => navigate('/credits'), category: 'navigation' },
-    { key: 'g e', description: 'Go to Events', action: () => navigate('/events'), category: 'navigation' },
-    { key: 'g s', description: 'Go to Settings', action: () => navigate('/settings'), category: 'navigation' },
+    { key: 'g d', description: 'Go to Dashboard', action: () => navigate({ to: '/' }), category: 'navigation' },
+    { key: 'g n', description: 'Go to Network', action: () => navigate({ to: '/network' }), category: 'navigation' },
+    { key: 'g t', description: 'Go to Tasks', action: () => navigate({ to: '/tasks' }), category: 'navigation' },
+    { key: 'g a', description: 'Go to Agents', action: () => navigate({ to: '/agents' }), category: 'navigation' },
+    { key: 'g m', description: 'Go to Messages', action: () => navigate({ to: '/messages' }), category: 'navigation' },
+    { key: 'g c', description: 'Go to Credits', action: () => navigate({ to: '/credits' }), category: 'navigation' },
+    { key: 'g e', description: 'Go to Events', action: () => navigate({ to: '/events' }), category: 'navigation' },
+    { key: 'g s', description: 'Go to Settings', action: () => navigate({ to: '/settings' }), category: 'navigation' },
     // Help
     { key: '?', description: 'Show keyboard shortcuts', action: () => setHelpOpen(true), category: 'help' },
     { key: 'Escape', description: 'Close modal', action: () => setHelpOpen(false), category: 'help' },

@@ -1,18 +1,11 @@
-import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
+import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Layout, ProtectedRoute, NotificationProvider } from "../components";
+import { NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
 import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
-import { RouterPage } from "../pages/router";
-import { DashboardPage } from "../pages/dashboard";
-import { NetworkPage } from "../pages/network";
-import { IntroPage } from "../pages/intro";
-import { MobileStatusPage } from "../pages/mobile-status";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { isSandboxMode } from "../graphql/fetcher";
 import { CommandPalette } from "../components/command-palette";
-import { PwaInstallPrompt } from "../components/pwa-install-prompt";
 import { OfflineIndicator } from "../components/offline-indicator";
 
 declare const __COMMIT_SHA__: string;
@@ -25,9 +18,9 @@ console.log(
   'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
   'color: #64748b'
 );
-import { PageTransition } from "../components/page-transition";
 import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
 import { AuthProvider, SidePanelProvider } from "../contexts";
+import { router } from "../routes";
 import type { ReactNode } from "react";
 
 // Check for demo/sandbox mode via URL param or env
@@ -35,17 +28,13 @@ const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 const scenarioParam = urlParams.get('scenario') || 'acmetech';
 
-// Use HashRouter everywhere — BrowserRouter causes blank page with nested Routes in PageTransition
-const Router = HashRouter;
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: (isDemoMode || isSandboxMode) ? 1000 * 5 : 1000 * 60, // 5s in demo/sandbox
-      gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5, // 30s in demo/sandbox
+      staleTime: (isDemoMode || isSandboxMode) ? 1000 * 5 : 1000 * 60,
+      gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      // In sandbox mode, poll every 3s for live updates from Ollama agents
       ...(isSandboxMode ? { refetchInterval: 3000 } : {}),
     },
   },
@@ -64,14 +53,6 @@ function DemoWrapper({ children }: { children: ReactNode }) {
       <DemoControls />
     </DemoProvider>
   );
-}
-
-// In demo/sandbox mode, skip auth protection
-function MaybeProtectedRoute({ children }: { children: ReactNode }) {
-  if (isDemoMode || isSandboxMode) {
-    return <>{children}</>;
-  }
-  return <ProtectedRoute>{children}</ProtectedRoute>;
 }
 
 function KeyboardShortcutsWrapper({ children }: { children: ReactNode }) {
@@ -93,49 +74,12 @@ export function App() {
             <OnboardingProvider>
             <SidePanelProvider>
             <DemoWrapper>
-              <Router>
               <OfflineIndicator />
-              {/* <PwaInstallPrompt /> — disabled for public demo */}
               <CommandPalette />
               <WelcomeScreen />
               <FeatureTour />
               <CompletionCelebration />
-              <Routes>
-                {/* Public routes — hidden in demo/sandbox mode */}
-                {!isDemoMode && !isSandboxMode && (
-                  <>
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                  </>
-                )}
-                
-                {/* Intro page — standalone, no layout */}
-                <Route path="/intro" element={<IntroPage />} />
-
-                {/* Protected routes */}
-                <Route
-                  path="/*"
-                  element={
-                    <MaybeProtectedRoute>
-                      <Layout>
-                        <PageTransition>
-                          <Route path="/" element={<DashboardPage />} />
-                          <Route path="/tasks" element={<TasksPage />} />
-                          <Route path="/agents" element={<AgentsPage />} />
-                          <Route path="/credits" element={<CreditsPage />} />
-                          <Route path="/events" element={<EventsPage />} />
-                          <Route path="/messages" element={<MessagesPage />} />
-                          <Route path="/router" element={<RouterPage />} />
-                          <Route path="/network" element={<NetworkPage />} />
-                          <Route path="/settings" element={<SettingsPage />} />
-                          <Route path="/status" element={<MobileStatusPage />} />
-                        </PageTransition>
-                      </Layout>
-                    </MaybeProtectedRoute>
-                  }
-                />
-              </Routes>
-            </Router>
+              <RouterProvider router={router} />
             </DemoWrapper>
             </SidePanelProvider>
             </OnboardingProvider>
