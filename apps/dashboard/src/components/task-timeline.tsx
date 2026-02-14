@@ -303,6 +303,8 @@ function TaskTimelineRow({
               level={agentMap.get(task.assigneeId)?.level || 1}
               size="sm"
               avatar={(agentMap.get(task.assigneeId) as any)?.avatar}
+
+              avatarUrl={(agentMap.get(task.assigneeId) as any)?.avatarUrl}
               avatarColor={(agentMap.get(task.assigneeId) as any)?.avatarColor}
             />
           )}

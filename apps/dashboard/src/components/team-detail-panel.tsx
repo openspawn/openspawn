@@ -275,6 +275,8 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
                   level={agent.level}
                   size="sm"
                   avatar={agent.avatar}
+
+                  avatarUrl={agent.avatarUrl}
                   avatarColor={agent.avatarColor}
                 />
                 <div className="flex-1 min-w-0">

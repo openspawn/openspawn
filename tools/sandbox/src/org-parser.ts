@@ -9,6 +9,43 @@ import remarkFrontmatter from 'remark-frontmatter';
 import type { Root, Heading, Content, List, ListItem, Paragraph, Text, Strong, PhrasingContent } from 'mdast';
 import type { SandboxAgent, ACPMessage } from './types.js';
 
+// Map character names to avatar image files in /avatars/
+const AVATAR_FILES: Record<string, string> = {
+  'mr. krabs': '/avatars/mr-krabs.png',
+  'sandy cheeks': '/avatars/sandy.png',
+  'spongebob squarepants': '/avatars/spongebob.png',
+  'spongebob': '/avatars/spongebob.png',
+  'patrick star': '/avatars/patrick.png',
+  'patrick': '/avatars/patrick.png',
+  'squidward tentacles': '/avatars/squidward.png',
+  'squidward': '/avatars/squidward.png',
+  'pearl krabs': '/avatars/pearl.png',
+  'pearl': '/avatars/pearl.png',
+  'gary': '/avatars/gary.png',
+  'plankton jr.': '/avatars/plankton.png',
+  'plankton': '/avatars/plankton.png',
+  'karen': '/avatars/karen.png',
+  'mermaid man': '/avatars/mermaid-man.png',
+  'barnacle boy': '/avatars/barnacle-boy.png',
+  'larry the lobster': '/avatars/larry.png',
+  'larry': '/avatars/larry.png',
+  'mrs. puff': '/avatars/mrs-puff.png',
+  'squilliam fancyson': '/avatars/squilliam.png',
+  'squilliam': '/avatars/squilliam.png',
+  'flying dutchman': '/avatars/flying-dutchman.png',
+};
+
+function nameToAvatarUrl(name: string): string | undefined {
+  // Try exact match first, then first name
+  const lower = name.toLowerCase();
+  if (AVATAR_FILES[lower]) return AVATAR_FILES[lower];
+  // Try matching on first part (e.g. "Sandy Cheeks — Engineering Lead" → "sandy cheeks")
+  for (const [key, url] of Object.entries(AVATAR_FILES)) {
+    if (lower.includes(key)) return url;
+  }
+  return undefined;
+}
+
 export interface ParsedOrg {
   name: string;
   agents: SandboxAgent[];
@@ -189,6 +226,7 @@ Respond with JSON ONLY. Actions:
     domain,
     avatar,
     avatarColor,
+    avatarUrl: nameToAvatarUrl(name),
     parentId,
     status: 'active',
     systemPrompt: fullPrompt,

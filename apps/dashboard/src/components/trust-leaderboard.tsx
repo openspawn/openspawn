@@ -12,6 +12,7 @@ interface LeaderboardEntry {
   tasksCompleted: number;
   avatar?: string | null;
   avatarColor?: string | null;
+  avatarUrl?: string | null;
 }
 
 interface TrustLeaderboardProps {
@@ -62,6 +63,8 @@ export function TrustLeaderboard({
                   size="sm"
                   showRing={false}
                   avatar={entry.avatar}
+
+                  avatarUrl={entry.avatarUrl}
                   avatarColor={entry.avatarColor}
                 />
                 <div>

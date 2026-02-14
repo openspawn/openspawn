@@ -34,6 +34,10 @@ function InlineAvatar({ agentId, agents, className = 'w-5 h-5', fontSize = 'text
   const agent = agents.find((a: any) => a.id === agentId);
   const avatar = (agent as any)?.avatar;
   const avatarColor = (agent as any)?.avatarColor || '#71717a';
+  const avatarUrl = (agent as any)?.avatarUrl;
+  if (avatarUrl) {
+    return <img src={avatarUrl} alt={agent?.name} className={`rounded-full object-cover ${className}`} />;
+  }
   return (
     <span
       className={`inline-flex items-center justify-center rounded-full ${fontSize} ${className}`}

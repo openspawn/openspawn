@@ -25,6 +25,8 @@ interface AgentAvatarProps {
   avatar?: string | null;
   /** Background color for emoji avatar from API (e.g. from ORG.md Avatar Color field) */
   avatarColor?: string | null;
+  /** URL to character avatar image (e.g. /avatars/spongebob.png) */
+  avatarUrl?: string | null;
   /** When provided, wraps the avatar with a presence glow ring and status dot */
   presenceStatus?: PresenceStatus;
   /** StatusRing health data — when provided, uses ring instead of glow */
@@ -57,6 +59,7 @@ export function AgentAvatar({
   showRing = true,
   avatar: avatarProp,
   avatarColor,
+  avatarUrl: avatarUrlProp,
   presenceStatus,
   completionRate,
   creditUsage,
@@ -86,7 +89,28 @@ export function AgentAvatar({
 
   const emojiSizes = { sm: 'text-lg', md: 'text-xl', lg: 'text-2xl', xl: 'text-3xl' };
 
-  const avatar = avatarProp ? (
+  const avatar = avatarUrlProp ? (
+    <Avatar
+      className={cn(
+        sizeConfig.class,
+        showRing && !presenceStatus && 'ring-2',
+        'overflow-hidden',
+        className
+      )}
+      style={{
+        backgroundColor: bgColor,
+        ...(showRing && !presenceStatus ? { '--tw-ring-color': accentColor } as React.CSSProperties : {}),
+      }}
+    >
+      <AvatarImage src={avatarUrlProp} alt={name || agentId} className="object-cover" />
+      <AvatarFallback
+        className={cn('flex items-center justify-center', emojiSizes[size])}
+        style={{ backgroundColor: bgColor }}
+      >
+        {avatarProp || '🤖'}
+      </AvatarFallback>
+    </Avatar>
+  ) : avatarProp ? (
     <Avatar
       className={cn(
         sizeConfig.class,

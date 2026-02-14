@@ -87,6 +87,8 @@ function IdleAgentCard({
             level={agent.level}
             size="md"
             avatar={agent.avatar}
+
+            avatarUrl={agent.avatarUrl}
             avatarColor={agent.avatarColor}
           />
           {/* Subtle pulse ring for idle state */}

@@ -205,6 +205,7 @@ interface AgentNodeData extends Record<string, unknown> {
   teamColor: string;
   avatar?: string;
   avatarColor?: string;
+  avatarUrl?: string;
 }
 
 function AgentOrgNode({ data }: NodeProps) {
@@ -276,12 +277,16 @@ function AgentOrgNode({ data }: NodeProps) {
           </div>
         )}
 
-        <span
-          className="w-8 h-8 rounded-full flex-shrink-0 inline-flex items-center justify-center text-base"
-          style={{ backgroundColor: avatarBg }}
-        >
-          {avatarEmoji}
-        </span>
+        {d.avatarUrl ? (
+          <img src={d.avatarUrl} alt={d.label} className="w-8 h-8 rounded-full flex-shrink-0 object-cover" />
+        ) : (
+          <span
+            className="w-8 h-8 rounded-full flex-shrink-0 inline-flex items-center justify-center text-base"
+            style={{ backgroundColor: avatarBg }}
+          >
+            {avatarEmoji}
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <div className="text-xs font-semibold text-foreground truncate">{d.label}</div>
           <div className="text-[10px] text-zinc-400">L{d.level}</div>
@@ -425,6 +430,7 @@ function buildOrgGraph(
           teamColor: team.color,
           avatar: agent.avatar,
           avatarColor: agent.avatarColor,
+          avatarUrl: agent.avatarUrl,
         } as AgentNodeData,
       });
 
@@ -467,6 +473,7 @@ function buildOrgGraph(
           teamColor: team.color,
           avatar: agent.avatar,
           avatarColor: agent.avatarColor,
+          avatarUrl: agent.avatarUrl,
         } as AgentNodeData,
       });
 

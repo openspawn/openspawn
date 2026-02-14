@@ -11,9 +11,10 @@ interface AgentHeartbeatProps {
   showPulse?: boolean;
   avatar?: string | null;
   avatarColor?: string | null;
+  avatarUrl?: string | null;
 }
 
-export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse = true, avatar, avatarColor }: AgentHeartbeatProps) {
+export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse = true, avatar, avatarColor, avatarUrl }: AgentHeartbeatProps) {
   const [isWorking, setIsWorking] = useState(status === 'ACTIVE');
 
   // Simulate activity changes in demo mode (not sandbox mode)
@@ -77,7 +78,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
           ease: 'easeInOut',
         }}
       >
-        {avatar || '🤖'}
+        {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-cover" /> : (avatar || '🤖')}
       </motion.span>
 
       {/* Status indicator dot */}
@@ -165,6 +166,8 @@ export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: num
             status={agent.status as AgentHeartbeatProps['status']}
             size="sm"
             avatar={agent.avatar}
+
+            avatarUrl={agent.avatarUrl}
             avatarColor={agent.avatarColor}
           />
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-muted rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
