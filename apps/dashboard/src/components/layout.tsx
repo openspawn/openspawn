@@ -179,7 +179,13 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-background">
+      <div className="flex h-screen bg-background relative">
+        {/* Bikini Bottom ambient backdrop */}
+        <div
+          className="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/bikini-bottom-bg.jpg)', opacity: 0.06 }}
+          aria-hidden="true"
+        />
         {/* Sidebar */}
         <motion.aside
           className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden"
