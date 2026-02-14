@@ -6,6 +6,7 @@ import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keybo
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
+import { IntroPage } from "../pages/intro";
 import { MobileStatusPage } from "../pages/mobile-status";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { isSandboxMode } from "../graphql/fetcher";
@@ -107,6 +108,9 @@ export function App() {
                   </>
                 )}
                 
+                {/* Intro page — standalone, no layout */}
+                <Route path="/intro" element={<IntroPage />} />
+
                 {/* Protected routes */}
                 <Route
                   path="/*"

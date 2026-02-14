@@ -155,7 +155,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
 }
 
 // Row of agent heartbeats for overview
-export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: number; status: string; name: string; avatar?: string; avatarColor?: string }[] }) {
+export function AgentHeartbeatRow({ agents }: { agents: { id: string; level: number; status: string; name: string; avatar?: string; avatarColor?: string; avatarUrl?: string }[] }) {
   return (
     <div className="flex items-center gap-2">
       {agents.map((agent) => (
