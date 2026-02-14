@@ -1,9 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Github, BookOpen, Users, Network, CheckSquare } from 'lucide-react';
+import { useAgents } from '../hooks/use-agents';
+import { useTasks } from '../hooks/use-tasks';
 
 export function IntroPage() {
   const navigate = useNavigate();
+  const { agents } = useAgents();
+  const { tasks } = useTasks();
+
+  const agentCount = agents.length || 23;
+  const activeAgents = agents.filter(a => a.status === 'ACTIVE').length;
+  const taskCount = tasks.length || 250;
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#020817]">
@@ -91,9 +99,9 @@ export function IntroPage() {
           className="flex flex-wrap justify-center gap-3 mb-10"
         >
           {[
-            { icon: Users, label: '23 Agents' },
-            { icon: Network, label: 'Live Network' },
-            { icon: CheckSquare, label: '250+ Tasks' },
+            { icon: Users, label: `${agentCount} Agents` },
+            { icon: Network, label: activeAgents > 0 ? `${activeAgents} Active Now` : 'Live Network' },
+            { icon: CheckSquare, label: `${taskCount}+ Tasks` },
           ].map(({ icon: Icon, label }) => (
             <span
               key={label}

@@ -986,7 +986,6 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
       const padding = isMobileOrTouch ? 0.25 : 0.15;
       setTimeout(() => fitView({ padding, duration: isMobileOrTouch ? 400 : 800 }), 50);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentIds, loading, compact, isMobileOrTouch, setNodes, setEdges, fitView]);
 
   // Task delegation simulation — use ref for edges to avoid interval restart on edge changes

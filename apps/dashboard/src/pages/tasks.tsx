@@ -700,7 +700,7 @@ export function TasksPage() {
               title="No tasks in the queue"
               description="Create your first task to start assigning work to your agents."
               ctaLabel="Create your first task →"
-              onCta={() => {}}
+              onCta={() => { /* TODO: open create task modal */ }}
             />
           </CardContent>
         </Card>

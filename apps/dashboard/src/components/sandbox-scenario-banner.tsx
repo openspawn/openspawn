@@ -96,7 +96,7 @@ export function ScenarioContextBanner({ status }: { status: ScenarioStatus | nul
         const speed = Math.round(800 / ms) || 1;
         setCurrentSpeed(speed);
       })
-      .catch(() => {});
+      .catch(() => { /* ignore */ });
   }, []);
 
   if (!isSandboxMode || !status?.active) return null;
@@ -114,7 +114,7 @@ export function ScenarioContextBanner({ status }: { status: ScenarioStatus | nul
       });
       setCurrentSpeed(speed);
       setPaused(false);
-    } catch {}
+    } catch { /* ignore */ }
   };
 
   const togglePause = async () => {
@@ -129,7 +129,7 @@ export function ScenarioContextBanner({ status }: { status: ScenarioStatus | nul
           body: JSON.stringify({ tickIntervalMs: 999999 }),
         });
         setPaused(true);
-      } catch {}
+      } catch { /* ignore */ }
     }
   };
 

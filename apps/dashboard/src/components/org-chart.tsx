@@ -545,7 +545,6 @@ function OrgChartInner({ className, onAgentClick, onTeamClick }: { className?: s
       setEdges(le);
       setIsLayouted(true);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentIds, loading, setNodes, setEdges]);
 
   // Animate edges — sandbox mode uses real SSE events, demo mode uses random
