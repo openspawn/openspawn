@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 const sidebar = [
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
+  { label: "OpenClaw Integration", to: "/docs/openclaw" },
   {
     label: "Protocols",
     children: [
