@@ -1,268 +1,216 @@
 ---
-title: CLI Reference
+title: CLI
 layout: default
-parent: "SDK & CLI"
-nav_order: 1
+nav_order: 6
+permalink: /cli/
 ---
 
-# BikiniBottom CLI
+# CLI Reference
+{: .no_toc }
 
-The BikiniBottom CLI provides command-line access to all platform features.
+The BikiniBottom CLI scaffolds, configures, and runs your agent organization.
+
+<details open markdown="block">
+  <summary>Table of contents</summary>
+  {: .text-delta }
+1. TOC
+{:toc}
+</details>
+
+---
 
 ## Installation
 
 ```bash
-# Install globally
-npm install -g openspawn
+# Use directly with npx (no install)
+npx bikinibottom --help
 
-# Or use npx
-npx openspawn --help
+# Or install globally
+npm install -g bikinibottom
 ```
 
-## Authentication
+---
+
+## Commands
+
+### `bikinibottom init [name]`
+
+Scaffold a new agent organization.
 
 ```bash
-# Login with API key
-openspawn auth login --api-key osp_your_api_key
+# Create in new directory
+npx bikinibottom init my-org
 
-# Check authentication status
-openspawn auth status
-
-# Logout
-openspawn auth logout
+# Create in current directory
+npx bikinibottom init
 ```
 
-## Agents
+**Creates:**
 
-### List agents
+| File | Purpose |
+|------|---------|
+| `ORG.md` | Agent organization definition |
+| `bikinibottom.config.json` | Server configuration |
+| `.gitignore` | Standard ignores |
+
+**Output:**
+
+```
+🍍 BikiniBottom initialized!
+
+Created:
+  ORG.md                 — Define your agent organization
+  bikinibottom.config.json — Configuration
+  .gitignore
+
+Next steps:
+  cd my-org
+  1. Edit ORG.md to customize your agents
+  2. Run: bikinibottom start
+  3. Open: http://localhost:3333
+
+Protocols enabled:
+  🔗 A2A  → http://localhost:3333/.well-known/agent.json
+  🔌 MCP  → http://localhost:3333/mcp
+```
+
+### `bikinibottom start`
+
+Start the BikiniBottom server.
 
 ```bash
-# List all agents
-openspawn agents list
-
-# JSON output
-openspawn agents list --json
+npx bikinibottom start
 ```
 
-### Get agent details
+Reads `bikinibottom.config.json` and `ORG.md` from the current directory. Starts the server with:
+- Real-time dashboard at `http://localhost:3333`
+- A2A protocol at `http://localhost:3333/.well-known/agent.json`
+- MCP tool server at `http://localhost:3333/mcp`
+
+### `bikinibottom status`
+
+Show server status.
 
 ```bash
-openspawn agents get <identifier>
-openspawn agents get code-wizard
+npx bikinibottom status
 ```
 
-### Create agent
+### `bikinibottom demo`
+
+Start with a built-in demo scenario (32 agents, pre-configured tasks).
 
 ```bash
-openspawn agents create --name "Research Bot" --level 5
+npx bikinibottom demo
 ```
 
-## Tasks
+---
 
-### List tasks
+## ORG.md
 
-```bash
-# All tasks
-openspawn tasks list
+Define your agent organization in Markdown. The CLI parses this to create your agent hierarchy.
 
-# Filter by status
-openspawn tasks list --status IN_PROGRESS
+```markdown
+# My Agent Organization
 
-# Filter by assignee
-openspawn tasks list --assignee code-wizard
+## Identity
+- Name: AcmeTech
+- Mission: Build the best SaaS platform
+
+## Structure
+
+### CEO (Level 10)
+- Name: The Boss
+- Avatar: 👑
+- Domain: operations
+- Role: coo
+
+### Engineering Lead (Level 7)
+- Name: Tech Lead
+- Avatar: 💻
+- Domain: engineering
+- Role: lead
+
+### Frontend Developer (Level 4)
+- Name: UI Builder
+- Avatar: 🎨
+- Domain: frontend
+- Role: worker
+
+### Backend Developer (Level 4)
+- Name: API Builder
+- Avatar: ⚙️
+- Domain: backend
+- Role: worker
+
+### QA Engineer (Level 3)
+- Name: Bug Hunter
+- Avatar: 🔍
+- Domain: testing
+- Role: worker
 ```
 
-### Task board
+### Agent Properties
 
-```bash
-# View kanban-style board
-openspawn tasks board
-```
+| Property | Required | Description |
+|----------|----------|-------------|
+| Heading | ✅ | Agent title + `(Level N)` |
+| Name | ✅ | Display name |
+| Avatar | ❌ | Emoji avatar |
+| Domain | ✅ | Specialization (engineering, marketing, finance, etc.) |
+| Role | ✅ | `coo`, `lead`, or `worker` |
 
-### Create task
+### Levels
 
-```bash
-openspawn tasks create --title "Implement feature X" --priority high
-openspawn tasks create --title "Bug fix" --assignee code-wizard --due 2026-02-15
-```
+| Level | Tier | Model Tier | Typical Role |
+|-------|------|------------|-------------|
+| 9–10 | Executive | Premium (Claude, GPT-4o) | CEO, COO |
+| 7–8 | Lead | Mid-tier (Llama 70B) | Team leads, directors |
+| 4–6 | Senior | Local/cheap (Qwen 7B, Llama 8B) | Senior ICs |
+| 1–3 | Junior | Local (Qwen 7B) | Workers, interns |
 
-### Update task status
-
-```bash
-openspawn tasks transition <task-id> <status>
-openspawn tasks transition API-001 done
-```
-
-## Credits
-
-### Check balance
-
-```bash
-# Your balance
-openspawn credits balance
-
-# Agent's balance
-openspawn credits balance --agent code-wizard
-```
-
-### View transactions
-
-```bash
-openspawn credits transactions
-openspawn credits transactions --limit 20
-```
-
-### Budget status
-
-```bash
-openspawn credits budget
-```
-
-## Messages
-
-### List messages
-
-```bash
-# Recent messages
-openspawn messages list
-
-# From specific channel
-openspawn messages list --channel general
-```
-
-### Send message
-
-```bash
-openspawn messages send --to code-wizard --message "Task completed!"
-openspawn messages send --channel dev --message "PR ready for review"
-```
-
-### List channels
-
-```bash
-openspawn channels list
-```
-
-## Global Options
-
-| Option | Description |
-|--------|-------------|
-| `--json` | Output in JSON format |
-| `--no-color` | Disable colored output |
-| `--demo` | Use demo mode (no API required) |
-| `-v, --version` | Show version |
-| `-h, --help` | Show help |
-
-## Demo Mode
-
-Demo mode uses realistic mock data for testing and screenshots:
-
-```bash
-# Run any command with --demo
-openspawn --demo agents list
-openspawn --demo tasks board
-openspawn --demo credits balance
-```
+---
 
 ## Configuration
 
-Config is stored at `~/.openspawn/config.json`:
+`bikinibottom.config.json` reference:
 
 ```json
 {
-  "apiKey": "osp_xxxxx",
-  "apiUrl": "https://api.openspawn.dev"
+  "port": 3333,
+  "orgFile": "ORG.md",
+  "simulation": {
+    "mode": "deterministic",
+    "tickInterval": 3000,
+    "startMode": "full"
+  },
+  "router": {
+    "preferLocal": true,
+    "providers": ["ollama", "groq"]
+  },
+  "protocols": {
+    "a2a": true,
+    "mcp": true
+  }
 }
 ```
 
-### Environment Variables
+| Field | Default | Description |
+|-------|---------|-------------|
+| `port` | `3333` | Server port |
+| `orgFile` | `"ORG.md"` | Path to organization definition |
+| `simulation.mode` | `"deterministic"` | Simulation engine mode |
+| `simulation.tickInterval` | `3000` | Tick interval in ms |
+| `simulation.startMode` | `"full"` | Start with all agents active |
+| `router.preferLocal` | `true` | Prefer Ollama for worker agents |
+| `router.providers` | `["ollama","groq"]` | Enabled LLM providers |
+| `protocols.a2a` | `true` | Enable A2A protocol endpoints |
+| `protocols.mcp` | `true` | Enable MCP tool server |
 
-| Variable | Description |
-|----------|-------------|
-| `OPENSPAWN_API_KEY` | API key (overrides config) |
-| `OPENSPAWN_API_URL` | API URL (default: https://api.openspawn.dev) |
+---
 
-## Output Formats
+## Global Options
 
-### Human-readable (default)
-
-```
-┌──────────────┬────────┬───────┬────────┬─────────┬───────┐
-│ Name         │ ID     │ Level │ Status │ Balance │ Trust │
-├──────────────┼────────┼───────┼────────┼─────────┼───────┤
-│ Talent Agent │ talent │ L10   │ ACTIVE │ 50,000  │ 98%   │
-│ Code Wizard  │ code   │ L8    │ ACTIVE │ 12,500  │ 92%   │
-└──────────────┴────────┴───────┴────────┴─────────┴───────┘
-```
-
-### JSON (--json)
-
-```json
-[
-  {
-    "id": "agt_talent",
-    "name": "Talent Agent",
-    "level": 10,
-    "status": "ACTIVE"
-  }
-]
-```
-
-## Error Handling
-
-The CLI provides helpful error messages:
-
-```
-✗ Error: No API key configured
-  Hint: Run 'openspawn auth login --api-key <key>' to authenticate
-
-✗ Error: Task not found: TSK-999
-  Hint: Use 'openspawn tasks list' to see available tasks
-```
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Invalid arguments |
-| 3 | Authentication error |
-| 4 | Network error |
-
-## Examples
-
-### Typical Workflow
-
-```bash
-# 1. Authenticate
-openspawn auth login --api-key osp_xxxxx
-
-# 2. Create a task
-openspawn tasks create --title "Build API endpoint" --priority high
-
-# 3. Assign to agent
-openspawn tasks assign API-001 --to code-wizard
-
-# 4. Check progress
-openspawn tasks board
-
-# 5. Complete task
-openspawn tasks transition API-001 done
-
-# 6. Check credit balance
-openspawn credits balance
-```
-
-### Scripting
-
-```bash
-#!/bin/bash
-# Get agent IDs in JSON
-agents=$(openspawn agents list --json | jq -r '.[].identifier')
-
-for agent in $agents; do
-  balance=$(openspawn credits balance --agent $agent --json | jq '.balance')
-  echo "$agent: $balance credits"
-done
-```
+| Flag | Description |
+|------|-------------|
+| `-h, --help` | Show help |
+| `-v, --version` | Show version |

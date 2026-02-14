@@ -15,17 +15,17 @@ permalink: /
     <div class="bubble bubble-6"></div>
   </div>
   <div class="hero-content">
-    <div class="hero-badge">Open Source · MIT Licensed</div>
+    <div class="hero-badge">Open Source · MIT Licensed · A2A + MCP Native</div>
     <h1 class="hero-title">
       <span class="hero-gradient">BikiniBottom</span>
     </h1>
     <p class="hero-subtitle">The control plane for your AI agent army</p>
     <p class="hero-description">
-      Orchestrate hundreds of agents with task routing, spending controls, trust hierarchies, and a real-time dashboard. Not a framework — just the infrastructure every multi-agent system needs.
+      Orchestrate hundreds of agents with native <strong>A2A Protocol</strong> support, an <strong>MCP Tool Server</strong>, intelligent <strong>model routing</strong>, and a real-time dashboard. Ship your agent org in one command: <code>npx bikinibottom init</code>
     </p>
     <div class="hero-cta">
-      <a href="https://openspawn.github.io/openspawn/demo/" class="cta-button cta-primary">
-        <span class="cta-icon">▶</span> Launch Live Demo
+      <a href="https://bikinibottom.ai" class="cta-button cta-primary">
+        <span class="cta-icon">▶</span> Live Demo — bikinibottom.ai
       </a>
       <a href="getting-started" class="cta-button cta-secondary">
         Get Started →
@@ -33,52 +33,60 @@ permalink: /
     </div>
     <div class="hero-stats">
       <div class="hero-stat">
-        <span class="hero-stat-value">50+</span>
-        <span class="hero-stat-label">API Endpoints</span>
+        <span class="hero-stat-value">A2A</span>
+        <span class="hero-stat-label">Agent Protocol</span>
       </div>
       <div class="hero-stat-divider"></div>
       <div class="hero-stat">
-        <span class="hero-stat-value">5</span>
-        <span class="hero-stat-label">Ocean Themes</span>
+        <span class="hero-stat-value">7</span>
+        <span class="hero-stat-label">MCP Tools</span>
       </div>
       <div class="hero-stat-divider"></div>
       <div class="hero-stat">
-        <span class="hero-stat-value">2</span>
-        <span class="hero-stat-label">SDKs</span>
+        <span class="hero-stat-value">3</span>
+        <span class="hero-stat-label">LLM Providers</span>
       </div>
       <div class="hero-stat-divider"></div>
       <div class="hero-stat">
-        <span class="hero-stat-value">8</span>
-        <span class="hero-stat-label">Integrations</span>
+        <span class="hero-stat-value">1 cmd</span>
+        <span class="hero-stat-label">To Launch</span>
       </div>
     </div>
   </div>
 </div>
 
-<div class="demo-showcase" markdown="0">
-  <div class="demo-showcase-header">
-    <span class="demo-showcase-tag">✨ Interactive Demo</span>
-    <h2 class="demo-showcase-title">See it in action — no setup required</h2>
-    <p class="demo-showcase-desc">22 agents, 5 scenarios, real-time simulation. Switch between AcmeTech startup and enterprise orgs.</p>
+---
+
+## Protocol Support
+
+BikiniBottom speaks the two protocols that matter for agentic AI:
+
+<div class="feature-grid" markdown="0">
+  <div class="feature-card">
+    <div class="feature-icon">🔗</div>
+    <h3>A2A Protocol</h3>
+    <p>Google's Agent-to-Agent protocol. Discover agents, send tasks, stream updates — all via standard HTTP. Your agents are interoperable with any A2A-compatible system.</p>
+    <p><a href="protocols/a2a/">Read the A2A guide →</a></p>
   </div>
-  <div class="demo-browser">
-    <div class="demo-browser-bar">
-      <div class="demo-browser-dots">
-        <span class="dot dot-red"></span>
-        <span class="dot dot-yellow"></span>
-        <span class="dot dot-green"></span>
-      </div>
-      <div class="demo-browser-url">openspawn.github.io/openspawn/demo</div>
-    </div>
-    <a href="https://openspawn.github.io/openspawn/demo/" class="demo-browser-content">
-      <img src="assets/dashboard-preview.png" alt="BikiniBottom Dashboard" class="demo-screenshot" />
-      <div class="demo-overlay">
-        <div class="demo-play-button">▶</div>
-        <span>Launch Live Demo</span>
-      </div>
-    </a>
+  <div class="feature-card">
+    <div class="feature-icon">🔌</div>
+    <h3>MCP Tool Server</h3>
+    <p>7 tools exposed via Model Context Protocol. Connect from Claude Desktop, Cursor, or any MCP client. Delegate tasks, list agents, get stats — all via JSON-RPC.</p>
+    <p><a href="protocols/mcp/">Read the MCP guide →</a></p>
   </div>
 </div>
+
+```bash
+# Discover agents via A2A
+curl https://bikinibottom.ai/.well-known/agent.json
+
+# List tools via MCP
+curl -X POST https://bikinibottom.ai/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+[Protocols overview →](protocols/){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 
 ---
 
@@ -91,7 +99,13 @@ One agent is a script. Ten agents is a distributed system. **This is your contro
   <div class="feature-card">
     <div class="feature-icon">🎯</div>
     <h3>Task Orchestration</h3>
-    <p>Priority queues, self-claim, approval workflows, and rejection handling. Route the right task to the right agent.</p>
+    <p>Priority queues, domain-based routing, approval workflows, and rejection handling. Route the right task to the right agent.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🧠</div>
+    <h3>Model Router</h3>
+    <p>Intelligent routing across Ollama, Groq, and OpenRouter. Level-based tiers, fallback chains, and real-time cost tracking.</p>
+    <p><a href="features/model-router/">Learn more →</a></p>
   </div>
   <div class="feature-card">
     <div class="feature-icon">💰</div>
@@ -104,19 +118,15 @@ One agent is a script. Ten agents is a distributed system. **This is your contro
     <p>Agents earn trust through performance. Automated promotion, demotion, and capability gating.</p>
   </div>
   <div class="feature-card">
-    <div class="feature-icon">👥</div>
-    <h3>Teams & Hierarchy</h3>
-    <p>Organize agents into teams with leads, sub-teams, and org charts. Real-time presence tracking.</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🔌</div>
-    <h3>Integrations</h3>
-    <p>GitHub sync, Linear, webhooks, OpenTelemetry, OpenClaw. Framework adapters for LangGraph & CrewAI.</p>
+    <div class="feature-icon">⚡</div>
+    <h3>CLI — One Command</h3>
+    <p><code>npx bikinibottom init</code> scaffolds your org with A2A + MCP enabled. Edit ORG.md, run <code>bikinibottom start</code>, done.</p>
+    <p><a href="cli/">CLI reference →</a></p>
   </div>
   <div class="feature-card">
     <div class="feature-icon">📊</div>
     <h3>Live Dashboard</h3>
-    <p>Real-time React dashboard with network graph, timeline, customizable widgets, and ocean themes.</p>
+    <p>Real-time React dashboard with network graph, timeline, router metrics, and ocean themes.</p>
   </div>
 </div>
 
@@ -125,11 +135,13 @@ One agent is a script. Ten agents is a distributed system. **This is your contro
 ## Quick Start
 
 ```bash
-git clone https://github.com/openspawn/openspawn.git
-cd openspawn && pnpm install && pnpm dev
+npx bikinibottom init my-org
+cd my-org
+npx bikinibottom start
+# Open http://localhost:3333
 ```
 
-Or skip setup entirely → [**try the live demo**](https://openspawn.github.io/openspawn/demo/)
+Or skip setup entirely → [**try the live demo at bikinibottom.ai**](https://bikinibottom.ai)
 {: .fs-5 .text-center }
 
 [Full getting started guide →](getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
@@ -139,28 +151,17 @@ Or skip setup entirely → [**try the live demo**](https://openspawn.github.io/o
 
 ## Architecture
 
-BikiniBottom is an **Nx monorepo** with a NestJS API, React dashboard, TypeScript SDK, and Python SDK.
+BikiniBottom is an **Nx monorepo** with a protocol layer, control plane, and agent runtime.
 
 | Component | Tech | Purpose |
 |-----------|------|---------|
-| **API** | NestJS + GraphQL | Core coordination engine |
+| **Protocol Layer** | A2A + MCP | External agent & tool interfaces |
+| **Model Router** | Multi-provider | Intelligent LLM routing with fallbacks |
+| **Control Plane** | NestJS + GraphQL | Coordination engine |
 | **Dashboard** | React + TanStack Query | Real-time monitoring UI |
-| **TS SDK** | TypeScript | Agent integration library |
-| **Python SDK** | Python | Agent integration library |
+| **CLI** | Node.js | `npx bikinibottom init/start/demo` |
 
-[Architecture deep dive →](openspawn/)
-
----
-
-## Roadmap
-
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phases 1-8 | ✅ Complete | Core platform (auth → orchestrator mode) |
-| Phase A | ✅ Complete | SDKs + Webhooks |
-| Phase B | ✅ Complete | GitHub, Linear, OTEL, OpenClaw |
-| Phase C | ✅ Complete | Framework adapters (LangGraph, CrewAI) |
-| Phase D | 📋 Planned | Marketplace |
+[Architecture deep dive →](architecture){: .btn .btn-outline .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
