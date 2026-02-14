@@ -14,6 +14,7 @@ import { ScenarioEngine } from './scenario-engine.js';
 import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
 import type { DeterministicSimulation } from './deterministic.js';
 import { makeAgentPublic } from './agents.js';
+import { A2AServer } from './a2a-server.js';
 
 const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
   'ai-dev-agency': aiDevAgencyScenario,
@@ -267,6 +268,9 @@ function json(res: ServerResponse, data: unknown) {
 }
 
 export function startServer(sim: Simulation): void {
+  // Initialize A2A server with the simulation (cast to DeterministicSimulation)
+  const a2a = new A2AServer(sim as unknown as DeterministicSimulation);
+
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     // CORS preflight
     if (req.method === 'OPTIONS') {
@@ -281,6 +285,155 @@ export function startServer(sim: Simulation): void {
 
     const url = new URL(req.url ?? '/', `http://localhost:${PORT}`);
     const path = url.pathname;
+
+    // ── A2A Protocol Endpoints ───────────────────────────────────────────────
+
+    // Agent card discovery
+    if (path === '/.well-known/agent.json' && req.method === 'GET') {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'A2A-Version': '0.3',
+      });
+      res.end(JSON.stringify(a2a.getControlPlaneCard()));
+      return;
+    }
+
+    // Per-agent card: /agents/:id/.well-known/agent.json
+    const agentCardMatch = path.match(/^\/agents\/([^/]+)\/.well-known\/agent\.json$/);
+    if (agentCardMatch && req.method === 'GET') {
+      const card = a2a.getAgentCard(agentCardMatch[1]);
+      if (!card) {
+        res.writeHead(404, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+        res.end(JSON.stringify({ code: 'AgentNotFound', message: 'Agent not found' }));
+        return;
+      }
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'A2A-Version': '0.3',
+      });
+      res.end(JSON.stringify(card));
+      return;
+    }
+
+    // Send message
+    if (path === '/a2a/message/send' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const request = JSON.parse(body) as import('./a2a-types.js').SendMessageRequest;
+          if (!request.message?.parts?.length) {
+            res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+            res.end(JSON.stringify({ code: 'InvalidRequest', message: 'message.parts required' }));
+            return;
+          }
+          const task = a2a.handleSendMessage(request);
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'A2A-Version': '0.3',
+          });
+          res.end(JSON.stringify(task));
+        } catch (err: any) {
+          const status = err?.status || 500;
+          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+        }
+      });
+      return;
+    }
+
+    // Stream message (SSE)
+    if (path === '/a2a/message/stream' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const request = JSON.parse(body) as import('./a2a-types.js').SendMessageRequest;
+          if (!request.message?.parts?.length) {
+            res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+            res.end(JSON.stringify({ code: 'InvalidRequest', message: 'message.parts required' }));
+            return;
+          }
+          a2a.handleStreamMessage(request, res);
+        } catch (err: any) {
+          res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+          res.end(JSON.stringify({ code: 'InvalidRequest', message: String(err) }));
+        }
+      });
+      return;
+    }
+
+    // List A2A tasks
+    if (path === '/a2a/tasks' && req.method === 'GET') {
+      const result = a2a.handleListTasks({
+        contextId: url.searchParams.get('contextId') || undefined,
+        status: url.searchParams.get('status') || undefined,
+        pageSize: url.searchParams.has('pageSize') ? parseInt(url.searchParams.get('pageSize')!, 10) : undefined,
+        pageToken: url.searchParams.get('pageToken') || undefined,
+      });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'A2A-Version': '0.3',
+      });
+      res.end(JSON.stringify(result));
+      return;
+    }
+
+    // Task-specific A2A routes: /a2a/tasks/:id, /a2a/tasks/:id/cancel, /a2a/tasks/:id/subscribe
+    const a2aTaskMatch = path.match(/^\/a2a\/tasks\/([^/]+)(\/cancel|\/subscribe)?$/);
+    if (a2aTaskMatch) {
+      const taskId = a2aTaskMatch[1];
+      const action = a2aTaskMatch[2];
+
+      // GET /a2a/tasks/:id
+      if (!action && req.method === 'GET') {
+        try {
+          const historyLength = url.searchParams.has('historyLength')
+            ? parseInt(url.searchParams.get('historyLength')!, 10)
+            : undefined;
+          const task = a2a.handleGetTask(taskId, historyLength);
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'A2A-Version': '0.3',
+          });
+          res.end(JSON.stringify(task));
+        } catch (err: any) {
+          const status = err?.status || 500;
+          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+        }
+        return;
+      }
+
+      // POST /a2a/tasks/:id/cancel
+      if (action === '/cancel' && req.method === 'POST') {
+        try {
+          const task = a2a.handleCancelTask(taskId);
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'A2A-Version': '0.3',
+          });
+          res.end(JSON.stringify(task));
+        } catch (err: any) {
+          const status = err?.status || 500;
+          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
+          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+        }
+        return;
+      }
+
+      // POST /a2a/tasks/:id/subscribe (SSE)
+      if (action === '/subscribe' && req.method === 'POST') {
+        a2a.handleSubscribe(taskId, res);
+        return;
+      }
+    }
 
     // GraphQL-compatible endpoint (handles all dashboard queries)
     if (path === '/graphql' && req.method === 'POST') {
