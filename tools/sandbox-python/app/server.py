@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -29,7 +31,24 @@ from .types import ACPType, SandboxEvent
 
 # ── App setup ────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="BikiniBottom Sandbox", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global sim
+    agents = create_all_agents()
+    tick_ms = int(os.environ.get("TICK_INTERVAL_MS", "5000"))
+    sim = Simulation(agents, tick_interval_ms=tick_ms)
+    asyncio.create_task(sim.run())
+    print(f"\n🌐 BikiniBottom Sandbox (FastAPI): http://0.0.0.0:{PORT}")
+
+    if SERVE_DASHBOARD and Path(DASHBOARD_DIR).is_dir():
+        app.mount("/", StaticFiles(directory=DASHBOARD_DIR, html=True), name="dashboard")
+        print(f"   Serving dashboard from {DASHBOARD_DIR}")
+
+    yield
+
+
+app = FastAPI(title="BikiniBottom Sandbox", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -425,19 +444,7 @@ async def agent_messages(agent_id: str):
 # ── Dashboard static file serving ───────────────────────────────────────────
 
 
-@app.on_event("startup")
-async def startup():
-    global sim
-    agents = create_all_agents()
-    tick_ms = int(os.environ.get("TICK_INTERVAL_MS", "5000"))
-    sim = Simulation(agents, tick_interval_ms=tick_ms)
-    asyncio.create_task(sim.run())
-    print(f"\n🌐 BikiniBottom Sandbox (FastAPI): http://0.0.0.0:{PORT}")
-
-    if SERVE_DASHBOARD and Path(DASHBOARD_DIR).is_dir():
-        # Mount static files for the dashboard
-        app.mount("/", StaticFiles(directory=DASHBOARD_DIR, html=True), name="dashboard")
-        print(f"   Serving dashboard from {DASHBOARD_DIR}")
+# Dashboard static serving is handled in lifespan
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
