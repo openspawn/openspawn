@@ -84,10 +84,11 @@ export function LandingPage() {
      <h1 className="animate-fade-in-up animate-delay-100 mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
       <span className="gradient-text">BikiniBottom</span>
      </h1>
-     <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-xl text-lg text-slate-400 md:text-xl">
-      The org chart your AI agents deserve.
-      <br />
-      <span className="text-slate-500">Define teams, hierarchy, and policies in markdown. Watch agents coordinate.</span>
+     <p className="animate-fade-in-up animate-delay-200 mx-auto mb-4 max-w-xl text-lg text-slate-300 md:text-xl">
+      One agent needs a prompt. A team needs an org.
+     </p>
+     <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-lg text-base text-slate-500">
+      The org chart for AI agents. Define teams, hierarchy, and policies in markdown.
      </p>
      <div className="animate-fade-in-up animate-delay-300 mb-10 flex flex-wrap items-center justify-center gap-4">
       <a href="/app/" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">Launch Live Demo →</a>
