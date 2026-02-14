@@ -4,6 +4,7 @@ import { Layout, ProtectedRoute, NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
 import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "../pages";
+import { RouterPage } from "../pages/router";
 import { DashboardPage } from "../pages/dashboard";
 import { NetworkPage } from "../pages/network";
 import { IntroPage } from "../pages/intro";
@@ -124,6 +125,7 @@ export function App() {
                           <Route path="/credits" element={<CreditsPage />} />
                           <Route path="/events" element={<EventsPage />} />
                           <Route path="/messages" element={<MessagesPage />} />
+                          <Route path="/router" element={<RouterPage />} />
                           <Route path="/network" element={<NetworkPage />} />
                           <Route path="/settings" element={<SettingsPage />} />
                           <Route path="/status" element={<MobileStatusPage />} />

@@ -12,6 +12,7 @@ import type { SandboxAgent, SandboxTask, SandboxEvent, SandboxConfig, ACPMessage
 import type { ParsedOrg } from './org-parser.js';
 import { makeAgentPublic } from './agents.js';
 import type { ScenarioEngine } from './scenario-engine.js';
+import type { ModelRouter, RouteRequest } from './model-router.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -595,6 +596,36 @@ export class DeterministicSimulation {
     // Scenario engine post-tick
     if (this.scenarioEngine) {
       this.scenarioEngine.postTick();
+    }
+
+    // Model router: simulate routing decisions for active agents working on tasks
+    const modelRouter = (this as any)._modelRouter as ModelRouter | undefined;
+    if (modelRouter) {
+      const workingAgents = sortedAgents.filter(a => {
+        const activeTasks = this.tasks.filter(t => t.assigneeId === a.id && t.status === 'in_progress');
+        return activeTasks.length > 0;
+      });
+      // Route 1-3 agents per tick for realistic stream rate
+      const toRoute = workingAgents.slice(0, Math.min(3, workingAgents.length));
+      for (const agent of toRoute) {
+        const taskTypes: Array<RouteRequest['taskType']> = ['delegation', 'coding', 'analysis', 'simple'];
+        const taskType = agent.role === 'coo' ? 'delegation' : agent.role === 'lead' ? 'analysis' : pickRandom(taskTypes);
+        const decision = modelRouter.route({
+          agentId: agent.id,
+          agentLevel: agent.level,
+          taskType,
+          preferLocal: agent.level <= 4,
+        });
+        const costStr = decision.estimatedCost === 0 ? '$0' : `$${decision.estimatedCost.toFixed(4)}`;
+        const routerEvent: SandboxEvent = {
+          type: 'router_decision',
+          agentId: agent.id,
+          message: `🔀 Routed to ${decision.provider}/${decision.model} (${decision.reason}) — ${costStr}`,
+          timestamp: Date.now(),
+        };
+        this.events.push(routerEvent);
+        this.emit(routerEvent);
+      }
     }
 
     // Metrics
