@@ -415,7 +415,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
       return res.json();
     },
     enabled: isSandboxMode,
-    refetchInterval: 5000,
+    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
 
   // Generate contextual messages based on agent properties (fallback for non-sandbox)

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SANDBOX_URL } from "../lib/sandbox-url";
@@ -56,16 +57,20 @@ export function ModelRouterWidget() {
   const [metrics, setMetrics] = useState<RouterMetrics | null>(null);
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
 
-  useEffect(() => {
-    if (!isSandboxMode) return;
-    const fetchData = () => {
-      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => { /* ignore */ });
-      fetch(`${SANDBOX_URL}/api/router/decisions?limit=5`).then(r => r.json()).then(setDecisions).catch(() => { /* ignore */ });
-    };
-    fetchData();
-    const interval = setInterval(fetchData, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Initial fetch + SSE-driven updates via query invalidation
+  const { data: fetchedMetrics } = useQuery({
+    queryKey: ['router-metrics'],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()),
+    enabled: isSandboxMode,
+  });
+  const { data: fetchedDecisions } = useQuery({
+    queryKey: ['router-decisions'],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/decisions?limit=5`).then(r => r.json()),
+    enabled: isSandboxMode,
+  });
+
+  useEffect(() => { if (fetchedMetrics) setMetrics(fetchedMetrics); }, [fetchedMetrics]);
+  useEffect(() => { if (fetchedDecisions) setDecisions(fetchedDecisions); }, [fetchedDecisions]);
 
   if (!isSandboxMode || !metrics) return null;
 

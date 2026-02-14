@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SANDBOX_URL } from "../lib/sandbox-url";
@@ -66,17 +67,25 @@ export function RouterPage() {
   const [metrics, setMetrics] = useState<RouterMetrics | null>(null);
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
 
-  useEffect(() => {
-    if (!isSandboxMode) return;
-    const fetchAll = () => {
-      fetch(`${SANDBOX_URL}/api/router/config`).then(r => r.json()).then(d => setProviders(d.providers || [])).catch(() => { /* ignore */ });
-      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => { /* ignore */ });
-      fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then(r => r.json()).then(setDecisions).catch(() => { /* ignore */ });
-    };
-    fetchAll();
-    const interval = setInterval(fetchAll, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data: configData } = useQuery({
+    queryKey: ['router-config'],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/config`).then(r => r.json()),
+    enabled: isSandboxMode,
+  });
+  const { data: metricsData } = useQuery({
+    queryKey: ['router-metrics'],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()),
+    enabled: isSandboxMode,
+  });
+  const { data: decisionsData } = useQuery({
+    queryKey: ['router-decisions-full'],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then(r => r.json()),
+    enabled: isSandboxMode,
+  });
+
+  useEffect(() => { if (configData) setProviders(configData.providers || []); }, [configData]);
+  useEffect(() => { if (metricsData) setMetrics(metricsData); }, [metricsData]);
+  useEffect(() => { if (decisionsData) setDecisions(decisionsData); }, [decisionsData]);
 
   if (!isSandboxMode) {
     return <div className="p-8 text-white/50">Model Router is only available in sandbox mode.</div>;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSandboxTickInvalidation } from "../hooks/use-sandbox-tick";
 import { Logo } from "./ui/logo";
 import { Link, useLocation, useSearch, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
@@ -126,6 +127,9 @@ export function Layout({ children }: LayoutProps) {
   const { collapsed: sidebarCollapsed, toggle: toggleSidebar } = useSidebarCollapsed();
   const sidePanel = useSidePanel();
   const { status: scenarioStatus, phaseTransition, setPhaseTransition } = useScenarioStatus();
+
+  // SSE-driven query invalidation — replaces global refetchInterval polling
+  useSandboxTickInvalidation();
 
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
 

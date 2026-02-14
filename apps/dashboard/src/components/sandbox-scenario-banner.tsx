@@ -3,6 +3,7 @@
  * Only visible in sandbox mode when a scenario is active.
  */
 import { useState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Pause, Play } from 'lucide-react';
 import { isSandboxMode } from '../graphql/fetcher';
@@ -24,8 +25,13 @@ export interface ScenarioStatus {
 
 const TOTAL_TICKS = 400;
 
+async function fetchScenarioStatus(): Promise<ScenarioStatus | null> {
+  const res = await fetch(`${SANDBOX_URL}/api/scenario/status`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export function useScenarioStatus() {
-  const [status, setStatus] = useState<ScenarioStatus | null>(null);
   const prevPhaseRef = useRef<number>(-1);
   const prevEventsRef = useRef<number>(0);
   const [phaseTransition, setPhaseTransition] = useState<{
@@ -36,47 +42,36 @@ export function useScenarioStatus() {
   } | null>(null);
   const [newEventCount, setNewEventCount] = useState(0);
 
+  const { data: status = null } = useQuery({
+    queryKey: ['scenario-status'],
+    queryFn: fetchScenarioStatus,
+    enabled: isSandboxMode,
+    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
+  });
+
+  // Detect phase transitions and new events from query data
   useEffect(() => {
-    if (!isSandboxMode) return;
-    let disposed = false;
+    if (!status?.active || status.currentPhaseIndex === undefined) return;
 
-    const poll = async () => {
-      try {
-        const res = await fetch(`${SANDBOX_URL}/api/scenario/status`);
-        if (!res.ok) return;
-        const data: ScenarioStatus = await res.json();
-        if (disposed) return;
-        setStatus(data);
+    if (prevPhaseRef.current >= 0 && status.currentPhaseIndex > prevPhaseRef.current) {
+      setPhaseTransition({
+        phaseName: status.currentPhase ?? '',
+        phaseIndex: status.currentPhaseIndex,
+        narrative: '',
+        epics: (status.epics ?? [])
+          .filter(e => e.status !== 'locked')
+          .map(e => e.title)
+          .slice(0, 5),
+      });
+    }
+    prevPhaseRef.current = status.currentPhaseIndex;
 
-        if (data.active && data.currentPhaseIndex !== undefined) {
-          if (prevPhaseRef.current >= 0 && data.currentPhaseIndex > prevPhaseRef.current) {
-            setPhaseTransition({
-              phaseName: data.currentPhase ?? '',
-              phaseIndex: data.currentPhaseIndex,
-              narrative: '',
-              epics: (data.epics ?? [])
-                .filter(e => e.status !== 'locked')
-                .map(e => e.title)
-                .slice(0, 5),
-            });
-          }
-          prevPhaseRef.current = data.currentPhaseIndex;
-
-          const fired = data.eventsFired ?? 0;
-          if (prevEventsRef.current > 0 && fired > prevEventsRef.current) {
-            setNewEventCount(fired - prevEventsRef.current);
-          }
-          prevEventsRef.current = fired;
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    poll();
-    const interval = setInterval(poll, 2000);
-    return () => { disposed = true; clearInterval(interval); };
-  }, []);
+    const fired = status.eventsFired ?? 0;
+    if (prevEventsRef.current > 0 && fired > prevEventsRef.current) {
+      setNewEventCount(fired - prevEventsRef.current);
+    }
+    prevEventsRef.current = fired;
+  }, [status]);
 
   return { status, phaseTransition, setPhaseTransition, newEventCount, setNewEventCount };
 }

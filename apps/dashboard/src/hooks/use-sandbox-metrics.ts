@@ -31,7 +31,7 @@ export function useSandboxMetrics() {
     queryKey: ['sandbox-metrics'],
     queryFn: fetchMetrics,
     enabled: isSandboxMode,
-    refetchInterval: 3000,
+    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
 }
 

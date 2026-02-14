@@ -34,7 +34,8 @@ export function useSelfClaim({ agentId, onSuccess, onError }: UseSelfClaimOption
       if (!isDemo || !engine) return 0;
       return engine.getTasks().filter((task: DemoTask) => !task.assigneeId && (task.status === "backlog" || task.status === "pending")).length;
     },
-    enabled: !!agentId, refetchInterval: 5000,
+    enabled: !!agentId,
+    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
 
   const mut = useMutation({
