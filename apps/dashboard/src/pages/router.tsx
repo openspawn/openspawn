@@ -69,9 +69,9 @@ export function RouterPage() {
   useEffect(() => {
     if (!isSandboxMode) return;
     const fetchAll = () => {
-      fetch(`${SANDBOX_URL}/api/router/config`).then(r => r.json()).then(d => setProviders(d.providers || [])).catch(() => {});
-      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => {});
-      fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then(r => r.json()).then(setDecisions).catch(() => {});
+      fetch(`${SANDBOX_URL}/api/router/config`).then(r => r.json()).then(d => setProviders(d.providers || [])).catch(() => { /* ignore */ });
+      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => { /* ignore */ });
+      fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then(r => r.json()).then(setDecisions).catch(() => { /* ignore */ });
     };
     fetchAll();
     const interval = setInterval(fetchAll, 3000);
@@ -88,9 +88,14 @@ export function RouterPage() {
 
   return (
     <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Model Router</h1>
-        <p className="text-sm text-white/50 mt-1">Intelligent LLM routing with provider fallback chains and cost tracking</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Model Router</h1>
+          <p className="text-sm text-white/50 mt-1">Intelligent LLM routing with provider fallback chains and cost tracking</p>
+        </div>
+        <span className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          ⚡ Simulated
+        </span>
       </div>
 
       {/* Cost savings banner */}

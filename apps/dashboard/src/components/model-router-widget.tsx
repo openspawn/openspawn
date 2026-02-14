@@ -59,8 +59,8 @@ export function ModelRouterWidget() {
   useEffect(() => {
     if (!isSandboxMode) return;
     const fetchData = () => {
-      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => {});
-      fetch(`${SANDBOX_URL}/api/router/decisions?limit=5`).then(r => r.json()).then(setDecisions).catch(() => {});
+      fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()).then(setMetrics).catch(() => { /* ignore */ });
+      fetch(`${SANDBOX_URL}/api/router/decisions?limit=5`).then(r => r.json()).then(setDecisions).catch(() => { /* ignore */ });
     };
     fetchData();
     const interval = setInterval(fetchData, 3000);
@@ -78,7 +78,10 @@ export function ModelRouterWidget() {
     <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white/80">🔀 Model Router</h3>
-        <span className="text-xs text-white/40">{metrics.totalRequests} requests</span>
+        <div className="flex items-center gap-2">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400/70 border border-amber-500/15">sim</span>
+          <span className="text-xs text-white/40">{metrics.totalRequests} requests</span>
+        </div>
       </div>
 
       {/* Provider status */}
