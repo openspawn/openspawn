@@ -118,6 +118,9 @@ export function SandboxActivityFeed({ taskId, agentId, maxEvents = 50 }: Sandbox
               {(event.type.startsWith('mcp') || event.message.includes('MCP')) && (
                 <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-500/20 text-violet-400 border border-violet-500/30">MCP</span>
               )}
+              {event.type === 'router_decision' && (
+                <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-400/70 border border-amber-500/20">SIM</span>
+              )}
               <span className="text-gray-300">{event.message}</span>
             </div>
           ))
