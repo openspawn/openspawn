@@ -7,6 +7,7 @@ import { A2AProtocol } from "./routes/docs/protocols/a2a";
 import { MCPTools } from "./routes/docs/protocols/mcp";
 import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
+import { OrgMdPage } from "./routes/org-md";
 
 const rootRoute = createRootRoute({ component: RootLayout });
 
@@ -66,4 +67,10 @@ const docsRouteTree = docsRoute.addChildren([
   modelRouterRoute,
 ]);
 
-export const routeTree = rootRoute.addChildren([indexRoute, docsRouteTree]);
+const orgMdRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/org-md",
+  component: OrgMdPage,
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, docsRouteTree]);

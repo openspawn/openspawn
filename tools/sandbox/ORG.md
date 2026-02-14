@@ -2,11 +2,20 @@
 
 ## Identity
 
-BikiniBottom by OpenSpawn — an agent coordination platform that makes multi-agent organizations actually work. We build the infrastructure layer between "I have AI agents" and "I have a functioning AI organization."
+BikiniBottom by OpenSpawn — the control plane for AI agent organizations.
 
+- **Mission:** Build the control plane for AI agent organizations.
+- **Vision:** Every team of agents — regardless of framework — coordinates through open protocols and human-readable config. ORG.md is the org chart. A2A is the language. The dashboard is the window.
 - **Industry:** AI infrastructure / Developer tools
 - **Stage:** Early-stage, moving fast
-- **Values:** Ship daily, automate everything, trust the hierarchy
+
+### Values
+- Open protocols over proprietary lock-in
+- Infrastructure over framework
+- Working demo over pitch deck
+- Markdown over YAML
+- Self-hosted first
+- Ship daily, automate everything, trust the hierarchy
 
 ## Culture
 
