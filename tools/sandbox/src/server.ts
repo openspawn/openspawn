@@ -457,7 +457,7 @@ export function startServer(sim: Simulation): void {
 
     // ── MCP Protocol Endpoint ─────────────────────────────────────────────
 
-    // GET /mcp — no server-initiated SSE for now
+    // GET /mcp — Streamable HTTP transport: return 405 (server-initiated streams not implemented)
     if (path === '/mcp' && req.method === 'GET') {
       res.writeHead(405, {
         'Content-Type': 'application/json',
@@ -487,7 +487,7 @@ export function startServer(sim: Simulation): void {
           }
 
           const result = mcp.handleRequest(parsed);
-          // Emit SSE event for MCP tool calls
+          // Emit activity event for dashboard feed
           if (parsed.method === 'tools/call' && parsed.params?.name) {
             sim.events.push({
               type: 'mcp_tool_call',
