@@ -93,14 +93,33 @@ export function LandingPage() {
       <a href="/app/" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">Launch Live Demo →</a>
       <a href="/docs/getting-started" className="rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-base font-semibold text-slate-200 transition hover:bg-white/10">Get Started</a>
      </div>
-     <div className="animate-fade-in-up animate-delay-400 mb-16 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+     <div className="animate-fade-in-up animate-delay-400 mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
       <ProtocolBadge label="A2A Protocol" />
       <ProtocolBadge label="MCP" />
       <ProtocolBadge label="Model Router" />
+     </div>
+     <div className="animate-fade-in-up animate-delay-400 mb-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
       <ProtocolBadge label="TypeScript" variant="core" />
       <ProtocolBadge label="Python" variant="core" />
      </div>
-     <div className="animate-fade-in-up animate-delay-500">
+     {/* Install command */}
+     <div className="animate-fade-in-up animate-delay-500 mb-16">
+      <div className="group relative mx-auto inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-mono text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.08]">
+       <span className="text-slate-500">$</span>
+       <span>npx bikinibottom init my-reef</span>
+       <button
+        type="button"
+        className="ml-1 rounded p-1 text-slate-500 transition hover:bg-white/10 hover:text-cyan-400"
+        onClick={() => { navigator.clipboard.writeText("npx bikinibottom init my-reef"); }}
+        aria-label="Copy to clipboard"
+       >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+        </svg>
+       </button>
+      </div>
+     </div>
+     <div className="animate-fade-in-up animate-delay-600">
       <TerminalDemo />
      </div>
     </div>
