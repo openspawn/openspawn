@@ -24,7 +24,7 @@ import {
   Github,
   Search,
   Signal,
-  ChevronLeft,
+  PanelLeft,
   Star,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
@@ -192,33 +192,10 @@ export function Layout({ children }: LayoutProps) {
         />
         {/* Sidebar */}
         <motion.aside
-          className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden relative"
+          className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden"
           animate={{ width: sidebarWidth }}
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Expand/collapse toggle — floats on the sidebar edge */}
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute top-[18px] -right-3 z-10 h-6 w-6 rounded-full border bg-background shadow-sm text-muted-foreground hover:text-foreground"
-                onClick={toggleSidebar}
-                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              >
-                <motion.div
-                  animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
-                  transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-                >
-                  <ChevronLeft className="h-3 w-3" />
-                </motion.div>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={12}>
-              {sidebarCollapsed ? "Expand" : "Collapse"} <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
-            </TooltipContent>
-          </Tooltip>
-
           {/* Logo */}
           <div className={cn("flex h-16 items-center gap-2 border-b border-border relative overflow-hidden", sidebarCollapsed ? "justify-center px-2" : "px-4")}>
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
@@ -719,8 +696,24 @@ export function Layout({ children }: LayoutProps) {
           </header>
 
           {/* Desktop top bar — aligned with sidebar header */}
-          <div className="hidden lg:flex h-16 items-center justify-end gap-2 px-6 border-b border-border relative overflow-hidden">
+          <div className="hidden lg:flex h-16 items-center gap-2 px-6 border-b border-border relative overflow-hidden">
             <div className="absolute inset-0 opacity-[0.02] bg-gradient-to-r from-cyan-500 to-transparent pointer-events-none" />
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  onClick={toggleSidebar}
+                  aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                >
+                  <PanelLeft className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {sidebarCollapsed ? "Expand" : "Collapse"} sidebar <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
+              </TooltipContent>
+            </Tooltip>
             <button
               data-tour="cmdk"
               onClick={() => {
