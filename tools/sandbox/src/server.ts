@@ -15,6 +15,7 @@ import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
 import type { DeterministicSimulation } from './deterministic.js';
 import { makeAgentPublic } from './agents.js';
 import { A2AServer } from './a2a-server.js';
+import { MCPServer } from './mcp-server.js';
 
 const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
   'ai-dev-agency': aiDevAgencyScenario,
@@ -270,6 +271,7 @@ function json(res: ServerResponse, data: unknown) {
 export function startServer(sim: Simulation): void {
   // Initialize A2A server with the simulation (cast to DeterministicSimulation)
   const a2a = new A2AServer(sim as unknown as DeterministicSimulation);
+  const mcp = new MCPServer(sim as unknown as DeterministicSimulation);
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     // CORS preflight
@@ -433,6 +435,58 @@ export function startServer(sim: Simulation): void {
         a2a.handleSubscribe(taskId, res);
         return;
       }
+    }
+
+    // ── MCP Protocol Endpoint ─────────────────────────────────────────────
+
+    // GET /mcp — no server-initiated SSE for now
+    if (path === '/mcp' && req.method === 'GET') {
+      res.writeHead(405, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(JSON.stringify({ error: 'Method Not Allowed. Use POST for MCP JSON-RPC requests.' }));
+      return;
+    }
+
+    // POST /mcp — JSON-RPC 2.0
+    if (path === '/mcp' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: string) => body += chunk);
+      req.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+
+          // Batch support
+          if (Array.isArray(parsed)) {
+            const results = parsed.map((r: any) => mcp.handleRequest(r));
+            res.writeHead(200, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            });
+            res.end(JSON.stringify(results));
+            return;
+          }
+
+          const result = mcp.handleRequest(parsed);
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          });
+          res.end(JSON.stringify(result));
+        } catch {
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          });
+          res.end(JSON.stringify({
+            jsonrpc: '2.0',
+            id: null,
+            error: { code: -32700, message: 'Parse error: invalid JSON' },
+          }));
+        }
+      });
+      return;
     }
 
     // GraphQL-compatible endpoint (handles all dashboard queries)
