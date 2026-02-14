@@ -966,6 +966,7 @@ export function startServer(sim: Simulation): void {
         '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
         '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
         '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
+        '.txt': 'text/plain', '.xml': 'application/xml', '.webp': 'image/webp',
       };
       const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', 'dashboard-dist');
       const websiteDir = process.env.WEBSITE_DIR || join(__dirname, '..', 'website-dist');
