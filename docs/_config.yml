@@ -40,7 +40,7 @@ heading_anchors: true
 # External navigation links
 nav_external_links:
   - title: Live Demo
-    url: https://openspawn.github.io/openspawn/demo/
+    url: https://bikinibottom.ai
 
 # Exclude files from build
 exclude:

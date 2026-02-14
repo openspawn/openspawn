@@ -6,144 +6,177 @@ nav_order: 2
 
 # Getting Started
 
-Get BikiniBottom running in under 5 minutes.
+Get BikiniBottom running in 2 minutes.
 
-## Prerequisites
+---
 
-- **Node.js 22+** ([download](https://nodejs.org/))
-- **pnpm** (`npm install -g pnpm`)
-- **Docker** ([download](https://docker.com/))
+## Try the Live Demo
 
-## Installation
+Visit [**bikinibottom.ai**](https://bikinibottom.ai) — 32 agents running right now. No setup required.
+{: .note }
 
-### 1. Clone the Repository
+---
 
-```bash
-git clone https://github.com/openspawn/openspawn.git
-cd openspawn
-```
+## Quick Start (Local)
 
-### 2. Install Dependencies
+### 1. Scaffold your project
 
 ```bash
-pnpm install
+npx bikinibottom init my-org
+cd my-org
 ```
 
-### 3. Start PostgreSQL
+This creates:
+- `ORG.md` — Your agent organization definition
+- `bikinibottom.config.json` — Configuration (port, providers, protocols)
+
+### 2. Start the server
 
 ```bash
-docker compose up -d postgres
+npx bikinibottom start
 ```
 
-### 4. Initialize Database
+Open [http://localhost:3333](http://localhost:3333) — your dashboard is live.
+
+### 3. Discover your agents via A2A
 
 ```bash
-# Sync schema
-node scripts/sync-db.mjs
-
-# Create admin user
-node scripts/seed-admin.mjs admin@example.com yourpassword "Your Name"
+curl http://localhost:3333/.well-known/agent.json
 ```
 
-### 5. Configure Environment
+```json
+{
+  "name": "My Org",
+  "description": "AI-powered operations",
+  "url": "http://localhost:3333",
+  "version": "1.0.0",
+  "protocolVersion": "0.3",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "extendedAgentCard": true
+  },
+  "skills": [
+    { "id": "task-delegation", "name": "Task Delegation", "description": "Delegate tasks to specialized agent teams" }
+  ]
+}
+```
 
-Copy the example environment file:
+### 4. Send a task
 
 ```bash
-cp .env.example .env
+curl -X POST http://localhost:3333/a2a/message/send \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": {
+      "role": "user",
+      "parts": [{ "kind": "text", "text": "Build a REST API for user management" }]
+    }
+  }'
 ```
 
-The defaults work for local development. For production, update:
-
-- `JWT_SECRET` — Generate with `openssl rand -hex 64`
-- `ENCRYPTION_KEY` — Generate with `openssl rand -hex 32`
-
-### 6. Start Services
+### 5. Use as MCP Tool Server
 
 ```bash
-# Start API and Dashboard
-pnpm exec nx run-many -t serve -p api,dashboard
+curl -X POST http://localhost:3333/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```
 
-Or in separate terminals:
+---
 
-```bash
-# Terminal 1: API
-pnpm exec nx run api:serve
+## Customize Your Organization
 
-# Terminal 2: Dashboard
-pnpm exec nx run dashboard:serve
+Edit `ORG.md` to define your agents:
+
+```markdown
+# My Agent Organization
+
+## Identity
+- Name: My Org
+- Mission: AI-powered operations
+
+## Structure
+
+### CEO (Level 10)
+- Name: The Boss
+- Avatar: 👑
+- Domain: operations
+- Role: coo
+
+### Engineering Lead (Level 7)
+- Name: Tech Lead
+- Avatar: 💻
+- Domain: engineering
+- Role: lead
+
+### Frontend Developer (Level 4)
+- Name: UI Builder
+- Avatar: 🎨
+- Domain: frontend
+- Role: worker
 ```
 
-## Access
+See the [CLI reference](cli) for all configuration options.
 
-| Service | URL |
-|---------|-----|
-| **Dashboard** | http://localhost:4200 |
-| **API** | http://localhost:3000 |
-| **GraphQL Playground** | http://localhost:3000/graphql |
+---
 
-## Demo Mode
+## Configuration
 
-Try BikiniBottom without creating data:
+`bikinibottom.config.json` controls your server:
 
+```json
+{
+  "port": 3333,
+  "orgFile": "ORG.md",
+  "simulation": {
+    "mode": "deterministic",
+    "tickInterval": 3000,
+    "startMode": "full"
+  },
+  "router": {
+    "preferLocal": true,
+    "providers": ["ollama", "groq"]
+  },
+  "protocols": {
+    "a2a": true,
+    "mcp": true
+  }
+}
 ```
-http://localhost:4200/?demo=true
-```
 
-Demo mode simulates:
-- Agent spawning and activation
-- Task creation and progression
-- Credit earning and spending
-- Real-time event feed
-
-### Demo Controls
-
-At the bottom of the screen:
-- ▶️ **Play/Pause** — Start or stop simulation
-- 🏃 **Speed** — 1× to 50× simulation speed
-- 🔄 **Reset** — Return to initial state
-- 📊 **Scenario** — Switch between team sizes
+---
 
 ## Next Steps
 
 | Guide | What You'll Learn |
 |-------|-------------------|
-| [Architecture Overview](openspawn/ARCHITECTURE) | System design, data flows, scaling |
-| [Agent Lifecycle](openspawn/AGENT-LIFECYCLE) | Onboarding, hierarchy, capabilities |
-| [Task Workflow](openspawn/TASK-WORKFLOW) | Templates, routing, auto-assignment |
-| [Credit System](openspawn/CREDITS) | Economy, budgets, analytics |
-| [API Reference](openspawn/API) | 50+ endpoints documented |
-| [Database Schema](openspawn/SCHEMA) | 14 tables explained |
+| [A2A Protocol](protocols/a2a) | Agent discovery, task sending, streaming |
+| [MCP Tools](protocols/mcp) | 7 tools, JSON-RPC integration, Claude Desktop setup |
+| [Model Router](features/model-router) | Provider routing, fallback chains, cost tracking |
+| [CLI Reference](cli) | All commands and configuration |
+| [Architecture](architecture) | System design and data flows |
+
+---
 
 ## Troubleshooting
 
-### Database Connection Failed
+### Port already in use
 
-Make sure PostgreSQL is running:
+Change the port in `bikinibottom.config.json`:
 
-```bash
-docker compose ps
-# Should show postgres as "Up"
+```json
+{ "port": 3334 }
 ```
 
-### Port Already in Use
+### Ollama not available
 
-Change the port in your command:
+BikiniBottom works without Ollama — it falls back to Groq or OpenRouter. Set API keys:
 
 ```bash
-# API on different port
-API_PORT=3001 pnpm exec nx run api:serve
-
-# Dashboard on different port
-pnpm exec nx run dashboard:serve -- --port 4201
+export GROQ_API_KEY=your_key
+export OPENROUTER_API_KEY=your_key
 ```
-
-### Login Not Working
-
-1. Verify user exists: `docker exec openspawn-postgres psql -U openspawn -d openspawn -c "SELECT email FROM users;"`
-2. Check API logs for errors
-3. Clear browser localStorage and try again
 
 ---
 
