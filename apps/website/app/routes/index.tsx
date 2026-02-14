@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
@@ -12,6 +13,17 @@ const features = [
 ];
 
 export function LandingPage() {
+  const [agentCount, setAgentCount] = useState(22);
+
+  useEffect(() => {
+    fetch("https://bikinibottom.ai/api/health")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.agents) setAgentCount(d.agents);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div>
       {/* Hero */}
@@ -83,7 +95,7 @@ export function LandingPage() {
       <section className="border-y border-white/5 py-16">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-8 sm:gap-12 px-8 sm:px-6 text-center">
           <div>
-            <div className="text-4xl font-bold text-cyan-400">22</div>
+            <div className="text-4xl font-bold text-cyan-400">{agentCount}</div>
             <div className="mt-1 text-sm text-slate-500">Agents</div>
           </div>
           <div className="h-8 w-px bg-white/10" />

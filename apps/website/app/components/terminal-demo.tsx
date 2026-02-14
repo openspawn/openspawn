@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 
 const lines = [
   { text: "$ npx bikinibottom init my-reef", color: "text-slate-300", delay: 0 },
-  { text: "🍍 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 800 },
-  { text: "", color: "", delay: 1200 },
-  { text: "$ npx bikinibottom start", color: "text-slate-300", delay: 1400 },
-  { text: "🌐 Server running at http://localhost:3333", color: "text-cyan-400", delay: 2200 },
-  { text: "🔗 A2A: /.well-known/agent.json", color: "text-violet-400", delay: 2600 },
-  { text: "🔌 MCP: /mcp (7 tools)", color: "text-amber-400", delay: 3000 },
-  { text: "🔀 Router: 3 providers configured", color: "text-emerald-400", delay: 3400 },
-  { text: "📊 Dashboard: http://localhost:3333", color: "text-cyan-400", delay: 3800 },
+  { text: "🍍 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
+  { text: "", color: "", delay: 1300 },
+  { text: "$ npx bikinibottom start", color: "text-slate-300", delay: 1500 },
+  { text: "🌐 Server running at http://localhost:3333", color: "text-cyan-400", delay: 2400 },
+  { text: "🔗 A2A: /.well-known/agent.json", color: "text-violet-400", delay: 2850 },
+  { text: "🔌 MCP: /mcp (7 tools)", color: "text-amber-400", delay: 3250 },
+  { text: "🔀 Router: 3 providers configured", color: "text-emerald-400", delay: 3700 },
+  { text: "📊 Dashboard: http://localhost:3333", color: "text-cyan-400", delay: 4100 },
+  { text: "", color: "", delay: 4600 },
+  { text: "✨ 22 agents ready. Visit http://localhost:3333", color: "text-cyan-300 font-semibold", delay: 5200 },
 ];
 
 export function TerminalDemo() {
@@ -17,7 +19,7 @@ export function TerminalDemo() {
 
   useEffect(() => {
     const timers = lines.map((line, i) =>
-      setTimeout(() => setVisibleLines(i + 1), line.delay)
+      setTimeout(() => setVisibleLines(i + 1), line.delay + Math.random() * 80)
     );
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -35,9 +37,7 @@ export function TerminalDemo() {
             {line.text || "\u00A0"}
           </div>
         ))}
-        {visibleLines < lines.length && (
-          <span className="cursor-blink text-slate-500">▋</span>
-        )}
+        <span className="cursor-blink text-slate-500">▋</span>
       </div>
     </div>
   );
