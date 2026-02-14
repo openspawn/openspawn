@@ -8,6 +8,7 @@ import { MCPTools } from "./routes/docs/protocols/mcp";
 import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
 import { OrgMdPage } from "./routes/org-md";
+import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
 
 const rootRoute = createRootRoute({ component: RootLayout });
 
@@ -58,9 +59,16 @@ const modelRouterRoute = createRoute({
   component: ModelRouterDocs,
 });
 
+const openclawQuickstartRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/openclaw",
+  component: OpenClawQuickstart,
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
+  openclawQuickstartRoute,
   a2aRoute,
   mcpRoute,
   dashboardRoute,
