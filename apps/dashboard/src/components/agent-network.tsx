@@ -354,7 +354,7 @@ function AgentNode({ data, selected }: NodeProps) {
             const avatarImg = nodeData.isHuman ? (
               <span className="text-lg leading-none">👤</span>
             ) : nodeData.avatarUrl ? (
-              <img src={nodeData.avatarUrl} alt={nodeData.label} className="w-8 h-8 rounded-full object-cover" />
+              <img src={nodeData.avatarUrl} alt={nodeData.label} className="w-8 h-8 rounded-full object-contain" style={{ backgroundColor: darkenForBackground(avatarColor) }} />
             ) : (
               <span
                 className="w-8 h-8 rounded-full inline-flex items-center justify-center text-xl leading-none select-none"
@@ -404,7 +404,7 @@ function AgentNode({ data, selected }: NodeProps) {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="rounded-full overflow-hidden" style={{ width: avatarSize, height: avatarSize }}>
                       {nodeData.avatarUrl ? (
-                        <img src={nodeData.avatarUrl} alt={nodeData.label} className="w-full h-full object-cover" />
+                        <img src={nodeData.avatarUrl} alt={nodeData.label} className="w-full h-full object-contain" style={{ backgroundColor: darkenForBackground(avatarColor) }} />
                       ) : (
                         <span
                           className="w-full h-full inline-flex items-center justify-center text-lg leading-none select-none"
