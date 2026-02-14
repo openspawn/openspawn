@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Github, BookOpen, Users, Network, CheckSquare } from 'lucide-react';
+import { ArrowRight, Github, BookOpen, Users, Network, CheckSquare, Link2, Plug } from 'lucide-react';
 import { useAgents } from '../hooks/use-agents';
 import { useTasks } from '../hooks/use-tasks';
 
@@ -101,13 +101,15 @@ export function IntroPage() {
           {[
             { icon: Users, label: `${agentCount} Agents` },
             { icon: Network, label: activeAgents > 0 ? `${activeAgents} Active Now` : 'Live Network' },
-            { icon: CheckSquare, label: `${taskCount}+ Tasks` },
-          ].map(({ icon: Icon, label }) => (
+            { icon: CheckSquare, label: `${taskCount}+ Tasks`, color: 'text-cyan-400' },
+            { icon: Link2, label: 'A2A v0.3', color: 'text-cyan-400', borderColor: 'border-cyan-500/50' },
+            { icon: Plug, label: 'MCP 7 tools', color: 'text-violet-400', borderColor: 'border-violet-500/50' },
+          ].map(({ icon: Icon, label, color, borderColor }) => (
             <span
               key={label}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/60 border border-slate-700/50 text-sm text-slate-300"
+              className={`flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/60 border ${borderColor || 'border-slate-700/50'} text-sm text-slate-300`}
             >
-              <Icon className="h-4 w-4 text-cyan-400" />
+              <Icon className={`h-4 w-4 ${color || 'text-cyan-400'}`} />
               {label}
             </span>
           ))}

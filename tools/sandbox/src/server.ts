@@ -125,6 +125,8 @@ function mapTask(task: SandboxTask, agents: SandboxAgent[]) {
     assigneeId: task.assigneeId ?? null,
     assignee: assignee ? { id: assignee.id, name: assignee.name } : null,
     creatorId: task.creatorId,
+    source: task.creatorId === 'human-principal' ? 'a2a' as const :
+            task.creatorId?.includes('mcp') ? 'mcp' as const : 'internal' as const,
     approvalRequired: false,
     dueDate: null,
     createdAt: new Date(task.createdAt).toISOString(),
@@ -332,6 +334,17 @@ export function startServer(sim: Simulation): void {
             return;
           }
           const task = a2a.handleSendMessage(request);
+          // Emit SSE event for dashboard
+          const messageText = request.message?.parts
+            ?.filter((p: any) => p.kind === 'text')
+            .map((p: any) => p.text)
+            .join(' ') || 'unknown';
+          sim.events.push({
+            type: 'a2a_task_received',
+            agentId: null as any,
+            message: `🔗 A2A: External task received — "${messageText.slice(0, 80)}"`,
+            timestamp: Date.now(),
+          });
           res.writeHead(200, {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
@@ -469,6 +482,15 @@ export function startServer(sim: Simulation): void {
           }
 
           const result = mcp.handleRequest(parsed);
+          // Emit SSE event for MCP tool calls
+          if (parsed.method === 'tools/call' && parsed.params?.name) {
+            sim.events.push({
+              type: 'mcp_tool_call',
+              agentId: null as any,
+              message: `🔌 MCP: Tool "${parsed.params.name}" called`,
+              timestamp: Date.now(),
+            });
+          }
           res.writeHead(200, {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',

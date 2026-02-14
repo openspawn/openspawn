@@ -52,6 +52,8 @@ import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SandboxCommandBar } from "./sandbox-command-bar";
+import { ProtocolStatus } from "./protocol-status";
+import { ProtocolActivity } from "./protocol-activity";
 import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-banner";
 import { PhaseTransitionOverlay } from "./phase-transition-overlay";
 import { ScenarioEventToasts } from "./scenario-event-toasts";
@@ -404,6 +406,20 @@ export function Layout({ children }: LayoutProps) {
                 <TooltipContent side="right" sideOffset={8}>GitHub</TooltipContent>
               </Tooltip>
             </div>
+          )}
+
+          {/* Protocol Status */}
+          {isSandboxMode && (
+            !sidebarCollapsed ? (
+              <div className="border-t border-border px-3 py-2 space-y-2">
+                <ProtocolStatus />
+                <ProtocolActivity />
+              </div>
+            ) : (
+              <div className="border-t border-border py-2 flex flex-col items-center gap-1">
+                <ProtocolStatus compact />
+              </div>
+            )
           )}
 
           {/* User & Footer */}

@@ -112,6 +112,12 @@ export function SandboxActivityFeed({ taskId, agentId, maxEvents = 50 }: Sandbox
               {event.agentName && (
                 <span className="text-cyan-400 shrink-0">[{event.agentName}]</span>
               )}
+              {(event.type.startsWith('a2a') || event.message.includes('A2A')) && (
+                <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">A2A</span>
+              )}
+              {(event.type.startsWith('mcp') || event.message.includes('MCP')) && (
+                <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-500/20 text-violet-400 border border-violet-500/30">MCP</span>
+              )}
               <span className="text-gray-300">{event.message}</span>
             </div>
           ))
