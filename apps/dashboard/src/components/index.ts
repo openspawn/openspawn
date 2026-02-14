@@ -26,3 +26,4 @@ export { TimelineView } from './timeline-view';
 export { TeamView } from './team-view';
 export { TeamStatsCards } from './team-stats-cards';
 export { OrgChart } from './org-chart';
+export { ModelRouterWidget } from "./model-router-widget";
