@@ -1,6 +1,8 @@
 import { DocsLayout, CodeBlock } from "../../../components/docs-layout";
+import { useTitle } from "../../../hooks/use-title";
 
 export function A2AProtocol() {
+  useTitle("A2A Protocol");
   return (
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">A2A Protocol</h1>

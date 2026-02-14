@@ -1,5 +1,6 @@
 import { DocsLayout } from "../../components/docs-layout";
 import { Link } from "@tanstack/react-router";
+import { useTitle } from "../../hooks/use-title";
 
 const sections = [
   { to: "/docs/getting-started", emoji: "🚀", title: "Getting Started", desc: "Get BikiniBottom running in 2 minutes." },
@@ -10,6 +11,7 @@ const sections = [
 ];
 
 export function DocsIndex() {
+  useTitle("Documentation");
   return (
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">Documentation</h1>

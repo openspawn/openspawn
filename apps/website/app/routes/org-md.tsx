@@ -1,4 +1,7 @@
+import { useTitle } from "../hooks/use-title";
+
 export function OrgMdPage() {
+  useTitle("ORG.md — Organization as Code");
   const orgSnippet = `# ORG.md — Krusty Krab
 
 ## Mission

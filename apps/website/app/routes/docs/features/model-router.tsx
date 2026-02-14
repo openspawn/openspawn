@@ -1,6 +1,8 @@
 import { DocsLayout, CodeBlock } from "../../../components/docs-layout";
+import { useTitle } from "../../../hooks/use-title";
 
 export function ModelRouterDocs() {
+  useTitle("Model Router");
   return (
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">Model Router</h1>
