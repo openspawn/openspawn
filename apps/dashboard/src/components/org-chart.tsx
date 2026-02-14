@@ -278,7 +278,7 @@ function AgentOrgNode({ data }: NodeProps) {
         )}
 
         {d.avatarUrl ? (
-          <img src={d.avatarUrl} alt={d.label} className="w-8 h-8 rounded-full flex-shrink-0 object-cover" />
+          <img src={d.avatarUrl} alt={d.label} className="w-8 h-8 rounded-full flex-shrink-0 object-contain p-0.5" style={{ backgroundColor: avatarBg }} />
         ) : (
           <span
             className="w-8 h-8 rounded-full flex-shrink-0 inline-flex items-center justify-center text-base"

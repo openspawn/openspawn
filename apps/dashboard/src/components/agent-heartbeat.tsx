@@ -78,7 +78,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
           ease: 'easeInOut',
         }}
       >
-        {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-cover" /> : (avatar || '🤖')}
+        {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-contain p-0.5" style={{ backgroundColor: darkenForBackground(avatarColor || '#71717a') }} /> : (avatar || '🤖')}
       </motion.span>
 
       {/* Status indicator dot */}

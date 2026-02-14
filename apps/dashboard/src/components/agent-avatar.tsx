@@ -102,7 +102,7 @@ export function AgentAvatar({
         ...(showRing && !presenceStatus ? { '--tw-ring-color': accentColor } as React.CSSProperties : {}),
       }}
     >
-      <AvatarImage src={avatarUrlProp} alt={name || agentId} className="object-cover" />
+      <AvatarImage src={avatarUrlProp} alt={name || agentId} className="object-contain p-0.5" style={{ backgroundColor: bgColor }} />
       <AvatarFallback
         className={cn('flex items-center justify-center', emojiSizes[size])}
         style={{ backgroundColor: bgColor }}
