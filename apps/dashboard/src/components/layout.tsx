@@ -188,7 +188,7 @@ export function Layout({ children }: LayoutProps) {
         {/* Bikini Bottom ambient backdrop */}
         <div
           className="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/bikini-bottom-bg.jpg)', opacity: 0.06 }}
+          style={{ backgroundImage: 'url(/app/bikini-bottom-bg.jpg)', opacity: 0.06 }}
           aria-hidden="true"
         />
         {/* Sidebar */}
