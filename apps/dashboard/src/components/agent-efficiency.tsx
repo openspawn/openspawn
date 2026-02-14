@@ -17,6 +17,7 @@ interface ComputedEfficiency {
   level: number;
   avatar: string;
   avatarColor: string;
+  avatarUrl?: string | null;
   tasksCompleted: number;
   totalAssigned: number;
   creditsSpent: number;
@@ -63,6 +64,7 @@ export function AgentEfficiencyLeaderboard() {
         level: agent.level,
         avatar: agent.avatar ?? '',
         avatarColor: agent.avatarColor ?? '',
+        avatarUrl: agent.avatarUrl,
         tasksCompleted,
         totalAssigned,
         creditsSpent,
@@ -184,6 +186,8 @@ export function AgentEfficiencyLeaderboard() {
                 level={agent.level}
                 size="sm"
                 avatar={agent.avatar}
+
+                avatarUrl={agent.avatarUrl}
                 avatarColor={agent.avatarColor}
                 showRing={false}
               />

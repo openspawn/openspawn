@@ -92,6 +92,7 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     teamId: domainToTeamId(agent.domain),
     avatar: agent.avatar ?? null,
     avatarColor: agent.avatarColor ?? null,
+    avatarUrl: agent.avatarUrl ?? null,
     systemPrompt: agent.systemPrompt,
     trigger: agent.trigger,
     triggerOn: agent.triggerOn ?? null,

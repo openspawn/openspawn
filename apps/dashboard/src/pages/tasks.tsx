@@ -99,13 +99,16 @@ function formatFullDate(dateStr?: string | null) {
   });
 }
 
+type AgentAvatarMap = Map<string, { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }>;
+
 interface TaskCardProps {
   task: Task;
   onClick: () => void;
   compact?: boolean;
+  agentMap: AgentAvatarMap;
 }
 
-function TaskCard({ task, onClick, compact }: TaskCardProps) {
+function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
   const dueDate = formatDate(task.dueDate);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
@@ -171,10 +174,10 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 {task.assignee ? (
                   <div className="flex items-center gap-1">
-                    {(() => { const a = agentMap.get(task.assigneeId); return (
+                    {(() => { const a = agentMap.get(task.assigneeId!); return (
                     <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
                       style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                      {a?.avatar || '🤖'}
+                      {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" /> : (a?.avatar || '🤖')}
                     </div>); })()}
                     <span className="truncate max-w-[100px]">{task.assignee.name}</span>
                   </div>
@@ -207,9 +210,10 @@ function TaskCard({ task, onClick, compact }: TaskCardProps) {
 interface TaskDetailSidebarProps {
   task: Task;
   onClose: () => void;
+  agentMap: AgentAvatarMap;
 }
 
-function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
+function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) {
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
   
@@ -328,10 +332,10 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
               </div>
               {task.assignee ? (
                 <div className="flex items-center gap-2">
-                  {(() => { const a = agentMap.get(task.assigneeId); return (
+                  {(() => { const a = agentMap.get(task.assigneeId!); return (
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
                     style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                    {a?.avatar || '🤖'}
+                    {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" /> : (a?.avatar || '🤖')}
                   </div>); })()}
                   <span className="text-sm font-medium">{task.assignee.name}</span>
                 </div>
@@ -417,7 +421,7 @@ function TaskDetailSidebar({ task, onClose }: TaskDetailSidebarProps) {
   );
 }
 
-function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task: Task) => void }) {
+function KanbanView({ tasks, onTaskClick, agentMap }: { tasks: Task[]; onTaskClick: (task: Task) => void; agentMap: AgentAvatarMap }) {
   return (
     <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-3 px-3 sm:-mx-4 sm:px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide">
       {statusColumns.map((column) => {
@@ -435,7 +439,7 @@ function KanbanView({ tasks, onTaskClick }: { tasks: Task[]; onTaskClick: (task:
               <div className="space-y-2 pr-2">
                 <AnimatePresence mode="popLayout">
                   {columnTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} compact />
+                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} compact agentMap={agentMap} />
                   ))}
                 </AnimatePresence>
                 {columnTasks.length === 0 && (
@@ -456,9 +460,10 @@ interface ListViewProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   selectedTaskId?: string;
+  agentMap: AgentAvatarMap;
 }
 
-function ListView({ tasks, onTaskClick, selectedTaskId }: ListViewProps) {
+function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProps) {
   return (
     <Card>
       <div className="divide-y divide-border">
@@ -502,10 +507,10 @@ function ListView({ tasks, onTaskClick, selectedTaskId }: ListViewProps) {
                 <div className="flex items-center gap-3 sm:contents text-xs sm:text-sm pl-0 sm:pl-0">
                   {task.assignee ? (
                     <div className="flex items-center gap-1 sm:w-28 flex-shrink-0 sm:order-5">
-                      {(() => { const a = agentMap.get(task.assigneeId); return (
+                      {(() => { const a = agentMap.get(task.assigneeId!); return (
                       <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
                         style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                        {a?.avatar || '🤖'}
+                        {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" /> : (a?.avatar || '🤖')}
                       </div>); })()}
                       <span className="text-muted-foreground truncate">
                         {task.assignee.name}
@@ -565,8 +570,8 @@ export function TasksPage() {
   
   const { agents } = useAgents();
   const agentMap = useMemo(() => {
-    const m = new Map<string, { avatar?: string | null; avatarColor?: string | null }>();
-    agents.forEach((a: any) => m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor }));
+    const m = new Map<string, { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }>();
+    agents.forEach((a: any) => m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor, avatarUrl: a.avatarUrl }));
     return m;
   }, [agents]);
   const { teams: allTeams } = useTeams();
@@ -650,7 +655,7 @@ export function TasksPage() {
   function handleTaskClick(task: Task) {
     setSelectedTask(task);
     openSidePanel(
-      <TaskDetailSidebar task={task} onClose={() => { setSelectedTask(null); closeSidePanel(); }} />,
+      <TaskDetailSidebar task={task} onClose={() => { setSelectedTask(null); closeSidePanel(); }} agentMap={agentMap} />,
       { width: 480 }
     );
   }
@@ -732,7 +737,7 @@ export function TasksPage() {
         </TabsList>
         
         <TabsContent value="kanban" className="mt-4">
-          <KanbanView tasks={tasks} onTaskClick={handleTaskClick} />
+          <KanbanView tasks={tasks} onTaskClick={handleTaskClick} agentMap={agentMap} />
         </TabsContent>
         
         <TabsContent value="list" className="mt-4 space-y-4">
@@ -818,6 +823,7 @@ export function TasksPage() {
             tasks={filteredAndSortedTasks} 
             onTaskClick={handleTaskClick}
             selectedTaskId={selectedTask?.id}
+            agentMap={agentMap}
           />
         </TabsContent>
 

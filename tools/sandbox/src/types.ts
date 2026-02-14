@@ -23,6 +23,7 @@ export interface SandboxAgent {
   domain: string;
   avatar?: string;
   avatarColor?: string;
+  avatarUrl?: string;
   parentId?: string;
   status: 'active' | 'idle' | 'busy' | 'pending';
   systemPrompt: string;

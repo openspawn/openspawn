@@ -60,6 +60,7 @@ type AgentType {
   updatedAt: DateTime!
   avatar: String
   avatarColor: String
+  avatarUrl: String
 }
 
 type ChannelGqlType {

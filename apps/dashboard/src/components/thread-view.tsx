@@ -173,7 +173,10 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                       const agentData = agentMap.get(msg.fromAgentId);
                       const emoji = agentData?.avatar || '🤖';
                       const color = agentData?.avatarColor || '#71717a';
-                      return (
+                      const imgUrl = agentData?.avatarUrl;
+                      return imgUrl ? (
+                        <img src={imgUrl} alt={sender?.name} className="w-7 h-7 rounded-full object-cover" />
+                      ) : (
                         <span
                           className="w-7 h-7 rounded-full inline-flex items-center justify-center text-sm"
                           style={{ backgroundColor: darkenForBackground(color) }}

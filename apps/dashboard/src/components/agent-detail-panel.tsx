@@ -738,6 +738,8 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
                 level={agent.level} 
                 size="lg"
                 avatar={agent.avatar}
+
+                avatarUrl={agent.avatarUrl}
                 avatarColor={agent.avatarColor}
               />
               <div className="flex-1 min-w-0">
