@@ -19,6 +19,7 @@ COPY tools/sandbox/org/ ./tools/sandbox/org/
 
 ENV VITE_SANDBOX_MODE=true
 RUN pnpm nx run dashboard:build --configuration=production
+RUN pnpm nx run website:build
 
 # Stage 2: Minimal runtime
 FROM node:24-alpine AS runtime
@@ -36,9 +37,11 @@ COPY tools/sandbox/src/ ./src/
 COPY tools/sandbox/ORG.md ./
 COPY tools/sandbox/org/ ./org/
 
-# Copy built dashboard
+# Copy built dashboard and website
 COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
+COPY --from=build /app/dist/apps/website ./website-dist
 
+ENV WEBSITE_DIR=/app/website-dist
 ENV NODE_ENV=production
 ENV SANDBOX_PORT=3333
 ENV SERVE_DASHBOARD=1
