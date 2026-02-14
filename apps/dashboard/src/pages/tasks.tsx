@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook } from "lucide-react";
+import { Plus, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook, Link2, Plug } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -147,6 +147,18 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                   <Badge variant="outline" className="text-xs text-cyan-500 border-cyan-500/30">
                     <Webhook className="w-3 h-3 mr-1" />
                     webhook
+                  </Badge>
+                )}
+                {(task as any).source === 'a2a' && (
+                  <Badge variant="outline" className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10">
+                    <Link2 className="w-3 h-3 mr-1" />
+                    A2A
+                  </Badge>
+                )}
+                {(task as any).source === 'mcp' && (
+                  <Badge variant="outline" className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10">
+                    <Plug className="w-3 h-3 mr-1" />
+                    MCP
                   </Badge>
                 )}
                 {hasRejection && (
