@@ -8,8 +8,8 @@ export function ProtocolActivity() {
   const [mcpCount, setMcpCount] = useState(0);
   const [a2aPulse, setA2aPulse] = useState(false);
   const [mcpPulse, setMcpPulse] = useState(false);
-  const a2aTimer = useRef<ReturnType<typeof setTimeout>>();
-  const mcpTimer = useRef<ReturnType<typeof setTimeout>>();
+  const a2aTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const mcpTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (!isSandboxMode) return;

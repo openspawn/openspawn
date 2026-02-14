@@ -52,7 +52,7 @@ import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
 import { isSandboxMode } from "../graphql/fetcher";
-import { SandboxCommandBar } from "./sandbox-command-bar";
+// SandboxCommandBar removed — ghost-typing prompt doesn't match replay demo UX
 import { ProtocolStatus } from "./protocol-status";
 import { ProtocolActivity } from "./protocol-activity";
 import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-banner";
@@ -192,12 +192,35 @@ export function Layout({ children }: LayoutProps) {
         />
         {/* Sidebar */}
         <motion.aside
-          className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden"
+          className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden relative"
           animate={{ width: sidebarWidth }}
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Logo + collapse toggle */}
-          <div className="flex h-16 items-center gap-2 border-b border-border px-4 relative overflow-hidden">
+          {/* Expand/collapse toggle — floats on the sidebar edge */}
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute top-[18px] -right-3 z-10 h-6 w-6 rounded-full border bg-background shadow-sm text-muted-foreground hover:text-foreground"
+                onClick={toggleSidebar}
+                aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <motion.div
+                  animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
+                  transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                </motion.div>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={12}>
+              {sidebarCollapsed ? "Expand" : "Collapse"} <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Logo */}
+          <div className={cn("flex h-16 items-center gap-2 border-b border-border relative overflow-hidden", sidebarCollapsed ? "justify-center px-2" : "px-4")}>
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
             {!sidebarCollapsed && (
@@ -216,32 +239,11 @@ export function Layout({ children }: LayoutProps) {
                 </span>
               </motion.div>
             )}
-            <div className="ml-auto flex items-center gap-1">
-              {!sidebarCollapsed && isDemo && activeCount > 0 && (
+            {!sidebarCollapsed && isDemo && activeCount > 0 && (
+              <div className="ml-auto">
                 <ActiveAgentsBadge count={activeCount} />
-              )}
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                    onClick={toggleSidebar}
-                    aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                  >
-                    <motion.div
-                      animate={{ rotate: sidebarCollapsed ? 180 : 0 }}
-                      transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </motion.div>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>
-                  {sidebarCollapsed ? "Expand" : "Collapse"} <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
-                </TooltipContent>
-              </Tooltip>
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -754,7 +756,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Main content + side panel */}
           <div className="flex flex-1 min-h-0">
             <main ref={mainContentRef} className="flex-1 overflow-y-auto overflow-x-hidden min-w-0">
-              <div className={`${fullBleedRoutes.has(location.pathname) ? 'h-full' : 'mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl w-full'} ${scenarioStatus ? 'pt-12' : ''} pb-24 sm:pb-20`}>{children}</div>
+              <div className={`${fullBleedRoutes.has(location.pathname) ? 'h-full' : 'mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl w-full'} ${scenarioStatus ? 'pt-12' : ''} pb-16 sm:pb-6`}>{children}</div>
             </main>
 
             {/* Global Side Panel - desktop: inline, mobile: full-screen overlay */}
@@ -805,7 +807,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Mobile bottom navigation bar */}
-          <nav className={`fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden ${isSandboxMode ? 'bottom-[52px]' : ''}`}>
+          <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-border sm:hidden">
             <div className="flex items-center justify-around h-14">
               {bottomNavItems.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -827,8 +829,7 @@ export function Layout({ children }: LayoutProps) {
           </nav>
         </div>
 
-        {/* Sandbox command bar — fixed at bottom */}
-        <SandboxCommandBar />
+        {/* Command bar removed — ghost-typing prompt didn't match demo UX */}
       </div>
 
       {/* Scenario experience overlays */}
