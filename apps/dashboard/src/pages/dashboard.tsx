@@ -15,7 +15,7 @@ function useStableSize(ref: React.RefObject<HTMLElement | null>) {
   }, [ref]);
   return size;
 }
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -268,7 +268,7 @@ export function DashboardPage() {
       case "teams-overview":
         return (
           <TeamStatsCards
-            onTeamClick={(teamId) => navigate(`/agents?tab=teams&team=${teamId}`)}
+            onTeamClick={(teamId) => navigate({ to: '/agents', search: { tab: 'teams', team: teamId } })}
           />
         );
       case "credit-flow-chart":
@@ -281,7 +281,7 @@ export function DashboardPage() {
         return (
           <IdleAgentsWidget
             maxCount={6}
-            onAgentClick={(agent) => navigate(`/agents?selected=${agent.agentId}`)}
+            onAgentClick={(agent) => navigate({ to: '/agents', search: { selected: agent.agentId } })}
           />
         );
       default:

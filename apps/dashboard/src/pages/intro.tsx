@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, Github, BookOpen, Users, Network, CheckSquare, Link2, Plug } from 'lucide-react';
 import { useAgents } from '../hooks/use-agents';
@@ -122,7 +122,7 @@ export function IntroPage() {
           transition={{ duration: 0.8, delay: 0.5 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/')}
+          onClick={() => navigate({ to: '/' })}
           className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-lg shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-shadow"
         >
           Dive In

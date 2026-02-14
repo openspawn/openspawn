@@ -1,6 +1,5 @@
-import { useLocation, Routes } from "react-router-dom";
+import { useLocation, Outlet } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import type { ReactNode } from "react";
 
 const reduceMotion =
   typeof window !== "undefined" &&
@@ -18,15 +17,12 @@ const transition = reduceMotion
   ? { duration: 0 }
   : { duration: 0.25, ease: [0, 0, 0.2, 1] as [number, number, number, number] };
 
-const exitTransition = reduceMotion
-  ? { duration: 0 }
-  : { duration: 0.15, ease: [0.4, 0, 1, 1] as [number, number, number, number] };
-
-interface PageTransitionProps {
-  children: ReactNode;
-}
-
-export function PageTransition({ children }: PageTransitionProps) {
+/**
+ * Page transition wrapper — now uses TanStack Router's Outlet.
+ * Note: In the new routing setup, transitions are handled in the layout route (routes.tsx).
+ * This component is kept for backward compatibility.
+ */
+export function PageTransition() {
   const location = useLocation();
 
   return (
@@ -40,7 +36,7 @@ export function PageTransition({ children }: PageTransitionProps) {
         transition={transition}
         style={{ willChange: "opacity, transform" }}
       >
-        <Routes location={location}>{children}</Routes>
+        <Outlet />
       </motion.div>
     </AnimatePresence>
   );

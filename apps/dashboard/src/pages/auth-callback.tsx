@@ -1,32 +1,32 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 
 import { useOAuthCallback } from "../contexts";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<string, string | undefined>;
 
   // Handle OAuth callback
   useOAuthCallback();
 
   useEffect(() => {
-    const error = searchParams.get("error");
+    const error = searchParams?.error;
     if (error) {
       // Redirect to login with error
-      navigate(`/login?error=${encodeURIComponent(error)}`);
+      navigate({ to: "/login", search: { error } });
       return;
     }
 
     // If no tokens in URL, check if we were redirected after storage
     const hasTokens =
-      searchParams.get("accessToken") &&
-      searchParams.get("refreshToken") &&
-      searchParams.get("expiresIn");
+      searchParams?.accessToken &&
+      searchParams?.refreshToken &&
+      searchParams?.expiresIn;
 
     if (!hasTokens) {
       // OAuth callback should have redirected us, go to home
-      navigate("/");
+      navigate({ to: "/" });
     }
   }, [navigate, searchParams]);
 

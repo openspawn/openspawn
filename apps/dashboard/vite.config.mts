@@ -15,7 +15,7 @@ const commitSha = (() => {
 const buildTime = new Date().toISOString();
 
 const isDemo = process.env.VITE_DEMO_MODE === 'true';
-const basePath = isDemo ? '/openspawn/demo/' : '/';
+const basePath = isDemo ? '/openspawn/demo/' : '/app/';
 
 // Plugin to fix base href in HTML and create 404.html for SPA routing
 function fixBaseHref(): Plugin {
