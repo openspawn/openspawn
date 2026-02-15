@@ -4,31 +4,34 @@ export interface AgentDef {
   id: string;
   name: string;
   emoji: string;
+  avatarUrl?: string;
 }
 
+const av = (name: string) => `/app/avatars/${name}.png`;
+
 export const AGENTS: Record<string, AgentDef> = {
-  'mr-krabs': { id: 'mr-krabs', name: 'Mr. Krabs', emoji: '🦀' },
-  'spongebob-squarepants': { id: 'spongebob-squarepants', name: 'SpongeBob', emoji: '🧽' },
-  'squidward-tentacles': { id: 'squidward-tentacles', name: 'Squidward', emoji: '🐙' },
-  'squilliam-fancyson': { id: 'squilliam-fancyson', name: 'Squilliam', emoji: '🎩' },
-  'sandy-cheeks': { id: 'sandy-cheeks', name: 'Sandy', emoji: '🐿️' },
-  'karen': { id: 'karen', name: 'Karen', emoji: '🖥️' },
-  'pearl-krabs': { id: 'pearl-krabs', name: 'Pearl', emoji: '🐳' },
+  'mr-krabs': { id: 'mr-krabs', name: 'Mr. Krabs', emoji: '🦀', avatarUrl: av('mr-krabs') },
+  'spongebob-squarepants': { id: 'spongebob-squarepants', name: 'SpongeBob', emoji: '🧽', avatarUrl: av('spongebob') },
+  'squidward-tentacles': { id: 'squidward-tentacles', name: 'Squidward', emoji: '🐙', avatarUrl: av('squidward') },
+  'squilliam-fancyson': { id: 'squilliam-fancyson', name: 'Squilliam', emoji: '🎩', avatarUrl: av('squilliam') },
+  'sandy-cheeks': { id: 'sandy-cheeks', name: 'Sandy', emoji: '🐿️', avatarUrl: av('sandy') },
+  'karen': { id: 'karen', name: 'Karen', emoji: '🖥️', avatarUrl: av('karen') },
+  'pearl-krabs': { id: 'pearl-krabs', name: 'Pearl', emoji: '🐳', avatarUrl: av('pearl') },
   'perch-perkins': { id: 'perch-perkins', name: 'Perch Perkins', emoji: '🐟' },
-  'mermaid-man': { id: 'mermaid-man', name: 'Mermaid Man', emoji: '🦸‍♂️' },
+  'mermaid-man': { id: 'mermaid-man', name: 'Mermaid Man', emoji: '🦸‍♂️', avatarUrl: av('mermaid-man') },
   'plankton-jr': { id: 'plankton-jr', name: 'Plankton Jr', emoji: '🧫' },
-  'patrick-star': { id: 'patrick-star', name: 'Patrick', emoji: '⭐' },
-  'gary': { id: 'gary', name: 'Gary', emoji: '🐌' },
-  'plankton': { id: 'plankton', name: 'Plankton', emoji: '🦠' },
-  'barnacle-boy': { id: 'barnacle-boy', name: 'Barnacle Boy', emoji: '🦸' },
-  'larry-the-lobster': { id: 'larry-the-lobster', name: 'Larry', emoji: '🦞' },
+  'patrick-star': { id: 'patrick-star', name: 'Patrick', emoji: '⭐', avatarUrl: av('patrick') },
+  'gary': { id: 'gary', name: 'Gary', emoji: '🐌', avatarUrl: av('gary') },
+  'plankton': { id: 'plankton', name: 'Plankton', emoji: '🦠', avatarUrl: av('plankton') },
+  'barnacle-boy': { id: 'barnacle-boy', name: 'Barnacle Boy', emoji: '🦸', avatarUrl: av('barnacle-boy') },
+  'larry-the-lobster': { id: 'larry-the-lobster', name: 'Larry', emoji: '🦞', avatarUrl: av('larry') },
   'bubble-bass': { id: 'bubble-bass', name: 'Bubble Bass', emoji: '🐡' },
   'dennis': { id: 'dennis', name: 'Dennis', emoji: '🕶️' },
-  'flying-dutchman': { id: 'flying-dutchman', name: 'Flying Dutchman', emoji: '👻' },
+  'flying-dutchman': { id: 'flying-dutchman', name: 'Flying Dutchman', emoji: '👻', avatarUrl: av('flying-dutchman') },
   'fred-1': { id: 'fred-1', name: 'Fred', emoji: '🧑' },
   'fred-2': { id: 'fred-2', name: 'Fred 2', emoji: '🧑' },
   'fred-3': { id: 'fred-3', name: 'Fred 3', emoji: '🧑' },
-  'mrs-puff': { id: 'mrs-puff', name: 'Mrs. Puff', emoji: '🐠' },
+  'mrs-puff': { id: 'mrs-puff', name: 'Mrs. Puff', emoji: '🐠', avatarUrl: av('mrs-puff') },
 };
 
 // ── Stats ────────────────────────────────────────────────────────────────────
