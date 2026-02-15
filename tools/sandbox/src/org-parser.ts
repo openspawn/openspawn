@@ -385,7 +385,9 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
 
       const deptMeta = extractMetaFromNodes(dept.content);
       const deptProse = extractProseFromNodes(dept.content);
-      const { level: deptLevel, role: deptRole } = inferLevelAndRole(dept.heading);
+      const inferred = inferLevelAndRole(dept.heading);
+      const deptLevel = deptMeta['level'] ? parseInt(deptMeta['level']) || inferred.level : inferred.level;
+      const deptRole = inferred.role;
 
       const isCLevel = deptLevel >= 10;
 
@@ -420,7 +422,9 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
 
         const subMeta = extractMetaFromNodes(sub.content);
         const subProse = extractProseFromNodes(sub.content);
-        const { level: subLevel, role: subRole } = inferLevelAndRole(sub.heading);
+        const subInferred = inferLevelAndRole(sub.heading);
+        const subLevel = subMeta['level'] ? parseInt(subMeta['level']) || subInferred.level : subInferred.level;
+        const subRole = subInferred.role;
 
         const id = makeId(subMeta['id'] ?? nameFromHeading(sub.heading));
         const domain = subMeta['domain'] ?? dept.heading;
