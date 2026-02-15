@@ -218,10 +218,10 @@ maintaining operational excellence across all stations.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="/app/"
+              href="/app/live"
               className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400"
             >
-              Launch Live Demo →
+              Watch the Demo →
             </a>
             <a
               href="/docs/getting-started"

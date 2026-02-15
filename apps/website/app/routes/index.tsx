@@ -98,7 +98,7 @@ export function LandingPage() {
       Define teams, hierarchy, and policies in markdown. Open source.
      </p>
      <div className="animate-fade-in-up animate-delay-300 mb-10 flex flex-wrap items-center justify-center gap-4">
-      <a href="/app/" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">Launch Live Demo →</a>
+      <a href="/app/live" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">Watch the Demo →</a>
       <a href="/docs/getting-started" className="rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-base font-semibold text-slate-200 transition hover:bg-white/10">Get Started</a>
      </div>
      <div className="animate-fade-in-up animate-delay-400 mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
