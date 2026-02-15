@@ -30,34 +30,34 @@ const NODE_LAYOUT: NodeDef[] = [
   // Layer 0: CEO
   { id: 'mr-krabs', x: CX, y: LY[0] },
   // Layer 1: VPs
-  { id: 'spongebob-squarepants', x: CX - 350, y: LY[1], parent: 'mr-krabs' },
+  { id: 'spongebob-squarepants', x: CX - 400, y: LY[1], parent: 'mr-krabs' },
   { id: 'squidward-tentacles', x: CX, y: LY[1], parent: 'mr-krabs' },
-  { id: 'squilliam-fancyson', x: CX + 350, y: LY[1], parent: 'mr-krabs' },
-  // Layer 2: SpongeBob's reports
+  { id: 'squilliam-fancyson', x: CX + 400, y: LY[1], parent: 'mr-krabs' },
+  // Layer 2: SpongeBob's reports (The Kitchen)
   { id: 'sandy-cheeks', x: CX - 500, y: LY[2], parent: 'spongebob-squarepants' },
-  { id: 'karen', x: CX - 350, y: LY[2], parent: 'spongebob-squarepants' },
-  { id: 'pearl-krabs', x: CX - 200, y: LY[2], parent: 'spongebob-squarepants' },
-  // Layer 2: Squidward's reports
-  { id: 'perch-perkins', x: CX - 75, y: LY[2], parent: 'squidward-tentacles' },
-  { id: 'mermaid-man', x: CX + 75, y: LY[2], parent: 'squidward-tentacles' },
+  { id: 'karen', x: CX - 300, y: LY[2], parent: 'spongebob-squarepants' },
+  // Layer 2: Squidward's reports (The Register)
+  { id: 'pearl-krabs', x: CX - 150, y: LY[2], parent: 'squidward-tentacles' },
+  { id: 'perch-perkins', x: CX - 25, y: LY[2], parent: 'squidward-tentacles' },
   { id: 'barnacle-boy', x: CX + 150, y: LY[2], parent: 'squidward-tentacles' },
-  // Layer 2: Squilliam's reports
-  { id: 'plankton-jr', x: CX + 300, y: LY[2], parent: 'squilliam-fancyson' },
-  { id: 'mrs-puff', x: CX + 430, y: LY[2], parent: 'squilliam-fancyson' },
+  // Layer 2: Squilliam's reports (The Vault)
+  { id: 'plankton', x: CX + 350, y: LY[2], parent: 'squilliam-fancyson' },
+  { id: 'mrs-puff', x: CX + 475, y: LY[2], parent: 'squilliam-fancyson' },
   // Layer 3: Sandy's reports
-  { id: 'patrick-star', x: CX - 570, y: LY[3], parent: 'sandy-cheeks' },
+  { id: 'patrick-star', x: CX - 575, y: LY[3], parent: 'sandy-cheeks' },
   { id: 'gary', x: CX - 500, y: LY[3], parent: 'sandy-cheeks' },
-  { id: 'plankton', x: CX - 430, y: LY[3], parent: 'sandy-cheeks' },
+  { id: 'plankton-jr', x: CX - 425, y: LY[3], parent: 'sandy-cheeks' },
   // Layer 3: Karen's report
-  { id: 'bubble-bass', x: CX - 350, y: LY[3], parent: 'karen' },
-  // Layer 3: Perch's reports (the Freds)
-  { id: 'larry-the-lobster', x: CX - 150, y: LY[3], parent: 'perch-perkins' },
-  { id: 'dennis', x: CX - 75, y: LY[3], parent: 'perch-perkins' },
-  // Layer 3: Mermaid Man's reports
-  { id: 'flying-dutchman', x: CX + 30, y: LY[3], parent: 'mermaid-man' },
-  { id: 'fred-1', x: CX + 105, y: LY[3], parent: 'mermaid-man' },
-  { id: 'fred-2', x: CX + 180, y: LY[3], parent: 'mermaid-man' },
-  { id: 'fred-3', x: CX + 255, y: LY[3], parent: 'mermaid-man' },
+  { id: 'mermaid-man', x: CX - 300, y: LY[3], parent: 'karen' },
+  // Layer 3: Perch Perkins' reports
+  { id: 'larry-the-lobster', x: CX - 100, y: LY[3], parent: 'perch-perkins' },
+  { id: 'bubble-bass', x: CX - 25, y: LY[3], parent: 'perch-perkins' },
+  { id: 'dennis', x: CX + 50, y: LY[3], parent: 'perch-perkins' },
+  // Layer 3: Barnacle Boy's reports
+  { id: 'flying-dutchman', x: CX + 125, y: LY[3], parent: 'barnacle-boy' },
+  { id: 'fred-1', x: CX + 200, y: LY[3], parent: 'barnacle-boy' },
+  { id: 'fred-2', x: CX + 250, y: LY[3], parent: 'barnacle-boy' },
+  { id: 'fred-3', x: CX + 300, y: LY[3], parent: 'barnacle-boy' },
 ];
 
 // ── Types ────────────────────────────────────────────────────────────────────
