@@ -2,20 +2,22 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function demoCommand(): void {
-  const configPath = join(process.cwd(), 'bikinibottom.config.json');
+  const configPath = join(process.cwd(), 'openspawn.config.json');
+  const legacyConfigPath = join(process.cwd(), 'bikinibottom.config.json');
 
-  if (!existsSync(configPath)) {
+  if (!existsSync(configPath) && !existsSync(legacyConfigPath)) {
     console.log(`
-\x1b[31m✗\x1b[0m No bikinibottom.config.json found in current directory.
+\x1b[31m✗\x1b[0m No openspawn.config.json found in current directory.
 
-Run \x1b[33mbikinibottom init\x1b[0m first to scaffold a project.
+Run \x1b[36mopenspawn init\x1b[0m first to scaffold a project.
 `);
     process.exit(1);
   }
 
   console.log(`
-\x1b[33m🍍 Starting BikiniBottom Demo...\x1b[0m
+\x1b[36m🪸 Starting OpenSpawn Demo...\x1b[0m
 
+Loading the BikiniBottom 🍍 demo scenario.
 Sending demo task: "Build a REST API for user management"
 Watch the agents coordinate at http://localhost:3333
 

@@ -1,15 +1,15 @@
-# 🍍 BikiniBottom
+# 🪸 OpenSpawn
 
 **AI agent orchestration control plane** — run 32 agents locally with A2A + MCP support.
 
-BikiniBottom is the control plane your AI agents deserve. Define your organization in a simple Markdown file, and watch agents coordinate tasks in real-time with protocol-native communication.
+OpenSpawn is the control plane your AI agents deserve. Define your organization in a simple Markdown file, and watch agents coordinate tasks in real-time with protocol-native communication.
 
 ## Quick Start
 
 ```bash
-npx bikinibottom init my-org
+npx openspawn init my-org
 cd my-org
-bikinibottom start
+openspawn start
 ```
 
 Open [http://localhost:3333](http://localhost:3333) to see the real-time dashboard.
@@ -27,14 +27,14 @@ Open [http://localhost:3333](http://localhost:3333) to see the real-time dashboa
 
 | Command | Description |
 |---------|-------------|
-| `bikinibottom init [name]` | Scaffold a new agent organization |
-| `bikinibottom start` | Start the local control plane server |
-| `bikinibottom status` | Show current server status |
-| `bikinibottom demo` | Start with a demo scenario running |
+| `openspawn init [name]` | Scaffold a new agent organization |
+| `openspawn start` | Start the local control plane server |
+| `openspawn status` | Show current server status |
+| `openspawn demo` | Start with the BikiniBottom demo scenario |
 
 ## Configuration
 
-After `init`, edit `bikinibottom.config.json`:
+After `init`, edit `openspawn.config.json`:
 
 ```json
 {
@@ -75,9 +75,14 @@ Agents inherit hierarchy from heading levels and communicate via A2A protocol.
 - **A2A** → `http://localhost:3333/.well-known/agent.json`
 - **MCP** → `http://localhost:3333/mcp`
 
+## Showcase
+
+Check out the [BikiniBottom demo](https://bikinibottom.ai) — a 32-agent SpongeBob-themed showcase built with OpenSpawn.
+
 ## Links
 
-- 🌐 **Live Demo:** [bikinibottom.ai](https://bikinibottom.ai)
+- 🌐 **Website:** [openspawn.ai](https://openspawn.ai)
+- 🍍 **Live Demo:** [bikinibottom.ai](https://bikinibottom.ai)
 - 📖 **GitHub:** [openspawn/openspawn](https://github.com/openspawn/openspawn)
 
 ## License

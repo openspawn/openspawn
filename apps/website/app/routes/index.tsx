@@ -8,7 +8,7 @@ const features = [
  { emoji: "🔌", title: "MCP Tools", description: "7 tools via Streamable HTTP. Your agents become MCP servers — connect from Claude Desktop, Cursor, or any MCP client.", color: "text-violet-400" },
  { emoji: "🔀", title: "Model Router", description: "Intelligent routing with fallback chains. Local-first with Ollama, cloud when needed. Cost tracking per provider.", color: "text-emerald-400" },
  { emoji: "📊", title: "Live Dashboard", description: "Real-time visualization of your agent organization. Network graph, task timeline, cost charts, router metrics.", color: "text-amber-400" },
- { emoji: "💻", title: "CLI", description: "npx bikinibottom init — zero config, instant setup. Scaffold, start, and deploy in seconds.", color: "text-cyan-400" },
+ { emoji: "💻", title: "CLI", description: "npx openspawn init — zero config, instant setup. Scaffold, start, and deploy in seconds.", color: "text-cyan-400" },
 ];
 
 const frameworks = [
@@ -73,6 +73,10 @@ export function LandingPage() {
 
  return (
   <div className="px-5 sm:px-6">
+   {/* Built with OpenSpawn */}
+   <div className="text-center py-2 text-xs text-slate-500">
+    Built with <a href="https://openspawn.ai" className="text-cyan-400 hover:text-cyan-300 transition font-medium">🪸 OpenSpawn</a>
+   </div>
    {/* Hero */}
    <section className="relative overflow-hidden pb-20 pt-24 md:pt-32">
     <div className="pointer-events-none absolute inset-0">
@@ -107,11 +111,11 @@ export function LandingPage() {
      <div className="animate-fade-in-up animate-delay-500 mb-16">
       <div className="group relative mx-auto inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-mono text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.08]">
        <span className="text-slate-500">$</span>
-       <span>npx bikinibottom init my-reef</span>
+       <span>npx openspawn init my-reef</span>
        <button
         type="button"
         className="ml-1 rounded p-1 text-slate-500 transition hover:bg-white/10 hover:text-cyan-400"
-        onClick={() => { navigator.clipboard.writeText("npx bikinibottom init my-reef"); }}
+        onClick={() => { navigator.clipboard.writeText("npx openspawn init my-reef"); }}
         aria-label="Copy to clipboard"
        >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

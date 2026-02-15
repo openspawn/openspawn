@@ -1,23 +1,23 @@
 {
-  "name": "bikinibottom",
+  "name": "openspawn",
   "version": "0.1.0",
-  "description": "AI agent orchestration control plane — run 32 agents locally with A2A + MCP support",
+  "description": "OpenSpawn — AI agent orchestration control plane with A2A + MCP support",
   "type": "module",
   "bin": {
-    "bikinibottom": "./dist/cli.js"
+    "openspawn": "./dist/cli.js"
   },
   "files": ["dist/", "README.md", "templates/"],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts"
   },
-  "keywords": ["ai", "agents", "a2a", "mcp", "orchestration", "multi-agent"],
+  "keywords": ["ai", "agents", "a2a", "mcp", "orchestration", "multi-agent", "openspawn"],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/openspawn/openspawn"
   },
-  "homepage": "https://bikinibottom.ai",
+  "homepage": "https://openspawn.ai",
   "engines": {
     "node": ">=18"
   }
