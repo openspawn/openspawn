@@ -1,5 +1,7 @@
-# ── BikiniBottom VPS Docker Compose ───────────────────────────────────────────
-# Lean demo: sandbox server + dashboard (single container)
+# ── BikiniBottom + OpenSpawn VPS Docker Compose ──────────────────────────────
+# Two containers:
+#   - bikinibottom (port 3333) — BikiniBottom demo at bikinibottom.ai
+#   - openspawn-platform (port 3334) — OpenSpawn landing at openspawn.ai
 # System Caddy handles HTTPS reverse proxy (see /etc/caddy/Caddyfile on VPS)
 #
 # Expected at /opt/bikinibottom/docker-compose.yml on the VPS
@@ -25,3 +27,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  platform:
+    image: ghcr.io/openspawn/openspawn-platform:latest
+    container_name: openspawn-platform
+    restart: unless-stopped
+    environment:
+      - PORT=3334
+      - PLATFORM_DIR=/app/dist
+      - NODE_ENV=production
+    ports:
+      - "3334:3334"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3334/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
