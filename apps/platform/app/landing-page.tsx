@@ -172,10 +172,13 @@ export function LandingPage() {
               <span className="gradient-text">OpenSpawn</span>
             </h1>
             <p className="animate-fade-in-up animate-delay-200 mx-auto mb-4 max-w-xl text-lg text-slate-300 md:text-xl">
-              One agent needs a prompt. A team needs an org.
+              One agent needs a prompt. A team needs structure.
             </p>
-            <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-lg text-base text-slate-500">
-              The open-source coordination layer for AI agent teams. Define structure, hierarchy, and policies in markdown. Your agents do the rest.
+            <p className="animate-fade-in-up animate-delay-200 mx-auto mb-2 max-w-lg text-base text-cyan-400 font-medium">
+              Introducing ORG.md — the org chart your AI agents actually read.
+            </p>
+            <p className="animate-fade-in-up animate-delay-200 mx-auto mb-8 max-w-lg text-sm text-slate-500">
+              Open-source coordination layer. Define teams, hierarchy, and policies in markdown.
             </p>
             <div className="animate-fade-in-up animate-delay-300 mb-10 flex flex-wrap items-center justify-center gap-4">
               <a href="#how-it-works" className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400">
