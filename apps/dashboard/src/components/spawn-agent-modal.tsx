@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { notify } from "../lib/toast";
 import {
   Dialog,
   DialogPopup,
@@ -79,6 +80,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Spawn failed");
       onOpenChange(false);
+      notify.agent(agentName, "spawned successfully");
       onSpawned?.({ name: agentName });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Spawn failed");
