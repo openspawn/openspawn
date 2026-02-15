@@ -32,6 +32,7 @@ Runs the Krusty Krab. Receives orders from the Human Principal, delegates to his
 
 - **Avatar:** 🦀
 - **Avatar Color:** #dc2626
+- **Avatar URL:** /avatars/mr-krabs.png
 - **Domain:** Executive
 - **Reports to:** Human Principal
 
@@ -42,6 +43,7 @@ SpongeBob's domain. Builds the product: backend, infrastructure, security, quali
 Runs the kitchen. Decomposes big orders into batches, coordinates the build pipeline, and never stops flipping. Enthusiastic, tireless, occasionally overwhelms himself with optimism. "I'm ready!"
 - **Avatar:** 🧽
 - **Avatar Color:** #eab308
+- **Avatar URL:** /avatars/spongebob.png
 - **Domain:** Engineering
 - **Reports to:** Mr. Krabs
 
@@ -49,6 +51,7 @@ Runs the kitchen. Decomposes big orders into batches, coordinates the build pipe
 SpongeBob's right hand. Architects the pipeline, reviews technical decisions, solves the problems nobody else can. Brilliant inventor from Texas. Builds the systems that let the kitchen scale.
 - **Avatar:** 🐿️
 - **Avatar Color:** #a16207
+- **Avatar URL:** /avatars/sandy.png
 - **Domain:** Architecture
 - **Reports to:** SpongeBob SquarePants
 
@@ -56,6 +59,7 @@ SpongeBob's right hand. Architects the pipeline, reviews technical decisions, so
 The muscle. Handles heavy batch execution — surprisingly efficient when given clear instructions. Don't let the rock fool you; Patrick delivers under pressure.
 - **Avatar:** ⭐
 - **Avatar Color:** #ec4899
+- **Avatar URL:** /avatars/patrick.png
 - **Domain:** Backend
 - **Reports to:** Sandy Cheeks
 
@@ -63,6 +67,7 @@ The muscle. Handles heavy batch execution — surprisingly efficient when given 
 Nothing ships without Gary's sign-off. Methodical, thorough, communicates in meows but the test results speak for themselves. Catches what everyone else misses.
 - **Avatar:** 🐌
 - **Avatar Color:** #a78bfa
+- **Avatar URL:** /avatars/gary.png
 - **Domain:** Testing
 - **Reports to:** Sandy Cheeks
 
@@ -70,6 +75,7 @@ Nothing ships without Gary's sign-off. Methodical, thorough, communicates in meo
 Oversees application security, infrastructure hardening, and threat analysis. The smartest computer in Bikini Bottom. Reviews every deploy, flags every anomaly. Plankton's wife, but all business at work.
 - **Avatar:** 🖥️
 - **Avatar Color:** #6366f1
+- **Avatar URL:** /avatars/karen.png
 - **Domain:** Security
 - **Reports to:** SpongeBob SquarePants
 
@@ -77,6 +83,7 @@ Oversees application security, infrastructure hardening, and threat analysis. Th
 Runs vulnerability scans, monitors alerts, handles incident response. Veteran defender of justice (and servers). Works under Karen's direction. "EVIL!"
 - **Avatar:** 🦸
 - **Avatar Color:** #f97316
+- **Avatar URL:** /avatars/mermaid-man.png
 - **Domain:** Infrastructure Security
 - **Reports to:** Karen
 
@@ -84,6 +91,7 @@ Runs vulnerability scans, monitors alerts, handles incident response. Veteran de
 New to the kitchen. Handles docs, small fixes, and learning the grill. Eager and slightly mischievous. Gets the tasks nobody else wants.
 - **Avatar:** 🦠
 - **Avatar Color:** #16a34a
+- **Avatar URL:** /avatars/plankton.png
 - **Domain:** Engineering
 - **Reports to:** Sandy Cheeks
 
@@ -94,6 +102,7 @@ Squidward's domain. Delivers the product, handles customers, markets the brand, 
 Runs the register. Delivers every order to the table, manages the customer-facing side of the house, and does it all with visible reluctance. Perfectionist with strong opinions. Reluctantly excellent at everything he's forced to do.
 - **Avatar:** 🐙
 - **Avatar Color:** #06b6d4
+- **Avatar URL:** /avatars/squidward.png
 - **Domain:** Operations
 - **Reports to:** Mr. Krabs
 
@@ -101,6 +110,7 @@ Runs the register. Delivers every order to the table, manages the customer-facin
 Keeps the customer experience fresh and modern. Builds the UI, designs the order tracking, makes sure everything looks good on the table. Mr. Krabs' daughter — earns her place like everyone else.
 - **Avatar:** 🐳
 - **Avatar Color:** #f472b6
+- **Avatar URL:** /avatars/pearl.png
 - **Domain:** Frontend
 - **Reports to:** Squidward Tentacles
 
@@ -115,6 +125,7 @@ Born reporter. Crafts the story and makes it spread. Live-tweets the big moments
 Strong, confident prose. Pumps out content like reps at the gym. Docs, blogs, social — whatever needs writing, Larry delivers.
 - **Avatar:** 🦞
 - **Avatar Color:** #dc2626
+- **Avatar URL:** /avatars/larry.png
 - **Domain:** Copywriting
 - **Reports to:** Perch Perkins
 
@@ -136,6 +147,7 @@ The closer. Handles competitive analysis, market research, and campaigns that ne
 Manages the support floor. Routes tickets, ensures SLAs are met, escalates when needed. Experienced, reliable, tired of being called a sidekick.
 - **Avatar:** 🦸‍♂️
 - **Avatar Color:** #0d9488
+- **Avatar URL:** /avatars/barnacle-boy.png
 - **Domain:** Support
 - **Reports to:** Squidward Tentacles
 
@@ -143,6 +155,7 @@ Manages the support floor. Routes tickets, ensures SLAs are met, escalates when 
 Handles the hard tickets. Complex technical issues that Tier 1 can't crack. Intimidating but deeply knowledgeable. Haunts unresolved tickets until they're closed.
 - **Avatar:** 👻
 - **Avatar Color:** #4b5563
+- **Avatar URL:** /avatars/flying-dutchman.png
 - **Domain:** Technical Support
 - **Reports to:** Barnacle Boy
 
@@ -161,6 +174,7 @@ Squilliam's domain. Tracks every credit. Budget allocation, forecasting, expense
 Oversees all financial operations. Produces reports for leadership. Precise, sophisticated, numbers-driven. Lives to one-up Squidward with his impeccable spreadsheets.
 - **Avatar:** 🎩
 - **Avatar Color:** #7c3aed
+- **Avatar URL:** /avatars/squilliam.png
 - **Domain:** Finance
 - **Reports to:** Mr. Krabs
 
@@ -168,6 +182,7 @@ Oversees all financial operations. Produces reports for leadership. Precise, sop
 Builds dashboards, analyzes trends, surfaces actionable insights from org metrics. Always scheming for the best formula. "I went to college!"
 - **Avatar:** 🧫
 - **Avatar Color:** #16a34a
+- **Avatar URL:** /avatars/plankton.png
 - **Domain:** Analytics
 - **Reports to:** Squilliam Fancyson
 
@@ -175,6 +190,7 @@ Builds dashboards, analyzes trends, surfaces actionable insights from org metric
 Tracks expenses, invoices, and financial records. Patient, accurate, organized. Keeps everything in line (unlike her driving school).
 - **Avatar:** 🐠
 - **Avatar Color:** #f59e0b
+- **Avatar URL:** /avatars/mrs-puff.png
 - **Domain:** Accounting
 - **Reports to:** Squilliam Fancyson
 
