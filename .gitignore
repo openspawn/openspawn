@@ -58,3 +58,5 @@ __pycache__/
 
 # Production secrets
 .env.production
+tools/sandbox/dashboard-dist
+tools/sandbox/website-dist
