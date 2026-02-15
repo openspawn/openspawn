@@ -164,13 +164,15 @@ startServer(sim as any);
 
 // Auto-start scenario — defaults to ai-dev-agency in deterministic mode
 // Set SCENARIO=none to disable, or SCENARIO=<id> to pick a specific one
-const scenarioId = process.env.SCENARIO ?? (useLLM ? 'none' : 'ai-dev-agency');
+const scenarioId = process.env.SCENARIO ?? (useLLM ? 'none' : 'krabby-patties');
 if (scenarioId !== 'none' && !useLLM) {
   const { ScenarioEngine } = await import('./scenario-engine.js');
   const { aiDevAgencyScenario } = await import('./scenarios/ai-dev-agency.js');
+  const { krabbyPattiesScenario } = await import('./scenarios/krabby-patties.js');
 
   const scenarioMap: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
     'ai-dev-agency': aiDevAgencyScenario,
+    'krabby-patties': krabbyPattiesScenario,
   };
 
   const scenarioDef = scenarioMap[scenarioId];
