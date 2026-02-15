@@ -48,7 +48,7 @@ export interface Stats {
 
 export const ACTS = [
   { num: 1, name: 'Act I: The Order', narrative: 'Plankton walks in with the order of a lifetime.' },
-  { num: 2, name: 'Act II: Full Steam', narrative: 'The kitchen roars to life. Patties fly off the grill.' },
+  { num: 2, name: 'Act II: Hiring the Kitchen', narrative: 'SpongeBob spins up 20 sous-chef instances. The org chart explodes.' },
   { num: 3, name: 'Act III: The Bottleneck', narrative: 'Squidward can\'t keep up. The queue grows. Tensions rise.' },
   { num: 4, name: 'Act IV: The Decision', narrative: 'Mr. Krabs reorganizes. Reinforcements arrive.' },
   { num: 5, name: 'Act V: Victory', narrative: 'The last patty delivered. Bikini Bottom celebrates.' },
@@ -58,9 +58,16 @@ export const ACTS = [
 
 export type NodeStatus = 'idle' | 'working' | 'busy' | 'overwhelmed';
 
+export interface SpawnedAgent {
+  id: string;
+  name: string;
+  emoji: string;
+  parentId: string;
+}
+
 export interface ReplayEvent {
   tick: number;
-  type: 'message' | 'delegation' | 'escalation' | 'completion' | 'stat_update' | 'act_change' | 'node_status' | 'reassign';
+  type: 'message' | 'delegation' | 'escalation' | 'completion' | 'stat_update' | 'act_change' | 'node_status' | 'reassign' | 'spawn' | 'despawn';
   data: {
     from?: string;
     to?: string;
@@ -72,6 +79,8 @@ export interface ReplayEvent {
     pattiesProduced?: number;
     pattiesDelivered?: number;
     queueSize?: number;
+    // spawn fields
+    spawnAgent?: SpawnedAgent;
   };
 }
 
@@ -92,30 +101,58 @@ export const TIMELINE: ReplayEvent[] = [
   { tick: 8, type: 'node_status', data: { agent: 'squilliam-fancyson', status: 'working' } },
   { tick: 10, type: 'message', data: { from: 'spongebob-squarepants', text: 'I\'M READY! I\'M READY! I\'M READY!' } },
 
-  // ═══ ACT 2: The Kitchen Heats Up (ticks 11-40) ═══
+  // ═══ ACT 2: Hiring the Kitchen (ticks 11-40) ═══
   { tick: 11, type: 'act_change', data: { act: 1 } },
-  { tick: 12, type: 'delegation', data: { from: 'spongebob-squarepants', to: 'sandy-cheeks', text: 'Sandy! Design the pipeline. We need max throughput!' } },
-  { tick: 12, type: 'node_status', data: { agent: 'sandy-cheeks', status: 'working' } },
-  { tick: 14, type: 'message', data: { from: 'sandy-cheeks', text: 'Configuring 3-stage pipeline: prep → grill → plate. Y\'all ready?' } },
-  { tick: 15, type: 'delegation', data: { from: 'sandy-cheeks', to: 'patrick-star', text: 'Patrick — batch execution. 50 patties per batch. Go!' } },
-  { tick: 15, type: 'node_status', data: { agent: 'patrick-star', status: 'working' } },
-  { tick: 16, type: 'message', data: { from: 'patrick-star', text: 'Is mayonnaise a batch parameter?' } },
-  { tick: 18, type: 'delegation', data: { from: 'sandy-cheeks', to: 'gary', text: 'Gary — QA every 10th patty. Reject anything substandard.' } },
-  { tick: 18, type: 'node_status', data: { agent: 'gary', status: 'working' } },
-  { tick: 19, type: 'message', data: { from: 'gary', text: 'Meow. 🔍 (QA initialized)' } },
+  { tick: 12, type: 'message', data: { from: 'spongebob-squarepants', text: '10,000 patties?! I can\'t do this with just Patrick and Sandy...' } },
+  { tick: 13, type: 'escalation', data: { from: 'spongebob-squarepants', to: 'mr-krabs', text: 'Mr. Krabs! I need to spin up sous-chef instances. 20 of them!' } },
+  { tick: 14, type: 'message', data: { from: 'mr-krabs', text: '20?! That\'s 50 credits each! 💸💸💸' } },
+  { tick: 15, type: 'message', data: { from: 'spongebob-squarepants', text: 'It\'s 1,000 credits... or we miss the order and lose 50,000.' } },
+  { tick: 16, type: 'message', data: { from: 'mr-krabs', text: '...fine. But they\'re TEMPORARY! sessions_spawn, 20 instances. Go!' } },
+  { tick: 17, type: 'delegation', data: { from: 'spongebob-squarepants', to: 'sandy-cheeks', text: 'Sandy — architect the pipeline. I\'m spinning up the team!' } },
+  { tick: 17, type: 'node_status', data: { agent: 'sandy-cheeks', status: 'working' } },
+  { tick: 18, type: 'message', data: { from: 'sandy-cheeks', text: '3-stage pipeline: prep → grill → plate. Each sous-chef gets a lane.' } },
+  // ── Sous-chefs spawn rapidly (ticks 19-28) — one per half-tick ──
+  { tick: 19, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-1', name: 'Sous Chef #1', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #1 spawned' } },
+  { tick: 19, type: 'stat_update', data: { stats: { kitchenRate: 5, pattiesProduced: 10, deliveryRate: 8, pattiesDelivered: 5, queueSize: 5, revenue: 25, budgetUsed: 5 } } },
+  { tick: 19, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-2', name: 'Sous Chef #2', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #2 spawned' } },
+  { tick: 20, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-3', name: 'Sous Chef #3', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #3 spawned' } },
+  { tick: 20, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-4', name: 'Sous Chef #4', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #4 spawned' } },
+  { tick: 20, type: 'stat_update', data: { stats: { kitchenRate: 15, pattiesProduced: 40, queueSize: 20 } } },
   { tick: 20, type: 'message', data: { from: 'karen', text: 'Running security scan on Plankton\'s order... 🔒' } },
   { tick: 20, type: 'node_status', data: { agent: 'karen', status: 'working' } },
-  { tick: 22, type: 'stat_update', data: { stats: { kitchenRate: 10, pattiesProduced: 50, deliveryRate: 8, pattiesDelivered: 20, queueSize: 30, revenue: 100, margin: 5.0, budgetUsed: 8 } } },
-  { tick: 25, type: 'stat_update', data: { stats: { kitchenRate: 20, pattiesProduced: 200, pattiesDelivered: 80, queueSize: 120, revenue: 400 } } },
-  { tick: 26, type: 'message', data: { from: 'perch-perkins', text: '📺 BREAKING: Krusty Krab takes MASSIVE 10,000 patty order!' } },
-  { tick: 26, type: 'node_status', data: { agent: 'perch-perkins', status: 'working' } },
-  { tick: 28, type: 'message', data: { from: 'gary', text: 'Meow! ✅ Batch 4 passed. ❌ Batch 5 rejected — bun alignment off.' } },
-  { tick: 30, type: 'stat_update', data: { stats: { kitchenRate: 35, pattiesProduced: 500, pattiesDelivered: 180, queueSize: 320, revenue: 900, budgetUsed: 15 } } },
-  { tick: 32, type: 'message', data: { from: 'spongebob-squarepants', text: 'Production at 35/tick! Pipeline is HUMMING! 🎵' } },
-  { tick: 35, type: 'stat_update', data: { stats: { kitchenRate: 50, pattiesProduced: 900, pattiesDelivered: 300, queueSize: 600, revenue: 1500, budgetUsed: 22 } } },
-  { tick: 36, type: 'message', data: { from: 'squidward-tentacles', text: 'Table 7... table 12... table 3... *sigh*' } },
-  { tick: 38, type: 'message', data: { from: 'squilliam-fancyson', text: 'Costs nominal. Kitchen efficiency at 94%. 📊' } },
-  { tick: 40, type: 'stat_update', data: { stats: { kitchenRate: 50, pattiesProduced: 1400, pattiesDelivered: 450, queueSize: 950, revenue: 2250, margin: 4.2, budgetUsed: 28 } } },
+  { tick: 21, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-5', name: 'Sous Chef #5', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #5 spawned' } },
+  { tick: 21, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-6', name: 'Sous Chef #6', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #6 spawned' } },
+  { tick: 21, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-7', name: 'Sous Chef #7', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #7 spawned' } },
+  { tick: 22, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-8', name: 'Sous Chef #8', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #8 spawned' } },
+  { tick: 22, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-9', name: 'Sous Chef #9', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #9 spawned' } },
+  { tick: 22, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-10', name: 'Sous Chef #10', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #10 spawned' } },
+  { tick: 22, type: 'stat_update', data: { stats: { kitchenRate: 40, pattiesProduced: 150, queueSize: 80, revenue: 375, budgetUsed: 10 } } },
+  { tick: 22, type: 'message', data: { from: 'spongebob-squarepants', text: '10 sous-chefs online! Production RAMPING! 🚀' } },
+  { tick: 23, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-11', name: 'Sous Chef #11', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #11 spawned' } },
+  { tick: 23, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-12', name: 'Sous Chef #12', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #12 spawned' } },
+  { tick: 23, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-13', name: 'Sous Chef #13', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #13 spawned' } },
+  { tick: 24, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-14', name: 'Sous Chef #14', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #14 spawned' } },
+  { tick: 24, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-15', name: 'Sous Chef #15', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #15 spawned' } },
+  { tick: 24, type: 'stat_update', data: { stats: { kitchenRate: 65, pattiesProduced: 400, queueSize: 250, revenue: 1000, budgetUsed: 15 } } },
+  { tick: 25, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-16', name: 'Sous Chef #16', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #16 spawned' } },
+  { tick: 25, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-17', name: 'Sous Chef #17', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #17 spawned' } },
+  { tick: 25, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-18', name: 'Sous Chef #18', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #18 spawned' } },
+  { tick: 26, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-19', name: 'Sous Chef #19', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #19 spawned' } },
+  { tick: 26, type: 'spawn', data: { spawnAgent: { id: 'sous-chef-20', name: 'Sous Chef #20', emoji: '🍳', parentId: 'spongebob-squarepants' }, text: '🍳 Sous Chef #20 spawned' } },
+  { tick: 26, type: 'stat_update', data: { stats: { kitchenRate: 100, pattiesProduced: 700, queueSize: 500, revenue: 1750, budgetUsed: 20 } } },
+  { tick: 27, type: 'message', data: { from: 'spongebob-squarepants', text: '🔥 ALL 20 SOUS-CHEFS ONLINE! Production at 100/tick! I\'M READY!' } },
+  { tick: 27, type: 'node_status', data: { agent: 'patrick-star', status: 'working' } },
+  { tick: 28, type: 'delegation', data: { from: 'sandy-cheeks', to: 'gary', text: 'Gary — QA every 10th patty. Reject anything substandard.' } },
+  { tick: 28, type: 'node_status', data: { agent: 'gary', status: 'working' } },
+  { tick: 28, type: 'message', data: { from: 'gary', text: 'Meow. 🔍 (QA initialized)' } },
+  { tick: 29, type: 'message', data: { from: 'perch-perkins', text: '📺 BREAKING: SpongeBob just hired 20 SOUS-CHEFS! Kitchen is a MACHINE!' } },
+  { tick: 29, type: 'node_status', data: { agent: 'perch-perkins', status: 'working' } },
+  { tick: 30, type: 'stat_update', data: { stats: { kitchenRate: 100, pattiesProduced: 1100, pattiesDelivered: 180, queueSize: 920, revenue: 2750, budgetUsed: 22 } } },
+  { tick: 32, type: 'message', data: { from: 'gary', text: 'Meow! ✅ Batch 4 passed. ❌ Batch 5 rejected — bun alignment off.' } },
+  { tick: 34, type: 'message', data: { from: 'squidward-tentacles', text: 'Table 7... table 12... table 3... why are there SO MANY patties?! *sigh*' } },
+  { tick: 36, type: 'message', data: { from: 'squilliam-fancyson', text: 'Sous-chef costs: 1,000cr. Kitchen throughput: 100/tick. ROI looks solid. 📊' } },
+  { tick: 38, type: 'stat_update', data: { stats: { kitchenRate: 100, pattiesProduced: 1900, pattiesDelivered: 450, queueSize: 1450, revenue: 4750, margin: 4.2, budgetUsed: 28 } } },
+  { tick: 40, type: 'stat_update', data: { stats: { kitchenRate: 100, pattiesProduced: 2500, pattiesDelivered: 600, queueSize: 1900, revenue: 6250, budgetUsed: 32 } } },
 
   // ═══ ACT 3: The Bottleneck (ticks 41-90) ═══
   { tick: 41, type: 'act_change', data: { act: 2 } },

@@ -6,7 +6,7 @@ import { IntroCard } from '../components/live/intro-card';
 import { OrgChartLive, type AgentNodeState, type EdgeAnimation } from '../components/live/org-chart-live';
 import { LiveFeed, type FeedMessage } from '../components/live/live-feed';
 import { StatsBar } from '../components/live/stats-bar';
-import { TIMELINE, ACTS, type Stats, type ReplayEvent } from '../components/live/replay-data';
+import { TIMELINE, ACTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
 
 // ── Replay Hook ──────────────────────────────────────────────────────────────
 
@@ -39,6 +39,7 @@ function useReplay() {
   const edgeAnimsRef = useRef<EdgeAnimation[]>([]);
   const reassignedRef = useRef<Array<{ from: string; to: string }>>([]);
   const actRef = useRef(0);
+  const spawnedRef = useRef<SpawnedAgent[]>([]);
   const [, forceUpdate] = useState(0);
 
   const start = useCallback(() => {
@@ -47,6 +48,7 @@ function useReplay() {
     messagesRef.current = [];
     edgeAnimsRef.current = [];
     reassignedRef.current = [];
+    spawnedRef.current = [];
     actRef.current = 0;
     setTick(0);
     setRunning(true);
@@ -85,6 +87,22 @@ function useReplay() {
           }
           break;
 
+        case 'spawn':
+          if (d.spawnAgent) {
+            spawnedRef.current = [...spawnedRef.current, d.spawnAgent];
+            // Set new agent as working
+            nodeStatesRef.current = {
+              ...nodeStatesRef.current,
+              [d.spawnAgent.id]: { status: 'working' },
+            };
+            // Add edge animation from parent to new agent
+            edgeAnimsRef.current = [
+              ...edgeAnimsRef.current,
+              { id: `ea-spawn-${currentTick}-${d.spawnAgent.id}`, from: d.spawnAgent.parentId, to: d.spawnAgent.id, color: '#22d3ee', timestamp: Date.now() },
+            ];
+          }
+          // Fall through to add message to feed
+        // eslint-disable-next-line no-fallthrough
         case 'message':
         case 'delegation':
         case 'escalation':
@@ -178,6 +196,7 @@ function useReplay() {
     nodeStates: nodeStatesRef.current,
     edgeAnimations: edgeAnimsRef.current,
     reassignedEdges: reassignedRef.current,
+    spawnedAgents: spawnedRef.current,
     messages: messagesRef.current,
     pattiesDelivered: statsRef.current.pattiesDelivered,
   };
@@ -260,6 +279,7 @@ export function LiveViewPage() {
               nodeStates={replay.nodeStates}
               edgeAnimations={replay.edgeAnimations}
               reassignedEdges={replay.reassignedEdges}
+              spawnedAgents={replay.spawnedAgents}
             />
           </div>
           {/* Live Feed - 40% */}

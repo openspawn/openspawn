@@ -12,7 +12,7 @@ import {
   type EdgeProps,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { AGENTS, type NodeStatus } from './replay-data';
+import { AGENTS, type NodeStatus, type SpawnedAgent } from './replay-data';
 
 // ── Node positions (hardcoded tree) ──────────────────────────────────────────
 
@@ -79,6 +79,7 @@ interface OrgChartLiveProps {
   nodeStates: Record<string, AgentNodeState>;
   edgeAnimations: EdgeAnimation[];
   reassignedEdges: Array<{ from: string; to: string }>;
+  spawnedAgents: SpawnedAgent[];
 }
 
 // ── Custom Node ──────────────────────────────────────────────────────────────
@@ -180,6 +181,7 @@ function buildGraph(
   nodeStates: Record<string, AgentNodeState>,
   edgeAnimations: EdgeAnimation[],
   reassignedEdges: Array<{ from: string; to: string }>,
+  spawnedAgents: SpawnedAgent[],
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = NODE_LAYOUT.map(n => {
     const agent = AGENTS[n.id];
@@ -197,6 +199,35 @@ function buildGraph(
       } satisfies LiveNodeData,
     };
   });
+
+  // Add spawned sous-chef nodes — 2 rows of 10, centered under SpongeBob
+  const SPONGEBOB_X = CX - 400;
+  const SPAWN_Y1 = LY[3] + 100; // below the existing layer 3
+  const SPAWN_Y2 = SPAWN_Y1 + 70;
+  const SPAWN_SPACING = 70;
+  const ROW_SIZE = 10;
+
+  for (let i = 0; i < spawnedAgents.length; i++) {
+    const sa = spawnedAgents[i];
+    const row = Math.floor(i / ROW_SIZE);
+    const col = i % ROW_SIZE;
+    const rowWidth = (Math.min(ROW_SIZE, spawnedAgents.length - row * ROW_SIZE) - 1) * SPAWN_SPACING;
+    const x = SPONGEBOB_X - rowWidth / 2 + col * SPAWN_SPACING;
+    const y = row === 0 ? SPAWN_Y1 : SPAWN_Y2;
+    const state = nodeStates[sa.id] || { status: 'working' as NodeStatus };
+
+    nodes.push({
+      id: sa.id,
+      type: 'liveAgent',
+      position: { x: x - 40, y },
+      data: {
+        agentId: sa.id,
+        emoji: sa.emoji,
+        name: sa.name,
+        status: state.status,
+      } satisfies LiveNodeData,
+    });
+  }
 
   // Build edge animation lookup
   const edgeAnimMap = new Map<string, EdgeAnimation[]>();
@@ -231,6 +262,21 @@ function buildGraph(
     });
   }
 
+  // Add edges for spawned agents
+  for (const sa of spawnedAgents) {
+    const edgeId = `e-${sa.parentId}-${sa.id}`;
+    const key = `${sa.parentId}-${sa.id}`;
+    edges.push({
+      id: edgeId,
+      source: sa.parentId,
+      target: sa.id,
+      sourceHandle: 'bottom',
+      targetHandle: 'top',
+      type: 'liveEdge',
+      data: { animations: edgeAnimMap.get(key) || [], isReassigned: false },
+    });
+  }
+
   // Add reassigned edges that aren't in the base tree
   for (const re of reassignedEdges) {
     const edgeId = `e-${re.from}-${re.to}`;
@@ -252,10 +298,10 @@ function buildGraph(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges }: OrgChartLiveProps) {
+function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents }: OrgChartLiveProps) {
   const { nodes, edges } = useMemo(
-    () => buildGraph(nodeStates, edgeAnimations, reassignedEdges),
-    [nodeStates, edgeAnimations, reassignedEdges],
+    () => buildGraph(nodeStates, edgeAnimations, reassignedEdges, spawnedAgents),
+    [nodeStates, edgeAnimations, reassignedEdges, spawnedAgents],
   );
 
   return (
