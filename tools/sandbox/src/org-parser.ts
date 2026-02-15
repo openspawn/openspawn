@@ -72,7 +72,7 @@ function makeId(name: string): string {
 function inferLevelAndRole(name: string): { level: number; role: SandboxAgent['role'] } {
   const n = name.toLowerCase();
   if (/\b(coo|cto|ceo)\b/.test(n)) return { level: 10, role: 'coo' };
-  if (/\b(vp|director|talent)\b/.test(n)) return { level: 9, role: 'talent' };
+  if (/\b(cfo|vp|director|talent)\b/.test(n)) return { level: 9, role: 'talent' };
   if (/\b(lead|manager)\b/.test(n)) return { level: 7, role: 'lead' };
   if (/\b(senior|principal)\b/.test(n)) return { level: 6, role: 'senior' };
   if (/\b(junior|intern|assistant)\b/.test(n)) return { level: 1, role: 'intern' };
