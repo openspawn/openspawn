@@ -16,7 +16,7 @@ export function getVersion(): string {
 
 export function showHelp(): void {
   console.log(`
-\x1b[33m🍍 BikiniBottom\x1b[0m — AI Agent Orchestration
+\x1b[36m🪸 OpenSpawn\x1b[0m — AI Agent Orchestration
 
   The control plane your AI agents deserve.
   32 agents. A2A + MCP protocols. Real-time dashboard.
@@ -32,11 +32,11 @@ export function showHelp(): void {
   --version, -v  Show version
 
 \x1b[1mExamples:\x1b[0m
-  $ npx bikinibottom init my-org
-  $ cd my-org && bikinibottom start
-  $ bikinibottom status
+  $ npx openspawn init my-org
+  $ cd my-org && openspawn start
+  $ openspawn status
 
-Learn more: \x1b[36mhttps://bikinibottom.ai\x1b[0m
+Learn more: \x1b[36mhttps://openspawn.ai\x1b[0m
 GitHub:     \x1b[36mhttps://github.com/openspawn/openspawn\x1b[0m
 `);
 }

@@ -3,28 +3,30 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 
 export function startCommand(): void {
-  const configPath = join(process.cwd(), 'bikinibottom.config.json');
+  const configPath = join(process.cwd(), 'openspawn.config.json');
+  const legacyConfigPath = join(process.cwd(), 'bikinibottom.config.json');
+  const actualConfigPath = existsSync(configPath) ? configPath : legacyConfigPath;
 
-  if (!existsSync(configPath)) {
+  if (!existsSync(actualConfigPath)) {
     console.log(`
-\x1b[31m✗\x1b[0m No bikinibottom.config.json found in current directory.
+\x1b[31m✗\x1b[0m No openspawn.config.json found in current directory.
 
-Run \x1b[33mbikinibottom init\x1b[0m first to scaffold a project.
+Run \x1b[36mopenspawn init\x1b[0m first to scaffold a project.
 `);
     process.exit(1);
   }
 
-  const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+  const config = JSON.parse(readFileSync(actualConfigPath, 'utf-8'));
   const port = config.port ?? 3333;
   const orgFile = config.orgFile ?? 'ORG.md';
 
   if (!existsSync(join(process.cwd(), orgFile))) {
-    console.log(`\x1b[31m✗\x1b[0m ${orgFile} not found. Create one or run \x1b[33mbikinibottom init\x1b[0m.`);
+    console.log(`\x1b[31m✗\x1b[0m ${orgFile} not found. Create one or run \x1b[36mopenspawn init\x1b[0m.`);
     process.exit(1);
   }
 
   console.log(`
-\x1b[33m🍍 Starting BikiniBottom...\x1b[0m
+\x1b[36m🪸 Starting OpenSpawn...\x1b[0m
 
 Port:       ${port}
 Org:        ${orgFile}
@@ -51,7 +53,7 @@ Protocols:  A2A ${config.protocols?.a2a ? '✓' : '✗'}  MCP ${config.protocols
       console.error(`\x1b[31m✗\x1b[0m Failed to start server: ${err.message}`);
       console.log(`
 \x1b[2mMake sure you have the sandbox package installed:
-  npm install bikinibottom
+  npm install openspawn
 
 Or run from the monorepo:
   cd tools/sandbox && npx tsx src/server.ts\x1b[0m
@@ -86,7 +88,7 @@ function findServerEntry(): string | null {
     join(process.cwd(), '..', '..', 'tools', 'sandbox', 'src', 'server.ts'),
     join(process.cwd(), 'tools', 'sandbox', 'src', 'server.ts'),
     // npm installed package
-    join(process.cwd(), 'node_modules', 'bikinibottom', 'sandbox', 'src', 'server.ts'),
+    join(process.cwd(), 'node_modules', 'openspawn', 'sandbox', 'src', 'server.ts'),
   ];
 
   for (const candidate of candidates) {

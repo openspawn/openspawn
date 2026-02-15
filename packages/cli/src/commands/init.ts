@@ -42,22 +42,22 @@ export function initCommand(name?: string): void {
   }
 
   writeFileSync(join(targetDir, 'ORG.md'), orgTemplate);
-  writeFileSync(join(targetDir, 'bikinibottom.config.json'), JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n');
+  writeFileSync(join(targetDir, 'openspawn.config.json'), JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n');
   writeFileSync(join(targetDir, '.gitignore'), 'node_modules/\n.env\ndata/\n');
 
   const prefix = name ? `  cd ${name}\n` : '';
 
   console.log(`
-\x1b[33m🍍 BikiniBottom initialized!\x1b[0m
+\x1b[36m🪸 OpenSpawn initialized!\x1b[0m
 
 Created:
   ORG.md                 — Define your agent organization
-  bikinibottom.config.json — Configuration
+  openspawn.config.json  — Configuration
   .gitignore
 
 Next steps:
 ${prefix}  1. Edit ORG.md to customize your agents
-  2. Run: bikinibottom start
+  2. Run: openspawn start
   3. Open: http://localhost:3333
 
 Protocols enabled:
