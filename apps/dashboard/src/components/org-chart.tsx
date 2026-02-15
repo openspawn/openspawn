@@ -21,7 +21,7 @@ import {
   type NodeProps,
   type EdgeProps,
 } from '@xyflow/react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import '@xyflow/react/dist/style.css';
 import {

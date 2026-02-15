@@ -2,7 +2,7 @@
  * Scenario Event Toasts — slide-in alerts for scenario events.
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { isSandboxMode } from '../graphql/fetcher';
 import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';

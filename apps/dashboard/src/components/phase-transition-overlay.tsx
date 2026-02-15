@@ -3,7 +3,7 @@
  * Non-intrusive: appears below scenario bar, auto-dismisses in 4s.
  */
 import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 const PHASE_ICONS = ['📋', '⚡', '⚔️', '🚀'];
 

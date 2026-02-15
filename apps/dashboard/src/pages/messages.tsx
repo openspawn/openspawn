@@ -10,7 +10,7 @@ import {
   MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { TypingIndicator } from '../components/presence';
 import { usePresence, useTeams } from '../hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';

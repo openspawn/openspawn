@@ -16,7 +16,7 @@ function useStableSize(ref: React.RefObject<HTMLElement | null>) {
   return size;
 }
 import { useNavigate, Link } from "@tanstack/react-router";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Users,
   CheckSquare,

@@ -4,7 +4,7 @@
  * Click any node to see details. Supports drill-down into agent detail.
  */
 import { useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Plus,
   UserPlus,

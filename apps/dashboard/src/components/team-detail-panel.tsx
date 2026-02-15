@@ -3,7 +3,7 @@
  * Displays team info, stats, members list, and sub-teams.
  */
 import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import {
   Users,
   Coins,

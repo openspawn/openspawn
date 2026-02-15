@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ArrowRight, Github, BookOpen, Users, Network, CheckSquare, Link2, Plug } from 'lucide-react';
 import { useAgents } from '../hooks/use-agents';
 import { useTasks } from '../hooks/use-tasks';

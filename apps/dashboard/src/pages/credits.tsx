@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowDownLeft, ArrowUpRight, Coins, TrendingUp } from "lucide-react";
 // recharts v3 has infinite-loop bug — using custom SVG chart instead
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";

@@ -3,7 +3,7 @@
  * Vertical timeline with color-coded entries and staggered animations.
  */
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { isSandboxMode } from '../graphql/fetcher';
 import { SANDBOX_URL } from '../lib/sandbox-url';
 
