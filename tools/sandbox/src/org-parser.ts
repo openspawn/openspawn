@@ -69,6 +69,12 @@ function makeId(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '').replace(/^-+/, '');
 }
 
+/** Extract just the name from a heading like "Mr. Krabs — CEO" → "Mr. Krabs" */
+function nameFromHeading(heading: string): string {
+  const dashIdx = heading.indexOf(' — ');
+  return dashIdx > 0 ? heading.slice(0, dashIdx).trim() : heading;
+}
+
 function inferLevelAndRole(name: string): { level: number; role: SandboxAgent['role'] } {
   const n = name.toLowerCase();
   if (/\b(coo|cto|ceo)\b/.test(n)) return { level: 10, role: 'coo' };
@@ -384,7 +390,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
 
       if (isCLevel || dept.children.length === 0) {
         // Direct agent at ### level (C-level or solo)
-        const id = makeId(deptMeta['id'] ?? dept.heading);
+        const id = makeId(deptMeta['id'] ?? nameFromHeading(dept.heading));
         const domain = deptMeta['domain'] ?? dept.heading;
         const count = parseInt(deptMeta['count'] ?? '1') || 1;
         const reportsTo = deptMeta['reports_to'];
@@ -394,7 +400,8 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
         const triggerInfo = parseTriggerMeta(deptMeta);
 
         for (let i = 0; i < count; i++) {
-          const agentName = count > 1 ? `${dept.heading} ${i + 1}` : dept.heading;
+          const displayName = nameFromHeading(dept.heading);
+          const agentName = count > 1 ? `${displayName} ${i + 1}` : displayName;
           const agentId = count > 1 ? `${id}-${i + 1}` : id;
           const agent = makeAgent(agentId, agentName, deptRole, deptLevel, domain, parentId, context, triggerInfo, deptMeta['avatar'], deptMeta['avatar_color']);
           agents.push(agent);
@@ -414,7 +421,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
         const subProse = extractProseFromNodes(sub.content);
         const { level: subLevel, role: subRole } = inferLevelAndRole(sub.heading);
 
-        const id = makeId(subMeta['id'] ?? sub.heading);
+        const id = makeId(subMeta['id'] ?? nameFromHeading(sub.heading));
         const domain = subMeta['domain'] ?? dept.heading;
         const count = parseInt(subMeta['count'] ?? '1') || 1;
         const reportsTo = subMeta['reports_to'];
@@ -433,7 +440,8 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
         const triggerInfo = parseTriggerMeta(subMeta);
 
         for (let i = 0; i < count; i++) {
-          const agentName = count > 1 ? `${sub.heading} ${i + 1}` : sub.heading;
+          const displayName = nameFromHeading(sub.heading);
+          const agentName = count > 1 ? `${displayName} ${i + 1}` : displayName;
           const agentId = count > 1 ? `${id}-${i + 1}` : id;
           const agent = makeAgent(agentId, agentName, subRole, subLevel, domain, parentId, context, triggerInfo, subMeta['avatar'], subMeta['avatar_color']);
           agents.push(agent);
