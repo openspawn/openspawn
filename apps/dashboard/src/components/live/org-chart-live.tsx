@@ -87,6 +87,7 @@ interface OrgChartLiveProps {
 interface LiveNodeData extends Record<string, unknown> {
   agentId: string;
   emoji: string;
+  avatarUrl?: string;
   name: string;
   status: NodeStatus;
   queueBadge?: number;
@@ -119,9 +120,17 @@ function LiveAgentNode({ data }: NodeProps) {
       />
 
       {/* Inner content */}
-      <div className="w-full h-full rounded-full flex flex-col items-center justify-center bg-[#0a1628] relative">
-        <span className="text-2xl leading-none">{d.emoji}</span>
-        <span className="text-[9px] text-white/60 font-medium mt-0.5 truncate max-w-[70px] text-center leading-tight">{d.name}</span>
+      <div className="w-full h-full rounded-full flex flex-col items-center justify-center bg-[#0a1628] relative overflow-hidden">
+        {d.avatarUrl ? (
+          <img src={d.avatarUrl} alt={d.name} className="w-full h-full object-contain p-1" />
+        ) : (
+          <span className="text-2xl leading-none">{d.emoji}</span>
+        )}
+      </div>
+
+      {/* Name label below */}
+      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+        <span className="text-[9px] text-white/60 font-medium">{d.name}</span>
       </div>
 
       {/* Queue badge */}
@@ -193,6 +202,7 @@ function buildGraph(
       data: {
         agentId: n.id,
         emoji: agent?.emoji ?? '🐟',
+        avatarUrl: agent?.avatarUrl,
         name: agent?.name ?? n.id,
         status: state.status,
         queueBadge: state.queueBadge,
