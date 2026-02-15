@@ -5,7 +5,7 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { Layout } from "./components";
 import { ProtectedRoute } from "./components/protected-route";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";

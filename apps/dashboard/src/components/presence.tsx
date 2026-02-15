@@ -7,7 +7,7 @@
  * - ActiveAgentsBadge – "N agents active" header pill
  */
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import type { PresenceStatus } from '../hooks/use-presence';
 

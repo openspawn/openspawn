@@ -1,5 +1,5 @@
 import { useMemo, useId } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 // ── Sparkline Data Generator ─────────────────────────────────────────
 export function generateSparklineData(

@@ -3,7 +3,7 @@
  * Used on the Agents page as an alternative view to grid/list.
  */
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronRight,
   Crown,

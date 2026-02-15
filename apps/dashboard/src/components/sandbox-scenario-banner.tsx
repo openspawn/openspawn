@@ -4,7 +4,7 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Pause, Play } from 'lucide-react';
 import { isSandboxMode } from '../graphql/fetcher';
 import { SANDBOX_URL } from '../lib/sandbox-url';

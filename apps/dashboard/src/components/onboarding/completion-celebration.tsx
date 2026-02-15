@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { PartyPopper, Rocket } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Button } from '../ui/button';

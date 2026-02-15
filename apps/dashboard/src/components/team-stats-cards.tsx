@@ -3,7 +3,7 @@
  * Shown on the dashboard page as a "Teams" section.
  */
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import {
   Crown,
   Code2,

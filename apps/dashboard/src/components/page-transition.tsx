@@ -1,5 +1,5 @@
 import { useLocation, Outlet } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 
 const reduceMotion =
   typeof window !== "undefined" &&

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Layers, Wallet, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useOnboarding } from './onboarding-provider';

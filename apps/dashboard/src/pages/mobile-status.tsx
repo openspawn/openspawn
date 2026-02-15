@@ -10,7 +10,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { RefreshCw, ChevronDown, Coins, Zap, Clock, Activity, CheckCircle, AlertTriangle, Bot } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAgents, usePresence, useAgentHealth, useTasks } from "../hooks";

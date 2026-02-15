@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock, Terminal } from "lucide-react";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SANDBOX_URL } from "../lib/sandbox-url";

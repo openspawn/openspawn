@@ -3,7 +3,7 @@
  * In demo mode, changes persist to localStorage.
  */
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import {
   Plus,
   Pencil,

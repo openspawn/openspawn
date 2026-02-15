@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, Play, Users, Building2, Rocket, TrendingUp, Sparkles, Layers, Wallet, Eye, Compass } from 'lucide-react';
 import { Logo } from '../components/ui/logo';
 import { Button } from '../components/ui/button';

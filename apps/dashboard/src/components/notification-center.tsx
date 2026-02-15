@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Bell, Bot, CheckSquare, MessageSquare, Coins, AlertTriangle, Check } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNotifications } from './live-notifications';

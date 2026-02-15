@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { GripVertical, LayoutGrid, RotateCcw, Eye, EyeOff, ChevronDown } from "lucide-react";
 
 // --- Types ---

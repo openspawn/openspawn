@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, Loader2, ClipboardList, Zap } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useSandboxTickInvalidation } from "../hooks/use-sandbox-tick";
 import { Logo } from "./ui/logo";
 import { Link, useLocation, useSearch, useNavigate } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import {
   LayoutDashboard,
   Users,
@@ -28,7 +28,7 @@ import {
   PanelLeft,
   Star,
 } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
@@ -60,6 +60,7 @@ import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-ban
 import { PhaseTransitionOverlay } from "./phase-transition-overlay";
 import { ScenarioEventToasts } from "./scenario-event-toasts";
 import { FirstVisitOverlay } from "./first-visit-overlay";
+import { Toaster } from "sonner";
 import type { ReactNode } from "react";
 
 interface LayoutProps {
@@ -838,6 +839,17 @@ export function Layout({ children }: LayoutProps) {
       />
       <ScenarioEventToasts />
       <FirstVisitOverlay />
+      <Toaster
+        theme="dark"
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'rgb(15, 23, 42)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'rgb(203, 213, 225)',
+          },
+        }}
+      />
     </TooltipProvider>
   );
 }
