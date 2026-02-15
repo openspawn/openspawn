@@ -96,11 +96,11 @@ jobs:
             docker compose ps
             exit 1
 
-      - name: Purge Cloudflare cache
+      - name: Purge Cloudflare cache (bikinibottom.ai)
         if: success()
         run: |
-          curl -sf -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_PURGE_CACHE_API_TOKEN }}" \
+          curl -sf -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID_BIKINIBOTTOM_DOT_AI }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_PURGE_CACHE_API_TOKEN_BIKINIBOTTOM_DOT_AI }}" \
             -H "Content-Type: application/json" \
             -d '{"purge_everything":true}' > /dev/null
-          echo "✅ Cloudflare cache purged"
+          echo "✅ Cloudflare cache purged (bikinibottom.ai)"
