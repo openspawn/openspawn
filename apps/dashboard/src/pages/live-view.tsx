@@ -40,6 +40,8 @@ function useReplay() {
   const reassignedRef = useRef<Array<{ from: string; to: string }>>([]);
   const actRef = useRef(0);
   const spawnedRef = useRef<SpawnedAgent[]>([]);
+  const [actBanner, setActBanner] = useState<{ num: number; name: string; narrative: string } | null>(null);
+  const actBannerTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [, forceUpdate] = useState(0);
 
   const start = useCallback(() => {
@@ -50,6 +52,8 @@ function useReplay() {
     reassignedRef.current = [];
     spawnedRef.current = [];
     actRef.current = 0;
+    setActBanner(null);
+    if (actBannerTimeoutRef.current) clearTimeout(actBannerTimeoutRef.current);
     setTick(0);
     setRunning(true);
     setFinished(false);
@@ -66,7 +70,15 @@ function useReplay() {
 
       switch (event.type) {
         case 'act_change':
-          if (d.act != null) actRef.current = d.act;
+          if (d.act != null) {
+            actRef.current = d.act;
+            const actInfo = ACTS[d.act];
+            if (actInfo) {
+              setActBanner({ num: actInfo.num, name: actInfo.name, narrative: actInfo.narrative });
+              if (actBannerTimeoutRef.current) clearTimeout(actBannerTimeoutRef.current);
+              actBannerTimeoutRef.current = setTimeout(() => setActBanner(null), 2500);
+            }
+          }
           break;
 
         case 'stat_update':
@@ -90,19 +102,30 @@ function useReplay() {
         case 'spawn':
           if (d.spawnAgent) {
             spawnedRef.current = [...spawnedRef.current, d.spawnAgent];
-            // Set new agent as working
             nodeStatesRef.current = {
               ...nodeStatesRef.current,
               [d.spawnAgent.id]: { status: 'working' },
             };
-            // Add edge animation from parent to new agent
             edgeAnimsRef.current = [
               ...edgeAnimsRef.current,
               { id: `ea-spawn-${currentTick}-${d.spawnAgent.id}`, from: d.spawnAgent.parentId, to: d.spawnAgent.id, color: '#22d3ee', timestamp: Date.now() },
             ];
           }
-          // Fall through to add message to feed
-        // eslint-disable-next-line no-fallthrough
+          if (d.text) {
+            const fromId = d.from || 'spongebob-squarepants';
+            messagesRef.current = [
+              ...messagesRef.current,
+              {
+                id: `${currentTick}-${event.type}-${fromId}-${messagesRef.current.length}`,
+                tick: currentTick,
+                agentId: fromId,
+                text: d.text,
+                type: 'message',
+              },
+            ];
+          }
+          break;
+
         case 'message':
         case 'delegation':
         case 'escalation':
@@ -199,6 +222,7 @@ function useReplay() {
     spawnedAgents: spawnedRef.current,
     messages: messagesRef.current,
     pattiesDelivered: statsRef.current.pattiesDelivered,
+    actBanner,
   };
 }
 
@@ -281,6 +305,29 @@ export function LiveViewPage() {
               reassignedEdges={replay.reassignedEdges}
               spawnedAgents={replay.spawnedAgents}
             />
+            {/* Act banner overlay */}
+            <AnimatePresence>
+              {replay.actBanner && (
+                <motion.div
+                  key={replay.actBanner.num}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#020817]/60 backdrop-blur-sm pointer-events-none"
+                >
+                  <div className="text-cyan-400/80 text-sm uppercase tracking-[0.3em] font-medium mb-1">
+                    Act {replay.actBanner.num}
+                  </div>
+                  <div className="text-white text-2xl md:text-3xl font-black tracking-tight mb-2">
+                    {replay.actBanner.name.replace(/^Act \w+: /, '')}
+                  </div>
+                  <div className="text-white/40 text-sm max-w-md text-center">
+                    {replay.actBanner.narrative}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           {/* Live Feed - 40% */}
           <div className="flex-[2] min-h-0 border-l border-white/5">
@@ -291,27 +338,52 @@ export function LiveViewPage() {
         {/* Bottom: Stats bar */}
         <StatsBar stats={replay.stats} />
 
-        {/* Finished CTA */}
+        {/* Finished overlay */}
         <AnimatePresence>
           {replay.finished && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4"
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0 z-30 flex items-center justify-center bg-[#020817]/90 backdrop-blur-sm"
             >
-              <Link
-                to="/"
-                className="flex items-center gap-2 px-6 py-3 bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-500/30 transition-all"
-              >
-                Explore the Dashboard <ArrowRight className="w-4 h-4" />
-              </Link>
-              <button
-                onClick={handleReplay}
-                className="px-6 py-3 bg-white/5 border border-white/10 text-white/60 font-medium rounded-xl hover:bg-white/10 transition-all cursor-pointer"
-              >
-                Replay ↻
-              </button>
+              <div className="text-center max-w-lg px-8">
+                <div className="text-6xl md:text-7xl font-black text-white mb-2">
+                  🍔 10,000
+                </div>
+                <div className="text-lg text-cyan-400 font-semibold mb-6">
+                  / 10,000 DELIVERED
+                </div>
+                <p className="text-white/50 text-lg mb-8">
+                  22 agents. 5 departments. One <code className="text-cyan-400 bg-cyan-950/50 px-1.5 py-0.5 rounded text-sm">ORG.md</code>.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Link
+                    to="/"
+                    className="flex items-center gap-2 px-6 py-3 bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-500/30 transition-all"
+                  >
+                    Explore the Dashboard <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <a
+                    href="/org-md"
+                    target="_blank"
+                    rel="noopener"
+                    className="px-6 py-3 bg-white/5 border border-white/10 text-white/60 font-medium rounded-xl hover:bg-white/10 transition-all"
+                  >
+                    See the ORG.md →
+                  </a>
+                  <button
+                    onClick={handleReplay}
+                    className="px-6 py-3 text-white/30 font-medium hover:text-white/50 transition-all cursor-pointer"
+                  >
+                    Replay ↻
+                  </button>
+                </div>
+                <p className="text-white/20 text-xs mt-8">
+                  Powered by OpenSpawn. Open source.
+                </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
