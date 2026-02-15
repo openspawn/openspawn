@@ -58,7 +58,11 @@ export function LiveFeed({ messages }: LiveFeedProps) {
                 transition={{ duration: 0.2 }}
                 className={`flex items-start gap-2 text-xs py-1.5 px-2 rounded ${borderClass} hover:bg-white/[0.02]`}
               >
-                <span className="text-base shrink-0">{agent?.emoji ?? '🐟'}</span>
+                {agent?.avatarUrl ? (
+                  <img src={agent.avatarUrl} alt={agent.name} className="w-6 h-6 rounded-full object-contain bg-[#0a1628] shrink-0" />
+                ) : (
+                  <span className="text-base shrink-0">{agent?.emoji ?? '🐟'}</span>
+                )}
                 <div className="min-w-0 flex-1">
                   <span className="font-semibold text-white/80">{agent?.name ?? msg.agentId}</span>
                   <span className="text-white/50 ml-2">{msg.text}</span>
