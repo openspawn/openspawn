@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -6,6 +6,7 @@ import {
   Position,
   BaseEdge,
   getSmoothStepPath,
+  useReactFlow,
   type Node,
   type Edge,
   type NodeProps,
@@ -233,6 +234,7 @@ function buildGraph(
       data: {
         agentId: sa.id,
         emoji: sa.emoji,
+        avatarUrl: sa.avatarUrl,
         name: sa.name,
         status: state.status,
       } satisfies LiveNodeData,
@@ -314,6 +316,32 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
     [nodeStates, edgeAnimations, reassignedEdges, spawnedAgents],
   );
 
+  const { fitView, setCenter } = useReactFlow();
+  const prevSpawnCount = useRef(0);
+  const zoomResetTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Zoom into spawn area when new agents appear, zoom back out after
+  useEffect(() => {
+    const count = spawnedAgents.length;
+    if (count > prevSpawnCount.current && count >= 1) {
+      // Zoom to the SpongeBob / Kitchen area where sous-chefs spawn
+      // SpongeBob is at CX-400=200, spawn rows are at Y=460-530
+      clearTimeout(zoomResetTimer.current);
+      setCenter(200, 420, { zoom: 1.4, duration: 800 });
+
+      // After 3 seconds (or when spawning stops), zoom back to full view
+      zoomResetTimer.current = setTimeout(() => {
+        fitView({ padding: 0.15, duration: 800 });
+      }, 3000);
+    }
+    prevSpawnCount.current = count;
+  }, [spawnedAgents.length, setCenter, fitView]);
+
+  // On first render and when no spawns, fit the full view
+  const onInit = useCallback(() => {
+    fitView({ padding: 0.15, duration: 0 });
+  }, [fitView]);
+
   return (
     <div className="w-full h-full">
       <ReactFlow
@@ -321,8 +349,7 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.15 }}
+        onInit={onInit}
         nodesDraggable={false}
         nodesConnectable={false}
         panOnDrag={false}
