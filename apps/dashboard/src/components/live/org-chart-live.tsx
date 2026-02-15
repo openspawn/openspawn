@@ -18,7 +18,7 @@ import { AGENTS, type NodeStatus, type SpawnedAgent } from './replay-data';
 // ── Node positions (hardcoded tree) ──────────────────────────────────────────
 
 const CX = 600; // center x
-const LY = [0, 120, 240, 360]; // layer y positions
+const LY = [0, 160, 330, 500]; // layer y positions
 
 interface NodeDef {
   id: string;
@@ -38,9 +38,9 @@ const NODE_LAYOUT: NodeDef[] = [
   { id: 'sandy-cheeks', x: CX - 500, y: LY[2], parent: 'spongebob-squarepants' },
   { id: 'karen', x: CX - 300, y: LY[2], parent: 'spongebob-squarepants' },
   // Layer 2: Squidward's reports (The Register)
-  { id: 'pearl-krabs', x: CX - 150, y: LY[2], parent: 'squidward-tentacles' },
-  { id: 'perch-perkins', x: CX - 25, y: LY[2], parent: 'squidward-tentacles' },
-  { id: 'barnacle-boy', x: CX + 150, y: LY[2], parent: 'squidward-tentacles' },
+  { id: 'pearl-krabs', x: CX - 180, y: LY[2], parent: 'squidward-tentacles' },
+  { id: 'perch-perkins', x: CX, y: LY[2], parent: 'squidward-tentacles' },
+  { id: 'barnacle-boy', x: CX + 180, y: LY[2], parent: 'squidward-tentacles' },
   // Layer 2: Squilliam's reports (The Vault)
   { id: 'plankton', x: CX + 350, y: LY[2], parent: 'squilliam-fancyson' },
   { id: 'mrs-puff', x: CX + 475, y: LY[2], parent: 'squilliam-fancyson' },
@@ -83,7 +83,7 @@ interface OrgChartLiveProps {
   spawnedAgents: SpawnedAgent[];
 }
 
-// ── Custom Node ──────────────────────────────────────────────────────────────
+// ── Custom Nodes ─────────────────────────────────────────────────────────────
 
 interface LiveNodeData extends Record<string, unknown> {
   agentId: string;
@@ -92,6 +92,12 @@ interface LiveNodeData extends Record<string, unknown> {
   name: string;
   status: NodeStatus;
   queueBadge?: number;
+}
+
+interface PoolNodeData extends Record<string, unknown> {
+  title: string;
+  count: number;
+  throughput?: number; // 0-100 percentage
 }
 
 function LiveAgentNode({ data }: NodeProps) {
@@ -106,6 +112,20 @@ function LiveAgentNode({ data }: NodeProps) {
   const isActive = d.status !== 'idle';
   const isPulsing = d.status === 'overwhelmed' || d.status === 'busy';
 
+  // Animation based on status
+  const getAnimation = () => {
+    if (d.status === 'overwhelmed') return 'jitter 0.3s ease-in-out infinite';
+    if (d.status === 'working') return 'bob 1.5s ease-in-out infinite';
+    return 'idle-pulse 3s ease-in-out infinite';
+  };
+
+  // Stagger delay for idle animation based on agent name hash
+  const getAnimationDelay = () => {
+    if (d.status !== 'idle') return '0s';
+    const hash = d.agentId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return `${(hash % 3000) / 1000}s`;
+  };
+
   return (
     <div className="relative" style={{ width: 80, height: 80 }}>
       <Handle id="top" type="target" position={Position.Top} style={{ opacity: 0, width: 1, height: 1 }} />
@@ -115,13 +135,21 @@ function LiveAgentNode({ data }: NodeProps) {
         className="absolute inset-0 rounded-full transition-all duration-500"
         style={{
           border: `3px solid ${ringColor}`,
-          boxShadow: isActive ? `0 0 12px ${ringColor}60, 0 0 24px ${ringColor}20` : 'none',
-          animation: isPulsing ? 'pulse 1.5s ease-in-out infinite' : undefined,
+          boxShadow: isActive
+            ? `0 0 ${d.status === 'working' ? '16px' : '12px'} ${ringColor}60, 0 0 24px ${ringColor}20`
+            : 'none',
+          animation: isPulsing ? 'ring-pulse 1.5s ease-in-out infinite' : undefined,
         }}
       />
 
       {/* Inner content */}
-      <div className="w-full h-full rounded-full flex flex-col items-center justify-center bg-[#0a1628] relative overflow-hidden">
+      <div
+        className="w-full h-full rounded-full flex flex-col items-center justify-center bg-[#0a1628] relative overflow-hidden"
+        style={{
+          animation: getAnimation(),
+          animationDelay: getAnimationDelay(),
+        }}
+      >
         {d.avatarUrl ? (
           <img src={d.avatarUrl} alt={d.name} className="w-full h-full object-contain p-1" />
         ) : (
@@ -140,6 +168,39 @@ function LiveAgentNode({ data }: NodeProps) {
           {d.queueBadge > 999 ? `${(d.queueBadge / 1000).toFixed(1)}k` : d.queueBadge}
         </div>
       )}
+
+      <Handle id="bottom" type="source" position={Position.Bottom} style={{ opacity: 0, width: 1, height: 1 }} />
+    </div>
+  );
+}
+
+function PoolNode({ data }: NodeProps) {
+  const d = data as unknown as PoolNodeData;
+  const throughput = d.throughput ?? 75;
+
+  return (
+    <div className="relative" style={{ width: 160, height: 80 }}>
+      <Handle id="top" type="target" position={Position.Top} style={{ opacity: 0, width: 1, height: 1 }} />
+
+      {/* Pool container */}
+      <div className="w-full h-full rounded-lg bg-gradient-to-br from-cyan-900/40 to-cyan-950/60 border-2 border-cyan-500/50 shadow-lg shadow-cyan-500/20 flex flex-col items-center justify-center px-3 py-2">
+        {/* Title */}
+        <div className="text-sm font-semibold text-cyan-300 mb-1">{d.title}</div>
+
+        {/* Count */}
+        <div className="text-xs text-white/80 font-medium mb-2">⭐×{d.count} active</div>
+
+        {/* Progress bar */}
+        <div className="w-full h-1.5 bg-black/30 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500 transition-all duration-500 rounded-full"
+            style={{
+              width: `${throughput}%`,
+              boxShadow: '0 0 8px rgba(34, 211, 238, 0.5)',
+            }}
+          />
+        </div>
+      </div>
 
       <Handle id="bottom" type="source" position={Position.Bottom} style={{ opacity: 0, width: 1, height: 1 }} />
     </div>
@@ -182,7 +243,7 @@ function LiveEdge(props: EdgeProps) {
   );
 }
 
-const nodeTypes = { liveAgent: LiveAgentNode };
+const nodeTypes = { liveAgent: LiveAgentNode, poolNode: PoolNode };
 const edgeTypes = { liveEdge: LiveEdge };
 
 // ── Build graph ──────────────────────────────────────────────────────────────
@@ -211,33 +272,27 @@ function buildGraph(
     };
   });
 
-  // Add spawned sous-chef nodes — 2 rows of 10, centered under SpongeBob
-  const SPONGEBOB_X = CX - 400;
-  const SPAWN_Y1 = LY[3] + 100; // below the existing layer 3
-  const SPAWN_Y2 = SPAWN_Y1 + 70;
-  const SPAWN_SPACING = 70;
-  const ROW_SIZE = 10;
-
-  for (let i = 0; i < spawnedAgents.length; i++) {
-    const sa = spawnedAgents[i];
-    const row = Math.floor(i / ROW_SIZE);
-    const col = i % ROW_SIZE;
-    const rowWidth = (Math.min(ROW_SIZE, spawnedAgents.length - row * ROW_SIZE) - 1) * SPAWN_SPACING;
-    const x = SPONGEBOB_X - rowWidth / 2 + col * SPAWN_SPACING;
-    const y = row === 0 ? SPAWN_Y1 : SPAWN_Y2;
-    const state = nodeStates[sa.id] || { status: 'working' as NodeStatus };
+  // Add pool node for spawned sous-chefs (if any)
+  if (spawnedAgents.length > 0) {
+    const SPONGEBOB_X = CX - 400;
+    const SPAWN_Y = LY[3] + 100; // below the existing layer 3
+    
+    // Calculate throughput based on working agents
+    const workingCount = spawnedAgents.filter(sa => {
+      const state = nodeStates[sa.id];
+      return state?.status === 'working' || state?.status === 'busy';
+    }).length;
+    const throughput = Math.min(100, (workingCount / spawnedAgents.length) * 100);
 
     nodes.push({
-      id: sa.id,
-      type: 'liveAgent',
-      position: { x: x - 40, y },
+      id: 'grill-station-pool',
+      type: 'poolNode',
+      position: { x: SPONGEBOB_X - 80, y: SPAWN_Y },
       data: {
-        agentId: sa.id,
-        emoji: sa.emoji,
-        avatarUrl: sa.avatarUrl,
-        name: sa.name,
-        status: state.status,
-      } satisfies LiveNodeData,
+        title: '🍳 Grill Station',
+        count: spawnedAgents.length,
+        throughput,
+      } satisfies PoolNodeData,
     });
   }
 
@@ -274,18 +329,27 @@ function buildGraph(
     });
   }
 
-  // Add edges for spawned agents
-  for (const sa of spawnedAgents) {
-    const edgeId = `e-${sa.parentId}-${sa.id}`;
-    const key = `${sa.parentId}-${sa.id}`;
+  // Add edge from SpongeBob to pool node (aggregates all spawn animations)
+  if (spawnedAgents.length > 0) {
+    const poolParent = 'spongebob-squarepants';
+    const poolKey = `${poolParent}-grill-station-pool`;
+    
+    // Aggregate all spawn animations to show on the pool edge
+    const poolAnimations: EdgeAnimation[] = [];
+    for (const sa of spawnedAgents) {
+      const key = `${sa.parentId}-${sa.id}`;
+      const anims = edgeAnimMap.get(key) || [];
+      poolAnimations.push(...anims);
+    }
+
     edges.push({
-      id: edgeId,
-      source: sa.parentId,
-      target: sa.id,
+      id: `e-${poolParent}-grill-station-pool`,
+      source: poolParent,
+      target: 'grill-station-pool',
       sourceHandle: 'bottom',
       targetHandle: 'top',
       type: 'liveEdge',
-      data: { animations: edgeAnimMap.get(key) || [], isReassigned: false },
+      data: { animations: poolAnimations, isReassigned: false },
     });
   }
 
@@ -318,16 +382,16 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
 
   const { fitView, setCenter } = useReactFlow();
   const prevSpawnCount = useRef(0);
-  const zoomResetTimer = useRef<ReturnType<typeof setTimeout>>();
+  const zoomResetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Zoom into spawn area when new agents appear, zoom back out after
+  // Zoom into pool node area when spawning starts, zoom back out after
   useEffect(() => {
     const count = spawnedAgents.length;
     if (count > prevSpawnCount.current && count >= 1) {
-      // Zoom to the SpongeBob / Kitchen area where sous-chefs spawn
-      // SpongeBob is at CX-400=200, spawn rows are at Y=460-530
+      // Zoom to the Grill Station pool node area
+      // Pool is at x=CX-400-80=120, y=LY[3]+100=600
       clearTimeout(zoomResetTimer.current);
-      setCenter(200, 420, { zoom: 1.4, duration: 800 });
+      setCenter(120, 580, { zoom: 1.4, duration: 800 });
 
       // After 3 seconds (or when spawning stops), zoom back to full view
       zoomResetTimer.current = setTimeout(() => {
@@ -360,9 +424,22 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
         proOptions={{ hideAttribution: true }}
       />
       <style>{`
-        @keyframes pulse {
+        @keyframes ring-pulse {
           0%, 100% { opacity: 0.7; }
           50% { opacity: 1; }
+        }
+        @keyframes idle-pulse {
+          0%, 100% { transform: scale(1.0); }
+          50% { transform: scale(1.03); }
+        }
+        @keyframes bob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-2px); }
+        }
+        @keyframes jitter {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-1.5px); }
+          75% { transform: translateX(1.5px); }
         }
       `}</style>
     </div>
