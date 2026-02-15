@@ -14,6 +14,7 @@ import { DashboardPage } from "./pages/dashboard";
 import { NetworkPage } from "./pages/network";
 import { IntroPage } from "./pages/intro";
 import { MobileStatusPage } from "./pages/mobile-status";
+import { LiveViewPage } from "./pages/live-view";
 import { isSandboxMode } from "./graphql/fetcher";
 import type { ReactNode } from "react";
 
@@ -79,6 +80,13 @@ const introRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/intro",
   component: IntroPage,
+});
+
+// Live view page — standalone, no layout
+const liveRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/live",
+  component: LiveViewPage,
 });
 
 // Layout route for all pages that use the sidebar layout
@@ -178,6 +186,7 @@ const layoutChildren = [
 
 const rootChildren = [
   introRoute,
+  liveRoute,
   layoutRoute.addChildren(layoutChildren),
   ...(!isDemoMode && !isSandboxMode ? [loginRoute, authCallbackRoute] : []),
 ];
