@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// BikiniBottom CLI — AI agent orchestration control plane
+// OpenSpawn CLI — AI agent orchestration control plane
 
 import { showHelp, getVersion } from './help.js';
 import { initCommand } from './commands/init.js';

@@ -15,7 +15,7 @@ export function statusCommand(): void {
         const idle = total - active;
 
         console.log(`
-\x1b[33m🍍 BikiniBottom Status\x1b[0m
+\x1b[36m🪸 OpenSpawn Status\x1b[0m
 
 Server:     http://localhost:${port} \x1b[32m✓\x1b[0m
 Agents:     ${total} (${active} active, ${idle} idle)
@@ -34,11 +34,11 @@ Protocols:  A2A ✓  MCP ✓
 
 function showOffline(): void {
   console.log(`
-\x1b[33m🍍 BikiniBottom Status\x1b[0m
+\x1b[36m🪸 OpenSpawn Status\x1b[0m
 
 Server:     \x1b[31mNot running\x1b[0m
 
 No server detected on localhost:3333.
-Start with: \x1b[33mbikinibottom start\x1b[0m
+Start with: \x1b[36mopenspawn start\x1b[0m
 `);
 }
