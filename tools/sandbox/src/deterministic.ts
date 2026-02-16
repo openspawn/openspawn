@@ -226,6 +226,9 @@ export class DeterministicSimulation {
   parsedOrg?: ParsedOrg;
   scenarioEngine?: ScenarioEngine;
 
+  /** Agent IDs to skip in the deterministic tick loop (e.g. already handled by LLM) */
+  protected skipAgentIds = new Set<string>();
+
   private sseListeners: Array<(event: SandboxEvent) => void> = [];
   /** Pending hires queue: domains the COO needs to fill */
   private pendingHires: string[] = [];
@@ -582,6 +585,9 @@ export class DeterministicSimulation {
     const sortedAgents = [...this.agents].filter(a => a.status === 'active').sort((a, b) => b.level - a.level);
 
     for (const agent of sortedAgents) {
+      // Skip agents already handled by LLM (populated by LLMSimulation subclass)
+      if (this.skipAgentIds.has(agent.id)) continue;
+
       if (agent.role === 'coo' || agent.level >= 9) {
         this.tickCOO(agent);
         this.tickUnblock(agent);
@@ -592,6 +598,9 @@ export class DeterministicSimulation {
         this.tickWorker(agent);
       }
     }
+
+    // Clear skip list after processing
+    this.skipAgentIds.clear();
 
     // Scenario engine post-tick
     if (this.scenarioEngine) {
