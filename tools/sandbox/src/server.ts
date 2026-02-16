@@ -655,7 +655,7 @@ export function startServer(sim: Simulation): void {
             parentId = domainLead?.id ?? coo?.id;
           }
 
-          const agent = makeAgentPublic(id, name, role, level ?? 4, domain ?? 'Engineering', parentId, undefined);
+          const agent = makeAgentPublic(id, name, role, level ?? 4, domain ?? 'Engineering', parentId ?? '', '');
           agent.avatar = avatar;
           agent.avatarColor = avatarColor;
           agent.status = 'active';
