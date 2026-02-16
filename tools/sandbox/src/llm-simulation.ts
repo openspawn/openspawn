@@ -3,7 +3,7 @@
 // Workers (L1-6) remain deterministic. Falls back to deterministic if LLM fails.
 
 import { DeterministicSimulation } from './deterministic.js';
-import { generate, isOllamaAvailable, getLLMConfig, type LLMConfig } from './llm-provider.js';
+import { generate, isLLMAvailable, getLLMConfig, type LLMConfig } from './llm-provider.js';
 import { buildAgentPrompt, parseDecision, resolveAgentId, type AgentDecision, type SimulationState } from './markdown-decision.js';
 import { DecisionRecorder } from './recorder.js';
 import { makeAgentPublic } from './agents.js';
@@ -57,9 +57,12 @@ export class LLMSimulation extends DeterministicSimulation {
   private llmConfig: LLMConfig;
   private recorder: DecisionRecorder | null = null;
   private recording: boolean;
-  private ollamaAvailable: boolean | null = null; // null = not checked yet
+  private llmAvailable: boolean | null = null; // null = not checked yet
   private scenarioOrder: string = '';
   private startTime: number = Date.now();
+  private totalCost: number = 0;
+  private totalInputTokens: number = 0;
+  private totalOutputTokens: number = 0;
 
   constructor(
     agents: SandboxAgent[],
@@ -74,7 +77,8 @@ export class LLMSimulation extends DeterministicSimulation {
 
     const modeLabel = recording ? 'record' : 'hybrid';
     console.log(`\n🧠 LLM Simulation (${modeLabel} mode)`);
-    console.log(`   Model: ${this.llmConfig.model} @ ${this.llmConfig.baseUrl}`);
+    console.log(`   Provider: ${this.llmConfig.provider} | Model: ${this.llmConfig.model}`);
+    if (this.llmConfig.provider === 'ollama') console.log(`   Endpoint: ${this.llmConfig.baseUrl}`);
     console.log(`   L7+ agents use LLM decisions, L1-6 stay deterministic`);
   }
 
@@ -88,18 +92,18 @@ export class LLMSimulation extends DeterministicSimulation {
 
   /** Override runTick to inject LLM decisions for L7+ agents before deterministic tick */
   async runTick(): Promise<void> {
-    // Check Ollama availability on first tick
-    if (this.ollamaAvailable === null) {
-      this.ollamaAvailable = await isOllamaAvailable(this.llmConfig);
-      if (!this.ollamaAvailable) {
-        console.log('⚠️  Ollama not available — all agents will use deterministic logic');
+    // Check LLM availability on first tick
+    if (this.llmAvailable === null) {
+      this.llmAvailable = await isLLMAvailable(this.llmConfig);
+      if (!this.llmAvailable) {
+        console.log('⚠️  LLM not available — all agents will use deterministic logic');
       }
     }
 
     // Run LLM decisions for active L7+ agents BEFORE the deterministic tick.
     // Successfully handled agents are added to skipAgentIds so the deterministic
     // loop doesn't double-process them. Failed agents fall through to deterministic.
-    if (this.ollamaAvailable) {
+    if (this.llmAvailable) {
       const llmAgents = this.agents.filter(a =>
         a.status === 'active' && a.level >= 7
       );
@@ -129,7 +133,14 @@ export class LLMSimulation extends DeterministicSimulation {
       return; // deterministic tick will handle
     }
 
-    console.log(`  🧠 ${agent.name}: ${decision.action} → ${decision.target} | ${decision.message.slice(0, 60)}`);
+    // Track token usage and cost
+    if (response.inputTokens) this.totalInputTokens += response.inputTokens;
+    this.totalOutputTokens += response.tokens;
+    if (response.cost) this.totalCost += response.cost;
+
+    const costStr = response.cost ? ` ($${response.cost.toFixed(4)})` : '';
+    const latency = response.durationMs ? ` ${(response.durationMs / 1000).toFixed(1)}s` : '';
+    console.log(`  🧠 ${agent.name}: ${decision.action} → ${decision.target} | ${decision.message.slice(0, 50)}${latency}${costStr}`);
 
     // Record if in recording mode
     if (this.recording) {
@@ -417,11 +428,25 @@ export class LLMSimulation extends DeterministicSimulation {
     return filepath;
   }
 
-  /** Override run to save recording when simulation finishes */
+  /** Override run to save recording and print cost summary when simulation finishes */
   async run(): Promise<void> {
     await super.run();
+    this.printCostSummary();
     if (this.recording) {
       await this.saveRecording();
+    }
+  }
+
+  private printCostSummary(): void {
+    if (this.totalInputTokens === 0 && this.totalOutputTokens === 0) return;
+    console.log(`\n💰 LLM Cost Summary:`);
+    console.log(`   Provider: ${this.llmConfig.provider} | Model: ${this.llmConfig.model}`);
+    console.log(`   Input tokens:  ${this.totalInputTokens.toLocaleString()}`);
+    console.log(`   Output tokens: ${this.totalOutputTokens.toLocaleString()}`);
+    if (this.totalCost > 0) {
+      console.log(`   Total cost:    $${this.totalCost.toFixed(2)}`);
+    } else {
+      console.log(`   Total cost:    $0 (local inference)`);
     }
   }
 
