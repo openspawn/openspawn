@@ -139,23 +139,24 @@ for (const a of agents) {
 const simMode = process.env.SIMULATION_MODE || 'deterministic';
 const useLLM = simMode === 'llm';
 const useHybrid = simMode === 'hybrid' || simMode === 'record';
-const useRecording = simMode === 'record';
 const useReplay = simMode === 'replay';
+const replayFile = process.env.REPLAY_FILE; // specific recording file to replay
 
 let sim: DeterministicSimulation | Simulation;
 if (useReplay) {
   const { ReplaySimulation } = await import('./replay-engine.js');
-  sim = new ReplaySimulation(agents, config, cleanSlate, parsedOrg);
-} else if (useHybrid || useRecording) {
+  sim = new ReplaySimulation(agents, config, cleanSlate, parsedOrg, replayFile);
+} else if (useHybrid) {
   const { LLMSimulation } = await import('./llm-simulation.js');
-  sim = new LLMSimulation(agents, config, cleanSlate, parsedOrg, useRecording);
+  // Always record when using LLM — recordings are cheap and useful for comparison
+  sim = new LLMSimulation(agents, config, cleanSlate, parsedOrg, true);
 } else if (useLLM) {
   sim = new Simulation(agents, config, cleanSlate, parsedOrg);
 } else {
   sim = new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
 }
 
-if (!useLLM && !useHybrid && !useRecording && !useReplay) {
+if (!useLLM && !useHybrid && !useReplay) {
   console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=replay|hybrid|record|llm for other modes)`);
 }
 
@@ -192,6 +193,17 @@ if (scenarioId !== 'none' && !useLLM) {
   } else {
     console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(scenarioMap).join(', ')}`);
   }
+}
+
+// Save recording on Ctrl+C / kill
+if (useHybrid && 'saveRecording' in sim) {
+  const save = async () => {
+    console.log('\n⏹️  Stopping simulation...');
+    await (sim as any).saveRecording();
+    process.exit(0);
+  };
+  process.on('SIGINT', save);
+  process.on('SIGTERM', save);
 }
 
 sim.run().catch(err => {
