@@ -95,7 +95,9 @@ export class LLMSimulation extends DeterministicSimulation {
       }
     }
 
-    // Run LLM decisions for active L7+ agents before the deterministic tick
+    // Run LLM decisions for active L7+ agents BEFORE the deterministic tick.
+    // Successfully handled agents are added to skipAgentIds so the deterministic
+    // loop doesn't double-process them. Failed agents fall through to deterministic.
     if (this.ollamaAvailable) {
       const llmAgents = this.agents.filter(a =>
         a.status === 'active' && a.level >= 7
@@ -106,12 +108,12 @@ export class LLMSimulation extends DeterministicSimulation {
           await this.tickAgentLLM(agent);
         } catch (err) {
           console.log(`  ⚠️ LLM error for ${agent.name}: ${err instanceof Error ? err.message : String(err)}`);
-          // Deterministic tick will handle this agent
+          // Don't add to skipAgentIds — deterministic tick will handle this agent
         }
       }
     }
 
-    // Run the normal deterministic tick (handles everything including L7+ fallback)
+    // Run the normal deterministic tick (skips LLM-handled agents, handles L1-6 + fallbacks)
     await super.runTick();
   }
 
@@ -141,13 +143,24 @@ export class LLMSimulation extends DeterministicSimulation {
 
     // Execute the decision
     this.executeDecision(agent, decision);
+
+    // Mark this agent so the deterministic tick skips it
+    this.skipAgentIds.add(agent.id);
   }
 
   private executeDecision(agent: SandboxAgent, decision: AgentDecision): void {
     switch (decision.action) {
-      case 'delegate':
+      case 'delegate': {
+        // If agent has no active direct reports, convert to work
+        const hasReports = this.agents.some(a => a.parentId === agent.id && a.status === 'active');
+        if (!hasReports) {
+          console.log(`  ⚠️ ${agent.name}: no active reports — converting delegate to work`);
+          this.executeWork(agent, { ...decision, action: 'work' });
+          break;
+        }
         this.executeDelegation(agent, decision);
         break;
+      }
       case 'escalate':
         this.executeEscalation(agent, decision);
         break;
@@ -174,6 +187,22 @@ export class LLMSimulation extends DeterministicSimulation {
     const target = targetId ? this.agents.find(a => a.id === targetId) : undefined;
     if (!target) {
       console.log(`  ⚠️ ${agent.name}: delegate target "${decision.target}" not found`);
+      return;
+    }
+
+    // Guard: can't delegate to your parent or someone above you — that's escalation
+    if (target.id === agent.parentId || target.level > agent.level) {
+      console.log(`  ⚠️ ${agent.name}: can't delegate UP to ${target.name} (L${target.level}) — converting to escalation`);
+      this.executeEscalation(agent, { ...decision, action: 'escalate' });
+      return;
+    }
+
+    // Guard: prefer delegating to direct reports, not sideways
+    const isDirectReport = target.parentId === agent.id;
+    const isSubordinate = target.level < agent.level;
+    if (!isDirectReport && !isSubordinate) {
+      console.log(`  ⚠️ ${agent.name}: ${target.name} is not a report — converting to message`);
+      this.executeMessage(agent, { ...decision, action: 'message' });
       return;
     }
 
@@ -253,7 +282,15 @@ export class LLMSimulation extends DeterministicSimulation {
     }
     if (!task) return;
 
-    // Guard: only complete tasks that have been worked on (in_progress) or are assigned to you
+    // Guard: only complete tasks that have been worked on (in_progress or review)
+    if (task.status !== 'in_progress' && task.status !== 'review') {
+      console.log(`  ⚠️ ${agent.name}: Can't complete "${task.title}" (status: ${task.status}) — must work on it first`);
+      // Auto-convert to work action instead
+      this.executeWork(agent, { ...decision, action: 'work' });
+      return;
+    }
+
+    // Guard: only the assignee or creator can complete
     if (task.assigneeId !== agent.id && task.creatorId !== agent.id) return;
 
     task.status = 'done';

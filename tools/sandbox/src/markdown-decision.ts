@@ -107,7 +107,13 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
         const label = agentTasks.length > 0 ? `working (${agentTasks.length} tasks)` : 'idle';
         return `- ${a.name} (${a.id}, L${a.level}) — ${label}`;
       }).join('\n')
-    : '(no direct reports)';
+    : '(no direct reports — you must WORK on tasks yourself or ESCALATE)';
+
+  // Pending reports (not yet spawned)
+  const pendingTeam = agents.filter(a => a.parentId === agent.id && a.status === 'pending');
+  const pendingLine = pendingTeam.length > 0
+    ? `\n*(${pendingTeam.length} more team members joining soon)*`
+    : '';
 
   // Inbox — recent messages TO this agent
   const inbox = agent.recentMessages
@@ -126,20 +132,34 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
   const activeTotalTasks = tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
 
   // Build the actions list based on agent level
-  let actionsBlock = `**Actions available:**
-- **work** — do work on a task yourself (describe what you did)
-- **complete** — mark a task done (only after you worked on it)
-- **message** — send needed information to another agent
-- **escalate** — ask your manager for help when stuck`;
+  let actionsBlock = `**Actions (choose ONE — priority order!):**`;
 
   if (agent.level >= 7) {
+    // Managers: delegate first, then work
     actionsBlock += `
-- **delegate** — assign a task to one of your direct reports
-- **hire** — spawn a new temporary agent (costs credits)`;
+1. **delegate** — assign a task to a direct report (PREFERRED for managers)
+2. **work** — do work on a task yourself (describe what you did)
+3. **escalate** — ask your manager for help when stuck
+4. **complete** — mark a task done (ONLY if status is in_progress or review)
+5. **message** — send needed info to another agent (NOT chitchat — must be task-related)
+6. **hire** — spawn a new temporary agent (costs credits, use when understaffed)
+7. **idle** — truly nothing to do (rare)`;
+  } else {
+    // Workers: work first
+    actionsBlock += `
+1. **work** — do work on your assigned task (PREFERRED — describe what you did)
+2. **complete** — mark a task done (ONLY if you already worked on it and it's in_progress)
+3. **escalate** — ask your manager for help when stuck
+4. **message** — send needed info to another agent (NOT chitchat — must be task-related)
+5. **idle** — truly nothing to do (rare)`;
   }
 
   actionsBlock += `
-- **idle** — nothing to do (use sparingly)`;
+
+⚠️ RULES:
+- You CANNOT complete a task unless you already used "work" on it (status must be in_progress)
+- "message" is NOT for chatting — only for requesting/sending task-critical information
+- If you have assigned tasks, you MUST work on them before doing anything else`;
 
   return `# You are ${agent.name}
 **Role:** ${agent.role} | **Domain:** ${agent.domain} | **Level:** ${agent.level}
@@ -150,8 +170,8 @@ Tick ${tick} | ${totalTasks} total tasks | ${doneTasks} done | ${activeTotalTask
 
 ## Your Tasks
 ${taskSection}
-## Your Team
-${teamLines}
+## Your Direct Reports (delegate ONLY to these agents)
+${teamLines}${pendingLine}
 
 ## Inbox
 ${inboxLines}
