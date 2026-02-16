@@ -59,6 +59,7 @@ export class LLMSimulation extends DeterministicSimulation {
   private recording: boolean;
   private ollamaAvailable: boolean | null = null; // null = not checked yet
   private scenarioOrder: string = '';
+  private startTime: number = Date.now();
 
   constructor(
     agents: SandboxAgent[],
@@ -396,10 +397,32 @@ export class LLMSimulation extends DeterministicSimulation {
   /** Save recording when simulation stops */
   async saveRecording(): Promise<string | null> {
     if (!this.recorder || this.recorder.entryCount === 0) return null;
+
+    // Attach final simulation stats
+    const totalTasks = this.tasks.length;
+    const tasksDone = this.tasks.filter(t => t.status === 'done').length;
+    const totalMessages = this.agents.reduce((s, a) => s + a.stats.messagessSent, 0);
+    this.recorder.setSummary({
+      totalTasks,
+      tasksDone,
+      completionRate: totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0,
+      totalMessages,
+      agentCount: this.agents.filter(a => a.status === 'active').length,
+      durationMs: Date.now() - this.startTime,
+    });
+
     const dir = resolve(__dirname, '..', 'scenarios', 'recorded');
     const filepath = await this.recorder.save(dir);
     console.log(`\n📼 Recording saved: ${filepath}`);
     return filepath;
+  }
+
+  /** Override run to save recording when simulation finishes */
+  async run(): Promise<void> {
+    await super.run();
+    if (this.recording) {
+      await this.saveRecording();
+    }
   }
 
   /** Override restart to save recording first */

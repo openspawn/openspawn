@@ -17,16 +17,31 @@ export interface RecordedDecision {
   durationMs?: number;
 }
 
+export interface RecordingSummary {
+  totalTasks: number;
+  tasksDone: number;
+  completionRate: number;
+  totalMessages: number;
+  agentCount: number;
+  durationMs: number;
+}
+
 export class DecisionRecorder {
   private entries: RecordedDecision[] = [];
   private scenarioName: string;
   private model: string;
   private startTime: number;
+  private summary: RecordingSummary | null = null;
 
   constructor(scenarioName: string, model: string) {
     this.scenarioName = scenarioName;
     this.model = model;
     this.startTime = Date.now();
+  }
+
+  /** Attach final simulation stats before saving */
+  setSummary(summary: RecordingSummary): void {
+    this.summary = summary;
   }
 
   record(
@@ -58,20 +73,56 @@ export class DecisionRecorder {
       : 0;
     const uniqueAgents = new Set(this.entries.map(e => e.agentId)).size;
 
+    // Action distribution
+    const actionCounts: Record<string, number> = {};
+    for (const e of this.entries) {
+      actionCounts[e.decision.action] = (actionCounts[e.decision.action] || 0) + 1;
+    }
+    const actionLines = Object.entries(actionCounts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([action, count]) => {
+        const pct = this.entries.length > 0 ? Math.round((count / this.entries.length) * 100) : 0;
+        return `${action}: ${count} (${pct}%)`;
+      })
+      .join(', ');
+
+    // Average latency
+    const withDuration = this.entries.filter(e => e.durationMs);
+    const avgLatency = withDuration.length > 0
+      ? Math.round(withDuration.reduce((s, e) => s + (e.durationMs || 0), 0) / withDuration.length)
+      : 0;
+
     const header = `---
 scenario: ${this.scenarioName}
 recorded: ${new Date(this.startTime).toISOString()}
 model: ${this.model}
 ticks: ${maxTick}
 agents: ${uniqueAgents}
+decisions: ${this.entries.length}
+actions: ${actionLines}
+avg_latency_ms: ${avgLatency}${this.summary ? `
+tasks_total: ${this.summary.totalTasks}
+tasks_done: ${this.summary.tasksDone}
+completion_rate: ${this.summary.completionRate}%
+total_messages: ${this.summary.totalMessages}
+duration_ms: ${this.summary.durationMs}` : ''}
 ---
 
 # Scenario: ${this.scenarioName}
+
+## Stats
+- **Decisions:** ${this.entries.length} across ${maxTick} ticks by ${uniqueAgents} agents
+- **Actions:** ${actionLines}
+- **Avg latency:** ${avgLatency}ms per LLM call${this.summary ? `
+- **Tasks:** ${this.summary.tasksDone}/${this.summary.totalTasks} completed (${this.summary.completionRate}%)
+- **Messages:** ${this.summary.totalMessages}
+- **Duration:** ${(this.summary.durationMs / 1000).toFixed(1)}s` : ''}
 `;
 
     const body = this.entries.map(e => {
+      const latency = e.durationMs ? ` (${e.durationMs}ms)` : '';
       return `
-## Tick ${e.tick} — ${e.agentName} (${e.agentRole.toUpperCase()}, L${e.agentLevel})
+## Tick ${e.tick} — ${e.agentName} (${e.agentRole.toUpperCase()}, L${e.agentLevel})${latency}
 - Action: ${e.decision.action}
 - Target: ${e.decision.target}
 - Task: ${e.decision.task}

@@ -209,15 +209,36 @@ export class ReplaySimulation extends DeterministicSimulation {
     config: SandboxConfig,
     skipSeedTasks = false,
     parsedOrg?: ParsedOrg,
+    replayFile?: string,
   ) {
     super(agents, config, skipSeedTasks, parsedOrg);
 
-    const scenariosDir = resolve(__dirname, '..', 'scenarios');
-    this.scenarios = loadScenarios(scenariosDir);
-    console.log(`\n🔁 Replay Simulation`);
-    console.log(`   Loaded ${this.scenarios.length} scenario(s) from ${scenariosDir}`);
-    for (const s of this.scenarios) {
-      console.log(`   • "${s.name}" (${s.decisions.length} decisions, ${s.metadata.ticks} ticks)`);
+    if (replayFile) {
+      // Load a specific recording file
+      const filePath = resolve(replayFile);
+      if (!existsSync(filePath)) {
+        console.log(`\n❌ Replay file not found: ${filePath}`);
+        this.scenarios = [];
+      } else {
+        const content = readFileSync(filePath, 'utf8');
+        const scenario = parseScenarioFile(content);
+        this.scenarios = scenario ? [scenario] : [];
+        console.log(`\n🔁 Replay Simulation (specific file)`);
+        console.log(`   📄 ${filePath}`);
+        if (scenario) {
+          console.log(`   • "${scenario.name}" (${scenario.decisions.length} decisions, ${scenario.metadata.ticks} ticks, model: ${scenario.metadata.model})`);
+        } else {
+          console.log(`   ⚠️ Failed to parse recording file`);
+        }
+      }
+    } else {
+      const scenariosDir = resolve(__dirname, '..', 'scenarios');
+      this.scenarios = loadScenarios(scenariosDir);
+      console.log(`\n🔁 Replay Simulation`);
+      console.log(`   Loaded ${this.scenarios.length} scenario(s) from ${scenariosDir}`);
+      for (const s of this.scenarios) {
+        console.log(`   • "${s.name}" (${s.decisions.length} decisions, ${s.metadata.ticks} ticks)`);
+      }
     }
   }
 

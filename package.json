@@ -21,12 +21,11 @@
     "dev:sandbox:full": "nx run sandbox:dev:full",
     "dev:sandbox:cofounder": "nx run sandbox:dev:cofounder",
     "dev:sandbox:hybrid": "nx run sandbox:dev:hybrid",
-    "dev:sandbox:record": "nx run sandbox:dev:record",
     "dev:sandbox:replay": "nx run sandbox:dev:replay",
     "sandbox": "nx run sandbox:serve",
     "sandbox:hybrid": "nx run sandbox:serve:hybrid",
-    "sandbox:record": "nx run sandbox:serve:record",
-    "sandbox:replay": "nx run sandbox:serve:replay"
+    "sandbox:replay": "nx run sandbox:serve:replay",
+    "sandbox:recordings": "nx run sandbox:recordings"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
