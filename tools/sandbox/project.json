@@ -17,6 +17,15 @@
         },
         "cofounder": {
           "command": "COFOUNDER=1 npx tsx tools/sandbox/src/index.ts"
+        },
+        "hybrid": {
+          "command": "SIMULATION_MODE=hybrid LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
+        },
+        "record": {
+          "command": "SIMULATION_MODE=record LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
+        },
+        "replay": {
+          "command": "SIMULATION_MODE=replay SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
         }
       }
     },
@@ -24,7 +33,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "CLEAN=1 npx tsx tools/sandbox/src/index.ts",
+          "CLEAN=1 SERVE_DASHBOARD=1 npx tsx tools/sandbox/src/index.ts",
           "VITE_SANDBOX_MODE=true nx serve dashboard"
         ],
         "cwd": "{workspaceRoot}",
@@ -33,14 +42,37 @@
       "configurations": {
         "full": {
           "commands": [
-            "npx tsx tools/sandbox/src/index.ts",
+            "SERVE_DASHBOARD=1 npx tsx tools/sandbox/src/index.ts",
             "VITE_SANDBOX_MODE=true nx serve dashboard"
           ]
         },
         "cofounder": {
           "commands": [
-            "COFOUNDER=1 npx tsx tools/sandbox/src/index.ts",
+            "COFOUNDER=1 SERVE_DASHBOARD=1 npx tsx tools/sandbox/src/index.ts",
             "VITE_SANDBOX_MODE=true nx serve dashboard"
+          ]
+        },
+        "hybrid": {
+          "commands": [
+            "SERVE_DASHBOARD=1 SIMULATION_MODE=hybrid LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts",
+            "VITE_SANDBOX_MODE=true nx serve dashboard"
+          ]
+        },
+        "record": {
+          "commands": [
+            "SERVE_DASHBOARD=1 SIMULATION_MODE=record LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts",
+            "VITE_SANDBOX_MODE=true nx serve dashboard"
+          ]
+        },
+        "replay": {
+          "commands": [
+            "SERVE_DASHBOARD=1 SIMULATION_MODE=replay SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts",
+            "VITE_SANDBOX_MODE=true nx serve dashboard"
+          ]
+        },
+        "prod": {
+          "commands": [
+            "SERVE_DASHBOARD=1 SIMULATION_MODE=replay SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
           ]
         }
       }
