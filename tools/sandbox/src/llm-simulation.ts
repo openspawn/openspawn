@@ -151,6 +151,9 @@ export class LLMSimulation extends DeterministicSimulation {
       case 'escalate':
         this.executeEscalation(agent, decision);
         break;
+      case 'work':
+        this.executeWork(agent, decision);
+        break;
       case 'complete':
         this.executeCompletion(agent, decision);
         break;
@@ -159,6 +162,9 @@ export class LLMSimulation extends DeterministicSimulation {
         break;
       case 'hire':
         this.executeHire(agent, decision);
+        break;
+      case 'idle':
+        // Do nothing — agent explicitly chose to wait
         break;
     }
   }
@@ -216,9 +222,39 @@ export class LLMSimulation extends DeterministicSimulation {
     agent.stats.messagessSent++;
   }
 
-  private executeCompletion(agent: SandboxAgent, decision: AgentDecision): void {
-    const task = this.resolveTask(decision.task, agent);
+  private executeWork(agent: SandboxAgent, decision: AgentDecision): void {
+    let task = this.resolveTask(decision.task, agent);
+    if (!task) {
+      // Try to find any task assigned to this agent
+      task = this.tasks.find(t => t.assigneeId === agent.id && !['done', 'rejected'].includes(t.status));
+    }
     if (!task) return;
+
+    // Mark task as in-progress
+    if (task.status === 'assigned' || task.status === 'backlog') {
+      task.status = 'in_progress';
+    }
+    task.updatedAt = Date.now();
+
+    // Log progress
+    const progressMsg = createACPMessage('progress', agent.id, agent.parentId || '', task.id, {
+      body: decision.message || `Working on "${task.title}"`,
+    });
+    pushMessage(this.agents, progressMsg);
+    task.activityLog.push(progressMsg);
+    agent.stats.messagessSent++;
+  }
+
+  private executeCompletion(agent: SandboxAgent, decision: AgentDecision): void {
+    let task = this.resolveTask(decision.task, agent);
+    if (!task) {
+      // Try to find any in-progress task assigned to this agent
+      task = this.tasks.find(t => t.assigneeId === agent.id && t.status === 'in_progress');
+    }
+    if (!task) return;
+
+    // Guard: only complete tasks that have been worked on (in_progress) or are assigned to you
+    if (task.assigneeId !== agent.id && task.creatorId !== agent.id) return;
 
     task.status = 'done';
     task.updatedAt = Date.now();

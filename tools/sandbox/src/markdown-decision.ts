@@ -3,10 +3,16 @@
 // from free-form markdown responses.
 
 import type { SandboxAgent, SandboxTask, ACPMessage } from './types.js';
+import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
+import { resolve, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ORG_DIR = resolve(__dirname, '..', 'org');
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-export type DecisionAction = 'delegate' | 'escalate' | 'complete' | 'message' | 'hire';
+export type DecisionAction = 'delegate' | 'escalate' | 'complete' | 'work' | 'message' | 'hire' | 'idle';
 
 export interface AgentDecision {
   action: DecisionAction;
@@ -22,35 +28,86 @@ export interface SimulationState {
   tick: number;
 }
 
+// ── Agent Config Cache ──────────────────────────────────────────────────────
+
+const soulCache = new Map<string, string>();
+
+function getAgentSoul(agentId: string): string {
+  if (soulCache.has(agentId)) return soulCache.get(agentId)!;
+  const config = loadAgentConfig(agentId, ORG_DIR);
+  const soul = buildSystemPrompt(config);
+  soulCache.set(agentId, soul);
+  return soul;
+}
+
 // ── Prompt Builder ──────────────────────────────────────────────────────────
 
-const VALID_ACTIONS: DecisionAction[] = ['delegate', 'escalate', 'complete', 'message', 'hire'];
+const VALID_ACTIONS: DecisionAction[] = ['delegate', 'escalate', 'complete', 'work', 'message', 'hire', 'idle'];
 
 export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): string {
-  const { agents, tasks } = state;
+  const { agents, tasks, tick } = state;
 
-  // Header
+  // Load agent's soul/personality
+  const soul = getAgentSoul(agent.id);
+
+  // Manager info
   const parent = agent.parentId ? agents.find(a => a.id === agent.parentId) : undefined;
-  const managerLine = parent ? `Manager: ${parent.name} (${parent.role})` : 'Manager: none (you report to the Human Principal)';
+  const managerLine = parent ? `**Manager:** ${parent.name} (${parent.id})` : '**Manager:** Human Principal';
 
-  // Tasks owned or created by this agent
-  const myTasks = tasks.filter(t => t.assigneeId === agent.id || t.creatorId === agent.id);
-  const taskLines = myTasks.length > 0
-    ? myTasks.map(t => {
-        const assignee = t.assigneeId ? agents.find(a => a.id === t.assigneeId) : undefined;
-        const assigneeLabel = assignee ? assignee.name : 'unassigned';
-        return `- ${t.id}: ${t.title} [${t.status}, ${t.priority}] → ${assigneeLabel}`;
-      }).join('\n')
-    : '- (no tasks yet)';
+  // Tasks: owned, created, or in this agent's domain that are unassigned
+  const myTasks = tasks.filter(t =>
+    t.assigneeId === agent.id ||
+    t.creatorId === agent.id
+  );
+  const activeTasks = myTasks.filter(t => !['done', 'rejected'].includes(t.status));
+  const assignedToMe = activeTasks.filter(t => t.assigneeId === agent.id);
+  const iCreated = activeTasks.filter(t => t.creatorId === agent.id && t.assigneeId !== agent.id);
+
+  let taskSection = '';
+  if (assignedToMe.length > 0) {
+    taskSection += '**Assigned to you (DO THESE FIRST):**\n';
+    taskSection += assignedToMe.map(t =>
+      `- ${t.id}: "${t.title}" [${t.status}, ${t.priority}]`
+    ).join('\n');
+    taskSection += '\n';
+  }
+  if (iCreated.length > 0) {
+    taskSection += '**Tasks you created (track progress):**\n';
+    taskSection += iCreated.map(t => {
+      const assignee = t.assigneeId ? agents.find(a => a.id === t.assigneeId) : undefined;
+      return `- ${t.id}: "${t.title}" [${t.status}] → ${assignee?.name ?? 'unassigned'}`;
+    }).join('\n');
+    taskSection += '\n';
+  }
+
+  // Unassigned tasks in the system (for managers to delegate)
+  if (agent.level >= 7) {
+    const unassigned = tasks.filter(t =>
+      !t.assigneeId && !['done', 'rejected'].includes(t.status)
+    );
+    if (unassigned.length > 0) {
+      taskSection += `**Unassigned tasks (${unassigned.length} — delegate these!):**\n`;
+      taskSection += unassigned.slice(0, 8).map(t =>
+        `- ${t.id}: "${t.title}" [${t.priority}]`
+      ).join('\n');
+      if (unassigned.length > 8) taskSection += `\n- ... and ${unassigned.length - 8} more`;
+      taskSection += '\n';
+    }
+  }
+
+  if (!taskSection.trim()) {
+    taskSection = '(no tasks — look for unassigned work or wait)\n';
+  }
 
   // Direct reports
   const team = agents.filter(a => a.parentId === agent.id && a.status === 'active');
   const teamLines = team.length > 0
     ? team.map(a => {
-        const busy = tasks.some(t => t.assigneeId === a.id && !['done', 'rejected', 'backlog'].includes(t.status));
-        return `- ${a.name} (L${a.level} ${a.role}) — ${busy ? 'busy' : 'idle'}`;
+        const agentTasks = tasks.filter(t => t.assigneeId === a.id && !['done', 'rejected'].includes(t.status));
+        const label = agentTasks.length > 0 ? `working (${agentTasks.length} tasks)` : 'idle';
+        return `- ${a.name} (${a.id}, L${a.level}) — ${label}`;
       }).join('\n')
-    : '- (no direct reports)';
+    : '(no direct reports)';
 
   // Inbox — recent messages TO this agent
   const inbox = agent.recentMessages
@@ -59,31 +116,55 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
   const inboxLines = inbox.length > 0
     ? inbox.map(m => {
         const sender = agents.find(a => a.id === m.from);
-        const senderName = sender?.name ?? m.from;
-        return `- [From ${senderName}]: ${m.body || m.summary || m.type}`;
+        return `- [${m.type}] ${sender?.name ?? m.from}: ${m.body || m.summary || '(no body)'}`;
       }).join('\n')
-    : '- (empty)';
+    : '(empty)';
 
-  return `# ${agent.name} — ${agent.role} (${agent.domain}, L${agent.level})
+  // Global situation awareness
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter(t => t.status === 'done').length;
+  const activeTotalTasks = tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
+
+  // Build the actions list based on agent level
+  let actionsBlock = `**Actions available:**
+- **work** — do work on a task yourself (describe what you did)
+- **complete** — mark a task done (only after you worked on it)
+- **message** — send needed information to another agent
+- **escalate** — ask your manager for help when stuck`;
+
+  if (agent.level >= 7) {
+    actionsBlock += `
+- **delegate** — assign a task to one of your direct reports
+- **hire** — spawn a new temporary agent (costs credits)`;
+  }
+
+  actionsBlock += `
+- **idle** — nothing to do (use sparingly)`;
+
+  return `# You are ${agent.name}
+**Role:** ${agent.role} | **Domain:** ${agent.domain} | **Level:** ${agent.level}
 ${managerLine}
 
-## Your Tasks
-${taskLines}
+${soul ? `## Personality\n${soul}\n` : ''}## Situation
+Tick ${tick} | ${totalTasks} total tasks | ${doneTasks} done | ${activeTotalTasks} active
 
+## Your Tasks
+${taskSection}
 ## Your Team
 ${teamLines}
 
 ## Inbox
 ${inboxLines}
 
-## Decide
-Pick ONE action and respond in this exact format:
+${actionsBlock}
 
-## Decision
-- Action: [delegate|escalate|complete|message|hire]
-- Target: [agent name or "none"]
-- Task: [TASK-XX or "new: description"]
-- Message: [what you want to say]`;
+## Your Decision
+Respond with EXACTLY this format (one action only):
+
+- Action: [work|delegate|complete|message|escalate|hire|idle]
+- Target: [agent id or "none"]
+- Task: [TASK-XXXX or "new: description"]
+- Message: [brief description of what you're doing and why]`;
 }
 
 // ── Response Parser ─────────────────────────────────────────────────────────
