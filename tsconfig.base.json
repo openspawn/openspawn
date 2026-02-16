@@ -37,9 +37,6 @@
       ],
       "@openspawn/demo-data": [
         "libs/demo-data/src/index.ts"
-      ],
-      "@openspawn/sdk": [
-        "libs/sdk/src/index.ts"
       ]
     }
   },
