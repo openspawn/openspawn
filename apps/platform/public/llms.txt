@@ -1,0 +1,29 @@
+# OpenSpawn
+
+> OpenSpawn is an open-source multi-agent coordination platform. Define AI agent organizations in markdown (ORG.md), coordinate via A2A and MCP protocols, and observe in a real-time dashboard. The tagline: "One agent needs a prompt. A team needs structure."
+
+OpenSpawn provides the control plane for AI agent teams. It is infrastructure, not a framework — it coordinates agent stacks like CrewAI, LangGraph, AutoGen, and OpenClaw rather than replacing them.
+
+The core innovation is **ORG.md**: a markdown file that defines an entire agent organization — hierarchy, roles, domains, culture, policies, and playbooks. This is analogous to how OpenClaw uses SOUL.md for individual agent identity, but scaled to organizations.
+
+- **Repo:** github.com/openspawn/openspawn (MIT licensed, Nx monorepo, TypeScript)
+- **Live demo:** bikinibottom.ai (22 SpongeBob-themed agents coordinate in real-time)
+- **Framework site:** openspawn.ai
+- **Protocols:** A2A v0.3, MCP (Streamable HTTP), Model Router
+- **CLI:** `npx bikinibottom init my-reef`
+- **Created by:** Adam Dennis (@adamwdennis)
+- **Status:** Demo stage (February 2026), open source, actively developed
+
+## Key Concepts
+
+- **ORG.md**: A markdown file that IS the org chart. Agents read their roles, reporting chains, and policies from it. Sections: Identity (mission/vision/values), Culture (presets like startup/enterprise), Structure (agent hierarchy with levels, domains, avatars), Policies (budgets, caps, permissions), Playbooks (escalation protocols, handoff procedures).
+- **Agent Communication Protocol (ACP)**: Internal message protocol — ACK, Progress, Escalation, Completion. Push for urgent (escalations), pull for optional (progress).
+- **Agent Levels**: L1 (intern) through L10 (CEO). Higher levels get event-driven triggers, lower levels poll. L7+ can spawn sub-agents.
+- **Simulation Modes**: Deterministic (rule-based, zero LLM), Hybrid (L7+ use LLM), Record (capture decisions), Replay (playback for demos).
+
+## Links
+
+- [GitHub Repository](https://github.com/openspawn/openspawn): Full source, issues, PRs
+- [Live Demo](https://bikinibottom.ai/app/live): 75-second choreographed agent coordination demo
+- [ORG.md Concept](https://bikinibottom.ai/org-md): Detailed explanation of the ORG.md format
+- [Documentation](https://bikinibottom.ai/docs): Getting started, protocols, features
