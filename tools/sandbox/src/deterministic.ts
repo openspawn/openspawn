@@ -235,32 +235,26 @@ export class DeterministicSimulation {
   /** Pending task assignments: tasks waiting for a lead in matching domain */
   private pendingTaskDefs: Array<{ title: string; domain: string; priority: SandboxTask['priority'] }> = [];
 
-  /** Queue of agents waiting to be revealed (staggered spawn) */
-  private spawnQueue: SandboxAgent[] = [];
-
   constructor(agents: SandboxAgent[], config: SandboxConfig, skipSeedTasks = false, parsedOrg?: ParsedOrg) {
-    this.agents = agents;
     this.tasks = [];
     this.config = config;
     this.parsedOrg = parsedOrg;
 
-    // Staggered spawn: only COO starts active, rest are queued
+    // Dynamic spawning: only the COO starts active.
+    // All other agents stay in the ORG.md roster (parsedOrg.agents)
+    // and get hired/spawned on demand via hireFromRoster().
     const coo = agents.find(a => a.role === 'coo' || a.level >= 9);
-    const others = agents.filter(a => a !== coo);
-    // Shuffle others for visual variety, then queue them
-    for (let i = others.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [others[i], others[j]] = [others[j], others[i]];
+    if (coo) {
+      coo.status = 'active';
+      this.agents = [coo];
+    } else {
+      // Fallback: no COO found, start with all agents
+      this.agents = agents;
     }
-    // Set non-COO agents to pending
-    for (const agent of others) {
-      agent.status = 'pending';
-    }
-    this.spawnQueue = others;
 
     this.log('🌊 BikiniBottom Sandbox started (deterministic mode)');
-    this.log(`   ${agents.length} agents | model: ${config.model} (flavor text only)`);
-    this.log(`   🦀 COO online — ${others.length} agents joining over the next ${Math.ceil(others.length / 2)} ticks`);
+    this.log(`   🦀 ${coo?.name ?? 'COO'} online — roster of ${(parsedOrg?.agents?.length ?? agents.length) - 1} agents available to spawn`);
+    this.log(`   📋 Agents spawn on demand as workload requires`);
   }
 
   // ── Event system ────────────────────────────────────────────────────────
@@ -306,8 +300,17 @@ export class DeterministicSimulation {
 
     if (candidate) {
       candidate.parentId = manager.id;
+      candidate.status = 'active';
       this.agents.push(candidate);
-      this.logAgent(manager, `🐣 Hired "${candidate.name}" from roster (L${candidate.level} ${candidate.domain} ${candidate.role})`);
+      this.logAgent(manager, `🐣 Spawned "${candidate.name}" from roster (L${candidate.level} ${candidate.domain} ${candidate.role})`);
+
+      // Emit spawn event so dashboard sees the new agent appear
+      this.emit({
+        type: 'agent_spawned',
+        agentId: candidate.id,
+        message: `${manager.name} spawned ${candidate.name}`,
+        timestamp: Date.now(),
+      });
 
       // ACP hire message
       const msg = createACPMessage('delegation', manager.id, candidate.id, '', {
@@ -368,7 +371,13 @@ export class DeterministicSimulation {
         if (!this.agents.find(a => a.id === id)) {
           const newAgent = makeAgentPublic(id, name, 'lead', 7, domain, coo.id, `${domain} department lead`);
           this.agents.push(newAgent);
-          this.logAgent(coo, `🐣 Created "${name}" (L7 ${domain} lead)`);
+          this.logAgent(coo, `🐣 Spawned "${name}" (L7 ${domain} lead)`);
+          this.emit({
+            type: 'agent_spawned',
+            agentId: id,
+            message: `${coo.name} spawned ${name}`,
+            timestamp: Date.now(),
+          });
         }
       }
       return; // One hire per tick
@@ -423,6 +432,47 @@ export class DeterministicSimulation {
         this.logAgent(coo, `📝 Created "${task.title}" (no lead available yet)`, task.id);
       }
       return; // One task per tick
+    }
+
+    // 3. Pick up unassigned backlog tasks (e.g. from scenario engine) and delegate
+    const unassignedBacklog = this.tasks.filter(t =>
+      t.status === 'backlog' && !t.assigneeId && !t.parentTaskId
+    );
+    if (unassignedBacklog.length > 0) {
+      const task = unassignedBacklog[0];
+      // Detect domain from task description
+      const domain = detectDomain(task.description || task.title);
+
+      // Find or hire a lead for this domain
+      const lead = this.agents.find(a =>
+        a.parentId === coo.id && a.domain.toLowerCase().includes(domain) && a.status === 'active'
+      ) || this.agents.find(a =>
+        a.parentId === coo.id && a.role === 'lead' && a.status === 'active'
+      );
+
+      if (lead) {
+        task.assigneeId = lead.id;
+        task.status = 'assigned';
+        lead.taskIds.push(task.id);
+
+        const delegationMsg = createACPMessage('delegation', coo.id, lead.id, task.id, {
+          body: pickRandom(DELEGATION_FLAVORS)(task.title, lead.name),
+        });
+        pushMessage(this.agents, delegationMsg);
+        task.activityLog.push(delegationMsg);
+        task.acked = true;
+
+        this.logAgent(coo, `📋 Delegated "${task.title}" → ${lead.name}`, task.id);
+        coo.stats.messagessSent++;
+      } else {
+        // No lead for this domain yet — hire one from roster
+        const hired = this.hireFromRoster(coo, domain, 'lead');
+        if (hired) {
+          this.logAgent(coo, `🔍 Need a ${domain} lead for "${task.title}" — spawned ${hired.name}`);
+        }
+        // Task stays in backlog, will be assigned next tick after lead is available
+      }
+      return; // One delegation per tick
     }
   }
 
@@ -559,14 +609,6 @@ export class DeterministicSimulation {
 
   async runTick(): Promise<void> {
     this.tick++;
-
-    // Staggered spawn: activate 2 agents per tick from the queue
-    for (let i = 0; i < 2 && this.spawnQueue.length > 0; i++) {
-      const agent = this.spawnQueue.shift()!;
-      agent.status = 'active';
-      this.log(`✨ ${agent.name} has joined the organization`);
-      this.emit({ type: 'agent_spawned', message: `${agent.name} joined`, timestamp: Date.now() });
-    }
 
     const done = this.tasks.filter(t => t.status === 'done').length;
     const active = this.tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
