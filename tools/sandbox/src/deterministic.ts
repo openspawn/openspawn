@@ -289,11 +289,33 @@ export class DeterministicSimulation {
     const roster = this.parsedOrg?.agents || [];
     const notYetHired = roster.filter(r => !this.agents.find(a => a.id === r.id));
 
-    // Find best match: same domain + role
+    // Domain aliases: map between scenario domains and ORG.md domains
+    const DOMAIN_ALIASES: Record<string, string[]> = {
+      engineering: ['kitchen', 'grill', 'architecture', 'systems', 'quality', 'engineering'],
+      backend: ['kitchen', 'grill', 'engineering'],
+      frontend: ['kitchen', 'seating', 'presentation'],
+      operations: ['floor', 'register', 'delivery', 'service', 'complaints', 'operations', 'table service'],
+      finance: ['vault', 'finance', 'accounting'],
+      security: ['security', 'safety'],
+      marketing: ['marketing', 'presentation', 'complaints'],
+      support: ['complaints', 'service', 'floor operations'],
+      hr: ['executive', 'floor'],
+    };
+
+    const domainLower = domain.toLowerCase();
+    const aliases = DOMAIN_ALIASES[domainLower] || [domainLower];
+
+    function domainMatches(agentDomain: string | undefined): boolean {
+      if (!agentDomain) return false;
+      const ad = agentDomain.toLowerCase();
+      return aliases.some(alias => ad.includes(alias) || alias.includes(ad));
+    }
+
+    // Find best match: same domain + role, then domain only, then role only
     const candidate = notYetHired.find(r =>
-      r.domain?.toLowerCase().includes(domain) && r.role === role
+      domainMatches(r.domain) && r.role === role
     ) || notYetHired.find(r =>
-      r.domain?.toLowerCase().includes(domain)
+      domainMatches(r.domain)
     ) || notYetHired.find(r =>
       r.role === role
     );
@@ -360,8 +382,8 @@ export class DeterministicSimulation {
 
   /** Process one tick of the simulation */
   private tickCOO(coo: SandboxAgent): void {
-    // 1. Hire pending leads (one per tick for visual effect)
-    if (this.pendingHires.length > 0) {
+    // 1. Hire pending leads (multiple per tick — COO moves fast)
+    while (this.pendingHires.length > 0) {
       const domain = this.pendingHires.shift()!;
       const hired = this.hireFromRoster(coo, domain, 'lead');
       if (!hired) {
@@ -380,7 +402,6 @@ export class DeterministicSimulation {
           });
         }
       }
-      return; // One hire per tick
     }
 
     // 2. Create and delegate pending tasks
@@ -435,15 +456,19 @@ export class DeterministicSimulation {
     }
 
     // 3. Pick up unassigned backlog tasks (e.g. from scenario engine) and delegate
+    //    Process multiple tasks per tick — COO is a coordinator, not a bottleneck
     const unassignedBacklog = this.tasks.filter(t =>
       t.status === 'backlog' && !t.assigneeId && !t.parentTaskId
     );
-    if (unassignedBacklog.length > 0) {
-      const task = unassignedBacklog[0];
-      // Detect domain from task description
+    const domainsHiredThisTick = new Set<string>();
+    let delegatedThisTick = 0;
+
+    for (const task of unassignedBacklog) {
+      if (delegatedThisTick >= 5) break; // Cap per-tick delegations
+
       const domain = detectDomain(task.description || task.title);
 
-      // Find or hire a lead for this domain
+      // Find an active lead for this domain
       const lead = this.agents.find(a =>
         a.parentId === coo.id && a.domain.toLowerCase().includes(domain) && a.status === 'active'
       ) || this.agents.find(a =>
@@ -464,15 +489,16 @@ export class DeterministicSimulation {
 
         this.logAgent(coo, `📋 Delegated "${task.title}" → ${lead.name}`, task.id);
         coo.stats.messagessSent++;
-      } else {
-        // No lead for this domain yet — hire one from roster
+        delegatedThisTick++;
+      } else if (!domainsHiredThisTick.has(domain)) {
+        // No lead for this domain yet — hire one from roster (once per domain per tick)
         const hired = this.hireFromRoster(coo, domain, 'lead');
         if (hired) {
           this.logAgent(coo, `🔍 Need a ${domain} lead for "${task.title}" — spawned ${hired.name}`);
+          domainsHiredThisTick.add(domain);
         }
         // Task stays in backlog, will be assigned next tick after lead is available
       }
-      return; // One delegation per tick
     }
   }
 
