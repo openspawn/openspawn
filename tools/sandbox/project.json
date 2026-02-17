@@ -19,7 +19,7 @@
           "command": "COFOUNDER=1 npx tsx tools/sandbox/src/index.ts"
         },
         "hybrid": {
-          "command": "SIMULATION_MODE=hybrid LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
+          "command": "SIMULATION_MODE=hybrid SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
         },
         "replay": {
           "command": "SIMULATION_MODE=replay SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts"
@@ -51,7 +51,7 @@
         },
         "hybrid": {
           "commands": [
-            "SERVE_DASHBOARD=1 SIMULATION_MODE=hybrid LLM_MODEL=qwen2.5:7b-instruct LLM_BASE_URL=http://localhost:11434 SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts",
+            "SERVE_DASHBOARD=1 SIMULATION_MODE=hybrid SCENARIO=krabby-patties npx tsx tools/sandbox/src/index.ts",
             "VITE_SANDBOX_MODE=true nx serve dashboard"
           ]
         },
