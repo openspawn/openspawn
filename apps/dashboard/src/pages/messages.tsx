@@ -22,6 +22,7 @@ import { cn } from '../lib/utils';
 import { EmptyState } from '../components/ui/empty-state';
 import { PageHeader } from '../components/ui/page-header';
 import { darkenForBackground } from '../lib/avatar-utils';
+import { resolveAvatarUrl } from '../lib/resolve-avatar-url';
 import { PhaseChip } from '../components/phase-chip';
 import { TeamBadge, TeamFilterDropdown } from '../components/team-badge';
 import { ThreadView } from '../components/thread-view';
@@ -36,7 +37,7 @@ function InlineAvatar({ agentId, agents, className = 'w-5 h-5', fontSize = 'text
   const avatarColor = (agent as any)?.avatarColor || '#71717a';
   const avatarUrl = (agent as any)?.avatarUrl;
   if (avatarUrl) {
-    return <img src={avatarUrl} alt={agent?.name} className={`rounded-full object-contain p-0.5 ${className}`} style={{ backgroundColor: darkenForBackground(avatarColor) }} />;
+    return <img src={resolveAvatarUrl(avatarUrl)} alt={agent?.name} className={`rounded-full object-contain p-0.5 ${className}`} style={{ backgroundColor: darkenForBackground(avatarColor) }} />;
   }
   return (
     <span

@@ -13,6 +13,7 @@ import { darkenForBackground } from '../lib/avatar-utils';
 import { PresenceGlow, StatusDot } from './presence';
 import { StatusRing } from './ui/status-ring';
 import type { PresenceStatus } from '../hooks/use-presence';
+import { resolveAvatarUrl } from '../lib/resolve-avatar-url';
 
 interface AgentAvatarProps {
   agentId: string;
@@ -89,7 +90,10 @@ export function AgentAvatar({
 
   const emojiSizes = { sm: 'text-lg', md: 'text-xl', lg: 'text-2xl', xl: 'text-3xl' };
 
-  const avatar = avatarUrlProp ? (
+  // Resolve avatar URL against sandbox API (handles dev vs prod origins)
+  const resolvedAvatarUrl = resolveAvatarUrl(avatarUrlProp) ?? null;
+
+  const avatar = resolvedAvatarUrl ? (
     <Avatar
       className={cn(
         sizeConfig.class,
@@ -102,7 +106,7 @@ export function AgentAvatar({
         ...(showRing && !presenceStatus ? { '--tw-ring-color': accentColor } as React.CSSProperties : {}),
       }}
     >
-      <AvatarImage src={avatarUrlProp} alt={name || agentId} className="object-contain p-0.5" style={{ backgroundColor: bgColor }} />
+      <AvatarImage src={resolvedAvatarUrl} alt={name || agentId} className="object-contain p-0.5" style={{ backgroundColor: bgColor }} />
       <AvatarFallback
         className={cn('flex items-center justify-center', emojiSizes[size])}
         style={{ backgroundColor: bgColor }}

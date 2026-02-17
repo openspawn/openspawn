@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { darkenForBackground } from '../lib/avatar-utils';
+import { resolveAvatarUrl } from '../lib/resolve-avatar-url';
 
 interface AgentHeartbeatProps {
   agentId: string;
@@ -78,7 +79,7 @@ export function AgentHeartbeat({ agentId, level, status, size = 'md', showPulse 
           ease: 'easeInOut',
         }}
       >
-        {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full rounded-full object-contain p-0.5" style={{ backgroundColor: darkenForBackground(avatarColor || '#71717a') }} /> : (avatar || '🤖')}
+        {avatarUrl ? <img src={resolveAvatarUrl(avatarUrl)} alt="" className="w-full h-full rounded-full object-contain p-0.5" style={{ backgroundColor: darkenForBackground(avatarColor || '#71717a') }} /> : (avatar || '🤖')}
       </motion.span>
 
       {/* Status indicator dot */}
