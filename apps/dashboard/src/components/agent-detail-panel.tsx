@@ -829,25 +829,25 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
             <ScrollArea className="flex-1">
               <div className="p-4 md:p-6">
                 <AnimatePresence mode="wait">
-                  <TabsContent value="overview" className="mt-0">
+                  <TabsContent key="overview" value="overview" className="mt-0">
                     <OverviewTab agent={agent} />
                   </TabsContent>
-                  <TabsContent value="prompt" className="mt-0">
+                  <TabsContent key="prompt" value="prompt" className="mt-0">
                     <PromptTab agent={agent} />
                   </TabsContent>
-                  <TabsContent value="tasks" className="mt-0">
+                  <TabsContent key="tasks" value="tasks" className="mt-0">
                     <TasksTab agent={agent} />
                   </TabsContent>
-                  <TabsContent value="credits" className="mt-0">
+                  <TabsContent key="credits" value="credits" className="mt-0">
                     <CreditsTab agent={agent} />
                   </TabsContent>
-                  <TabsContent value="messages" className="mt-0">
+                  <TabsContent key="messages" value="messages" className="mt-0">
                     <MessagesTab agent={agent} />
                   </TabsContent>
-                  <TabsContent value="timeline" className="mt-0">
+                  <TabsContent key="timeline" value="timeline" className="mt-0">
                     <TimelineView agentId={agent.agentId} />
                   </TabsContent>
-                  <TabsContent value="settings" className="mt-0">
+                  <TabsContent key="settings" value="settings" className="mt-0">
                     <SettingsTab agent={agent} />
                   </TabsContent>
                 </AnimatePresence>
