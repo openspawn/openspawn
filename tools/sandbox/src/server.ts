@@ -1031,7 +1031,8 @@ export function startServer(sim: Simulation): void {
       }
 
       // Website: /* routes — serve from website-dist (SPA with fallback to index.html)
-      if (existsSync(websiteDir)) {
+      // Skip API and protocol routes — those must reach handlers below
+      if (existsSync(websiteDir) && !path.startsWith('/api/') && !path.startsWith('/graphql') && !path.startsWith('/sse') && !path.startsWith('/mcp') && !path.startsWith('/.well-known/')) {
         const subPath = path === '/' ? 'index.html' : path.slice(1);
         let filePath = join(websiteDir, subPath);
 
