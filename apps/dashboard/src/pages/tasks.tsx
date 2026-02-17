@@ -18,6 +18,7 @@ import { SandboxActivityFeed } from "../components/sandbox-activity-feed";
 import { TaskCascade } from "../components/task-cascade";
 import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { darkenForBackground } from "../lib/avatar-utils";
+import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 
 type SortField = "created" | "priority" | "status" | "title";
 type SortDirection = "asc" | "desc";
@@ -189,7 +190,7 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                     {(() => { const a = agentMap.get(task.assigneeId!); return (
                     <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
                       style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                      {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
+                      {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
                     </div>); })()}
                     <span className="truncate max-w-[100px]">{task.assignee.name}</span>
                   </div>
@@ -347,7 +348,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
                   {(() => { const a = agentMap.get(task.assigneeId!); return (
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
                     style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                    {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
+                    {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
                   </div>); })()}
                   <span className="text-sm font-medium">{task.assignee.name}</span>
                 </div>
@@ -522,7 +523,7 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                       {(() => { const a = agentMap.get(task.assigneeId!); return (
                       <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
                         style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                        {a?.avatarUrl ? <img src={a.avatarUrl} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
+                        {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
                       </div>); })()}
                       <span className="text-muted-foreground truncate">
                         {task.assignee.name}

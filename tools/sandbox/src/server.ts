@@ -959,6 +959,38 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
+    // ── Avatar static files (always available — serves /avatars/* from dashboard public) ──
+    if (path.startsWith('/avatars/')) {
+      const avatarFile = path.slice('/avatars/'.length);
+      // Sanitize: only allow simple filenames (no path traversal)
+      if (avatarFile && /^[a-z0-9-]+\.png$/i.test(avatarFile)) {
+        const AVATAR_MIME: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
+        // Try multiple locations: source (local dev), Nx build output (local prod), Docker layout
+        const workspaceRoot = join(__dirname, '..', '..', '..');
+        const candidates = [
+          join(workspaceRoot, 'apps', 'dashboard', 'public', 'avatars', avatarFile), // local dev (source)
+          join(workspaceRoot, 'dist', 'apps', 'dashboard', 'avatars', avatarFile),   // local prod (Nx output)
+          join(__dirname, '..', 'dashboard-dist', 'avatars', avatarFile),             // Docker
+        ];
+        for (const filePath of candidates) {
+          if (existsSync(filePath) && statSync(filePath).isFile()) {
+            const ext = extname(filePath);
+            const content = readFileSync(filePath);
+            res.writeHead(200, {
+              'Content-Type': AVATAR_MIME[ext] || 'application/octet-stream',
+              'Cache-Control': 'public, max-age=86400',
+              'Access-Control-Allow-Origin': '*',
+            });
+            res.end(content);
+            return;
+          }
+        }
+      }
+      res.writeHead(404);
+      res.end('Avatar not found');
+      return;
+    }
+
     // ── Static file serving (production: serve built dashboard) ──────────
     if (process.env.SERVE_DASHBOARD === '1') {
       const MIME_TYPES: Record<string, string> = {
@@ -968,8 +1000,14 @@ export function startServer(sim: Simulation): void {
         '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
         '.txt': 'text/plain', '.xml': 'application/xml', '.webp': 'image/webp',
       };
-      const dashboardDir = process.env.DASHBOARD_DIR || join(__dirname, '..', 'dashboard-dist');
-      const websiteDir = process.env.WEBSITE_DIR || join(__dirname, '..', 'website-dist');
+      // Resolve dashboard/website dirs: env var → Nx output → Docker layout
+      const workspaceRoot = join(__dirname, '..', '..', '..');
+      const dashboardDir = process.env.DASHBOARD_DIR
+        || (existsSync(join(workspaceRoot, 'dist', 'apps', 'dashboard')) ? join(workspaceRoot, 'dist', 'apps', 'dashboard') : null)
+        || join(__dirname, '..', 'dashboard-dist');
+      const websiteDir = process.env.WEBSITE_DIR
+        || (existsSync(join(workspaceRoot, 'dist', 'apps', 'website')) ? join(workspaceRoot, 'dist', 'apps', 'website') : null)
+        || join(__dirname, '..', 'website-dist');
 
       // Dashboard: /app/* routes
       if (path.startsWith('/app')) {

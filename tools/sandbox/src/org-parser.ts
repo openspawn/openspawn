@@ -9,30 +9,30 @@ import remarkFrontmatter from 'remark-frontmatter';
 import type { Root, Heading, Content, List, ListItem, Paragraph, Text, Strong, PhrasingContent } from 'mdast';
 import type { SandboxAgent, ACPMessage } from './types.js';
 
-// Map character names to avatar image files in /avatars/
+// Map character names to avatar image files served at /avatars/ by the sandbox API
 const AVATAR_FILES: Record<string, string> = {
-  'mr. krabs': '/app/avatars/mr-krabs.png',
-  'sandy cheeks': '/app/avatars/sandy.png',
-  'spongebob squarepants': '/app/avatars/spongebob.png',
-  'spongebob': '/app/avatars/spongebob.png',
-  'patrick star': '/app/avatars/patrick.png',
-  'patrick': '/app/avatars/patrick.png',
-  'squidward tentacles': '/app/avatars/squidward.png',
-  'squidward': '/app/avatars/squidward.png',
-  'pearl krabs': '/app/avatars/pearl.png',
-  'pearl': '/app/avatars/pearl.png',
-  'gary': '/app/avatars/gary.png',
-  'plankton jr.': '/app/avatars/plankton.png',
-  'plankton': '/app/avatars/plankton.png',
-  'karen': '/app/avatars/karen.png',
-  'mermaid man': '/app/avatars/mermaid-man.png',
-  'barnacle boy': '/app/avatars/barnacle-boy.png',
-  'larry the lobster': '/app/avatars/larry.png',
-  'larry': '/app/avatars/larry.png',
-  'mrs. puff': '/app/avatars/mrs-puff.png',
-  'squilliam fancyson': '/app/avatars/squilliam.png',
-  'squilliam': '/app/avatars/squilliam.png',
-  'flying dutchman': '/app/avatars/flying-dutchman.png',
+  'mr. krabs': '/avatars/mr-krabs.png',
+  'sandy cheeks': '/avatars/sandy.png',
+  'spongebob squarepants': '/avatars/spongebob.png',
+  'spongebob': '/avatars/spongebob.png',
+  'patrick star': '/avatars/patrick.png',
+  'patrick': '/avatars/patrick.png',
+  'squidward tentacles': '/avatars/squidward.png',
+  'squidward': '/avatars/squidward.png',
+  'pearl krabs': '/avatars/pearl.png',
+  'pearl': '/avatars/pearl.png',
+  'gary': '/avatars/gary.png',
+  'plankton jr.': '/avatars/plankton.png',
+  'plankton': '/avatars/plankton.png',
+  'karen': '/avatars/karen.png',
+  'mermaid man': '/avatars/mermaid-man.png',
+  'barnacle boy': '/avatars/barnacle-boy.png',
+  'larry the lobster': '/avatars/larry.png',
+  'larry': '/avatars/larry.png',
+  'mrs. puff': '/avatars/mrs-puff.png',
+  'squilliam fancyson': '/avatars/squilliam.png',
+  'squilliam': '/avatars/squilliam.png',
+  'flying dutchman': '/avatars/flying-dutchman.png',
 };
 
 function nameToAvatarUrl(name: string): string | undefined {

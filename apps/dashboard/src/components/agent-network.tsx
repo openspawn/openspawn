@@ -28,6 +28,7 @@ import { useAgents, type Agent } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useMessages, useConversations } from "../hooks/use-messages";
 import { darkenForBackground } from "../lib/avatar-utils";
+import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 import { useAgentHealth } from "../hooks/use-agent-health";
 import { useTouchDevice } from "../hooks/use-touch-device";
 import { levelColors } from "../lib/status-colors";
@@ -830,7 +831,7 @@ function buildNodesAndEdges(
         domain: agent.domain || undefined,
         avatar: agent.avatar || undefined,
         avatarColor: agent.avatarColor || undefined,
-        avatarUrl: agent.avatarUrl || undefined,
+        avatarUrl: resolveAvatarUrl(agent.avatarUrl) || undefined,
         tasksCompleted: 0,
         compact,
         activityLevel: activity?.activityLevel,

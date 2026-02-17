@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { cn } from '../lib/utils';
 import { darkenForBackground } from '../lib/avatar-utils';
+import { resolveAvatarUrl } from '../lib/resolve-avatar-url';
 import { useAgents, type Message } from '../hooks';
 
 interface ThreadViewProps {
@@ -173,7 +174,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                       const agentData = agentMap.get(msg.fromAgentId);
                       const emoji = agentData?.avatar || '🤖';
                       const color = agentData?.avatarColor || '#71717a';
-                      const imgUrl = agentData?.avatarUrl;
+                      const imgUrl = resolveAvatarUrl(agentData?.avatarUrl);
                       return imgUrl ? (
                         <img src={imgUrl} alt={sender?.name} className="w-7 h-7 rounded-full object-cover" />
                       ) : (

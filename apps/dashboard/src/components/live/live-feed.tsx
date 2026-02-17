@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AGENTS } from './replay-data';
+import { resolveAvatarUrl } from '../../lib/resolve-avatar-url';
 
 export interface FeedMessage {
   id: string;
@@ -59,7 +60,7 @@ export function LiveFeed({ messages }: LiveFeedProps) {
                 className={`flex items-start gap-2 text-xs py-1.5 px-2 rounded ${borderClass} hover:bg-white/[0.02]`}
               >
                 {agent?.avatarUrl ? (
-                  <img src={agent.avatarUrl} alt={agent.name} className="w-6 h-6 rounded-full object-contain bg-[#0a1628] shrink-0" />
+                  <img src={resolveAvatarUrl(agent.avatarUrl)} alt={agent.name} className="w-6 h-6 rounded-full object-contain bg-[#0a1628] shrink-0" />
                 ) : (
                   <span className="text-base shrink-0">{agent?.emoji ?? '🐟'}</span>
                 )}

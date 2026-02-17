@@ -14,6 +14,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { AGENTS, type NodeStatus, type SpawnedAgent } from './replay-data';
+import { resolveAvatarUrl } from '../../lib/resolve-avatar-url';
 
 // ── Node positions (hardcoded tree) ──────────────────────────────────────────
 
@@ -151,7 +152,7 @@ function LiveAgentNode({ data }: NodeProps) {
         }}
       >
         {d.avatarUrl ? (
-          <img src={d.avatarUrl} alt={d.name} className="w-full h-full object-contain p-1" />
+          <img src={resolveAvatarUrl(d.avatarUrl)} alt={d.name} className="w-full h-full object-contain p-1" />
         ) : (
           <span className="text-2xl leading-none">{d.emoji}</span>
         )}
