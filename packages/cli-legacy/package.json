@@ -1,5 +1,5 @@
 {
-  "name": "openspawn",
+  "name": "openspawn-cli-legacy",
   "version": "0.1.0",
   "description": "OpenSpawn — AI agent orchestration control plane with A2A + MCP support",
   "type": "module",
