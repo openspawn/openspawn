@@ -1,14 +1,14 @@
 {
-  "name": "@openspawn/cli",
+  "name": "@openspawn/sandbox-cli",
   "version": "0.1.0",
   "description": "OpenSpawn CLI - Multi-agent coordination platform",
   "type": "commonjs",
-  "main": "../../dist/apps/cli/openspawn.cjs",
+  "main": "../../dist/apps/sandbox-cli/openspawn.cjs",
   "bin": {
-    "openspawn": "../../dist/apps/cli/openspawn.cjs"
+    "openspawn-sandbox": "../../dist/apps/sandbox-cli/openspawn.cjs"
   },
   "files": [
-    "../../dist/apps/cli"
+    "../../dist/apps/sandbox-cli"
   ],
   "keywords": [
     "cli",
@@ -23,7 +23,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/openspawn/openspawn.git",
-    "directory": "apps/cli"
+    "directory": "apps/sandbox-cli"
   },
   "dependencies": {
     "cli-table3": "^0.6.5",
