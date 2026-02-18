@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/apps/cli",
+    "outDir": "../../dist/apps/sandbox-cli",
     "rootDir": "src",
     "module": "ESNext",
     "moduleResolution": "bundler",
