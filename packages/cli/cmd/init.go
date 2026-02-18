@@ -8,8 +8,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
-	"github.com/openspawn/openspawn/cli/internal/templates"
-	"github.com/openspawn/openspawn/cli/internal/wizard"
+	"github.com/openspawn/openspawn/packages/cli/internal/templates"
+	"github.com/openspawn/openspawn/packages/cli/internal/wizard"
 )
 
 var (

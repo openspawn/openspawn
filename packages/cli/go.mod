@@ -1,4 +1,4 @@
-module github.com/openspawn/openspawn/cli
+module github.com/openspawn/openspawn/packages/cli
 
 go 1.24.2
 

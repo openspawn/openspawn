@@ -1,0 +1,52 @@
+version: 2
+
+project_name: openspawn
+
+builds:
+  - id: openspawn
+    main: .
+    binary: openspawn
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/openspawn/openspawn/packages/cli/cmd.version={{.Version}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "openspawn_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+brews:
+  - name: openspawn
+    repository:
+      owner: openspawn
+      name: homebrew-tap
+    directory: Formula
+    homepage: "https://openspawn.ai"
+    description: "Organization as Code for AI agent teams"
+    license: "MIT"
+    test: |
+      system "#{bin}/openspawn", "version"
+    install: |
+      bin.install "openspawn"
