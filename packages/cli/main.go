@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/openspawn/openspawn/cli/cmd"
+	"github.com/openspawn/openspawn/packages/cli/cmd"
 )
 
 func main() {

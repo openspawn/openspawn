@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/openspawn/openspawn/cli/internal/orgparser"
+	"github.com/openspawn/openspawn/packages/cli/internal/orgparser"
 )
 
 var validateCmd = &cobra.Command{

@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/openspawn/openspawn/cli/internal/orgparser"
-	"github.com/openspawn/openspawn/cli/internal/templates"
+	"github.com/openspawn/openspawn/packages/cli/internal/orgparser"
+	"github.com/openspawn/openspawn/packages/cli/internal/templates"
 )
 
 func TestTemplatesAvailable(t *testing.T) {
