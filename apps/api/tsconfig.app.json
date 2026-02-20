@@ -4,6 +4,8 @@
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "types": ["node"],
+    "declaration": true,
+    "composite": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
