@@ -245,7 +245,7 @@ Respond with JSON ONLY. Actions:
     stats: {
       tasksCompleted: 0,
       tasksFailed: 0,
-      messagessSent: 0,
+      messagesSent: 0,
       creditsEarned: 0,
       creditsSpent: 0,
     },
