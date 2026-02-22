@@ -339,7 +339,7 @@ export class DeterministicSimulation {
         body: pickRandom(HIRE_FLAVORS)(candidate.name, domain),
       });
       pushMessage(this.agents, msg);
-      manager.stats.messagessSent++;
+      manager.stats.messagesSent++;
 
       return candidate;
     }
@@ -448,7 +448,7 @@ export class DeterministicSimulation {
         task.acked = true;
 
         this.logAgent(coo, `📋 Created & delegated "${task.title}" → ${lead.name}`, task.id);
-        coo.stats.messagessSent++;
+        coo.stats.messagesSent++;
       } else {
         this.logAgent(coo, `📝 Created "${task.title}" (no lead available yet)`, task.id);
       }
@@ -488,7 +488,7 @@ export class DeterministicSimulation {
         task.acked = true;
 
         this.logAgent(coo, `📋 Delegated "${task.title}" → ${lead.name}`, task.id);
-        coo.stats.messagessSent++;
+        coo.stats.messagesSent++;
         delegatedThisTick++;
       } else if (!domainsHiredThisTick.has(domain)) {
         // No lead for this domain yet — hire one from roster (once per domain per tick)
@@ -529,7 +529,7 @@ export class DeterministicSimulation {
         });
         pushMessage(this.agents, msg);
         task.activityLog.push(msg);
-        lead.stats.messagessSent++;
+        lead.stats.messagesSent++;
 
         this.logAgent(lead, `📋 Assigned "${task.title}" → ${availableWorker.name}`, task.id);
       } else if (workers.length < 3) {
@@ -565,7 +565,7 @@ export class DeterministicSimulation {
             });
             pushMessage(this.agents, completionMsg);
             task.activityLog.push(completionMsg);
-            worker.stats.messagessSent++;
+            worker.stats.messagesSent++;
             this.logAgent(worker, `✅ Completed "${task.title}"`, task.id);
           }
         } else if (result.status === 'blocked') {
@@ -578,7 +578,7 @@ export class DeterministicSimulation {
             });
             pushMessage(this.agents, escMsg);
             task.activityLog.push(escMsg);
-            worker.stats.messagessSent++;
+            worker.stats.messagesSent++;
             this.logAgent(worker, `⬆️ Escalated "${task.title}": ${task.blockedReason}`, task.id);
           }
         } else if (result.status === 'in_progress') {
@@ -591,7 +591,7 @@ export class DeterministicSimulation {
             });
             pushMessage(this.agents, progressMsg);
             task.activityLog.push(progressMsg);
-            worker.stats.messagessSent++;
+            worker.stats.messagesSent++;
           }
           this.logAgent(worker, `🔨 Working on "${task.title}" → ${result.status}`, task.id);
         } else if (result.status === 'review') {
@@ -716,7 +716,7 @@ export class DeterministicSimulation {
       tasksInReview: this.tasks.filter(t => t.status === 'review').length,
       totalCreditsEarned: this.agents.reduce((s, a) => s + a.stats.creditsEarned, 0),
       totalCreditsSpent: this.agents.reduce((s, a) => s + a.stats.creditsSpent, 0),
-      messageCount: this.agents.reduce((s, a) => s + a.stats.messagessSent, 0),
+      messageCount: this.agents.reduce((s, a) => s + a.stats.messagesSent, 0),
     });
 
     // Emit tick_complete so SSE clients can invalidate caches
@@ -742,7 +742,7 @@ export class DeterministicSimulation {
           taskIds: [], recentMessages: [], inbox: [],
           trigger: coo.trigger ?? 'event-driven',
           triggerOn: coo.triggerOn ?? ['escalation', 'completion', 'delegation'],
-          stats: { tasksCompleted: 0, tasksFailed: 0, messagessSent: 0, creditsEarned: 0, creditsSpent: 0 },
+          stats: { tasksCompleted: 0, tasksFailed: 0, messagesSent: 0, creditsEarned: 0, creditsSpent: 0 },
         }];
       }
       this.log('🔄 Reset — COO from ORG.md, organic growth');
@@ -778,7 +778,7 @@ export class DeterministicSimulation {
     const active = this.tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
     console.log(`Tasks: ${done} done / ${active} active / ${this.tasks.length} total`);
     console.log(`Agents: ${this.agents.length}`);
-    const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagessSent, 0);
+    const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagesSent, 0);
     console.log(`Messages: ${totalMessages}`);
     const sorted = [...this.agents].sort((a, b) => b.stats.tasksCompleted - a.stats.tasksCompleted);
     const top = sorted.filter(a => a.stats.tasksCompleted > 0).slice(0, 5);

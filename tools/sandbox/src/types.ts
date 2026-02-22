@@ -43,7 +43,7 @@ export interface SandboxAgent {
   stats: {
     tasksCompleted: number;
     tasksFailed: number;
-    messagessSent: number;
+    messagesSent: number;
     creditsEarned: number;
     creditsSpent: number;
   };

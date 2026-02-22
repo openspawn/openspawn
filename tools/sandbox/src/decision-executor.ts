@@ -125,7 +125,7 @@ function executeDelegation(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
   });
   pushMessage(ctx.agents, msg);
   task.activityLog.push(msg);
-  agent.stats.messagessSent++;
+  agent.stats.messagesSent++;
 
   const ack = createACPMessage('ack', target.id, agent.id, task.id, {
     body: `Acknowledged: "${task.title}"`,
@@ -148,7 +148,7 @@ function executeEscalation(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
   });
   pushMessage(ctx.agents, msg);
   if (task) task.activityLog.push(msg);
-  agent.stats.messagessSent++;
+  agent.stats.messagesSent++;
 }
 
 function executeCompletion(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
@@ -168,7 +168,7 @@ function executeCompletion(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
     });
     pushMessage(ctx.agents, msg);
     task.activityLog.push(msg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
   }
 }
 
@@ -181,7 +181,7 @@ function executeMessage(agent: SandboxAgent, decision: AgentDecision, ctx: Execu
     body: decision.message,
   });
   pushMessage(ctx.agents, msg);
-  agent.stats.messagessSent++;
+  agent.stats.messagesSent++;
 }
 
 function executeHire(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
@@ -202,7 +202,7 @@ function executeHire(agent: SandboxAgent, decision: AgentDecision, ctx: Executio
       body: decision.message || `Welcome aboard, ${candidate.name}!`,
     });
     pushMessage(ctx.agents, msg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
     console.log(`  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`);
   } else {
     const name = decision.target !== 'none' ? decision.target : `${domain} Worker`;

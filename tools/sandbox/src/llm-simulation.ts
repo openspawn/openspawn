@@ -236,7 +236,7 @@ export class LLMSimulation extends DeterministicSimulation {
     });
     pushMessage(this.agents, msg);
     task.activityLog.push(msg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
 
     // Auto-ack
     const ack = createACPMessage('ack', target.id, agent.id, task.id, {
@@ -260,7 +260,7 @@ export class LLMSimulation extends DeterministicSimulation {
     });
     pushMessage(this.agents, msg);
     if (task) task.activityLog.push(msg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
   }
 
   private executeWork(agent: SandboxAgent, decision: AgentDecision): void {
@@ -283,7 +283,7 @@ export class LLMSimulation extends DeterministicSimulation {
     });
     pushMessage(this.agents, progressMsg);
     task.activityLog.push(progressMsg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
   }
 
   private executeCompletion(agent: SandboxAgent, decision: AgentDecision): void {
@@ -318,7 +318,7 @@ export class LLMSimulation extends DeterministicSimulation {
       });
       pushMessage(this.agents, msg);
       task.activityLog.push(msg);
-      agent.stats.messagessSent++;
+      agent.stats.messagesSent++;
     }
   }
 
@@ -331,7 +331,7 @@ export class LLMSimulation extends DeterministicSimulation {
       body: decision.message,
     });
     pushMessage(this.agents, msg);
-    agent.stats.messagessSent++;
+    agent.stats.messagesSent++;
   }
 
   private executeHire(agent: SandboxAgent, decision: AgentDecision): void {
@@ -354,7 +354,7 @@ export class LLMSimulation extends DeterministicSimulation {
         body: decision.message || `Welcome aboard, ${candidate.name}!`,
       });
       pushMessage(this.agents, msg);
-      agent.stats.messagessSent++;
+      agent.stats.messagesSent++;
       console.log(`  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`);
     } else {
       // Create a generic agent
@@ -412,7 +412,7 @@ export class LLMSimulation extends DeterministicSimulation {
     // Attach final simulation stats
     const totalTasks = this.tasks.length;
     const tasksDone = this.tasks.filter(t => t.status === 'done').length;
-    const totalMessages = this.agents.reduce((s, a) => s + a.stats.messagessSent, 0);
+    const totalMessages = this.agents.reduce((s, a) => s + a.stats.messagesSent, 0);
     this.recorder.setSummary({
       totalTasks,
       tasksDone,

@@ -339,7 +339,7 @@ export class Simulation {
             body: action.content,
           });
           pushMessage(this.agents, msg);
-          agent.stats.messagessSent++;
+          agent.stats.messagesSent++;
           this.logAgent(agent, `💬 → ${target.name}: "${action.content.substring(0, 80)}"`);
         }
         break;
@@ -562,7 +562,7 @@ export class Simulation {
       tasksInReview: this.tasks.filter(t => t.status === 'review').length,
       totalCreditsEarned: this.agents.reduce((s, a) => s + a.stats.creditsEarned, 0),
       totalCreditsSpent: this.agents.reduce((s, a) => s + a.stats.creditsSpent, 0),
-      messageCount: this.agents.reduce((s, a) => s + a.stats.messagessSent, 0),
+      messageCount: this.agents.reduce((s, a) => s + a.stats.messagesSent, 0),
     });
   }
 
@@ -576,7 +576,7 @@ export class Simulation {
     } else if (this.parsedOrg) {
       // Organic: just the COO from the parsed org
       const coo = this.parsedOrg.agents.find(a => a.role === 'coo');
-      this.agents = coo ? [{ ...coo, taskIds: [], recentMessages: [], inbox: [], trigger: coo.trigger ?? 'event-driven', triggerOn: coo.triggerOn ?? ['escalation', 'completion', 'delegation'], stats: { tasksCompleted: 0, tasksFailed: 0, messagessSent: 0, creditsEarned: 0, creditsSpent: 0 } }] : createCOO();
+      this.agents = coo ? [{ ...coo, taskIds: [], recentMessages: [], inbox: [], trigger: coo.trigger ?? 'event-driven', triggerOn: coo.triggerOn ?? ['escalation', 'completion', 'delegation'], stats: { tasksCompleted: 0, tasksFailed: 0, messagesSent: 0, creditsEarned: 0, creditsSpent: 0 } }] : createCOO();
       this.log('🔄 Sandbox reset — COO from ORG.md, organic growth');
     } else {
       this.agents = createCOO();
@@ -619,7 +619,7 @@ export class Simulation {
     const active = this.tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
     console.log(`Tasks: ${done} done / ${active} active / ${this.tasks.length} total`);
     
-    const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagessSent, 0);
+    const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagesSent, 0);
     const totalCompleted = this.agents.reduce((sum, a) => sum + a.stats.tasksCompleted, 0);
     console.log(`Messages sent: ${totalMessages} | Tasks completed by agents: ${totalCompleted}`);
     
@@ -628,7 +628,7 @@ export class Simulation {
     if (top.length > 0) {
       console.log(`\nTop performers:`);
       for (const a of top) {
-        console.log(`  ${a.name} (L${a.level}): ${a.stats.tasksCompleted} tasks, ${a.stats.messagessSent} messages`);
+        console.log(`  ${a.name} (L${a.level}): ${a.stats.tasksCompleted} tasks, ${a.stats.messagesSent} messages`);
       }
     }
     console.log(`${'─'.repeat(60)}`);

@@ -110,7 +110,7 @@ export class ScenarioEngine {
       totalDecisions: this.decisionCount,
       totalTicks: this.sim?.tick ?? 0,
       totalAgents: this.sim?.agents.length ?? 0,
-      totalMessages: this.sim?.agents.reduce((s, a) => s + a.stats.messagessSent, 0) ?? 0,
+      totalMessages: this.sim?.agents.reduce((s, a) => s + a.stats.messagesSent, 0) ?? 0,
       eventsSurvived: this.eventsFired,
     };
   }
@@ -650,7 +650,7 @@ export class ScenarioEngine {
 
   private countDecisions(): void {
     // Count based on total messages sent (each message ≈ 1 decision)
-    const totalMessages = this.sim.agents.reduce((s, a) => s + a.stats.messagessSent, 0);
+    const totalMessages = this.sim.agents.reduce((s, a) => s + a.stats.messagesSent, 0);
     const newDecisions = totalMessages - this.lastDecisionSnapshot;
     this.decisionCount += Math.max(0, newDecisions);
     this.lastDecisionSnapshot = totalMessages;
