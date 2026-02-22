@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 // We need to re-import each test because getSandboxUrl reads window at import time
 describe('getSandboxUrl', () => {

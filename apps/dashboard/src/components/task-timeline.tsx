@@ -18,15 +18,15 @@ import {
   ChevronRight,
   ArrowRight,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { AgentAvatar } from './agent-avatar';
 import { cn } from '../lib/utils';
-import { useAgents, useTasks, useMessages, useEvents } from '../hooks';
+import { useAgents, useTasks, useMessages } from '../hooks';
 import type { Task } from '../hooks/use-tasks';
 import type { Message } from '../hooks/use-messages';
-import { getStatusVariant, getTaskStatusVariant } from '../lib/status-colors';
+import { getTaskStatusVariant } from '../lib/status-colors';
 import { TaskStatus } from '../graphql/generated/graphql';
 
 // ── Timeline event types ────────────────────────────────────────────────────

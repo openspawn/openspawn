@@ -2,7 +2,6 @@ import { Command } from "commander";
 import pc from "picocolors";
 import { createClient, unwrap } from "../lib/api.js";
 import {
-  output,
   outputError,
   outputSuccess,
   outputTable,

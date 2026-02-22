@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Between, MoreThanOrEqual } from "typeorm";
+import { Repository } from "typeorm";
 
 import { Agent, CreditTransaction } from "@openspawn/database";
 import { CreditType, AgentStatus } from "@openspawn/shared-types";

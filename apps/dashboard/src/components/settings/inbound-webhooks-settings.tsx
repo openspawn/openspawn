@@ -3,15 +3,13 @@ import {
   Webhook,
   Plus,
   Trash2,
-  Loader2,
   Copy,
   Check,
   RefreshCw,
   Eye,
   EyeOff,
   ExternalLink,
-  Code,
-} from "lucide-react";
+  } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";

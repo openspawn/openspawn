@@ -70,7 +70,7 @@ test.describe('Trust Leaderboard', () => {
     
     if (await leaderboardSection.isVisible({ timeout: 2000 }).catch(() => false)) {
       // Should have numbered rankings or medal icons
-      const rankings = leaderboardSection.locator('[class*="rank"], .medal, span:has-text(/[1-9]\./)');
+      const rankings = leaderboardSection.locator('[class*="rank"], .medal, span:has-text(/[1-9]./)');
       const count = await rankings.count();
       console.log('Rankings found:', count);
     }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Key, Plus, Trash2, Copy, Eye, EyeOff, Loader2, Check } from "lucide-react";
+import { Key, Plus, Trash2, Copy, Loader2, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";

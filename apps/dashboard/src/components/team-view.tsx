@@ -34,18 +34,16 @@ import { AgentModeBadge } from './agent-mode-selector';
 import { getStatusVariant } from '../lib/status-colors';
 import { cn } from '../lib/utils';
 import {
-  teams,
   type Team,
   getParentTeams,
   getSubTeams,
   getTeamColor,
-  TEAM_COLOR_MAP,
-} from '../demo/teams';
+  } from '../demo/teams';
 import { useAgents } from '../hooks/use-agents';
 import { useTeamStats } from '../hooks/use-teams';
 import { usePresence } from '../hooks/use-presence';
 import { useAgentHealth } from '../hooks/use-agent-health';
-import { AgentMode, AgentStatus } from '../graphql/generated/graphql';
+import { AgentMode } from '../graphql/generated/graphql';
 import type { AgentFieldsFragment } from '../graphql/generated/graphql';
 
 type Agent = AgentFieldsFragment;
