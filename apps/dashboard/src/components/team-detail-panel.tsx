@@ -33,7 +33,7 @@ import { Badge } from './ui/badge';
 import { AgentAvatar } from './agent-avatar';
 import { AgentModeBadge } from './agent-mode-selector';
 import { Progress } from './ui/progress';
-import { getStatusVariant, getLevelColor } from '../lib/status-colors';
+import { getStatusVariant } from '../lib/status-colors';
 import {
   type Team,
   getTeamById,

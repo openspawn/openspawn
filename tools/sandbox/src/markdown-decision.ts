@@ -4,7 +4,7 @@
 
 import type { SandboxAgent, SandboxTask, ACPMessage } from './types.js';
 import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
-import { resolve, dirname, join } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

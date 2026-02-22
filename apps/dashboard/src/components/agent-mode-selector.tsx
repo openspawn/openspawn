@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Briefcase, Eye, Network, Check, ChevronDown, Info } from "lucide-react";
+import { Briefcase, Eye, Network, Check, ChevronDown } from "lucide-react";
 import { cn } from "../lib/utils";
 import {
   DropdownMenu,

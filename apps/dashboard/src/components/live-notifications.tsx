@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { isSandboxMode } from '../graphql/fetcher';
 import { useSandboxSSE, type SandboxSSEEvent } from '../hooks/use-sandbox-sse';

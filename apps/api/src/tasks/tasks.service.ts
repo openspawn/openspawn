@@ -11,7 +11,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { Task, TaskComment, TaskDependency, TaskTag } from "@openspawn/database";
-import { TaskPriority, TaskStatus } from "@openspawn/shared-types";
+import { TaskStatus } from "@openspawn/shared-types";
 
 import { TrustService } from "../agents";
 import { EventsService } from "../events";

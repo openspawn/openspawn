@@ -2,15 +2,13 @@ import { Command } from "commander";
 import pc from "picocolors";
 import { createClient, unwrap } from "../lib/api.js";
 import {
-  output,
   outputError,
   outputSuccess,
   outputTable,
   formatTask,
   formatEmpty,
   icons,
-  colors,
-} from "../lib/output.js";
+  } from "../lib/output.js";
 import { withSpinner } from "../lib/spinner.js";
 
 interface Task {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock, Terminal } from "lucide-react";
@@ -13,7 +13,7 @@ import { Progress } from "./ui/progress";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
-import { AgentRole, AgentStatus, TaskStatus } from "../graphql/generated/graphql";
+import { AgentRole, TaskStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 // recharts v3 has infinite-loop bug — using custom bars instead
 import { useContainerSize } from "../hooks/use-container-size";

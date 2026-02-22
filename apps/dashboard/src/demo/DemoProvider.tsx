@@ -13,7 +13,7 @@ import {
   type DemoScenario,
 } from '@openspawn/demo-data';
 import { setDemoEngine } from './mock-fetcher';
-import { celebrate, celebrateLevelUp, celebrateSparkle, celebrateElite } from '../lib/confetti';
+import { celebrateLevelUp, celebrateElite } from '../lib/confetti';
 import { debug } from '../lib/debug';
 
 export type ScenarioName = 'acmetech' | 'fresh' | 'startup' | 'growth' | 'enterprise' | 'sandbox';

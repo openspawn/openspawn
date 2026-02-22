@@ -88,7 +88,7 @@ export class JwtOrApiKeyGuard implements CanActivate {
       throw new UnauthorizedException("Missing authorization header");
     }
 
-    const [scheme, token] = authHeader.split(" ");
+    const [_scheme, token] = authHeader.split(" ");
     if (!token) {
       throw new UnauthorizedException("Invalid authorization format");
     }

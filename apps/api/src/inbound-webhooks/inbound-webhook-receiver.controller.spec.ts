@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NotFoundException, UnauthorizedException, BadRequestException } from "@nestjs/common";
+import { NotFoundException, UnauthorizedException } from "@nestjs/common";
 
 import { InboundWebhookKey, Task } from "@openspawn/database";
 import { TaskPriority, TaskStatus } from "@openspawn/shared-types";

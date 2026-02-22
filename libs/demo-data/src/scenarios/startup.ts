@@ -1,6 +1,6 @@
 import type { DemoScenario } from '../types';
-import { agents, AGENT_IDS, generateRandomAgent } from '../fixtures/agents';
-import { tasks, generateRandomTask } from '../fixtures/tasks';
+import { agents, AGENT_IDS } from '../fixtures/agents';
+import { tasks } from '../fixtures/tasks';
 import { creditTransactions } from '../fixtures/credits';
 import { events } from '../fixtures/events';
 import { generateInitialMessages } from '../fixtures/messages';

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
 const STORAGE_KEY = 'bb-onboarding-complete';
 const TOTAL_STEPS = 5;

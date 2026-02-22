@@ -7,8 +7,7 @@ import {
   formatStatus,
   formatKeyValue,
   icons,
-  colors,
-} from "../lib/output.js";
+  } from "../lib/output.js";
 import { withSpinner } from "../lib/spinner.js";
 import { OpenSpawnClient } from "../lib/api.js";
 

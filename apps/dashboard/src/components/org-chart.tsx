@@ -2,7 +2,7 @@
  * Org Chart — ReactFlow tree layout showing teams → sub-teams → agents.
  * Features: animated edge pulses, click-to-detail, presence glow on active agents.
  */
-import { useEffect, useState, useMemo, useCallback, useRef, memo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useDemo } from '../demo/DemoProvider';
 import {
   ReactFlow,

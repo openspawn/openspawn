@@ -7,12 +7,10 @@ import {
   Copy,
   Check,
   ExternalLink,
-  RefreshCw,
   Link2,
   GitPullRequest,
   AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
+  } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";

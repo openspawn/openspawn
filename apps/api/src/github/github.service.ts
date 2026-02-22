@@ -2,8 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException,
-} from "@nestjs/common";
+  } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OnEvent } from "@nestjs/event-emitter";
 import { Repository } from "typeorm";

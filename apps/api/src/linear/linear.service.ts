@@ -87,13 +87,13 @@ export class LinearService implements IntegrationProvider {
     catch { return false; }
   }
 
-  async handleWebhookEvent(orgId: string, event: string, payload: unknown): Promise<void> {
-    this.logger.log(`Processing Linear event: \${event} for org \${orgId}`);
+  async handleWebhookEvent(_orgId: string, _event: string, _payload: unknown): Promise<void> {
+    this.logger.log(`Processing Linear webhook event`);
     // Webhook processing implementation
   }
 
-  async syncOutbound(orgId: string, event: string, data: Record<string, unknown>): Promise<void> {
-    this.logger.log(`Outbound sync: \${event} for org \${orgId}`);
+  async syncOutbound(_orgId: string, _event: string, _data: Record<string, unknown>): Promise<void> {
+    this.logger.log(`Outbound sync`);
   }
 
   async testConnection(connectionId: string): Promise<{ ok: boolean; message: string }> {

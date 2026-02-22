@@ -26,9 +26,9 @@ if (existsSync(envPath)) {
 } else {
   console.log(`  ⚠ No .env file found at ${envPath}`);
 }
-import { createAgents, createCOO } from './agents.js';
+import { createAgents } from './agents.js';
 import { parseOrgMd, type ParsedOrg } from './org-parser.js';
-import { initLLM, getProvider, getProviderInfo } from './llm.js';
+import { initLLM } from './llm.js';
 import { Simulation } from './simulation.js';
 import { DeterministicSimulation } from './deterministic.js';
 import { startServer } from './server.js';
