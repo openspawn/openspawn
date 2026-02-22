@@ -3,43 +3,14 @@
 
 import { resolveAgentId, type AgentDecision } from './markdown-decision.js';
 import { makeAgentPublic } from './agents.js';
-import type { SandboxAgent, SandboxTask, ACPMessage } from './types.js';
+import { createACPMessage, pushMessage } from './acp.js';
+import type { SandboxAgent, SandboxTask } from './types.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 let executorTaskCounter = 20000;
 function nextExecutorTaskId(): string {
   return `TASK-${String(++executorTaskCounter).padStart(4, '0')}`;
-}
-
-function acpId(): string {
-  return `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function createACPMessage(
-  type: ACPMessage['type'],
-  from: string,
-  to: string,
-  taskId: string,
-  extra?: Partial<ACPMessage>,
-): ACPMessage {
-  return { id: acpId(), type, from, to, taskId, timestamp: Date.now(), ...extra };
-}
-
-function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
-  for (const agent of agents) {
-    if (agent.id === msg.from || agent.id === msg.to) {
-      agent.recentMessages.push(msg);
-      if (agent.recentMessages.length > 10) {
-        agent.recentMessages = agent.recentMessages.slice(-10);
-      }
-    }
-    if (agent.id === msg.to && agent.trigger === 'event-driven') {
-      if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
-        agent.inbox.push(msg);
-      }
-    }
-  }
 }
 
 // ── Context for execution ───────────────────────────────────────────────────

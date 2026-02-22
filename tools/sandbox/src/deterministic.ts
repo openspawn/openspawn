@@ -11,6 +11,8 @@
 import type { SandboxAgent, SandboxTask, SandboxEvent, SandboxConfig, ACPMessage } from './types.js';
 import type { ParsedOrg } from './org-parser.js';
 import { makeAgentPublic } from './agents.js';
+import { createACPMessage, pushMessage } from './acp.js';
+import { createPRNG, type PRNG } from './prng.js';
 import type { ScenarioEngine } from './scenario-engine.js';
 import type { ModelRouter, RouteRequest } from './model-router.js';
 
@@ -19,36 +21,6 @@ import type { ModelRouter, RouteRequest } from './model-router.js';
 let taskCounter = 0;
 function nextTaskId(): string {
   return `TASK-${String(++taskCounter).padStart(4, '0')}`;
-}
-
-function acpId(): string {
-  return `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function createACPMessage(
-  type: ACPMessage['type'],
-  from: string,
-  to: string,
-  taskId: string,
-  extra?: Partial<ACPMessage>,
-): ACPMessage {
-  return { id: acpId(), type, from, to, taskId, timestamp: Date.now(), ...extra };
-}
-
-function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
-  for (const agent of agents) {
-    if (agent.id === msg.from || agent.id === msg.to) {
-      agent.recentMessages.push(msg);
-      if (agent.recentMessages.length > 10) {
-        agent.recentMessages = agent.recentMessages.slice(-10);
-      }
-    }
-    if (agent.id === msg.to && agent.trigger === 'event-driven') {
-      if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
-        agent.inbox.push(msg);
-      }
-    }
-  }
 }
 
 // ── Domain matching ─────────────────────────────────────────────────────────
@@ -132,7 +104,7 @@ function parseOrderIntoTasks(order: string): Array<{ title: string; domain: stri
 // ── Work simulation ─────────────────────────────────────────────────────────
 
 /** Tick-based work progress. Returns true if task advanced a stage. */
-function advanceWork(task: SandboxTask, agent: SandboxAgent): { advanced: boolean; done: boolean; status: string } {
+function advanceWork(task: SandboxTask, agent: SandboxAgent, rng: PRNG): { advanced: boolean; done: boolean; status: string } {
   // Work progresses through stages: assigned → in_progress → review → done
   // Each stage takes 2-4 ticks based on priority
   const ticksPerStage = task.priority === 'critical' ? 2 : task.priority === 'high' ? 3 : 4;
@@ -152,9 +124,9 @@ function advanceWork(task: SandboxTask, agent: SandboxAgent): { advanced: boolea
   }
   if (task.status === 'in_progress') {
     // 10% chance of getting blocked (adds drama)
-    if (Math.random() < 0.10) {
+    if (rng.chance(0.10)) {
       task.status = 'blocked';
-      task.blockedReason = pickRandom(['Missing requirements', 'Dependency not ready', 'Need clarification', 'Waiting on external service']);
+      task.blockedReason = rng.pick(['Missing requirements', 'Dependency not ready', 'Need clarification', 'Waiting on external service']);
       return { advanced: true, done: false, status: 'blocked' };
     }
     task.status = 'review';
@@ -171,9 +143,7 @@ function advanceWork(task: SandboxTask, agent: SandboxAgent): { advanced: boolea
   return { advanced: false, done: false, status: task.status };
 }
 
-function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+// pickRandom removed — use this.rng.pick() instead
 
 // ── Flavor messages ─────────────────────────────────────────────────────────
 
@@ -225,6 +195,8 @@ export class DeterministicSimulation {
   }> = [];
   parsedOrg?: ParsedOrg;
   scenarioEngine?: ScenarioEngine;
+  /** Seedable PRNG — same seed = identical simulation run */
+  rng: PRNG;
 
   /** Agent IDs to skip in the deterministic tick loop (e.g. already handled by LLM) */
   protected skipAgentIds = new Set<string>();
@@ -235,7 +207,8 @@ export class DeterministicSimulation {
   /** Pending task assignments: tasks waiting for a lead in matching domain */
   private pendingTaskDefs: Array<{ title: string; domain: string; priority: SandboxTask['priority'] }> = [];
 
-  constructor(agents: SandboxAgent[], config: SandboxConfig, skipSeedTasks = false, parsedOrg?: ParsedOrg) {
+  constructor(agents: SandboxAgent[], config: SandboxConfig, skipSeedTasks = false, parsedOrg?: ParsedOrg, seed?: number) {
+    this.rng = createPRNG(seed);
     this.tasks = [];
     this.config = config;
     this.parsedOrg = parsedOrg;
@@ -336,7 +309,7 @@ export class DeterministicSimulation {
 
       // ACP hire message
       const msg = createACPMessage('delegation', manager.id, candidate.id, '', {
-        body: pickRandom(HIRE_FLAVORS)(candidate.name, domain),
+        body: this.rng.pick(HIRE_FLAVORS)(candidate.name, domain),
       });
       pushMessage(this.agents, msg);
       manager.stats.messagessSent++;
@@ -434,7 +407,7 @@ export class DeterministicSimulation {
         lead.taskIds.push(task.id);
 
         const delegationMsg = createACPMessage('delegation', coo.id, lead.id, task.id, {
-          body: pickRandom(DELEGATION_FLAVORS)(task.title, lead.name),
+          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
         });
         pushMessage(this.agents, delegationMsg);
         task.activityLog.push(delegationMsg);
@@ -481,7 +454,7 @@ export class DeterministicSimulation {
         lead.taskIds.push(task.id);
 
         const delegationMsg = createACPMessage('delegation', coo.id, lead.id, task.id, {
-          body: pickRandom(DELEGATION_FLAVORS)(task.title, lead.name),
+          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
         });
         pushMessage(this.agents, delegationMsg);
         task.activityLog.push(delegationMsg);
@@ -525,7 +498,7 @@ export class DeterministicSimulation {
         availableWorker.taskIds.push(task.id);
 
         const msg = createACPMessage('delegation', lead.id, availableWorker.id, task.id, {
-          body: pickRandom(DELEGATION_FLAVORS)(task.title, availableWorker.name),
+          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, availableWorker.name),
         });
         pushMessage(this.agents, msg);
         task.activityLog.push(msg);
@@ -552,7 +525,7 @@ export class DeterministicSimulation {
     );
 
     for (const task of myTasks) {
-      const result = advanceWork(task, worker);
+      const result = advanceWork(task, worker, this.rng);
 
       if (result.advanced) {
         if (result.done) {
@@ -560,7 +533,7 @@ export class DeterministicSimulation {
           const parent = this.agents.find(a => a.id === worker.parentId);
           if (parent) {
             const completionMsg = createACPMessage('completion', worker.id, parent.id, task.id, {
-              summary: pickRandom(COMPLETION_FLAVORS)(task.title),
+              summary: this.rng.pick(COMPLETION_FLAVORS)(task.title),
               body: `Completed: "${task.title}"`,
             });
             pushMessage(this.agents, completionMsg);
@@ -574,7 +547,7 @@ export class DeterministicSimulation {
           if (parent) {
             const escMsg = createACPMessage('escalation', worker.id, parent.id, task.id, {
               reason: 'BLOCKED',
-              body: pickRandom(ESCALATION_FLAVORS)(task.title, task.blockedReason || 'Unknown'),
+              body: this.rng.pick(ESCALATION_FLAVORS)(task.title, task.blockedReason || 'Unknown'),
             });
             pushMessage(this.agents, escMsg);
             task.activityLog.push(escMsg);
@@ -586,7 +559,7 @@ export class DeterministicSimulation {
           const parent = this.agents.find(a => a.id === worker.parentId);
           if (parent) {
             const progressMsg = createACPMessage('progress', worker.id, parent.id, task.id, {
-              body: pickRandom(PROGRESS_FLAVORS)(task.title),
+              body: this.rng.pick(PROGRESS_FLAVORS)(task.title),
               pct: 30,
             });
             pushMessage(this.agents, progressMsg);
@@ -686,7 +659,7 @@ export class DeterministicSimulation {
       const toRoute = workingAgents.slice(0, Math.min(3, workingAgents.length));
       for (const agent of toRoute) {
         const taskTypes: Array<RouteRequest['taskType']> = ['delegation', 'coding', 'analysis', 'simple'];
-        const taskType = agent.role === 'coo' ? 'delegation' : agent.role === 'lead' ? 'analysis' : pickRandom(taskTypes);
+        const taskType = agent.role === 'coo' ? 'delegation' : agent.role === 'lead' ? 'analysis' : this.rng.pick(taskTypes);
         const decision = modelRouter.route({
           agentId: agent.id,
           agentLevel: agent.level,
