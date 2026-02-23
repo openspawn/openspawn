@@ -46,7 +46,7 @@ interface ReplayState {
   zoomTarget: ZoomTarget | null;
 }
 
-// ── Zoom choreography schedule (demo scenario) ──────────────────────────────
+// ── Zoom choreography schedule ───────────────────────────────────────────────
 const CHART_CX = 600;
 const CHART_LY = [0, 160, 330, 500];
 
@@ -248,6 +248,14 @@ function useReplay(scenario: ScenarioDef) {
     if (tick >= 0) processEvents(tick);
   }, [tick, processEvents]);
 
+  // Zoom choreography
+  const zoomTarget = useMemo(() => {
+    for (const [start, end, zt] of ZOOM_SCHEDULE) {
+      if (tick >= start && tick < end) return zt;
+    }
+    return null;
+  }, [tick]);
+
   return {
     tick,
     running,
@@ -262,6 +270,7 @@ function useReplay(scenario: ScenarioDef) {
     messages: messagesRef.current,
     pattiesDelivered: statsRef.current.pattiesDelivered,
     actBanner,
+    zoomTarget,
   };
 }
 
@@ -386,7 +395,10 @@ export function LiveViewPage() {
               edgeAnimations={replay.edgeAnimations}
               reassignedEdges={replay.reassignedEdges}
               spawnedAgents={replay.spawnedAgents}
+              zoomTarget={replay.zoomTarget}
             />
+            {/* Narrative annotations */}
+            <NarrativeAnnotations tick={replay.tick} />
             {/* Act banner overlay */}
             <AnimatePresence>
               {replay.actBanner && (
