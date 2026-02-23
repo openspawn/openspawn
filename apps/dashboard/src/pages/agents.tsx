@@ -1,7 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "motion/react";
-import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network } from "lucide-react";
+import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network, BarChart3 } from "lucide-react";
+import { TremorCreditsByAgent, TremorTasksOverTime } from "../components/charts/tremor-agent-metrics";
+import { HoverLiftCard } from "../components/motion-primitives";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -29,7 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { PhaseChip } from "../components/phase-chip";
 import { cn } from "../lib/utils";
 import { SpawnAgentModal } from "../components/spawn-agent-modal";
-import { useAgents, useCurrentPhase, usePresence, useAgentHealth } from "../hooks";
+import { useAgents, useCurrentPhase, usePresence, useAgentHealth, useTasks, useCredits } from "../hooks";
 import { AgentOnboarding } from "../components/agent-onboarding";
 import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
@@ -603,7 +605,7 @@ function AgentVirtualGrid({
                 {rowAgents.map((agent) => {
                   const levelColor = getLevelColor(agent.level);
                   return (
-                    <motion.div
+                    <HoverLiftCard
                       key={agent.id}
                       layout
                       initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -613,7 +615,7 @@ function AgentVirtualGrid({
                     >
                       <Card
                         data-testid="agent-card"
-                        className="relative overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
+                        className="relative overflow-hidden group cursor-pointer"
                         onClick={() => onCardClick(agent.id)}
                       >
                         <div
@@ -713,7 +715,7 @@ function AgentVirtualGrid({
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </HoverLiftCard>
                   );
                 })}
               </AnimatePresence>
@@ -721,6 +723,47 @@ function AgentVirtualGrid({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function AgentMetricsTab() {
+  const { agents } = useAgents();
+  const { tasks } = useTasks();
+  const { transactions } = useCredits();
+
+  const tasksOverTime = useMemo(() => {
+    const completed = tasks.filter((t) => t.status?.toUpperCase() === "DONE" && t.completedAt);
+    const byDate = new Map<string, number>();
+    completed.forEach((t) => {
+      const d = new Date(t.completedAt!).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      byDate.set(d, (byDate.get(d) || 0) + 1);
+    });
+    return [...byDate.entries()].slice(-14).map(([date, completed]) => ({ date, completed }));
+  }, [tasks]);
+
+  const creditsByAgent = useMemo(() => {
+    const map = new Map<string, { earned: number; spent: number; name: string }>();
+    transactions.forEach((tx) => {
+      const agentId = tx.agentId;
+      if (!agentId) return;
+      const entry = map.get(agentId) || { earned: 0, spent: 0, name: "" };
+      if (tx.type === "CREDIT") entry.earned += tx.amount;
+      else entry.spent += tx.amount;
+      const agent = agents.find((a) => a.id === agentId);
+      entry.name = agent?.name || agentId;
+      map.set(agentId, entry);
+    });
+    return [...map.values()]
+      .sort((a, b) => b.earned + b.spent - (a.earned + a.spent))
+      .slice(0, 10)
+      .map((e) => ({ agent: e.name, earned: e.earned, spent: e.spent }));
+  }, [transactions, agents]);
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <TremorTasksOverTime data={tasksOverTime} />
+      <TremorCreditsByAgent data={creditsByAgent} />
     </div>
   );
 }
@@ -888,7 +931,7 @@ export function AgentsPage() {
 
       {/* Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-6 lg:w-[720px] scrollbar-hide">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-7 lg:w-[840px] scrollbar-hide">
           <TabsTrigger value="agents" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             <span className="hidden sm:inline">All Agents</span>
@@ -913,6 +956,11 @@ export function AgentsPage() {
             <Zap className="h-4 w-4" />
             <span className="hidden sm:inline">Capabilities</span>
             <span className="sm:hidden">Skills</span>
+          </TabsTrigger>
+          <TabsTrigger value="metrics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            <span className="hidden sm:inline">Metrics</span>
+            <span className="sm:hidden">Stats</span>
           </TabsTrigger>
           <TabsTrigger value="budgets" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
@@ -1128,6 +1176,11 @@ export function AgentsPage() {
         {/* Capabilities Tab */}
         <TabsContent value="capabilities" className="space-y-6">
           <CapabilityManager onAgentClick={openAgentDetail} />
+        </TabsContent>
+
+        {/* Metrics Tab */}
+        <TabsContent value="metrics" className="space-y-6">
+          <AgentMetricsTab />
         </TabsContent>
 
         {/* Budgets Tab */}

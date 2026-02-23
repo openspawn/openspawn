@@ -1,20 +1,5 @@
 import { useMemo, useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 
-/** Stable container size hook — avoids recharts ResponsiveContainer infinite loop */
-function useStableSize(ref: React.RefObject<HTMLElement | null>) {
-  const [size, setSize] = useState({ width: 0, height: 0 });
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      if (width > 0 && height > 0) setSize((prev) => (prev.width === Math.round(width) && prev.height === Math.round(height) ? prev : { width: Math.round(width), height: Math.round(height) }));
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [ref]);
-  return size;
-}
 import { useNavigate, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -30,7 +15,9 @@ import {
   Layers,
   CheckCircle,
 } from "lucide-react";
-// recharts v3 has infinite-loop bug in ChartDataContextProvider — using custom SVG charts instead
+// Tremor wraps recharts v2 internally — replaces custom SVG charts
+import { TremorCreditArea } from "../components/charts/tremor-credit-area";
+import { TremorTaskDonut } from "../components/charts/tremor-task-donut";
 import { StaggerContainer, StaggerItem } from "../components/stagger";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -96,9 +83,6 @@ export function DashboardPage() {
   const { isDemo, scenario, speed } = useDemo();
   const layout = useDashboardLayout();
   const { data: acpMetrics } = useACPMetrics();
-
-  const creditChartRef = useRef<HTMLDivElement>(null);
-  const creditChartSize = useStableSize(creditChartRef);
 
   // Debounced events: at high speeds, batch updates to avoid render thrashing
   const [displayEvents, setDisplayEvents] = useState(events);
@@ -290,115 +274,14 @@ export function DashboardPage() {
   }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, reviewTasks, tasks.length, totalCreditsEarned, totalCreditsSpent, sparklines, navigate]);
 
   function renderCreditChart() {
-    const maxVal = Math.max(...creditHistory.map(d => Math.max(d.earned ?? 0, d.spent ?? 0)), 1);
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg">Credit Flow</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div ref={creditChartRef} className="h-[220px] sm:h-[300px]">
-            {creditChartSize.width > 0 && (
-              <svg width={creditChartSize.width} height={creditChartSize.height} className="overflow-visible">
-                <defs>
-                  <linearGradient id="earnedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
-                  </linearGradient>
-                  <linearGradient id="spentGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                {/* Area fills */}
-                {creditHistory.length > 1 && (
-                  <>
-                    <path
-                      d={creditHistory.map((d, i) => {
-                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
-                        const y = creditChartSize.height - 30 - ((d.earned ?? 0) / maxVal) * (creditChartSize.height - 50);
-                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-                      }).join(' ') + ` L${creditChartSize.width - 20},${creditChartSize.height - 30} L20,${creditChartSize.height - 30} Z`}
-                      fill="url(#earnedGrad)"
-                    />
-                    <path
-                      d={creditHistory.map((d, i) => {
-                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
-                        const y = creditChartSize.height - 30 - ((d.spent ?? 0) / maxVal) * (creditChartSize.height - 50);
-                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-                      }).join(' ') + ` L${creditChartSize.width - 20},${creditChartSize.height - 30} L20,${creditChartSize.height - 30} Z`}
-                      fill="url(#spentGrad)"
-                    />
-                    {/* Lines */}
-                    <path
-                      d={creditHistory.map((d, i) => {
-                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
-                        const y = creditChartSize.height - 30 - ((d.earned ?? 0) / maxVal) * (creditChartSize.height - 50);
-                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-                      }).join(' ')}
-                      fill="none" stroke="#10b981" strokeWidth={2}
-                    />
-                    <path
-                      d={creditHistory.map((d, i) => {
-                        const x = (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20;
-                        const y = creditChartSize.height - 30 - ((d.spent ?? 0) / maxVal) * (creditChartSize.height - 50);
-                        return `${i === 0 ? 'M' : 'L'}${x},${y}`;
-                      }).join(' ')}
-                      fill="none" stroke="#f59e0b" strokeWidth={2}
-                    />
-                  </>
-                )}
-                {/* X axis labels */}
-                {creditHistory.map((d, i) => {
-                  const x = creditHistory.length > 1 ? (i / (creditHistory.length - 1)) * (creditChartSize.width - 40) + 20 : creditChartSize.width / 2;
-                  return i % Math.max(1, Math.floor(creditHistory.length / 6)) === 0 ? (
-                    <text key={i} x={x} y={creditChartSize.height - 8} textAnchor="middle" className="fill-muted-foreground text-[10px]">{d.period}</text>
-                  ) : null;
-                })}
-                {/* Legend */}
-                <circle cx={creditChartSize.width - 120} cy={12} r={4} fill="#10b981" />
-                <text x={creditChartSize.width - 112} y={16} className="fill-muted-foreground text-[11px]">Earned</text>
-                <circle cx={creditChartSize.width - 60} cy={12} r={4} fill="#f59e0b" />
-                <text x={creditChartSize.width - 52} y={16} className="fill-muted-foreground text-[11px]">Spent</text>
-              </svg>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <TremorCreditArea creditHistory={creditHistory} />;
   }
 
-  function renderTasksChart() {
-    const maxCount = Math.max(...tasksByStatus.map(d => d.count), 1);
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg">Tasks by Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {tasksByStatus.map((item) => (
-              <div key={item.status} className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground w-24 text-right shrink-0">{item.status}</span>
-                <div className="flex-1 h-8 bg-muted/30 rounded overflow-hidden">
-                  <div
-                    className="h-full rounded transition-all duration-500"
-                    style={{
-                      width: `${Math.max((item.count / maxCount) * 100, item.count > 0 ? 8 : 0)}%`,
-                      backgroundColor: item.fill,
-                    }}
-                  />
-                </div>
-                <span className="text-sm font-mono w-8 text-right">{item.count}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
+    function renderTasksChart() {
+    return <TremorTaskDonut tasksByStatus={tasksByStatus} />;
   }
 
-  function renderRecentActivity() {
+    function renderRecentActivity() {
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
