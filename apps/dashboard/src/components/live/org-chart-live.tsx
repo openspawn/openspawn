@@ -77,11 +77,19 @@ export interface EdgeAnimation {
   timestamp: number;
 }
 
+export interface ZoomTarget {
+  x: number;
+  y: number;
+  zoom: number;
+  duration?: number;
+}
+
 interface OrgChartLiveProps {
   nodeStates: Record<string, AgentNodeState>;
   edgeAnimations: EdgeAnimation[];
   reassignedEdges: Array<{ from: string; to: string }>;
   spawnedAgents: SpawnedAgent[];
+  zoomTarget?: ZoomTarget | null;
 }
 
 // ── Custom Nodes ─────────────────────────────────────────────────────────────
@@ -375,34 +383,30 @@ function buildGraph(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents }: OrgChartLiveProps) {
+function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents, zoomTarget }: OrgChartLiveProps) {
   const { nodes, edges } = useMemo(
     () => buildGraph(nodeStates, edgeAnimations, reassignedEdges, spawnedAgents),
     [nodeStates, edgeAnimations, reassignedEdges, spawnedAgents],
   );
 
   const { fitView, setCenter } = useReactFlow();
-  const prevSpawnCount = useRef(0);
-  const zoomResetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const prevZoomRef = useRef<ZoomTarget | null>(null);
 
-  // Zoom into pool node area when spawning starts, zoom back out after
+  // External zoom choreography — driven by parent via zoomTarget prop
   useEffect(() => {
-    const count = spawnedAgents.length;
-    if (count > prevSpawnCount.current && count >= 1) {
-      // Zoom to the Grill Station pool node area
-      // Pool is at x=CX-400-80=120, y=LY[3]+100=600
-      clearTimeout(zoomResetTimer.current);
-      setCenter(120, 580, { zoom: 1.4, duration: 800 });
-
-      // After 3 seconds (or when spawning stops), zoom back to full view
-      zoomResetTimer.current = setTimeout(() => {
-        fitView({ padding: 0.15, duration: 800 });
-      }, 3000);
+    if (zoomTarget && zoomTarget !== prevZoomRef.current) {
+      prevZoomRef.current = zoomTarget;
+      setCenter(zoomTarget.x, zoomTarget.y, {
+        zoom: zoomTarget.zoom,
+        duration: zoomTarget.duration ?? 800,
+      });
+    } else if (!zoomTarget && prevZoomRef.current) {
+      prevZoomRef.current = null;
+      fitView({ padding: 0.15, duration: 800 });
     }
-    prevSpawnCount.current = count;
-  }, [spawnedAgents.length, setCenter, fitView]);
+  }, [zoomTarget, setCenter, fitView]);
 
-  // On first render and when no spawns, fit the full view
+  // On first render, fit the full view
   const onInit = useCallback(() => {
     fitView({ padding: 0.15, duration: 0 });
   }, [fitView]);
