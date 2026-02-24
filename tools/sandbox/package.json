@@ -5,9 +5,14 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
-    "start:single": "tsx src/test-single.ts"
+    "start:single": "tsx src/test-single.ts",
+    "cli": "tsx src/cli/index.ts"
+  },
+  "bin": {
+    "openspawn-agents": "./src/cli/index.ts"
   },
   "dependencies": {
+    "commander": "^13.1.0",
     "ollama": "^0.5.0"
   },
   "devDependencies": {
