@@ -350,7 +350,7 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="dashboard-charts">
       {/* Page header */}
       <PageHeader
         title="Dashboard"

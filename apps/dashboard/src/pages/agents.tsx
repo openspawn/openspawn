@@ -913,7 +913,7 @@ export function AgentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="agent-list">
       {/* Page header */}
       <PageHeader
         title="Agents"

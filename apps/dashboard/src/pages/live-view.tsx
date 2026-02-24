@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, FlaskConical, PlayCircle } from 'lucide-react';
+import { ArrowRight, FlaskConical, PlayCircle, Clapperboard } from 'lucide-react';
+import { useTourSafe } from '../components/tour';
 import { IntroCard } from '../components/live/intro-card';
 import { OrgChartLive, type AgentNodeState, type EdgeAnimation, type ZoomTarget } from '../components/live/org-chart-live';
 import { LiveFeed, type FeedMessage } from '../components/live/live-feed';
@@ -328,6 +329,28 @@ function ScenarioPicker({ current, onChange }: { current: ScenarioId; onChange: 
   );
 }
 
+// ── Tour Button ──────────────────────────────────────────────────────────────
+
+function TourButton({ onStartReplay }: { onStartReplay: () => void }) {
+  const tour = useTourSafe();
+  if (!tour) return null;
+
+  const handleClick = () => {
+    onStartReplay();
+    tour.start();
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-300 hover:from-cyan-500/30 hover:to-purple-500/30 transition-all cursor-pointer"
+    >
+      <Clapperboard className="w-3 h-3" />
+      🎬 Guided Tour
+    </button>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export function LiveViewPage() {
@@ -381,7 +404,10 @@ export function LiveViewPage() {
       <div className="relative z-10 flex flex-col h-full">
         {/* Top: Scenario picker + Progress header */}
         <div className="shrink-0 flex items-center justify-between px-4 pt-3 pb-1 bg-white/[0.02]">
-          <ScenarioPicker current={scenarioId} onChange={handleScenarioChange} />
+          <div className="flex items-center gap-3">
+            <ScenarioPicker current={scenarioId} onChange={handleScenarioChange} />
+            <TourButton onStartReplay={handleStart} />
+          </div>
           <div className="text-[10px] text-white/20 font-mono">tick {replay.tick}/{scenario.maxTick}</div>
         </div>
         <ProgressHeader act={replay.act} pattiesDelivered={replay.pattiesDelivered} target={scenario.target} targetLabel={scenario.targetLabel} badge={scenario.badge} />

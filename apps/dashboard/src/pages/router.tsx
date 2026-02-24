@@ -96,7 +96,7 @@ export function RouterPage() {
   const saved = metrics ? (metrics.cloudOnlyCostEstimate - metrics.totalCost) : 0;
 
   return (
-    <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto" data-tour="router-cards">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Model Router</h1>

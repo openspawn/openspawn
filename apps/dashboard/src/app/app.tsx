@@ -19,6 +19,7 @@ console.log(
   'color: #64748b'
 );
 import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
+import { TourProvider, TourBar, TourSpotlight } from "../components/tour";
 import { AuthProvider, SidePanelProvider } from "../contexts";
 import { router } from "../routes";
 import type { ReactNode } from "react";
@@ -74,14 +75,18 @@ export function App() {
           <NotificationProvider>
             <OnboardingProvider>
             <SidePanelProvider>
+            <TourProvider>
             <DemoWrapper>
               <OfflineIndicator />
               <CommandPalette />
               <WelcomeScreen />
               <FeatureTour />
               <CompletionCelebration />
+              <TourBar />
+              <TourSpotlight />
               <RouterProvider router={router} />
             </DemoWrapper>
+            </TourProvider>
             </SidePanelProvider>
             </OnboardingProvider>
           </NotificationProvider>
