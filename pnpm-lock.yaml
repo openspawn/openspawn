@@ -391,7 +391,16 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(webpack@5.105.0)
 
-  apps/cli:
+  apps/mcp:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.26.0
+        version: 1.26.0(zod@4.3.6)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+
+  apps/sandbox-cli:
     dependencies:
       cli-table3:
         specifier: ^0.6.5
@@ -411,15 +420,6 @@ importers:
       terminal-link:
         specifier: ^5.0.0
         version: 5.0.0
-
-  apps/mcp:
-    dependencies:
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.26.0
-        version: 1.26.0(zod@4.3.6)
-      zod:
-        specifier: ^4.3.6
-        version: 4.3.6
 
   libs/database:
     dependencies:
