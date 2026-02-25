@@ -9,6 +9,7 @@ import { MCPTools } from "./routes/docs/protocols/mcp";
 import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
 import { OrgMdPage } from "./routes/org-md";
+import { TemplatesPage } from "./routes/templates";
 import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
 import { HowItWorks } from "./routes/docs/how-it-works";
 import { NotFoundPage } from "./routes/not-found";
@@ -101,4 +102,10 @@ const orgMdRoute = createRoute({
   component: OrgMdPage,
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, docsRouteTree]);
+const templatesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/templates",
+  component: TemplatesPage,
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, docsRouteTree]);
