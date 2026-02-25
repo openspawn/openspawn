@@ -1,11 +1,13 @@
 import { DocsLayout, CodeBlock } from "../../../components/docs-layout";
+import { useTitle } from "../../../hooks/use-title";
 
 export function MCPTools() {
+  useTitle("MCP Tools");
   return (
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">MCP Tools</h1>
       <p className="mb-8 text-lg text-slate-400">
-        BikiniBottom exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">POST /mcp</code>.
+        OpenSpawn exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">POST /mcp</code>.
       </p>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Quick Start</h2>
@@ -50,7 +52,7 @@ export function MCPTools() {
       <p className="mb-4 text-slate-400">Add to your MCP client config:</p>
       <CodeBlock title="mcp_config.json">{`{
   "mcpServers": {
-    "bikinibottom": {
+    "openspawn": {
       "url": "https://bikinibottom.ai/mcp",
       "transport": "streamable-http"
     }

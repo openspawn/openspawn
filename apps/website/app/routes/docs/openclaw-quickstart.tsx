@@ -6,7 +6,7 @@ export function OpenClawQuickstart() {
   useTitle("OpenClaw Integration");
   return (
     <DocsLayout>
-      <h1 className="mb-2 text-4xl font-bold text-slate-100">BikiniBottom for OpenClaw Agents</h1>
+      <h1 className="mb-2 text-4xl font-bold text-slate-100">OpenSpawn for OpenClaw Agents</h1>
       <p className="mb-8 text-lg text-slate-400">
         You have agents. Give them an organization. 5-minute guide.
       </p>
@@ -41,7 +41,7 @@ export function OpenClawQuickstart() {
       </p>
 
       {/* Section 2 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What BikiniBottom adds</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What OpenSpawn adds</h2>
       <p className="mb-4 text-slate-400">
         <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code> defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies.
       </p>
@@ -87,8 +87,8 @@ Read \`ORG.md\` at the start of every session. It defines:
 
 Treat ORG.md as authoritative for organizational decisions.`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">3. Launch the BikiniBottom dashboard (optional)</h3>
-      <CodeBlock title="bash">{`npx bikinibottom demo
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">3. Launch the OpenSpawn dashboard (optional)</h3>
+      <CodeBlock title="bash">{`npx openspawn start
 # Opens dashboard at http://localhost:3333/app/`}</CodeBlock>
       <p className="text-slate-400">
         The dashboard gives you real-time visibility into your agent org — network graph, task flow, credit usage, escalation chains.
@@ -116,7 +116,7 @@ Treat ORG.md as authoritative for organizational decisions.`}</CodeBlock>
 
       {/* Callout */}
       <div className="mt-10 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
-        BikiniBottom doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. BikiniBottom adds the organizational layer that makes multi-agent coordination actually work.
+        OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. OpenSpawn adds the organizational layer that makes multi-agent coordination actually work.
       </div>
     </DocsLayout>
   );

@@ -1,16 +1,21 @@
-import { createRootRoute, createRoute } from "@tanstack/react-router";
+import { createRootRoute, createRoute, createNotFoundRoute } from "@tanstack/react-router";
 import { RootLayout } from "./routes/__root";
 import { LandingPage } from "./routes/index";
 import { DocsIndex } from "./routes/docs/index";
 import { GettingStarted } from "./routes/docs/getting-started";
+import { YourFirstOrgMd } from "./routes/docs/tutorials/your-first-org-md";
 import { A2AProtocol } from "./routes/docs/protocols/a2a";
 import { MCPTools } from "./routes/docs/protocols/mcp";
 import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
 import { OrgMdPage } from "./routes/org-md";
 import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
+import { NotFoundPage } from "./routes/not-found";
 
-const rootRoute = createRootRoute({ component: RootLayout });
+const rootRoute = createRootRoute({
+  component: RootLayout,
+  notFoundComponent: NotFoundPage,
+});
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -65,10 +70,17 @@ const openclawQuickstartRoute = createRoute({
   component: OpenClawQuickstart,
 });
 
+const yourFirstOrgMdRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/tutorials/your-first-org-md",
+  component: YourFirstOrgMd,
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
   openclawQuickstartRoute,
+  yourFirstOrgMdRoute,
   a2aRoute,
   mcpRoute,
   dashboardRoute,
