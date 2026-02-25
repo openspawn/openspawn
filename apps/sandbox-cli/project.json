@@ -1,0 +1,22 @@
+{
+  "name": "sandbox-cli",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/sandbox-cli/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "esbuild apps/sandbox-cli/src/main.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/apps/sandbox-cli/openspawn.cjs --external:fsevents"
+      },
+      "outputs": ["{workspaceRoot}/dist/apps/sandbox-cli"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx apps/sandbox-cli/src/main.ts"
+      }
+    }
+  }
+}

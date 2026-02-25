@@ -1,0 +1,41 @@
+# ── BikiniBottom Live Demo — Docker Compose ──────────────────────────────────
+# Usage: docker compose up -d
+# Requires: .env file with GROQ_API_KEY (and optionally OPENROUTER_API_KEY)
+
+services:
+  sandbox:
+    image: ghcr.io/openspawn/openspawn:latest
+    build: .  # Used for local dev; production pulls from GHCR
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      - NODE_ENV=production
+      - SANDBOX_PORT=3333
+      - SERVE_DASHBOARD=1
+      - SANDBOX_READONLY=1
+    expose:
+      - "3333"
+    networks:
+      - web
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+    depends_on:
+      - sandbox
+
+networks:
+  web:
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bb-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="bb-grad-light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Pineapple house body -->
+  <path d="M32 8L18 22v24a6 6 0 006 6h16a6 6 0 006-6V22L32 8z" fill="url(#bb-grad)" opacity="0.9"/>
+  <!-- Cross-hatch pattern (pineapple texture) -->
+  <line x1="24" y1="20" x2="40" y2="20" stroke="white" stroke-opacity="0.25" stroke-width="1"/>
+  <line x1="22" y1="28" x2="42" y2="28" stroke="white" stroke-opacity="0.25" stroke-width="1"/>
+  <line x1="22" y1="36" x2="42" y2="36" stroke="white" stroke-opacity="0.25" stroke-width="1"/>
+  <line x1="22" y1="44" x2="42" y2="44" stroke="white" stroke-opacity="0.25" stroke-width="1"/>
+  <!-- Door (agent portal) -->
+  <rect x="27" y="34" width="10" height="14" rx="5" fill="#0f172a" opacity="0.7"/>
+  <circle cx="35" cy="42" r="1.2" fill="#00e5ff"/>
+  <!-- Leaf/antenna top -->
+  <path d="M32 8C30 4 26 2 24 3s0 6 2 7" stroke="url(#bb-grad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M32 8C34 4 38 2 40 3s0 6-2 7" stroke="url(#bb-grad)" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M32 8V3" stroke="url(#bb-grad)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Bubbles -->
+  <circle cx="48" cy="14" r="3" fill="url(#bb-grad-light)" stroke="#00e5ff" stroke-opacity="0.4" stroke-width="0.8"/>
+  <circle cx="52" cy="8" r="2" fill="url(#bb-grad-light)" stroke="#00e5ff" stroke-opacity="0.3" stroke-width="0.6"/>
+  <circle cx="46" cy="6" r="1.5" fill="url(#bb-grad-light)" stroke="#00e5ff" stroke-opacity="0.3" stroke-width="0.5"/>
+</svg>

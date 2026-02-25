@@ -1,0 +1,20 @@
+{
+  "name": "platform",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/platform/app",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "command": "vite build",
+      "options": { "cwd": "apps/platform" },
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "outputs": ["{workspaceRoot}/dist/apps/platform"]
+    },
+    "serve": {
+      "command": "vite serve",
+      "options": { "cwd": "apps/platform" }
+    }
+  }
+}

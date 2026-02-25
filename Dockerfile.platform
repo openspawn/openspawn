@@ -1,0 +1,30 @@
+# ── OpenSpawn Platform Site ───────────────────────────────────────────────────
+# Static landing page for openspawn.ai
+
+# Stage 1: Build
+FROM node:24-alpine AS build
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
+COPY apps/platform/ ./apps/platform/
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm nx run platform:build
+
+# Stage 2: Minimal runtime
+FROM node:24-alpine
+WORKDIR /app
+
+COPY --from=build /app/dist/apps/platform ./dist
+COPY apps/platform/server.ts ./server.ts
+
+# server.ts uses import.meta — run with tsx
+RUN npm i -g tsx
+
+ENV PORT=3334
+ENV PLATFORM_DIR=/app/dist
+
+EXPOSE 3334
+
+CMD ["tsx", "server.ts"]

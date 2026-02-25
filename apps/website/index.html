@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BikiniBottom — The org chart for AI agents</title>
+    <meta name="description" content="One agent needs a prompt. A team needs structure. Introducing ORG.md — the org chart your AI agents actually read. Open source." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://bikinibottom.ai/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bikinibottom.ai/" />
+    <meta property="og:title" content="BikiniBottom — The org chart for AI agents" />
+    <meta property="og:description" content="One agent needs a prompt. A team needs structure. Introducing ORG.md — the org chart your AI agents actually read. Open source." />
+    <meta property="og:image" content="https://bikinibottom.ai/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="BikiniBottom" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BikiniBottom — The control plane your AI agents deserve" />
+    <meta name="twitter:description" content="One agent needs a prompt. A team needs structure. Introducing ORG.md — the org chart your AI agents actually read. Open source." />
+    <meta name="twitter:image" content="https://bikinibottom.ai/og-image.jpg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Kill any stale service workers at root scope.
+      // Dashboard PWA was previously registered at / before moving to /app/.
+      // Register a self-destroying SW that replaces the old one and nukes caches.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(function(reg) { reg.update(); })
+          .catch(function() {});
+      }
+    </script>
+    <script type="module" src="/app/main.tsx"></script>
+  </body>
+</html>

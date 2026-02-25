@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, height=630">
+  <title>BikiniBottom — Multi-Agent Coordination</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1200px;
+      height: 630px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    }
+    
+    .container {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(135deg, #0a1929 0%, #1a2942 25%, #0f3460 50%, #1a2942 75%, #0a1929 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px;
+    }
+    
+    /* Animated waves background */
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+    
+    .wave:nth-child(1) {
+      background: radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.4) 0%, transparent 50%);
+      animation: wave-drift 20s ease-in-out infinite;
+    }
+    
+    .wave:nth-child(2) {
+      background: radial-gradient(circle at 80% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+      animation: wave-drift 15s ease-in-out infinite reverse;
+    }
+    
+    .wave:nth-child(3) {
+      background: radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
+      animation: wave-drift 25s ease-in-out infinite;
+    }
+    
+    @keyframes wave-drift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-5%, 5%) rotate(2deg); }
+      50% { transform: translate(0, 10%) rotate(0deg); }
+      75% { transform: translate(5%, 5%) rotate(-2deg); }
+    }
+    
+    /* Bubbles */
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    
+    .bubble {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(6, 182, 212, 0.6), rgba(59, 130, 246, 0.3));
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+      animation: rise 8s ease-in infinite;
+    }
+    
+    .bubble:nth-child(1) { left: 15%; animation-delay: 0s; }
+    .bubble:nth-child(2) { left: 35%; animation-delay: 2s; width: 8px; height: 8px; }
+    .bubble:nth-child(3) { left: 55%; animation-delay: 4s; }
+    .bubble:nth-child(4) { left: 75%; animation-delay: 1s; width: 10px; height: 10px; }
+    .bubble:nth-child(5) { left: 85%; animation-delay: 3s; width: 6px; height: 6px; }
+    
+    @keyframes rise {
+      0% { bottom: -20px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { bottom: 100%; opacity: 0; }
+    }
+    
+    /* Agent nodes network */
+    .network {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 500px;
+      height: 500px;
+      opacity: 0.15;
+    }
+    
+    .node {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.8), rgba(59, 130, 246, 0.4));
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.6);
+    }
+    
+    .node-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3));
+      transform-origin: left center;
+    }
+    
+    /* Content */
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 900px;
+    }
+    
+    .emoji {
+      font-size: 120px;
+      margin-bottom: 30px;
+      filter: drop-shadow(0 10px 30px rgba(6, 182, 212, 0.3));
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .title {
+      font-size: 96px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 24px;
+      letter-spacing: -2px;
+      text-shadow: 0 0 80px rgba(6, 182, 212, 0.5);
+    }
+    
+    .tagline {
+      font-size: 36px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      margin-bottom: 40px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 12px 32px;
+      background: rgba(6, 182, 212, 0.15);
+      border: 2px solid rgba(6, 182, 212, 0.4);
+      border-radius: 30px;
+      color: #06b6d4;
+      font-size: 22px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Animated wave backgrounds -->
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    
+    <!-- Bubbles -->
+    <div class="bubbles">
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    </div>
+    
+    <!-- Agent network visualization -->
+    <div class="network">
+      <svg width="500" height="500">
+        <!-- Connection lines -->
+        <line x1="150" y1="100" x2="300" y2="150" stroke="rgba(6, 182, 212, 0.3)" stroke-width="2"/>
+        <line x1="300" y1="150" x2="250" y2="300" stroke="rgba(6, 182, 212, 0.3)" stroke-width="2"/>
+        <line x1="250" y1="300" x2="100" y2="250" stroke="rgba(6, 182, 212, 0.3)" stroke-width="2"/>
+        <line x1="100" y1="250" x2="150" y2="100" stroke="rgba(6, 182, 212, 0.3)" stroke-width="2"/>
+        <line x1="300" y1="150" x2="400" y2="200" stroke="rgba(6, 182, 212, 0.3)" stroke-width="2"/>
+        
+        <!-- Nodes -->
+        <circle cx="150" cy="100" r="20" fill="url(#nodeGrad1)" filter="url(#glow)"/>
+        <circle cx="300" cy="150" r="25" fill="url(#nodeGrad2)" filter="url(#glow)"/>
+        <circle cx="250" cy="300" r="18" fill="url(#nodeGrad3)" filter="url(#glow)"/>
+        <circle cx="100" cy="250" r="22" fill="url(#nodeGrad1)" filter="url(#glow)"/>
+        <circle cx="400" cy="200" r="15" fill="url(#nodeGrad2)" filter="url(#glow)"/>
+        
+        <defs>
+          <radialGradient id="nodeGrad1">
+            <stop offset="0%" style="stop-color:rgb(6, 182, 212);stop-opacity:0.9" />
+            <stop offset="100%" style="stop-color:rgb(59, 130, 246);stop-opacity:0.5" />
+          </radialGradient>
+          <radialGradient id="nodeGrad2">
+            <stop offset="0%" style="stop-color:rgb(59, 130, 246);stop-opacity:0.9" />
+            <stop offset="100%" style="stop-color:rgb(6, 182, 212);stop-opacity:0.5" />
+          </radialGradient>
+          <radialGradient id="nodeGrad3">
+            <stop offset="0%" style="stop-color:rgb(6, 182, 212);stop-opacity:0.8" />
+            <stop offset="100%" style="stop-color:rgb(14, 165, 233);stop-opacity:0.4" />
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+    
+    <!-- Main content -->
+    <div class="content">
+      <div class="emoji">🌊</div>
+      <h1 class="title">BikiniBottom</h1>
+      <p class="tagline">Where your agents come together</p>
+      <div class="badge">Open Source Multi-Agent Coordination</div>
+    </div>
+  </div>
+</body>
+</html>

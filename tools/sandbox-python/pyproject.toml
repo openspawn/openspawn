@@ -1,0 +1,22 @@
+[project]
+name = "bikinibottom-sandbox"
+version = "0.1.0"
+description = "BikiniBottom multi-agent coordination sandbox — FastAPI backend"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.10",
+    "sse-starlette>=2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120

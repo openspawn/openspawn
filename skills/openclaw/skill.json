@@ -1,0 +1,7 @@
+{
+  "name": "openspawn",
+  "version": "1.0.0",
+  "description": "Manage BikiniBottom/OpenSpawn agents, tasks, and metrics from OpenClaw",
+  "author": "openspawn",
+  "tags": ["agents", "orchestration", "tasks", "multi-agent"]
+}

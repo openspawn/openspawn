@@ -1,0 +1,87 @@
+name: Deploy Platform (openspawn.ai)
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: openspawn/openspawn-platform
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.platform
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Copy deploy files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "deploy/docker-compose.yml"
+          target: /opt/bikinibottom
+          strip_components: 1
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GH_TOKEN
+          script: |
+            set -e
+            cd /opt/bikinibottom
+
+            echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
+
+            docker compose pull platform
+            docker compose up -d platform --force-recreate --remove-orphans
+
+            echo "⏳ Waiting for platform to start..."
+            for i in $(seq 1 8); do
+              if curl -sf http://localhost:3334/api/health > /dev/null 2>&1; then
+                echo "✅ Platform deploy successful!"
+                docker image prune -f
+                exit 0
+              fi
+              echo "  Attempt $i/8 — waiting 5s..."
+              sleep 5
+            done
+
+            echo "❌ Health check failed after 40s"
+            docker compose logs --tail=50 platform
+            exit 1
+
+      - name: Purge Cloudflare cache (openspawn.ai)
+        if: success()
+        run: |
+          curl -sf -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID_OPENSPAWN_DOT_AI }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_PURGE_CACHE_API_TOKEN_OPENSPAWN_DOT_AI }}" \
+            -H "Content-Type: application/json" \
+            -d '{"purge_everything":true}' > /dev/null
+          echo "✅ Cloudflare cache purged (openspawn.ai)"

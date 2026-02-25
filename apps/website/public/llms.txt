@@ -1,0 +1,50 @@
+# BikiniBottom (OpenSpawn)
+
+> BikiniBottom is an open-source multi-agent coordination platform — the control plane for AI agent organizations. Define your org in a single markdown file (ORG.md), coordinate agents via A2A and MCP protocols, and watch them work in a real-time dashboard. Built on OpenClaw. MIT licensed.
+
+BikiniBottom is infrastructure, not a framework. It doesn't replace your agent stack — it coordinates it. Works with CrewAI, LangGraph, AutoGen, or any A2A-compatible agent.
+
+The core concept is **ORG.md** — a markdown file that defines an entire agent organization: hierarchy, roles, domains, reporting chains, culture, policies, and playbooks. Agents read their roles from this file the same way OpenClaw agents read SOUL.md.
+
+The project is at demo stage (February 2026). The live demo at bikinibottom.ai shows 22 SpongeBob-themed AI agents across 5 departments coordinating to deliver 10,000 Krabby Patties.
+
+- **Repo:** github.com/openspawn/openspawn (Nx monorepo, TypeScript)
+- **Stack:** React + TanStack Router (dashboard + website), Node.js sandbox server, Vite
+- **Protocols:** A2A v0.3 (agent discovery), MCP (Streamable HTTP, 7 tools), Model Router (Ollama/Groq/OpenRouter)
+- **CLI:** `npx bikinibottom init my-reef` (zero external dependencies)
+- **Created by:** Adam Dennis (@adamwdennis)
+- **License:** MIT
+
+## Docs
+
+- [Getting Started](https://bikinibottom.ai/docs/getting-started): Installation, setup, and first run
+- [ORG.md Concept](https://bikinibottom.ai/org-md): The org chart your AI agents actually read — defines hierarchy, culture, policies, playbooks in markdown
+- [OpenClaw Quickstart](https://bikinibottom.ai/docs/openclaw): How to use BikiniBottom with OpenClaw agents
+- [A2A Protocol](https://bikinibottom.ai/docs/protocols/a2a): Agent-to-Agent discovery and task management via /.well-known/agent.json
+- [MCP Server](https://bikinibottom.ai/docs/protocols/mcp): 7 tools exposed via POST /mcp (Streamable HTTP, JSON-RPC 2.0)
+- [Model Router](https://bikinibottom.ai/docs/features/model-router): Intelligent routing across Ollama, Groq, and OpenRouter with fallback chains
+- [Dashboard](https://bikinibottom.ai/docs/features/dashboard): Real-time network graph, task timeline, agent details, credits tracking
+
+## Code
+
+- [GitHub Repository](https://github.com/openspawn/openspawn): Full source code, Nx monorepo
+- [Dashboard App](https://github.com/openspawn/openspawn/tree/main/apps/dashboard): React + TanStack Router SPA
+- [Website App](https://github.com/openspawn/openspawn/tree/main/apps/website): Marketing site + docs
+- [Sandbox Server](https://github.com/openspawn/openspawn/tree/main/tools/sandbox): Node.js server — org parser, simulation engine, A2A, MCP, model router
+- [CLI Package](https://github.com/openspawn/openspawn/tree/main/packages/cli): `npx bikinibottom init` scaffolding tool
+- [ORG.md Example](https://github.com/openspawn/openspawn/blob/main/tools/sandbox/org.md): The Krusty Krab — 22 agents, 3 departments, full playbooks
+
+## Architecture
+
+The sandbox server is the brain. It parses ORG.md into an agent hierarchy, runs a tick-based simulation engine, and exposes REST + SSE + A2A + MCP endpoints. The dashboard connects via SSE for real-time updates. The website serves docs and marketing at root, dashboard at /app/.
+
+Key components:
+- **Org Parser** (`org-parser.ts`): Parses ORG.md markdown into typed agent hierarchy using unified/remark
+- **Simulation Engine** (`simulation.ts`, `deterministic.ts`): Tick-based coordination with ACP (Agent Communication Protocol)
+- **Replay Engine** (`replay-engine.ts`): Plays back recorded LLM simulation scenarios for zero-cost demos
+- **LLM Provider** (`llm-provider.ts`): Ollama, Groq, OpenRouter with markdown-based decision prompts
+
+## Optional
+
+- [Live Demo](https://bikinibottom.ai/app/live): 75-second choreographed replay of 22 agents coordinating
+- [Design Strategy Docs](https://github.com/openspawn/openspawn/tree/main/docs/strategy): Agent Communication Protocol, event-driven architecture, scenario engine, competitive analysis

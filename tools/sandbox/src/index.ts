@@ -1,0 +1,212 @@
+#!/usr/bin/env node
+// ── BikiniBottom Agent Sandbox ───────────────────────────────────────────────
+// Runs AI agents in a simulated organization using local Ollama models
+// Supports loading org structure from ORG.md or using hardcoded agents
+
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Load .env from sandbox directory (won't override existing env vars)
+const __filename2 = fileURLToPath(import.meta.url);
+const __sandboxRoot = resolve(dirname(__filename2), '..');
+const envPath = join(__sandboxRoot, '.env');
+if (existsSync(envPath)) {
+  let envCount = 0;
+  for (const line of readFileSync(envPath, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    if (!process.env[key]) { process.env[key] = val; envCount++; }
+  }
+  if (envCount > 0) console.log(`  📋 Loaded ${envCount} vars from ${envPath}`);
+} else {
+  console.log(`  ⚠ No .env file found at ${envPath}`);
+}
+import { createAgents } from './agents.js';
+import { parseOrgMd, type ParsedOrg } from './org-parser.js';
+import { initLLM } from './llm.js';
+import { Simulation } from './simulation.js';
+import { DeterministicSimulation } from './deterministic.js';
+import { startServer } from './server.js';
+import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
+import type { SandboxConfig } from './types.js';
+
+const config: SandboxConfig = {
+  model: process.env.SANDBOX_MODEL || 'qwen3:0.6b',
+  tickIntervalMs: Number(process.env.TICK_INTERVAL) || (process.env.LLM_PROVIDER === 'ollama' ? 2000 : (process.env.GROQ_API_KEY || process.env.OPENROUTER_API_KEY) ? 5000 : 2000),
+  maxTicks: Number(process.env.MAX_TICKS) || 0, // 0 = run forever
+  maxConcurrentInferences: Number(process.env.MAX_CONCURRENT) || 4,
+  contextWindowTokens: 2048,
+  verbose: process.env.VERBOSE !== '0',
+  defaultTrigger: (process.env.DEFAULT_TRIGGER as 'polling' | 'event-driven') || 'polling',
+};
+
+console.log(`
+╔══════════════════════════════════════════╗
+║  🌊 BikiniBottom Agent Sandbox 🌊       ║
+╚══════════════════════════════════════════╝
+`);
+
+console.log(`Config:`);
+console.log(`  Model: ${config.model}`);
+console.log(`  Tick interval: ${config.tickIntervalMs}ms`);
+console.log(`  Max ticks: ${config.maxTicks}`);
+console.log(`  Max concurrent: ${config.maxConcurrentInferences}`);
+console.log(`  Verbose: ${config.verbose}`);
+
+// Init
+await initLLM(config);
+
+// Determine org source
+const cofounderMode = process.env.COFOUNDER === '1' || process.argv.includes('--cofounder');
+const cleanSlate = process.env.CLEAN === '1' || process.argv.includes('--clean') || cofounderMode;
+
+// Check for --org CLI arg or default ORG.md location
+const orgArgIdx = process.argv.indexOf('--org');
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const defaultOrgPath = resolve(__dirname, '..', 'ORG.md');
+const orgPath = orgArgIdx !== -1 && process.argv[orgArgIdx + 1]
+  ? resolve(process.argv[orgArgIdx + 1])
+  : defaultOrgPath;
+
+let parsedOrg: ParsedOrg | undefined;
+let agents;
+
+// Always load ORG.md if it exists — it defines who works here
+if (existsSync(orgPath)) {
+  try {
+    parsedOrg = parseOrgMd(orgPath);
+
+    if (cofounderMode) {
+      // Cofounder mode: just the COO, but ORG.md is the "hiring plan"
+      // Mr. Krabs starts alone and spawns from the roster as needed
+      agents = parsedOrg.agents.filter(a => a.role === 'coo' || a.level >= 9);
+      console.log(`\n🦀 Cofounder mode — Mr. Krabs starts alone`);
+      console.log(`   ${parsedOrg.agents.length} candidates in the hiring plan (ORG.md)`);
+    } else {
+      agents = parsedOrg.agents;
+    }
+
+    console.log(`📄 Loaded org from ORG.md (${agents.length} active agents)`);
+    console.log(`   Org: ${parsedOrg.name}`);
+    if (parsedOrg.culture.preset) console.log(`   Culture: ${parsedOrg.culture.preset}`);
+    if (cleanSlate) console.log(`   🧹 Clean slate — fresh tasks/events`);
+  } catch (err) {
+    console.error(`⚠ Failed to parse ORG.md: ${err instanceof Error ? err.message : String(err)}`);
+    console.log(`📦 Falling back to built-in agents`);
+    agents = createAgents();
+  }
+} else {
+  agents = createAgents();
+  console.log(`\n📦 Using built-in agents (${agents.length} agents)`);
+}
+
+// Load agent configs from org/agents/ directory if it exists
+const orgDir = resolve(__dirname, '..', 'org');
+const agentsConfigDir = join(orgDir, 'agents');
+if (existsSync(agentsConfigDir)) {
+  let customCount = 0;
+  let defaultCount = 0;
+  for (const agent of agents) {
+    const agentConfigDir = join(agentsConfigDir, agent.id);
+    const config = loadAgentConfig(agent.id, orgDir);
+    if (config.soul || config.identity || config.agents) {
+      const prompt = buildSystemPrompt(config);
+      if (prompt) {
+        // Config overrides the generated system prompt prefix but keeps the action instructions
+        const actionIdx = agent.systemPrompt.indexOf('Respond with JSON ONLY.');
+        const actionSuffix = actionIdx !== -1 ? agent.systemPrompt.slice(actionIdx) : '';
+        agent.systemPrompt = prompt + '\n\n' + actionSuffix;
+      }
+      if (existsSync(agentConfigDir)) customCount++;
+      else defaultCount++;
+    }
+  }
+  console.log(`\n📂 Loaded agent configs from org/agents/ (${customCount} custom, ${defaultCount} defaults)`);
+}
+
+console.log(`\n🤖 ${agents.length} agents:`);
+for (const a of agents) {
+  const indent = '  '.repeat(Math.max(0, 3 - Math.floor(a.level / 3)));
+  console.log(`${indent}L${a.level} ${a.name} (${a.id}) — ${a.domain}`);
+}
+
+// Run — deterministic mode by default, LLM/hybrid/record modes available
+const simMode = process.env.SIMULATION_MODE || 'deterministic';
+const useLLM = simMode === 'llm';
+const useHybrid = simMode === 'hybrid' || simMode === 'record';
+const useReplay = simMode === 'replay';
+const replayFile = process.env.REPLAY_FILE; // specific recording file to replay
+
+let sim: DeterministicSimulation | Simulation;
+if (useReplay) {
+  const { ReplaySimulation } = await import('./replay-engine.js');
+  sim = new ReplaySimulation(agents, config, cleanSlate, parsedOrg, replayFile);
+} else if (useHybrid) {
+  const { LLMSimulation } = await import('./llm-simulation.js');
+  // Always record when using LLM — recordings are cheap and useful for comparison
+  sim = new LLMSimulation(agents, config, cleanSlate, parsedOrg, true);
+} else if (useLLM) {
+  sim = new Simulation(agents, config, cleanSlate, parsedOrg);
+} else {
+  sim = new DeterministicSimulation(agents, config, cleanSlate, parsedOrg);
+}
+
+if (!useLLM && !useHybrid && !useReplay) {
+  console.log(`\n🎯 Deterministic mode (set SIMULATION_MODE=replay|hybrid|record|llm for other modes)`);
+}
+
+// Start HTTP API server for dashboard integration
+startServer(sim as any);
+
+// Auto-start scenario — defaults to ai-dev-agency in deterministic mode
+// Set SCENARIO=none to disable, or SCENARIO=<id> to pick a specific one
+const scenarioId = process.env.SCENARIO ?? (useLLM ? 'none' : 'krabby-patties');
+if (scenarioId !== 'none' && !useLLM) {
+  const { ScenarioEngine } = await import('./scenario-engine.js');
+  const { aiDevAgencyScenario } = await import('./scenarios/ai-dev-agency.js');
+  const { krabbyPattiesScenario } = await import('./scenarios/krabby-patties.js');
+
+  const scenarioMap: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
+    'ai-dev-agency': aiDevAgencyScenario,
+    'krabby-patties': krabbyPattiesScenario,
+  };
+
+  const scenarioDef = scenarioMap[scenarioId];
+  if (scenarioDef) {
+    const engine = new ScenarioEngine(scenarioDef);
+    const detSim = sim as DeterministicSimulation;
+
+    // Use scenario's tick interval (overrides default config)
+    if (scenarioDef.meta.tickIntervalMs) {
+      detSim.config = { ...detSim.config, tickIntervalMs: scenarioDef.meta.tickIntervalMs };
+      console.log(`\n⏱️  Tick interval: ${scenarioDef.meta.tickIntervalMs}ms (from scenario)`);
+    }
+
+    detSim.scenarioEngine = engine;
+    engine.attach(detSim);
+    console.log(`🎬 Auto-started scenario: ${scenarioDef.meta.name}`);
+  } else {
+    console.log(`\n⚠️ Unknown scenario: ${scenarioId}. Available: ${Object.keys(scenarioMap).join(', ')}`);
+  }
+}
+
+// Save recording on Ctrl+C / kill
+if (useHybrid && 'saveRecording' in sim) {
+  const save = async () => {
+    console.log('\n⏹️  Stopping simulation...');
+    await (sim as any).saveRecording();
+    process.exit(0);
+  };
+  process.on('SIGINT', save);
+  process.on('SIGTERM', save);
+}
+
+sim.run().catch(err => {
+  console.error('💥 Simulation crashed:', err);
+  process.exit(1);
+});
