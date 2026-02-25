@@ -25,7 +25,9 @@
     "sandbox": "nx run sandbox:serve",
     "sandbox:hybrid": "nx run sandbox:serve:hybrid",
     "sandbox:replay": "nx run sandbox:serve:replay",
-    "sandbox:recordings": "nx run sandbox:recordings"
+    "sandbox:recordings": "nx run sandbox:recordings",
+    "test:e2e": "nx run website:test:e2e",
+    "test:e2e:website": "cd apps/website && LD_LIBRARY_PATH=$HOME/.playwright-libs:$LD_LIBRARY_PATH npx playwright test"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
