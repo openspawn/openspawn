@@ -1,10 +1,78 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+/**
+ * IntroCard — Full-screen intro overlay before the live dashboard.
+ * POLISH PASS: Replaced motion/react with CSS-only animations.
+ * CSS animations only. prefers-reduced-motion: respected via media query.
+ */
+
 import { Play } from 'lucide-react';
 
 interface IntroCardProps {
   onStart: () => void;
 }
+
+// CSS animations injected once
+const INTRO_STYLES = `
+  @keyframes intro-overlay-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes intro-terminal-in {
+    from { opacity: 0; transform: translateX(-32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes intro-copy-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes intro-burger-bounce {
+    0%   { transform: scale(0.5) rotate(-12deg); opacity: 0; }
+    60%  { transform: scale(1.12) rotate(3deg); opacity: 1; }
+    80%  { transform: scale(0.96) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes intro-title-in {
+    from { opacity: 0; transform: translateY(10px); letter-spacing: 0.1em; }
+    to   { opacity: 1; transform: translateY(0); letter-spacing: -0.01em; }
+  }
+  @keyframes intro-btn-in {
+    0%   { opacity: 0; transform: scale(0.85); }
+    60%  { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes intro-cta-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(244,197,66,0.5), 0 0 40px rgba(244,197,66,0.2); }
+    50%       { box-shadow: 0 0 32px rgba(244,197,66,0.75), 0 0 60px rgba(244,197,66,0.35); }
+  }
+
+  .intro-overlay   { animation: intro-overlay-in  0.5s ease forwards; }
+  .intro-terminal  { animation: intro-terminal-in 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+  .intro-copy      { animation: intro-copy-in     0.5s 0.4s ease forwards; opacity: 0; }
+  .intro-burger    { animation: intro-burger-bounce 0.6s 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; opacity: 0; }
+  .intro-title     { animation: intro-title-in    0.5s 0.65s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+  .intro-btn       {
+    animation:
+      intro-btn-in   0.5s 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards,
+      intro-cta-glow 2.5s 1.4s ease-in-out infinite;
+    opacity: 0;
+  }
+  .intro-btn:hover {
+    animation-play-state: paused;
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 0 40px rgba(244,197,66,0.8), 0 0 80px rgba(244,197,66,0.4) !important;
+  }
+  .intro-btn:active {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro-overlay, .intro-terminal, .intro-copy, .intro-burger,
+    .intro-title, .intro-btn {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+`;
 
 const ORG_LINES = [
   '# 🍍 The Krusty Krab',
@@ -76,102 +144,20 @@ function renderLine(line: string) {
   return <span style={{ color: 'rgba(184,228,247,0.45)' }}>{line}</span>;
 }
 
-// ── Typewriter hook: rAF-driven character-by-character reveal ────────────────
-
-function useTypewriter(lines: string[], charDelay = 12, lineDelay = 80) {
-  const [visibleLines, setVisibleLines] = useState<string[]>([]);
-  const [done, setDone] = useState(false);
-  const rafRef = useRef<number>(0);
-  const startRef = useRef<number>(0);
-
-  useEffect(() => {
-    const flat: { lineIdx: number; charIdx: number; time: number }[] = [];
-    let t = 0;
-    for (let l = 0; l < lines.length; l++) {
-      const line = lines[l];
-      if (line.length === 0) {
-        flat.push({ lineIdx: l, charIdx: 0, time: t });
-        t += lineDelay;
-      } else {
-        for (let c = 0; c < line.length; c++) {
-          flat.push({ lineIdx: l, charIdx: c + 1, time: t });
-          t += charDelay;
-        }
-        t += lineDelay;
-      }
-    }
-
-    const totalTime = t;
-
-    const tick = (now: number) => {
-      if (!startRef.current) startRef.current = now;
-      const elapsed = now - startRef.current;
-
-      let lastIdx = -1;
-      for (let i = 0; i < flat.length; i++) {
-        if (flat[i].time <= elapsed) lastIdx = i;
-        else break;
-      }
-
-      if (lastIdx >= 0) {
-        const next = new Array(lines.length).fill('');
-        for (let i = 0; i <= lastIdx; i++) {
-          const entry = flat[i];
-          next[entry.lineIdx] = lines[entry.lineIdx].slice(0, entry.charIdx);
-        }
-        setVisibleLines([...next]);
-      }
-
-      if (elapsed < totalTime) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        setVisibleLines([...lines]);
-        setDone(true);
-      }
-    };
-
-    const timeout = setTimeout(() => {
-      rafRef.current = requestAnimationFrame(tick);
-    }, 400);
-
-    return () => {
-      clearTimeout(timeout);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [lines, charDelay, lineDelay]);
-
-  return { visibleLines, done };
-}
-
 export function IntroCard({ onStart }: IntroCardProps) {
-  const { visibleLines, done } = useTypewriter(ORG_LINES, 12, 60);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [visibleLines]);
-
-  const lastVisibleIdx = visibleLines.reduce((acc, l, i) => (l && l.length > 0 ? i : acc), -1);
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-      style={{ background: 'rgba(3,14,26,0.96)' }}
+    <div
+      className="intro-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{
+        background: 'rgba(3,14,26,0.96)',
+        backdropFilter: 'blur(8px)',
+      }}
     >
+      <style>{INTRO_STYLES}</style>
+
       <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full">
         {/* Left: ORG.md terminal */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
-          className="w-full md:w-[55%] shrink-0"
-        >
+        <div className="intro-terminal w-full md:w-[55%] shrink-0">
           <div
             className="rounded-2xl max-h-[40vh] md:max-h-none overflow-y-auto scrollbar-none"
             style={{
@@ -215,16 +201,12 @@ export function IntroCard({ onStart }: IntroCardProps) {
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Right: Intro copy */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="flex flex-col items-center md:items-start text-center md:text-left"
-        >
-          <div className="text-7xl mb-4">🍔</div>
+        <div className="intro-copy flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="intro-burger text-7xl mb-4">🍔</div>
+
           <div
             className="text-xs uppercase tracking-widest mb-1"
             style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}
@@ -232,7 +214,7 @@ export function IntroCard({ onStart }: IntroCardProps) {
             Operation:
           </div>
           <h1
-            className="font-black mb-6"
+            className="intro-title font-black mb-6"
             style={{
               fontFamily: '"Baloo 2", cursive',
               fontSize: '1.875rem',
@@ -255,32 +237,27 @@ export function IntroCard({ onStart }: IntroCardProps) {
             Watch them coordinate — or collapse.
           </p>
 
-          <motion.button
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
-            whileHover={{ scale: 1.05, boxShadow: '0 0 32px rgba(244,197,66,0.6)' }}
-            whileTap={{ scale: 0.97 }}
+          <button
             onClick={onStart}
-            className="flex items-center gap-3 px-8 py-3.5 rounded-2xl font-black text-lg cursor-pointer"
+            className="intro-btn flex items-center gap-3 px-8 py-3.5 rounded-2xl font-black text-lg cursor-pointer border-none"
             style={{
               background: 'linear-gradient(135deg, #F4C542 0%, #EAB308 100%)',
               color: '#062A45',
               fontFamily: '"Baloo 2", cursive',
-              boxShadow: '0 0 24px rgba(244,197,66,0.4)',
             }}
           >
             <Play className="w-5 h-5" />
             Watch the Story →
-          </motion.button>
+          </button>
+
           <p
             className="text-xs mt-3"
             style={{ color: 'rgba(184,228,247,0.25)', fontFamily: 'Nunito, sans-serif' }}
           >
             Defined in one markdown file.
           </p>
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

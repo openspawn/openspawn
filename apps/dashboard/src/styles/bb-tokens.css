@@ -779,3 +779,371 @@
   background: radial-gradient(ellipse 70% 50% at 70% 60%, rgba(46, 204, 113, 0.05) 0%, transparent 70%);
   animation-delay: -6s;
 }
+
+/* ============================================================
+   POLISH PASS — Enhanced animations for award-worthy feel
+   Added: scroll-reveal, text-wave, hero-reveal, cta-pulse,
+          act-banner-enter, feed-flash, stat-tick,
+          multi-layer caustics, varied kelp, organic bubbles
+   ============================================================ */
+
+/* ── Additional Keyframes ──────────────────────────────────── */
+
+/* Multi-layer caustic variants for depth */
+@keyframes bb-caustic-2 {
+  0%, 100% {
+    opacity: 0.03;
+    transform: scale(1) rotate(0deg) translateX(0);
+  }
+  40% {
+    opacity: 0.06;
+    transform: scale(1.08) rotate(-3deg) translateX(20px);
+  }
+  70% {
+    opacity: 0.04;
+    transform: scale(0.92) rotate(1.5deg) translateX(-10px);
+  }
+}
+
+@keyframes bb-caustic-3 {
+  0%, 100% {
+    opacity: 0.02;
+    transform: scale(1.1) rotate(5deg);
+  }
+  50% {
+    opacity: 0.05;
+    transform: scale(0.9) rotate(-4deg);
+  }
+}
+
+/* Hero text reveal — word slides up one-by-one via stagger classes */
+@keyframes bb-word-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em) skewY(2deg);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
+  }
+}
+
+/* Subtitle reveal */
+@keyframes bb-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CTA glow pulse — irresistible beckoning */
+@keyframes bb-cta-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(244, 197, 66, 0.5),
+      0 0 40px rgba(244, 197, 66, 0.25),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 32px rgba(244, 197, 66, 0.7),
+      0 0 64px rgba(244, 197, 66, 0.35),
+      0 0 90px rgba(244, 197, 66, 0.15),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+}
+
+/* Act banner — dramatic cinematic entrance */
+@keyframes bb-act-enter {
+  0% {
+    opacity: 0;
+    transform: scale(1.04) translateY(-6px);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.99) translateY(1px);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes bb-act-title-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.2) translateY(-4px);
+    letter-spacing: 0.1em;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(0.98);
+    letter-spacing: -0.02em;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Feed escalation — red flash then settle */
+@keyframes bb-feed-flash-red {
+  0%   { background: rgba(255, 71, 87, 0.35); }
+  60%  { background: rgba(255, 71, 87, 0.20); }
+  100% { background: rgba(255, 71, 87, 0.12); }
+}
+
+/* Feed completion — green pulse */
+@keyframes bb-feed-flash-green {
+  0%   { background: rgba(74, 232, 138, 0.25); }
+  60%  { background: rgba(74, 232, 138, 0.15); }
+  100% { background: rgba(74, 232, 138, 0.08); }
+}
+
+/* Stat value change tick — brief sandy flash */
+@keyframes bb-stat-tick {
+  0%   { color: #fff; text-shadow: 0 0 16px rgba(244, 197, 66, 0.9); }
+  40%  { color: #F4C542; text-shadow: 0 0 8px rgba(244, 197, 66, 0.5); }
+  100% { color: #F4C542; text-shadow: none; }
+}
+
+/* Scroll-reveal — items slide up as they enter viewport */
+@keyframes bb-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pill badge shimmer — sparkle on the agent count badge */
+@keyframes bb-pill-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* Kelp sway variants for natural variation */
+@keyframes bb-kelp-sway-gentle {
+  0%, 100% { transform: skewX(0deg) scaleY(1); transform-origin: bottom center; }
+  33%       { transform: skewX(1.5deg) scaleY(1.005); transform-origin: bottom center; }
+  66%       { transform: skewX(-2deg) scaleY(0.998); transform-origin: bottom center; }
+}
+
+@keyframes bb-kelp-sway-strong {
+  0%, 100% { transform: skewX(0deg) scaleY(1); transform-origin: bottom center; }
+  25%       { transform: skewX(5deg) scaleY(1.015); transform-origin: bottom center; }
+  75%       { transform: skewX(-4deg) scaleY(0.985); transform-origin: bottom center; }
+}
+
+@keyframes bb-kelp-sway-medium {
+  0%, 100% { transform: skewX(0deg) scaleY(1); transform-origin: bottom center; }
+  30%       { transform: skewX(3deg) scaleY(1.01); transform-origin: bottom center; }
+  70%       { transform: skewX(-3.5deg) scaleY(0.992); transform-origin: bottom center; }
+}
+
+/* Organic bubble — zigzag drift */
+@keyframes bb-bubble-drift-left {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  5%   { opacity: 0.6; }
+  25%  { transform: translateY(-25vh) translateX(-12px) scale(0.95); opacity: 0.5; }
+  50%  { transform: translateY(-50vh) translateX(6px) scale(0.88); opacity: 0.35; }
+  75%  { transform: translateY(-75vh) translateX(-8px) scale(0.8); opacity: 0.2; }
+  95%  { opacity: 0.05; }
+  100% { transform: translateY(-105vh) translateX(4px) scale(0.65); opacity: 0; }
+}
+
+@keyframes bb-bubble-drift-right {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  5%   { opacity: 0.55; }
+  25%  { transform: translateY(-25vh) translateX(10px) scale(0.93); opacity: 0.45; }
+  50%  { transform: translateY(-50vh) translateX(-5px) scale(0.85); opacity: 0.3; }
+  75%  { transform: translateY(-75vh) translateX(14px) scale(0.75); opacity: 0.15; }
+  95%  { opacity: 0.05; }
+  100% { transform: translateY(-108vh) translateX(-2px) scale(0.6); opacity: 0; }
+}
+
+/* Swim entrance — character parade enters from right */
+@keyframes bb-swim-bob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25%       { transform: translateY(-5px) rotate(-1deg); }
+  75%       { transform: translateY(3px) rotate(1deg); }
+}
+
+/* Completion overlay — stamp entrance */
+@keyframes bb-stamp {
+  0%   { transform: scale(1.4); opacity: 0; }
+  60%  { transform: scale(0.95); opacity: 1; }
+  80%  { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────── */
+
+/* CTA button — irresistible glow pulse */
+.bb-cta-pulse {
+  animation: bb-cta-glow 2.5s ease-in-out infinite;
+}
+
+.bb-cta-pulse:hover {
+  animation-play-state: paused;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 0 40px rgba(244, 197, 66, 0.8),
+    0 0 80px rgba(244, 197, 66, 0.4),
+    0 8px 32px rgba(6, 42, 69, 0.5) !important;
+}
+
+/* Scroll-reveal — applied via JS IntersectionObserver */
+.bb-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bb-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bb-reveal-delay-1 { transition-delay: 0.1s; }
+.bb-reveal-delay-2 { transition-delay: 0.2s; }
+.bb-reveal-delay-3 { transition-delay: 0.3s; }
+.bb-reveal-delay-4 { transition-delay: 0.4s; }
+.bb-reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Hero title words — stagger reveal */
+.bb-hero-word {
+  display: inline-block;
+  opacity: 0;
+  animation: bb-word-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-hero-word:nth-child(1) { animation-delay: 0.2s; }
+.bb-hero-word:nth-child(2) { animation-delay: 0.45s; }
+.bb-hero-word:nth-child(3) { animation-delay: 0.65s; }
+.bb-hero-word:nth-child(4) { animation-delay: 0.82s; }
+.bb-hero-word:nth-child(5) { animation-delay: 0.95s; }
+
+/* Hero subtitle and CTA fade-up */
+.bb-fade-up-1 { opacity: 0; animation: bb-fade-up 0.8s 1.0s ease forwards; }
+.bb-fade-up-2 { opacity: 0; animation: bb-fade-up 0.8s 1.3s ease forwards; }
+.bb-fade-up-3 { opacity: 0; animation: bb-fade-up 0.8s 1.5s ease forwards; }
+.bb-fade-up-4 { opacity: 0; animation: bb-fade-up 0.8s 1.7s ease forwards; }
+
+/* Act banner enter */
+.bb-act-enter {
+  animation: bb-act-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-act-title {
+  animation: bb-act-title-stamp 0.45s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Feed entry animations */
+.bb-feed-entry {
+  animation: bb-fade-up 0.22s ease forwards;
+}
+
+.bb-feed-entry-escalation {
+  animation: bb-feed-flash-red 0.6s ease forwards;
+  border-left: 4px solid #FF4757;
+}
+
+.bb-feed-entry-completion {
+  animation: bb-feed-flash-green 0.5s ease forwards;
+  border-left: 4px solid #4AE88A;
+}
+
+/* Stat value flash when it changes */
+.bb-stat-changed {
+  animation: bb-stat-tick 0.5s ease forwards;
+}
+
+/* Stamp for completion screen */
+.bb-stamp {
+  animation: bb-stamp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Pill shimmer */
+.bb-pill-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 174, 217, 0.1) 0%,
+    rgba(74, 174, 217, 0.25) 40%,
+    rgba(74, 174, 217, 0.1) 80%
+  );
+  background-size: 200% auto;
+  animation: bb-pill-shimmer 3s linear infinite;
+}
+
+/* ── prefers-reduced-motion — respect user preferences ──────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all ambient animations */
+  .bb-bob,
+  .bb-bob-fast,
+  .bb-jitter,
+  .bb-sway,
+  .bb-cta-pulse,
+  .bb-hero-word,
+  .bb-fade-up-1,
+  .bb-fade-up-2,
+  .bb-fade-up-3,
+  .bb-fade-up-4,
+  .bb-reveal,
+  .bb-pill-shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  /* Disable bubble float */
+  .bb-bubble,
+  [style*="bb-bubble-float"],
+  [style*="bb-bubble-drift"] {
+    animation: none !important;
+    opacity: 0.3;
+  }
+
+  /* Disable kelp sway */
+  [style*="bb-kelp-sway"] {
+    animation: none !important;
+  }
+
+  /* Disable character swim */
+  [style*="bb-swim"] {
+    animation: none !important;
+    display: none;
+  }
+
+  /* Keep status badges readable but static */
+  .bb-status-working,
+  .bb-status-busy,
+  .bb-status-overwhelmed {
+    animation: none !important;
+  }
+
+  /* Keep transitions minimal */
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
