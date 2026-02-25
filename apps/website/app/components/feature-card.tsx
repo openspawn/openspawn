@@ -4,11 +4,26 @@ interface FeatureCardProps {
   description: string;
   color: string;
   href?: string;
+  category?: string;
+  categoryColor?: string;
 }
 
-export function FeatureCard({ emoji, title, description, color, href }: FeatureCardProps) {
+export function FeatureCard({
+  emoji,
+  title,
+  description,
+  color,
+  href,
+  category,
+  categoryColor = "text-slate-500 bg-white/5",
+}: FeatureCardProps) {
   const inner = (
     <>
+      {category && (
+        <span className={`mb-3 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${categoryColor}`}>
+          {category}
+        </span>
+      )}
       <div className="mb-3 text-3xl">{emoji}</div>
       <h3 className={`mb-2 text-lg font-semibold ${color}`}>{title}</h3>
       <p className="text-sm leading-relaxed text-slate-400">{description}</p>
