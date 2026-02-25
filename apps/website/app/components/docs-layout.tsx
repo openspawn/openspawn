@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 const sidebar = [
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
+  { label: "How It Works", to: "/docs/how-it-works" },
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
   {
     label: "Tutorials",
@@ -31,6 +32,7 @@ const sidebar = [
 const flatPages = [
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
+  { label: "How It Works", to: "/docs/how-it-works" },
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
   { label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" },
   { label: "A2A Protocol", to: "/docs/protocols/a2a" },
