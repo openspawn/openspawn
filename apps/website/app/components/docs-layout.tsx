@@ -6,6 +6,12 @@ const sidebar = [
   { label: "Getting Started", to: "/docs/getting-started" },
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
   {
+    label: "Tutorials",
+    children: [
+      { label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" },
+    ],
+  },
+  {
     label: "Protocols",
     children: [
       { label: "A2A Protocol", to: "/docs/protocols/a2a" },
@@ -26,6 +32,7 @@ const flatPages = [
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
+  { label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" },
   { label: "A2A Protocol", to: "/docs/protocols/a2a" },
   { label: "MCP Tools", to: "/docs/protocols/mcp" },
   { label: "Dashboard", to: "/docs/features/dashboard" },
