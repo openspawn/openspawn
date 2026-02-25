@@ -103,11 +103,12 @@ interface PoolNodeData extends Record<string, unknown> {
 
 function LiveAgentNode({ data }: NodeProps) {
   const d = data as unknown as LiveNodeData;
+  // BikiniBottom palette — NOT cyan like OpenSpawn
   const statusColors: Record<NodeStatus, string> = {
-    idle: '#22c55e',
-    working: '#22d3ee',
-    busy: '#eab308',
-    overwhelmed: '#ef4444',
+    idle:        '#4AAED9',   // ocean-blue for idle
+    working:     '#F4C542',   // sandy yellow for active — primary brand color
+    busy:        '#FF6B6B',   // coral for swamped
+    overwhelmed: '#FF4757',   // hot coral for crisis
   };
   const ringColor = statusColors[d.status];
   const isActive = d.status !== 'idle';
@@ -145,8 +146,9 @@ function LiveAgentNode({ data }: NodeProps) {
 
       {/* Inner content */}
       <div
-        className="w-full h-full rounded-full flex flex-col items-center justify-center bg-[#0a1628] relative overflow-hidden"
+        className="w-full h-full rounded-full flex flex-col items-center justify-center relative overflow-hidden"
         style={{
+          background: 'radial-gradient(circle at center, #0B3D60, #062A45)',
           animation: getAnimation(),
           animationDelay: getAnimationDelay(),
         }}
@@ -160,7 +162,7 @@ function LiveAgentNode({ data }: NodeProps) {
 
       {/* Name label below */}
       <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
-        <span className="text-[9px] text-white/60 font-medium">{d.name}</span>
+        <span className="text-[9px] font-medium" style={{ color: 'rgba(184,228,247,0.7)', fontFamily: 'Nunito, sans-serif' }}>{d.name}</span>
       </div>
 
       {/* Queue badge */}
@@ -184,20 +186,28 @@ function PoolNode({ data }: NodeProps) {
       <Handle id="top" type="target" position={Position.Top} style={{ opacity: 0, width: 1, height: 1 }} />
 
       {/* Pool container */}
-      <div className="w-full h-full rounded-lg bg-gradient-to-br from-cyan-900/40 to-cyan-950/60 border-2 border-cyan-500/50 shadow-lg shadow-cyan-500/20 flex flex-col items-center justify-center px-3 py-2">
+      <div
+        className="w-full h-full rounded-xl flex flex-col items-center justify-center px-3 py-2"
+        style={{
+          background: 'linear-gradient(135deg, rgba(11,93,138,0.5), rgba(6,42,69,0.7))',
+          border: '2px solid rgba(244,197,66,0.4)',
+          boxShadow: '0 0 16px rgba(244,197,66,0.15)',
+        }}
+      >
         {/* Title */}
-        <div className="text-sm font-semibold text-cyan-300 mb-1">{d.title}</div>
+        <div className="text-sm font-bold mb-1" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>{d.title}</div>
 
         {/* Count */}
-        <div className="text-xs text-white/80 font-medium mb-2">⭐×{d.count} active</div>
+        <div className="text-xs font-medium mb-2" style={{ color: '#B8E4F7', fontFamily: 'Nunito, sans-serif' }}>⭐×{d.count} active</div>
 
         {/* Progress bar */}
-        <div className="w-full h-1.5 bg-black/30 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(74,174,217,0.15)' }}>
           <div
-            className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500 transition-all duration-500 rounded-full"
+            className="h-full transition-all duration-500 rounded-full"
             style={{
               width: `${throughput}%`,
-              boxShadow: '0 0 8px rgba(34, 211, 238, 0.5)',
+              background: 'linear-gradient(90deg, #F4C542, #4AE88A)',
+              boxShadow: '0 0 8px rgba(244, 197, 66, 0.4)',
             }}
           />
         </div>
@@ -224,9 +234,9 @@ function LiveEdge(props: EdgeProps) {
         id={id}
         path={edgePath}
         style={{
-          stroke: isReassigned ? '#22d3ee' : 'rgba(34, 211, 238, 0.15)',
+          stroke: isReassigned ? '#F4C542' : 'rgba(74, 174, 217, 0.18)',
           strokeWidth: isReassigned ? 2.5 : 1.5,
-          filter: isReassigned ? 'drop-shadow(0 0 6px rgba(34, 211, 238, 0.4))' : undefined,
+          filter: isReassigned ? 'drop-shadow(0 0 6px rgba(244, 197, 66, 0.5))' : undefined,
         }}
       />
       {/* Animated particles */}
@@ -408,7 +418,7 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
   }, [fitView]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #062A45 0%, #030E1A 100%)' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
