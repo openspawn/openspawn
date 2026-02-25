@@ -1,67 +1,63 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from '@tanstack/react-router';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, FlaskConical, PlayCircle, Clapperboard } from 'lucide-react';
-import { useTourSafe } from '../components/tour';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { IntroCard } from '../components/live/intro-card';
-import { OrgChartLive, type AgentNodeState, type EdgeAnimation, type ZoomTarget } from '../components/live/org-chart-live';
+import { OrgChartLive, type AgentNodeState, type EdgeAnimation } from '../components/live/org-chart-live';
+import { MobileOrgChart } from '../components/live/MobileOrgChart';
 import { LiveFeed, type FeedMessage } from '../components/live/live-feed';
 import { StatsBar } from '../components/live/stats-bar';
-import { NarrativeAnnotations } from '../components/live/narrative-annotations';
+import { OpenSpawnBadge } from '../components/live/OpenSpawnBadge';
 import { TIMELINE, ACTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
-import { LLM_TIMELINE, LLM_ACTS, LLM_MAX_TICK, LLM_TARGET, LLM_DELIVERED, LLM_METADATA } from '../components/live/replay-data-llm';
 
-// ── Scenario definitions ─────────────────────────────────────────────────────
+// ── Variable tick timing ──────────────────────────────────────────────────────
+//
+// Dramatic pauses fire BEFORE the specified tick (pre-event delay).
+// Act timings:
+//   Act I   (0–10):   400ms — brisk
+//   Act II  (11–40):  500ms — steady; spawn burst (19–26) = 300ms
+//   Act III (41–90):  rising 450 → crisis 350 → dead-stop 600
+//   Act IV  (91–120): 600ms — breathing room
+//   Act V   (121–150):500ms
 
-export type ScenarioId = 'demo' | 'llm-recording';
+const PRE_PAUSE_TICKS: Record<number, number> = {
+  1:   1000,   // Before Plankton's mega-order
+  13:  900,    // Before SpongeBob's first escalation
+  56:  800,    // Before Squidward overwhelmed
+  70:  800,    // Before escalation to Mr. Krabs 🚨
+  92:  900,    // Before Mr. Krabs's decision
+  138: 1500,   // Before final completion
+};
 
-interface ScenarioDef {
-  id: ScenarioId;
-  label: string;
-  timeline: ReplayEvent[];
-  acts: readonly { num: number; name: string; narrative: string }[];
-  maxTick: number;
-  target: number;
-  targetLabel: string;
-  badge?: string;
+function getTickDelay(nextTick: number): number {
+  // Dramatic pre-event pauses override everything
+  if (PRE_PAUSE_TICKS[nextTick] !== undefined) return PRE_PAUSE_TICKS[nextTick];
+
+  // Act I: brisk setup (0–10)
+  if (nextTick <= 10) return 400;
+
+  // Spawn burst: rapid-fire (19–26)
+  if (nextTick >= 19 && nextTick <= 26) return 300;
+
+  // Act II: steady cooking (11–40)
+  if (nextTick <= 40) return 500;
+
+  // Act III rising tension (41–55)
+  if (nextTick <= 55) return 450;
+
+  // Act III crisis peak (56–75): frantic
+  if (nextTick <= 75) return 350;
+
+  // Act III dead stop (76–90): uncomfortable silence
+  if (nextTick <= 90) return 600;
+
+  // Act IV resolution (91–120): breathing room
+  if (nextTick <= 120) return 600;
+
+  // Act V victory (121–150)
+  return 500;
 }
-
-const SCENARIOS: ScenarioDef[] = [
-  { id: 'demo', label: 'Choreographed Demo', timeline: TIMELINE, acts: ACTS, maxTick: 150, target: 10000, targetLabel: 'patties' },
-  { id: 'llm-recording', label: 'Groq LLM Recording', timeline: LLM_TIMELINE, acts: LLM_ACTS, maxTick: LLM_MAX_TICK, target: LLM_TARGET, targetLabel: 'tasks', badge: 'LLM' },
-];
 
 // ── Replay Hook ──────────────────────────────────────────────────────────────
-
-interface ReplayState {
-  tick: number;
-  running: boolean;
-  finished: boolean;
-  act: typeof ACTS[0];
-  stats: Stats;
-  nodeStates: Record<string, AgentNodeState>;
-  edgeAnimations: EdgeAnimation[];
-  reassignedEdges: Array<{ from: string; to: string }>;
-  messages: FeedMessage[];
-  pattiesDelivered: number;
-  zoomTarget: ZoomTarget | null;
-}
-
-// ── Zoom choreography schedule ───────────────────────────────────────────────
-const CHART_CX = 600;
-const CHART_LY = [0, 160, 330, 500];
-
-const ZOOM_SCHEDULE: Array<[number, number, ZoomTarget]> = [
-  [1, 5, { x: CHART_CX, y: CHART_LY[0] + 80, zoom: 1.6 }],
-  [4, 8, { x: CHART_CX - 200, y: CHART_LY[0] + 80, zoom: 1.2 }],
-  [17, 28, { x: CHART_CX - 400, y: CHART_LY[2] + 80, zoom: 1.3, duration: 1200 }],
-  [28, 40, { x: CHART_CX, y: CHART_LY[1] + 80, zoom: 0.85, duration: 1000 }],
-  [42, 55, { x: CHART_CX, y: CHART_LY[1] + 80, zoom: 1.3 }],
-  [68, 78, { x: CHART_CX - 100, y: CHART_LY[0] + 120, zoom: 1.2 }],
-  [91, 100, { x: CHART_CX - 50, y: CHART_LY[1] + 60, zoom: 1.1, duration: 1000 }],
-  [105, 120, { x: CHART_CX, y: CHART_LY[1] + 80, zoom: 0.85, duration: 1200 }],
-  [135, 150, { x: CHART_CX, y: CHART_LY[1] + 60, zoom: 0.8, duration: 1500 }],
-];
 
 const INITIAL_STATS: Stats = {
   kitchenRate: 0, queueSize: 0, deliveryRate: 0,
@@ -69,7 +65,7 @@ const INITIAL_STATS: Stats = {
   pattiesProduced: 0, pattiesDelivered: 0,
 };
 
-function useReplay(scenario: ScenarioDef) {
+function useReplay() {
   const [tick, setTick] = useState(-1);
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -101,7 +97,7 @@ function useReplay(scenario: ScenarioDef) {
 
   // Process events for a given tick
   const processEvents = useCallback((currentTick: number) => {
-    const events = scenario.timeline.filter(e => e.tick === currentTick);
+    const events = TIMELINE.filter((e: ReplayEvent) => e.tick === currentTick);
     let changed = false;
 
     for (const event of events) {
@@ -112,7 +108,7 @@ function useReplay(scenario: ScenarioDef) {
         case 'act_change':
           if (d.act != null) {
             actRef.current = d.act;
-            const actInfo = scenario.acts[d.act];
+            const actInfo = ACTS[d.act];
             if (actInfo) {
               setActBanner({ num: actInfo.num, name: actInfo.name, narrative: actInfo.narrative });
               if (actBannerTimeoutRef.current) clearTimeout(actBannerTimeoutRef.current);
@@ -199,7 +195,7 @@ function useReplay(scenario: ScenarioDef) {
           if (event.type === 'reassign' && d.from && d.to) {
             reassignedRef.current = [
               ...reassignedRef.current,
-              { from: 'squidward-tentacles', to: d.to }, // reassigned agents join Squidward's delivery
+              { from: 'squidward-tentacles', to: d.to },
             ];
           }
           break;
@@ -227,42 +223,37 @@ function useReplay(scenario: ScenarioDef) {
     if (changed) forceUpdate(n => n + 1);
   }, []);
 
-  // Tick interval
+  // Variable-speed tick engine using setTimeout (instead of flat setInterval)
   useEffect(() => {
     if (!running) return;
-    const interval = setInterval(() => {
-      setTick(prev => {
-        const next = prev + 1;
-        if (next > scenario.maxTick) {
-          setRunning(false);
-          setFinished(true);
-          return prev;
-        }
-        return next;
-      });
-    }, 500);
-    return () => clearInterval(interval);
-  }, [running]);
+    if (tick < 0) return;
+
+    const nextTick = tick + 1;
+    if (nextTick > 150) {
+      setRunning(false);
+      setFinished(true);
+      return;
+    }
+
+    const delay = getTickDelay(nextTick);
+    const timer = setTimeout(() => {
+      setTick(nextTick);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [tick, running]);
 
   // Process events when tick changes
   useEffect(() => {
     if (tick >= 0) processEvents(tick);
   }, [tick, processEvents]);
 
-  // Zoom choreography
-  const zoomTarget = useMemo(() => {
-    for (const [start, end, zt] of ZOOM_SCHEDULE) {
-      if (tick >= start && tick < end) return zt;
-    }
-    return null;
-  }, [tick]);
-
   return {
     tick,
     running,
     finished,
     start,
-    act: scenario.acts[actRef.current] || scenario.acts[0],
+    act: ACTS[actRef.current] || ACTS[0],
     stats: statsRef.current,
     nodeStates: nodeStatesRef.current,
     edgeAnimations: edgeAnimsRef.current,
@@ -271,14 +262,13 @@ function useReplay(scenario: ScenarioDef) {
     messages: messagesRef.current,
     pattiesDelivered: statsRef.current.pattiesDelivered,
     actBanner,
-    zoomTarget,
   };
 }
 
 // ── Progress Bar ─────────────────────────────────────────────────────────────
 
-function ProgressHeader({ act, pattiesDelivered, target, targetLabel, badge }: { act: { num: number; name: string; narrative: string }; pattiesDelivered: number; target: number; targetLabel: string; badge?: string }) {
-  const pct = Math.min(100, (pattiesDelivered / target) * 100);
+function ProgressHeader({ act, tick, pattiesDelivered }: { act: typeof ACTS[0]; tick: number; pattiesDelivered: number }) {
+  const pct = Math.min(100, (pattiesDelivered / 10000) * 100);
 
   return (
     <div className="shrink-0 space-y-2 px-4 py-3 border-b" style={{ background: 'rgba(6,42,69,0.9)', borderColor: 'rgba(74,174,217,0.2)', backdropFilter: 'blur(8px)' }}>
@@ -293,59 +283,313 @@ function ProgressHeader({ act, pattiesDelivered, target, targetLabel, badge }: {
         </div>
       </div>
       <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(74,174,217,0.1)' }}>
-        <motion.div
+        <div
           className="absolute inset-y-0 left-0 rounded-full"
-          style={{ background: 'linear-gradient(90deg, #F4C542 0%, #4AE88A 100%)', boxShadow: '0 0 12px rgba(244,197,66,0.4)' }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          style={{
+            background: 'linear-gradient(90deg, #F4C542 0%, #4AE88A 100%)',
+            boxShadow: '0 0 12px rgba(244,197,66,0.4)',
+            width: `${pct}%`,
+            transition: 'width 0.5s ease-out',
+          }}
         />
       </div>
     </div>
   );
 }
 
-// ── Scenario Picker ──────────────────────────────────────────────────────────
+// ── Act Banner CSS animations ─────────────────────────────────────────────────
+const ACT_BANNER_STYLES = `
+  @keyframes act-overlay-in {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to   { opacity: 1; backdrop-filter: blur(8px); }
+  }
+  @keyframes act-label-rise {
+    from { opacity: 0; transform: translateY(8px); letter-spacing: 0.6em; }
+    to   { opacity: 1; transform: translateY(0); letter-spacing: 0.3em; }
+  }
+  @keyframes act-title-stamp {
+    0%   { opacity: 0; transform: scale(1.18) translateY(-6px); letter-spacing: 0.05em; filter: blur(6px); }
+    60%  { opacity: 1; transform: scale(0.98) translateY(1px); letter-spacing: -0.03em; filter: blur(0); }
+    80%  { transform: scale(1.01); }
+    100% { opacity: 1; transform: scale(1); letter-spacing: -0.01em; }
+  }
+  @keyframes act-narrative-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes act-line-expand {
+    from { width: 0; opacity: 0; }
+    to   { width: 80px; opacity: 1; }
+  }
+  @keyframes act-overlay-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
 
-function ScenarioPicker({ current, onChange }: { current: ScenarioId; onChange: (id: ScenarioId) => void }) {
+  @media (prefers-reduced-motion: reduce) {
+    .act-overlay, .act-label, .act-title, .act-narrative, .act-line {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+`;
+
+// ── Act Banner (CSS-only, no motion/react) ───────────────────────────────────
+
+function ActBanner({ banner }: { banner: { num: number; name: string; narrative: string } | null }) {
+  const [visible, setVisible] = useState(false);
+  const [content, setContent] = useState<typeof banner>(null);
+  // Key increments each time a new banner appears → forces re-mount → re-triggers animations
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    if (banner) {
+      setContent(banner);
+      setVisible(true);
+      setAnimKey(k => k + 1);
+    } else {
+      setVisible(false);
+    }
+  }, [banner]);
+
+  if (!content) return null;
+
   return (
-    <div className="flex items-center gap-2">
-      {SCENARIOS.map(s => (
-        <button
-          key={s.id}
-          onClick={() => onChange(s.id)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-            current === s.id
-              ? 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400'
-              : 'bg-white/5 border border-white/10 text-white/40 hover:text-white/60 hover:bg-white/10'
-          }`}
+    <>
+      <style>{ACT_BANNER_STYLES}</style>
+      <div
+        key={`overlay-${animKey}`}
+        className="act-overlay absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none"
+        style={{
+          background: 'rgba(3,14,26,0.75)',
+          opacity: visible ? undefined : 0,
+          transition: visible ? undefined : 'opacity 0.4s ease',
+          animation: visible ? 'act-overlay-in 0.4s ease forwards' : undefined,
+        }}
+      >
+        {/* Decorative top line */}
+        <div
+          key={`line-top-${animKey}`}
+          className="act-line h-px mb-6"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.6), transparent)',
+            animation: 'act-line-expand 0.5s 0.1s ease forwards',
+            width: 0,
+            opacity: 0,
+          }}
+        />
+
+        {/* Act number label */}
+        <div
+          key={`label-${animKey}`}
+          className="act-label text-xs font-bold uppercase mb-2"
+          style={{
+            color: 'rgba(244,197,66,0.7)',
+            fontFamily: 'Nunito, sans-serif',
+            animation: 'act-label-rise 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) forwards',
+            opacity: 0,
+            letterSpacing: '0.3em',
+          }}
         >
-          {s.badge ? <FlaskConical className="w-3 h-3" /> : <PlayCircle className="w-3 h-3" />}
-          {s.label}
-        </button>
-      ))}
-    </div>
+          ── Act {content.num} ──
+        </div>
+
+        {/* Title — cinematic stamp */}
+        <div
+          key={`title-${animKey}`}
+          className="act-title text-2xl md:text-4xl font-black tracking-tight mb-3"
+          style={{
+            color: '#F4C542',
+            fontFamily: '"Baloo 2", cursive',
+            textShadow: '0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2)',
+            animation: 'act-title-stamp 0.55s 0.12s cubic-bezier(0.34,1.56,0.64,1) forwards',
+            opacity: 0,
+          }}
+        >
+          {content.name.replace(/^Act \w+: /, '')}
+        </div>
+
+        {/* Narrative */}
+        <div
+          key={`narrative-${animKey}`}
+          className="act-narrative text-sm max-w-sm text-center px-6"
+          style={{
+            color: 'rgba(184,228,247,0.55)',
+            fontFamily: 'Nunito, sans-serif',
+            animation: 'act-narrative-in 0.5s 0.3s ease forwards',
+            opacity: 0,
+          }}
+        >
+          {content.narrative}
+        </div>
+
+        {/* Decorative bottom line */}
+        <div
+          key={`line-bot-${animKey}`}
+          className="act-line h-px mt-6"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.4), transparent)',
+            animation: 'act-line-expand 0.5s 0.2s ease forwards',
+            width: 0,
+            opacity: 0,
+          }}
+        />
+      </div>
+    </>
   );
 }
 
-// ── Tour Button ──────────────────────────────────────────────────────────────
+// ── Completion Overlay (CSS-only) ────────────────────────────────────────────
 
-function TourButton({ onStartReplay }: { onStartReplay: () => void }) {
-  const tour = useTourSafe();
-  if (!tour) return null;
+const COMPLETION_STYLES = `
+  @keyframes completion-stamp {
+    0%   { transform: scale(1.5); opacity: 0; filter: blur(8px); }
+    55%  { transform: scale(0.94); opacity: 1; filter: blur(0); }
+    75%  { transform: scale(1.03); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes completion-subtitle {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes completion-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes completion-glow-pulse {
+    0%, 100% { text-shadow: 0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2); }
+    50%       { text-shadow: 0 0 60px rgba(244,197,66,0.8), 0 0 120px rgba(244,197,66,0.35); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .completion-stamp, .completion-subtitle, .completion-glow { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+  }
+`;
 
-  const handleClick = () => {
-    onStartReplay();
-    tour.start();
-  };
-
+function CompletionOverlay({ finished, onReplay }: { finished: boolean; onReplay: () => void }) {
   return (
-    <button
-      onClick={handleClick}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-300 hover:from-cyan-500/30 hover:to-purple-500/30 transition-all cursor-pointer"
-    >
-      <Clapperboard className="w-3 h-3" />
-      🎬 Guided Tour
-    </button>
+    <>
+      <style>{COMPLETION_STYLES}</style>
+      <div
+        className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
+        style={{
+          background: 'rgba(3,14,26,0.92)',
+          opacity: finished ? 1 : 0,
+          pointerEvents: finished ? 'auto' : 'none',
+          transition: 'opacity 0.5s ease',
+        }}
+      >
+      <div className="text-center max-w-lg px-8">
+        {/* Stamp entrance for the big number */}
+        <div
+          className="completion-stamp text-6xl md:text-7xl font-black mb-2"
+          style={{
+            fontFamily: '"Baloo 2", cursive',
+            color: '#F4C542',
+            animation: finished ? 'completion-stamp 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards, completion-glow-pulse 3s 1s ease-in-out infinite' : 'none',
+            opacity: finished ? undefined : 0,
+          }}
+        >
+          🍔 10,000
+        </div>
+        <div
+          className="completion-subtitle text-lg font-semibold mb-6"
+          style={{
+            color: '#4AE88A',
+            fontFamily: '"Baloo 2", cursive',
+            animation: finished ? 'completion-subtitle 0.6s 0.35s ease forwards' : 'none',
+            opacity: finished ? undefined : 0,
+          }}
+        >
+          🎉 PATTIES DELIVERED! 🎉
+        </div>
+        <p className="text-lg mb-8" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
+          22 agents. 5 departments. One{' '}
+          <code
+            className="px-1.5 py-0.5 rounded text-sm"
+            style={{ color: '#F4C542', background: 'rgba(244,197,66,0.1)' }}
+          >
+            ORG.md
+          </code>
+          .
+        </p>
+
+        {/* Navigation buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
+            style={{
+              background: 'rgba(244,197,66,0.15)',
+              border: '1px solid rgba(244,197,66,0.4)',
+              color: '#F4C542',
+              fontFamily: 'Nunito, sans-serif',
+            }}
+          >
+            Explore the Dashboard <ArrowRight className="w-4 h-4" />
+          </Link>
+          <a
+            href="/org-md"
+            target="_blank"
+            rel="noopener"
+            className="px-6 py-3 rounded-xl font-medium transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(184,228,247,0.6)',
+              fontFamily: 'Nunito, sans-serif',
+            }}
+          >
+            See the ORG.md →
+          </a>
+          <button
+            onClick={onReplay}
+            className="px-6 py-3 font-medium transition-all cursor-pointer"
+            style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'Nunito, sans-serif', background: 'none', border: 'none' }}
+          >
+            Replay ↻
+          </button>
+        </div>
+
+        {/* OpenSpawn CTA block — upgraded from tiny footnote */}
+        <div
+          className="rounded-2xl p-6 text-left"
+          style={{
+            background: 'rgba(6,42,69,0.8)',
+            border: '1px solid rgba(74,174,217,0.3)',
+          }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl">🪸</span>
+            <span className="text-lg font-black" style={{ color: '#4AAED9', fontFamily: '"Baloo 2", cursive' }}>
+              OpenSpawn
+            </span>
+          </div>
+          <p className="text-sm mb-1" style={{ color: '#B8E4F7', fontFamily: 'Nunito, sans-serif' }}>
+            This entire operation ran on OpenSpawn.
+          </p>
+          <p className="text-sm mb-4" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
+            22 AI agents. 5 departments. One ORG.md file. No engineers babysitting the process.
+          </p>
+          <a
+            href="https://openspawn.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all"
+            style={{
+              background: 'rgba(74,174,217,0.2)',
+              border: '1px solid rgba(74,174,217,0.5)',
+              color: '#4AAED9',
+              fontFamily: 'Nunito, sans-serif',
+            }}
+          >
+            Build your own org → <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
+    </div>
+    </>
   );
 }
 
@@ -355,21 +599,8 @@ export function LiveViewPage() {
   const [showIntro, setShowIntro] = useState(() => {
     return !localStorage.getItem('live-intro-seen');
   });
-  const [scenarioId, setScenarioId] = useState<ScenarioId>(() => {
-    return (localStorage.getItem('live-scenario') as ScenarioId) || 'demo';
-  });
-  const scenario = SCENARIOS.find(s => s.id === scenarioId) || SCENARIOS[0];
-  const replay = useReplay(scenario);
 
-  const handleScenarioChange = useCallback((id: ScenarioId) => {
-    localStorage.setItem('live-scenario', id);
-    setScenarioId(id);
-  }, []);
-
-  // Restart when scenario changes
-  useEffect(() => {
-    if (!showIntro) replay.start();
-  }, [scenarioId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const replay = useReplay();
 
   const handleStart = useCallback(() => {
     localStorage.setItem('live-intro-seen', '1');
@@ -393,63 +624,85 @@ export function LiveViewPage() {
       {/* BikiniBottom ocean background */}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(11,94,138,0.3) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(26,125,181,0.2) 0%, transparent 50%)' }} />
 
+      {/* Ambient caustic light effects — subtle underwater atmosphere */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '50vw', height: '40vh', top: '-5vh', left: '-5vw',
+          background: 'radial-gradient(ellipse, rgba(74,174,217,1) 0%, transparent 70%)',
+          opacity: 0.04,
+          animation: 'bb-caustic 18s ease-in-out infinite',
+        }} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '40vw', height: '30vh', bottom: '10%', right: '-8vw',
+          background: 'radial-gradient(ellipse, rgba(46,204,113,1) 0%, transparent 70%)',
+          opacity: 0.025,
+          animation: 'bb-caustic-2 13s 6s ease-in-out infinite',
+        }} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '35vw', height: '25vh', top: '40%', left: '30%',
+          background: 'radial-gradient(ellipse, rgba(26,125,181,1) 0%, transparent 70%)',
+          opacity: 0.03,
+          animation: 'bb-caustic-3 22s 3s ease-in-out infinite',
+        }} />
+      </div>
+
       {/* Intro overlay */}
-      <AnimatePresence>
-        {showIntro && <IntroCard onStart={handleStart} />}
-      </AnimatePresence>
+      {showIntro && <IntroCard onStart={handleStart} />}
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col h-full">
-        {/* Top: Scenario picker + Progress header */}
-        <div className="shrink-0 flex items-center justify-between px-4 pt-3 pb-1 bg-white/[0.02]">
-          <div className="flex items-center gap-3">
-            <ScenarioPicker current={scenarioId} onChange={handleScenarioChange} />
-            <TourButton onStartReplay={handleStart} />
-          </div>
-          <div className="text-[10px] text-white/20 font-mono">tick {replay.tick}/{scenario.maxTick}</div>
+        {/* Top: Progress header */}
+        <ProgressHeader act={replay.act} tick={replay.tick} pattiesDelivered={replay.pattiesDelivered} />
+
+        {/* Mobile: OpenSpawn badge strip (below header, above org chart) */}
+        <div className="flex md:hidden">
+          <OpenSpawnBadge
+            variant="mobile"
+            spawnedAgents={replay.spawnedAgents}
+            pattiesDelivered={replay.pattiesDelivered}
+            finished={replay.finished}
+          />
         </div>
-        <ProgressHeader act={replay.act} pattiesDelivered={replay.pattiesDelivered} target={scenario.target} targetLabel={scenario.targetLabel} badge={scenario.badge} />
 
         {/* Middle: Org Chart + Feed */}
         <div className="flex-1 min-h-0 flex flex-col md:flex-row">
-          {/* Org Chart - 60% */}
-          <div className="flex-[3] min-h-0 relative">
+          {/* Desktop Org Chart (md+) - 60% */}
+          <div className="hidden md:flex flex-[3] min-h-0 relative">
             <OrgChartLive
               nodeStates={replay.nodeStates}
               edgeAnimations={replay.edgeAnimations}
               reassignedEdges={replay.reassignedEdges}
               spawnedAgents={replay.spawnedAgents}
-              zoomTarget={replay.zoomTarget}
             />
-            {/* Narrative annotations */}
-            <NarrativeAnnotations tick={replay.tick} />
+
+            {/* Desktop OpenSpawn badge — bottom-left of org chart panel */}
+            <OpenSpawnBadge
+              variant="desktop"
+              spawnedAgents={replay.spawnedAgents}
+              pattiesDelivered={replay.pattiesDelivered}
+              finished={replay.finished}
+            />
+
             {/* Act banner overlay */}
-            <AnimatePresence>
-              {replay.actBanner && (
-                <motion.div
-                  key={replay.actBanner.num}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-sm pointer-events-none"
-                  style={{ background: 'rgba(3,14,26,0.7)' }}
-                >
-                  <div className="text-sm uppercase tracking-[0.3em] font-medium mb-1" style={{ color: 'rgba(244,197,66,0.8)', fontFamily: 'Nunito, sans-serif' }}>
-                    Act {replay.actBanner.num}
-                  </div>
-                  <div className="text-2xl md:text-3xl font-black tracking-tight mb-2" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>
-                    {replay.actBanner.name.replace(/^Act \w+: /, '')}
-                  </div>
-                  <div className="text-sm max-w-md text-center" style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}>
-                    {replay.actBanner.narrative}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <ActBanner banner={replay.actBanner} />
           </div>
+
+          {/* Mobile Org Chart (<md) — compact department cards */}
+          <div className="flex md:hidden w-full overflow-y-auto" style={{ maxHeight: '45vh' }}>
+            <MobileOrgChart
+              nodeStates={replay.nodeStates}
+              spawnedAgents={replay.spawnedAgents}
+            />
+          </div>
+
           {/* Live Feed - 40% */}
-          <div className="flex-[2] min-h-0" style={{ borderLeft: '1px solid rgba(74,174,217,0.1)' }}>
+          <div
+            className="flex-[2] min-h-0"
+            style={{ borderLeft: '1px solid rgba(74,174,217,0.1)' }}
+          >
             <LiveFeed messages={replay.messages} />
           </div>
         </div>
@@ -458,75 +711,7 @@ export function LiveViewPage() {
         <StatsBar stats={replay.stats} />
 
         {/* Finished overlay */}
-        <AnimatePresence>
-          {replay.finished && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
-              style={{ background: 'rgba(3,14,26,0.92)' }}
-            >
-              <div className="text-center max-w-lg px-8">
-                <div className="text-6xl md:text-7xl font-black mb-2" style={{ fontFamily: '"Baloo 2", cursive', color: '#F4C542' }}>
-                  🍔 10,000
-                </div>
-                <div className="text-lg font-semibold mb-6" style={{ color: '#4AE88A', fontFamily: '"Baloo 2", cursive' }}>
-                  🎉 PATTIES DELIVERED! 🎉
-                </div>
-                <p className="text-lg mb-8" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
-                  22 agents. 5 departments. One{' '}
-                  <code
-                    className="px-1.5 py-0.5 rounded text-sm"
-                    style={{ color: '#F4C542', background: 'rgba(244,197,66,0.1)' }}
-                  >
-                    ORG.md
-                  </code>
-                  .
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Link
-                    to="/"
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
-                    style={{
-                      background: 'rgba(244,197,66,0.15)',
-                      border: '1px solid rgba(244,197,66,0.4)',
-                      color: '#F4C542',
-                      fontFamily: 'Nunito, sans-serif',
-                    }}
-                  >
-                    Explore the Dashboard <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <a
-                    href="/org-md"
-                    target="_blank"
-                    rel="noopener"
-                    className="px-6 py-3 rounded-xl font-medium transition-all"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: 'rgba(184,228,247,0.6)',
-                      fontFamily: 'Nunito, sans-serif',
-                    }}
-                  >
-                    See the ORG.md →
-                  </a>
-                  <button
-                    onClick={handleReplay}
-                    className="px-6 py-3 font-medium transition-all cursor-pointer"
-                    style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'Nunito, sans-serif' }}
-                  >
-                    Replay ↻
-                  </button>
-                </div>
-                <p className="text-xs mt-8" style={{ color: 'rgba(184,228,247,0.2)', fontFamily: 'Nunito, sans-serif' }}>
-                  Powered by OpenSpawn. Open source.
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <CompletionOverlay finished={replay.finished} onReplay={handleReplay} />
       </div>
     </div>
   );
