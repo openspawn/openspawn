@@ -1,3 +1,7 @@
+import { Badge } from "./badge";
+
+type BadgeColor = "cyan" | "violet" | "amber" | "emerald" | "red" | "slate";
+
 interface FeatureCardProps {
   emoji: string;
   title: string;
@@ -5,6 +9,9 @@ interface FeatureCardProps {
   color: string;
   href?: string;
   category?: string;
+  /** Badge color for the category pill. Replaces the old `categoryColor` class string. */
+  badgeColor?: BadgeColor;
+  /** @deprecated Use `badgeColor` instead */
   categoryColor?: string;
 }
 
@@ -15,14 +22,16 @@ export function FeatureCard({
   color,
   href,
   category,
-  categoryColor = "text-slate-500 bg-white/5",
+  badgeColor = "slate",
 }: FeatureCardProps) {
   const inner = (
     <>
       {category && (
-        <span className={`mb-3 inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${categoryColor}`}>
-          {category}
-        </span>
+        <div className="mb-3">
+          <Badge color={badgeColor} size="sm" uppercase>
+            {category}
+          </Badge>
+        </div>
       )}
       <div className="mb-3 text-3xl">{emoji}</div>
       <h3 className={`mb-2 text-lg font-semibold ${color}`}>{title}</h3>
