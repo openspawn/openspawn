@@ -46,9 +46,9 @@ const STATUS_RING: Record<AgentStatus, string> = {
 
 const ANIM_CLASS: Record<AgentStatus, string> = {
   idle:        'animate-[bb-bob_2.5s_ease-in-out_infinite]',
-  working:     'animate-[bb-bob-fast_1s_ease-in-out_infinite]',
+  working:     'animate-[bb-bob_1s_ease-in-out_infinite]',
   busy:        'animate-[bb-bob_1.2s_ease-in-out_infinite]',
-  overwhelmed: 'animate-[bb-jitter_0.35s_ease-in-out_infinite]',
+  overwhelmed: 'animate-[bb-bob_0.6s_ease-in-out_infinite]',
 };
 
 interface CharacterCardProps {
@@ -85,7 +85,7 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
     >
       {/* Crisis overlay flash */}
       {isCrisis && (
-        <div className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring-coral_1s_ease-in-out_infinite]" />
+        <div className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]" style={{ '--bb-ring-color': 'rgba(255, 71, 87, 0.4)' } as React.CSSProperties} />
       )}
 
       {/* Avatar */}

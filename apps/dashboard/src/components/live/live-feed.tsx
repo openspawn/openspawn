@@ -54,23 +54,50 @@ const TYPE_PREFIX: Record<FeedMessage['type'], string> = {
   message:     '',
 };
 
-// CSS animation class injected once
+// CSS animations — injected once, no motion/react needed
 const FEED_STYLES = `
   @keyframes feed-slide-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-  @keyframes feed-slide-right {
-    from { opacity: 0; transform: translateX(20px); }
-    to   { opacity: 1; transform: translateX(0); }
+  @keyframes feed-slam-right {
+    0%   { opacity: 0; transform: translateX(28px); }
+    60%  { transform: translateX(-3px); }
+    100% { opacity: 1; transform: translateX(0); }
   }
-  @keyframes feed-scale-in {
-    from { opacity: 0; transform: scale(0.9); }
-    to   { opacity: 1; transform: scale(1); }
+  @keyframes feed-pop {
+    0%   { opacity: 0; transform: scale(0.88); }
+    60%  { transform: scale(1.03); }
+    100% { opacity: 1; transform: scale(1); }
   }
-  .feed-entry { animation: feed-slide-in 0.2s ease forwards; }
-  .feed-entry-escalation { animation: feed-slide-right 0.25s ease forwards; }
-  .feed-entry-completion { animation: feed-scale-in 0.3s ease forwards; }
+  @keyframes feed-flash-red {
+    0%   { background: rgba(255,71,87,0.30); }
+    50%  { background: rgba(255,71,87,0.18); }
+    100% { background: rgba(255,71,87,0.12); }
+  }
+  @keyframes feed-flash-green {
+    0%   { background: rgba(74,232,138,0.22); }
+    50%  { background: rgba(74,232,138,0.13); }
+    100% { background: rgba(74,232,138,0.08); }
+  }
+  @keyframes feed-flash-sandy {
+    0%   { background: rgba(244,197,66,0.16); }
+    100% { background: rgba(244,197,66,0.05); }
+  }
+  .feed-entry            { animation: feed-slide-in 0.22s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .feed-entry-escalation { animation: feed-slam-right 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards,
+                                      feed-flash-red 0.7s 0.05s ease forwards; }
+  .feed-entry-completion { animation: feed-pop 0.32s cubic-bezier(0.34,1.56,0.64,1) forwards,
+                                      feed-flash-green 0.6s 0.05s ease forwards; }
+  .feed-entry-reassign   { animation: feed-slide-in 0.22s ease forwards,
+                                      feed-flash-sandy 0.6s 0.05s ease forwards; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feed-entry, .feed-entry-escalation, .feed-entry-completion, .feed-entry-reassign {
+      animation: none !important;
+      opacity: 1;
+    }
+  }
 `;
 
 function FeedEntry({ msg, isMobile }: { msg: FeedMessage; isMobile?: boolean }) {
@@ -78,6 +105,7 @@ function FeedEntry({ msg, isMobile }: { msg: FeedMessage; isMobile?: boolean }) 
   const animClass =
     msg.type === 'escalation' ? 'feed-entry-escalation' :
     msg.type === 'completion'  ? 'feed-entry-completion' :
+    msg.type === 'reassign'    ? 'feed-entry-reassign' :
     'feed-entry';
 
   return (
@@ -86,6 +114,12 @@ function FeedEntry({ msg, isMobile }: { msg: FeedMessage; isMobile?: boolean }) 
       style={{
         background: TYPE_BG[msg.type],
         borderLeft: TYPE_BORDER[msg.type],
+        // Color-coded subtle left border glow on dramatic messages
+        boxShadow: msg.type === 'escalation'
+          ? 'inset 4px 0 8px -4px rgba(255,71,87,0.3)'
+          : msg.type === 'completion'
+          ? 'inset 4px 0 8px -4px rgba(74,232,138,0.25)'
+          : undefined,
       }}
     >
       {agent?.avatarUrl ? (

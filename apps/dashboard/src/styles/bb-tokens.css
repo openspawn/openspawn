@@ -235,43 +235,37 @@
 
 /* ============================================================
    KEYFRAME ANIMATIONS
+   Consolidated: use CSS custom properties for variation.
+   --bb-bob-y: bob distance (default -4px)
+   --bb-sway-angle: kelp sway amplitude (default 3deg)
+   --bb-sway-scale: kelp sway scaleY delta (default 0.01)
+   --bb-ring-color: pulse ring color (default sandy)
+   --bb-caustic-rotate: caustic rotation (default 2deg)
+   --bb-caustic-drift: caustic translateX (default 0px)
+   --bb-enter-y: enter translateY distance (default 12px)
+   --bb-enter-blur: enter blur (default 0px)
+   --bb-enter-skew: enter skewY (default 0deg)
+   --bb-flash-color: feed flash rgb (default coral)
    ============================================================ */
 
 @keyframes bb-bob {
   0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-4px); }
-}
-
-@keyframes bb-bob-fast {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-3px); }
-}
-
-@keyframes bb-jitter {
-  0%, 100% { transform: translateX(0); }
-  20%       { transform: translateX(-2px) rotate(-1deg); }
-  40%       { transform: translateX(2px) rotate(1deg); }
-  60%       { transform: translateX(-1.5px); }
-  80%       { transform: translateX(1.5px); }
+  50%       { transform: translateY(var(--bb-bob-y, -4px)); }
 }
 
 @keyframes bb-bubble-float {
   0% {
-    transform: translateY(0) translateX(0) scale(1);
+    transform: translateY(0) translateX(var(--bb-drift-x1, 0px)) scale(1);
     opacity: 0;
   }
-  5% {
-    opacity: 0.5;
-  }
+  5% { opacity: 0.5; }
   50% {
-    transform: translateY(-50vh) translateX(8px) scale(0.9);
+    transform: translateY(-50vh) translateX(var(--bb-drift-x2, 8px)) scale(0.9);
     opacity: 0.4;
   }
-  95% {
-    opacity: 0.2;
-  }
+  95% { opacity: 0.2; }
   100% {
-    transform: translateY(-100vh) translateX(-4px) scale(0.6);
+    transform: translateY(-100vh) translateX(var(--bb-drift-x3, -4px)) scale(0.6);
     opacity: 0;
   }
 }
@@ -282,11 +276,11 @@
     transform-origin: bottom center;
   }
   25% {
-    transform: skewX(3deg) scaleY(1.01);
+    transform: skewX(var(--bb-sway-angle, 3deg)) scaleY(calc(1 + var(--bb-sway-scale, 0.01)));
     transform-origin: bottom center;
   }
   75% {
-    transform: skewX(-3deg) scaleY(0.99);
+    transform: skewX(calc(-1 * var(--bb-sway-angle, 3deg))) scaleY(calc(1 - var(--bb-sway-scale, 0.01)));
     transform-origin: bottom center;
   }
 }
@@ -298,32 +292,22 @@
 
 @keyframes bb-caustic {
   0%, 100% {
-    opacity: 0.04;
-    transform: scale(1) rotate(0deg);
+    opacity: var(--bb-caustic-min, 0.04);
+    transform: scale(1) rotate(0deg) translateX(0px);
   }
   33% {
-    opacity: 0.07;
-    transform: scale(1.1) rotate(2deg);
+    opacity: var(--bb-caustic-max, 0.07);
+    transform: scale(1.1) rotate(var(--bb-caustic-rotate, 2deg)) translateX(var(--bb-caustic-drift, 0px));
   }
   66% {
-    opacity: 0.05;
-    transform: scale(0.95) rotate(-1deg);
+    opacity: calc((var(--bb-caustic-min, 0.04) + var(--bb-caustic-max, 0.07)) / 2);
+    transform: scale(0.95) rotate(calc(-0.5 * var(--bb-caustic-rotate, 2deg))) translateX(calc(-0.5 * var(--bb-caustic-drift, 0px)));
   }
 }
 
 @keyframes bb-pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0px rgba(244, 197, 66, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(244, 197, 66, 0); }
-}
-
-@keyframes bb-pulse-ring-coral {
-  0%, 100% { box-shadow: 0 0 0 0px rgba(255, 71, 87, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(255, 71, 87, 0); }
-}
-
-@keyframes bb-pulse-ring-kelp {
-  0%, 100% { box-shadow: 0 0 0 0px rgba(74, 232, 138, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(74, 232, 138, 0); }
+  0%, 100% { box-shadow: 0 0 0 0px var(--bb-ring-color, rgba(244, 197, 66, 0.4)); }
+  50%       { box-shadow: 0 0 0 8px transparent; }
 }
 
 @keyframes bb-shimmer {
@@ -334,18 +318,20 @@
 @keyframes bb-enter-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(var(--bb-enter-y, 12px)) skewY(var(--bb-enter-skew, 0deg));
+    filter: blur(var(--bb-enter-blur, 0px));
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
   }
 }
 
 @keyframes bb-enter-scale {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(var(--bb-enter-from-scale, 0.92));
   }
   to {
     opacity: 1;
@@ -353,20 +339,71 @@
   }
 }
 
+@keyframes bb-cta-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(244, 197, 66, 0.5),
+      0 0 40px rgba(244, 197, 66, 0.25),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 32px rgba(244, 197, 66, 0.7),
+      0 0 64px rgba(244, 197, 66, 0.35),
+      0 0 90px rgba(244, 197, 66, 0.15),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+}
+
+@keyframes bb-act-enter {
+  0% {
+    opacity: 0;
+    transform: scale(1.04) translateY(-6px);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.99) translateY(1px);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes bb-feed-flash {
+  0%   { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.35); }
+  60%  { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.20); }
+  100% { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.12); }
+}
+
+@keyframes bb-stat-tick {
+  0%   { color: #fff; text-shadow: 0 0 16px rgba(244, 197, 66, 0.9); }
+  40%  { color: #F4C542; text-shadow: 0 0 8px rgba(244, 197, 66, 0.5); }
+  100% { color: #F4C542; text-shadow: none; }
+}
+
+@keyframes bb-swim-bob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25%       { transform: translateY(-5px) rotate(-1deg); }
+  75%       { transform: translateY(3px) rotate(1deg); }
+}
+
 /* ============================================================
    ANIMATION UTILITIES
    ============================================================ */
 
-.bb-bob         { animation: bb-bob var(--bb-duration-bob) var(--bb-ease-float) infinite; }
-.bb-bob-fast    { animation: bb-bob-fast 1s var(--bb-ease-float) infinite; }
-.bb-jitter      { animation: bb-jitter 0.4s var(--bb-ease-wave) infinite; }
-.bb-sway        { animation: bb-kelp-sway var(--bb-duration-kelp) var(--bb-ease-float) infinite; }
+.bb-bob         { animation: bb-bob var(--bb-duration-bob) var(--bb-ease-float) infinite; will-change: transform; }
+.bb-bob-fast    { --bb-bob-y: -3px; animation: bb-bob 1s var(--bb-ease-float) infinite; will-change: transform; }
+.bb-sway        { animation: bb-kelp-sway var(--bb-duration-kelp) var(--bb-ease-float) infinite; will-change: transform; }
 
 /* Status-based animation helpers */
-[data-status="working"]     { animation: bb-bob-fast 1s ease-in-out infinite; }
-[data-status="overwhelmed"] { animation: bb-jitter 0.35s ease-in-out infinite; }
+[data-status="working"]     { --bb-bob-y: -3px; animation: bb-bob 1s ease-in-out infinite; }
+[data-status="overwhelmed"] { --bb-bob-y: -2px; animation: bb-bob 0.6s ease-in-out infinite; }
 [data-status="idle"]        { animation: bb-bob 2.5s ease-in-out infinite; }
-[data-status="busy"]        { animation: bb-bob 1.2s ease-in-out infinite; }
+[data-status="busy"]        { --bb-bob-y: -3px; animation: bb-bob 1.2s ease-in-out infinite; }
 
 /* ============================================================
    COMPONENT TOKENS: CHARACTER CARDS
@@ -444,18 +481,21 @@
   background: rgba(244, 197, 66, 0.15);
   color: var(--bb-sandy-400);
   border: 1px solid rgba(244, 197, 66, 0.3);
+  --bb-ring-color: rgba(244, 197, 66, 0.4);
   animation: bb-pulse-ring 2s ease-in-out infinite;
 }
 .bb-status-working::before {
   background: var(--bb-sandy-400);
-  animation: bb-bob-fast 0.8s ease-in-out infinite;
+  --bb-bob-y: -3px;
+  animation: bb-bob 0.8s ease-in-out infinite;
 }
 
 .bb-status-busy {
   background: rgba(255, 107, 107, 0.15);
   color: var(--bb-coral-400);
   border: 1px solid rgba(255, 107, 107, 0.3);
-  animation: bb-pulse-ring-coral 1.5s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
 }
 .bb-status-busy::before {
   background: var(--bb-coral-400);
@@ -465,11 +505,13 @@
   background: rgba(255, 71, 87, 0.2);
   color: var(--bb-coral-500);
   border: 1px solid rgba(255, 71, 87, 0.4);
-  animation: bb-jitter 0.4s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1s ease-in-out infinite;
 }
 .bb-status-overwhelmed::before {
   background: var(--bb-coral-500);
-  animation: bb-pulse-ring-coral 0.8s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 0.8s ease-in-out infinite;
 }
 
 /* ============================================================
@@ -618,19 +660,22 @@
 .bb-agent-ring[data-status="working"] {
   border-color: var(--bb-sandy-400);
   box-shadow: var(--bb-glow-sandy);
+  --bb-ring-color: rgba(244, 197, 66, 0.4);
   animation: bb-pulse-ring 2s ease-in-out infinite;
 }
 
 .bb-agent-ring[data-status="busy"] {
   border-color: var(--bb-coral-400);
   box-shadow: var(--bb-glow-coral);
-  animation: bb-pulse-ring-coral 1.5s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
 }
 
 .bb-agent-ring[data-status="overwhelmed"] {
   border-color: var(--bb-coral-500);
   box-shadow: var(--bb-glow-coral);
-  animation: bb-pulse-ring-coral 0.8s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 0.8s ease-in-out infinite;
 }
 
 .bb-agent-ring[data-status="idle"] {
@@ -711,7 +756,8 @@
 
 .bb-stat-crisis .bb-stat-value {
   color: var(--bb-coral-400);
-  animation: bb-jitter 0.5s ease-in-out infinite;
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
 }
 
 /* ============================================================
@@ -778,4 +824,174 @@
 .bb-caustics::after {
   background: radial-gradient(ellipse 70% 50% at 70% 60%, rgba(46, 204, 113, 0.05) 0%, transparent 70%);
   animation-delay: -6s;
+}
+
+/* ============================================================
+   POLISH PASS — Utility classes for consolidated keyframes
+   Caustic/kelp/bubble variations use CSS custom properties
+   on the consolidated keyframes above.
+   ============================================================ */
+
+/* ── Utility Classes ─────────────────────────────────────────── */
+
+/* CTA button — irresistible glow pulse */
+.bb-cta-pulse {
+  animation: bb-cta-glow 2.5s ease-in-out infinite;
+}
+
+.bb-cta-pulse:hover {
+  animation-play-state: paused;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 0 40px rgba(244, 197, 66, 0.8),
+    0 0 80px rgba(244, 197, 66, 0.4),
+    0 8px 32px rgba(6, 42, 69, 0.5) !important;
+}
+
+/* Scroll-reveal — applied via JS IntersectionObserver */
+.bb-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bb-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bb-reveal-delay-1 { transition-delay: 0.1s; }
+.bb-reveal-delay-2 { transition-delay: 0.2s; }
+.bb-reveal-delay-3 { transition-delay: 0.3s; }
+.bb-reveal-delay-4 { transition-delay: 0.4s; }
+.bb-reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Hero title words — stagger reveal */
+.bb-hero-word {
+  display: inline-block;
+  opacity: 0;
+  --bb-enter-y: 0.5em;
+  --bb-enter-skew: 2deg;
+  --bb-enter-blur: 4px;
+  animation: bb-enter-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-hero-word:nth-child(1) { animation-delay: 0.2s; }
+.bb-hero-word:nth-child(2) { animation-delay: 0.45s; }
+.bb-hero-word:nth-child(3) { animation-delay: 0.65s; }
+.bb-hero-word:nth-child(4) { animation-delay: 0.82s; }
+.bb-hero-word:nth-child(5) { animation-delay: 0.95s; }
+
+/* Hero subtitle and CTA fade-up */
+.bb-fade-up-1 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.0s ease forwards; }
+.bb-fade-up-2 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.3s ease forwards; }
+.bb-fade-up-3 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.5s ease forwards; }
+.bb-fade-up-4 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.7s ease forwards; }
+
+/* Act banner enter */
+.bb-act-enter {
+  animation: bb-act-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-act-title {
+  --bb-enter-from-scale: 1.2;
+  animation: bb-enter-scale 0.45s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Feed entry animations */
+.bb-feed-entry {
+  --bb-enter-y: 8px;
+  animation: bb-enter-up 0.22s ease forwards;
+}
+
+.bb-feed-entry-escalation {
+  --bb-flash-r: 255; --bb-flash-g: 71; --bb-flash-b: 87;
+  animation: bb-feed-flash 0.6s ease forwards;
+  border-left: 4px solid #FF4757;
+}
+
+.bb-feed-entry-completion {
+  --bb-flash-r: 74; --bb-flash-g: 232; --bb-flash-b: 138;
+  animation: bb-feed-flash 0.5s ease forwards;
+  border-left: 4px solid #4AE88A;
+}
+
+/* Stat value flash when it changes */
+.bb-stat-changed {
+  animation: bb-stat-tick 0.5s ease forwards;
+}
+
+/* Stamp for completion screen */
+.bb-stamp {
+  --bb-enter-from-scale: 1.4;
+  animation: bb-enter-scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Pill shimmer */
+.bb-pill-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 174, 217, 0.1) 0%,
+    rgba(74, 174, 217, 0.25) 40%,
+    rgba(74, 174, 217, 0.1) 80%
+  );
+  background-size: 200% auto;
+  animation: bb-shimmer 3s linear infinite;
+}
+
+/* ── prefers-reduced-motion — respect user preferences ──────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all ambient animations */
+  .bb-bob,
+  .bb-bob-fast,
+  .bb-sway,
+  .bb-cta-pulse,
+  .bb-hero-word,
+  .bb-fade-up-1,
+  .bb-fade-up-2,
+  .bb-fade-up-3,
+  .bb-fade-up-4,
+  .bb-reveal,
+  .bb-pill-shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  /* Disable bubble float */
+  .bb-bubble,
+  [style*="bb-bubble-float"] {
+    animation: none !important;
+    opacity: 0.3;
+  }
+
+  /* Disable kelp sway */
+  [style*="bb-kelp-sway"] {
+    animation: none !important;
+  }
+
+  /* Disable character swim */
+  [style*="bb-swim"] {
+    animation: none !important;
+    display: none;
+  }
+
+  /* Keep status badges readable but static */
+  .bb-status-working,
+  .bb-status-busy,
+  .bb-status-overwhelmed {
+    animation: none !important;
+  }
+
+  /* Keep transitions minimal */
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
