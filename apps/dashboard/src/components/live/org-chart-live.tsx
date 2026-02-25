@@ -429,7 +429,6 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
         nodesConnectable={false}
         panOnDrag={false}
         zoomOnScroll={false}
-        zoomOnPinch={false}
         zoomOnDoubleClick={false}
         preventScrolling={false}
         proOptions={{ hideAttribution: true }}
