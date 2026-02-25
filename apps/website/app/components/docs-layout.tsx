@@ -13,6 +13,19 @@ const sidebar = [
     ],
   },
   {
+    label: "Guides",
+    children: [
+      { label: "Connecting Real Agents", to: "/docs/guides/connecting-agents" },
+      { label: "Dashboard Guide", to: "/docs/guides/dashboard-guide" },
+    ],
+  },
+  {
+    label: "Concepts",
+    children: [
+      { label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" },
+    ],
+  },
+  {
     label: "Protocols",
     children: [
       { label: "A2A Protocol", to: "/docs/protocols/a2a" },
@@ -35,6 +48,9 @@ const flatPages = [
   { label: "How It Works", to: "/docs/how-it-works" },
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
   { label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" },
+  { label: "Connecting Real Agents", to: "/docs/guides/connecting-agents" },
+  { label: "Dashboard Guide", to: "/docs/guides/dashboard-guide" },
+  { label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" },
   { label: "A2A Protocol", to: "/docs/protocols/a2a" },
   { label: "MCP Tools", to: "/docs/protocols/mcp" },
   { label: "Dashboard", to: "/docs/features/dashboard" },

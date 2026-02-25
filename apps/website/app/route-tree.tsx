@@ -12,6 +12,9 @@ import { OrgMdPage } from "./routes/org-md";
 import { TemplatesPage } from "./routes/templates";
 import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
 import { HowItWorks } from "./routes/docs/how-it-works";
+import { ConnectingAgents } from "./routes/docs/guides/connecting-agents";
+import { DashboardGuide } from "./routes/docs/guides/dashboard-guide";
+import { AcpVsA2A } from "./routes/docs/concepts/acp-vs-a2a";
 import { NotFoundPage } from "./routes/not-found";
 
 const rootRoute = createRootRoute({
@@ -84,12 +87,33 @@ const yourFirstOrgMdRoute = createRoute({
   component: YourFirstOrgMd,
 });
 
+const connectingAgentsRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/guides/connecting-agents",
+  component: ConnectingAgents,
+});
+
+const dashboardGuideRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/guides/dashboard-guide",
+  component: DashboardGuide,
+});
+
+const acpVsA2ARoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/concepts/acp-vs-a2a",
+  component: AcpVsA2A,
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
   howItWorksRoute,
   openclawQuickstartRoute,
   yourFirstOrgMdRoute,
+  connectingAgentsRoute,
+  dashboardGuideRoute,
+  acpVsA2ARoute,
   a2aRoute,
   mcpRoute,
   dashboardRoute,

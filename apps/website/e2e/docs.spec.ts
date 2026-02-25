@@ -7,6 +7,9 @@ const SIDEBAR_LINKS = [
   { label: "How It Works", href: "/docs/how-it-works" },
   { label: "OpenClaw Integration", href: "/docs/openclaw" },
   { label: "Your First ORG.md", href: "/docs/tutorials/your-first-org-md" },
+  { label: "Connecting Real Agents", href: "/docs/guides/connecting-agents" },
+  { label: "Dashboard Guide", href: "/docs/guides/dashboard-guide" },
+  { label: "ACP vs A2A", href: "/docs/concepts/acp-vs-a2a" },
   { label: "A2A Protocol", href: "/docs/protocols/a2a" },
   { label: "MCP Tools", href: "/docs/protocols/mcp" },
   { label: "Dashboard", href: "/docs/features/dashboard" },
@@ -112,6 +115,96 @@ test.describe("Docs — Your First ORG.md tutorial", () => {
   test("has prev/next navigation", async ({ page }) => {
     await expect(page.getByText("← Previous")).toBeVisible();
     // May or may not have next, but should have prev
+  });
+});
+
+test.describe("Docs — Connecting Real Agents page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/docs/guides/connecting-agents");
+    await page.waitForSelector("h1");
+  });
+
+  test("loads and has content", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { name: "Connecting Real Agents", level: 1 })
+    ).toBeVisible();
+
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText.length).toBeGreaterThan(500);
+  });
+
+  test("sidebar nav renders with all expected links", async ({ page }) => {
+    const sidebar = page.locator("aside");
+    await expect(sidebar).toBeVisible();
+
+    for (const { label } of SIDEBAR_LINKS) {
+      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+    }
+  });
+
+  test("has prev/next navigation", async ({ page }) => {
+    await expect(page.getByText("← Previous")).toBeVisible();
+    await expect(page.getByText("Next →")).toBeVisible();
+  });
+});
+
+test.describe("Docs — Dashboard Guide page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/docs/guides/dashboard-guide");
+    await page.waitForSelector("h1");
+  });
+
+  test("loads and has content", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { name: "Dashboard Guide", level: 1 })
+    ).toBeVisible();
+
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText.length).toBeGreaterThan(500);
+  });
+
+  test("sidebar nav renders with all expected links", async ({ page }) => {
+    const sidebar = page.locator("aside");
+    await expect(sidebar).toBeVisible();
+
+    for (const { label } of SIDEBAR_LINKS) {
+      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+    }
+  });
+
+  test("has prev/next navigation", async ({ page }) => {
+    await expect(page.getByText("← Previous")).toBeVisible();
+    await expect(page.getByText("Next →")).toBeVisible();
+  });
+});
+
+test.describe("Docs — ACP vs A2A page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/docs/concepts/acp-vs-a2a");
+    await page.waitForSelector("h1");
+  });
+
+  test("loads and has content", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { name: "ACP vs A2A", level: 1 })
+    ).toBeVisible();
+
+    const bodyText = await page.evaluate(() => document.body.innerText.trim());
+    expect(bodyText.length).toBeGreaterThan(500);
+  });
+
+  test("sidebar nav renders with all expected links", async ({ page }) => {
+    const sidebar = page.locator("aside");
+    await expect(sidebar).toBeVisible();
+
+    for (const { label } of SIDEBAR_LINKS) {
+      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+    }
+  });
+
+  test("has prev/next navigation", async ({ page }) => {
+    await expect(page.getByText("← Previous")).toBeVisible();
+    await expect(page.getByText("Next →")).toBeVisible();
   });
 });
 
