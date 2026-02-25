@@ -1,4 +1,5 @@
 import { DocsLayout, CodeBlock } from "../../components/docs-layout";
+import { Callout } from "../../components/callout";
 import { Link } from "@tanstack/react-router";
 import { useTitle } from "../../hooks/use-title";
 
@@ -11,9 +12,9 @@ export function OpenClawQuickstart() {
         You have agents. Give them an organization. 5-minute guide.
       </p>
 
-      <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
+      <Callout className="mb-8">
         🦞 Already running OpenClaw with multiple agents? This guide shows you how to add organizational structure without changing your existing setup.
-      </div>
+      </Callout>
 
       {/* Section 1 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What you have</h2>
@@ -43,7 +44,7 @@ export function OpenClawQuickstart() {
       {/* Section 2 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What OpenSpawn adds</h2>
       <p className="mb-4 text-slate-400">
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code> defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies.
+        <code className="inline-code">ORG.md</code> defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies.
       </p>
       <CodeBlock title="ORG.md">{`# 🍍 BikiniBottom Inc.
 > Mission: Ship fast, stay weird, protect the reef.
@@ -77,7 +78,7 @@ cp ORG.md ~/.openclaw/workspace-spongebob/
 cp ORG.md ~/.openclaw/workspace-squidward/`}</CodeBlock>
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">2. Tell agents to read ORG.md</h3>
-      <p className="mb-4 text-slate-400">Add to each agent's <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">AGENTS.md</code>:</p>
+      <p className="mb-4 text-slate-400">Add to each agent's <code className="inline-code">AGENTS.md</code>:</p>
       <CodeBlock title="AGENTS.md">{`## Organization
 Read \`ORG.md\` at the start of every session. It defines:
 - Your role and level in the org
@@ -114,10 +115,9 @@ Treat ORG.md as authoritative for organizational decisions.`}</CodeBlock>
         <li><a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">OpenClaw Documentation</a> — OpenClaw docs & guides</li>
       </ul>
 
-      {/* Callout */}
-      <div className="mt-10 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
+      <Callout className="mt-10">
         OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. OpenSpawn adds the organizational layer that makes multi-agent coordination actually work.
-      </div>
+      </Callout>
     </DocsLayout>
   );
 }

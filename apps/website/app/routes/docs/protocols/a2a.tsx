@@ -15,7 +15,7 @@ export function A2AProtocol() {
       </div>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Agent Discovery</h2>
-      <p className="mb-4 text-slate-400">Every OpenSpawn instance publishes an Agent Card at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/.well-known/agent.json</code>:</p>
+      <p className="mb-4 text-slate-400">Every OpenSpawn instance publishes an Agent Card at <code className="inline-code">/.well-known/agent.json</code>:</p>
       <CodeBlock title="bash">{`curl https://bikinibottom.ai/.well-known/agent.json`}</CodeBlock>
       <CodeBlock title="Response">{`{
   "name": "OpenSpawn HQ",
@@ -31,7 +31,7 @@ export function A2AProtocol() {
 }`}</CodeBlock>
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Per-agent cards</h3>
-      <p className="mb-4 text-slate-400">Each agent has its own card at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/a2a/agents/:id/agent.json</code>.</p>
+      <p className="mb-4 text-slate-400">Each agent has its own card at <code className="inline-code">/a2a/agents/:id/agent.json</code>.</p>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Sending Tasks</h2>
       <CodeBlock title="bash">{`curl -X POST https://bikinibottom.ai/a2a/message/send \\
@@ -44,7 +44,7 @@ export function A2AProtocol() {
   }'`}</CodeBlock>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Streaming</h2>
-      <p className="mb-4 text-slate-400">Use <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/a2a/message/stream</code> for SSE streaming of task progress and results.</p>
+      <p className="mb-4 text-slate-400">Use <code className="inline-code">/a2a/message/stream</code> for SSE streaming of task progress and results.</p>
       <CodeBlock title="bash">{`curl -N -X POST https://bikinibottom.ai/a2a/message/stream \\
   -H 'Content-Type: application/json' \\
   -d '{"message":{"role":"user","parts":[{"kind":"text","text":"Design a landing page"}]}}'`}</CodeBlock>
