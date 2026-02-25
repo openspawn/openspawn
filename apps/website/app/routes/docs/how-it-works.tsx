@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { DocsLayout, CodeBlock } from "../../components/docs-layout";
+import { ArchDiagram } from "../../components/arch-diagram";
 import { useTitle } from "../../hooks/use-title";
 
 export function HowItWorks() {
@@ -284,45 +285,7 @@ COO sends final completion to Human`}</CodeBlock>
       {/* Architecture Diagram */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Architecture at a Glance</h2>
       <p className="mb-4 text-slate-400">Here's how the pieces fit together:</p>
-      <div className="terminal my-4">
-        <pre className="overflow-x-auto p-4 text-sm leading-relaxed text-slate-300 font-mono whitespace-pre">{`┌─────────────────────────────────────────────────────┐
-│                     ORG.md                          │
-│   (agents · hierarchy · models · policies · nodes)  │
-└────────────────────────┬────────────────────────────┘
-                         │ defines
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│              OpenSpawn Runtime                      │
-│                                                     │
-│  ┌───────────┐   ┌──────────────┐   ┌───────────┐  │
-│  │ Simulation│   │     ACP      │   │  Model    │  │
-│  │  Engine   │   │  Message Bus │   │  Router   │  │
-│  │ (tick/    │   │ (ack·prog·   │   │ (Opus /   │  │
-│  │  events)  │   │  esc·done)   │   │  Sonnet / │  │
-│  └─────┬─────┘   └──────┬───────┘   │  Haiku /  │  │
-│        │                │           │  Ollama)  │  │
-│        └────────────────┘           └───────────┘  │
-└────────────┬──────────────────────────────┬─────────┘
-             │                              │
-             ▼                              ▼
-┌────────────────────────┐   ┌─────────────────────────┐
-│   Live Dashboard       │   │   Nodes (Real World)    │
-│                        │   │                         │
-│  · Org chart           │   │  📱 Phone camera        │
-│  · Task board          │   │  🖥️  Desktop screen     │
-│  · Message stream      │   │  📍 GPS location        │
-│  · Cost tracker        │   │  🔔 Notifications       │
-│  · Metrics             │   │  💻 Shell commands      │
-└────────────────────────┘   └─────────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────────────────┐
-│              External Protocols                     │
-│                                                     │
-│  A2A (Agent-to-Agent)  ·  MCP (Tool Server)        │
-│  LangGraph · CrewAI · Claude Desktop · AutoGen     │
-└─────────────────────────────────────────────────────┘`}</pre>
-      </div>
+      <ArchDiagram className="my-6" />
       <p className="mb-4 text-slate-400">
         <strong className="text-slate-200">The request lifecycle in one sentence:</strong> A task enters the org at
         the top → cascades down through delegation → each agent wakes (by tick or event), decides an action, and
