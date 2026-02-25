@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
+import { Play } from 'lucide-react';
 
 interface IntroCardProps {
   onStart: () => void;
@@ -35,18 +36,22 @@ const ORG_LINES = [
 ];
 
 function renderLine(line: string) {
-  if (line.startsWith('#### ')) return <span className="text-cyan-400 font-bold">{line.slice(5)}</span>;
-  if (line.startsWith('### ')) return <span className="text-cyan-400 font-bold text-[15px]">{line.slice(4)}</span>;
-  if (line.startsWith('## ')) return <span className="text-cyan-400 font-bold text-base">{line.slice(3)}</span>;
-  if (line.startsWith('# ')) return <span className="text-cyan-400 font-bold text-lg">{line.slice(2)}</span>;
+  if (line.startsWith('#### '))
+    return <span style={{ color: '#F4C542', fontWeight: 'bold' }}>{line.slice(5)}</span>;
+  if (line.startsWith('### '))
+    return <span style={{ color: '#F4C542', fontWeight: 'bold', fontSize: '15px' }}>{line.slice(4)}</span>;
+  if (line.startsWith('## '))
+    return <span style={{ color: '#4AAED9', fontWeight: 'bold' }}>{line.slice(3)}</span>;
+  if (line.startsWith('# '))
+    return <span style={{ color: '#4AAED9', fontWeight: 'bold', fontSize: '1.125rem' }}>{line.slice(2)}</span>;
 
   const metaMatch = line.match(/^- \*\*(.+?):\*\* (.+)$/);
   if (metaMatch) {
     return (
       <span>
-        <span className="text-slate-500">- </span>
-        <span className="text-slate-400 font-semibold">{metaMatch[1]}:</span>
-        <span className="text-white/70"> {metaMatch[2]}</span>
+        <span style={{ color: '#4AAED9' }}>- </span>
+        <span style={{ color: '#B8E4F7', fontWeight: '600' }}>{metaMatch[1]}:</span>
+        <span style={{ color: 'rgba(184,228,247,0.6)' }}> {metaMatch[2]}</span>
       </span>
     );
   }
@@ -54,16 +59,21 @@ function renderLine(line: string) {
   if (line.includes('sessions_spawn')) {
     const parts = line.split('sessions_spawn');
     return (
-      <span className="text-white/50">
+      <span style={{ color: 'rgba(184,228,247,0.5)' }}>
         {parts[0]}
-        <code className="bg-cyan-400/10 text-cyan-300 px-1.5 py-0.5 rounded text-[11px]">sessions_spawn</code>
+        <code
+          className="px-1.5 py-0.5 rounded text-[11px]"
+          style={{ background: 'rgba(244,197,66,0.1)', color: '#F4C542' }}
+        >
+          sessions_spawn
+        </code>
         {parts[1]}
       </span>
     );
   }
 
   if (line === '') return <span>&nbsp;</span>;
-  return <span className="text-white/50">{line}</span>;
+  return <span style={{ color: 'rgba(184,228,247,0.45)' }}>{line}</span>;
 }
 
 // ── Typewriter hook: rAF-driven character-by-character reveal ────────────────
@@ -151,43 +161,58 @@ export function IntroCard({ onStart }: IntroCardProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#020817]/95 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+      style={{ background: 'rgba(3,14,26,0.96)' }}
     >
       <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 max-w-5xl w-full">
-        {/* Left: Terminal panel with typewriter effect */}
+        {/* Left: ORG.md terminal */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
           className="w-full md:w-[55%] shrink-0"
         >
-          <div className="rounded-xl border border-white/10 bg-[#0d1117] shadow-[0_0_40px_rgba(34,211,238,0.08)] max-h-[40vh] md:max-h-none overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
+          <div
+            className="rounded-2xl max-h-[40vh] md:max-h-none overflow-y-auto scrollbar-none"
+            style={{
+              background: '#0B3D60',
+              border: '1px solid rgba(74,174,217,0.2)',
+              boxShadow: '0 0 40px rgba(74,174,217,0.08)',
+            }}
+          >
+            {/* Terminal chrome */}
+            <div
+              className="flex items-center gap-2 px-4 py-2.5"
+              style={{ borderBottom: '1px solid rgba(74,174,217,0.1)' }}
+            >
               <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-                <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF4757' }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#F4C542' }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#4AE88A' }} />
               </div>
-              <span className="text-white/40 text-xs ml-2 font-mono">org.md</span>
+              <span
+                className="ml-2"
+                style={{ color: 'rgba(184,228,247,0.4)', fontSize: '0.75rem', fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                org.md
+              </span>
             </div>
-            <div ref={containerRef} className="p-4 font-mono text-[13px] leading-relaxed overflow-y-auto max-h-[35vh] md:max-h-[60vh]">
-              {ORG_LINES.map((fullLine, i) => {
-                const partial = visibleLines[i];
-                if (partial === undefined || (partial === '' && fullLine !== '')) return null;
-                return (
-                  <div key={i} className="flex gap-3">
-                    <span className="text-white/10 select-none w-5 text-right shrink-0 text-[11px] leading-relaxed">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0">
-                      {renderLine(partial)}
-                      {!done && i === lastVisibleIdx && (
-                        <span className="inline-block w-[2px] h-[14px] bg-cyan-400 ml-0.5 align-middle animate-pulse" />
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            {/* Content */}
+            <div
+              className="p-4 text-[13px] leading-relaxed"
+              style={{ fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              {ORG_LINES.map((line, i) => (
+                <div key={i} className="flex gap-3">
+                  <span
+                    className="select-none w-5 text-right shrink-0 text-[11px] leading-relaxed"
+                    style={{ color: 'rgba(74,174,217,0.2)' }}
+                  >
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0">{renderLine(line)}</div>
+                </div>
+              ))}
             </div>
           </div>
         </motion.div>
@@ -200,22 +225,60 @@ export function IntroCard({ onStart }: IntroCardProps) {
           className="flex flex-col items-center md:items-start text-center md:text-left"
         >
           <div className="text-7xl mb-4">🍔</div>
-          <div className="text-white/40 text-xs uppercase tracking-widest mb-1">Operation:</div>
-          <h1 className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-6">
+          <div
+            className="text-xs uppercase tracking-widest mb-1"
+            style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}
+          >
+            Operation:
+          </div>
+          <h1
+            className="font-black mb-6"
+            style={{
+              fontFamily: '"Baloo 2", cursive',
+              fontSize: '1.875rem',
+              color: '#F4C542',
+              textShadow: '0 0 30px rgba(244,197,66,0.3)',
+            }}
+          >
             10,000 KRABBY PATTIES
           </h1>
-          <p className="text-white/50 text-lg mb-1">22 agents. One massive order.</p>
-          <p className="text-white/50 text-lg mb-8">Watch them coordinate — or collapse.</p>
+          <p
+            className="text-lg mb-1"
+            style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}
+          >
+            22 agents. One massive order.
+          </p>
+          <p
+            className="text-lg mb-8"
+            style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}
+          >
+            Watch them coordinate — or collapse.
+          </p>
+
           <motion.button
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 0 32px rgba(244,197,66,0.6)' }}
+            whileTap={{ scale: 0.97 }}
             onClick={onStart}
-            className="px-8 py-3 bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-500/30 hover:border-cyan-500/60 transition-all text-lg cursor-pointer"
+            className="flex items-center gap-3 px-8 py-3.5 rounded-2xl font-black text-lg cursor-pointer"
+            style={{
+              background: 'linear-gradient(135deg, #F4C542 0%, #EAB308 100%)',
+              color: '#062A45',
+              fontFamily: '"Baloo 2", cursive',
+              boxShadow: '0 0 24px rgba(244,197,66,0.4)',
+            }}
           >
+            <Play className="w-5 h-5" />
             Watch the Story →
           </motion.button>
-          <p className="text-white/30 text-xs mt-3">Defined in one markdown file.</p>
+          <p
+            className="text-xs mt-3"
+            style={{ color: 'rgba(184,228,247,0.25)', fontFamily: 'Nunito, sans-serif' }}
+          >
+            Defined in one markdown file.
+          </p>
         </motion.div>
       </div>
     </motion.div>
