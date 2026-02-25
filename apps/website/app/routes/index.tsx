@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
+import { Button } from "../components/button";
 
 // ─── Feature grid data ──────────────────────────────────────────────────────
 const features = [
   {
     category: "REAL-WORLD",
-    categoryColor: "text-cyan-400 bg-cyan-500/10",
+    badgeColor: "cyan" as const,
     emoji: "📱",
     title: "Device & Node Orchestration",
     description:
@@ -16,7 +17,7 @@ const features = [
   },
   {
     category: "PROTOCOL",
-    categoryColor: "text-violet-400 bg-violet-500/10",
+    badgeColor: "violet" as const,
     emoji: "🔗",
     title: "A2A Protocol",
     description:
@@ -26,7 +27,7 @@ const features = [
   },
   {
     category: "PROTOCOL",
-    categoryColor: "text-violet-400 bg-violet-500/10",
+    badgeColor: "violet" as const,
     emoji: "🔌",
     title: "MCP Tools",
     description:
@@ -36,7 +37,7 @@ const features = [
   },
   {
     category: "INTELLIGENCE",
-    categoryColor: "text-emerald-400 bg-emerald-500/10",
+    badgeColor: "emerald" as const,
     emoji: "🔀",
     title: "Model Router",
     description:
@@ -46,7 +47,7 @@ const features = [
   },
   {
     category: "VISIBILITY",
-    categoryColor: "text-amber-400 bg-amber-500/10",
+    badgeColor: "amber" as const,
     emoji: "📊",
     title: "Live Dashboard",
     description:
@@ -56,7 +57,7 @@ const features = [
   },
   {
     category: "DEVELOPER",
-    categoryColor: "text-slate-400 bg-white/5",
+    badgeColor: "slate" as const,
     emoji: "💻",
     title: "Zero-Config CLI",
     description:
@@ -203,20 +204,19 @@ export function LandingPage() {
 
           {/* CTAs */}
           <div className="animate-fade-in-up animate-delay-300 mb-10 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="/docs/getting-started"
-              className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400"
-            >
+            <Button as="a" href="/docs/getting-started" variant="primary" size="lg" className="glow-cyan">
               Get Started →
-            </a>
-            <a
+            </Button>
+            <Button
+              as="a"
               href="https://bikinibottom.ai/app/"
               target="_blank"
               rel="noopener"
-              className="rounded-xl border border-white/10 bg-white/5 px-8 py-3 text-base font-semibold text-slate-200 transition hover:bg-white/10"
+              variant="neutral"
+              size="lg"
             >
               🍍 Watch 22 SpongeBob Agents Run a Company →
-            </a>
+            </Button>
           </div>
 
           {/* Protocol badges */}
@@ -513,20 +513,18 @@ export function LandingPage() {
             real-world agent org.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
+            <Button
+              as="a"
               href="https://github.com/openspawn/openspawn"
               target="_blank"
               rel="noopener"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-medium text-slate-200 transition hover:bg-white/10"
+              variant="neutral"
             >
               ⭐ {stars ? `${stars.toLocaleString()} Stars on GitHub` : "Star on GitHub"}
-            </a>
-            <a
-              href="/docs/getting-started"
-              className="inline-flex items-center gap-2 rounded-xl bg-cyan-500/10 px-6 py-3 font-medium text-cyan-400 ring-1 ring-cyan-500/20 transition hover:bg-cyan-500/20"
-            >
+            </Button>
+            <Button as="a" href="/docs/getting-started" variant="ghost">
               Read the Docs →
-            </a>
+            </Button>
           </div>
         </div>
       </section>
