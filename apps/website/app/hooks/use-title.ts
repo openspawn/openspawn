@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-const BASE = "BikiniBottom";
+const BASE = "OpenSpawn";
 
 export function useTitle(page?: string) {
   useEffect(() => {
-    document.title = page ? `${page} — ${BASE}` : `${BASE} — The control plane your AI agents deserve`;
+    document.title = page ? `${page} — ${BASE}` : `${BASE} — AI agents that touch the real world`;
   }, [page]);
 }
