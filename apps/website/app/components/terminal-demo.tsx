@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const lines = [
   { text: "$ npx bikinibottom init my-reef", color: "text-slate-300", delay: 0 },
@@ -16,28 +16,51 @@ const lines = [
 
 export function TerminalDemo() {
   const [visibleLines, setVisibleLines] = useState(0);
+  const [key, setKey] = useState(0);
+
+  const startAnimation = useCallback(() => {
+    setVisibleLines(0);
+    setKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     const timers = lines.map((line, i) =>
       setTimeout(() => setVisibleLines(i + 1), line.delay + Math.random() * 80)
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [key]);
+
+  const isDone = visibleLines >= lines.length;
 
   return (
     <div className="terminal glow-cyan mx-auto max-w-2xl">
-      <div className="terminal-header">
-        <div className="terminal-dot bg-red-500/80" />
-        <div className="terminal-dot bg-yellow-500/80" />
-        <div className="terminal-dot bg-green-500/80" />
+      <div className="terminal-header flex items-center justify-between">
+        <div className="flex gap-2">
+          <div className="terminal-dot bg-red-500/80" />
+          <div className="terminal-dot bg-yellow-500/80" />
+          <div className="terminal-dot bg-green-500/80" />
+        </div>
+        {isDone && (
+          <button
+            type="button"
+            onClick={startAnimation}
+            className="flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-slate-500 transition hover:bg-white/10 hover:text-cyan-400"
+            aria-label="Replay terminal animation"
+          >
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Replay
+          </button>
+        )}
       </div>
       <div className="p-5 min-h-[260px]">
         {lines.slice(0, visibleLines).map((line, i) => (
-          <div key={i} className={`${line.color} ${i === visibleLines - 1 ? "animate-fade-in-up" : ""}`}>
+          <div key={`${key}-${i}`} className={`${line.color} ${i === visibleLines - 1 ? "animate-fade-in-up" : ""}`}>
             {line.text || "\u00A0"}
           </div>
         ))}
-        <span className="cursor-blink text-slate-500">▋</span>
+        {!isDone && <span className="cursor-blink text-slate-500">▋</span>}
       </div>
     </div>
   );
