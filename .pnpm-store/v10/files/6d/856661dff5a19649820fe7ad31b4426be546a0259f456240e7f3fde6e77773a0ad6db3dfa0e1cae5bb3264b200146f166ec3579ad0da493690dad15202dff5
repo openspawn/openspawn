@@ -1,0 +1,4 @@
+import type { GeneratorCallback, Tree } from '@nx/devkit';
+import { InitGeneratorOptions } from '../schema';
+export declare function addDependencies(tree: Tree, options: InitGeneratorOptions): GeneratorCallback;
+//# sourceMappingURL=add-dependencies.d.ts.map

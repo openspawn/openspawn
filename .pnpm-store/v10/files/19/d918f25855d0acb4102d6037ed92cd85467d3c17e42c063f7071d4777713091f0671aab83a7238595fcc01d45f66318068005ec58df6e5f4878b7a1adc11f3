@@ -1,0 +1,1 @@
+{"version":3,"file":"create-copy-plugin.d.ts","sourceRoot":"","sources":["../../../../../packages/webpack/src/utils/create-copy-plugin.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,iBAAiB,MAAM,qBAAqB,CAAC;AACzD,OAAO,EAAE,gBAAgB,EAAE,MAAM,6BAA6B,CAAC;AAE/D,wBAAgB,gBAAgB,CAAC,MAAM,EAAE,gBAAgB,EAAE,qBAoB1D"}

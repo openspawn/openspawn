@@ -1,0 +1,28 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getFileModuleImports = void 0;
+const fs_1 = require("fs");
+const parse_go_list_1 = require("./parse-go-list");
+/**
+ * Gets a list of go imports with associated module in the file.
+ *
+ * @param fileData file object computed by Nx
+ * @param modules list of go modules
+ */
+const getFileModuleImports = (fileData, modules) => {
+    var _a;
+    const content = (_a = (0, fs_1.readFileSync)(fileData.file, 'utf-8')) === null || _a === void 0 ? void 0 : _a.toString();
+    if (content == null) {
+        return [];
+    }
+    return (0, parse_go_list_1.parseGoList)('import', content)
+        .map((item) => (item.includes('"') ? item.split('"')[1] : item))
+        .filter((item) => item != null)
+        .map((item) => ({
+        import: item,
+        module: modules.find((mod) => item.startsWith(mod.Path)),
+    }))
+        .filter((item) => item.module);
+};
+exports.getFileModuleImports = getFileModuleImports;
+//# sourceMappingURL=get-file-module-imports.js.map

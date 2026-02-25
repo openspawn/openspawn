@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+"use strict";
+
+require("./cli/cli");
+var _logger = require("./logger");
+// ESM-friendly version of root-check
+if (typeof process.getuid === 'function' && process.getuid() === 0) {
+  process.emitWarning(`Verdaccio doesn't need superuser privileges. Don't run it under root.`);
+}
+process.on('uncaughtException', err => {
+  _logger.logger?.fatal?.({
+    err
+  }, 'uncaught exception, please report this\n@{err.stack}');
+  process.exit(255);
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJyZXF1aXJlIiwiX2xvZ2dlciIsInByb2Nlc3MiLCJnZXR1aWQiLCJlbWl0V2FybmluZyIsIm9uIiwiZXJyIiwibG9nZ2VyIiwiZmF0YWwiLCJleGl0Il0sInNvdXJjZXMiOlsiLi4vLi4vc3JjL2xpYi9jbGkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiIyEvdXNyL2Jpbi9lbnYgbm9kZVxuaW1wb3J0ICcuL2NsaS9jbGknO1xuaW1wb3J0IHsgbG9nZ2VyIH0gZnJvbSAnLi9sb2dnZXInO1xuXG4vLyBFU00tZnJpZW5kbHkgdmVyc2lvbiBvZiByb290LWNoZWNrXG5pZiAodHlwZW9mIHByb2Nlc3MuZ2V0dWlkID09PSAnZnVuY3Rpb24nICYmIHByb2Nlc3MuZ2V0dWlkKCkgPT09IDApIHtcbiAgcHJvY2Vzcy5lbWl0V2FybmluZyhgVmVyZGFjY2lvIGRvZXNuJ3QgbmVlZCBzdXBlcnVzZXIgcHJpdmlsZWdlcy4gRG9uJ3QgcnVuIGl0IHVuZGVyIHJvb3QuYCk7XG59XG5cbnByb2Nlc3Mub24oJ3VuY2F1Z2h0RXhjZXB0aW9uJywgKGVycjogdW5rbm93bikgPT4ge1xuICBsb2dnZXI/LmZhdGFsPy4oeyBlcnIgfSwgJ3VuY2F1Z2h0IGV4Y2VwdGlvbiwgcGxlYXNlIHJlcG9ydCB0aGlzXFxuQHtlcnIuc3RhY2t9Jyk7XG4gIHByb2Nlc3MuZXhpdCgyNTUpO1xufSk7XG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQW1COztBQUNuQkEsT0FBQTtBQUNBLElBQUFDLE9BQUEsR0FBQUQsT0FBQTtBQUVBO0FBQ0EsSUFBSSxPQUFPRSxPQUFPLENBQUNDLE1BQU0sS0FBSyxVQUFVLElBQUlELE9BQU8sQ0FBQ0MsTUFBTSxDQUFDLENBQUMsS0FBSyxDQUFDLEVBQUU7RUFDbEVELE9BQU8sQ0FBQ0UsV0FBVyxDQUFDLHVFQUF1RSxDQUFDO0FBQzlGO0FBRUFGLE9BQU8sQ0FBQ0csRUFBRSxDQUFDLG1CQUFtQixFQUFHQyxHQUFZLElBQUs7RUFDaERDLGNBQU0sRUFBRUMsS0FBSyxHQUFHO0lBQUVGO0VBQUksQ0FBQyxFQUFFLHNEQUFzRCxDQUFDO0VBQ2hGSixPQUFPLENBQUNPLElBQUksQ0FBQyxHQUFHLENBQUM7QUFDbkIsQ0FBQyxDQUFDIiwiaWdub3JlTGlzdCI6W119

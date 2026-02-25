@@ -1,0 +1,46 @@
+{
+  "name": "@nx/nest",
+  "version": "22.4.5",
+  "private": false,
+  "description": "The Nx Plugin for Nest contains executors and generators for allowing your workspace to create powerful Nest best in class APIs.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nrwl/nx.git",
+    "directory": "packages/nest"
+  },
+  "keywords": [
+    "Monorepo",
+    "Node",
+    "Nest",
+    "Jest",
+    "Cypress",
+    "CLI",
+    "Backend"
+  ],
+  "main": "./index.js",
+  "typings": "./index.d.ts",
+  "author": "Victor Savkin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nrwl/nx/issues"
+  },
+  "homepage": "https://nx.dev",
+  "generators": "./generators.json",
+  "ng-update": {
+    "requirements": {},
+    "migrations": "./migrations.json"
+  },
+  "dependencies": {
+    "@nestjs/schematics": "^11.0.0",
+    "@nx/devkit": "22.4.5",
+    "@nx/js": "22.4.5",
+    "@nx/eslint": "22.4.5",
+    "@nx/node": "22.4.5",
+    "tslib": "^2.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "./index.d.ts",
+  "type": "commonjs"
+}

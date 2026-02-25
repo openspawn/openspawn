@@ -1,0 +1,1 @@
+{"version":3,"file":"ContainerReferencePlugin.js","sourceRoot":"","sources":["../../../src/wrapper/ContainerReferencePlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,0BAA0B,CAAC;AAE/C,MAAqB,wBAAyB,SAAQ,2BAAiB;IACrE,YACE,OAAiE;QAEjE,KAAK,CAAC,OAAO,EAAE,WAAW,EAAE,2CAA2C,CAAC,CAAC;IAC3E,CAAC;CACF;AAND,2CAMC"}

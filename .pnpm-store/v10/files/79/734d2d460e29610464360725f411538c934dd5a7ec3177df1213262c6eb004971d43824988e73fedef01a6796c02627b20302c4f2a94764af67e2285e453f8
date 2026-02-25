@@ -1,0 +1,5 @@
+import { Config, Manifest, Notification, RemoteUser } from '@verdaccio/types';
+export declare function compileTemplate(content: any, metadata: any): Promise<unknown>;
+export declare function handleNotify(metadata: Partial<Manifest>, notifyEntry: any, remoteUser: Partial<RemoteUser>, publishedPackage: string): Promise<boolean>;
+export declare function sendNotification(metadata: Manifest, notify: Notification, remoteUser: Partial<RemoteUser>, publishedPackage: string): Promise<boolean>;
+export declare function notify(metadata: Manifest, config: Config, remoteUser: RemoteUser, publishedPackage: string): Promise<boolean[]>;

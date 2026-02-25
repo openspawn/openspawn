@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = runExecutor;
+const utils_1 = require("../../utils");
+/**
+ * This executor runs go mod tidy on the specified module.
+ *
+ * @param schema options passed to the executor
+ * @param context context passed to the executor
+ */
+async function runExecutor(schema, context) {
+    var _a;
+    return (0, utils_1.executeCommand)(['mod', 'tidy', ...((_a = schema.args) !== null && _a !== void 0 ? _a : [])], {
+        cwd: (0, utils_1.extractProjectRoot)(context),
+    });
+}
+//# sourceMappingURL=executor.js.map

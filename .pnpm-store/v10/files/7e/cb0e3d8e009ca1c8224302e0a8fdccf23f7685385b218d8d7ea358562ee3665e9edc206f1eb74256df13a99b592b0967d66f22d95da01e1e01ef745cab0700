@@ -1,0 +1,1 @@
+{"version":3,"file":"SharePlugin.js","sourceRoot":"","sources":["../../../src/wrapper/SharePlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,aAAa,CAAC;AAElC,MAAqB,WAAY,SAAQ,2BAAiB;IACxD,YAAY,OAA2B;QACrC,KAAK,CAAC,OAAO,EAAE,WAAW,EAAE,4BAA4B,CAAC,CAAC;IAC5D,CAAC;CACF;AAJD,8BAIC"}

@@ -1,0 +1,19 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = runExecutor;
+const utils_1 = require("../../utils");
+/**
+ * This executor lints Go code using the `go fmt` command.
+ *
+ * @param schema options passed to the executor
+ * @param context context passed to the executor
+ */
+async function runExecutor(schema, context) {
+    var _a;
+    const defaultArgs = schema.linter == null ? ['fmt'] : [];
+    return (0, utils_1.executeCommand)([...defaultArgs, ...((_a = schema.args) !== null && _a !== void 0 ? _a : []), './...'], {
+        cwd: (0, utils_1.extractProjectRoot)(context),
+        executable: schema.linter,
+    });
+}
+//# sourceMappingURL=executor.js.map

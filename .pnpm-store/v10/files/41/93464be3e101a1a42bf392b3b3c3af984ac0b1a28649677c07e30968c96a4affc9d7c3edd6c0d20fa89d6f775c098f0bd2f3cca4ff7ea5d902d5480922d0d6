@@ -1,0 +1,1 @@
+{"version":3,"file":"types.js","names":[],"sources":["../src/types.ts"],"sourcesContent":["import { LoggerOptions } from 'pino';\n\nexport interface PrettyOptionsExtended extends LoggerOptions {\n  prettyStamp: boolean;\n  colors?: boolean;\n}\n"],"mappings":"","ignoreList":[]}

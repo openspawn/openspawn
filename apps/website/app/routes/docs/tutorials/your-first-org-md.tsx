@@ -729,9 +729,9 @@ All client-deliverable tasks must complete within:
       <div className="grid gap-3 sm:grid-cols-2">
         {[
           {
-            title: "ORG.md Reference",
-            desc: "Every field, every option, every default",
-            to: "/docs/reference/org-md",
+            title: "ORG.md Tutorial",
+            desc: "Revisit any section: departments, culture, policies, playbooks",
+            to: "/docs/tutorials/your-first-org-md",
           },
           {
             title: "Dashboard Walkthrough",

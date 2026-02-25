@@ -1,0 +1,62 @@
+{
+  "name": "@verdaccio/local-storage-legacy",
+  "version": "11.1.1",
+  "description": "Local storage implementation",
+  "keywords": [
+    "plugin",
+    "verdaccio",
+    "storage",
+    "local-storage"
+  ],
+  "author": "Juan Picado <juanpicado19@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://verdaccio.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/verdaccio/monorepo",
+    "directory": "plugins/local-storage"
+  },
+  "bugs": {
+    "url": "https://github.com/verdaccio/monorepo/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@verdaccio/core": "8.0.0-next-8.21",
+    "@verdaccio/file-locking": "10.3.1",
+    "@verdaccio/streams": "10.2.1",
+    "debug": "4.4.1",
+    "async": "3.2.6",
+    "lodash": "4.17.21",
+    "lowdb": "1.0.0",
+    "mkdirp": "1.0.4"
+  },
+  "devDependencies": {
+    "@types/minimatch": "^3.0.3",
+    "@types/node": "^20.5.8",
+    "@verdaccio/legacy-types": "1.0.2",
+    "minimatch": "^4.0.0",
+    "rmdir-sync": "^1.0.1"
+  },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/verdaccio"
+  },
+  "scripts": {
+    "clean": "rimraf ./build",
+    "test": "cross-env NODE_ENV=test BABEL_ENV=test jest",
+    "type-check": "tsc --noEmit -p tsconfig.build.json",
+    "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+    "build:js": "babel src/ --out-dir lib/ --copy-files --extensions \".ts,.tsx\" --source-maps",
+    "build": "pnpm run build:js && pnpm run build:types"
+  }
+}

@@ -1,0 +1,46 @@
+import { VerdaccioError, pluginUtils } from '@verdaccio/core';
+import { Callback, Config, JWTSignOptions, Logger, RemoteUser } from '@verdaccio/types';
+import { $RequestExtend, $ResponseExtend, IAuthMiddleware, NextFunction, TokenEncryption } from './types';
+declare class Auth implements IAuthMiddleware, TokenEncryption, pluginUtils.IBasicAuth {
+    config: Config;
+    secret: string;
+    logger: Logger;
+    plugins: pluginUtils.Auth<Config>[];
+    options: {
+        legacyMergeConfigs: boolean;
+    };
+    constructor(config: Config, logger: Logger, options?: {
+        legacyMergeConfigs: boolean;
+    });
+    init(): Promise<void>;
+    private loadDefaultPlugin;
+    private loadPlugin;
+    private applyFallbackPluginMethods;
+    changePassword(username: string, password: string, newPassword: string, cb: Callback): void;
+    invalidateToken(token: string): Promise<void>;
+    authenticate(username: string, password: string, cb: (error: VerdaccioError | null, user?: RemoteUser) => void): void;
+    add_user(user: string, password: string, cb: (error: VerdaccioError | null, user?: RemoteUser) => void): void;
+    /**
+     * Allow user to access a package.
+     */
+    allow_access({ packageName, packageVersion }: pluginUtils.AuthPluginPackage, user: RemoteUser, callback: pluginUtils.AccessCallback): void;
+    allow_unpublish({ packageName, packageVersion }: pluginUtils.AuthPluginPackage, user: RemoteUser, callback: Callback): void;
+    /**
+     * Allow user to publish a package.
+     */
+    allow_publish({ packageName, packageVersion }: pluginUtils.AuthPluginPackage, user: RemoteUser, callback: Callback): void;
+    apiJWTmiddleware(): any;
+    private handleJWTAPIMiddleware;
+    private handleAESMiddleware;
+    private _isRemoteUserValid;
+    /**
+     * JWT middleware for WebUI
+     */
+    webUIJWTmiddleware(): (req: $RequestExtend, res: $ResponseExtend, _next: NextFunction) => void;
+    jwtEncrypt(user: RemoteUser, signOptions: JWTSignOptions): Promise<string>;
+    /**
+     * Encrypt a string.
+     */
+    aesEncrypt(value: string): string | void;
+}
+export { Auth };

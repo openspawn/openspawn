@@ -1,0 +1,334 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GraphQLAstExplorer = void 0;
+const tslib_1 = require("tslib");
+const common_1 = require("@nestjs/common");
+const lodash_1 = require("lodash");
+const graphql_constants_1 = require("./graphql.constants");
+let tsMorphLib;
+let GraphQLAstExplorer = class GraphQLAstExplorer {
+    constructor() {
+        this.root = ['Query', 'Mutation', 'Subscription'];
+    }
+    async explore(documentNode, outputPath, mode, options = {}) {
+        if (!documentNode) {
+            return;
+        }
+        tsMorphLib = await Promise.resolve().then(() => require('ts-morph'));
+        const tsAstHelper = new tsMorphLib.Project({
+            manipulationSettings: {
+                newLineKind: process.platform === 'win32'
+                    ? tsMorphLib.NewLineKind.CarriageReturnLineFeed
+                    : tsMorphLib.NewLineKind.LineFeed,
+            },
+        });
+        const tsFile = tsAstHelper.createSourceFile(outputPath, '', {
+            overwrite: true,
+        });
+        let { definitions } = documentNode;
+        definitions = (0, lodash_1.sortBy)(definitions, ['kind', 'name']);
+        const fileStructure = tsFile.getStructure();
+        const header = options.additionalHeader
+            ? `${graphql_constants_1.DEFINITIONS_FILE_HEADER}\n\n${options.additionalHeader}`
+            : graphql_constants_1.DEFINITIONS_FILE_HEADER;
+        fileStructure.statements = [header];
+        fileStructure.statements.push(...definitions
+            .map((item) => this.toDefinitionStructures(item, mode, options))
+            .filter(Boolean));
+        fileStructure.statements.push({
+            kind: tsMorphLib.StructureKind.TypeAlias,
+            name: 'Nullable',
+            isExported: false,
+            type: 'T | null',
+            typeParameters: [
+                {
+                    name: 'T',
+                },
+            ],
+        });
+        tsFile.set(fileStructure);
+        return tsFile;
+    }
+    toDefinitionStructures(item, mode, options) {
+        switch (item.kind) {
+            case 'SchemaDefinition':
+                return this.toRootSchemaDefinitionStructure(item.operationTypes, mode);
+            case 'ObjectTypeDefinition':
+            case 'ObjectTypeExtension':
+            case 'InputObjectTypeDefinition':
+            case 'InputObjectTypeExtension':
+                return this.toObjectTypeDefinitionStructure(item, mode, options);
+            case 'InterfaceTypeDefinition':
+            case 'InterfaceTypeExtension':
+                return this.toObjectTypeDefinitionStructure(item, 'interface', options);
+            case 'ScalarTypeDefinition':
+            case 'ScalarTypeExtension':
+                return this.toScalarDefinitionStructure(item, options);
+            case 'EnumTypeDefinition':
+            case 'EnumTypeExtension':
+                return this.toEnumDefinitionStructure(item, options);
+            case 'UnionTypeDefinition':
+            case 'UnionTypeExtension':
+                return this.toUnionDefinitionStructure(item, options);
+        }
+    }
+    toRootSchemaDefinitionStructure(operationTypes, mode) {
+        const structureKind = mode === 'class'
+            ? tsMorphLib.StructureKind.Class
+            : tsMorphLib.StructureKind.Interface;
+        const properties = operationTypes
+            .filter(Boolean)
+            .map((item) => {
+            const tempOperationName = item.operation;
+            const typeName = (0, lodash_1.get)(item, 'type.name.value');
+            const interfaceName = typeName || tempOperationName;
+            return {
+                name: interfaceName,
+                type: this.addSymbolIfRoot((0, lodash_1.upperFirst)(interfaceName)),
+            };
+        })
+            .filter(Boolean);
+        return {
+            name: 'ISchema',
+            isExported: true,
+            kind: structureKind,
+            properties: properties,
+        };
+    }
+    toObjectTypeDefinitionStructure(item, mode, options) {
+        const parentName = (0, lodash_1.get)(item, 'name.value');
+        if (!parentName) {
+            return;
+        }
+        const structureKind = mode === 'class'
+            ? tsMorphLib.StructureKind.Class
+            : tsMorphLib.StructureKind.Interface;
+        const isRoot = this.root.indexOf(parentName) >= 0;
+        // Don't transform root type names (Query, Mutation, Subscription)
+        const transformedName = isRoot
+            ? parentName
+            : this.getTransformedTypeName(parentName, options);
+        const parentStructure = {
+            name: this.addSymbolIfRoot((0, lodash_1.upperFirst)(transformedName)),
+            isExported: true,
+            isAbstract: isRoot && mode === 'class',
+            kind: structureKind,
+            properties: [],
+            methods: [],
+        };
+        const interfaces = (0, lodash_1.get)(item, 'interfaces');
+        if (interfaces) {
+            if (mode === 'class') {
+                parentStructure.implements = interfaces
+                    .map((element) => {
+                    const interfaceName = (0, lodash_1.get)(element, 'name.value');
+                    return interfaceName
+                        ? this.getTransformedTypeName(interfaceName, options)
+                        : null;
+                })
+                    .filter(Boolean);
+            }
+            else {
+                parentStructure.extends = interfaces
+                    .map((element) => {
+                    const interfaceName = (0, lodash_1.get)(element, 'name.value');
+                    return interfaceName
+                        ? this.getTransformedTypeName(interfaceName, options)
+                        : null;
+                })
+                    .filter(Boolean);
+            }
+        }
+        const isObjectType = item.kind === 'ObjectTypeDefinition';
+        if (isObjectType && options.emitTypenameField) {
+            parentStructure.properties.push({
+                name: '__typename',
+                type: `'${parentStructure.name}'`,
+                hasQuestionToken: true,
+            });
+        }
+        if (!this.isRoot(parentStructure.name) || options.skipResolverArgs) {
+            const properties = (item.fields || [])
+                .map((element) => this.toPropertyDeclarationStructure(element, options))
+                .filter(Boolean);
+            parentStructure.properties.push(...properties);
+        }
+        else {
+            const methods = (item.fields || [])
+                .map((element) => this.toMethodDeclarationStructure(element, mode, options))
+                .filter(Boolean);
+            parentStructure.methods.push(...methods);
+        }
+        return parentStructure;
+    }
+    toPropertyDeclarationStructure(item, options) {
+        const propertyName = (0, lodash_1.get)(item, 'name.value');
+        if (!propertyName) {
+            return undefined;
+        }
+        const federatedFields = ['_entities', '_service'];
+        if (federatedFields.includes(propertyName)) {
+            return undefined;
+        }
+        const { name: type, required } = this.getFieldTypeDefinition(item.type, options);
+        return {
+            name: propertyName,
+            type: this.addSymbolIfRoot(type),
+            hasQuestionToken: !required || item.arguments?.length > 0,
+        };
+    }
+    toMethodDeclarationStructure(item, mode, options) {
+        const propertyName = (0, lodash_1.get)(item, 'name.value');
+        if (!propertyName) {
+            return;
+        }
+        const federatedFields = ['_entities', '_service'];
+        if (federatedFields.includes(propertyName)) {
+            return;
+        }
+        const { name: type } = this.getFieldTypeDefinition(item.type, options);
+        return {
+            isAbstract: mode === 'class',
+            name: propertyName,
+            returnType: `${type} | Promise<${type}>`,
+            parameters: this.getFunctionParameters(item.arguments, options),
+        };
+    }
+    getFieldTypeDefinition(typeNode, options) {
+        const stringifyType = (typeNode) => {
+            const { type, required } = this.unwrapTypeIfNonNull(typeNode);
+            const isArray = type.kind === 'ListType';
+            if (isArray) {
+                const arrayType = (0, lodash_1.get)(type, 'type');
+                return required
+                    ? `${stringifyType(arrayType)}[]`
+                    : `Nullable<${stringifyType(arrayType)}[]>`;
+            }
+            const typeName = this.addSymbolIfRoot((0, lodash_1.get)(type, 'name.value'));
+            return required
+                ? this.getType(typeName, options)
+                : `Nullable<${this.getType(typeName, options)}>`;
+        };
+        const { required } = this.unwrapTypeIfNonNull(typeNode);
+        return {
+            name: stringifyType(typeNode),
+            required,
+        };
+    }
+    unwrapTypeIfNonNull(type) {
+        const isNonNullType = type.kind === 'NonNullType';
+        if (isNonNullType) {
+            return {
+                type: this.unwrapTypeIfNonNull((0, lodash_1.get)(type, 'type')).type,
+                required: isNonNullType,
+            };
+        }
+        return { type, required: false };
+    }
+    getType(typeName, options) {
+        const defaults = this.getDefaultTypes(options);
+        const isDefault = defaults[typeName];
+        if (isDefault) {
+            return defaults[typeName];
+        }
+        const transformedName = this.getTransformedTypeName(typeName, options);
+        return (0, lodash_1.upperFirst)(transformedName);
+    }
+    getDefaultTypes(options) {
+        return {
+            String: options.defaultTypeMapping?.String ?? 'string',
+            Int: options.defaultTypeMapping?.Int ?? 'number',
+            Boolean: options.defaultTypeMapping?.Boolean ?? 'boolean',
+            ID: options.defaultTypeMapping?.ID ?? 'string',
+            Float: options.defaultTypeMapping?.Float ?? 'number',
+        };
+    }
+    getFunctionParameters(inputs, options) {
+        if (!inputs) {
+            return [];
+        }
+        return inputs.map((element) => {
+            const { name, required } = this.getFieldTypeDefinition(element.type, options);
+            return {
+                name: (0, lodash_1.get)(element, 'name.value'),
+                type: name,
+                hasQuestionToken: !required,
+                kind: tsMorphLib.StructureKind.Parameter,
+            };
+        });
+    }
+    toScalarDefinitionStructure(item, options) {
+        const name = (0, lodash_1.get)(item, 'name.value');
+        if (!name || name === 'Date') {
+            return undefined;
+        }
+        const typeMapping = options.customScalarTypeMapping?.[name];
+        const mappedTypeName = typeof typeMapping === 'string' ? typeMapping : typeMapping?.name;
+        const transformedName = this.getTransformedTypeName(name, options);
+        return {
+            kind: tsMorphLib.StructureKind.TypeAlias,
+            name: transformedName,
+            type: mappedTypeName ?? options.defaultScalarType ?? 'any',
+            isExported: true,
+        };
+    }
+    toEnumDefinitionStructure(item, options) {
+        const name = (0, lodash_1.get)(item, 'name.value');
+        if (!name) {
+            return undefined;
+        }
+        const transformedName = this.getTransformedTypeName(name, options);
+        if (options.enumsAsTypes) {
+            const values = item.values.map((value) => `"${(0, lodash_1.get)(value, 'name.value')}"`);
+            return {
+                kind: tsMorphLib.StructureKind.TypeAlias,
+                name: transformedName,
+                type: values.join(' | '),
+                isExported: true,
+            };
+        }
+        const members = (0, lodash_1.map)(item.values, (value) => ({
+            name: (0, lodash_1.get)(value, 'name.value'),
+            value: (0, lodash_1.get)(value, 'name.value'),
+        }));
+        return {
+            kind: tsMorphLib.StructureKind.Enum,
+            name: transformedName,
+            members,
+            isExported: true,
+        };
+    }
+    toUnionDefinitionStructure(item, options) {
+        const name = (0, lodash_1.get)(item, 'name.value');
+        if (!name) {
+            return undefined;
+        }
+        const transformedName = this.getTransformedTypeName(name, options);
+        const types = (0, lodash_1.map)(item.types, (value) => {
+            const typeName = (0, lodash_1.get)(value, 'name.value');
+            return typeName ? this.getTransformedTypeName(typeName, options) : null;
+        }).filter(Boolean);
+        return {
+            kind: tsMorphLib.StructureKind.TypeAlias,
+            name: transformedName,
+            type: types.join(' | '),
+            isExported: true,
+        };
+    }
+    addSymbolIfRoot(name) {
+        return this.root.indexOf(name) >= 0 ? `I${name}` : name;
+    }
+    isRoot(name) {
+        return ['IQuery', 'IMutation', 'ISubscription'].indexOf(name) >= 0;
+    }
+    getTransformedTypeName(name, options) {
+        if (!options.typeName) {
+            return name;
+        }
+        return options.typeName(name);
+    }
+};
+exports.GraphQLAstExplorer = GraphQLAstExplorer;
+exports.GraphQLAstExplorer = GraphQLAstExplorer = tslib_1.__decorate([
+    (0, common_1.Injectable)()
+], GraphQLAstExplorer);

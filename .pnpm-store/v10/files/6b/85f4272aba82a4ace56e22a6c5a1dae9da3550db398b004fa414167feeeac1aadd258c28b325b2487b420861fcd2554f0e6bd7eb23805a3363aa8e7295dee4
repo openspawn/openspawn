@@ -1,0 +1,73 @@
+{
+  "name": "@nestjs/graphql",
+  "version": "13.2.4",
+  "description": "Nest - modern, fast, powerful node.js web framework (@graphql)",
+  "author": "Kamil Mysliwiec",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "plugin.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test:e2e": "jest --config ./tests/jest-e2e.json",
+    "test:e2e:dev": "jest --config ./tests/jest-e2e.json --watch"
+  },
+  "dependencies": {
+    "@graphql-tools/merge": "9.1.7",
+    "@graphql-tools/schema": "10.0.31",
+    "@graphql-tools/utils": "11.0.0",
+    "@nestjs/mapped-types": "2.1.0",
+    "chokidar": "4.0.3",
+    "fast-glob": "3.3.3",
+    "graphql-tag": "2.12.6",
+    "graphql-ws": "6.0.7",
+    "lodash": "4.17.23",
+    "normalize-path": "3.0.0",
+    "subscriptions-transport-ws": "0.11.0",
+    "tslib": "2.8.1",
+    "ws": "8.19.0"
+  },
+  "devDependencies": {
+    "@apollo/subgraph": "2.2.3",
+    "@nestjs/common": "11.1.13",
+    "@nestjs/core": "11.1.13",
+    "@nestjs/testing": "11.1.13",
+    "graphql": "16.12.0",
+    "reflect-metadata": "0.2.2",
+    "ts-morph": "27.0.2"
+  },
+  "peerDependencies": {
+    "@apollo/subgraph": "^2.9.3",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "class-transformer": "*",
+    "class-validator": "*",
+    "graphql": "^16.11.0",
+    "reflect-metadata": "^0.1.13 || ^0.2.0",
+    "ts-morph": "^20.0.0 || ^21.0.0 || ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@apollo/subgraph": {
+      "optional": true
+    },
+    "class-transformer": {
+      "optional": true
+    },
+    "class-validator": {
+      "optional": true
+    },
+    "ts-morph": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nestjs/graphql"
+  },
+  "gitHead": "2ef9dee23dd8e3c06c94567d02dc1c6fe6cfe0e3"
+}

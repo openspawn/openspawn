@@ -1,0 +1,64 @@
+import * as React from 'react';
+import { ReactStore } from '@base-ui/utils/store';
+import { Timeout } from '@base-ui/utils/useTimeout';
+import { type InteractionType } from '@base-ui/utils/useEnhancedClickHandler';
+import { PopoverRoot } from "../root/PopoverRoot.js";
+import { PopupStoreContext, PopupStoreState } from "../../utils/popups/index.js";
+export type State<Payload> = PopupStoreState<Payload> & {
+  disabled: boolean;
+  instantType: 'dismiss' | 'click' | undefined;
+  modal: boolean | 'trap-focus';
+  openMethod: InteractionType | null;
+  openChangeReason: PopoverRoot.ChangeEventReason | null;
+  stickIfOpen: boolean;
+  nested: boolean;
+  titleElementId: string | undefined;
+  descriptionElementId: string | undefined;
+  openOnHover: boolean;
+  closeDelay: number;
+  hasViewport: boolean;
+};
+type Context = PopupStoreContext<PopoverRoot.ChangeEventDetails> & {
+  readonly popupRef: React.RefObject<HTMLElement | null>;
+  readonly backdropRef: React.RefObject<HTMLDivElement | null>;
+  readonly internalBackdropRef: React.RefObject<HTMLDivElement | null>;
+  readonly triggerFocusTargetRef: React.RefObject<HTMLElement | null>;
+  readonly beforeContentFocusGuardRef: React.RefObject<HTMLElement | null>;
+  readonly stickIfOpenTimeout: Timeout;
+};
+declare const selectors: {
+  disabled: (state: State<unknown>) => boolean;
+  instantType: (state: State<unknown>) => "click" | "dismiss" | undefined;
+  openMethod: (state: State<unknown>) => InteractionType | null;
+  openChangeReason: (state: State<unknown>) => import("../index.js").PopoverRootChangeEventReason | null;
+  modal: (state: State<unknown>) => boolean | "trap-focus";
+  stickIfOpen: (state: State<unknown>) => boolean;
+  titleElementId: (state: State<unknown>) => string | undefined;
+  descriptionElementId: (state: State<unknown>) => string | undefined;
+  openOnHover: (state: State<unknown>) => boolean;
+  closeDelay: (state: State<unknown>) => number;
+  hasViewport: (state: State<unknown>) => boolean;
+  open: (state: PopupStoreState<unknown>) => boolean;
+  mounted: (state: PopupStoreState<unknown>) => boolean;
+  transitionStatus: (state: PopupStoreState<unknown>) => import("../../utils/useTransitionStatus.js").TransitionStatus;
+  floatingRootContext: (state: PopupStoreState<unknown>) => import("../../floating-ui-react/components/FloatingRootStore.js").FloatingRootStore;
+  preventUnmountingOnClose: (state: PopupStoreState<unknown>) => boolean;
+  payload: (state: PopupStoreState<unknown>) => unknown;
+  activeTriggerId: (state: PopupStoreState<unknown>) => string | null;
+  activeTriggerElement: (state: PopupStoreState<unknown>) => Element | null;
+  isTriggerActive: (state: PopupStoreState<unknown>, triggerId: string | undefined) => boolean;
+  isOpenedByTrigger: (state: PopupStoreState<unknown>, triggerId: string | undefined) => boolean;
+  isMountedByTrigger: (state: PopupStoreState<unknown>, triggerId: string | undefined) => boolean;
+  triggerProps: (state: PopupStoreState<unknown>, isActive: boolean) => import("../../index.js").HTMLProps;
+  popupProps: (state: PopupStoreState<unknown>) => import("../../index.js").HTMLProps;
+  popupElement: (state: PopupStoreState<unknown>) => HTMLElement | null;
+  positionerElement: (state: PopupStoreState<unknown>) => HTMLElement | null;
+};
+export declare class PopoverStore<Payload> extends ReactStore<Readonly<State<Payload>>, Context, Selectors> {
+  constructor(initialState?: Partial<State<Payload>>);
+  setOpen: (nextOpen: boolean, eventDetails: Omit<PopoverRoot.ChangeEventDetails, "preventUnmountOnClose">) => void;
+  static useStore<Payload>(externalStore: PopoverStore<Payload> | undefined, initialState: Partial<State<Payload>>): PopoverStore<Payload>;
+  private disposeEffect;
+}
+type Selectors = typeof selectors;
+export {};

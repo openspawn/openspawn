@@ -1,0 +1,1 @@
+{"version":3,"file":"serve-path.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/executors/dev-server/lib/serve-path.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gCAAgC,EAAE,MAAM,sBAAsB,CAAC;AAE7E,wBAAgB,cAAc,CAC5B,cAAc,EAAE,gCAAgC,UAajD;AAED,wBAAgB,qBAAqB,CACnC,QAAQ,CAAC,EAAE,MAAM,EACjB,SAAS,CAAC,EAAE,MAAM,GACjB,MAAM,GAAG,IAAI,CAoCf"}

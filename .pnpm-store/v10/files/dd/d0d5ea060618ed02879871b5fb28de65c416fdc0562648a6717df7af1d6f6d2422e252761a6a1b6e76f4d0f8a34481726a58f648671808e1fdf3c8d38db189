@@ -1,0 +1,1 @@
+{"version":3,"file":"package-chunk-sort.d.ts","sourceRoot":"","sources":["../../../../../../packages/webpack/src/utils/webpack/package-chunk-sort.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,WAAW,CAAC;AAG5C,wBAAgB,mBAAmB,CAAC,SAAS,EAAE;IAC7C,MAAM,EAAE,eAAe,EAAE,CAAC;IAC1B,OAAO,EAAE,eAAe,EAAE,CAAC;CAC5B,YA8CA"}

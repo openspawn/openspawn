@@ -1,0 +1,24 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.computeGoModules = void 0;
+const devkit_1 = require("@nx/devkit");
+const get_go_modules_1 = require("./get-go-modules");
+/**
+ * Computes a list of go modules.
+ *
+ * @param failSilently if true, the function will not throw an error if it fails
+ */
+const computeGoModules = (failSilently = false) => {
+    const blocks = (0, get_go_modules_1.getGoModules)(devkit_1.workspaceRoot, failSilently);
+    if (blocks != null) {
+        return blocks
+            .split('}')
+            .filter((block) => block.trim().length > 0)
+            .map((block) => JSON.parse(`${block}}`))
+            .sort((module1, module2) => module1.Path.localeCompare(module2.Path))
+            .reverse();
+    }
+    throw new Error('Cannot get list of Go modules');
+};
+exports.computeGoModules = computeGoModules;
+//# sourceMappingURL=compute-go-modules.js.map

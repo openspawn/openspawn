@@ -1,0 +1,54 @@
+{
+  "name": "css-gradient-parser",
+  "version": "0.0.17",
+  "description": "a css gradient parser",
+  "packageManager": "pnpm@8.7.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "author": "Lynnnnnnxx<jcignorance@gmail.com>",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --cache"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vitest/coverage-v8": "^2.0.2",
+    "changelogen": "^0.5.5",
+    "eslint": "^8.57.0",
+    "lint-staged": "^14.0.1",
+    "simple-git-hooks": "^2.11.1",
+    "tsup": "^8.5.0",
+    "tsx": "^3.14.0",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "lint": "eslint . --ext .js,.jsx,.ts --quiet --cache",
+    "lint:fix": "pnpm lint --fix",
+    "r": "pnpm build && changelogen --release --push && pnpm publish"
+  }
+}

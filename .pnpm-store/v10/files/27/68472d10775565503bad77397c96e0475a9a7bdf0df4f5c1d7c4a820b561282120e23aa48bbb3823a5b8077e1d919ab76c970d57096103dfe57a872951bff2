@@ -1,0 +1,45 @@
+{
+  "name": "@naxodev/gonx",
+  "version": "3.0.0",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "executors": "./executors.json",
+  "generators": "./generators.json",
+  "description": "Modern Nx plugin to use Go in a Nx workspace",
+  "homepage": "https://gonx.naxo.dev/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:naxodev/oss.git",
+    "directory": "packages/gonx"
+  },
+  "keywords": [
+    "nx",
+    "golang",
+    "go",
+    "plugin"
+  ],
+  "contributors": [
+    {
+      "name": "Nacho Vazquez",
+      "email": "nacho@naxo.dev",
+      "url": "https://github.com/NachoVazquez"
+    },
+    {
+      "name": "Abel Penton",
+      "url": "https://github.com/abelpenton"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/naxodev/oss/issues?q=is:issue+is:open+sort:updated-desc"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@nx/devkit": "^22.0.0",
+    "nx": "^22.0.0",
+    "tslib": "^2.3.0",
+    "npm-run-path": "4.0.1",
+    "chalk": "^4.1.2",
+    "@melkeydev/go-blueprint": "0.10.11"
+  }
+}

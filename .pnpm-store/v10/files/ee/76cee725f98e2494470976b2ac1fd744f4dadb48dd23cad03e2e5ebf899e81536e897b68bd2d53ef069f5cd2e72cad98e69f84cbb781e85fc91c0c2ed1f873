@@ -1,0 +1,49 @@
+import { ExecutorContext } from '@nx/devkit';
+import { BuildExecutorSchema } from '../executors/build/schema';
+import { ServeExecutorSchema } from '../executors/serve/schema';
+export type RunGoOptions = {
+    executable?: string;
+    cwd?: string;
+    env?: {
+        [key: string]: string;
+    };
+};
+/**
+ * Extract the project root from the executor context.
+ *
+ * @param context the executor context
+ */
+export declare const extractProjectRoot: (context: ExecutorContext) => string;
+/**
+ * Execute and log a command, then return the result to executor.
+ *
+ * @param parameters the parameters of the command
+ * @param options the options of the command
+ */
+export declare const executeCommand: (parameters?: string[], options?: RunGoOptions) => Promise<{
+    success: boolean;
+}>;
+/**
+ * Add a flag to an array of parameter if it is enabled.
+ *
+ * @param flag the flag to add
+ * @param enabled true if flag should be added
+ */
+export declare const buildFlagIfEnabled: (flag: string, enabled: boolean) => string[];
+/**
+ * Add a string flag to an array of parameter if it is valid.
+ *
+ * @param flag the flag to add
+ * @param value the value of the flag
+ */
+export declare const buildStringFlagIfValid: (flag: string, value?: string) => string[];
+/**
+ * Extracts the current working directory (CWD) for the build process.
+ * If the 'main' option is provided, returns the directory containing the main.go file.
+ * Otherwise, returns the project root directory.
+ *
+ * @param options - The build executor schema options.
+ * @param context - The executor context.
+ * @returns The resolved CWD path.
+ */
+export declare function extractCWD(options: BuildExecutorSchema | ServeExecutorSchema, context: ExecutorContext): string;

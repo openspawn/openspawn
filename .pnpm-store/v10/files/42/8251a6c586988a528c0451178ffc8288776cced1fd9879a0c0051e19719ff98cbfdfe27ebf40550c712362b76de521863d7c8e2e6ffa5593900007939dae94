@@ -1,0 +1,99 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.log = exports.LOG_VERDACCIO_ERROR = exports.LOG_VERDACCIO_BYTES = exports.LOG_STATUS_MESSAGE = void 0;
+var _lodash = _interopRequireDefault(require("lodash"));
+var _core = require("@verdaccio/core");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+// FIXME: deprecated, moved to @verdaccio/dev-commons
+const LOG_STATUS_MESSAGE = exports.LOG_STATUS_MESSAGE = "@{status}, user: @{user}(@{remoteIP}), req: '@{request.method} @{request.url}'";
+const LOG_VERDACCIO_ERROR = exports.LOG_VERDACCIO_ERROR = `${LOG_STATUS_MESSAGE}, error: @{!error}`;
+const LOG_VERDACCIO_BYTES = exports.LOG_VERDACCIO_BYTES = `${LOG_STATUS_MESSAGE}, bytes: @{bytes.in}/@{bytes.out}`;
+const log = logger => {
+  return function log(req, res, next) {
+    // logger
+    req.log = logger.child({
+      sub: 'in'
+    });
+    const _auth = req.headers.authorization;
+    if (_lodash.default.isNil(_auth) === false) {
+      req.headers.authorization = '<Classified>';
+    }
+    const _cookie = req.get('cookie');
+    if (_lodash.default.isNil(_cookie) === false) {
+      req.headers.cookie = '<Classified>';
+    }
+    req.url = req.originalUrl;
+    req.log.info({
+      req: req,
+      ip: req.ip
+    }, "@{ip} requested '@{req.method} @{req.url}'");
+    req.originalUrl = req.url;
+    if (_lodash.default.isNil(_auth) === false) {
+      req.headers.authorization = _auth;
+    }
+    if (_lodash.default.isNil(_cookie) === false) {
+      req.headers.cookie = _cookie;
+    }
+    let bytesin = 0;
+    req.on('data', function (chunk) {
+      bytesin += chunk.length;
+    });
+    let bytesout = 0;
+    const _write = res.write;
+    // FIXME: res.write should return boolean
+    // @ts-ignore
+    res.write = function (buf) {
+      bytesout += buf.length;
+      /* eslint prefer-rest-params: "off" */
+      // @ts-ignore
+      _write.apply(res, arguments);
+    };
+    const log = function () {
+      const forwardedFor = req.get(_core.HEADERS.FORWARDED_FOR);
+      const remoteAddress = req.connection.remoteAddress;
+      const remoteIP = forwardedFor ? `${forwardedFor} via ${remoteAddress}` : remoteAddress;
+      let message;
+      if (res.locals._verdaccio_error) {
+        message = LOG_VERDACCIO_ERROR;
+      } else {
+        message = LOG_VERDACCIO_BYTES;
+      }
+      req.url = req.originalUrl;
+      req.log.http({
+        request: {
+          method: req.method,
+          url: req.url
+        },
+        user: req.remote_user?.name || null,
+        remoteIP,
+        status: res.statusCode,
+        error: res.locals._verdaccio_error,
+        bytes: {
+          in: bytesin,
+          out: bytesout
+        }
+      }, message);
+      req.originalUrl = req.url;
+    };
+    req.on('close', function () {
+      log();
+    });
+    const _end = res.end;
+    // @ts-ignore
+    res.end = function (buf) {
+      if (buf) {
+        bytesout += buf.length;
+      }
+      /* eslint prefer-rest-params: "off" */
+      // @ts-ignore
+      _end.apply(res, arguments);
+      log();
+    };
+    next();
+  };
+};
+exports.log = log;
+//# sourceMappingURL=log.js.map

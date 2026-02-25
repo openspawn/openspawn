@@ -1,0 +1,1 @@
+{"version":3,"file":"validate-project.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/generators/convert-config-to-webpack-plugin/lib/validate-project.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,oBAAoB,EAAE,IAAI,EAAE,MAAM,YAAY,CAAC;AAyBxD;;;;;;GAMG;AACH,wBAAgB,eAAe,CAAC,IAAI,EAAE,IAAI,EAAE,OAAO,EAAE,oBAAoB,UAcxE"}

@@ -1,0 +1,55 @@
+import * as React from 'react';
+import type { ElementProps, FloatingContext, FloatingRootContext } from "../types.js";
+export interface UseTypeaheadProps {
+  /**
+   * A ref which contains an array of strings whose indices match the HTML
+   * elements of the list.
+   * @default empty list
+   */
+  listRef: React.MutableRefObject<Array<string | null>>;
+  /**
+   * The index of the active (focused or highlighted) item in the list.
+   * @default null
+   */
+  activeIndex: number | null;
+  /**
+   * Callback invoked with the matching index if found as the user types.
+   */
+  onMatch?: (index: number) => void;
+  /**
+   * Callback invoked with the typing state as the user types.
+   */
+  onTypingChange?: (isTyping: boolean) => void;
+  /**
+   * Whether the Hook is enabled, including all internal Effects and event
+   * handlers.
+   * @default true
+   */
+  enabled?: boolean;
+  /**
+   * A function that returns the matching string from the list.
+   * @default lowercase-finder
+   */
+  findMatch?: null | ((list: Array<string | null>, typedString: string) => string | null | undefined);
+  /**
+   * The number of milliseconds to wait before resetting the typed string.
+   * @default 750
+   */
+  resetMs?: number;
+  /**
+   * An array of keys to ignore when typing.
+   * @default []
+   */
+  ignoreKeys?: Array<string>;
+  /**
+   * The index of the selected item in the list, if available.
+   * @default null
+   */
+  selectedIndex?: number | null;
+}
+/**
+ * Provides a matching callback that can be used to focus an item as the user
+ * types, often used in tandem with `useListNavigation()`.
+ * @see https://floating-ui.com/docs/useTypeahead
+ */
+export declare function useTypeahead(context: FloatingRootContext | FloatingContext, props: UseTypeaheadProps): ElementProps;

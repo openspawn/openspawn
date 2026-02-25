@@ -1,0 +1,37 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createDependencies = void 0;
+const devkit_1 = require("@nx/devkit");
+const path_1 = require("path");
+const compute_go_modules_1 = require("./utils/compute-go-modules");
+const extract_project_root_map_1 = require("./utils/extract-project-root-map");
+const get_file_module_imports_1 = require("./utils/get-file-module-imports");
+const get_project_name_for_go_imports_1 = require("./utils/get-project-name-for-go-imports");
+// NOTE: LIMITATION: This assumes the name of the package from the last part of the path.
+// So having two package with the same name in different directories will cause issues.
+const createDependencies = async (options, context) => {
+    const dependencies = [];
+    let goModules = null;
+    let projectRootMap = null;
+    for (const projectName in context.filesToProcess.projectFileMap) {
+        const files = context.filesToProcess.projectFileMap[projectName].filter((file) => (0, path_1.extname)(file.file) === '.go');
+        if (files.length > 0 && goModules == null) {
+            goModules = (0, compute_go_modules_1.computeGoModules)(options === null || options === void 0 ? void 0 : options.skipGoDependencyCheck);
+            projectRootMap = (0, extract_project_root_map_1.extractProjectRootMap)(context);
+        }
+        for (const file of files) {
+            dependencies.push(...(0, get_file_module_imports_1.getFileModuleImports)(file, goModules)
+                .map((goImport) => (0, get_project_name_for_go_imports_1.getProjectNameForGoImport)(projectRootMap, goImport))
+                .filter((target) => target != null)
+                .map((target) => ({
+                type: devkit_1.DependencyType.static,
+                source: projectName,
+                target: target,
+                sourceFile: file.file,
+            })));
+        }
+    }
+    return dependencies;
+};
+exports.createDependencies = createDependencies;
+//# sourceMappingURL=create-dependencies.js.map

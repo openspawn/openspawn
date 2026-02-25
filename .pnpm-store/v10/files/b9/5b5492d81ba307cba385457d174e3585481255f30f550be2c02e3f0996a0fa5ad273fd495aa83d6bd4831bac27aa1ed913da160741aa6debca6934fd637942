@@ -1,0 +1,8 @@
+/**
+ * Determines if a Go module contains a main package,
+ * indicating it is an application rather than a library.
+ *
+ * @param projectRoot The root directory of the project
+ * @returns True if the project is an application, false otherwise
+ */
+export declare function hasMainPackage(projectRoot: string): boolean;

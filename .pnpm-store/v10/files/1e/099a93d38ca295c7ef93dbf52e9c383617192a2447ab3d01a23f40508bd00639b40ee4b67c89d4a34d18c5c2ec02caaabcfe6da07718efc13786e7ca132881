@@ -1,0 +1,234 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.allow_action = allow_action;
+exports.buildUser = buildUser;
+exports.convertPayloadToBase64 = convertPayloadToBase64;
+exports.expireReasons = void 0;
+exports.getApiToken = getApiToken;
+exports.getDefaultPluginMethods = getDefaultPluginMethods;
+exports.getMiddlewareCredentials = getMiddlewareCredentials;
+exports.handleSpecialUnpublish = handleSpecialUnpublish;
+exports.isAESLegacy = isAESLegacy;
+exports.isAuthHeaderValid = isAuthHeaderValid;
+exports.parseAESCredentials = parseAESCredentials;
+exports.parseAuthTokenHeader = parseAuthTokenHeader;
+exports.verifyJWTPayload = verifyJWTPayload;
+var _debug = _interopRequireDefault(require("debug"));
+var _lodash = _interopRequireDefault(require("lodash"));
+var _config = require("@verdaccio/config");
+var _core = require("@verdaccio/core");
+var _signature = require("@verdaccio/signature");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const debug = (0, _debug.default)('verdaccio:auth:utils');
+
+/**
+ * Split authentication header eg: Bearer [secret_token]
+ * @param authorizationHeader auth token
+ */
+function parseAuthTokenHeader(authorizationHeader) {
+  const parts = authorizationHeader.split(' ');
+  const [scheme, token] = parts;
+  return {
+    scheme,
+    token
+  };
+}
+function parseAESCredentials(authorizationHeader, secret) {
+  debug('parseAESCredentials init');
+  const {
+    scheme,
+    token
+  } = parseAuthTokenHeader(authorizationHeader);
+
+  // basic is deprecated and should not be enforced
+  // basic is currently being used for functional test
+  if (scheme.toUpperCase() === _core.TOKEN_BASIC.toUpperCase()) {
+    debug('legacy header basic');
+    const credentials = convertPayloadToBase64(token).toString();
+    return credentials;
+  } else if (scheme.toUpperCase() === _core.TOKEN_BEARER.toUpperCase()) {
+    debug('legacy header bearer');
+    debug('secret length %o', secret.length);
+    const isLegacyUnsecure = secret.length > 32;
+    debug('is legacy unsecure %o', isLegacyUnsecure);
+    if (isLegacyUnsecure) {
+      debug('legacy unsecure enabled');
+      return (0, _signature.aesDecryptDeprecated)(convertPayloadToBase64(token), secret).toString('utf-8');
+    } else {
+      debug('legacy secure enabled');
+      return (0, _signature.aesDecrypt)(token.toString(), secret);
+    }
+  }
+}
+function getMiddlewareCredentials(security, secretKey, authorizationHeader) {
+  debug('getMiddlewareCredentials init');
+  // comment out for debugging purposes
+  if (isAESLegacy(security)) {
+    debug('is legacy');
+    const credentials = parseAESCredentials(authorizationHeader, secretKey);
+    if (!credentials) {
+      debug('parse legacy credentials failed');
+      return;
+    }
+    const parsedCredentials = (0, _signature.parseBasicPayload)(credentials);
+    if (!parsedCredentials) {
+      debug('parse legacy basic payload credentials failed');
+      return;
+    }
+    return parsedCredentials;
+  }
+  const {
+    scheme,
+    token
+  } = parseAuthTokenHeader(authorizationHeader);
+  debug('is jwt');
+  if (_lodash.default.isString(token) && scheme.toUpperCase() === _core.TOKEN_BEARER.toUpperCase()) {
+    return verifyJWTPayload(token, secretKey, security);
+  }
+}
+function isAESLegacy(security) {
+  const {
+    legacy,
+    jwt
+  } = security.api;
+  return _lodash.default.isNil(legacy) === false && _lodash.default.isNil(jwt) && legacy === true;
+}
+async function getApiToken(auth, config, remoteUser, aesPassword) {
+  debug('get api token');
+  const {
+    security
+  } = config;
+  if (isAESLegacy(security)) {
+    debug('security legacy enabled');
+    // fallback all goes to AES encryption
+    return await new Promise(resolve => {
+      resolve(auth.aesEncrypt(buildUser(remoteUser.name, aesPassword)));
+    });
+  }
+  const {
+    jwt
+  } = security.api;
+  if (jwt?.sign) {
+    return await auth.jwtEncrypt(remoteUser, jwt.sign);
+  }
+  return await new Promise(resolve => {
+    resolve(auth.aesEncrypt(buildUser(remoteUser.name, aesPassword)));
+  });
+}
+const expireReasons = exports.expireReasons = ['JsonWebTokenError', 'TokenExpiredError'];
+function verifyJWTPayload(token, secret, security) {
+  try {
+    const payload = (0, _signature.verifyPayload)(token, secret, security?.api?.jwt?.verify);
+    return payload;
+  } catch (error) {
+    // #168 this check should be removed as soon AES encrypt is removed.
+    if (expireReasons.includes(error.name)) {
+      // it might be possible the jwt configuration is enabled and
+      // old tokens fails still remains in usage, thus
+      // we return an anonymous user to force log in.
+      return (0, _config.createAnonymousRemoteUser)();
+    }
+    throw _core.errorUtils.getCode(_core.HTTP_STATUS.UNAUTHORIZED, error.message);
+  }
+}
+function isAuthHeaderValid(authorization) {
+  return authorization.split(' ').length === 2;
+}
+
+/**
+ * Return a default configuration for authentication if none is provided.
+ * @param logger {Logger}
+ * @returns object of default implementations.
+ */
+function getDefaultPluginMethods(logger) {
+  return {
+    authenticate(_user, _password, cb) {
+      debug('triggered default authenticate method');
+      cb(_core.errorUtils.getForbidden(_core.API_ERROR.BAD_USERNAME_PASSWORD));
+    },
+    adduser(_user, _password, cb) {
+      debug('triggered default adduser method');
+      // since adduser is not implemented but optional, continue without error
+      // this assumes that the user is added by an external system
+      cb(null, true);
+    },
+    // @ts-ignore
+    allow_access: allow_action('access', logger),
+    // @ts-ignore
+    allow_publish: allow_action('publish', logger),
+    allow_unpublish: handleSpecialUnpublish(logger)
+  };
+}
+function allow_action(action, logger) {
+  return function allowActionCallback(user, pkg, callback) {
+    logger.trace({
+      remote: user.name
+    }, `[auth/allow_action]: user: @{remote}`);
+    const {
+      name,
+      groups
+    } = user;
+    debug('allow_action "%s": groups %s', action, groups);
+    const groupAccess = pkg[action];
+    debug('allow_action "%s": groupAccess %s', action, groupAccess);
+    const hasPermission = groupAccess.some(group => {
+      return name === group || groups.includes(group);
+    });
+    debug('package "%s" has permission "%s"', name, hasPermission);
+    logger.trace({
+      pkgName: pkg.name,
+      hasPermission,
+      remote: user.name,
+      groupAccess
+    }, `[auth/allow_action]: hasPermission? @{hasPermission} for user: @{remote}, package: @{pkgName}`);
+    if (hasPermission) {
+      logger.trace({
+        remote: user.name
+      }, `auth/allow_action: access granted to: @{remote}`);
+      return callback(null, true);
+    }
+    if (name) {
+      callback(_core.errorUtils.getForbidden(`user ${name} is not allowed to ${action} package ${pkg.name}`));
+    } else {
+      callback(_core.errorUtils.getUnauthorized(`authorization required to ${action} package ${pkg.name}`));
+    }
+  };
+}
+
+/**
+ *
+ */
+function handleSpecialUnpublish(logger) {
+  return function (user, pkg, callback) {
+    const action = 'unpublish';
+    // verify whether the unpublish prop has been defined
+    const isUnpublishMissing = !pkg[action];
+    debug('is unpublish method missing ? %s', isUnpublishMissing);
+    const hasGroups = isUnpublishMissing ? false : pkg[action].length > 0;
+    logger.trace({
+      user: user.name,
+      name: pkg.name,
+      hasGroups
+    }, `fallback unpublish for @{name} has groups: @{hasGroups} for @{user}`);
+    if (isUnpublishMissing || hasGroups === false) {
+      return callback(null, undefined);
+    }
+    logger.trace({
+      user: user.name,
+      name: pkg.name,
+      action,
+      hasGroups
+    }, `allow_action for @{action} for @{name} has groups: @{hasGroups} for @{user}`);
+    return allow_action(action, logger)(user, pkg, callback);
+  };
+}
+function buildUser(name, password) {
+  return String(`${name}:${password}`);
+}
+function convertPayloadToBase64(payload) {
+  return Buffer.from(payload, 'base64');
+}
+//# sourceMappingURL=utils.js.map

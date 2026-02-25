@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","names":["_logger","require"],"sources":["../src/index.ts"],"sourcesContent":["export { setup, createLogger, prepareSetup } from './logger';\n"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;AAAA,IAAAA,OAAA,GAAAC,OAAA","ignoreList":[]}

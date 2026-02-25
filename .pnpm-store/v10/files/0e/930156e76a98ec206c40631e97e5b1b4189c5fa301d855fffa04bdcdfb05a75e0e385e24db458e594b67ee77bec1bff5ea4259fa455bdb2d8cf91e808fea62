@@ -1,0 +1,4 @@
+export declare const GO_MOD_FILE = "go.mod";
+export declare const GO_WORK_FILE = "go.work";
+export declare const GO_WORK_MINIMUM_VERSION = "1.18";
+export declare const NX_PLUGIN_NAME = "@naxodev/gonx";

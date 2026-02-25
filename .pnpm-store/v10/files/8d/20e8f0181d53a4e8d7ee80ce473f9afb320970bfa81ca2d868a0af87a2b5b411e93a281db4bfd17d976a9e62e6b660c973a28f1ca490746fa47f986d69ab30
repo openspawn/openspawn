@@ -1,0 +1,21 @@
+import { ProjectType, Tree } from '@nx/devkit';
+export interface GeneratorSchema {
+    directory: string;
+    name?: string;
+    template?: 'standard' | 'cli' | 'tui';
+    tags?: string;
+    skipFormat?: boolean;
+    addGoDotWork?: boolean;
+}
+export interface GeneratorNormalizedSchema extends GeneratorSchema {
+    moduleName: string;
+    projectName: string;
+    projectRoot: string;
+    projectType: ProjectType;
+    parsedTags: string[];
+    goVersion: string;
+    cobraVersion?: string;
+    bubbleTeaVersion?: string;
+    lipGlossVersion?: string;
+}
+export declare const normalizeOptions: (tree: Tree, options: GeneratorSchema, projectType: ProjectType) => Promise<GeneratorNormalizedSchema>;

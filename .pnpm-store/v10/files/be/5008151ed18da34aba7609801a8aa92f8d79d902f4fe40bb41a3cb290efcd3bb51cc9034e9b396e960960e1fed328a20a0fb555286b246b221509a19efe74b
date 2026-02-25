@@ -1,0 +1,1 @@
+{"version":3,"file":"update-tsconfig.d.ts","sourceRoot":"","sources":["../../../../../../../packages/nest/src/generators/library/lib/update-tsconfig.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,IAAI,EAAE,MAAM,YAAY,CAAC;AAEvC,OAAO,KAAK,EAAE,iBAAiB,EAAE,MAAM,WAAW,CAAC;AAEnD,wBAAgB,cAAc,CAAC,IAAI,EAAE,IAAI,EAAE,OAAO,EAAE,iBAAiB,GAAG,IAAI,CAsB3E"}

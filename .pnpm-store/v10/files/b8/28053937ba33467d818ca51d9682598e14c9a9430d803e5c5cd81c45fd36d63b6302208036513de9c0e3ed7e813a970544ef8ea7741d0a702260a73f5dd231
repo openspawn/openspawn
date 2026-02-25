@@ -1,0 +1,1 @@
+{"version":3,"file":"ast.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/generators/convert-to-inferred/utils/ast.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,MAAM,YAAY,CAAC;AAEjC,wBAAgB,oBAAoB,CAClC,GAAG,EAAE,MAAM,EACX,KAAK,EAAE,OAAO,GACb,EAAE,CAAC,kBAAkB,CAiCvB;AAED,wBAAgB,YAAY,CAAC,KAAK,EAAE,OAAO,GAAG,EAAE,CAAC,UAAU,CAkB1D"}

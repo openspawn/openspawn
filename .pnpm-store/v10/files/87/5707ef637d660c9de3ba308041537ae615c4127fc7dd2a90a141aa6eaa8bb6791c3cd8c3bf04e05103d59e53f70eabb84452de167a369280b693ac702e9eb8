@@ -1,0 +1,24 @@
+{
+  "name": "@oxlint/linux-arm64-gnu",
+  "version": "1.43.0",
+  "type": "commonjs",
+  "main": "oxlint.linux-arm64-gnu.node",
+  "author": "Boshen and oxc contributors",
+  "license": "MIT",
+  "homepage": "https://oxc.rs/docs/guide/usage/linter",
+  "bugs": "https://github.com/oxc-project/oxc/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxc-project/oxc",
+    "directory": "npm/oxlint"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "libc": [
+    "glibc"
+  ]
+}

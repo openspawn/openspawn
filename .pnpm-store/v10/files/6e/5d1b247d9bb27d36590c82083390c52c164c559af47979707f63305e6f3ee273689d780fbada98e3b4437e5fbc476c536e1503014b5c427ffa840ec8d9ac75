@@ -1,0 +1,1 @@
+{"version":3,"file":"constant.esm.js","sources":["../src/constant.ts"],"sourcesContent":["export const SHARED_STRATEGY = 'loaded-first';\n"],"names":[],"mappings":"AAAY,MAAC,eAAe,GAAG;;;;"}

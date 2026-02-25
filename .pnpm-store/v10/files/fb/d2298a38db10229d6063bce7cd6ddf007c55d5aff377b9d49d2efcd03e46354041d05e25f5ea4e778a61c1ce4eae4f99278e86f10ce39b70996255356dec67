@@ -1,0 +1,1 @@
+{"version":3,"file":"graphiql-html.factory.d.ts","sourceRoot":"","sources":["../../lib/graphiql/graphiql-html.factory.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,yCAAyC,CAAC;AAE1E,qBAAa,mBAAmB;IAC9B,MAAM,CAAC,OAAO,EAAE,eAAe,GAAG,MAAM;CA+DzC"}

@@ -1,0 +1,6 @@
+export declare const generate: () => {
+    executor: string;
+    cache: boolean;
+    dependsOn: string[];
+    inputs: string[];
+};

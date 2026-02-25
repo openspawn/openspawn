@@ -1,0 +1,36 @@
+import { ExecutionContext, ModuleMetadata, Type } from '@nestjs/common/interfaces';
+import { ThrottlerStorage } from './throttler-storage.interface';
+import { ThrottlerLimitDetail } from './throttler.guard.interface';
+export type Resolvable<T extends number | string | boolean> = T | ((context: ExecutionContext) => T | Promise<T>);
+export interface ThrottlerOptions {
+    name?: string;
+    limit: Resolvable<number>;
+    ttl: Resolvable<number>;
+    blockDuration?: Resolvable<number>;
+    ignoreUserAgents?: RegExp[];
+    skipIf?: (context: ExecutionContext) => boolean;
+    getTracker?: ThrottlerGetTrackerFunction;
+    generateKey?: ThrottlerGenerateKeyFunction;
+    setHeaders?: boolean;
+}
+export type ThrottlerModuleOptions = Array<ThrottlerOptions> | {
+    ignoreUserAgents?: RegExp[];
+    skipIf?: (context: ExecutionContext) => boolean;
+    getTracker?: ThrottlerGetTrackerFunction;
+    generateKey?: ThrottlerGenerateKeyFunction;
+    errorMessage?: string | ((context: ExecutionContext, throttlerLimitDetail: ThrottlerLimitDetail) => string);
+    storage?: ThrottlerStorage;
+    throttlers: Array<ThrottlerOptions>;
+    setHeaders?: boolean;
+};
+export interface ThrottlerOptionsFactory {
+    createThrottlerOptions(): Promise<ThrottlerModuleOptions> | ThrottlerModuleOptions;
+}
+export interface ThrottlerAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
+    useExisting?: Type<ThrottlerOptionsFactory>;
+    useClass?: Type<ThrottlerOptionsFactory>;
+    useFactory?: (...args: any[]) => Promise<ThrottlerModuleOptions> | ThrottlerModuleOptions;
+    inject?: any[];
+}
+export type ThrottlerGetTrackerFunction = (req: Record<string, any>, context: ExecutionContext) => Promise<string> | string;
+export type ThrottlerGenerateKeyFunction = (context: ExecutionContext, trackerString: string, throttlerName: string) => string;

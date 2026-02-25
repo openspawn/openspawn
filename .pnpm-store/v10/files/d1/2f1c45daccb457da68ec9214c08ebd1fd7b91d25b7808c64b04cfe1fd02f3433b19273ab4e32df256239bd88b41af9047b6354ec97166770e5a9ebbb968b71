@@ -1,0 +1,8 @@
+'use strict';
+
+var sdk = require('@module-federation/sdk');
+
+const logger = sdk.createLogger('[ Module Federation Data Prefetch ]');
+
+exports.logger = logger;
+//# sourceMappingURL=index.cjs2.cjs.map

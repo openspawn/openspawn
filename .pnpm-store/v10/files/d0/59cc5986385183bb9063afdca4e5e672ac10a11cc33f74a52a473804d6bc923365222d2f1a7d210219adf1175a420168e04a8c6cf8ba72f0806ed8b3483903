@@ -1,0 +1,34 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getProjectNameForGoImport = void 0;
+const devkit_1 = require("@nx/devkit");
+const path_1 = require("path");
+/**
+ * Gets the project name for the go import by getting the relative path for the import with in the go module system
+ * then uses that to calculate the relative path on disk and looks up which project in the workspace the import is a part
+ * of.
+ *
+ * @param projectRootMap map with project roots in the workspace
+ * @param import the go import
+ * @param module the go module
+ */
+const getProjectNameForGoImport = (projectRootMap, { import: goImport, module }) => {
+    const relativeImportPath = goImport.substring(module.Path.length + 1);
+    const relativeModuleDir = module.Dir.substring(devkit_1.workspaceRoot.length + 1).replace(/\\/g, '/');
+    let projectPath = relativeModuleDir
+        ? `${relativeModuleDir}/${relativeImportPath}`
+        : relativeImportPath;
+    while (projectPath !== '.') {
+        if (projectPath.endsWith('/')) {
+            projectPath = projectPath.slice(0, -1);
+        }
+        const projectName = projectRootMap.get(projectPath);
+        if (projectName) {
+            return projectName;
+        }
+        projectPath = (0, path_1.dirname)(projectPath);
+    }
+    return null;
+};
+exports.getProjectNameForGoImport = getProjectNameForGoImport;
+//# sourceMappingURL=get-project-name-for-go-imports.js.map

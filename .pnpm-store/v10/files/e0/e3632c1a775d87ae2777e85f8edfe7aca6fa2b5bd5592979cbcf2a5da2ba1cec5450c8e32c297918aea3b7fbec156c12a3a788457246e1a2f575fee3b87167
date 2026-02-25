@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.tidy = void 0;
+const tidy = () => ({
+    executor: '@naxodev/gonx:tidy',
+    cache: true,
+    inputs: [
+        '{projectRoot}/go.mod',
+        '{projectRoot}/go.sum',
+        '{projectRoot}/**/*.{go}',
+    ],
+});
+exports.tidy = tidy;
+//# sourceMappingURL=tidy.js.map

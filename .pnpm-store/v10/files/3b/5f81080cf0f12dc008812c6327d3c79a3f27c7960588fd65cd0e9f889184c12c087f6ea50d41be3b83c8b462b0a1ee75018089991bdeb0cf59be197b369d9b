@@ -1,0 +1,148 @@
+{
+  "name": "@tremor/react",
+  "version": "3.18.7",
+  "description": "The React library to build dashboards faster.",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "rollup -c",
+    "lint": "eslint \"{**/*,*}.{js,ts,jsx,tsx}\"",
+    "prettier": "prettier --write \"{src,types,tests,example/src}/**/*.{js,ts,jsx,tsx}\"",
+    "tests": "jest",
+    "fix-lint": "eslint . --ext .ts --ext .tsx --fix",
+    "build-storybook": "storybook build",
+    "semantic-release": "semantic-release",
+    "storybook": "storybook dev -p 6006"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tremorlabs/tremor-npm.git"
+  },
+  "author": "tremor",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/tremorlabs/tremor-npm/issues"
+  },
+  "homepage": "https://github.com/tremorlabs/tremor-npm-npm#readme",
+  "dependencies": {
+    "@floating-ui/react": "^0.19.2",
+    "@headlessui/react": "2.2.0",
+    "date-fns": "^3.6.0",
+    "react-day-picker": "^8.10.1",
+    "react-transition-state": "^2.1.2",
+    "recharts": "^2.13.3",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
+    "@chromatic-com/storybook": "^3.2.2",
+    "@mdx-js/react": "^2.3.0",
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^8.5.0",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/github": "github:semantic-release/github",
+    "@semantic-release/npm": "github:semantic-release/npm",
+    "@storybook/addon-a11y": "^8.4.7",
+    "@storybook/addon-actions": "^8.4.7",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/addon-interactions": "^8.4.7",
+    "@storybook/addon-links": "^8.4.7",
+    "@storybook/addon-styling-webpack": "^1.0.1",
+    "@storybook/addon-themes": "^8.4.7",
+    "@storybook/addon-webpack5-compiler-babel": "^3.0.3",
+    "@storybook/manager-api": "^8.4.7",
+    "@storybook/mdx2-csf": "^1.1.0",
+    "@storybook/react": "^8.4.7",
+    "@storybook/react-vite": "^8.4.7",
+    "@storybook/react-webpack5": "^8.4.7",
+    "@storybook/test": "^8.4.7",
+    "@storybook/theming": "^8.4.7",
+    "@tailwindcss/forms": "^0.5.9",
+    "@testing-library/react": "^14.3.1",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.6.1",
+    "@types/react": "^18.3.9",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "autoprefixer": "^10.4.20",
+    "babel-jest": "^27.5.1",
+    "babel-loader": "^8.4.1",
+    "conventional-changelog-conventionalcommits": "^5.0.0",
+    "css-loader": "^6.11.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.36.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "html-webpack-plugin": "^5.6.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^7.3.4",
+    "prettier": "3.4.2",
+    "prop-types": "^15.8.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resize-observer-polyfill": "^1.5.1",
+    "rollup": "^2.79.1",
+    "rollup-plugin-dts": "^4.2.3",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-preserve-directives": "^0.1.1",
+    "rollup-plugin-typescript-paths": "^1.5.0",
+    "semantic-release": "^24.1.1",
+    "storybook": "^8.4.7",
+    "style-loader": "^3.3.4",
+    "tailwindcss": "^3.4.16",
+    "tslib": "^2.7.0",
+    "typescript": "^4.9.5",
+    "webpack": "^5.97.1"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": ">=16.6.0"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "beta-*",
+        "prerelease": true
+      }
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits",
+          "releaseRules": [
+            {
+              "type": "build",
+              "release": "minor"
+            }
+          ]
+        }
+      ],
+      "@semantic-release/npm",
+      "@semantic-release/github"
+    ]
+  }
+}

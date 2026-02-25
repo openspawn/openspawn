@@ -1,0 +1,10 @@
+export declare const build: () => {
+    executor: string;
+    cache: boolean;
+    dependsOn: string[];
+    inputs: string[];
+    options: {
+        outputPath: string;
+    };
+    outputs: string[];
+};

@@ -1,0 +1,149 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.compileTemplate = compileTemplate;
+exports.handleNotify = handleNotify;
+exports.notify = notify;
+exports.sendNotification = sendNotification;
+var _debug = _interopRequireDefault(require("debug"));
+var _handlebars = _interopRequireDefault(require("handlebars"));
+var _logger = require("@verdaccio/logger");
+var _notifyRequest = require("./notify-request");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+/* eslint-disable no-undef */
+
+const debug = (0, _debug.default)('verdaccio:hooks');
+function compileTemplate(content, metadata) {
+  // FUTURE: multiple handlers
+  return new Promise((resolve, reject) => {
+    let handler;
+    try {
+      if (!handler) {
+        debug('compile default template handler %o', content);
+        const template = _handlebars.default.compile(content);
+        return resolve(template(metadata));
+      }
+    } catch (error) {
+      debug('error  template handler %o', error?.message);
+      _logger.logger.error({
+        error: error.message
+      }, 'notification template compilation has failed: @{error}');
+      reject(error);
+    }
+  });
+}
+async function handleNotify(metadata, notifyEntry, remoteUser, publishedPackage) {
+  let regex;
+  try {
+    if (metadata.name && notifyEntry.packagePattern) {
+      debug('checking package pattern %o', notifyEntry.packagePattern);
+      debug('checking package pattern flags %o', notifyEntry.packagePatternFlags);
+      regex = new RegExp(notifyEntry.packagePattern, notifyEntry.packagePatternFlags ?? '');
+      if (!regex.test(metadata.name)) {
+        _logger.logger.debug('Notification exclude does not match %o', metadata.name);
+        return false;
+      }
+      debug('package pattern matched %o', metadata.name);
+    }
+  } catch (error) {
+    _logger.logger.error('Invalid regex pattern or flags: %o', error?.message);
+    return false;
+  }
+  let content;
+  // FIXME: publisher is not part of the expected types metadata
+  // @ts-ignore
+  if (typeof metadata?.publisher === 'undefined' || metadata?.publisher === null) {
+    // @ts-ignore
+    metadata = {
+      ...metadata,
+      publishedPackage,
+      publisher: {
+        name: remoteUser.name
+      }
+    };
+    debug('template metadata %o', metadata);
+    content = await compileTemplate(notifyEntry.content, metadata);
+  }
+  const options = {
+    body: content
+  };
+
+  // provides fallback support, it's accept an Object {} and Array of {}
+  if (notifyEntry.headers && Array.isArray(notifyEntry.headers)) {
+    const header = {};
+    // FIXME: we can simplify this
+    notifyEntry.headers.map(function (item) {
+      if (Object.is(item, item)) {
+        for (const key in item) {
+          /* eslint no-prototype-builtins: 0 */
+          if (item.hasOwnProperty(key)) {
+            header[key] = item[key];
+          }
+        }
+      }
+    });
+    options.headers = header;
+  } else if (Object.is(notifyEntry.headers, notifyEntry.headers)) {
+    options.headers = notifyEntry.headers;
+  }
+  if (!notifyEntry.endpoint) {
+    debug('error due endpoint is missing');
+    throw new Error('missing parameter');
+  }
+  return (0, _notifyRequest.notifyRequest)(notifyEntry.endpoint, {
+    method: notifyEntry.method,
+    ...options
+  });
+}
+function sendNotification(metadata, notify, remoteUser, publishedPackage) {
+  return handleNotify(metadata, notify, remoteUser, publishedPackage);
+}
+function isHasNotification(value) {
+  return value && typeof value === 'object' && 'endpoint' in value && 'content' in value;
+}
+async function notify(metadata, config, remoteUser, publishedPackage) {
+  debug('init send notification');
+  const notification = config?.notify;
+  if (!notification) {
+    debug('no notify configuration detected');
+    return [false];
+  }
+  const isSingle = isHasNotification(notification);
+  debug('is single notify %o', isSingle);
+  if (isSingle) {
+    debug('send single notification');
+    try {
+      const response = await sendNotification(metadata, config.notify, remoteUser, publishedPackage);
+      return [response];
+    } catch {
+      debug('error on sending single notification');
+      return [false];
+    }
+  } else {
+    try {
+      debug('send multiples notification');
+      const notificationEntries = Object.entries(notification).filter(([, item]) => isHasNotification(item));
+      debug('valid notification entries %o', notificationEntries.length);
+      if (notificationEntries.length === 0) {
+        // No valid notifications, return false for each entry
+        return Object.keys(notification).map(() => false);
+      }
+      debug('sending %o notifications', notificationEntries.length);
+      const results = await Promise.allSettled(notificationEntries.map(([, item]) => sendNotification(metadata, item, remoteUser, publishedPackage))).catch(error => {
+        _logger.logger.error({
+          error
+        }, 'notify request has failed: @error');
+      });
+      if (!results) {
+        return [];
+      }
+      return results.map(result => result.status === 'fulfilled' ? result.value : false);
+    } catch (error) {
+      debug('error on sending multiple notification %o', error);
+      return Object.keys(notification).map(() => false);
+    }
+  }
+}
+//# sourceMappingURL=notify.js.map

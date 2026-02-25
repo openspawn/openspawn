@@ -1,0 +1,11 @@
+import { ExecutorContext } from '@nx/devkit';
+import { GenerateExecutorSchema } from './schema';
+/**
+ * This executor runs code generation using the `go generate` command.
+ *
+ * @param options options passed to the executor
+ * @param context context passed to the executor
+ */
+export default function runExecutor(options: GenerateExecutorSchema, context: ExecutorContext): Promise<{
+    success: boolean;
+}>;

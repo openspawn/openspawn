@@ -1,0 +1,1 @@
+{"version":3,"file":"HoistContainerReferencesPlugin.js","sourceRoot":"","sources":["../../../src/wrapper/HoistContainerReferencesPlugin.ts"],"names":[],"mappings":";;;;;AAAA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,gCAAgC,CAAC;AAErD,MAAqB,8BAA+B,SAAQ,2BAAiB;IAC3E;QACE,KAAK,CAAC,EAAE,EAAE,WAAW,EAAE,iDAAiD,CAAC,CAAC;IAC5E,CAAC;CACF;AAJD,iDAIC"}

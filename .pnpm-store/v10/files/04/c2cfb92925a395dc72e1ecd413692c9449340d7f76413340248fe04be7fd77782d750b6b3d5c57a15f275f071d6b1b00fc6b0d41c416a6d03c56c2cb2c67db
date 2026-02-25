@@ -1,0 +1,1 @@
+{"version":3,"file":"AsyncBoundaryPlugin.js","sourceRoot":"","sources":["../../../src/wrapper/AsyncBoundaryPlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,qBAAqB,CAAC;AAE1C,MAAqB,mBAAoB,SAAQ,2BAAiB;IAChE,YAAY,OAAgB;QAC1B,KAAK,CAAC,OAAO,EAAE,WAAW,EAAE,sCAAsC,CAAC,CAAC;IACtE,CAAC;CACF;AAJD,sCAIC"}
