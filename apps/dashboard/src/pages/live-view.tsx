@@ -297,16 +297,58 @@ function ProgressHeader({ act, tick, pattiesDelivered }: { act: typeof ACTS[0]; 
   );
 }
 
+// ── Act Banner CSS animations ─────────────────────────────────────────────────
+const ACT_BANNER_STYLES = `
+  @keyframes act-overlay-in {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to   { opacity: 1; backdrop-filter: blur(8px); }
+  }
+  @keyframes act-label-rise {
+    from { opacity: 0; transform: translateY(8px); letter-spacing: 0.6em; }
+    to   { opacity: 1; transform: translateY(0); letter-spacing: 0.3em; }
+  }
+  @keyframes act-title-stamp {
+    0%   { opacity: 0; transform: scale(1.18) translateY(-6px); letter-spacing: 0.05em; filter: blur(6px); }
+    60%  { opacity: 1; transform: scale(0.98) translateY(1px); letter-spacing: -0.03em; filter: blur(0); }
+    80%  { transform: scale(1.01); }
+    100% { opacity: 1; transform: scale(1); letter-spacing: -0.01em; }
+  }
+  @keyframes act-narrative-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes act-line-expand {
+    from { width: 0; opacity: 0; }
+    to   { width: 80px; opacity: 1; }
+  }
+  @keyframes act-overlay-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .act-overlay, .act-label, .act-title, .act-narrative, .act-line {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+`;
+
 // ── Act Banner (CSS-only, no motion/react) ───────────────────────────────────
 
 function ActBanner({ banner }: { banner: { num: number; name: string; narrative: string } | null }) {
   const [visible, setVisible] = useState(false);
   const [content, setContent] = useState<typeof banner>(null);
+  // Key increments each time a new banner appears → forces re-mount → re-triggers animations
+  const [animKey, setAnimKey] = useState(0);
 
   useEffect(() => {
     if (banner) {
       setContent(banner);
       setVisible(true);
+      setAnimKey(k => k + 1);
     } else {
       setVisible(false);
     }
@@ -315,45 +357,151 @@ function ActBanner({ banner }: { banner: { num: number; name: string; narrative:
   if (!content) return null;
 
   return (
-    <div
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-sm pointer-events-none"
-      style={{
-        background: 'rgba(3,14,26,0.7)',
-        opacity: visible ? 1 : 0,
-        transition: 'opacity 0.3s ease',
-      }}
-    >
-      <div className="text-sm uppercase tracking-[0.3em] font-medium mb-1" style={{ color: 'rgba(244,197,66,0.8)', fontFamily: 'Nunito, sans-serif' }}>
-        Act {content.num}
+    <>
+      <style>{ACT_BANNER_STYLES}</style>
+      <div
+        key={`overlay-${animKey}`}
+        className="act-overlay absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none"
+        style={{
+          background: 'rgba(3,14,26,0.75)',
+          opacity: visible ? undefined : 0,
+          transition: visible ? undefined : 'opacity 0.4s ease',
+          animation: visible ? 'act-overlay-in 0.4s ease forwards' : undefined,
+        }}
+      >
+        {/* Decorative top line */}
+        <div
+          key={`line-top-${animKey}`}
+          className="act-line h-px mb-6"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.6), transparent)',
+            animation: 'act-line-expand 0.5s 0.1s ease forwards',
+            width: 0,
+            opacity: 0,
+          }}
+        />
+
+        {/* Act number label */}
+        <div
+          key={`label-${animKey}`}
+          className="act-label text-xs font-bold uppercase mb-2"
+          style={{
+            color: 'rgba(244,197,66,0.7)',
+            fontFamily: 'Nunito, sans-serif',
+            animation: 'act-label-rise 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) forwards',
+            opacity: 0,
+            letterSpacing: '0.3em',
+          }}
+        >
+          ── Act {content.num} ──
+        </div>
+
+        {/* Title — cinematic stamp */}
+        <div
+          key={`title-${animKey}`}
+          className="act-title text-2xl md:text-4xl font-black tracking-tight mb-3"
+          style={{
+            color: '#F4C542',
+            fontFamily: '"Baloo 2", cursive',
+            textShadow: '0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2)',
+            animation: 'act-title-stamp 0.55s 0.12s cubic-bezier(0.34,1.56,0.64,1) forwards',
+            opacity: 0,
+          }}
+        >
+          {content.name.replace(/^Act \w+: /, '')}
+        </div>
+
+        {/* Narrative */}
+        <div
+          key={`narrative-${animKey}`}
+          className="act-narrative text-sm max-w-sm text-center px-6"
+          style={{
+            color: 'rgba(184,228,247,0.55)',
+            fontFamily: 'Nunito, sans-serif',
+            animation: 'act-narrative-in 0.5s 0.3s ease forwards',
+            opacity: 0,
+          }}
+        >
+          {content.narrative}
+        </div>
+
+        {/* Decorative bottom line */}
+        <div
+          key={`line-bot-${animKey}`}
+          className="act-line h-px mt-6"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.4), transparent)',
+            animation: 'act-line-expand 0.5s 0.2s ease forwards',
+            width: 0,
+            opacity: 0,
+          }}
+        />
       </div>
-      <div className="text-2xl md:text-3xl font-black tracking-tight mb-2" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>
-        {content.name.replace(/^Act \w+: /, '')}
-      </div>
-      <div className="text-sm max-w-md text-center" style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}>
-        {content.narrative}
-      </div>
-    </div>
+    </>
   );
 }
 
 // ── Completion Overlay (CSS-only) ────────────────────────────────────────────
 
+const COMPLETION_STYLES = `
+  @keyframes completion-stamp {
+    0%   { transform: scale(1.5); opacity: 0; filter: blur(8px); }
+    55%  { transform: scale(0.94); opacity: 1; filter: blur(0); }
+    75%  { transform: scale(1.03); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes completion-subtitle {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes completion-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes completion-glow-pulse {
+    0%, 100% { text-shadow: 0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2); }
+    50%       { text-shadow: 0 0 60px rgba(244,197,66,0.8), 0 0 120px rgba(244,197,66,0.35); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .completion-stamp, .completion-subtitle, .completion-glow { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+  }
+`;
+
 function CompletionOverlay({ finished, onReplay }: { finished: boolean; onReplay: () => void }) {
   return (
-    <div
-      className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
-      style={{
-        background: 'rgba(3,14,26,0.92)',
-        opacity: finished ? 1 : 0,
-        pointerEvents: finished ? 'auto' : 'none',
-        transition: 'opacity 0.5s ease',
-      }}
-    >
+    <>
+      <style>{COMPLETION_STYLES}</style>
+      <div
+        className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
+        style={{
+          background: 'rgba(3,14,26,0.92)',
+          opacity: finished ? 1 : 0,
+          pointerEvents: finished ? 'auto' : 'none',
+          transition: 'opacity 0.5s ease',
+        }}
+      >
       <div className="text-center max-w-lg px-8">
-        <div className="text-6xl md:text-7xl font-black mb-2" style={{ fontFamily: '"Baloo 2", cursive', color: '#F4C542' }}>
+        {/* Stamp entrance for the big number */}
+        <div
+          className="completion-stamp text-6xl md:text-7xl font-black mb-2"
+          style={{
+            fontFamily: '"Baloo 2", cursive',
+            color: '#F4C542',
+            animation: finished ? 'completion-stamp 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards, completion-glow-pulse 3s 1s ease-in-out infinite' : 'none',
+            opacity: finished ? undefined : 0,
+          }}
+        >
           🍔 10,000
         </div>
-        <div className="text-lg font-semibold mb-6" style={{ color: '#4AE88A', fontFamily: '"Baloo 2", cursive' }}>
+        <div
+          className="completion-subtitle text-lg font-semibold mb-6"
+          style={{
+            color: '#4AE88A',
+            fontFamily: '"Baloo 2", cursive',
+            animation: finished ? 'completion-subtitle 0.6s 0.35s ease forwards' : 'none',
+            opacity: finished ? undefined : 0,
+          }}
+        >
           🎉 PATTIES DELIVERED! 🎉
         </div>
         <p className="text-lg mb-8" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
@@ -441,6 +589,7 @@ function CompletionOverlay({ finished, onReplay }: { finished: boolean; onReplay
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -474,6 +623,39 @@ export function LiveViewPage() {
     <div className="relative h-screen w-full text-white flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, #062A45 0%, #030E1A 100%)' }}>
       {/* BikiniBottom ocean background */}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(11,94,138,0.3) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(26,125,181,0.2) 0%, transparent 50%)' }} />
+
+      {/* Ambient caustic light effects — subtle underwater atmosphere */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '50vw', height: '40vh', top: '-5vh', left: '-5vw',
+          background: 'radial-gradient(ellipse, rgba(74,174,217,1) 0%, transparent 70%)',
+          opacity: 0.04,
+          animation: 'bb-caustic 18s ease-in-out infinite',
+        }} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '40vw', height: '30vh', bottom: '10%', right: '-8vw',
+          background: 'radial-gradient(ellipse, rgba(46,204,113,1) 0%, transparent 70%)',
+          opacity: 0.025,
+          animation: 'bb-caustic 13s 6s ease-in-out infinite',
+          '--bb-caustic-rotate': '-3deg' as string,
+          '--bb-caustic-drift': '20px' as string,
+          '--bb-caustic-min': '0.02' as string,
+          '--bb-caustic-max': '0.05' as string,
+        } as React.CSSProperties} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: '35vw', height: '25vh', top: '40%', left: '30%',
+          background: 'radial-gradient(ellipse, rgba(26,125,181,1) 0%, transparent 70%)',
+          opacity: 0.03,
+          animation: 'bb-caustic 22s 3s ease-in-out infinite',
+          '--bb-caustic-rotate': '5deg' as string,
+          '--bb-caustic-drift': '0px' as string,
+          '--bb-caustic-min': '0.02' as string,
+          '--bb-caustic-max': '0.04' as string,
+        } as React.CSSProperties} />
+      </div>
 
       {/* Intro overlay */}
       {showIntro && <IntroCard onStart={handleStart} />}
