@@ -213,15 +213,17 @@ maintaining operational excellence across all stations.
             See it running
           </h2>
           <p className="mb-8 text-slate-400 text-lg">
-            BikiniBottom is a live reference implementation — 22 agents,
+            The BikiniBottom demo is a live OpenSpawn reference implementation — 22 SpongeBob agents,
             organized by ORG.md, running right now.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="/app/live"
+              href="https://bikinibottom.ai/app/"
+              target="_blank"
+              rel="noopener"
               className="glow-cyan rounded-xl bg-cyan-500 px-8 py-3 text-base font-semibold text-navy-950 transition hover:bg-cyan-400"
             >
-              Watch the Demo →
+              Watch 22 SpongeBob Agents →
             </a>
             <a
               href="/docs/getting-started"
