@@ -7,7 +7,7 @@ export function MCPTools() {
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">MCP Tools</h1>
       <p className="mb-8 text-lg text-slate-400">
-        OpenSpawn exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">POST /mcp</code>.
+        OpenSpawn exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at <code className="inline-code">POST /mcp</code>.
       </p>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Quick Start</h2>
@@ -39,7 +39,7 @@ export function MCPTools() {
               ["get_org_stats", "Get organization-wide statistics", "—"],
             ].map(([tool, desc, params]) => (
               <tr key={tool} className="border-b border-white/5">
-                <td className="py-2 pr-4"><code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">{tool}</code></td>
+                <td className="py-2 pr-4"><code className="inline-code">{tool}</code></td>
                 <td className="py-2 pr-4 text-slate-400">{desc}</td>
                 <td className="py-2 text-slate-500">{params}</td>
               </tr>

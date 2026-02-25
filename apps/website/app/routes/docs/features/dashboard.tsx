@@ -15,7 +15,7 @@ export function DashboardDocs() {
       </div>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Overview</h2>
-      <p className="mb-4 text-slate-400">The dashboard starts automatically when you run <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">npx openspawn start</code>. It provides:</p>
+      <p className="mb-4 text-slate-400">The dashboard starts automatically when you run <code className="inline-code">npx openspawn start</code>. It provides:</p>
       <ul className="mb-6 ml-4 list-disc space-y-2 text-slate-400">
         <li><strong className="text-slate-200">Agent network graph</strong> — Visualize the org hierarchy and active connections</li>
         <li><strong className="text-slate-200">Task timeline</strong> — Real-time feed of task creation, delegation, and completion</li>
