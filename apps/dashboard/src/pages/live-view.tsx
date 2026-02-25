@@ -29,6 +29,31 @@ const INITIAL_STATS: Stats = {
   pattiesProduced: 0, pattiesDelivered: 0,
 };
 
+// ── Variable tick timing ─────────────────────────────────────────────────────
+
+/** Base tick duration by act/phase */
+function getTickDuration(tick: number): number {
+  // Spawn burst: slow enough that each agent pop registers
+  if (tick >= 19 && tick <= 26) return 300;
+  // Act I: setup — brisk
+  if (tick <= 10) return 400;
+  // Act II: cooking — steady
+  if (tick <= 40) return 500;
+  // Act III: bottleneck — frantic
+  if (tick <= 90) return 300;
+  // Act IV + V: resolution — breathing room
+  return 600;
+}
+
+/** Extra pre-event pause (ms) added BEFORE tick fires — for dramatic moments */
+const DRAMATIC_PAUSES: Record<number, number> = {
+  1: 1000,   // Plankton's mega-order
+  13: 800,   // First escalation (SpongeBob → Mr. Krabs)
+  56: 900,   // Squidward overwhelmed
+  92: 1000,  // Mr. Krabs's decision
+  138: 1200, // Final completion 🎉
+};
+
 function useReplay() {
   const [tick, setTick] = useState(-1);
   const [running, setRunning] = useState(false);
@@ -44,7 +69,37 @@ function useReplay() {
   const actBannerTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [, forceUpdate] = useState(0);
 
+  // Refs for the variable-speed tick scheduler
+  const tickRef = useRef(-1);
+  const runningRef = useRef(false);
+  const tickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleNextTick = useCallback(() => {
+    const nextTick = tickRef.current + 1;
+    if (nextTick > 150) {
+      runningRef.current = false;
+      setRunning(false);
+      setFinished(true);
+      return;
+    }
+    const duration = getTickDuration(nextTick) + (DRAMATIC_PAUSES[nextTick] ?? 0);
+    tickTimerRef.current = setTimeout(() => {
+      tickRef.current = nextTick;
+      setTick(nextTick);
+      if (runningRef.current) scheduleNextTick();
+    }, duration);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (tickTimerRef.current) clearTimeout(tickTimerRef.current);
+    };
+  }, []);
+
   const start = useCallback(() => {
+    // Clear any running timer
+    if (tickTimerRef.current) clearTimeout(tickTimerRef.current);
     statsRef.current = { ...INITIAL_STATS };
     nodeStatesRef.current = {};
     messagesRef.current = [];
@@ -54,10 +109,15 @@ function useReplay() {
     actRef.current = 0;
     setActBanner(null);
     if (actBannerTimeoutRef.current) clearTimeout(actBannerTimeoutRef.current);
+    // Fire tick 0 immediately (act_change only — not dramatic)
+    tickRef.current = 0;
+    runningRef.current = true;
     setTick(0);
     setRunning(true);
     setFinished(false);
-  }, []);
+    // Then schedule tick 1 onwards with variable timing
+    scheduleNextTick();
+  }, [scheduleNextTick]);
 
   // Process events for a given tick
   const processEvents = useCallback((currentTick: number) => {
@@ -186,23 +246,6 @@ function useReplay() {
 
     if (changed) forceUpdate(n => n + 1);
   }, []);
-
-  // Tick interval
-  useEffect(() => {
-    if (!running) return;
-    const interval = setInterval(() => {
-      setTick(prev => {
-        const next = prev + 1;
-        if (next > 150) {
-          setRunning(false);
-          setFinished(true);
-          return prev;
-        }
-        return next;
-      });
-    }, 500);
-    return () => clearInterval(interval);
-  }, [running]);
 
   // Process events when tick changes
   useEffect(() => {
