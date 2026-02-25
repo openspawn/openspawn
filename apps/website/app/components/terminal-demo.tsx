@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 
 const lines = [
-  { text: "$ npx bikinibottom init my-reef", color: "text-slate-300", delay: 0 },
-  { text: "🍍 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
+  { text: "$ npx openspawn init my-org", color: "text-slate-300", delay: 0 },
+  { text: "🪸 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
   { text: "", color: "", delay: 1300 },
-  { text: "$ npx bikinibottom start", color: "text-slate-300", delay: 1500 },
+  { text: "$ npx openspawn start", color: "text-slate-300", delay: 1500 },
   { text: "🌐 Server running at http://localhost:3333", color: "text-cyan-400", delay: 2400 },
   { text: "🔗 A2A: /.well-known/agent.json", color: "text-violet-400", delay: 2850 },
   { text: "🔌 MCP: /mcp (7 tools)", color: "text-amber-400", delay: 3250 },

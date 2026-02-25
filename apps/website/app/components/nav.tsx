@@ -8,8 +8,8 @@ export function Nav() {
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-navy-950/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold">
-          <span className="text-2xl">🍍</span>
-          <span className="gradient-text">BikiniBottom</span>
+          <span className="text-2xl">🪸</span>
+          <span className="gradient-text">OpenSpawn</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
           <Link to="/org-md" className="text-sm text-slate-400 transition hover:text-cyan-400">
@@ -29,10 +29,12 @@ export function Nav() {
         </div>
         <div className="flex items-center gap-3">
           <a
-            href="/app/"
+            href="https://bikinibottom.ai/app/"
+            target="_blank"
+            rel="noopener"
             className="rounded-lg bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 ring-1 ring-cyan-500/20 transition hover:bg-cyan-500/20"
           >
-            Launch Demo →
+            Live Demo →
           </a>
           <button
             type="button"
@@ -66,6 +68,15 @@ export function Nav() {
               className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400"
             >
               GitHub
+            </a>
+            <a
+              href="https://bikinibottom.ai/app/"
+              target="_blank"
+              rel="noopener"
+              className="rounded-lg px-3 py-2 text-sm text-cyan-400 transition hover:bg-white/5"
+              onClick={() => setMenuOpen(false)}
+            >
+              Live Demo →
             </a>
           </div>
         </div>
