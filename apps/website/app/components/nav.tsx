@@ -15,6 +15,9 @@ export function Nav() {
           <Link to="/org-md" className="text-sm text-slate-400 transition hover:text-cyan-400">
             ORG.md
           </Link>
+          <Link to="/templates" className="text-sm text-slate-400 transition hover:text-cyan-400">
+            Templates
+          </Link>
           <Link to="/docs" className="text-sm text-slate-400 transition hover:text-cyan-400">
             Docs
           </Link>
@@ -57,6 +60,9 @@ export function Nav() {
           <div className="flex flex-col gap-1 px-8 py-4">
             <Link to="/org-md" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               ORG.md
+            </Link>
+            <Link to="/templates" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+              Templates
             </Link>
             <Link to="/docs" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               Docs

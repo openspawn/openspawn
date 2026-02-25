@@ -15,6 +15,10 @@
     "serve": {
       "command": "vite serve",
       "options": { "cwd": "apps/website" }
+    },
+    "test:e2e": {
+      "command": "NODE_ENV=development LD_LIBRARY_PATH=$HOME/.playwright-libs:$LD_LIBRARY_PATH npx playwright test",
+      "options": { "cwd": "apps/website" }
     }
   }
 }

@@ -37,7 +37,7 @@ export function YourFirstOrgMd() {
         org? The answer is a name and a Structure section with at least one role.
       </p>
       <p className="mb-4 text-slate-400">
-        Create a file called <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>:
+        Create a file called <code className="inline-code">ORG.md</code>:
       </p>
       <CodeBlock title="ORG.md">{`# Tandem
 
@@ -86,7 +86,7 @@ Writes docs, blog posts, and marketing copy.
       <p className="mb-3 text-slate-400">Let's break down what OpenSpawn is reading from those three roles.</p>
       <p className="mb-2 text-slate-400">
         <strong className="text-slate-200">The COO role — </strong>
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">### COO</code> is an H3 heading. OpenSpawn
+        <code className="inline-code">### COO</code> is an H3 heading. OpenSpawn
         recognizes "COO" as a C-level keyword and assigns level L10 — this agent can delegate and has authority over
         the whole org. The prose "Routes work to the right person." becomes the COO's system prompt context — the LLM
         reads this and uses it to decide how to behave.
@@ -94,9 +94,9 @@ Writes docs, blog posts, and marketing copy.
       <p className="mb-2 text-slate-400">
         <strong className="text-slate-200">Hierarchy inference: </strong>When the COO delegates, it matches the task
         domain against available agents. "Write a README" matches{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">domain: content</code>, so it goes to the
+        <code className="inline-code">domain: content</code>, so it goes to the
         Writer. "Fix the auth bug" would match{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">domain: engineering</code> and go to the
+        <code className="inline-code">domain: engineering</code> and go to the
         Developer. No explicit routing rules needed.
       </p>
 
@@ -182,7 +182,7 @@ Writes docs, blog posts, landing pages, and release notes.
         </p>
         <p>
           <strong className="text-slate-200">
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">Count: 2</code>
+            <code className="inline-code">Count: 2</code>
           </strong>{" "}
           spawns two agents: "Backend Developer 1" and "Backend Developer 2". They're independent — separate task
           queues, separate trust scores. The Engineering Lead picks the one with capacity (or higher trust for harder
@@ -199,7 +199,7 @@ Writes docs, blog posts, landing pages, and release notes.
       <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Part 3 — Adding Culture</h2>
       <p className="mb-4 text-slate-400">
         Right now your org uses all defaults for communication. Add a{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">Culture</code> section:
+        <code className="inline-code">Culture</code> section:
       </p>
       <CodeBlock title="ORG.md">{`# Tandem
 
@@ -239,7 +239,7 @@ preset: startup`}</CodeBlock>
             ].map(([preset, desc]) => (
               <tr key={preset} className="border-b border-white/5">
                 <td className="py-2 pr-6">
-                  <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">{preset}</code>
+                  <code className="inline-code">{preset}</code>
                 </td>
                 <td className="py-2">{desc}</td>
               </tr>
@@ -259,9 +259,9 @@ preset: startup
       <p className="mb-4 text-slate-400">
         Culture maps directly to the Agent Communication Protocol (ACP) — the message-passing system that governs how
         agents talk to each other. When you set{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">Ack required: yes</code>, every delegation
+        <code className="inline-code">Ack required: yes</code>, every delegation
         automatically triggers an acknowledgment. When you set{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">Escalation: immediate</code>, a blocked
+        <code className="inline-code">Escalation: immediate</code>, a blocked
         agent escalates in the same tick it gets stuck. These aren't suggestions — they're ACP configuration. The
         protocol enforces them.
       </p>
@@ -340,7 +340,7 @@ If no domain match is found, the task goes to the COO for manual delegation.
         <p>
           <strong className="text-slate-200">Budget limits are per-agent, not per-org.</strong> If Backend Developer 1
           hits 500 credits, it pauses. Backend Developer 2 keeps running. Override per-agent by adding{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">**Budget:** 1000 credits/period</code> to
+          <code className="inline-code">**Budget:** 1000 credits/period</code> to
           any role.
         </p>
         <p>
@@ -703,21 +703,21 @@ All client-deliverable tasks must complete within:
         <p>
           <strong className="text-slate-200">Write Culture before you need it.</strong> The default communication
           settings are fine for testing. Set{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ack required: yes</code> and{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">escalation: immediate</code> from the
+          <code className="inline-code">ack required: yes</code> and{" "}
+          <code className="inline-code">escalation: immediate</code> from the
           start.
         </p>
         <p>
           <strong className="text-slate-200">Commit your ORG.md to git.</strong> Every change to your org is a git
-          commit. <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">git log ORG.md</code> becomes your
+          commit. <code className="inline-code">git log ORG.md</code> becomes your
           org history.{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">git revert</code> undoes a structural
+          <code className="inline-code">git revert</code> undoes a structural
           decision that didn't work out.
         </p>
         <p>
           <strong className="text-slate-200">Export regularly.</strong> When leads spawn new agents dynamically, the
           running org diverges from your file. Run{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">
+          <code className="inline-code">
             npx openspawn export &gt; ORG.md
           </code>{" "}
           to sync them.

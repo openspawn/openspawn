@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { DocsLayout, CodeBlock } from "../../components/docs-layout";
+import { ArchDiagram } from "../../components/arch-diagram";
+import { Callout } from "../../components/callout";
 import { useTitle } from "../../hooks/use-title";
 
 export function HowItWorks() {
@@ -12,16 +14,16 @@ export function HowItWorks() {
         through an agent organization.
       </p>
 
-      <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
+      <Callout className="mb-8">
         Before you run a single command, this page gives you the mental model. Five minutes here will save you an hour
         of confusion later.
-      </div>
+      </Callout>
 
       {/* One-Paragraph Version */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">The One-Paragraph Version</h2>
       <p className="mb-4 text-slate-400">
         OpenSpawn is a platform for building and running <strong className="text-slate-200">organizations made of AI agents</strong>. You describe your org in a single markdown file (called{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>) — who the agents are, how
+        <code className="inline-code">ORG.md</code>) — who the agents are, how
         they're structured, what they're allowed to do, and how they communicate. OpenSpawn reads that file, spins up a
         live simulation, and your agents start working: delegating tasks, reporting progress, escalating blockers, and
         completing work — just like a real team. The unique part: OpenSpawn agents can also reach into the physical
@@ -41,7 +43,7 @@ export function HowItWorks() {
         OpenSpawn takes a different approach: <strong className="text-slate-200">your organization lives in a file.</strong>
       </p>
       <p className="mb-4 text-slate-400">
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code> is plain markdown. It defines
+        <code className="inline-code">ORG.md</code> is plain markdown. It defines
         everything:
       </p>
       <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-1">
@@ -89,14 +91,14 @@ Triages technical work. Delegates to the team.
 - Morgan (QA) — claude-haiku`}</CodeBlock>
       <p className="mb-4 text-slate-400">
         This file is your org chart, your configuration, and your documentation — all in one. Check it into git.
-        Review changes with <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">git diff</code>. Roll
+        Review changes with <code className="inline-code">git diff</code>. Roll
         back bad configurations like bad code. The documentation <em>is</em> the system.
       </p>
       <div className="mb-6 rounded-lg border border-white/5 bg-white/[0.02] px-5 py-4 text-sm">
         <p className="mb-2 font-semibold text-slate-200">The mental model:</p>
         <ul className="space-y-1 text-slate-400">
           <li>
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>{" "}
+            <code className="inline-code">ORG.md</code>{" "}
             = the org chart + employee handbook
           </li>
           <li>
@@ -124,9 +126,9 @@ Triages technical work. Delegates to the team.
       <p className="mb-4 text-slate-400">
         The design philosophy comes from how effective human organizations actually work:
       </p>
-      <div className="mb-6 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
+      <Callout className="mb-6">
         <strong>Push what's urgent. Pull what's optional. Minimize interrupts.</strong>
-      </div>
+      </Callout>
       <p className="mb-6 text-slate-400">ACP defines four types of messages:</p>
 
       <div className="mb-8 space-y-6">
@@ -152,9 +154,9 @@ Triages technical work. Delegates to the team.
             When an agent can't proceed — blocked on a resource, out of its domain, over budget, low confidence — it
             escalates <strong className="text-slate-200">immediately and loudly</strong> to its direct manager.
             Escalations are push-based because blockers need attention <em>now</em>. The escalation carries a reason (
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">BLOCKED</code>,{" "}
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">OUT_OF_DOMAIN</code>,{" "}
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">OVER_BUDGET</code>, etc.) so the
+            <code className="inline-code">BLOCKED</code>,{" "}
+            <code className="inline-code">OUT_OF_DOMAIN</code>,{" "}
+            <code className="inline-code">OVER_BUDGET</code>, etc.) so the
             manager can act quickly.
           </p>
           <p className="text-slate-400">
@@ -236,7 +238,7 @@ COO sends final completion to Human`}</CodeBlock>
         </p>
       </div>
       <p className="mb-3 text-slate-400">
-        You configure this in <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>:
+        You configure this in <code className="inline-code">ORG.md</code>:
       </p>
       <CodeBlock title="ORG.md">{`### COO
 - **Trigger:** event-driven
@@ -275,7 +277,7 @@ COO sends final completion to Human`}</CodeBlock>
       </p>
       <p className="mb-4 text-slate-400">
         No custom APIs. No glue code. You give your agent access to a node in{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>, and it has eyes and hands
+        <code className="inline-code">ORG.md</code>, and it has eyes and hands
         in the physical world.
       </p>
 
@@ -284,45 +286,7 @@ COO sends final completion to Human`}</CodeBlock>
       {/* Architecture Diagram */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Architecture at a Glance</h2>
       <p className="mb-4 text-slate-400">Here's how the pieces fit together:</p>
-      <div className="terminal my-4">
-        <pre className="overflow-x-auto p-4 text-sm leading-relaxed text-slate-300 font-mono whitespace-pre">{`┌─────────────────────────────────────────────────────┐
-│                     ORG.md                          │
-│   (agents · hierarchy · models · policies · nodes)  │
-└────────────────────────┬────────────────────────────┘
-                         │ defines
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│              OpenSpawn Runtime                      │
-│                                                     │
-│  ┌───────────┐   ┌──────────────┐   ┌───────────┐  │
-│  │ Simulation│   │     ACP      │   │  Model    │  │
-│  │  Engine   │   │  Message Bus │   │  Router   │  │
-│  │ (tick/    │   │ (ack·prog·   │   │ (Opus /   │  │
-│  │  events)  │   │  esc·done)   │   │  Sonnet / │  │
-│  └─────┬─────┘   └──────┬───────┘   │  Haiku /  │  │
-│        │                │           │  Ollama)  │  │
-│        └────────────────┘           └───────────┘  │
-└────────────┬──────────────────────────────┬─────────┘
-             │                              │
-             ▼                              ▼
-┌────────────────────────┐   ┌─────────────────────────┐
-│   Live Dashboard       │   │   Nodes (Real World)    │
-│                        │   │                         │
-│  · Org chart           │   │  📱 Phone camera        │
-│  · Task board          │   │  🖥️  Desktop screen     │
-│  · Message stream      │   │  📍 GPS location        │
-│  · Cost tracker        │   │  🔔 Notifications       │
-│  · Metrics             │   │  💻 Shell commands      │
-└────────────────────────┘   └─────────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────────────────┐
-│              External Protocols                     │
-│                                                     │
-│  A2A (Agent-to-Agent)  ·  MCP (Tool Server)        │
-│  LangGraph · CrewAI · Claude Desktop · AutoGen     │
-└─────────────────────────────────────────────────────┘`}</pre>
-      </div>
+      <ArchDiagram className="my-6" />
       <p className="mb-4 text-slate-400">
         <strong className="text-slate-200">The request lifecycle in one sentence:</strong> A task enters the org at
         the top → cascades down through delegation → each agent wakes (by tick or event), decides an action, and

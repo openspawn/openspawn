@@ -31,7 +31,7 @@ export function GettingStarted() {
       </p>
       <p className="mb-4 text-slate-400">
         The entire org is defined in a single markdown file:{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code>.
+        <code className="inline-code">ORG.md</code>.
       </p>
       <CodeBlock title="flow">{`ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything`}</CodeBlock>
       <p className="mb-4 text-slate-400">
@@ -47,7 +47,7 @@ export function GettingStarted() {
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
         <li>
           Node.js 18 or newer (
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">node --version</code> to check)
+          <code className="inline-code">node --version</code> to check)
         </li>
       </ul>
       <p className="mb-3 text-slate-400">
@@ -59,7 +59,7 @@ export function GettingStarted() {
             Ollama
           </a>{" "}
           for free local model inference — workers in your org can use{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">qwen2.5</code> at zero cost
+          <code className="inline-code">qwen2.5</code> at zero cost
         </li>
         <li>
           A{" "}
@@ -89,7 +89,7 @@ export function GettingStarted() {
 ├── ORG.md                  # Your org definition — this is the important one
 └── openspawn.config.json   # Server config (port, model providers, etc.)`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Let's look at what <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code> contains by
+        Let's look at what <code className="inline-code">ORG.md</code> contains by
         default:
       </p>
       <CodeBlock title="ORG.md">{`# My Org
@@ -141,20 +141,20 @@ Write code, run tests, build APIs.
         </li>
         <li>
           <strong className="text-slate-200">Heading levels define the hierarchy.</strong> H3 (
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">###</code>) is a department or top-level
-          role. H4 (<code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">####</code>) is a team member
+          <code className="inline-code">###</code>) is a department or top-level
+          role. H4 (<code className="inline-code">####</code>) is a team member
           that reports to the H3 above it.
         </li>
         <li>
           <strong className="text-slate-200">
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">Count: 2</code> spawns multiple
+            <code className="inline-code">Count: 2</code> spawns multiple
             agents
           </strong>{" "}
           with the same role — auto-numbered as "Backend Worker 1", "Backend Worker 2".
         </li>
         <li>
           <strong className="text-slate-200">
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">preset: startup</code>
+            <code className="inline-code">preset: startup</code>
           </strong>{" "}
           is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow
           hierarchy.
@@ -211,7 +211,7 @@ Write code, run tests, build APIs.
       "parts": [{ "kind": "text", "text": "Build a REST API for user management with CRUD endpoints" }]
     }
   }'`}</CodeBlock>
-      <p className="mb-3 text-slate-400">You'll get back a response with a <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">taskId</code>. Watch what happens in the dashboard:</p>
+      <p className="mb-3 text-slate-400">You'll get back a response with a <code className="inline-code">taskId</code>. Watch what happens in the dashboard:</p>
       <ol className="mb-4 list-decimal pl-6 text-slate-400 space-y-1">
         <li><strong className="text-slate-200">Task created</strong> — appears in the task timeline as "submitted"</li>
         <li><strong className="text-slate-200">COO wakes</strong> — acknowledges the task (👍 appears on the task card)</li>
@@ -279,7 +279,7 @@ Write code, run tests, build APIs.
       {/* Step 5 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 5 — Modify Your Org</h2>
       <p className="mb-4 text-slate-400">
-        Open <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">ORG.md</code> and add a new agent:
+        Open <code className="inline-code">ORG.md</code> and add a new agent:
       </p>
       <CodeBlock title="ORG.md diff">{` #### Backend Workers
  Write code, run tests, build APIs.
@@ -354,7 +354,7 @@ Write code, run tests, build APIs.
       <p className="mb-4 text-slate-400">
         Any A2A-compatible agent — from any framework — can discover your org and send it tasks. Each individual agent
         also has their own Agent Card at{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/a2a/agents/:id/agent.json</code>.
+        <code className="inline-code">/a2a/agents/:id/agent.json</code>.
       </p>
 
       {/* Step 8 */}
@@ -372,13 +372,13 @@ Write code, run tests, build APIs.
 }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
         This exposes 7 tools:{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">delegate_task</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">list_agents</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">get_agent</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">list_tasks</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">get_task</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">send_message</code>,{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">get_org_stats</code>.
+        <code className="inline-code">delegate_task</code>,{" "}
+        <code className="inline-code">list_agents</code>,{" "}
+        <code className="inline-code">get_agent</code>,{" "}
+        <code className="inline-code">list_tasks</code>,{" "}
+        <code className="inline-code">get_task</code>,{" "}
+        <code className="inline-code">send_message</code>,{" "}
+        <code className="inline-code">get_org_stats</code>.
       </p>
 
       {/* Under the Hood */}
@@ -462,7 +462,7 @@ Write code, run tests, build APIs.
             ].map(([cmd, desc]) => (
               <tr key={cmd} className="border-b border-white/5">
                 <td className="py-2 pr-6">
-                  <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400 text-xs">{cmd}</code>
+                  <code className="inline-code text-xs">{cmd}</code>
                 </td>
                 <td className="py-2">{desc}</td>
               </tr>
@@ -490,7 +490,7 @@ Write code, run tests, build APIs.
             ].map(([ep, desc]) => (
               <tr key={ep} className="border-b border-white/5">
                 <td className="py-2 pr-6">
-                  <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400 text-xs">{ep}</code>
+                  <code className="inline-code text-xs">{ep}</code>
                 </td>
                 <td className="py-2">{desc}</td>
               </tr>
