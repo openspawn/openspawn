@@ -10,6 +10,7 @@ import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
 import { OrgMdPage } from "./routes/org-md";
 import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
+import { HowItWorks } from "./routes/docs/how-it-works";
 import { NotFoundPage } from "./routes/not-found";
 
 const rootRoute = createRootRoute({
@@ -70,6 +71,12 @@ const openclawQuickstartRoute = createRoute({
   component: OpenClawQuickstart,
 });
 
+const howItWorksRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/how-it-works",
+  component: HowItWorks,
+});
+
 const yourFirstOrgMdRoute = createRoute({
   getParentRoute: () => docsRoute,
   path: "/tutorials/your-first-org-md",
@@ -79,6 +86,7 @@ const yourFirstOrgMdRoute = createRoute({
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
+  howItWorksRoute,
   openclawQuickstartRoute,
   yourFirstOrgMdRoute,
   a2aRoute,
