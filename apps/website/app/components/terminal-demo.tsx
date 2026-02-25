@@ -33,34 +33,56 @@ export function TerminalDemo() {
   const isDone = visibleLines >= lines.length;
 
   return (
-    <div className="terminal glow-cyan mx-auto max-w-2xl">
+    /* terminal-enhanced adds depth glow + scanline pseudo-element */
+    <div className="terminal terminal-enhanced mx-auto max-w-2xl">
       <div className="terminal-header flex items-center justify-between">
         <div className="flex gap-2">
           <div className="terminal-dot bg-red-500/80" />
           <div className="terminal-dot bg-yellow-500/80" />
           <div className="terminal-dot bg-green-500/80" />
+          <span className="ml-2 text-xs text-slate-600 font-medium tracking-wide">
+            openspawn — bash
+          </span>
         </div>
-        {isDone && (
-          <button
-            type="button"
-            onClick={startAnimation}
-            className="flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-slate-500 transition hover:bg-white/10 hover:text-cyan-400"
-            aria-label="Replay terminal animation"
-          >
-            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
-            Replay
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Live indicator */}
+          <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+            <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block" />
+            live
+          </span>
+          {isDone && (
+            <button
+              type="button"
+              onClick={startAnimation}
+              className="flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-slate-500 transition-all duration-150 hover:bg-white/10 hover:text-cyan-400"
+              aria-label="Replay terminal animation"
+            >
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Replay
+            </button>
+          )}
+        </div>
       </div>
-      <div className="p-5 min-h-[260px]">
+      <div className="relative p-5 min-h-[280px]">
         {lines.slice(0, visibleLines).map((line, i) => (
-          <div key={`${key}-${i}`} className={`${line.color} ${i === visibleLines - 1 ? "animate-fade-in-up" : ""}`}>
-            {line.text || "\u00A0"}
+          <div
+            key={`${key}-${i}`}
+            className={`${line.color} ${i === visibleLines - 1 ? "animate-fade-in-up" : ""} leading-relaxed`}
+          >
+            {/* Highlight $ prompt with distinct color */}
+            {line.text.startsWith("$") ? (
+              <>
+                <span className="text-cyan-500/70 select-none">$ </span>
+                <span>{line.text.slice(2)}</span>
+              </>
+            ) : (
+              line.text || "\u00A0"
+            )}
           </div>
         ))}
-        {!isDone && <span className="cursor-blink text-slate-500">▋</span>}
+        {!isDone && <span className="cursor-blink text-cyan-500/70 font-bold">▋</span>}
       </div>
     </div>
   );

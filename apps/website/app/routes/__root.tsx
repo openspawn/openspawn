@@ -1,10 +1,13 @@
 import { Outlet } from "@tanstack/react-router";
+import { HeadContent } from "@tanstack/react-router";
 import { Nav } from "../components/nav";
 import { Footer } from "../components/footer";
 
 export function RootLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-navy-950 text-slate-200 overflow-x-hidden">
+      {/* TanStack Router meta/head injection (React 19 hoists these to <head>) */}
+      <HeadContent />
       {/* Subtle ocean backdrop */}
       <div
         className="pointer-events-none fixed inset-0 -z-10"

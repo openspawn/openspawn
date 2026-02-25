@@ -382,3 +382,332 @@ body {
 .docs-prose code { background: rgba(255,255,255,0.10); color: var(--os-accent-light); border-radius: var(--os-radius-sm); padding: 0.125rem 0.375rem; font-family: var(--os-font-mono); font-size: 0.875em; }
 .docs-prose hr  { border-color: var(--os-border-faint); margin: 2rem 0; }
 .docs-prose strong { color: var(--os-text-body); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISUAL POLISH v2.0 — Awwwards-level micro-interactions & atmosphere
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Fluid spacing utilities ─────────────────────────────────────────────── */
+.section-py {
+  padding-top:    clamp(3rem, 6vw, 6rem);
+  padding-bottom: clamp(3rem, 6vw, 6rem);
+}
+
+.section-py-lg {
+  padding-top:    clamp(4rem, 8vw, 8rem);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+/* ── Atmospheric gradient animations ─────────────────────────────────────── */
+@keyframes gradientShift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0,   0)   scale(1);    }
+  33%       { transform: translate(-3%, 2%)  scale(1.06); }
+  66%       { transform: translate(2%,  -2%) scale(0.96); }
+}
+
+@keyframes orbDriftAlt {
+  0%, 100% { transform: translate(0,   0)   scale(1);    }
+  40%       { transform: translate(4%,  -3%) scale(1.05); }
+  70%       { transform: translate(-2%, 3%)  scale(0.97); }
+}
+
+/* Animates the gradient-text to shift through hues */
+.gradient-text-animated {
+  background: linear-gradient(
+    135deg,
+    #06b6d4 0%,
+    #8b5cf6 35%,
+    #f59e0b 65%,
+    #06b6d4 100%
+  );
+  background-size: 300% 300%;
+  animation: gradientShift 7s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Drifting background orbs (pointer-events:none wrappers only) */
+.orb-drift       { animation: orbDrift    14s ease-in-out infinite; }
+.orb-drift-alt   { animation: orbDriftAlt 18s ease-in-out infinite; }
+
+/* ── Grain texture overlay ───────────────────────────────────────────────── */
+/*  Apply .grain-overlay as a *wrapper* — adds an ::after pseudo-element     */
+.grain-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Tiny SVG noise rendered as a data-URI background */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ── Scroll-reveal system ────────────────────────────────────────────────── */
+/*  1. Add class="reveal" to any element you want to reveal on scroll        */
+/*  2. The JS IntersectionObserver adds "in-view" when 10% visible           */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity  0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger siblings inside a .reveal-stagger parent */
+.reveal-stagger > .reveal:nth-child(1) { transition-delay:   0ms; }
+.reveal-stagger > .reveal:nth-child(2) { transition-delay:  80ms; }
+.reveal-stagger > .reveal:nth-child(3) { transition-delay: 160ms; }
+.reveal-stagger > .reveal:nth-child(4) { transition-delay: 240ms; }
+.reveal-stagger > .reveal:nth-child(5) { transition-delay: 320ms; }
+.reveal-stagger > .reveal:nth-child(6) { transition-delay: 400ms; }
+
+/* ── Feature card micro-interactions ─────────────────────────────────────── */
+/*  Wrap FeatureCard in <div class="feature-card-wrap"> for lift + shimmer   */
+.feature-card-enhanced {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform    0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow   0.35s ease,
+    border-color 0.25s ease,
+    background   0.25s ease;
+}
+
+.feature-card-enhanced:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0  0  0 1px rgba(6, 182, 212, 0.12),
+    0  0 20px rgba(6, 182, 212, 0.06);
+}
+
+/* Shine shimmer on hover */
+.feature-card-enhanced::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  pointer-events: none;
+  transition: none;
+  z-index: 2;
+}
+
+.feature-card-enhanced:hover::before {
+  animation: shimmerSlide 0.7s ease forwards;
+}
+
+@keyframes shimmerSlide {
+  from { left: -100%; }
+  to   { left:  200%; }
+}
+
+/* Badge pop on hover */
+.feature-card-enhanced:hover .badge-pop {
+  transform: scale(1.06);
+  filter: brightness(1.15);
+}
+
+.badge-pop {
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+/* Illustration scale-up on hover */
+.feature-card-enhanced:hover .illus-hover {
+  transform: scale(1.08) translateY(-2px);
+  filter: drop-shadow(0 4px 12px rgba(6, 182, 212, 0.2));
+}
+
+.illus-hover {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+
+/* ── Terminal enhanced glow & scanlines ──────────────────────────────────── */
+.terminal-enhanced {
+  position: relative;
+  box-shadow:
+    0  0  30px rgba(6, 182, 212, 0.12),
+    0  0  80px rgba(6, 182, 212, 0.05),
+    0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+/* Subtle scanlines */
+.terminal-enhanced::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.04) 3px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+  border-radius: inherit;
+}
+
+/* ── Code block glow on hover ────────────────────────────────────────────── */
+.code-block-hover {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.code-block-hover:hover {
+  box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.15), 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-color: rgba(6, 182, 212, 0.15) !important;
+}
+
+/* ── Tagline word-reveal animation ───────────────────────────────────────── */
+@keyframes wordReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.tagline-word {
+  display: inline-block;
+  opacity: 0;
+  animation: wordReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Applied via inline style for each word: animation-delay: Ns */
+
+/* ── Hero coral emoji pulse ──────────────────────────────────────────────── */
+@keyframes coralFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg);   }
+  40%       { transform: translateY(-6px) rotate(2deg);  }
+  70%       { transform: translateY(-3px) rotate(-1deg); }
+}
+
+.coral-float {
+  display: inline-block;
+  animation: coralFloat 5s ease-in-out infinite;
+}
+
+/* ── Pulsing live dot (replaces plain animate-pulse) ─────────────────────── */
+@keyframes liveDot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0   0 rgba(52, 211, 153, 0.5); }
+  50%       { opacity: 0.8; box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);   }
+}
+
+.live-dot {
+  animation: liveDot 1.8s ease-in-out infinite;
+}
+
+/* ── Stats counter pop animation ─────────────────────────────────────────── */
+@keyframes statPop {
+  from { opacity: 0; transform: scale(0.7) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0);    }
+}
+
+.stat-pop {
+  animation: statPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+.stat-pop:nth-child(1) { animation-delay: 0.05s; }
+.stat-pop:nth-child(2) { animation-delay: 0.12s; }
+.stat-pop:nth-child(3) { animation-delay: 0.19s; }
+.stat-pop:nth-child(4) { animation-delay: 0.26s; }
+.stat-pop:nth-child(5) { animation-delay: 0.33s; }
+
+/* ── Install command highlight ring ─────────────────────────────────────────*/
+@keyframes ringPulse {
+  0%, 100% { box-shadow: 0 0  0   0 rgba(6, 182, 212, 0);    border-color: rgba(255,255,255,0.10); }
+  50%       { box-shadow: 0 0 20px 2px rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.20); }
+}
+
+.install-cmd {
+  animation: ringPulse 4s ease-in-out infinite;
+}
+
+/* ── Differentiator section — pill items ──────────────────────────────────── */
+.diff-pill {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.diff-pill:hover {
+  transform: translateY(-1px) scale(1.03);
+  background: rgba(6, 182, 212, 0.12) !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+}
+
+/* ── Ecosystem / stack badges ─────────────────────────────────────────────── */
+.stack-badge {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.stack-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  color: var(--os-text-primary);
+}
+
+/* ── Reduced-motion overrides ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text-animated,
+  .orb-drift,
+  .orb-drift-alt,
+  .coral-float,
+  .live-dot,
+  .stat-pop,
+  .install-cmd,
+  .tagline-word {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .feature-card-enhanced,
+  .feature-card-enhanced:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .feature-card-enhanced::before,
+  .feature-card-enhanced:hover::before {
+    animation: none !important;
+  }
+}

@@ -23,10 +23,12 @@ test.describe("Landing Page", () => {
     await expect(h1).toBeVisible();
     await expect(h1).toContainText("OpenSpawn");
 
-    // Primary subtitle
+    // Tagline — word-by-word reveal (each word is a .tagline-word span inside a <p>)
+    // Wait for animation to complete, then verify the aria-label on the wrapping span
+    await page.waitForTimeout(1500); // allow wordReveal animations to finish
     await expect(
-      page.getByText("AI agents that touch the real world.")
-    ).toBeVisible();
+      page.locator('[aria-label="Your agents. Your devices. Your rules."]')
+    ).toBeAttached();
   });
 
   test("differentiator section renders tagline", async ({ page }) => {

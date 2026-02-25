@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bikinibottom.ai/sitemap.xml
+Sitemap: https://openspawn.dev/sitemap.xml
