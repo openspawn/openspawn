@@ -7,7 +7,7 @@ export function A2AProtocol() {
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">A2A Protocol</h1>
       <p className="mb-8 text-lg text-slate-400">
-        BikiniBottom implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming.
+        OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming.
       </p>
 
       <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
@@ -15,10 +15,10 @@ export function A2AProtocol() {
       </div>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Agent Discovery</h2>
-      <p className="mb-4 text-slate-400">Every BikiniBottom instance publishes an Agent Card at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/.well-known/agent.json</code>:</p>
+      <p className="mb-4 text-slate-400">Every OpenSpawn instance publishes an Agent Card at <code className="rounded bg-white/10 px-1.5 py-0.5 text-cyan-400">/.well-known/agent.json</code>:</p>
       <CodeBlock title="bash">{`curl https://bikinibottom.ai/.well-known/agent.json`}</CodeBlock>
       <CodeBlock title="Response">{`{
-  "name": "BikiniBottom HQ",
+  "name": "OpenSpawn HQ",
   "description": "Multi-agent coordination control plane",
   "url": "https://bikinibottom.ai",
   "version": "1.0.0",
