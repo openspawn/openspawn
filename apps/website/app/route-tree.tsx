@@ -3,6 +3,7 @@ import { RootLayout } from "./routes/__root";
 import { LandingPage } from "./routes/index";
 import { DocsIndex } from "./routes/docs/index";
 import { GettingStarted } from "./routes/docs/getting-started";
+import { YourFirstOrgMd } from "./routes/docs/tutorials/your-first-org-md";
 import { A2AProtocol } from "./routes/docs/protocols/a2a";
 import { MCPTools } from "./routes/docs/protocols/mcp";
 import { DashboardDocs } from "./routes/docs/features/dashboard";
@@ -69,10 +70,17 @@ const openclawQuickstartRoute = createRoute({
   component: OpenClawQuickstart,
 });
 
+const yourFirstOrgMdRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/tutorials/your-first-org-md",
+  component: YourFirstOrgMd,
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
   openclawQuickstartRoute,
+  yourFirstOrgMdRoute,
   a2aRoute,
   mcpRoute,
   dashboardRoute,
