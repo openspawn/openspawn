@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createNodesV2 = void 0;
+const devkit_1 = require("@nx/devkit");
+const create_nodes_internal_1 = require("./utils/create-nodes-internal");
+// NOTE: We use the full project path as the project name to ensure uniqueness
+// and compatibility with Go's release tagging convention (projectRoot/vx.x.x).
+// This removes potential name conflicts between packages at different locations.
+// File glob to find all Go projects
+const goModGlob = '**/go.mod';
+// Entry function that Nx calls to modify the graph
+exports.createNodesV2 = [
+    goModGlob,
+    (configFiles, options, context) => {
+        return (0, devkit_1.createNodesFromFiles)((configFile, options, context) => (0, create_nodes_internal_1.createNodesInternal)(configFile, options, context), configFiles, options, context);
+    },
+];
+//# sourceMappingURL=createNodesV2.js.map

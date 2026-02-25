@@ -1,0 +1,74 @@
+import { useRef, useEffect, useState } from 'react';
+import { l as logger } from './index.esm2.js';
+import { M as MFDataPrefetch } from './prefetch.esm.js';
+import { prefetch } from './universal.esm.js';
+import { g as getScope } from './runtime-utils.esm.js';
+
+const useFirstMounted = () => {
+    const ref = useRef(true);
+    useEffect(() => {
+        ref.current = false;
+    }, []);
+    return ref.current;
+};
+
+const usePrefetch = (options) => {
+    const isFirstMounted = useFirstMounted();
+    if (isFirstMounted) {
+        const startTiming = performance.now();
+        logger.info(`2. Start Get Prefetch Data: ${options.id} - ${options.functionId || 'default'} - ${startTiming}`);
+    }
+    const { id, functionId, deferId } = options;
+    const prefetchInfo = {
+        id,
+        functionId,
+    };
+    const mfScope = getScope();
+    let state;
+    const prefetchResult = prefetch(options);
+    if (deferId) {
+        if (prefetchResult instanceof Promise) {
+            state = prefetchResult.then((deferredData) => deferredData.data[deferId]);
+        }
+        else {
+            state = prefetchResult.data[deferId];
+        }
+    }
+    else {
+        state = prefetchResult;
+    }
+    const [prefetchState, setPrefetchState] = useState(state);
+    const prefetchInstance = MFDataPrefetch.getInstance(mfScope);
+    useEffect(() => {
+        const useEffectTiming = performance.now();
+        logger.info(`3. Start Execute UseEffect: ${options.id} - ${options.functionId || 'default'} - ${useEffectTiming}`);
+        return () => {
+            prefetchInstance === null || prefetchInstance === void 0 ? void 0 : prefetchInstance.markOutdate(prefetchInfo, true);
+        };
+    }, []);
+    const refreshExecutor = (refetchParams) => {
+        const refetchOptions = Object.assign({}, options);
+        if (refetchParams) {
+            refetchOptions.refetchParams = refetchParams;
+        }
+        prefetchInstance === null || prefetchInstance === void 0 ? void 0 : prefetchInstance.markOutdate(prefetchInfo, true);
+        const newVal = prefetch(refetchOptions);
+        let newState;
+        if (deferId) {
+            if (newVal instanceof Promise) {
+                newState = newVal.then((deferredData) => deferredData.data[deferId]);
+            }
+            else {
+                newState = newVal.data[deferId];
+            }
+        }
+        else {
+            newState = newVal;
+        }
+        setPrefetchState(newState);
+    };
+    return [prefetchState, refreshExecutor];
+};
+
+export { usePrefetch };
+//# sourceMappingURL=react.esm.js.map

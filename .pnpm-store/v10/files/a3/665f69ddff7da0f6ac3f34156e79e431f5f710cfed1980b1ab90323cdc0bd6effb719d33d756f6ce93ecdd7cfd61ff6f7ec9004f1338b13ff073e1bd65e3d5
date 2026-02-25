@@ -1,0 +1,1 @@
+{"version":3,"file":"plugin.d.ts","sourceRoot":"","sources":["../../../../../packages/eslint/src/plugins/plugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAIL,aAAa,EAMd,MAAM,YAAY,CAAC;AAqBpB,MAAM,WAAW,mBAAmB;IAClC,UAAU,CAAC,EAAE,MAAM,CAAC;IACpB,UAAU,CAAC,EAAE,MAAM,EAAE,CAAC;CACvB;AA0GD,eAAO,MAAM,WAAW,EAAE,aAAa,CAAC,mBAAmB,CA8D1D,CAAC;AAEF,eAAO,MAAM,aAAa,oCAAc,CAAC"}

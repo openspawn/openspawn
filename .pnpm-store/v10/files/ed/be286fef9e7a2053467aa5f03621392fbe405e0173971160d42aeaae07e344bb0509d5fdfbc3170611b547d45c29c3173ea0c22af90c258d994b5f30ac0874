@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","names":["_pluginAsyncLoader","require"],"sources":["../src/index.ts"],"sourcesContent":["export { asyncLoadPlugin } from './plugin-async-loader';\n"],"mappings":";;;;;;;;;;;AAAA,IAAAA,kBAAA,GAAAC,OAAA","ignoreList":[]}

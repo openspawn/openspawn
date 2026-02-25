@@ -1,0 +1,54 @@
+{
+  "name": "@verdaccio/search-indexer",
+  "version": "8.0.0-next-8.5",
+  "description": "Verdaccio Search Indexer",
+  "main": "./build/dist.js",
+  "types": "build/index.d.ts",
+  "author": {
+    "name": "Juan Picado",
+    "email": "juanpicado19@gmail.com"
+  },
+  "repository": {
+    "type": "https",
+    "url": "https://github.com/verdaccio/verdaccio",
+    "directory": "packages/search-indexer"
+  },
+  "bugs": {
+    "url": "https://github.com/verdaccio/verdaccio/issues"
+  },
+  "license": "MIT",
+  "homepage": "https://verdaccio.org",
+  "keywords": [
+    "private",
+    "package",
+    "repository",
+    "registry",
+    "enterprise",
+    "modules",
+    "proxy",
+    "server",
+    "verdaccio"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@verdaccio/types": "13.0.0-next-8.6",
+    "@orama/orama": "1.2.4",
+    "debug": "4.4.1",
+    "esbuild": "0.24.2",
+    "vitest": "3.0.4"
+  },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/verdaccio"
+  },
+  "scripts": {
+    "clean": "rimraf ./build",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit -p tsconfig.build.json",
+    "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+    "build:js": "babel src/ --out-dir build/ --copy-files --extensions \".ts,.tsx\" --source-maps",
+    "build": "esbuild src/index.ts --bundle --outfile=build/dist.js --platform=node --target=node18  && pnpm run build:types"
+  }
+}

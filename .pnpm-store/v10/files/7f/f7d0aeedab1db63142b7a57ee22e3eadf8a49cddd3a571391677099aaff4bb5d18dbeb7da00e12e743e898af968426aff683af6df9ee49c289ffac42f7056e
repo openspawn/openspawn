@@ -1,0 +1,1 @@
+{"version":3,"file":"index.cjs2.cjs","sources":["../src/logger/index.ts"],"sourcesContent":["import { createLogger } from '@module-federation/sdk';\nconst logger = createLogger('[ Module Federation Data Prefetch ]');\nexport default logger;\n"],"names":["createLogger"],"mappings":";;;;AACK,MAAC,MAAM,GAAGA,gBAAY,CAAC,qCAAqC;;;;"}

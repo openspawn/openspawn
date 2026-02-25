@@ -1,0 +1,3 @@
+export declare function getProjectTagsFromSchema(options: {
+    tags?: string;
+}): string[];

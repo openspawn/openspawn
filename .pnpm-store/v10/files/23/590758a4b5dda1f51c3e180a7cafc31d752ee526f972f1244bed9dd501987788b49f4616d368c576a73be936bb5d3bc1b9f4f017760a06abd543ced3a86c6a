@@ -1,0 +1,56 @@
+{
+  "name": "@theguild/federation-composition",
+  "version": "0.21.3",
+  "description": "Open Source Composition library for Apollo Federation",
+  "peerDependencies": {
+    "graphql": "^16.0.0"
+  },
+  "dependencies": {
+    "constant-case": "^3.0.4",
+    "debug": "4.4.3",
+    "json5": "^2.2.3",
+    "lodash.sortby": "^4.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "graphql-hive/federation-composition"
+  },
+  "keywords": [
+    "graphql",
+    "federation",
+    "graphql-federation"
+  ],
+  "author": {
+    "email": "contact@the-guild.dev",
+    "name": "The Guild",
+    "url": "https://the-guild.dev"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "typings": "typings/index.d.ts",
+  "typescript": {
+    "definition": "typings/index.d.ts"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./typings/index.d.cts",
+        "default": "./cjs/index.js"
+      },
+      "import": {
+        "types": "./typings/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "default": {
+        "types": "./typings/index.d.ts",
+        "default": "./esm/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  }
+}

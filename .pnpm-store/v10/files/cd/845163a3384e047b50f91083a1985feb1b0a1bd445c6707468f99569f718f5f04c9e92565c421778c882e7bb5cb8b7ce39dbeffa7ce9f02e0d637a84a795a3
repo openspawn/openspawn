@@ -1,0 +1,2 @@
+import { Tree } from '@nx/devkit';
+export declare function getProjectRootFromSchema(host: Tree, projectDirectory: string, projectType: 'application' | 'library'): string;

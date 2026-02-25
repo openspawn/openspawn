@@ -1,0 +1,9 @@
+/**
+ * Resolver method parameter decorator. Extracts the parent/root
+ * object from the underlying platform and populates the decorated
+ * parameter with the value of parent/root.
+ *
+ * @publicApi
+ */
+export declare const Parent: () => ParameterDecorator;
+//# sourceMappingURL=parent.decorator.d.ts.map

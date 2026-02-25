@@ -1,0 +1,1 @@
+{"version":3,"file":"stats-json-plugin.d.ts","sourceRoot":"","sources":["../../../../../packages/webpack/src/plugins/stats-json-plugin.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAW,MAAM,SAAS,CAAC;AAE5C,qBAAa,eAAe;IAC1B,KAAK,CAAC,QAAQ,EAAE,QAAQ;CAMzB"}

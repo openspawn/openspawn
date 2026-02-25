@@ -1,0 +1,30 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = applicationGenerator;
+const tslib_1 = require("tslib");
+const devkit_1 = require("@nx/devkit");
+const path_1 = require("path");
+const utils_1 = require("../../utils");
+const generator_1 = tslib_1.__importDefault(require("../init/generator"));
+async function applicationGenerator(tree, schema) {
+    const options = await (0, utils_1.normalizeOptions)(tree, schema, 'application');
+    await (0, generator_1.default)(tree, {
+        skipFormat: true,
+        addGoDotWork: options.addGoDotWork,
+    });
+    const template = options.template || 'standard';
+    const templatePath = (0, path_1.join)(__dirname, 'files', template);
+    (0, devkit_1.generateFiles)(tree, templatePath, options.projectRoot, options);
+    const templateHasModFile = tree.exists((0, path_1.join)(options.projectRoot, 'go.mod'));
+    if (!templateHasModFile) {
+        (0, utils_1.createGoMod)(tree, options.projectRoot, options.projectRoot);
+    }
+    // Only add to go.work if it exists
+    if ((0, utils_1.isGoWorkspace)(tree)) {
+        (0, utils_1.addGoWorkDependency)(tree, options.projectRoot);
+    }
+    if (!options.skipFormat) {
+        await (0, devkit_1.formatFiles)(tree);
+    }
+}
+//# sourceMappingURL=generator.js.map

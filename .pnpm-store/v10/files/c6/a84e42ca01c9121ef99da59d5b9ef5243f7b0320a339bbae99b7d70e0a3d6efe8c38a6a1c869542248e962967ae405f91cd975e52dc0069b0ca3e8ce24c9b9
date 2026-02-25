@@ -1,0 +1,32 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = runExecutor;
+const utils_1 = require("../../utils");
+/**
+ * This executor runs a Go program using the `go run` command.
+ *
+ * @param options options passed to the executor
+ * @param context context passed to the executor
+ */
+async function runExecutor(options, context) {
+    var _a;
+    return (0, utils_1.executeCommand)(buildParams(options, context), {
+        cwd: (0, utils_1.extractCWD)(options, context),
+        env: options.env,
+        executable: (_a = options.cmd) !== null && _a !== void 0 ? _a : 'go',
+    });
+}
+const buildParams = (options, context) => {
+    var _a, _b;
+    const projectName = context.projectName;
+    if (!projectName) {
+        throw new Error('Project name is not provided');
+    }
+    const projectRoot = (_a = context.projectsConfigurations.projects[context.projectName]) === null || _a === void 0 ? void 0 : _a.root;
+    if (!projectRoot) {
+        throw new Error(`Cannot find project root for ${context.projectName}`);
+    }
+    const runPath = options.main ? '.' : './...';
+    return ['run', runPath, ...((_b = options.args) !== null && _b !== void 0 ? _b : [])];
+};
+//# sourceMappingURL=executor.js.map

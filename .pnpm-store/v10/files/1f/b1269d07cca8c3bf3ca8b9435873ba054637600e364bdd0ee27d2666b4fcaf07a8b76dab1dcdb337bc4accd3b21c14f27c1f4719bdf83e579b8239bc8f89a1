@@ -1,0 +1,1 @@
+{"version":3,"file":"TreeShakingSharedPlugin.js","sourceRoot":"","sources":["../../../src/wrapper/TreeShakingSharedPlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,yBAAyB,CAAC;AAE9C,MAAqB,uBAAwB,SAAQ,2BAAiB;IACpE,YAAY,OAAsC;QAChD,KAAK,CACH,OAAO,EACP,WAAW,EACX,qDAAqD,CACtD,CAAC;IACJ,CAAC;CACF;AARD,0CAQC"}

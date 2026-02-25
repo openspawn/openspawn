@@ -1,0 +1,121 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "API_ERROR", {
+  enumerable: true,
+  get: function () {
+    return _core.API_ERROR;
+  }
+});
+Object.defineProperty(exports, "API_MESSAGE", {
+  enumerable: true,
+  get: function () {
+    return _core.API_MESSAGE;
+  }
+});
+Object.defineProperty(exports, "APP_ERROR", {
+  enumerable: true,
+  get: function () {
+    return _core.APP_ERROR;
+  }
+});
+Object.defineProperty(exports, "CHARACTER_ENCODING", {
+  enumerable: true,
+  get: function () {
+    return _core.CHARACTER_ENCODING;
+  }
+});
+Object.defineProperty(exports, "DEFAULT_DOMAIN", {
+  enumerable: true,
+  get: function () {
+    return _core.DEFAULT_DOMAIN;
+  }
+});
+exports.DEFAULT_NO_README = exports.DEFAULT_MIN_LIMIT_PASSWORD = void 0;
+Object.defineProperty(exports, "DEFAULT_PROTOCOL", {
+  enumerable: true,
+  get: function () {
+    return _core.DEFAULT_PROTOCOL;
+  }
+});
+exports.ERROR_CODE = exports.DIST_TAGS = exports.DEFAULT_UPLINK = exports.DEFAULT_REGISTRY = void 0;
+Object.defineProperty(exports, "HEADERS", {
+  enumerable: true,
+  get: function () {
+    return _core.HEADERS;
+  }
+});
+Object.defineProperty(exports, "HEADER_TYPE", {
+  enumerable: true,
+  get: function () {
+    return _core.HEADER_TYPE;
+  }
+});
+Object.defineProperty(exports, "HTTP_STATUS", {
+  enumerable: true,
+  get: function () {
+    return _core.HTTP_STATUS;
+  }
+});
+exports.MODULE_NOT_FOUND = exports.LATEST = void 0;
+Object.defineProperty(exports, "PACKAGE_ACCESS", {
+  enumerable: true,
+  get: function () {
+    return _utils.PACKAGE_ACCESS;
+  }
+});
+Object.defineProperty(exports, "ROLES", {
+  enumerable: true,
+  get: function () {
+    return _utils.ROLES;
+  }
+});
+exports.STORAGE = void 0;
+Object.defineProperty(exports, "SUPPORT_ERRORS", {
+  enumerable: true,
+  get: function () {
+    return _core.SUPPORT_ERRORS;
+  }
+});
+exports.TIME_EXPIRATION_24H = exports.TIME_EXPIRATION_1H = void 0;
+Object.defineProperty(exports, "TOKEN_BASIC", {
+  enumerable: true,
+  get: function () {
+    return _core.TOKEN_BASIC;
+  }
+});
+Object.defineProperty(exports, "TOKEN_BEARER", {
+  enumerable: true,
+  get: function () {
+    return _core.TOKEN_BEARER;
+  }
+});
+exports.keyPem = exports.csrPem = exports.certPem = exports.WEB_TITLE = exports.USERS = void 0;
+var _core = require("@verdaccio/core");
+var _utils = require("@verdaccio/utils");
+const TIME_EXPIRATION_24H = exports.TIME_EXPIRATION_24H = '24h';
+const TIME_EXPIRATION_1H = exports.TIME_EXPIRATION_1H = '1h';
+const DIST_TAGS = exports.DIST_TAGS = 'dist-tags';
+const LATEST = exports.LATEST = 'latest';
+const USERS = exports.USERS = 'users';
+const DEFAULT_MIN_LIMIT_PASSWORD = exports.DEFAULT_MIN_LIMIT_PASSWORD = 3;
+const keyPem = exports.keyPem = 'verdaccio-key.pem';
+const certPem = exports.certPem = 'verdaccio-cert.pem';
+const csrPem = exports.csrPem = 'verdaccio-csr.pem';
+const ERROR_CODE = exports.ERROR_CODE = {
+  token_required: 'token is required'
+};
+const DEFAULT_REGISTRY = exports.DEFAULT_REGISTRY = 'https://registry.npmjs.org';
+const DEFAULT_UPLINK = exports.DEFAULT_UPLINK = 'npmjs';
+const DEFAULT_NO_README = exports.DEFAULT_NO_README = 'ERROR: No README data found!';
+const MODULE_NOT_FOUND = exports.MODULE_NOT_FOUND = 'MODULE_NOT_FOUND';
+const WEB_TITLE = exports.WEB_TITLE = 'Verdaccio';
+const STORAGE = exports.STORAGE = {
+  PACKAGE_FILE_NAME: 'package.json',
+  FILE_EXIST_ERROR: 'EEXISTS',
+  NO_SUCH_FILE_ERROR: 'ENOENT',
+  DEFAULT_REVISION: '0-0000000000000000'
+};
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfY29yZSIsInJlcXVpcmUiLCJfdXRpbHMiLCJUSU1FX0VYUElSQVRJT05fMjRIIiwiZXhwb3J0cyIsIlRJTUVfRVhQSVJBVElPTl8xSCIsIkRJU1RfVEFHUyIsIkxBVEVTVCIsIlVTRVJTIiwiREVGQVVMVF9NSU5fTElNSVRfUEFTU1dPUkQiLCJrZXlQZW0iLCJjZXJ0UGVtIiwiY3NyUGVtIiwiRVJST1JfQ09ERSIsInRva2VuX3JlcXVpcmVkIiwiREVGQVVMVF9SRUdJU1RSWSIsIkRFRkFVTFRfVVBMSU5LIiwiREVGQVVMVF9OT19SRUFETUUiLCJNT0RVTEVfTk9UX0ZPVU5EIiwiV0VCX1RJVExFIiwiU1RPUkFHRSIsIlBBQ0tBR0VfRklMRV9OQU1FIiwiRklMRV9FWElTVF9FUlJPUiIsIk5PX1NVQ0hfRklMRV9FUlJPUiIsIkRFRkFVTFRfUkVWSVNJT04iXSwic291cmNlcyI6WyIuLi8uLi9zcmMvbGliL2NvbnN0YW50cy50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQge1xuICBBUElfRVJST1IsXG4gIEFQSV9NRVNTQUdFLFxuICBIVFRQX1NUQVRVUyxcbiAgSEVBREVSUyxcbiAgSEVBREVSX1RZUEUsXG4gIENIQVJBQ1RFUl9FTkNPRElORyxcbiAgVE9LRU5fQkFTSUMsXG4gIFRPS0VOX0JFQVJFUixcbiAgU1VQUE9SVF9FUlJPUlMsXG4gIEFQUF9FUlJPUixcbiAgREVGQVVMVF9QUk9UT0NPTCxcbiAgREVGQVVMVF9ET01BSU4sXG59IGZyb20gJ0B2ZXJkYWNjaW8vY29yZSc7XG5leHBvcnQgeyBST0xFUywgUEFDS0FHRV9BQ0NFU1MgfSBmcm9tICdAdmVyZGFjY2lvL3V0aWxzJztcblxuZXhwb3J0IGNvbnN0IFRJTUVfRVhQSVJBVElPTl8yNEggPSAnMjRoJztcbmV4cG9ydCBjb25zdCBUSU1FX0VYUElSQVRJT05fMUggPSAnMWgnO1xuZXhwb3J0IGNvbnN0IERJU1RfVEFHUyA9ICdkaXN0LXRhZ3MnO1xuZXhwb3J0IGNvbnN0IExBVEVTVCA9ICdsYXRlc3QnO1xuZXhwb3J0IGNvbnN0IFVTRVJTID0gJ3VzZXJzJztcbmV4cG9ydCBjb25zdCBERUZBVUxUX01JTl9MSU1JVF9QQVNTV09SRCA9IDM7XG5cbmV4cG9ydCBjb25zdCBrZXlQZW0gPSAndmVyZGFjY2lvLWtleS5wZW0nO1xuZXhwb3J0IGNvbnN0IGNlcnRQZW0gPSAndmVyZGFjY2lvLWNlcnQucGVtJztcbmV4cG9ydCBjb25zdCBjc3JQZW0gPSAndmVyZGFjY2lvLWNzci5wZW0nO1xuXG5leHBvcnQgY29uc3QgRVJST1JfQ09ERSA9IHtcbiAgdG9rZW5fcmVxdWlyZWQ6ICd0b2tlbiBpcyByZXF1aXJlZCcsXG59O1xuZXhwb3J0IGNvbnN0IERFRkFVTFRfUkVHSVNUUlkgPSAnaHR0cHM6Ly9yZWdpc3RyeS5ucG1qcy5vcmcnO1xuZXhwb3J0IGNvbnN0IERFRkFVTFRfVVBMSU5LID0gJ25wbWpzJztcbmV4cG9ydCBjb25zdCBERUZBVUxUX05PX1JFQURNRSA9ICdFUlJPUjogTm8gUkVBRE1FIGRhdGEgZm91bmQhJztcbmV4cG9ydCBjb25zdCBNT0RVTEVfTk9UX0ZPVU5EID0gJ01PRFVMRV9OT1RfRk9VTkQnO1xuZXhwb3J0IGNvbnN0IFdFQl9USVRMRSA9ICdWZXJkYWNjaW8nO1xuZXhwb3J0IGNvbnN0IFNUT1JBR0UgPSB7XG4gIFBBQ0tBR0VfRklMRV9OQU1FOiAncGFja2FnZS5qc29uJyxcbiAgRklMRV9FWElTVF9FUlJPUjogJ0VFWElTVFMnLFxuICBOT19TVUNIX0ZJTEVfRVJST1I6ICdFTk9FTlQnLFxuICBERUZBVUxUX1JFVklTSU9OOiAnMC0wMDAwMDAwMDAwMDAwMDAwJyxcbn07XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsSUFBQUEsS0FBQSxHQUFBQyxPQUFBO0FBY0EsSUFBQUMsTUFBQSxHQUFBRCxPQUFBO0FBRU8sTUFBTUUsbUJBQW1CLEdBQUFDLE9BQUEsQ0FBQUQsbUJBQUEsR0FBRyxLQUFLO0FBQ2pDLE1BQU1FLGtCQUFrQixHQUFBRCxPQUFBLENBQUFDLGtCQUFBLEdBQUcsSUFBSTtBQUMvQixNQUFNQyxTQUFTLEdBQUFGLE9BQUEsQ0FBQUUsU0FBQSxHQUFHLFdBQVc7QUFDN0IsTUFBTUMsTUFBTSxHQUFBSCxPQUFBLENBQUFHLE1BQUEsR0FBRyxRQUFRO0FBQ3ZCLE1BQU1DLEtBQUssR0FBQUosT0FBQSxDQUFBSSxLQUFBLEdBQUcsT0FBTztBQUNyQixNQUFNQywwQkFBMEIsR0FBQUwsT0FBQSxDQUFBSywwQkFBQSxHQUFHLENBQUM7QUFFcEMsTUFBTUMsTUFBTSxHQUFBTixPQUFBLENBQUFNLE1BQUEsR0FBRyxtQkFBbUI7QUFDbEMsTUFBTUMsT0FBTyxHQUFBUCxPQUFBLENBQUFPLE9BQUEsR0FBRyxvQkFBb0I7QUFDcEMsTUFBTUMsTUFBTSxHQUFBUixPQUFBLENBQUFRLE1BQUEsR0FBRyxtQkFBbUI7QUFFbEMsTUFBTUMsVUFBVSxHQUFBVCxPQUFBLENBQUFTLFVBQUEsR0FBRztFQUN4QkMsY0FBYyxFQUFFO0FBQ2xCLENBQUM7QUFDTSxNQUFNQyxnQkFBZ0IsR0FBQVgsT0FBQSxDQUFBVyxnQkFBQSxHQUFHLDRCQUE0QjtBQUNyRCxNQUFNQyxjQUFjLEdBQUFaLE9BQUEsQ0FBQVksY0FBQSxHQUFHLE9BQU87QUFDOUIsTUFBTUMsaUJBQWlCLEdBQUFiLE9BQUEsQ0FBQWEsaUJBQUEsR0FBRyw4QkFBOEI7QUFDeEQsTUFBTUMsZ0JBQWdCLEdBQUFkLE9BQUEsQ0FBQWMsZ0JBQUEsR0FBRyxrQkFBa0I7QUFDM0MsTUFBTUMsU0FBUyxHQUFBZixPQUFBLENBQUFlLFNBQUEsR0FBRyxXQUFXO0FBQzdCLE1BQU1DLE9BQU8sR0FBQWhCLE9BQUEsQ0FBQWdCLE9BQUEsR0FBRztFQUNyQkMsaUJBQWlCLEVBQUUsY0FBYztFQUNqQ0MsZ0JBQWdCLEVBQUUsU0FBUztFQUMzQkMsa0JBQWtCLEVBQUUsUUFBUTtFQUM1QkMsZ0JBQWdCLEVBQUU7QUFDcEIsQ0FBQyIsImlnbm9yZUxpc3QiOltdfQ==

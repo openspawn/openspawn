@@ -1,0 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lipGlossVersion = exports.bubbleTeaVersion = exports.cobraVersion = exports.goVersion = void 0;
+exports.goVersion = '1.24';
+exports.cobraVersion = '1.9.1';
+exports.bubbleTeaVersion = '1.3.6';
+exports.lipGlossVersion = '1.1.0';
+//# sourceMappingURL=versions.js.map

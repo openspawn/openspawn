@@ -1,0 +1,53 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isClickLikeEvent = isClickLikeEvent;
+exports.isMouseLikePointerType = isMouseLikePointerType;
+exports.isReactEvent = isReactEvent;
+exports.isVirtualClick = isVirtualClick;
+exports.isVirtualPointerEvent = isVirtualPointerEvent;
+exports.stopEvent = stopEvent;
+var _detectBrowser = require("@base-ui/utils/detectBrowser");
+function stopEvent(event) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+function isReactEvent(event) {
+  return 'nativeEvent' in event;
+}
+
+// License: https://github.com/adobe/react-spectrum/blob/b35d5c02fe900badccd0cf1a8f23bb593419f238/packages/@react-aria/utils/src/isVirtualEvent.ts
+function isVirtualClick(event) {
+  // FIXME: Firefox is now emitting a deprecation warning for `mozInputSource`.
+  // Try to find a workaround for this. `react-aria` source still has the check.
+  if (event.mozInputSource === 0 && event.isTrusted) {
+    return true;
+  }
+  if (_detectBrowser.isAndroid && event.pointerType) {
+    return event.type === 'click' && event.buttons === 1;
+  }
+  return event.detail === 0 && !event.pointerType;
+}
+function isVirtualPointerEvent(event) {
+  if (_detectBrowser.isJSDOM) {
+    return false;
+  }
+  return !_detectBrowser.isAndroid && event.width === 0 && event.height === 0 || _detectBrowser.isAndroid && event.width === 1 && event.height === 1 && event.pressure === 0 && event.detail === 0 && event.pointerType === 'mouse' ||
+  // iOS VoiceOver returns 0.333• for width/height.
+  event.width < 1 && event.height < 1 && event.pressure === 0 && event.detail === 0 && event.pointerType === 'touch';
+}
+function isMouseLikePointerType(pointerType, strict) {
+  // On some Linux machines with Chromium, mouse inputs return a `pointerType`
+  // of "pen": https://github.com/floating-ui/floating-ui/issues/2015
+  const values = ['mouse', 'pen'];
+  if (!strict) {
+    values.push('', undefined);
+  }
+  return values.includes(pointerType);
+}
+function isClickLikeEvent(event) {
+  const type = event.type;
+  return type === 'click' || type === 'mousedown' || type === 'keydown' || type === 'keyup';
+}

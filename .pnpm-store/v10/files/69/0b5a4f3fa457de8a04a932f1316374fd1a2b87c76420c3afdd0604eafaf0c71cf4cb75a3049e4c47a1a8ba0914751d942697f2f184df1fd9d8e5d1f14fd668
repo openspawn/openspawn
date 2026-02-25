@@ -1,0 +1,1 @@
+{"version":3,"file":"ContainerPlugin.js","sourceRoot":"","sources":["../../../src/wrapper/ContainerPlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,iBAAiB,CAAC;AAEtC,MAAqB,eAAgB,SAAQ,2BAAiB;IAC5D,YAAY,OAA+C;QACzD,KAAK,CAAC,OAAO,EAAE,WAAW,EAAE,kCAAkC,CAAC,CAAC;IAClE,CAAC;CACF;AAJD,kCAIC"}

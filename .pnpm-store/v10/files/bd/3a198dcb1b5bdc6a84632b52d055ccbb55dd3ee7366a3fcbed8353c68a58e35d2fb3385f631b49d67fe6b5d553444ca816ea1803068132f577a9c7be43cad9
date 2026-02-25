@@ -1,0 +1,1 @@
+{"version":3,"file":"instantiate-script-plugins.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/plugins/nx-webpack-plugin/lib/instantiate-script-plugins.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,qBAAqB,EAAE,MAAM,SAAS,CAAC;AAKhD,OAAO,EAAE,mCAAmC,EAAE,MAAM,kCAAkC,CAAC;AAEvF,wBAAgB,wBAAwB,CACtC,OAAO,EAAE,mCAAmC,GAC3C,qBAAqB,EAAE,CA+CzB"}

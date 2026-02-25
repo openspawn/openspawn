@@ -1,0 +1,7 @@
+import { GoModule } from '../types/go-module';
+/**
+ * Computes a list of go modules.
+ *
+ * @param failSilently if true, the function will not throw an error if it fails
+ */
+export declare const computeGoModules: (failSilently?: boolean) => GoModule[];

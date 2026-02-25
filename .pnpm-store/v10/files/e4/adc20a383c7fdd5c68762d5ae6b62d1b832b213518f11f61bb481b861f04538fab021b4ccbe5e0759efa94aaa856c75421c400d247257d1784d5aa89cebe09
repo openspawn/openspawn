@@ -1,0 +1,19 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.swc = swc;
+function swc() {
+    const { transform } = require('@swc/core');
+    return {
+        name: 'nx-swc',
+        transform(code, filename) {
+            return transform(code, {
+                filename,
+                jsc: {
+                    transform: {
+                        react: { runtime: 'automatic' },
+                    },
+                },
+            });
+        },
+    };
+}

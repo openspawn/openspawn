@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","names":["_notify","require"],"sources":["../src/index.ts"],"sourcesContent":["export { handleNotify, notify, sendNotification } from './notify';\n"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;AAAA,IAAAA,OAAA,GAAAC,OAAA","ignoreList":[]}

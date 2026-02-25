@@ -1,0 +1,6 @@
+import { GeneratorCallback, Tree } from '@nx/devkit';
+import { ConfigurationGeneratorSchema } from './schema';
+export declare function configurationGenerator(tree: Tree, options: ConfigurationGeneratorSchema): Promise<GeneratorCallback>;
+export declare function configurationGeneratorInternal(tree: Tree, options: ConfigurationGeneratorSchema): Promise<GeneratorCallback>;
+export default configurationGenerator;
+//# sourceMappingURL=configuration.d.ts.map

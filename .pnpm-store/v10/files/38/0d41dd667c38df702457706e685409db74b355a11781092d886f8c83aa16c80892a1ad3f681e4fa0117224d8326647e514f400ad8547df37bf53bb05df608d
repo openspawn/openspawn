@@ -1,0 +1,1 @@
+{"version":3,"file":"extract-webpack-options.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/generators/convert-config-to-webpack-plugin/lib/extract-webpack-options.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,IAAI,EAAE,MAAM,YAAY,CAAC;AAElC,OAAO,KAAK,EAAE,MAAM,YAAY,CAAC;AAEjC,wBAAgB,qBAAqB,CAAC,IAAI,EAAE,IAAI,EAAE,iBAAiB,EAAE,MAAM;;;EA+D1E"}

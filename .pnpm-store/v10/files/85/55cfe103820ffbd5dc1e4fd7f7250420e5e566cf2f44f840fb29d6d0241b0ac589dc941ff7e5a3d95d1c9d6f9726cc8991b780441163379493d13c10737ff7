@@ -1,0 +1,8 @@
+import { CreateDependenciesContext } from '@nx/devkit';
+import { ProjectRootMap } from '../types/project-root-map';
+/**
+ * Extracts a map of project root to project name based on context.
+ *
+ * @param context the Nx graph context
+ */
+export declare const extractProjectRootMap: (context: CreateDependenciesContext) => ProjectRootMap;

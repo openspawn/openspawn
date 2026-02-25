@@ -1,0 +1,19 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.initGenerator = initGenerator;
+const devkit_1 = require("@nx/devkit");
+const utils_1 = require("../../utils");
+async function initGenerator(tree, options) {
+    if ((0, utils_1.supportsGoWorkspace)() && options.addGoDotWork) {
+        (0, utils_1.createGoWork)(tree);
+    }
+    (0, utils_1.addNxPlugin)(tree);
+    if (options.addGoDotWork) {
+        (0, utils_1.ensureGoConfigInSharedGlobals)(tree);
+    }
+    if (!options.skipFormat) {
+        await (0, devkit_1.formatFiles)(tree);
+    }
+}
+exports.default = initGenerator;
+//# sourceMappingURL=generator.js.map

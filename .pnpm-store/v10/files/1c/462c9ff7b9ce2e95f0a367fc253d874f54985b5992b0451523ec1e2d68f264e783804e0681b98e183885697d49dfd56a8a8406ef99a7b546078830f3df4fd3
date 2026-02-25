@@ -1,0 +1,30 @@
+import * as React from 'react';
+import { FieldValidityData } from "../root/FieldRoot.js";
+/**
+ * Used to display a custom message based on the field’s validity.
+ * Requires `children` to be a function that accepts field validity state as an argument.
+ *
+ * Documentation: [Base UI Field](https://base-ui.com/react/components/field)
+ */
+export declare const FieldValidity: React.FC<FieldValidity.Props>;
+export interface FieldValidityState extends Omit<FieldValidityData, 'state'> {
+  validity: FieldValidityData['state'];
+}
+export interface FieldValidityProps {
+  /**
+   * A function that accepts the field validity state as an argument.
+   *
+   * ```jsx
+   * <Field.Validity>
+   *   {(validity) => {
+   *     return <div>...</div>
+   *   }}
+   * </Field.Validity>
+   * ```
+   */
+  children: (state: FieldValidity.State) => React.ReactNode;
+}
+export declare namespace FieldValidity {
+  type State = FieldValidityState;
+  type Props = FieldValidityProps;
+}

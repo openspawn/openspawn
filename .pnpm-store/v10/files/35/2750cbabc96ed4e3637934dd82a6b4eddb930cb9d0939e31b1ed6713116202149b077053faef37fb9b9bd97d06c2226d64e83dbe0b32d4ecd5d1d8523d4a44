@@ -1,0 +1,48 @@
+{
+  "name": "@dicebear/micah",
+  "version": "9.3.1",
+  "description": "Avatar style for DiceBear",
+  "keywords": [
+    "dicebear"
+  ],
+  "bugs": {
+    "url": "https://github.com/dicebear/dicebear/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dicebear/dicebear.git"
+  },
+  "license": "(MIT AND CC-BY-4.0)",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "LICENSE",
+    "lib",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "del-cli lib",
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "uvu tests"
+  },
+  "devDependencies": {
+    "@dicebear/core": "9.3.1",
+    "@tsconfig/recommended": "^1.0.10",
+    "del-cli": "^6.0.0",
+    "typescript": "^5.8.3",
+    "uvu": "^0.5.6"
+  },
+  "peerDependencies": {
+    "@dicebear/core": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "572d49bed953a1e2befca11863255669ee3c67ed"
+}

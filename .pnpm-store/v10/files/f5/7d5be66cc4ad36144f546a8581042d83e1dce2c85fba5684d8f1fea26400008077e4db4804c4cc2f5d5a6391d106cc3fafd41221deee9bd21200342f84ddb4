@@ -1,0 +1,14 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sliderStateAttributesMapping = void 0;
+const sliderStateAttributesMapping = exports.sliderStateAttributesMapping = {
+  activeThumbIndex: () => null,
+  max: () => null,
+  min: () => null,
+  minStepsBetweenValues: () => null,
+  step: () => null,
+  values: () => null
+};

@@ -1,0 +1,1 @@
+{"version":3,"file":"types.js","names":[],"sources":["../src/types.ts"],"sourcesContent":["export interface AESPayload {\n  user: string;\n  password: string;\n}\n\nexport type BasicPayload = AESPayload | void;\n"],"mappings":"","ignoreList":[]}

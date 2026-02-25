@@ -1,0 +1,53 @@
+{
+    "name": "nest",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/nest",
+    "projectType": "library",
+    "targets": {
+        "build": {
+            "outputs": ["{workspaceRoot}/dist/packages/nest/README.md"],
+            "command": "node ./scripts/copy-readme.js nest"
+        },
+        "legacy-post-build": {
+            "executor": "@nx/workspace-plugin:legacy-post-build",
+            "options": {
+                "tsConfig": "./tsconfig.lib.json",
+                "assets": [
+                    {
+                        "input": "packages/nest",
+                        "glob": "**/files/**",
+                        "output": "/"
+                    },
+                    {
+                        "input": "packages/nest",
+                        "glob": "**/files/**/.gitkeep",
+                        "output": "/"
+                    },
+                    {
+                        "input": "packages/nest",
+                        "glob": "**/*.json",
+                        "ignore": ["**/tsconfig*.json", "project.json", ".eslintrc.json"],
+                        "output": "/"
+                    },
+                    {
+                        "input": "packages/nest",
+                        "glob": "**/*.js",
+                        "ignore": ["**/jest.config.js"],
+                        "output": "/"
+                    },
+                    {
+                        "input": "packages/nest",
+                        "glob": "**/*.d.ts",
+                        "output": "/"
+                    },
+                    {
+                        "input": "",
+                        "glob": "LICENSE",
+                        "output": "/"
+                    }
+                ]
+            }
+        }
+    },
+    "implicitDependencies": ["node", "eslint"]
+}

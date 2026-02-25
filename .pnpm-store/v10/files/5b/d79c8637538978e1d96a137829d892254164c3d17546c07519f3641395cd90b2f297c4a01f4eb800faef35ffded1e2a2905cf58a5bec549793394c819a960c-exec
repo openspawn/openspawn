@@ -1,0 +1,1 @@
+npx --no-install commitlint -c --config .commitlintrc.json -E --edit $1

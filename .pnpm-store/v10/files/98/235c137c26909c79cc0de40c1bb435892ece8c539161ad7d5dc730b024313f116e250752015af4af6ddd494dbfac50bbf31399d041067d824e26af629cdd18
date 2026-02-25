@@ -1,0 +1,2 @@
+export declare const sdl = "\n  directive @policy(\n    policies: [[policy__Policy!]!]!\n  ) on ENUM | FIELD_DEFINITION | INTERFACE | OBJECT | SCALAR\n\n  scalar policy__Policy\n";
+//# sourceMappingURL=policy.d.ts.map

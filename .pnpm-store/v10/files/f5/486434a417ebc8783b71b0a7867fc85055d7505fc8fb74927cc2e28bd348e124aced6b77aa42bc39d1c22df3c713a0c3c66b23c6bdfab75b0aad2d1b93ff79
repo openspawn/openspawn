@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ensureDependencies = ensureDependencies;
+const devkit_1 = require("@nx/devkit");
+const versions_1 = require("./versions");
+function ensureDependencies(tree, projectRoot) {
+    const packageJsonPath = projectRoot
+        ? (0, devkit_1.joinPathFragments)(projectRoot, 'package.json')
+        : 'package.json';
+    return (0, devkit_1.addDependenciesToPackageJson)(tree, {
+        '@nestjs/common': versions_1.nestJsVersion,
+        '@nestjs/core': versions_1.nestJsVersion,
+        '@nestjs/platform-express': versions_1.nestJsVersion,
+        'reflect-metadata': versions_1.reflectMetadataVersion,
+        rxjs: versions_1.rxjsVersion,
+        tslib: versions_1.tsLibVersion,
+    }, {
+        '@nestjs/testing': versions_1.nestJsVersion,
+    }, packageJsonPath);
+}

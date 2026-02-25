@@ -1,0 +1,166 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.asyncLoadPlugin = asyncLoadPlugin;
+exports.executePlugin = executePlugin;
+var _debug = _interopRequireDefault(require("debug"));
+var _lodash = _interopRequireDefault(require("lodash"));
+var _promises = require("node:fs/promises");
+var _nodePath = require("node:path");
+var _core = require("@verdaccio/core");
+var _utils = require("./utils");
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const debug = (0, _debug.default)('verdaccio:plugin:loader:async');
+async function isDirectory(pathFolder) {
+  const stat = await (0, _promises.lstat)(pathFolder);
+  return stat.isDirectory();
+}
+function mergeConfig(appConfig, pluginConfig) {
+  return _lodash.default.merge({}, appConfig, pluginConfig);
+}
+
+// type Plugins<T> =
+//   | pluginUtils.Auth<T>
+//   | pluginUtils.Storage<T>
+//   | pluginUtils.ExpressMiddleware<T, unknown, unknown>;
+
+/**
+ * The plugin loader find recursively plugins, if one plugin fails is ignored and report the error to the logger.
+ *
+ * The loader follows the order:
+ * - If the at the `config.yaml` file the  `plugins: ./plugins` is defined
+ *   - If is absolute will use the provided path
+ *   - If is relative, will use the base path of the config file. eg: /root/config.yaml the plugins folder should be
+ *     hosted at /root/plugins
+ * - The next step is find at the node_modules or global based on the `require` native algorithm.
+ * - If the package is scoped eg: @scope/foo, try to load the package `@scope/foo`
+ * - If the package is not scoped, will use the default prefix: verdaccio-foo ("verdaccio-theme-" prefix for theme ui plugins).
+ * - If a custom prefix is provided, the verdaccio- is replaced by the config.server.pluginPrefix.
+ *
+ * The `sanityCheck` is the validation for the required methods to load the plugin, if the validation fails the plugin won't be loaded.
+ * The `params` is an object that contains the global configuration and the logger.
+ *
+ * @param {*} pluginConfigs the custom plugin section
+ * @param {*} pluginOptions a set of options to initialize the plugin
+ * @param {*} sanityCheck callback that check the shape that should fulfill the plugin
+ * @param {*} prefix by default is verdaccio but can be override with config.server.pluginPrefix
+ * @param {*} pluginCategory the category of the plugin, eg: auth, storage, middleware
+ * @return {Array} list of plugins
+ */
+async function asyncLoadPlugin(pluginConfigs = {}, pluginOptions, sanityCheck, legacyMergeConfigs = false, prefix = _core.PLUGIN_PREFIX, pluginCategory = 'unknown') {
+  const logger = pluginOptions?.logger;
+  const pluginsIds = Object.keys(pluginConfigs || {});
+  const {
+    config
+  } = pluginOptions;
+  let plugins = [];
+  for (let pluginId of pluginsIds) {
+    debug('>>> looking for plugin %o', pluginId);
+    const isScoped = pluginId.startsWith('@') && pluginId.includes('/');
+    debug('is scoped plugin: %s', isScoped);
+    const pluginName = isScoped ? pluginId : `${prefix}-${pluginId}`;
+    debug('plugin package name %s', pluginName);
+
+    // Try to load the plugin from the config.plugins path
+    if (typeof config.plugins === 'string') {
+      let pluginsPath = config.plugins;
+      debug('plugin path %s', pluginsPath);
+      if (!(0, _nodePath.isAbsolute)(pluginsPath)) {
+        if (typeof config.config_path === 'string' && !config.configPath) {
+          logger.error('configPath is missing and the legacy config.config_path is not available for loading plugins');
+        }
+        if (!config.configPath) {
+          logger.error('config path property is required for loading plugins');
+          continue;
+        }
+        pluginsPath = (0, _nodePath.resolve)((0, _nodePath.join)((0, _nodePath.dirname)(config.configPath), pluginsPath));
+      }
+      logger.debug({
+        path: pluginsPath
+      }, 'plugins folder defined, loading plugins from @{path} ');
+      // throws if is not a directory
+      try {
+        await isDirectory(pluginsPath);
+        const pluginDir = pluginsPath;
+        const externalFilePlugin = (0, _nodePath.resolve)(pluginDir, pluginName);
+        let plugin = (0, _utils.tryLoad)(externalFilePlugin, (a, b) => {
+          logger.error(a, b);
+        });
+        debug('external plugin %o', plugin);
+        if (plugin && (0, _utils.isValid)(plugin)) {
+          plugin = executePlugin(plugin, pluginConfigs[pluginId], pluginOptions, legacyMergeConfigs);
+          if (!sanityCheck(plugin)) {
+            logger.error({
+              content: externalFilePlugin
+            }, "@{content} doesn't look like a valid plugin");
+            continue;
+          }
+          debug('>>> plugin is running and passed sanity check');
+          plugins.push(plugin);
+          logger.info({
+            pluginName,
+            pluginCategory
+          }, 'plugin @{pluginName} successfully loaded (@{pluginCategory})');
+          continue;
+        }
+      } catch (err) {
+        logger.warn({
+          err: err.message,
+          pluginsPath,
+          pluginName
+        }, '@{err} on loading plugins at @{pluginsPath} for @{pluginName}');
+      }
+    }
+
+    // Try to load the plugin from the node_modules or global based on the `require` native algorithm
+    if (typeof pluginId === 'string') {
+      let plugin = (0, _utils.tryLoad)(pluginName, (a, b) => {
+        logger.error(a, b);
+      });
+      if (plugin && (0, _utils.isValid)(plugin)) {
+        plugin = executePlugin(plugin, pluginConfigs[pluginId], pluginOptions, legacyMergeConfigs);
+        if (!sanityCheck(plugin)) {
+          logger.error({
+            pluginName
+          }, "@{pluginName} doesn't look like a valid plugin");
+          continue;
+        }
+        debug('>>> plugin is running and passed sanity check');
+        plugins.push(plugin);
+        logger.info({
+          pluginName,
+          pluginCategory
+        }, 'plugin @{pluginName} successfully loaded (@{pluginCategory})');
+        continue;
+      } else {
+        logger.error({
+          pluginName
+        }, 'package not found, try to install @{pluginName} with a package manager');
+        continue;
+      }
+    }
+  }
+  debug('%o plugins found: %o', pluginCategory, plugins.length);
+  return plugins;
+}
+function executePlugin(plugin, pluginConfig, pluginOptions, legacyMergeConfigs = false) {
+  // this is a legacy support for plugins that are not using the new API
+  if (legacyMergeConfigs) {
+    debug('>>> plugin merge config enabled');
+    let originalConfig = pluginOptions.config;
+    pluginConfig = mergeConfig(originalConfig, pluginConfig);
+  }
+  if ((0, _utils.isES6)(plugin)) {
+    debug('plugin is ES6');
+    // @ts-expect-error no relevant for the code
+    // eslint-disable-next-line new-cap
+    return new plugin.default(pluginConfig, pluginOptions);
+  } else {
+    debug('plugin is commonJS');
+    // @ts-expect-error improve this type
+    return plugin(pluginConfig, pluginOptions);
+  }
+}
+//# sourceMappingURL=plugin-async-loader.js.map

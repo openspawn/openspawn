@@ -1,0 +1,1 @@
+{"version":3,"file":"with-nx.d.ts","sourceRoot":"","sources":["../../../../../packages/webpack/src/utils/with-nx.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,yBAAyB,EAA6B,MAAM,UAAU,CAAC;AAEhF,OAAO,EAAE,yBAAyB,EAAE,MAAM,4DAA4D,CAAC;AAKvG,MAAM,MAAM,aAAa,GAAG,OAAO,CAAC,yBAAyB,CAAC,CAAC;AAE/D;;;GAGG;AACH,wBAAgB,MAAM,CACpB,aAAa,GAAE,aAAkB,GAChC,yBAAyB,CAkC3B"}

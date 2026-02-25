@@ -1,0 +1,24 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateTsConfig = updateTsConfig;
+const devkit_1 = require("@nx/devkit");
+function updateTsConfig(tree, options) {
+    const project = (0, devkit_1.readProjectConfiguration)(tree, options.projectName);
+    return (0, devkit_1.updateJson)(tree, `${project.root}/tsconfig.lib.json`, (json) => {
+        json.compilerOptions.target = options.target;
+        // NestJS requires decorators to be enabled for dependency injection
+        json.compilerOptions.experimentalDecorators = true;
+        json.compilerOptions.emitDecoratorMetadata = true;
+        if (options.strict) {
+            json.compilerOptions = {
+                ...json.compilerOptions,
+                strictNullChecks: true,
+                noImplicitAny: true,
+                strictBindCallApply: true,
+                forceConsistentCasingInFileNames: true,
+                noFallthroughCasesInSwitch: true,
+            };
+        }
+        return json;
+    });
+}

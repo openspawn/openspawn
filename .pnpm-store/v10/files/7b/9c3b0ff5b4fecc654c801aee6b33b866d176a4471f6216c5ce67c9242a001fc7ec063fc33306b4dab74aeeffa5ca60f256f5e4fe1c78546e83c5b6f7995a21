@@ -1,0 +1,1 @@
+{"version":3,"file":"add-dependencies.d.ts","sourceRoot":"","sources":["../../../../../../../packages/nest/src/generators/init/lib/add-dependencies.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,iBAAiB,EAAE,IAAI,EAAE,MAAM,YAAY,CAAC;AAG1D,OAAO,EAAE,oBAAoB,EAAE,MAAM,WAAW,CAAC;AAEjD,wBAAgB,eAAe,CAC7B,IAAI,EAAE,IAAI,EACV,OAAO,EAAE,oBAAoB,GAC5B,iBAAiB,CAWnB"}

@@ -1,0 +1,4 @@
+import { Tree } from '@nx/devkit';
+import { InitGeneratorSchema } from './schema';
+export declare function initGenerator(tree: Tree, options: InitGeneratorSchema): Promise<void>;
+export default initGenerator;

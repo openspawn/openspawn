@@ -1,0 +1,13 @@
+{
+  "main.js": "-/static/main.5ec29369d48298d8575d.js",
+  "runtime.js": "-/static/runtime.5ec29369d48298d8575d.js",
+  "Version.js": "-/static/Version.5ec29369d48298d8575d.js",
+  "Home.js": "-/static/Home.5ec29369d48298d8575d.js",
+  "Login.js": "-/static/Login.5ec29369d48298d8575d.js",
+  "AddUser.js": "-/static/AddUser.5ec29369d48298d8575d.js",
+  "ChangePassword.js": "-/static/ChangePassword.5ec29369d48298d8575d.js",
+  "Success.js": "-/static/Success.5ec29369d48298d8575d.js",
+  "vendors.js": "-/static/vendors.5ec29369d48298d8575d.js",
+  "favicon.ico": "-/static/favicon.ico",
+  "index.html": "-/static/index.html"
+}

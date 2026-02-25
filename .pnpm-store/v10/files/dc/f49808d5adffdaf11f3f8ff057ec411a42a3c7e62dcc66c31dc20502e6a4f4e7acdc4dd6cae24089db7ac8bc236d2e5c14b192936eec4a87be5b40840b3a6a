@@ -1,0 +1,9 @@
+import { Hash, ProjectGraph, ProjectsConfigurations, Task, TaskGraph, TaskHasher } from '@nx/devkit';
+export default function run(task: Task, context: {
+    hasher: TaskHasher;
+    projectGraph: ProjectGraph;
+    taskGraph: TaskGraph;
+    projectsConfigurations: ProjectsConfigurations;
+    env: NodeJS.ProcessEnv;
+}): Promise<Hash>;
+//# sourceMappingURL=hasher.d.ts.map

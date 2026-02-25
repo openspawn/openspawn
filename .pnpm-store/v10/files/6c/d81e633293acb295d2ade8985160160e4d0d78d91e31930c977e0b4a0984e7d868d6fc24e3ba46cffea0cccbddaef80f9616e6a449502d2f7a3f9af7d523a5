@@ -1,0 +1,1 @@
+{"version":3,"file":"fs.d.ts","sourceRoot":"","sources":["../../../../../packages/webpack/src/utils/fs.ts"],"names":[],"mappings":"AAIA,wBAAgB,MAAM,CACpB,KAAK,EAAE,MAAM,GAAG,MAAM,EAAE,EACxB,IAAI,EAAE,MAAM,EACZ,iBAAiB,UAAQ,UA2B1B;AAED,wBAAgB,kBAAkB,CAAC,IAAI,EAAE,MAAM,EAAE,IAAI,CAAC,EAAE,MAAM,YAkB7D;AAED;;GAEG;AACH,wBAAgB,eAAe,CAAC,IAAI,EAAE,MAAM,EAAE,UAAU,EAAE,MAAM,QAO/D"}

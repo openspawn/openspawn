@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getProjectRootFromSchema = getProjectRootFromSchema;
+const devkit_1 = require("@nx/devkit");
+function getProjectRootFromSchema(host, projectDirectory, projectType) {
+    const workspaceLayoutRoot = projectType === 'application'
+        ? (0, devkit_1.getWorkspaceLayout)(host).appsDir
+        : (0, devkit_1.getWorkspaceLayout)(host).libsDir;
+    if (workspaceLayoutRoot) {
+        if (projectDirectory.startsWith(workspaceLayoutRoot)) {
+            return projectDirectory;
+        }
+        return (0, devkit_1.joinPathFragments)(workspaceLayoutRoot, projectDirectory);
+    }
+    return projectDirectory;
+}
+//# sourceMappingURL=get-project-root-from-schema.js.map

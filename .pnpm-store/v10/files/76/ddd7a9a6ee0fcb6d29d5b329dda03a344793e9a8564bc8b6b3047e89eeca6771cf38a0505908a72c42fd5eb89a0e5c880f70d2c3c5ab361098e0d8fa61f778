@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.releasePublish = releasePublish;
+/**
+ * Creates a release-publish target configuration for a Go project
+ * @param projectRoot The root path of the project
+ * @returns The target configuration for releasing and publishing the Go module
+ */
+function releasePublish(projectRoot) {
+    return {
+        executor: '@naxodev/gonx:release-publish',
+        options: {
+            moduleRoot: projectRoot,
+        },
+        configurations: {
+            development: {
+                dryRun: true,
+            },
+        },
+    };
+}
+//# sourceMappingURL=release-publish.js.map

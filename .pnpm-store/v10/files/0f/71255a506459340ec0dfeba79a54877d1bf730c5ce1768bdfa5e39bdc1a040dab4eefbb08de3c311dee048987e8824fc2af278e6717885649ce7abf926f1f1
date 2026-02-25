@@ -1,0 +1,1 @@
+{"version":3,"file":"ProvideSharedPlugin.js","sourceRoot":"","sources":["../../../src/wrapper/ProvideSharedPlugin.ts"],"names":[],"mappings":";;;;;AACA,4EAAoD;AAEpD,MAAM,WAAW,GAAG,qBAAqB,CAAC;AAE1C,MAAqB,mBAAoB,SAAQ,2BAAiB;IAChE,YAAY,OAAmC;QAC7C,KAAK,CAAC,OAAO,EAAE,WAAW,EAAE,oCAAoC,CAAC,CAAC;IACpE,CAAC;CACF;AAJD,sCAIC"}

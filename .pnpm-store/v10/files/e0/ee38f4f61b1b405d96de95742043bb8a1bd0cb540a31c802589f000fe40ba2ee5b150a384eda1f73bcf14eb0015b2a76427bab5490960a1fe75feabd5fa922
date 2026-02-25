@@ -1,0 +1,1 @@
+{"version":3,"file":"normalize-entry.d.ts","sourceRoot":"","sources":["../../../../../../packages/webpack/src/utils/webpack/normalize-entry.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,oBAAoB,EAAE,MAAM,WAAW,CAAC;AAElE,wBAAgB,yBAAyB,CACvC,gBAAgB,EAAE,eAAe,EAAE,EACnC,iBAAiB,EAAE,MAAM,GACxB,oBAAoB,EAAE,CAwBxB"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"normalize-path-options.d.ts","sourceRoot":"","sources":["../../../../../../../packages/webpack/src/generators/convert-config-to-webpack-plugin/lib/normalize-path-options.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,sBAAsB,EAAE,MAAM,mCAAmC,CAAC;AAmB3E,wBAAgB,oBAAoB,CAClC,WAAW,EAAE,MAAM,EACnB,OAAO,EAAE,OAAO,CAAC,sBAAsB,CAAC,mCAezC"}

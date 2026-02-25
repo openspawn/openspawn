@@ -1,0 +1,10 @@
+"use strict";
+const create_dependencies_1 = require("./graph/create-dependencies");
+const createNodesV2_1 = require("./graph/createNodesV2");
+const nxPlugin = {
+    name: '@naxodev/gonx',
+    createDependencies: create_dependencies_1.createDependencies,
+    createNodesV2: createNodesV2_1.createNodesV2,
+};
+module.exports = nxPlugin;
+//# sourceMappingURL=index.js.map
