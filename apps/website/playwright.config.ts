@@ -11,6 +11,11 @@ import { defineConfig, devices } from "@playwright/test";
  *   npx playwright install --with-deps chromium
  */
 
+// Vite dev server requires NODE_ENV=development to serve JSX/React dev bundles.
+// In many CI/container setups NODE_ENV defaults to production — override it here
+// so esbuild dep pre-bundling picks up the development React variants.
+process.env.NODE_ENV = "development";
+
 // Inject LD_LIBRARY_PATH for systems missing the Chromium system deps
 // (no-op on systems where deps are already installed).
 const extraLibPath = `${process.env.HOME}/.playwright-libs`;
@@ -45,11 +50,15 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "pnpm exec nx serve website",
+    command: "NODE_ENV=development pnpm exec nx serve website",
     url: "http://localhost:4300",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     // Run from the monorepo root (two levels up from apps/website)
     cwd: "../../",
+    env: {
+      NODE_ENV: "development",
+      LD_LIBRARY_PATH: `${process.env.HOME}/.playwright-libs:${process.env.LD_LIBRARY_PATH ?? ""}`,
+    },
   },
 });

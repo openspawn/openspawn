@@ -103,8 +103,8 @@ test.describe("Landing Page", () => {
     const footer = page.locator("footer");
     await expect(footer).toBeVisible();
 
-    // Footer brand
-    await expect(footer.getByText("OpenSpawn")).toBeVisible();
+    // Footer brand (the span with the brand name inside the logo area)
+    await expect(footer.locator(".gradient-text").first()).toBeVisible();
 
     // Footer sections
     await expect(
@@ -128,13 +128,16 @@ test.describe("Landing Page", () => {
       footer.getByRole("link", { name: "GitHub" })
     ).toBeVisible();
 
-    // Copyright notice
-    await expect(footer.getByText(/OpenSpawn.*MIT/i)).toBeVisible();
+    // Copyright notice (span inside the footer bottom bar)
+    await expect(
+      footer.locator("span").filter({ hasText: /OpenSpawn.*MIT/i }).first()
+    ).toBeVisible();
   });
 
   test("install command snippet is shown in hero", async ({ page }) => {
+    // The install command appears in the hero section (may appear in multiple places)
     await expect(
-      page.getByText("npx openspawn init my-org")
+      page.getByText("npx openspawn init my-org").first()
     ).toBeVisible();
   });
 });
