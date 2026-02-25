@@ -1,4 +1,4 @@
-import { createRootRoute, createRoute } from "@tanstack/react-router";
+import { createRootRoute, createRoute, createNotFoundRoute } from "@tanstack/react-router";
 import { RootLayout } from "./routes/__root";
 import { LandingPage } from "./routes/index";
 import { DocsIndex } from "./routes/docs/index";
@@ -9,8 +9,12 @@ import { DashboardDocs } from "./routes/docs/features/dashboard";
 import { ModelRouterDocs } from "./routes/docs/features/model-router";
 import { OrgMdPage } from "./routes/org-md";
 import { OpenClawQuickstart } from "./routes/docs/openclaw-quickstart";
+import { NotFoundPage } from "./routes/not-found";
 
-const rootRoute = createRootRoute({ component: RootLayout });
+const rootRoute = createRootRoute({
+  component: RootLayout,
+  notFoundComponent: NotFoundPage,
+});
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
