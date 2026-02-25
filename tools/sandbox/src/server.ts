@@ -993,6 +993,14 @@ export function startServer(sim: Simulation): void {
 
     // ── Static file serving (production: serve built dashboard) ──────────
     if (process.env.SERVE_DASHBOARD === '1') {
+      // BikiniBottom: redirect bare root to the BikiniBottom intro (landing) page
+      // so visitors see "Hire the whole ocean" instead of the OpenSpawn marketing site.
+      if (path === '/' && req.method === 'GET') {
+        res.writeHead(302, { Location: '/app/intro' });
+        res.end();
+        return;
+      }
+
       const MIME_TYPES: Record<string, string> = {
         '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
         '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
