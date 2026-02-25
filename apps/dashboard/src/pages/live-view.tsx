@@ -108,7 +108,7 @@ function useReplay() {
             };
             edgeAnimsRef.current = [
               ...edgeAnimsRef.current,
-              { id: `ea-spawn-${currentTick}-${d.spawnAgent.id}`, from: d.spawnAgent.parentId, to: d.spawnAgent.id, color: '#22d3ee', timestamp: Date.now() },
+              { id: `ea-spawn-${currentTick}-${d.spawnAgent.id}`, from: d.spawnAgent.parentId, to: d.spawnAgent.id, color: '#F4C542', timestamp: Date.now() },
             ];
           }
           if (d.text) {
@@ -147,7 +147,7 @@ function useReplay() {
           if ((event.type === 'delegation' || event.type === 'reassign') && d.from && d.to) {
             edgeAnimsRef.current = [
               ...edgeAnimsRef.current,
-              { id: `ea-${currentTick}-${d.from}-${d.to}`, from: d.from, to: d.to, color: '#22d3ee', timestamp: Date.now() },
+              { id: `ea-${currentTick}-${d.from}-${d.to}`, from: d.from, to: d.to, color: '#F4C542', timestamp: Date.now() },
             ];
           }
           if (event.type === 'escalation' && d.from && d.to) {
@@ -232,20 +232,21 @@ function ProgressHeader({ act, tick, pattiesDelivered }: { act: typeof ACTS[0]; 
   const pct = Math.min(100, (pattiesDelivered / 10000) * 100);
 
   return (
-    <div className="shrink-0 space-y-2 px-4 py-3 bg-white/[0.02] border-b border-white/10">
+    <div className="shrink-0 space-y-2 px-4 py-3 border-b" style={{ background: 'rgba(6,42,69,0.9)', borderColor: 'rgba(74,174,217,0.2)', backdropFilter: 'blur(8px)' }}>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold text-cyan-400 uppercase tracking-widest">{act.name}</h2>
-          <p className="text-white/40 text-xs">{act.narrative}</p>
+          <h2 className="text-sm font-bold uppercase tracking-widest" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>{act.name}</h2>
+          <p className="text-[#B8E4F7]/50 text-xs" style={{ fontFamily: 'Nunito, sans-serif' }}>{act.narrative}</p>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-white">{pattiesDelivered.toLocaleString()}</div>
-          <div className="text-[10px] text-white/30">/ 10,000 patties</div>
+          <div className="text-lg font-bold" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>{pattiesDelivered.toLocaleString()}</div>
+          <div className="text-[10px] text-[#B8E4F7]/30" style={{ fontFamily: 'Nunito, sans-serif' }}>/ 10,000 patties 🍔</div>
         </div>
       </div>
-      <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
+      <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(74,174,217,0.1)' }}>
         <motion.div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full"
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{ background: 'linear-gradient(90deg, #F4C542 0%, #4AE88A 100%)', boxShadow: '0 0 12px rgba(244,197,66,0.4)' }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         />
@@ -281,9 +282,9 @@ export function LiveViewPage() {
   }, [showIntro, replay.running, replay.finished, replay.tick, replay.start]);
 
   return (
-    <div className="relative h-screen w-full bg-[#020817] text-white flex flex-col overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020817] via-[#0a1628] to-[#020817]" />
+    <div className="relative h-screen w-full text-white flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, #062A45 0%, #030E1A 100%)' }}>
+      {/* BikiniBottom ocean background */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(11,94,138,0.3) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(26,125,181,0.2) 0%, transparent 50%)' }} />
 
       {/* Intro overlay */}
       <AnimatePresence>
@@ -314,15 +315,16 @@ export function LiveViewPage() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#020817]/60 backdrop-blur-sm pointer-events-none"
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-sm pointer-events-none"
+                  style={{ background: 'rgba(3,14,26,0.7)' }}
                 >
-                  <div className="text-cyan-400/80 text-sm uppercase tracking-[0.3em] font-medium mb-1">
+                  <div className="text-sm uppercase tracking-[0.3em] font-medium mb-1" style={{ color: 'rgba(244,197,66,0.8)', fontFamily: 'Nunito, sans-serif' }}>
                     Act {replay.actBanner.num}
                   </div>
-                  <div className="text-white text-2xl md:text-3xl font-black tracking-tight mb-2">
+                  <div className="text-2xl md:text-3xl font-black tracking-tight mb-2" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>
                     {replay.actBanner.name.replace(/^Act \w+: /, '')}
                   </div>
-                  <div className="text-white/40 text-sm max-w-md text-center">
+                  <div className="text-sm max-w-md text-center" style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}>
                     {replay.actBanner.narrative}
                   </div>
                 </motion.div>
@@ -330,7 +332,7 @@ export function LiveViewPage() {
             </AnimatePresence>
           </div>
           {/* Live Feed - 40% */}
-          <div className="flex-[2] min-h-0 border-l border-white/5">
+          <div className="flex-[2] min-h-0" style={{ borderLeft: '1px solid rgba(74,174,217,0.1)' }}>
             <LiveFeed messages={replay.messages} />
           </div>
         </div>
@@ -346,22 +348,36 @@ export function LiveViewPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="absolute inset-0 z-30 flex items-center justify-center bg-[#020817]/90 backdrop-blur-sm"
+              className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
+              style={{ background: 'rgba(3,14,26,0.92)' }}
             >
               <div className="text-center max-w-lg px-8">
-                <div className="text-6xl md:text-7xl font-black text-white mb-2">
+                <div className="text-6xl md:text-7xl font-black mb-2" style={{ fontFamily: '"Baloo 2", cursive', color: '#F4C542' }}>
                   🍔 10,000
                 </div>
-                <div className="text-lg text-cyan-400 font-semibold mb-6">
-                  / 10,000 DELIVERED
+                <div className="text-lg font-semibold mb-6" style={{ color: '#4AE88A', fontFamily: '"Baloo 2", cursive' }}>
+                  🎉 PATTIES DELIVERED! 🎉
                 </div>
-                <p className="text-white/50 text-lg mb-8">
-                  22 agents. 5 departments. One <code className="text-cyan-400 bg-cyan-950/50 px-1.5 py-0.5 rounded text-sm">ORG.md</code>.
+                <p className="text-lg mb-8" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
+                  22 agents. 5 departments. One{' '}
+                  <code
+                    className="px-1.5 py-0.5 rounded text-sm"
+                    style={{ color: '#F4C542', background: 'rgba(244,197,66,0.1)' }}
+                  >
+                    ORG.md
+                  </code>
+                  .
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     to="/"
-                    className="flex items-center gap-2 px-6 py-3 bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-500/30 transition-all"
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
+                    style={{
+                      background: 'rgba(244,197,66,0.15)',
+                      border: '1px solid rgba(244,197,66,0.4)',
+                      color: '#F4C542',
+                      fontFamily: 'Nunito, sans-serif',
+                    }}
                   >
                     Explore the Dashboard <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -369,18 +385,25 @@ export function LiveViewPage() {
                     href="/org-md"
                     target="_blank"
                     rel="noopener"
-                    className="px-6 py-3 bg-white/5 border border-white/10 text-white/60 font-medium rounded-xl hover:bg-white/10 transition-all"
+                    className="px-6 py-3 rounded-xl font-medium transition-all"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: 'rgba(184,228,247,0.6)',
+                      fontFamily: 'Nunito, sans-serif',
+                    }}
                   >
                     See the ORG.md →
                   </a>
                   <button
                     onClick={handleReplay}
-                    className="px-6 py-3 text-white/30 font-medium hover:text-white/50 transition-all cursor-pointer"
+                    className="px-6 py-3 font-medium transition-all cursor-pointer"
+                    style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'Nunito, sans-serif' }}
                   >
                     Replay ↻
                   </button>
                 </div>
-                <p className="text-white/20 text-xs mt-8">
+                <p className="text-xs mt-8" style={{ color: 'rgba(184,228,247,0.2)', fontFamily: 'Nunito, sans-serif' }}>
                   Powered by OpenSpawn. Open source.
                 </p>
               </div>
