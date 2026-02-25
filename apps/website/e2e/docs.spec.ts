@@ -40,7 +40,7 @@ test.describe("Docs — Getting Started page", () => {
     await expect(sidebar).toBeVisible();
 
     for (const { label } of SIDEBAR_LINKS) {
-      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 
@@ -75,7 +75,7 @@ test.describe("Docs — How It Works page", () => {
     await expect(sidebar).toBeVisible();
 
     for (const { label } of SIDEBAR_LINKS) {
-      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 
@@ -138,7 +138,7 @@ test.describe("Docs — Connecting Real Agents page", () => {
     await expect(sidebar).toBeVisible();
 
     for (const { label } of SIDEBAR_LINKS) {
-      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 
@@ -168,7 +168,7 @@ test.describe("Docs — Dashboard Guide page", () => {
     await expect(sidebar).toBeVisible();
 
     for (const { label } of SIDEBAR_LINKS) {
-      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 
@@ -198,7 +198,7 @@ test.describe("Docs — ACP vs A2A page", () => {
     await expect(sidebar).toBeVisible();
 
     for (const { label } of SIDEBAR_LINKS) {
-      await expect(sidebar.getByRole("link", { name: label })).toBeVisible();
+      await expect(sidebar.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 
