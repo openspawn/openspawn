@@ -12,11 +12,11 @@ export function Nav() {
           <span className="gradient-text">BikiniBottom</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
+          <Link to="/org-md" className="text-sm text-slate-400 transition hover:text-cyan-400">
+            ORG.md
+          </Link>
           <Link to="/docs" className="text-sm text-slate-400 transition hover:text-cyan-400">
             Docs
-          </Link>
-          <Link to="/docs/protocols/a2a" className="text-sm text-slate-400 transition hover:text-cyan-400">
-            Protocols
           </Link>
           <a
             href="https://github.com/openspawn/openspawn"
@@ -53,11 +53,11 @@ export function Nav() {
       {menuOpen && (
         <div className="border-t border-white/5 bg-navy-950/95 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1 px-8 py-4">
+            <Link to="/org-md" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+              ORG.md
+            </Link>
             <Link to="/docs" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               Docs
-            </Link>
-            <Link to="/docs/protocols/a2a" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
-              Protocols
             </Link>
             <a
               href="https://github.com/openspawn/openspawn"
