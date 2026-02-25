@@ -61,7 +61,8 @@
         "serveTargetName": "serve",
         "testTargetName": "test",
         "lintTargetName": "lint",
-        "tidyTargetName": "tidy"
+        "tidyTargetName": "tidy",
+        "skipGoDependencyCheck": true
       }
     }
   ],
