@@ -8,9 +8,10 @@
  *   3. Live Ticker feed preview
  *   4. Meet the Crew (CharacterCardGrid)
  *   5. Footer
+ *
+ * NOTE: All animations use plain CSS (bb-tokens.css keyframes) — no motion/react.
  */
 
-import { motion } from 'motion/react';
 import { ArrowRight, Play, Waves } from 'lucide-react';
 import { BubbleField } from './BubbleField';
 import { KelpSilhouette } from './KelpSilhouette';
@@ -104,21 +105,19 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
                 GitHub
               </button>
             )}
-            <motion.button
+            <button
               onClick={onWatchLive}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-[1.04] active:scale-[0.97]"
               style={{
                 background: '#F4C542',
                 color: '#062A45',
                 fontFamily: '"Baloo 2", cursive',
                 boxShadow: '0 0 16px rgba(244,197,66,0.4)',
               }}
-              whileHover={{ scale: 1.04, boxShadow: '0 0 24px rgba(244,197,66,0.6)' }}
-              whileTap={{ scale: 0.97 }}
             >
               <Play className="w-3 h-3" />
               Watch Live
-            </motion.button>
+            </button>
           </div>
         </nav>
 
@@ -126,10 +125,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
         <div className="relative z-30 flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
 
           {/* Subtitle pill */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
             className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-semibold"
             style={{
               background: 'rgba(74,174,217,0.1)',
@@ -140,13 +136,10 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
           >
             <Waves className="w-4 h-4" />
             {agentCount} agents · 1 massive order · 0 humans in the loop
-          </motion.div>
+          </div>
 
           {/* H1 — Sandy yellow, NOT cyan */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+          <h1
             className="font-black leading-[1.05] tracking-tight mb-6"
             style={{
               fontFamily: '"Baloo 2", cursive',
@@ -159,13 +152,10 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
             Hire the
             <br />
             whole ocean.
-          </motion.h1>
+          </h1>
 
           {/* Subhead */}
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+          <p
             className="font-medium max-w-xl mb-10 leading-relaxed"
             style={{
               fontFamily: 'Nunito, sans-serif',
@@ -176,64 +166,47 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
             22 SpongeBob characters running a real business with{' '}
             <span className="font-semibold" style={{ color: '#F4C542' }}>OpenSpawn</span>.
             Watch them argue, delegate, mess up, and somehow deliver 10,000 Krabby Patties.
-          </motion.p>
+          </p>
 
           {/* CTA buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-4 mb-16"
-          >
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
             {/* PRIMARY CTA — Sandy yellow, big, bouncy */}
-            <motion.button
+            <button
               onClick={onWatchLive}
-              className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-xl"
+              className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-xl transition-all hover:scale-[1.06] hover:-translate-y-1 active:scale-[0.97]"
               style={{
                 background: 'linear-gradient(135deg, #F4C542 0%, #EAB308 100%)',
                 color: '#062A45',
                 fontFamily: '"Baloo 2", cursive',
                 boxShadow: '0 0 24px rgba(244,197,66,0.5), 0 4px 16px rgba(6,42,69,0.3)',
               }}
-              whileHover={{
-                scale: 1.06,
-                y: -3,
-                boxShadow: '0 0 40px rgba(244,197,66,0.7), 0 8px 24px rgba(6,42,69,0.4)',
-              }}
-              whileTap={{ scale: 0.97 }}
             >
               <Play className="w-5 h-5" />
               Watch the Agents Live
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            </button>
 
             {/* Secondary */}
             {onGitHub && (
-              <motion.button
+              <button
                 onClick={onGitHub}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base border backdrop-blur-sm transition-colors"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base border backdrop-blur-sm transition-all hover:-translate-y-0.5"
                 style={{
                   color: '#B8E4F7',
                   fontFamily: 'Nunito, sans-serif',
                   borderColor: 'rgba(74,174,217,0.25)',
                   background: 'rgba(74,174,217,0.08)',
                 }}
-                whileHover={{ y: -2, borderColor: 'rgba(74,174,217,0.4)' }}
               >
                 View on GitHub →
-              </motion.button>
+              </button>
             )}
-          </motion.div>
+          </div>
 
           {/* Live ticker preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="w-full max-w-lg"
-          >
+          <div className="w-full max-w-lg">
             <LiveTickerFeed messages={SAMPLE_TICKER_MESSAGES} onJoinWatch={onWatchLive} />
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Character swim parade ── */}
@@ -292,12 +265,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
       >
         <BubbleField count={8} className="opacity-50" />
         <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
+          <div>
             <p
               className="text-sm font-bold uppercase tracking-widest mb-4"
               style={{ color: '#4AAED9', fontFamily: 'Nunito, sans-serif' }}
@@ -364,7 +332,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -379,13 +347,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
       >
         <BubbleField count={10} className="opacity-40" />
         <div className="relative z-10 max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <p
               className="text-sm font-bold uppercase tracking-widest mb-4"
               style={{ color: '#4AAED9', fontFamily: 'Nunito, sans-serif' }}
@@ -408,35 +370,27 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
             >
               Each agent is a real SpongeBob character with a job title, a team, and way too much to do.
             </p>
-          </motion.div>
+          </div>
 
           <CharacterCardGrid agents={AGENT_ROSTER} maxVisible={6} />
 
           {/* CTA to watch live */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center mt-12"
-          >
-            <motion.button
+          <div className="text-center mt-12">
+            <button
               onClick={onWatchLive}
-              className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-xl"
+              className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-xl transition-all hover:scale-[1.05] hover:-translate-y-0.5 active:scale-[0.97]"
               style={{
                 background: 'linear-gradient(135deg, #F4C542 0%, #EAB308 100%)',
                 color: '#062A45',
                 fontFamily: '"Baloo 2", cursive',
                 boxShadow: '0 0 24px rgba(244,197,66,0.4)',
               }}
-              whileHover={{ scale: 1.05, y: -2, boxShadow: '0 0 40px rgba(244,197,66,0.6)' }}
-              whileTap={{ scale: 0.97 }}
             >
               <Play className="w-5 h-5" />
               Watch Them Work
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </motion.div>
+            </button>
+          </div>
         </div>
 
         {/* Kelp at bottom of this section too */}
