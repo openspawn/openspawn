@@ -13,6 +13,12 @@ interface FeatureCardProps {
   badgeColor?: BadgeColor;
   /** @deprecated Use `badgeColor` instead */
   categoryColor?: string;
+  /**
+   * Optional SVG illustration component rendered above the title.
+   * When provided, replaces the emoji as the visual focal point.
+   * Should accept a `className` prop for sizing.
+   */
+  illustration?: React.ComponentType<{ className?: string }>;
 }
 
 export function FeatureCard({
@@ -23,6 +29,7 @@ export function FeatureCard({
   href,
   category,
   badgeColor = "slate",
+  illustration: Illustration,
 }: FeatureCardProps) {
   const inner = (
     <>
@@ -33,7 +40,16 @@ export function FeatureCard({
           </Badge>
         </div>
       )}
-      <div className="mb-3 text-3xl">{emoji}</div>
+
+      {/* Visual: SVG illustration (preferred) or emoji fallback */}
+      <div className="mb-4">
+        {Illustration ? (
+          <Illustration className="w-16 h-16 transition-transform duration-300 group-hover:scale-105" />
+        ) : (
+          <span className="text-3xl">{emoji}</span>
+        )}
+      </div>
+
       <h3 className={`mb-2 text-lg font-semibold ${color}`}>{title}</h3>
       <p className="text-sm leading-relaxed text-slate-400">{description}</p>
       {href && (

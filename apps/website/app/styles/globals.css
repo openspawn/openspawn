@@ -327,6 +327,48 @@ body {
   background: var(--os-bg-subtle);
 }
 
+/* ── BikiniBottom design tokens ───────────────────────────────────────────── */
+/* Sandy, tropical, SpongeBob-themed palette for bikinibottom.ai OG cards     */
+:root {
+  /* Sand / ocean background scale */
+  --bb-bg-base:    #f5c842;   /* bright sandy yellow */
+  --bb-bg-deep:    #e6b930;   /* darker sand */
+  --bb-bg-ocean:   #1a6ea8;   /* ocean blue */
+  --bb-bg-ocean-dark: #0f4d7a;
+  --bb-bg-surface: rgba(255, 255, 255, 0.15);
+  --bb-bg-bubble:  rgba(255, 255, 255, 0.25);
+
+  /* BikiniBottom text */
+  --bb-text-primary:   #1a1a0e;   /* dark near-black */
+  --bb-text-secondary: #3d3a0a;
+  --bb-text-ocean:     #e8f4fd;   /* light on ocean blue */
+  --bb-text-muted:     #7a6e00;
+
+  /* BikiniBottom accent palette */
+  --bb-pineapple:  #e8a020;   /* SpongeBob's house */
+  --bb-coral:      #e84040;   /* coral reef red */
+  --bb-sea-green:  #2d9e5f;   /* seaweed green */
+  --bb-purple:     #7b2fbe;   /* Patrick star-ish */
+  --bb-bubble:     rgba(255, 255, 255, 0.6);
+
+  /* BikiniBottom borders */
+  --bb-border-sand:  rgba(0, 0, 0, 0.12);
+  --bb-border-wave:  rgba(26, 110, 168, 0.30);
+  --bb-border-light: rgba(255, 255, 255, 0.40);
+
+  /* BikiniBottom radius */
+  --bb-radius-sm:   6px;
+  --bb-radius-md:   12px;
+  --bb-radius-lg:   20px;
+  --bb-radius-bubble: 50%;
+
+  /* BikiniBottom shadows */
+  --bb-shadow-card:    0 4px 16px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0,0,0,0.10);
+  --bb-shadow-bubble:  0 2px 8px rgba(26, 110, 168, 0.20);
+  --bb-glow-ocean:     0 0 20px rgba(26, 110, 168, 0.25);
+  --bb-glow-sand:      0 0 30px rgba(245, 200, 66, 0.40);
+}
+
 /* ── Prose utilities for docs ─────────────────────────────────────────────── */
 /* Uniform styling for doc page content without a prose plugin */
 .docs-prose h1 { font-size: 2.25rem; font-weight: 700; color: var(--os-text-primary); margin-bottom: 0.5rem; }

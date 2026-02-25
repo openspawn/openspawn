@@ -3,6 +3,14 @@ import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
 import { Button } from "../components/button";
+import {
+  DeviceOrchestrationIllustration,
+  AgentCommunicationIllustration,
+  ProtocolNativeIllustration,
+  ModelRouterIllustration,
+  DashboardIllustration,
+  ZeroConfigCliIllustration,
+} from "../components/illustrations";
 
 // ─── Feature grid data ──────────────────────────────────────────────────────
 const features = [
@@ -10,6 +18,7 @@ const features = [
     category: "REAL-WORLD",
     badgeColor: "cyan" as const,
     emoji: "📱",
+    illustration: DeviceOrchestrationIllustration,
     title: "Device & Node Orchestration",
     description:
       "Give your agents eyes, ears, and hands. Control phones, cameras, screens, and IoT devices from your agent org — no competitor does this.",
@@ -19,6 +28,7 @@ const features = [
     category: "PROTOCOL",
     badgeColor: "violet" as const,
     emoji: "🔗",
+    illustration: AgentCommunicationIllustration,
     title: "A2A Protocol",
     description:
       "Coordinate agents across services without brittle custom APIs. Native Agent-to-Agent protocol with streaming, task queues, and per-agent discovery cards.",
@@ -29,6 +39,7 @@ const features = [
     category: "PROTOCOL",
     badgeColor: "violet" as const,
     emoji: "🔌",
+    illustration: ProtocolNativeIllustration,
     title: "MCP Tools",
     description:
       "Connect your agents to Claude Desktop, Cursor, or any MCP client instantly. 7 tools via Streamable HTTP — your agents become MCP servers.",
@@ -39,6 +50,7 @@ const features = [
     category: "INTELLIGENCE",
     badgeColor: "emerald" as const,
     emoji: "🔀",
+    illustration: ModelRouterIllustration,
     title: "Model Router",
     description:
       "Route to the right model automatically. Local-first with Ollama, cloud when needed. Fallback chains and per-task cost tracking built in.",
@@ -49,6 +61,7 @@ const features = [
     category: "VISIBILITY",
     badgeColor: "amber" as const,
     emoji: "📊",
+    illustration: DashboardIllustration,
     title: "Live Dashboard",
     description:
       "See exactly what your agents are doing in real-time. Network graph, task timeline, cost charts — watch your org breathe.",
@@ -59,6 +72,7 @@ const features = [
     category: "DEVELOPER",
     badgeColor: "slate" as const,
     emoji: "💻",
+    illustration: ZeroConfigCliIllustration,
     title: "Zero-Config CLI",
     description:
       "Go from zero to a running agent org in under 30 seconds. Scaffold, start, and deploy with a single command.",
