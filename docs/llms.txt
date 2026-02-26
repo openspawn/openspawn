@@ -167,6 +167,44 @@ OpenSpawn exposes tools via MCP (Streamable HTTP at `POST /mcp`). Agents authent
 | `consensus_vote` | Submit vote | `consensusId`, `vote` (approve/reject), `reason?` |
 | `consensus_status` | Check consensus status | `consensusId` |
 
+### Coordination Tools (PR #426)
+
+SQLite-backed coordination server for multi-agent task management. Exposed via MCP.
+
+#### Task Management
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `task_create` | Create a task and optionally assign it | `title`, `description?`, `priority?` (urgent/high/normal/low), `assign_to?`, `created_by?` |
+| `task_claim` | Atomically claim an open task (prevents duplicate work) | `task_id`, `agent_id` |
+| `task_update` | Update task status or details | `task_id`, `status?`, `description?`, `priority?`, `assign_to?` |
+| `task_complete` | Mark task done with result and artifacts | `task_id`, `result`, `artifacts?` (string array) |
+| `task_list` | List tasks with filters | `status?`, `assigned_to?`, `priority?` |
+
+#### Agent Management
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `agent_register` | Register an agent in the org | `id`, `name`, `role`, `level?`, `department?`, `model?` |
+| `agent_update_status` | Set agent status | `agent_id`, `status` (idle/working/paused/overwhelmed) |
+| `agent_fire` | Remove agent (archives workspace) | `agent_id` |
+| `agent_list` | List all agents with current status | — |
+
+#### Communication
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `message_send` | Send structured message between agents | `to`, `body`, `type` (TASK/RESULT/ESCALATION/DECISION) |
+| `message_list` | List messages with filters | `to?`, `from?`, `type?` |
+
+#### Escalation
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `escalation_create` | Create an escalation | `issue`, `context?`, `severity` (low/medium/high/critical), `to_agent?` |
+| `escalation_list` | List escalations | `severity?`, `status?` |
+
+#### Overview
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `org_status` | Full org overview: agents, tasks, budget | — |
+
 ---
 
 ## Key Concepts
@@ -267,6 +305,15 @@ A: Run `openspawn start` to generate `openclaw-patch.json`, then apply it to you
 
 **Q: What does openclaw-patch.json contain?**
 A: OpenClaw `agents.list` entries with `id`, `model`, `workspace`, and `subagents.allowAgents` for managers. L7+ agents get opus, L6- get sonnet. The highest-level agent gets `default: true`. All agents get `tools.profile: "full"`.
+
+**Q: How do agents coordinate work?**
+A: Via MCP coordination tools (PR #426). `task_create` assigns work, `task_claim` prevents duplicate effort (atomic — only one agent wins), `task_complete` records results with artifacts. Use `org_status` for a full overview.
+
+**Q: How do I escalate an issue?**
+A: `escalation_create { issue: "deployment failed", severity: "high" }`. Escalations are tracked and can be filtered by severity. Resolve them with the escalation workflow.
+
+**Q: Can two agents claim the same task?**
+A: No. `task_claim` is atomic — only one agent wins the claim, the other gets an error. This prevents duplicate work by design.
 
 **Q: How is this different from CrewAI/LangGraph/AutoGen?**
 A: Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together: build agents with your framework, coordinate them with OpenSpawn.

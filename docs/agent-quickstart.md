@@ -224,6 +224,51 @@ Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
 
 ---
 
+## Managing Tasks
+
+The coordination tools (PR #426) give agents a shared task board backed by SQLite. Here's the core workflow:
+
+### Create a task
+```
+tool: task_create { title: "Implement auth API", priority: "high", assign_to: "engineer-1" }
+```
+
+### Claim an open task
+```
+tool: task_claim { task_id: "abc123", agent_id: "engineer-1" }
+```
+> **Q: Can two agents claim the same task?**
+> No. `task_claim` is atomic — only one agent wins, the other gets an error. This prevents duplicate work.
+
+### Complete a task
+```
+tool: task_complete { task_id: "abc123", result: "PR #42 merged", artifacts: ["src/auth.ts"] }
+```
+
+### List tasks
+```
+tool: task_list { status: "open", priority: "high" }
+```
+
+### Escalate a problem
+```
+tool: escalation_create { issue: "deployment failed", severity: "high", to_agent: "ceo" }
+```
+
+### Check org status
+```
+tool: org_status
+```
+> Returns a full overview: all agents, task counts, budget status.
+
+> **Q: How do agents coordinate work?**
+> Via coordination tools. `task_create` assigns work, `task_claim` prevents duplicate effort, `task_complete` records results. `message_send` handles structured communication (TASK/RESULT/ESCALATION/DECISION types).
+
+> **Q: Where's the full tool reference?**
+> See `docs/llms.txt` — the "Coordination Tools" section lists all 14 tools with parameters.
+
+---
+
 ## Common workflows
 
 ### Delegate a task
