@@ -18,6 +18,9 @@ import { AcpVsA2A } from "./routes/docs/concepts/acp-vs-a2a";
 import { ComparisonPage } from "./routes/docs/comparison";
 import { MCPReference } from "./routes/docs/protocols/mcp-reference";
 import { OrgMdReference } from "./routes/docs/reference/org-md-reference";
+import { AgentQuickstart } from "./routes/docs/agent-quickstart";
+import { TemplatesGuide } from "./routes/docs/templates";
+import { CommunicationProtocol } from "./routes/docs/communication-protocol";
 import { NotFoundPage } from "./routes/not-found";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
@@ -485,6 +488,60 @@ const orgMdReferenceRoute = createRoute({
     }),
 });
 
+const agentQuickstartRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/agent-quickstart",
+  component: AgentQuickstart,
+  meta: () =>
+    buildMeta({
+      title: "Agent Quickstart — OpenSpawn",
+      description:
+        "Get an AI agent from zero to a running multi-agent organization in 10 minutes. Step-by-step guide for AI agents that need to coordinate other agents.",
+      path: "/docs/agent-quickstart",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Agent Quickstart", href: "/docs/agent-quickstart" },
+      ]),
+    }),
+});
+
+const templatesGuideRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/templates",
+  component: TemplatesGuide,
+  meta: () =>
+    buildMeta({
+      title: "Templates Guide — OpenSpawn Org Templates",
+      description:
+        "Choose and customize OpenSpawn org templates. Compare assistant-team, content-agency, dev-shop, and research-lab with decision trees and role breakdowns.",
+      path: "/docs/templates",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Templates Guide", href: "/docs/templates" },
+      ]),
+    }),
+});
+
+const communicationProtocolRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/communication-protocol",
+  component: CommunicationProtocol,
+  meta: () =>
+    buildMeta({
+      title: "Communication Protocol — OpenSpawn",
+      description:
+        "The OpenSpawn Communication Protocol eliminates 40-60% of wasted tokens in multi-agent organizations. Four message types, decision trees, and anti-patterns.",
+      path: "/docs/communication-protocol",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Communication Protocol", href: "/docs/communication-protocol" },
+      ]),
+    }),
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
@@ -501,6 +558,9 @@ const docsRouteTree = docsRoute.addChildren([
   modelRouterRoute,
   comparisonRoute,
   orgMdReferenceRoute,
+  agentQuickstartRoute,
+  templatesGuideRoute,
+  communicationProtocolRoute,
 ]);
 
 const orgMdRoute = createRoute({

@@ -41,6 +41,14 @@ const sidebar = [
     ],
   },
   {
+    label: "Agent Guide",
+    children: [
+      { label: "Agent Quickstart", to: "/docs/agent-quickstart" },
+      { label: "Templates Guide", to: "/docs/templates" },
+      { label: "Communication Protocol", to: "/docs/communication-protocol" },
+    ],
+  },
+  {
     label: "Reference",
     children: [
       { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
@@ -64,6 +72,9 @@ const flatPages = [
   { label: "MCP Reference", to: "/docs/protocols/mcp-reference" },
   { label: "Dashboard", to: "/docs/features/dashboard" },
   { label: "Model Router", to: "/docs/features/model-router" },
+  { label: "Agent Quickstart", to: "/docs/agent-quickstart" },
+  { label: "Templates Guide", to: "/docs/templates" },
+  { label: "Communication Protocol", to: "/docs/communication-protocol" },
   { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
   { label: "Comparison", to: "/docs/comparison" },
 ];
