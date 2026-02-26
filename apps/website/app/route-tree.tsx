@@ -21,6 +21,7 @@ import { OrgMdReference } from "./routes/docs/reference/org-md-reference";
 import { AgentQuickstart } from "./routes/docs/agent-quickstart";
 import { TemplatesGuide } from "./routes/docs/templates";
 import { CommunicationProtocol } from "./routes/docs/communication-protocol";
+import { GettingStartedPage } from "./routes/getting-started";
 import { NotFoundPage } from "./routes/not-found";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
@@ -589,4 +590,25 @@ const templatesRoute = createRoute({
     }),
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, docsRouteTree]);
+const gettingStartedTopRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/getting-started",
+  component: GettingStartedPage,
+  meta: () =>
+    buildMeta({
+      title: "Getting Started with OpenSpawn — 5 Minutes to Your First Agent Org",
+      description:
+        "Install OpenSpawn, create an ORG.md, and boot a multi-agent organization on OpenClaw in under 5 minutes.",
+      path: "/getting-started",
+      schemaLd: {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "OpenSpawn", item: BASE_URL },
+          { "@type": "ListItem", position: 2, name: "Getting Started", item: `${BASE_URL}/getting-started` },
+        ],
+      },
+    }),
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, gettingStartedTopRoute, docsRouteTree]);
