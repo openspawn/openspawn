@@ -1,0 +1,237 @@
+# OpenSpawn
+
+> OpenSpawn is an open-source coordination layer for AI agent organizations. You define your entire agent org — roles, hierarchy, culture, policies — in a single markdown file (ORG.md), and OpenSpawn parses it, spawns agents, routes tasks through the hierarchy, and gives you a real-time dashboard. It is infrastructure, not a framework: it works with any agent stack (OpenClaw, LangGraph, CrewAI, AutoGen, raw API calls).
+
+## When to use OpenSpawn vs sub-agents
+
+```
+Do you need persistent agents with roles, hierarchy, and budgets?
+├── YES → Use OpenSpawn
+└── NO
+    Do you need a one-off parallel task that finishes and dies?
+    ├── YES → Use sub-agents (sessions_spawn)
+    └── NO
+        Do you need agents that communicate with each other?
+        ├── YES → Use OpenSpawn
+        └── NO → Use a single agent or sub-agent
+```
+
+Key difference: sub-agents are ephemeral (spawn, do work, die). OpenSpawn agents are persistent (they have roles, levels, trust scores, credit balances, and communicate through a defined hierarchy).
+
+---
+
+## Quickstart
+
+```bash
+# Install CLI
+npm install -g openspawn
+
+# Create a new org from template
+openspawn init my-org --template=assistant-team
+cd my-org
+
+# Preview in dashboard (no API keys needed)
+npx openspawn preview
+
+# Or clone and run the full platform
+git clone https://github.com/openspawn/openspawn.git
+cd openspawn && pnpm install
+pnpm exec nx serve sandbox
+# Open http://localhost:3333
+```
+
+---
+
+## CLI Commands
+
+### `openspawn init [directory]`
+Create a new agent organization.
+
+| Flag | Description |
+|------|-------------|
+| `-t, --template` | Template name: `assistant-team`, `content-agency`, `dev-shop`, `research-lab` |
+| `--non-interactive` | Skip wizard, use defaults |
+
+```bash
+openspawn init my-org
+openspawn init my-org --template=dev-shop
+openspawn init my-org --template=assistant-team --non-interactive
+```
+
+### `openspawn validate [file]`
+Parse and validate an ORG.md file.
+
+```bash
+openspawn validate
+openspawn validate path/to/ORG.md
+```
+
+Checks: valid markdown structure, required sections (Structure minimum), agent role definitions, hierarchy consistency, policy completeness.
+
+### `openspawn version`
+Print the CLI version.
+
+### `openspawn preview`
+Preview your org in the dashboard locally (simulation mode, no API keys).
+
+---
+
+## MCP Tools
+
+OpenSpawn exposes tools via MCP (Streamable HTTP at `POST /mcp`). Agents authenticate via HMAC.
+
+### Agent Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `agent_list` | List all agents in the org | — |
+| `agent_whoami` | Get current agent info | — |
+
+### Task Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `task_list` | List tasks with filters | `status?`, `assigneeId?` |
+| `task_create` | Create a new task | `title`, `description?`, `priority?` (urgent/high/normal/low), `assigneeId?` |
+| `task_get` | Get task by ID | `id` |
+| `task_transition` | Change task status | `id`, `status` (backlog/todo/in_progress/review/done/blocked/cancelled), `reason?` |
+| `task_assign` | Assign task to agent | `id`, `assigneeId` |
+| `task_comment` | Add comment to task | `taskId`, `body` |
+
+### Credit Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `credits_balance` | Get current balance | — |
+| `credits_spend` | Spend credits | `amount` (int), `reason` |
+| `credits_history` | Transaction history | `limit?` (default 50), `offset?` (default 0) |
+
+### Message Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `message_channels` | List channels | — |
+| `message_send` | Send message | `channelId`, `body`, `type?` (text/handoff/status_update/request) |
+| `message_read` | Read messages | `channelId`, `limit?` (default 50) |
+
+### Trust Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `trust_get_reputation` | Get agent trust score | `agentId` |
+| `trust_get_history` | Reputation change history | `agentId`, `limit?` |
+| `trust_leaderboard` | Top agents by trust | `limit?` |
+| `trust_bonus` | Award reputation bonus (HR role) | `agentId`, `amount` (1-20), `reason` |
+| `trust_penalty` | Apply reputation penalty (HR role) | `agentId`, `amount` (1-20), `reason` |
+
+### Escalation Tools
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `escalation_create` | Escalate task to higher agent | `taskId`, `reason`, `targetAgentId` |
+| `escalation_list` | List escalations | `taskId?` |
+| `escalation_resolve` | Resolve an escalation | `escalationId`, `resolution` |
+| `consensus_request` | Request vote from agents | `taskId`, `question`, `voterIds` (array) |
+| `consensus_vote` | Submit vote | `consensusId`, `vote` (approve/reject), `reason?` |
+| `consensus_status` | Check consensus status | `consensusId` |
+
+---
+
+## Key Concepts
+
+### ORG.md
+A single markdown file that defines your entire agent organization. Five optional sections:
+
+1. **Identity** — Name, mission, values, industry context. Becomes ambient context for all agents.
+2. **Culture** — Communication norms. Use a preset (`startup`, `enterprise`, `agency`, `research`, `military`, `remote-async`) or customize individual parameters.
+3. **Structure** — Agent roles with name, level (L1-L10), domain, reporting hierarchy, avatar.
+4. **Policies** — Budget limits, department caps, permission levels.
+5. **Playbooks** — Step-by-step procedures for common scenarios (escalation, handoff, rush hour).
+
+### Templates
+Pre-built ORG.md files for common team shapes:
+
+| Template | Description | Roles |
+|----------|-------------|-------|
+| `assistant-team` | Personal AI team for solo operator | Chief of staff, research, content (strategy + writer + design), engineering, security, quality |
+| `content-agency` | Content production pipeline | Research, strategy, writing, design |
+| `dev-shop` | Software development team | Lead, frontend, backend, QA |
+| `research-lab` | Research & analysis team | High autonomy, exploration budget |
+
+### Agent Communication Protocol (ACP)
+How agents communicate through the hierarchy. Four message types:
+
+| Type | Direction | Mechanism | When |
+|------|-----------|-----------|------|
+| ACK | Up (assignee → delegator) | 👍 reaction on task | Task received |
+| Progress | To task log | Activity entry (pull-based) | Meaningful state change |
+| Escalation | Up (agent → manager) | Push message | Blocked, overwhelmed, wrong station |
+| Completion | Up (assignee → delegator) | Push + summary | Task done |
+
+Core principle: **Push what's urgent, pull what's optional, minimize interrupts.**
+
+### Culture Presets
+
+| Preset | Escalation | Progress | Hierarchy | Vibe |
+|--------|-----------|----------|-----------|------|
+| `startup` | Immediate | Frequent | 2-3 levels | Fast, scrappy |
+| `enterprise` | Batched (hourly) | On phase change | 5-8 levels | Process-driven |
+| `agency` | Immediate | Every tick | 3-4 levels | Client-facing, deadline-driven |
+| `research` | Delayed | On request | 2-3 levels | Exploratory, high autonomy |
+| `military` | Immediate | Every tick | Strict chain | Zero ambiguity, mandatory acks |
+| `remote-async` | Delayed | On request | Flat | High trust, async-first |
+
+### Agent Levels
+L1 (junior worker) through L10 (executive). Levels determine:
+- Permission scope (L7+ can create tasks and spawn agents, L6+ can review)
+- Budget allocation
+- Escalation routing (always escalate up, never skip the chain)
+
+### Credits
+Internal currency for agent operations. Each agent has a balance. Spending is tracked with audit trails. Budget alerts fire at configurable thresholds. Overage behavior: pause and escalate.
+
+---
+
+## Architecture
+
+```
+ORG.md → Org Parser → Agent Engine → Sandbox Server (:3333)
+                                        ├── REST API
+                                        ├── SSE (real-time events)
+                                        ├── MCP endpoint (/mcp)
+                                        ├── A2A (/.well-known/agent.json)
+                                        └── Dashboard (React)
+```
+
+Stack: NestJS API + React Dashboard + PostgreSQL + MCP Server.
+
+---
+
+## FAQ
+
+**Q: Do I need API keys to try OpenSpawn?**
+A: No. The default scaffold uses simulation/demo mode that works without any API keys. You'll see the full coordination flow.
+
+**Q: What models does it support?**
+A: Ollama (free local), Groq (fast mid-tier), OpenRouter (Claude, GPT-4o). Configure per agent level — cheap models for workers, expensive for executives.
+
+**Q: Can I use my existing agents with OpenSpawn?**
+A: Yes. OpenSpawn is infrastructure, not a framework. Any A2A-compatible agent works. It coordinates; your agents do the actual work.
+
+**Q: What's the minimum ORG.md I need?**
+A: Just a `# Name` heading and a `## Structure` section with at least one agent.
+
+**Q: How do agents communicate?**
+A: Through ACP (Agent Communication Protocol). ACK on task receipt, progress to task log, push escalations for blockers, push completions when done.
+
+**Q: Can agents spawn sub-agents dynamically?**
+A: Yes. L7+ agents can use `sessions_spawn` to create temporary workers. Costs credits. Temporary agents despawn when work completes.
+
+**Q: What happens when an agent is blocked?**
+A: It escalates to its direct manager (never skips the chain). Manager has 2 cycles to respond. If unresolved after 2 levels, alerts the owner → human principal.
+
+**Q: How is this different from CrewAI/LangGraph/AutoGen?**
+A: Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together: build agents with your framework, coordinate them with OpenSpawn.
+
+---
+
+## Links
+
+- GitHub: https://github.com/openspawn/openspawn
+- Live Demo: https://bikinibottom.ai/app/
+- Docs: https://bikinibottom.ai/docs
+- ORG.md Spec: https://bikinibottom.ai/org-md
