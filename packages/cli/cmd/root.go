@@ -9,6 +9,11 @@ import (
 
 var version = "0.1.0"
 
+var (
+	flagDir  string
+	flagJSON bool
+)
+
 var rootCmd = &cobra.Command{
 	Use:   "openspawn",
 	Short: "OpenSpawn — AI agent orchestration",
@@ -35,6 +40,14 @@ func Execute() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(validateCmd)
+	rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(statusCmd)
+
+	// Shared flags for start and status
+	for _, cmd := range []*cobra.Command{startCmd, statusCmd} {
+		cmd.Flags().StringVar(&flagDir, "dir", ".", "Directory containing openclaw-agents.json")
+		cmd.Flags().BoolVar(&flagJSON, "json", false, "Output as JSON")
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
