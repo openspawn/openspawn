@@ -23,6 +23,7 @@ import { TemplatesGuide } from "./routes/docs/templates";
 import { CommunicationProtocol } from "./routes/docs/communication-protocol";
 import { GettingStartedPage } from "./routes/getting-started";
 import { NotFoundPage } from "./routes/not-found";
+import { PluginsPage } from "./routes/plugins";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
 const OG_IMAGE = "https://openspawn.dev/og-image.jpg";
@@ -611,4 +612,17 @@ const gettingStartedTopRoute = createRoute({
     }),
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, gettingStartedTopRoute, docsRouteTree]);
+const pluginsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/plugins",
+  component: PluginsPage,
+  meta: () =>
+    buildMeta({
+      title: "SpawnHub — Plugin Marketplace for OpenSpawn Agent Organizations",
+      description:
+        "Browse and install plugins for your agent organization. Task coordination, monitoring, identity, DevOps integrations.",
+      path: "/plugins",
+    }),
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, gettingStartedTopRoute, pluginsRoute, docsRouteTree]);
