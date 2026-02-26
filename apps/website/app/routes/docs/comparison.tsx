@@ -38,7 +38,7 @@ export function ComparisonPage() {
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
               ["Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration"],
-              ["Languages", "TypeScript, Python (SDK)", "Python", "Python"],
+              ["Languages", "TypeScript (Python SDK planned)", "Python", "Python"],
               ["Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes"],
               ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"],
               ["Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools"],
