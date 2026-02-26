@@ -3,27 +3,40 @@ purpose: Get an AI agent from zero to a running multi-agent organization
 audience: AI agents (LLMs) that need to coordinate other agents
 prerequisites: Node.js 18+, npm
 time_estimate: 10 minutes
-commands_used: [openspawn init, openspawn validate, openspawn preview]
+commands_used: [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
 ---
 
 # Agent Quickstart
 
 You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file.
 
-## One command to a running org
+## Three commands to a running org
 
 ```bash
-npx openspawn init my-org --template=assistant-team --non-interactive && cd my-org && npx openspawn preview
+openspawn init my-org --template=assistant-team --yes
+cd my-org
+openspawn start
+openspawn status
 ```
 
-That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — all coordinated through a hierarchy.
+That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — with OpenClaw gateway configs ready to apply.
 
 > **Q: Do I need API keys?**
 > - No. Demo/simulation mode works out of the box with zero configuration.
 
 > **Q: What just happened?**
-> - `init` created `ORG.md` (your org definition) and `openspawn.config.json` (server config)
-> - `preview` launched the sandbox server with a dashboard at http://localhost:3333
+> - `init` created `ORG.md` (your org definition) and `openclaw-agents.json`
+> - `start` read the agents config and generated `openclaw-patch.json` with OpenClaw gateway entries
+> - `status` displayed a table of all agents with their name, level, model, workspace, and reports-to
+
+> **Q: What is openclaw-patch.json?**
+> - A ready-to-apply patch for your OpenClaw gateway's `agents.list`
+> - Each entry has: `id`, `model` (opus for L7+, sonnet for L6-), `workspace`, `tools.profile: "full"`
+> - Manager agents (L7+ with direct reports) also get `subagents.allowAgents`
+> - The highest-level agent gets `default: true`
+
+> **Q: How do I apply the patch to my gateway?**
+> - Copy the entries from `openclaw-patch.json` into your OpenClaw `agents.list` configuration, then restart the gateway.
 
 ---
 

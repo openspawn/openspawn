@@ -144,7 +144,39 @@ Expected output:
 
 ---
 
-## Step 4 — Preview
+## Step 4 — Generate OpenClaw configs
+
+```bash
+openspawn start
+```
+
+This reads your org and generates `openclaw-patch.json` — ready-to-apply OpenClaw gateway configuration.
+
+```bash
+openspawn status
+```
+
+Displays a table of all agents:
+
+```
+Name       Level  Model   Workspace              Reports To
+Oscar      L10    opus    workspace-oscar         Human Principal
+Radar      L7     opus    workspace-radar         Oscar
+Forge      L7     opus    workspace-forge         Oscar
+Ink        L4     sonnet  workspace-ink           Muse
+```
+
+> **Q: What happens after init?**
+> - Run `openspawn start` to generate OpenClaw configs, then apply the patch to your gateway. The `openclaw-patch.json` file contains `agents.list` entries with id, model, workspace, and subagents config.
+
+> **Q: Can I output status as JSON?**
+> ```bash
+> openspawn status --json
+> ```
+
+---
+
+## Step 5 — Preview
 
 ```bash
 npx openspawn preview
@@ -168,7 +200,7 @@ Opens the dashboard at http://localhost:3333. You'll see:
 
 ---
 
-## Step 5 — Customize
+## Step 6 — Customize
 
 ### Change the culture preset
 
@@ -224,7 +256,7 @@ Crunches numbers, builds dashboards, surfaces insights.
 
 ---
 
-## Step 6 — Connect real models (optional)
+## Step 7 — Connect real models (optional)
 
 Edit `openspawn.config.json`:
 
