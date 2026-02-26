@@ -87,20 +87,97 @@ export function IntroCard({ onStart }: IntroCardProps) {
       <style>{INTRO_STYLES}</style>
 
       <div className="flex flex-col items-center text-center max-w-2xl w-full">
+        {/* Mr. Krabs intro */}
+        <div
+          className="intro-hero flex items-center gap-3 mb-6"
+        >
+          <span className="text-4xl">🦀</span>
+          <div className="text-left">
+            <div
+              className="font-black text-lg"
+              style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}
+            >
+              Mr. Krabs
+            </div>
+            <div
+              className="text-xs"
+              style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}
+            >
+              CEO · The Krusty Krab
+            </div>
+          </div>
+        </div>
+
+        {/* The command — this is the origin story */}
+        <div
+          className="intro-sub w-full max-w-lg rounded-xl mb-6 overflow-hidden"
+          style={{
+            background: '#0d1117',
+            border: '1px solid rgba(74,174,217,0.3)',
+          }}
+        >
+          <div
+            className="flex items-center gap-2 px-4 py-2"
+            style={{ background: 'rgba(74,174,217,0.08)', borderBottom: '1px solid rgba(74,174,217,0.15)' }}
+          >
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28C840' }} />
+            <span className="ml-2 text-xs" style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'monospace' }}>terminal</span>
+          </div>
+          <div className="px-4 py-4" style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace', fontSize: '13px' }}>
+            <div style={{ color: 'rgba(184,228,247,0.4)' }}>
+              <span style={{ color: '#4AE88A' }}>mr-krabs</span>
+              <span style={{ color: 'rgba(184,228,247,0.3)' }}> ~ $ </span>
+            </div>
+            <div className="mt-1" style={{ color: '#79c0ff' }}>
+              npx openspawn start{' '}
+              <span style={{ color: '#F4C542' }}>"Run the Krusty Krab — 10,000 patties, 5 departments, zero humans"</span>
+            </div>
+            <div className="mt-3" style={{ color: 'rgba(184,228,247,0.5)' }}>
+              <div>🪸 OpenSpawn v0.1.0</div>
+              <div className="mt-1">
+                <span style={{ color: '#4AE88A' }}>✓</span> Parsed ORG.md — 22 agents, 5 departments
+              </div>
+              <div>
+                <span style={{ color: '#4AE88A' }}>✓</span> Created agent workspaces
+              </div>
+              <div>
+                <span style={{ color: '#4AE88A' }}>✓</span> Gateway patched — all agents online
+              </div>
+              <div className="mt-1" style={{ color: '#4AAED9' }}>
+                Your org is running. Dashboard: http://localhost:3333
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Hero headline */}
         <h1
-          className="intro-hero font-black mb-4 leading-tight"
+          className="intro-compare font-black mb-3 leading-tight"
           style={{
             fontFamily: '"Baloo 2", cursive',
-            fontSize: 'clamp(1.75rem, 5vw, 3rem)',
+            fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
             color: '#F4C542',
             textShadow: '0 0 40px rgba(244,197,66,0.3)',
           }}
         >
-          Watch 42 agents run a restaurant.
-          <br />
-          No humans. One command.
+          One command. 22 agents. Zero humans.
         </h1>
+
+        <p
+          className="intro-compare text-sm mb-6 max-w-md"
+          style={{
+            color: 'rgba(184,228,247,0.6)',
+            fontFamily: 'Nunito, sans-serif',
+            lineHeight: 1.6,
+          }}
+        >
+          Mr. Krabs used{' '}
+          <span style={{ color: '#4AAED9', fontWeight: 700 }}>OpenSpawn</span>
+          {' '}to spin up an entire restaurant operation — kitchen, delivery, finance — from a single ORG.md file.
+          Watch what happens next.
+        </p>
 
         {/* Divider line */}
         <div
@@ -108,91 +185,14 @@ export function IntroCard({ onStart }: IntroCardProps) {
           style={{ background: 'linear-gradient(90deg, transparent, rgba(74,174,217,0.5), transparent)' }}
         />
 
-        {/* Subtext */}
-        <p
-          className="intro-sub text-lg mb-8 max-w-md"
-          style={{
-            color: 'rgba(184,228,247,0.7)',
-            fontFamily: 'Nunito, sans-serif',
-            lineHeight: 1.6,
-          }}
-        >
-          Built with{' '}
-          <span style={{ color: '#4AAED9', fontWeight: 700 }}>OpenSpawn</span>
-          {' '}— the platform agents use when sub-agents aren't enough.
-        </p>
-
-        {/* Comparison card */}
+        {/* Quick comparison — compact */}
         <div
-          className="intro-compare w-full max-w-lg rounded-2xl p-5 mb-8"
-          style={{
-            background: 'rgba(6,42,69,0.6)',
-            border: '1px solid rgba(74,174,217,0.2)',
-          }}
+          className="intro-badge flex items-center gap-4 mb-8 text-xs"
+          style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}
         >
-          <div className="grid grid-cols-2 gap-4 text-left">
-            {/* Sub-agents column */}
-            <div>
-              <div
-                className="text-xs font-bold uppercase tracking-wider mb-3"
-                style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}
-              >
-                Sub-agents
-              </div>
-              <ul className="space-y-2 text-sm" style={{ color: 'rgba(184,228,247,0.45)', fontFamily: 'Nunito, sans-serif' }}>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#FF4757' }}>✗</span> No persistence
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#FF4757' }}>✗</span> No hierarchy
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#FF4757' }}>✗</span> No peer communication
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#FF4757' }}>✗</span> No org structure
-                </li>
-              </ul>
-            </div>
-
-            {/* OpenSpawn column */}
-            <div>
-              <div
-                className="text-xs font-bold uppercase tracking-wider mb-3"
-                style={{ color: '#4AAED9', fontFamily: 'Nunito, sans-serif' }}
-              >
-                🪸 OpenSpawn
-              </div>
-              <ul className="space-y-2 text-sm" style={{ color: 'rgba(184,228,247,0.7)', fontFamily: 'Nunito, sans-serif' }}>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#4AE88A' }}>✓</span> Persistent agents
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#4AE88A' }}>✓</span> Org hierarchy
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#4AE88A' }}>✓</span> Agent-to-agent comms
-                </li>
-                <li className="flex items-start gap-2">
-                  <span style={{ color: '#4AE88A' }}>✓</span> Escalation & delegation
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* OpenSpawn badge */}
-        <div
-          className="intro-badge flex items-center gap-2 mb-8 px-4 py-2 rounded-xl"
-          style={{
-            background: 'rgba(74,174,217,0.08)',
-            border: '1px solid rgba(74,174,217,0.2)',
-          }}
-        >
-          <span>🪸</span>
-          <span className="text-xs" style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}>
-            42 agents · 5 departments · 0 humans · Powered by OpenSpawn
-          </span>
+          <span><span style={{ color: '#FF4757' }}>✗</span> Sub-agents: no persistence, no hierarchy, no peer comms</span>
+          <span style={{ color: 'rgba(74,174,217,0.3)' }}>|</span>
+          <span><span style={{ color: '#4AE88A' }}>✓</span> OpenSpawn: persistent org, hierarchy, escalation, budgets</span>
         </div>
 
         {/* CTA */}
@@ -214,7 +214,7 @@ export function IntroCard({ onStart }: IntroCardProps) {
           className="text-xs mt-4"
           style={{ color: 'rgba(184,228,247,0.2)', fontFamily: 'Nunito, sans-serif' }}
         >
-          ~75 seconds · Defined in one markdown file
+          ~75 seconds · 22 agents scale to 42 · Defined in one markdown file
         </p>
       </div>
     </div>

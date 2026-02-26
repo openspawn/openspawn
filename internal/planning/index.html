@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>OpenSpawn — Internal Planning</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0e17; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: #0d1117; border-right: 1px solid #21262d; padding: 20px; overflow-y: auto; }
+  .sidebar h1 { font-size: 14px; color: #58a6ff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
+  .sidebar a { display: block; padding: 8px 12px; margin: 2px 0; border-radius: 6px; color: #8b949e; text-decoration: none; font-size: 14px; transition: all 0.15s; }
+  .sidebar a:hover, .sidebar a.active { background: #161b22; color: #c9d1d9; }
+  .sidebar .section { font-size: 11px; color: #484f58; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px 12px; }
+  .content { margin-left: 260px; max-width: 800px; padding: 40px 60px; }
+  .content h1 { color: #f0f6fc; font-size: 28px; margin-bottom: 8px; }
+  .content h2 { color: #e6edf3; font-size: 22px; margin-top: 32px; margin-bottom: 12px; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
+  .content h3 { color: #c9d1d9; font-size: 18px; margin-top: 24px; margin-bottom: 8px; }
+  .content p { line-height: 1.7; margin-bottom: 12px; }
+  .content ul, .content ol { padding-left: 24px; margin-bottom: 12px; }
+  .content li { margin-bottom: 6px; line-height: 1.6; }
+  .content code { background: #161b22; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #79c0ff; }
+  .content pre { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0; }
+  .content pre code { background: none; padding: 0; color: #c9d1d9; }
+  .content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  .content th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #21262d; color: #58a6ff; font-size: 13px; }
+  .content td { padding: 8px 12px; border-bottom: 1px solid #21262d; font-size: 14px; }
+  .content blockquote { border-left: 3px solid #58a6ff; padding: 8px 16px; margin: 12px 0; background: #161b22; border-radius: 0 6px 6px 0; }
+  .content strong { color: #e6edf3; }
+  .content a { color: #58a6ff; text-decoration: none; }
+  .content a:hover { text-decoration: underline; }
+  .meta { color: #484f58; font-size: 13px; margin-bottom: 24px; }
+  .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .status-active { background: #1f6feb33; color: #58a6ff; }
+  .status-done { background: #23863633; color: #3fb950; }
+  .status-blocked { background: #da363333; color: #f85149; }
+  .status-planned { background: #484f5833; color: #8b949e; }
+  @media (max-width: 768px) { .sidebar { display: none; } .content { margin-left: 0; padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <h1>🪸 Planning</h1>
+  <div class="section">Strategy</div>
+  <a href="#" onclick="load('strategy')">Agent-First Vision</a>
+  <a href="#" onclick="load('positioning')">Positioning</a>
+  <div class="section">Architecture</div>
+  <a href="#" onclick="load('coordination')">Coordination Layer</a>
+  <a href="#" onclick="load('cli')">CLI Design</a>
+  <a href="#" onclick="load('dashboard')">Dashboard</a>
+  <div class="section">Progress</div>
+  <a href="#" onclick="load('shipped')">Shipped</a>
+  <a href="#" onclick="load('roadmap')">Roadmap</a>
+</div>
+<div class="content" id="content">Loading...</div>
+<script>
+const pages = {};
+async function loadPages() {
+  const res = await fetch('pages.json');
+  const list = await res.json();
+  for (const name of list) {
+    const r = await fetch(`pages/${name}.md`);
+    pages[name] = await r.text();
+  }
+  load('strategy');
+}
+function load(name) {
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  document.querySelector(`.sidebar a[onclick="load('${name}')"]`)?.classList.add('active');
+  document.getElementById('content').innerHTML = marked.parse(pages[name] || '# Not found');
+}
+loadPages();
+</script>
+</body>
+</html>
