@@ -21,6 +21,9 @@ export function Nav() {
           <Link to="/templates" className="text-sm text-slate-400 transition hover:text-cyan-400">
             Templates
           </Link>
+          <Link to="/plugins" className="text-sm text-slate-400 transition hover:text-cyan-400">
+            Plugins
+          </Link>
           <Link to="/docs" className="text-sm text-slate-400 transition hover:text-cyan-400">
             Docs
           </Link>
@@ -69,6 +72,9 @@ export function Nav() {
             </Link>
             <Link to="/templates" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               Templates
+            </Link>
+            <Link to="/plugins" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+              Plugins
             </Link>
             <Link to="/docs" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               Docs
