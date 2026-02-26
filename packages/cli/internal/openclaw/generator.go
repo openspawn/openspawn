@@ -10,15 +10,7 @@ import (
 	"github.com/openspawn/openspawn/packages/cli/internal/orgparser"
 )
 
-// AgentConfig represents a single agent's OpenClaw session configuration.
-type AgentConfig struct {
-	Name      string `json:"name"`
-	Role      string `json:"role"`
-	Level     int    `json:"level"`
-	ReportsTo string `json:"reportsTo"`
-	Workspace string `json:"workspace"`
-	Model     string `json:"model"`
-}
+// AgentConfig is defined in patcher.go
 
 const standardAgentsMD = `# AGENTS.md - Agent Workspace
 
@@ -38,12 +30,7 @@ const standardAgentsMD = `# AGENTS.md - Agent Workspace
 - When in doubt, ask.
 `
 
-func modelForLevel(level int) string {
-	if level >= 7 {
-		return "anthropic/claude-opus-4-6"
-	}
-	return "anthropic/claude-sonnet-4-5"
-}
+// modelForLevel is defined in patcher.go
 
 func sanitizeDirName(name string) string {
 	s := strings.ToLower(name)
@@ -101,6 +88,7 @@ func Generate(targetDir string, orgContent []byte) error {
 		}
 
 		configs = append(configs, AgentConfig{
+			ID:        dirName,
 			Name:      agent.Name,
 			Role:      agent.Role,
 			Level:     agent.Level,

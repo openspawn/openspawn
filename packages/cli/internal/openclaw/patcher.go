@@ -12,13 +12,16 @@ import (
 
 // AgentConfig is one entry in openclaw-agents.json (written by `openspawn init`).
 type AgentConfig struct {
+	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Role      string `json:"role"`
 	Level     int    `json:"level"`
-	Domain    string `json:"domain"`
-	Avatar    string `json:"avatar"`
+	Domain    string `json:"domain,omitempty"`
+	Avatar    string `json:"avatar,omitempty"`
 	ReportsTo string `json:"reportsTo,omitempty"`
 	ParentID  string `json:"parentId,omitempty"`
+	Workspace string `json:"workspace,omitempty"`
+	Model     string `json:"model,omitempty"`
 }
 
 // PatchAgent is one agent in the generated OpenClaw config patch.
