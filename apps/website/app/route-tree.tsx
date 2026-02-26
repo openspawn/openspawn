@@ -15,6 +15,9 @@ import { HowItWorks } from "./routes/docs/how-it-works";
 import { ConnectingAgents } from "./routes/docs/guides/connecting-agents";
 import { DashboardGuide } from "./routes/docs/guides/dashboard-guide";
 import { AcpVsA2A } from "./routes/docs/concepts/acp-vs-a2a";
+import { ComparisonPage } from "./routes/docs/comparison";
+import { MCPReference } from "./routes/docs/protocols/mcp-reference";
+import { OrgMdReference } from "./routes/docs/reference/org-md-reference";
 import { NotFoundPage } from "./routes/not-found";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
@@ -428,6 +431,60 @@ const modelRouterRoute = createRoute({
     }),
 });
 
+const comparisonRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/comparison",
+  component: ComparisonPage,
+  meta: () =>
+    buildMeta({
+      title: "OpenSpawn vs CrewAI vs LangGraph — Multi-Agent Framework Comparison (2026)",
+      description:
+        "Compare OpenSpawn, CrewAI, and LangGraph side-by-side. Feature tables, honest tradeoffs, and migration guides for switching between multi-agent frameworks.",
+      path: "/docs/comparison",
+      ogTitle: "OpenSpawn vs CrewAI vs LangGraph",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Comparison", href: "/docs/comparison" },
+      ]),
+    }),
+});
+
+const mcpReferenceRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/protocols/mcp-reference",
+  component: MCPReference,
+  meta: () =>
+    buildMeta({
+      title: "MCP Tools & Integrations — OpenSpawn Model Context Protocol Reference",
+      description:
+        "Complete reference for OpenSpawn's MCP server. Connect Claude Desktop, Cursor, CrewAI, LangGraph, or any MCP client to your agent org via 7 tools over Streamable HTTP.",
+      path: "/docs/protocols/mcp-reference",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Protocols", href: "/docs/protocols/mcp-reference" },
+        { name: "MCP Reference", href: "/docs/protocols/mcp-reference" },
+      ]),
+    }),
+});
+
+const orgMdReferenceRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/org-md-reference",
+  component: OrgMdReference,
+  meta: () =>
+    buildMeta({
+      title: "ORG.md Reference — OpenSpawn Configuration Specification",
+      description:
+        "Complete reference for ORG.md, the OpenSpawn organization definition format. Every field, section, value, and example — plus copy-pasteable snippets for common configurations.",
+      path: "/docs/reference/org-md-reference",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/org-md-reference" },
+        { name: "ORG.md Reference", href: "/docs/reference/org-md-reference" },
+      ]),
+    }),
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
@@ -439,8 +496,11 @@ const docsRouteTree = docsRoute.addChildren([
   acpVsA2ARoute,
   a2aRoute,
   mcpRoute,
+  mcpReferenceRoute,
   dashboardRoute,
   modelRouterRoute,
+  comparisonRoute,
+  orgMdReferenceRoute,
 ]);
 
 const orgMdRoute = createRoute({

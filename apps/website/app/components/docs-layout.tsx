@@ -30,6 +30,7 @@ const sidebar = [
     children: [
       { label: "A2A Protocol", to: "/docs/protocols/a2a" },
       { label: "MCP Tools", to: "/docs/protocols/mcp" },
+      { label: "MCP Reference", to: "/docs/protocols/mcp-reference" },
     ],
   },
   {
@@ -39,6 +40,13 @@ const sidebar = [
       { label: "Model Router", to: "/docs/features/model-router" },
     ],
   },
+  {
+    label: "Reference",
+    children: [
+      { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
+    ],
+  },
+  { label: "Comparison", to: "/docs/comparison" },
 ];
 
 // Flat ordered list for prev/next navigation
@@ -53,8 +61,11 @@ const flatPages = [
   { label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" },
   { label: "A2A Protocol", to: "/docs/protocols/a2a" },
   { label: "MCP Tools", to: "/docs/protocols/mcp" },
+  { label: "MCP Reference", to: "/docs/protocols/mcp-reference" },
   { label: "Dashboard", to: "/docs/features/dashboard" },
   { label: "Model Router", to: "/docs/features/model-router" },
+  { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
+  { label: "Comparison", to: "/docs/comparison" },
 ];
 
 export function DocsLayout({ children }: { children: ReactNode }) {
