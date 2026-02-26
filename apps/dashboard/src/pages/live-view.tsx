@@ -6,8 +6,10 @@ import { MobileOrgChart } from '../components/live/MobileOrgChart';
 import { LiveFeed, type FeedMessage } from '../components/live/live-feed';
 import { StatsBar } from '../components/live/stats-bar';
 import { OpenSpawnBadge } from '../components/live/OpenSpawnBadge';
-import { TIMELINE, ACTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
+import { TIMELINE, ACTS, AGENTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
 import { getActiveAnnotation, type Annotation } from '../components/live/live-view-annotations';
+import { AgentControlPanel, TaskControlBar, AgentContextMenu, AGENT_DEPARTMENTS, type AgentControlState, type AgentControlStatus, type Department } from '../components/controls';
+import '../components/controls/control-animations.css';
 
 // ── Variable tick timing ──────────────────────────────────────────────────────
 
@@ -655,6 +657,68 @@ export function LiveViewPage() {
   });
   const [mobileTab, setMobileTab] = useState<MobileTab>('org');
 
+  // Agent control state
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [agentOverrides, setAgentOverrides] = useState<Record<string, { paused?: boolean; department?: Department; modelTier?: 'sonnet' | 'opus' }>>({});
+  const [firedAgents, setFiredAgents] = useState<Set<string>>(new Set());
+  const [contextMenu, setContextMenu] = useState<{ agentId: string; x: number; y: number } | null>(null);
+
+  const getAgentControlState = useCallback((agentId: string, nodeStates: Record<string, AgentNodeState>): AgentControlState | null => {
+    const agentDef = AGENTS[agentId];
+    if (!agentDef) return null;
+    const overrides = agentOverrides[agentId] || {};
+    const nodeState = nodeStates[agentId];
+    const baseStatus = nodeState?.status || 'idle';
+    const status: AgentControlStatus = overrides.paused ? 'paused' : baseStatus;
+    return {
+      id: agentId,
+      name: agentDef.name,
+      emoji: agentDef.emoji,
+      avatarUrl: agentDef.avatarUrl,
+      status,
+      department: overrides.department || AGENT_DEPARTMENTS[agentId] || 'Operations',
+      modelTier: overrides.modelTier || 'sonnet',
+    };
+  }, [agentOverrides]);
+
+  const handlePauseResume = useCallback((agentId: string) => {
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], paused: !prev[agentId]?.paused },
+    }));
+  }, []);
+
+  const handleReassign = useCallback((agentId: string, department: Department) => {
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], department },
+    }));
+  }, []);
+
+  const handleFire = useCallback((agentId: string) => {
+    setFiredAgents(prev => new Set([...prev, agentId]));
+    setSelectedAgentId(null);
+  }, []);
+
+  const handleModelChange = useCallback((agentId: string, tier: 'sonnet' | 'opus') => {
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], modelTier: tier },
+    }));
+  }, []);
+
+  const handleHire = useCallback((role: string, department: Department, modelTier: 'sonnet' | 'opus') => {
+    console.log(`[LiveView] hire-agent: role=${role}, dept=${department}, tier=${modelTier}`);
+  }, []);
+
+  const handleEscalate = useCallback(() => {
+    console.log('[LiveView] escalate: sending to CEO agent');
+  }, []);
+
+  const handleViewPlan = useCallback(() => {
+    console.log('[LiveView] view-plan: opening PLAN.md');
+  }, []);
+
   const replay = useReplay();
   const annotation = getActiveAnnotation(replay.tick);
 
@@ -725,6 +789,8 @@ export function LiveViewPage() {
               edgeAnimations={replay.edgeAnimations}
               reassignedEdges={replay.reassignedEdges}
               spawnedAgents={replay.spawnedAgents}
+              onAgentClick={(agentId) => { if (!firedAgents.has(agentId)) setSelectedAgentId(agentId); }}
+              onAgentContextMenu={(agentId, x, y) => { if (!firedAgents.has(agentId)) setContextMenu({ agentId, x, y }); }}
             />
             <ActBanner banner={replay.actBanner} />
             <AnnotationBubble annotation={annotation} />
@@ -775,6 +841,46 @@ export function LiveViewPage() {
           spawnedCount={replay.spawnedAgents.length}
         />
       </div>
+
+      {/* Task Control Bar */}
+      <TaskControlBar
+        onHire={handleHire}
+        onEscalate={handleEscalate}
+        onViewPlan={handleViewPlan}
+      />
+
+      {/* Agent Control Panel (slide-in) */}
+      {selectedAgentId && (() => {
+        const agentState = getAgentControlState(selectedAgentId, replay.nodeStates);
+        if (!agentState) return null;
+        return (
+          <AgentControlPanel
+            agent={agentState}
+            onClose={() => setSelectedAgentId(null)}
+            onPauseResume={handlePauseResume}
+            onReassign={handleReassign}
+            onFire={handleFire}
+            onModelChange={handleModelChange}
+          />
+        );
+      })()}
+
+      {/* Agent Context Menu */}
+      {contextMenu && (
+        <AgentContextMenu
+          agentId={contextMenu.agentId}
+          agentName={AGENTS[contextMenu.agentId]?.name || contextMenu.agentId}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          isPaused={!!agentOverrides[contextMenu.agentId]?.paused}
+          onClose={() => setContextMenu(null)}
+          onViewLogs={(id) => console.log(`[LiveView] view-logs: ${id}`)}
+          onSendMessage={(id) => console.log(`[LiveView] send-message: ${id}`)}
+          onReassign={(id) => { setContextMenu(null); setSelectedAgentId(id); }}
+          onPauseResume={(id) => { handlePauseResume(id); setContextMenu(null); }}
+          onFire={(id) => { handleFire(id); setContextMenu(null); }}
+        />
+      )}
     </div>
   );
 }

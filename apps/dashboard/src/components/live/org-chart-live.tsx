@@ -82,6 +82,8 @@ interface OrgChartLiveProps {
   edgeAnimations: EdgeAnimation[];
   reassignedEdges: Array<{ from: string; to: string }>;
   spawnedAgents: SpawnedAgent[];
+  onAgentClick?: (agentId: string) => void;
+  onAgentContextMenu?: (agentId: string, x: number, y: number) => void;
 }
 
 // ── Custom Nodes ─────────────────────────────────────────────────────────────
@@ -385,7 +387,7 @@ function buildGraph(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents }: OrgChartLiveProps) {
+function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents, onAgentClick, onAgentContextMenu }: OrgChartLiveProps) {
   const { nodes, edges } = useMemo(
     () => buildGraph(nodeStates, edgeAnimations, reassignedEdges, spawnedAgents),
     [nodeStates, edgeAnimations, reassignedEdges, spawnedAgents],
@@ -425,6 +427,17 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onInit={onInit}
+        onNodeClick={(_event, node) => {
+          if (node.type === 'liveAgent' && onAgentClick) {
+            onAgentClick(node.id);
+          }
+        }}
+        onNodeContextMenu={(event, node) => {
+          if (node.type === 'liveAgent' && onAgentContextMenu) {
+            event.preventDefault();
+            onAgentContextMenu(node.id, event.clientX, event.clientY);
+          }
+        }}
         nodesDraggable={false}
         nodesConnectable={false}
         panOnDrag={false}
