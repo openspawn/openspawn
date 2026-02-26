@@ -12,6 +12,9 @@ export function Nav() {
           <span className="gradient-text">OpenSpawn</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
+          <Link to="/getting-started" className="text-sm font-medium text-cyan-400 transition hover:text-cyan-300">
+            Get Started
+          </Link>
           <Link to="/org-md" className="text-sm text-slate-400 transition hover:text-cyan-400">
             ORG.md
           </Link>
@@ -58,6 +61,9 @@ export function Nav() {
       {menuOpen && (
         <div className="border-t border-white/5 bg-navy-950/95 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1 px-8 py-4">
+            <Link to="/getting-started" className="rounded-lg px-3 py-2 text-sm font-medium text-cyan-400 transition hover:bg-white/5" onClick={() => setMenuOpen(false)}>
+              Get Started
+            </Link>
             <Link to="/org-md" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
               ORG.md
             </Link>

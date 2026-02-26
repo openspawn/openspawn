@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 
 const sidebar = [
+  { label: "⚡ Quick Start (5 min)", to: "/getting-started" },
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
   { label: "How It Works", to: "/docs/how-it-works" },
