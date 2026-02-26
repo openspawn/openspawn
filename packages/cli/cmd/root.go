@@ -44,9 +44,10 @@ func Execute() {
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(hireCmd)
 	rootCmd.AddCommand(fireCmd)
+	rootCmd.AddCommand(doneCmd)
 
 	// Shared flags for commands that operate on an org directory
-	for _, cmd := range []*cobra.Command{startCmd, statusCmd, hireCmd, fireCmd} {
+	for _, cmd := range []*cobra.Command{startCmd, statusCmd, hireCmd, fireCmd, doneCmd} {
 		cmd.Flags().StringVar(&flagDir, "dir", ".", "Directory containing openclaw-agents.json")
 		cmd.Flags().BoolVar(&flagJSON, "json", false, "Output as JSON")
 	}
