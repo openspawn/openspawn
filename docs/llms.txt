@@ -71,6 +71,44 @@ Checks: valid markdown structure, required sections (Structure minimum), agent r
 ### `openspawn version`
 Print the CLI version.
 
+### `openspawn start [--dir <path>] [--json]`
+Read `openclaw-agents.json` and generate `openclaw-patch.json` with OpenClaw gateway configuration.
+
+| Flag | Description |
+|------|-------------|
+| `--dir <path>` | Project directory (default: current directory) |
+| `--json` | Output result as JSON |
+
+```bash
+openspawn start
+openspawn start --dir ./my-org
+openspawn start --json
+```
+
+What it does:
+- Reads `openclaw-agents.json` from the project directory
+- Generates `openclaw-patch.json` with `agents.list` entries for your OpenClaw gateway
+- Agent ID = lowercase hyphenated name from ORG.md
+- L7+ agents get `opus` model, L6 and below get `sonnet`
+- L7+ agents with direct reports get `subagents.allowAgents`
+- Highest-level agent gets `default: true`
+- All agents get `tools.profile: "full"`
+
+### `openspawn status [--dir <path>] [--json]`
+Display a formatted table of agents in your organization.
+
+| Flag | Description |
+|------|-------------|
+| `--dir <path>` | Project directory (default: current directory) |
+| `--json` | Output as JSON instead of table |
+
+```bash
+openspawn status
+openspawn status --json
+```
+
+Output columns: name, level, model, workspace, reports-to.
+
 ### `openspawn preview`
 Preview your org in the dashboard locally (simulation mode, no API keys).
 
@@ -223,6 +261,12 @@ A: Yes. L7+ agents can use `sessions_spawn` to create temporary workers. Costs c
 
 **Q: What happens when an agent is blocked?**
 A: It escalates to its direct manager (never skips the chain). Manager has 2 cycles to respond. If unresolved after 2 levels, alerts the owner → human principal.
+
+**Q: How do I connect to my OpenClaw gateway?**
+A: Run `openspawn start` to generate `openclaw-patch.json`, then apply it to your gateway config. The patch contains ready-to-use `agents.list` entries.
+
+**Q: What does openclaw-patch.json contain?**
+A: OpenClaw `agents.list` entries with `id`, `model`, `workspace`, and `subagents.allowAgents` for managers. L7+ agents get opus, L6- get sonnet. The highest-level agent gets `default: true`. All agents get `tools.profile: "full"`.
 
 **Q: How is this different from CrewAI/LangGraph/AutoGen?**
 A: Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together: build agents with your framework, coordinate them with OpenSpawn.
