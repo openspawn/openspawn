@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Layout } from "./components";
 import { ProtectedRoute } from "./components/protected-route";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";
+import { KanbanPage } from "./pages/kanban";
 import { RouterPage } from "./pages/router";
 import { DashboardPage } from "./pages/dashboard";
 import { NetworkPage } from "./pages/network";
@@ -151,6 +152,12 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
+const kanbanRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/kanban",
+  component: KanbanPage,
+});
+
 const statusRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/status",
@@ -182,6 +189,7 @@ const layoutChildren = [
   networkRoute,
   settingsRoute,
   statusRoute,
+  kanbanRoute,
 ];
 
 const rootChildren = [

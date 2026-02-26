@@ -309,6 +309,40 @@ tool: org_status
 
 ---
 
+## Boot Sequence — How Orgs Start Up
+
+When `openspawn start` boots your org, the lead agent doesn't just start delegating. It follows a **planning-first boot sequence**:
+
+```
+1. Read ORG.md     → understand mission, team, constraints
+2. Read PLAN.md    → check if resuming a previous run
+3. Write PLAN.md   → break mission into phased tasks with assignments
+4. Register agents → agent_register for each team member
+5. Create tasks    → task_create for current-phase items
+6. Monitor         → org_status every 5 minutes
+7. Adapt           → update PLAN.md when things change
+8. Complete        → escalate "mission complete" when done
+```
+
+> **Q: Why planning first?**
+> Plans are cheaper than confusion. A 30-second PLAN.md prevents hours of rework, wasted tokens, and "what did you mean?" messages.
+
+> **Q: What goes in PLAN.md?**
+> - Mission statement (from ORG.md)
+> - Phase breakdown (what order to build)
+> - Task table with assignments, priorities, dependencies, and status
+> - Success criteria and definition of done
+
+> **Q: How do workers know what to do?**
+> Workers read PLAN.md on startup, then claim their assigned tasks via `task_claim`. They don't wait for chat messages — the plan IS the assignment.
+
+> **Q: What if the plan needs to change?**
+> The lead updates PLAN.md first, then updates MCP tasks to match. PLAN.md is always the source of truth.
+
+See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md` for the lead agent template, and `templates/SOUL-worker.md` for the worker template.
+
+---
+
 ## Next steps
 
 - Customize your ORG.md: add agents, change levels, write playbooks

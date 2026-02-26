@@ -197,6 +197,28 @@ openspawn init my-org --template=research-lab
 
 ---
 
+## Boot Sequence Templates
+
+In addition to org templates, OpenSpawn ships agent SOUL.md templates and a boot sequence spec. These define how agents behave when an org starts.
+
+| Template | Purpose | Use for |
+|----------|---------|---------|
+| `templates/boot-sequence.md` | Step-by-step startup protocol | Reference — how the lead agent boots an org |
+| `templates/SOUL-lead.md` | Complete SOUL.md for lead agents | Lead/CEO/coordinator agent workspaces |
+| `templates/SOUL-worker.md` | Complete SOUL.md for worker agents | Any worker/specialist agent workspace |
+| `templates/AGENTS-leader.md` | AGENTS.md for leaders | Leader workspace operational instructions |
+| `templates/AGENTS-worker.md` | AGENTS.md for workers | Worker workspace operational instructions |
+| `templates/AGENTS-reviewer.md` | AGENTS.md for reviewers | Reviewer workspace operational instructions |
+| `templates/soul-protocol-rules.md` | Communication rules snippet | Append to any agent's SOUL.md |
+
+> **Q: What's the boot sequence?**
+> When an org starts, the lead agent reads ORG.md, writes PLAN.md (breaking the mission into phased tasks), registers agents, creates tasks via MCP, then monitors. Workers read PLAN.md and claim their tasks. See `templates/boot-sequence.md` for the full protocol.
+
+> **Q: Do I need both SOUL.md and AGENTS.md templates?**
+> Yes. SOUL.md defines identity and behavior. AGENTS.md defines operational instructions (what files to read, how to use tools). They serve different purposes.
+
+---
+
 ## Customizing a template
 
 After `openspawn init`, your ORG.md is just a markdown file. Edit freely:
