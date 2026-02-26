@@ -9,6 +9,8 @@ import { OpenSpawnBadge } from '../components/live/OpenSpawnBadge';
 import { TIMELINE, ACTS, AGENTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
 import { getActiveAnnotation, type Annotation } from '../components/live/live-view-annotations';
 import { AgentControlPanel, TaskControlBar, AgentContextMenu, AGENT_DEPARTMENTS, type AgentControlState, type AgentControlStatus, type Department } from '../components/controls';
+import { agentUpdateStatus, agentFire, agentRegister, escalate, eventList, taskList, McpError } from '../services/mcp-client';
+import { useMcpOrgStatus } from '../hooks/use-mcp';
 import '../components/controls/control-animations.css';
 
 // ── Variable tick timing ──────────────────────────────────────────────────────
@@ -682,11 +684,16 @@ export function LiveViewPage() {
   }, [agentOverrides]);
 
   const handlePauseResume = useCallback((agentId: string) => {
+    const wasPaused = !!agentOverrides[agentId]?.paused;
+    const newStatus = wasPaused ? 'working' : 'paused';
+    agentUpdateStatus(agentId, newStatus).catch((err: unknown) =>
+      console.warn('[MCP] agentUpdateStatus failed:', err instanceof Error ? err.message : err),
+    );
     setAgentOverrides(prev => ({
       ...prev,
       [agentId]: { ...prev[agentId], paused: !prev[agentId]?.paused },
     }));
-  }, []);
+  }, [agentOverrides]);
 
   const handleReassign = useCallback((agentId: string, department: Department) => {
     setAgentOverrides(prev => ({
@@ -696,6 +703,9 @@ export function LiveViewPage() {
   }, []);
 
   const handleFire = useCallback((agentId: string) => {
+    agentFire(agentId).catch((err: unknown) =>
+      console.warn('[MCP] agentFire failed:', err instanceof Error ? err.message : err),
+    );
     setFiredAgents(prev => new Set([...prev, agentId]));
     setSelectedAgentId(null);
   }, []);
@@ -708,10 +718,17 @@ export function LiveViewPage() {
   }, []);
 
   const handleHire = useCallback((role: string, department: Department, modelTier: 'sonnet' | 'opus') => {
+    const id = `agent-${role.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+    agentRegister({ id, name: role, role, department, model: modelTier }).catch((err: unknown) =>
+      console.warn('[MCP] agentRegister failed:', err instanceof Error ? err.message : err),
+    );
     console.log(`[LiveView] hire-agent: role=${role}, dept=${department}, tier=${modelTier}`);
   }, []);
 
   const handleEscalate = useCallback(() => {
+    escalate('Dashboard user escalation', 'high').catch((err: unknown) =>
+      console.warn('[MCP] escalate failed:', err instanceof Error ? err.message : err),
+    );
     console.log('[LiveView] escalate: sending to CEO agent');
   }, []);
 
@@ -719,6 +736,7 @@ export function LiveViewPage() {
     console.log('[LiveView] view-plan: opening PLAN.md');
   }, []);
 
+  const mcpOrg = useMcpOrgStatus();
   const replay = useReplay();
   const annotation = getActiveAnnotation(replay.tick);
 
@@ -874,7 +892,12 @@ export function LiveViewPage() {
           y={contextMenu.y}
           isPaused={!!agentOverrides[contextMenu.agentId]?.paused}
           onClose={() => setContextMenu(null)}
-          onViewLogs={(id) => console.log(`[LiveView] view-logs: ${id}`)}
+          onViewLogs={(id) => {
+            eventList({ agent_id: id }).then(
+              (events) => console.log(`[LiveView] logs for ${id}:`, events),
+              (err: unknown) => console.warn('[MCP] eventList failed:', err instanceof Error ? err.message : err),
+            );
+          }}
           onSendMessage={(id) => console.log(`[LiveView] send-message: ${id}`)}
           onReassign={(id) => { setContextMenu(null); setSelectedAgentId(id); }}
           onPauseResume={(id) => { handlePauseResume(id); setContextMenu(null); }}
