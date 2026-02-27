@@ -266,10 +266,13 @@ export function LandingPage() {
           </div>
 
           {/* Category badge */}
-          <div className="animate-fade-in-up animate-delay-100 mb-5">
+          <div className="animate-fade-in-up animate-delay-100 mb-3 flex flex-wrap items-center justify-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400">
               <span className="live-dot h-1.5 w-1.5 rounded-full bg-cyan-400 inline-block" />
               Multi-Agent Platform
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-300">
+              🎓 Graduate from sub-agents
             </span>
           </div>
 
@@ -285,8 +288,9 @@ export function LandingPage() {
 
           {/* Sub-copy */}
           <p className="animate-fade-in-up animate-delay-300 mx-auto mb-10 max-w-xl text-base text-slate-400 md:text-lg leading-relaxed">
-            Orchestrate agent teams across devices, nodes, and services — with the structure
-            your org actually needs. No competitor brings agents into the physical world like this.
+            Sub-agents are great for simple tasks. But when you need a full team — with persistent
+            memory, coordination, and budget control — you need an org.{" "}
+            <span className="text-slate-300">OpenSpawn gives your agents structure.</span>
           </p>
 
           {/* CTAs */}
@@ -406,6 +410,169 @@ export function LandingPage() {
                 <span className="text-sm font-medium">{a.name}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── "Graduate from sub-agents" — Why not just use sub-agents? ───── */}
+      <section aria-labelledby="why-not-subagents" className="section-py-lg">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <span className="inline-block rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-violet-400 mb-4">
+              Why OpenSpawn
+            </span>
+            <h2 id="why-not-subagents" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Why not just use <span className="gradient-text">sub-agents?</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-slate-400">
+              Sub-agents are ephemeral — they run once and disappear. OpenSpawn gives your agents
+              persistence, hierarchy, and governance. It's the difference between a freelancer and
+              a company.
+            </p>
+          </div>
+          <div className="reveal grid gap-4 sm:grid-cols-2">
+            {/* Sub-agent column */}
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-2xl">🤖</span>
+                <h3 className="font-semibold text-slate-300">Sub-agent (typical)</h3>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Spawned once, forgets everything after</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are equal</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go wrong</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No visibility into what agents are actually doing</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Org structure lives only in the prompt</li>
+              </ul>
+            </div>
+            {/* OpenSpawn column */}
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-6 ring-1 ring-cyan-500/10">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-2xl">🪸</span>
+                <h3 className="font-semibold text-cyan-300">OpenSpawn org</h3>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Persistent agents with continuous memory</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> 10-level hierarchy — delegation &amp; escalation built in</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Per-agent credit budgets with automatic tracking</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Typed escalation chain of command</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Live dashboard: network graph, task timeline, cost</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Org structure version-controlled in <code className="font-mono text-xs bg-white/10 px-1 rounded">ORG.md</code></li>
+              </ul>
+            </div>
+          </div>
+          <div className="reveal mt-6 text-center">
+            <a
+              href="/docs/comparison"
+              className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              Full framework comparison (vs CrewAI, LangGraph)
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3 Core Benefits ───────────────────────────────────────────────── */}
+      <section aria-labelledby="core-benefits" className="section-py">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <h2 id="core-benefits" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Three things sub-agents can't do
+            </h2>
+          </div>
+          <div className="reveal grid gap-6 sm:grid-cols-3">
+            <div className="rounded-xl border border-violet-500/20 bg-gradient-to-br from-violet-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">🧠</div>
+              <h3 className="mb-2 font-bold text-slate-100">Persistent Agents</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Your agents run continuously. They remember past tasks, build context over time,
+                and improve their trust score with every successful completion.
+              </p>
+            </div>
+            <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">🏢</div>
+              <h3 className="mb-2 font-bold text-slate-100">Team Coordination</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Hierarchy, delegation, and escalation built in. Agents route tasks up and down
+                the org chart — no manual wiring required.
+              </p>
+            </div>
+            <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">💰</div>
+              <h3 className="mb-2 font-bold text-slate-100">Budget Control</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Per-agent credit limits, automatic cost tracking, and configurable overage
+                behavior. Know exactly what your org costs before the bill lands.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works — 3 steps ────────────────────────────────────────── */}
+      <section aria-labelledby="how-it-works" className="section-py-lg">
+        <div className="mx-auto max-w-4xl">
+          <div className="reveal text-center mb-12">
+            <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
+              How It Works
+            </span>
+            <h2 id="how-it-works" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              From zero to running org in{" "}
+              <span className="gradient-text">3 commands</span>
+            </h2>
+          </div>
+          <ol className="reveal grid gap-6 sm:grid-cols-3" role="list">
+            {/* Step 1 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">1</span>
+                <h3 className="font-bold text-slate-100">Init</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>npx openspawn init my-org</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                An interactive wizard creates your <code className="text-xs font-mono text-slate-300">ORG.md</code> — the single file that defines
+                your entire agent organization.
+              </p>
+            </li>
+            {/* Step 2 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">2</span>
+                <h3 className="font-bold text-slate-100">Start</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>openspawn start</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                Agents spawn in sandboxed containers, load their roles from ORG.md, and begin
+                listening for tasks immediately. Dashboard at <code className="text-xs font-mono text-slate-300">localhost:3333</code>.
+              </p>
+            </li>
+            {/* Step 3 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">3</span>
+                <h3 className="font-bold text-slate-100">Done</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>openspawn done</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                When the work is complete, graceful shutdown collects all artifacts, task logs,
+                and cost summaries into a portable archive.
+              </p>
+            </li>
+          </ol>
+          <div className="reveal mt-8 text-center">
+            <a href="/getting-started" className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan">
+              Get Started in 5 Minutes →
+            </a>
           </div>
         </div>
       </section>
@@ -678,6 +845,37 @@ export function LandingPage() {
             >
               Full framework comparison →
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Ready to graduate? — Final CTA ───────────────────────────────── */}
+      <section aria-labelledby="graduate-cta" className="section-py-lg">
+        <div className="mx-auto max-w-3xl">
+          <div className="reveal overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.08] via-violet-500/[0.04] to-transparent p-10 text-center md:p-16">
+            <div className="mb-4 text-5xl">🎓</div>
+            <h2 id="graduate-cta" className="mb-4 text-3xl font-extrabold text-slate-100 md:text-4xl tracking-tight">
+              Ready to graduate?
+            </h2>
+            <p className="mx-auto mb-8 max-w-lg text-slate-400 leading-relaxed">
+              Sub-agents are training wheels. OpenSpawn is the real company — persistent agents,
+              hierarchy, budget control, and full visibility. Deploy your first org in 5 minutes.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="/getting-started"
+                className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-8 py-3.5 font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan"
+              >
+                Get Started →
+              </a>
+              <a
+                href="/docs/comparison"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20"
+              >
+                Compare frameworks
+              </a>
+            </div>
+            <p className="mt-6 text-xs text-slate-600">MIT licensed · No account required · Runs locally</p>
           </div>
         </div>
       </section>
