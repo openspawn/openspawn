@@ -8,13 +8,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
+	"github.com/openspawn/openspawn/packages/cli/internal/openclaw"
 	"github.com/openspawn/openspawn/packages/cli/internal/templates"
 	"github.com/openspawn/openspawn/packages/cli/internal/wizard"
 )
 
 var (
-	flagTemplate string
+	flagTemplate       string
 	flagNonInteractive bool
+	flagOpenClaw       bool
 )
 
 var initCmd = &cobra.Command{
@@ -42,6 +44,10 @@ Examples:
 			targetDir = args[0]
 		}
 
+		if yes, _ := cmd.Flags().GetBool("yes"); yes {
+			flagNonInteractive = true
+		}
+
 		if flagNonInteractive {
 			return runNonInteractive(targetDir)
 		}
@@ -53,6 +59,8 @@ Examples:
 func init() {
 	initCmd.Flags().StringVarP(&flagTemplate, "template", "t", "", "Template to use (skip wizard selection)")
 	initCmd.Flags().BoolVar(&flagNonInteractive, "non-interactive", false, "Skip wizard, use defaults")
+	initCmd.Flags().BoolVarP(&flagOpenClaw, "openclaw", "", true, "Generate OpenClaw agent configs and workspaces")
+	initCmd.Flags().BoolP("yes", "y", false, "Alias for --non-interactive")
 }
 
 func runWizard(targetDir string) error {
@@ -146,6 +154,15 @@ func scaffold(targetDir string, answers wizard.Answers) error {
 		return fmt.Errorf("failed to write .gitignore: %w", err)
 	}
 
+	// Generate OpenClaw agent configs
+	openclawMsg := ""
+	if flagOpenClaw {
+		if err := openclaw.Generate(targetDir, []byte(orgContent)); err != nil {
+			return fmt.Errorf("failed to generate OpenClaw configs: %w", err)
+		}
+		openclawMsg = "  openclaw-agents.json    — OpenClaw agent session configs\n  workspaces/             — Agent workspace directories\n"
+	}
+
 	// Success message
 	prefix := ""
 	if targetDir != "." {
@@ -159,7 +176,7 @@ Created:
   ORG.md                  — Your agent organization
   openspawn.config.json   — Configuration
   .gitignore
-
+%s
 Next steps:
 %s  1. Review and customize ORG.md
   2. Run: openspawn preview
@@ -167,7 +184,7 @@ Next steps:
 
 Template: %s
 Team: %s
-`, prefix, answers.TemplateName, answers.TeamName)
+`, openclawMsg, prefix, answers.TemplateName, answers.TeamName)
 
 	return nil
 }

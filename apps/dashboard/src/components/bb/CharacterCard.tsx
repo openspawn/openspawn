@@ -1,10 +1,11 @@
 /**
  * CharacterCard — BikiniBottom character display card.
  * Used on landing "Meet the Crew" and dashboard agent roster.
+ *
+ * NOTE: All animations use plain CSS (bb-tokens.css keyframes) — no motion/react.
  */
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 
 export type AgentStatus = 'idle' | 'working' | 'busy' | 'overwhelmed';
 
@@ -45,9 +46,9 @@ const STATUS_RING: Record<AgentStatus, string> = {
 
 const ANIM_CLASS: Record<AgentStatus, string> = {
   idle:        'animate-[bb-bob_2.5s_ease-in-out_infinite]',
-  working:     'animate-[bb-bob-fast_1s_ease-in-out_infinite]',
+  working:     'animate-[bb-bob_1s_ease-in-out_infinite]',
   busy:        'animate-[bb-bob_1.2s_ease-in-out_infinite]',
-  overwhelmed: 'animate-[bb-jitter_0.35s_ease-in-out_infinite]',
+  overwhelmed: 'animate-[bb-bob_0.6s_ease-in-out_infinite]',
 };
 
 interface CharacterCardProps {
@@ -68,29 +69,23 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
   };
 
   return (
-    <motion.div
+    <div
       className={`
         relative flex items-start ${sizeClasses[size]}
         bg-[rgba(11,61,96,0.6)] border border-[rgba(74,174,217,0.2)]
         rounded-[1.25rem] cursor-pointer
         backdrop-blur-[12px]
+        transition-all duration-200 hover:-translate-y-1 hover:scale-[1.015]
         ${agent.cardClass ?? ''}
       `}
       style={{
         boxShadow: '0 4px 20px rgba(6,42,69,0.5), 0 1px 4px rgba(244,197,66,0.05)',
       }}
-      whileHover={{
-        y: -4,
-        scale: 1.015,
-        boxShadow: `0 8px 32px rgba(6,42,69,0.6), 0 0 20px ${agent.accentColor}44`,
-        borderColor: `${agent.accentColor}66`,
-      }}
-      whileTap={{ scale: 0.98 }}
       onClick={onClick}
     >
       {/* Crisis overlay flash */}
       {isCrisis && (
-        <div className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring-coral_1s_ease-in-out_infinite]" />
+        <div className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]" style={{ '--bb-ring-color': 'rgba(255, 71, 87, 0.4)' } as React.CSSProperties} />
       )}
 
       {/* Avatar */}
@@ -175,7 +170,7 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -194,38 +189,26 @@ export function CharacterCardGrid({ agents, maxVisible = 6, onAgentClick }: Char
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence initial={false}>
-          {visible.map((agent, idx) => (
-            <motion.div
-              key={agent.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{
-                duration: 0.3,
-                delay: idx < maxVisible ? 0 : (idx - maxVisible) * 0.05,
-              }}
-            >
-              <CharacterCard
-                agent={agent}
-                size="md"
-                onClick={onAgentClick ? () => onAgentClick(agent) : undefined}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {visible.map(agent => (
+          <div key={agent.id}>
+            <CharacterCard
+              agent={agent}
+              size="md"
+              onClick={onAgentClick ? () => onAgentClick(agent) : undefined}
+            />
+          </div>
+        ))}
       </div>
 
       {agents.length > maxVisible && (
-        <motion.button
-          className="mt-6 mx-auto flex items-center gap-2 text-[#4AAED9] font-['Nunito'] font-semibold text-sm hover:text-[#F4C542] transition-colors"
+        <button
+          className="mt-6 mx-auto flex items-center gap-2 text-[#4AAED9] font-['Nunito'] font-semibold text-sm hover:text-[#F4C542] transition-colors hover:scale-[1.02]"
           onClick={() => setExpanded(e => !e)}
-          whileHover={{ scale: 1.02 }}
         >
           {expanded
             ? 'Show fewer agents ↑'
             : `See all ${agents.length} agents → (${agents.length - maxVisible} more)`}
-        </motion.button>
+        </button>
       )}
     </div>
   );

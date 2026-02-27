@@ -77,19 +77,13 @@ export interface EdgeAnimation {
   timestamp: number;
 }
 
-export interface ZoomTarget {
-  x: number;
-  y: number;
-  zoom: number;
-  duration?: number;
-}
-
 interface OrgChartLiveProps {
   nodeStates: Record<string, AgentNodeState>;
   edgeAnimations: EdgeAnimation[];
   reassignedEdges: Array<{ from: string; to: string }>;
   spawnedAgents: SpawnedAgent[];
-  zoomTarget?: ZoomTarget | null;
+  onAgentClick?: (agentId: string) => void;
+  onAgentContextMenu?: (agentId: string, x: number, y: number) => void;
 }
 
 // ── Custom Nodes ─────────────────────────────────────────────────────────────
@@ -393,30 +387,34 @@ function buildGraph(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents, zoomTarget }: OrgChartLiveProps) {
+function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAgents, onAgentClick, onAgentContextMenu }: OrgChartLiveProps) {
   const { nodes, edges } = useMemo(
     () => buildGraph(nodeStates, edgeAnimations, reassignedEdges, spawnedAgents),
     [nodeStates, edgeAnimations, reassignedEdges, spawnedAgents],
   );
 
   const { fitView, setCenter } = useReactFlow();
-  const prevZoomRef = useRef<ZoomTarget | null>(null);
+  const prevSpawnCount = useRef(0);
+  const zoomResetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // External zoom choreography — driven by parent via zoomTarget prop
+  // Zoom into pool node area when spawning starts, zoom back out after
   useEffect(() => {
-    if (zoomTarget && zoomTarget !== prevZoomRef.current) {
-      prevZoomRef.current = zoomTarget;
-      setCenter(zoomTarget.x, zoomTarget.y, {
-        zoom: zoomTarget.zoom,
-        duration: zoomTarget.duration ?? 800,
-      });
-    } else if (!zoomTarget && prevZoomRef.current) {
-      prevZoomRef.current = null;
-      fitView({ padding: 0.15, duration: 800 });
-    }
-  }, [zoomTarget, setCenter, fitView]);
+    const count = spawnedAgents.length;
+    if (count > prevSpawnCount.current && count >= 1) {
+      // Zoom to the Grill Station pool node area
+      // Pool is at x=CX-400-80=120, y=LY[3]+100=600
+      clearTimeout(zoomResetTimer.current);
+      setCenter(120, 580, { zoom: 1.4, duration: 800 });
 
-  // On first render, fit the full view
+      // After 3 seconds (or when spawning stops), zoom back to full view
+      zoomResetTimer.current = setTimeout(() => {
+        fitView({ padding: 0.15, duration: 800 });
+      }, 3000);
+    }
+    prevSpawnCount.current = count;
+  }, [spawnedAgents.length, setCenter, fitView]);
+
+  // On first render and when no spawns, fit the full view
   const onInit = useCallback(() => {
     fitView({ padding: 0.15, duration: 0 });
   }, [fitView]);
@@ -429,11 +427,21 @@ function OrgChartInner({ nodeStates, edgeAnimations, reassignedEdges, spawnedAge
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onInit={onInit}
+        onNodeClick={(_event, node) => {
+          if (node.type === 'liveAgent' && onAgentClick) {
+            onAgentClick(node.id);
+          }
+        }}
+        onNodeContextMenu={(event, node) => {
+          if (node.type === 'liveAgent' && onAgentContextMenu) {
+            event.preventDefault();
+            onAgentContextMenu(node.id, event.clientX, event.clientY);
+          }
+        }}
         nodesDraggable={false}
         nodesConnectable={false}
         panOnDrag={false}
         zoomOnScroll={false}
-        zoomOnPinch={false}
         zoomOnDoubleClick={false}
         preventScrolling={false}
         proOptions={{ hideAttribution: true }}

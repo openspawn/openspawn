@@ -3,7 +3,10 @@
  * POLISH PASS: Per-strand animation-delay variation, 3 sway amplitude variants,
  * 4 depth layers for natural parallax feel.
  * CSS animations only. prefers-reduced-motion: respected via global bb-tokens.css rule.
+ * IntersectionObserver pauses animation when off-screen.
  */
+
+import { useEffect, useRef, useState } from 'react';
 
 // Per-strand config: x position, color, strokeWidth, sway variant, delay
 interface Strand {
@@ -16,6 +19,8 @@ interface Strand {
   opacity: number;
   ctrl1offset: number; // Q control point x offset
   ctrl2offset: number;
+  swayAngle: string;
+  swayScale: string;
 }
 
 // Generate deterministic per-strand variation
@@ -29,8 +34,11 @@ function makeStrand(x: number, i: number, layer: 0|1|2|3): Strand {
   ] as const;
   const l = layers[layer];
 
-  const animNames = ['bb-kelp-sway-gentle', 'bb-kelp-sway-medium', 'bb-kelp-sway-strong'];
-  const anim = animNames[seed % animNames.length];
+  const anim = 'bb-kelp-sway';
+  // Sway amplitude varies by strand via CSS custom property
+  const swayAngles = ['1.5deg', '3deg', '5deg'];
+  const swayScales = ['0.005', '0.01', '0.015'];
+  const swayIdx = seed % swayAngles.length;
 
   // Duration varies 3-6s per layer range
   const durBase = [5, 4.5, 4, 3.2] as const;
@@ -53,10 +61,26 @@ function makeStrand(x: number, i: number, layer: 0|1|2|3): Strand {
     opacity: l.opBase - (seed % 12) / 100, // subtle variation
     ctrl1offset,
     ctrl2offset,
+    swayAngle: swayAngles[swayIdx],
+    swayScale: swayScales[swayIdx],
   };
 }
 
 export function KelpSilhouette({ className = '' }: { className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Layer x positions — offset per layer for depth feel
   const backXs   = [60, 170, 310, 470, 640, 810, 950, 1090, 1270, 1390];
   const midBackXs = [95, 190, 330, 490, 655, 820, 970, 1110, 1290, 1400];
@@ -81,14 +105,18 @@ export function KelpSilhouette({ className = '' }: { className?: string }) {
         opacity={s.opacity}
         style={{
           animation: `${s.anim} ${s.dur}s ${s.delay}s ease-in-out infinite`,
+          animationPlayState: isVisible ? 'running' : 'paused',
           transformOrigin: 'bottom center',
-        }}
+          '--bb-sway-angle': s.swayAngle,
+          '--bb-sway-scale': s.swayScale,
+        } as React.CSSProperties}
       />
     );
   };
 
   return (
     <div
+      ref={containerRef}
       className={`absolute bottom-0 left-0 right-0 pointer-events-none ${className}`}
       aria-hidden="true"
     >

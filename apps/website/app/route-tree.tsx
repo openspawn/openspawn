@@ -15,7 +15,15 @@ import { HowItWorks } from "./routes/docs/how-it-works";
 import { ConnectingAgents } from "./routes/docs/guides/connecting-agents";
 import { DashboardGuide } from "./routes/docs/guides/dashboard-guide";
 import { AcpVsA2A } from "./routes/docs/concepts/acp-vs-a2a";
+import { ComparisonPage } from "./routes/docs/comparison";
+import { MCPReference } from "./routes/docs/protocols/mcp-reference";
+import { OrgMdReference } from "./routes/docs/reference/org-md-reference";
+import { AgentQuickstart } from "./routes/docs/agent-quickstart";
+import { TemplatesGuide } from "./routes/docs/templates";
+import { CommunicationProtocol } from "./routes/docs/communication-protocol";
+import { GettingStartedPage } from "./routes/getting-started";
 import { NotFoundPage } from "./routes/not-found";
+import { PluginsPage } from "./routes/plugins";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
 const OG_IMAGE = "https://openspawn.dev/og-image.jpg";
@@ -428,6 +436,114 @@ const modelRouterRoute = createRoute({
     }),
 });
 
+const comparisonRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/comparison",
+  component: ComparisonPage,
+  meta: () =>
+    buildMeta({
+      title: "OpenSpawn vs CrewAI vs LangGraph — Multi-Agent Framework Comparison (2026)",
+      description:
+        "Compare OpenSpawn, CrewAI, and LangGraph side-by-side. Feature tables, honest tradeoffs, and migration guides for switching between multi-agent frameworks.",
+      path: "/docs/comparison",
+      ogTitle: "OpenSpawn vs CrewAI vs LangGraph",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Comparison", href: "/docs/comparison" },
+      ]),
+    }),
+});
+
+const mcpReferenceRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/protocols/mcp-reference",
+  component: MCPReference,
+  meta: () =>
+    buildMeta({
+      title: "MCP Tools & Integrations — OpenSpawn Model Context Protocol Reference",
+      description:
+        "Complete reference for OpenSpawn's MCP server. Connect Claude Desktop, Cursor, CrewAI, LangGraph, or any MCP client to your agent org via 7 tools over Streamable HTTP.",
+      path: "/docs/protocols/mcp-reference",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Protocols", href: "/docs/protocols/mcp-reference" },
+        { name: "MCP Reference", href: "/docs/protocols/mcp-reference" },
+      ]),
+    }),
+});
+
+const orgMdReferenceRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/org-md-reference",
+  component: OrgMdReference,
+  meta: () =>
+    buildMeta({
+      title: "ORG.md Reference — OpenSpawn Configuration Specification",
+      description:
+        "Complete reference for ORG.md, the OpenSpawn organization definition format. Every field, section, value, and example — plus copy-pasteable snippets for common configurations.",
+      path: "/docs/reference/org-md-reference",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/org-md-reference" },
+        { name: "ORG.md Reference", href: "/docs/reference/org-md-reference" },
+      ]),
+    }),
+});
+
+const agentQuickstartRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/agent-quickstart",
+  component: AgentQuickstart,
+  meta: () =>
+    buildMeta({
+      title: "Agent Quickstart — OpenSpawn",
+      description:
+        "Get an AI agent from zero to a running multi-agent organization in 10 minutes. Step-by-step guide for AI agents that need to coordinate other agents.",
+      path: "/docs/agent-quickstart",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Agent Quickstart", href: "/docs/agent-quickstart" },
+      ]),
+    }),
+});
+
+const templatesGuideRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/templates",
+  component: TemplatesGuide,
+  meta: () =>
+    buildMeta({
+      title: "Templates Guide — OpenSpawn Org Templates",
+      description:
+        "Choose and customize OpenSpawn org templates. Compare assistant-team, content-agency, dev-shop, and research-lab with decision trees and role breakdowns.",
+      path: "/docs/templates",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Templates Guide", href: "/docs/templates" },
+      ]),
+    }),
+});
+
+const communicationProtocolRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/communication-protocol",
+  component: CommunicationProtocol,
+  meta: () =>
+    buildMeta({
+      title: "Communication Protocol — OpenSpawn",
+      description:
+        "The OpenSpawn Communication Protocol eliminates 40-60% of wasted tokens in multi-agent organizations. Four message types, decision trees, and anti-patterns.",
+      path: "/docs/communication-protocol",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Agent Guide", href: "/docs/agent-quickstart" },
+        { name: "Communication Protocol", href: "/docs/communication-protocol" },
+      ]),
+    }),
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
@@ -439,8 +555,14 @@ const docsRouteTree = docsRoute.addChildren([
   acpVsA2ARoute,
   a2aRoute,
   mcpRoute,
+  mcpReferenceRoute,
   dashboardRoute,
   modelRouterRoute,
+  comparisonRoute,
+  orgMdReferenceRoute,
+  agentQuickstartRoute,
+  templatesGuideRoute,
+  communicationProtocolRoute,
 ]);
 
 const orgMdRoute = createRoute({
@@ -469,4 +591,38 @@ const templatesRoute = createRoute({
     }),
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, docsRouteTree]);
+const gettingStartedTopRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/getting-started",
+  component: GettingStartedPage,
+  meta: () =>
+    buildMeta({
+      title: "Getting Started with OpenSpawn — 5 Minutes to Your First Agent Org",
+      description:
+        "Install OpenSpawn, create an ORG.md, and boot a multi-agent organization on OpenClaw in under 5 minutes.",
+      path: "/getting-started",
+      schemaLd: {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "OpenSpawn", item: BASE_URL },
+          { "@type": "ListItem", position: 2, name: "Getting Started", item: `${BASE_URL}/getting-started` },
+        ],
+      },
+    }),
+});
+
+const pluginsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/plugins",
+  component: PluginsPage,
+  meta: () =>
+    buildMeta({
+      title: "SpawnHub — Plugin Marketplace for OpenSpawn Agent Organizations",
+      description:
+        "Browse and install plugins for your agent organization. Task coordination, monitoring, identity, DevOps integrations.",
+      path: "/plugins",
+    }),
+});
+
+export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, gettingStartedTopRoute, pluginsRoute, docsRouteTree]);

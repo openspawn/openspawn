@@ -625,6 +625,63 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── How we compare ───────────────────────────────────────────────── */}
+      <section className="py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-3 text-center">
+            <span className="inline-block rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-violet-400">
+              How We Compare
+            </span>
+          </div>
+          <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">
+            How We Compare
+          </h2>
+          <p className="mb-4 text-center text-lg font-semibold text-slate-300">vs CrewAI &amp; LangGraph</p>
+          <p className="mx-auto mb-10 max-w-xl text-center text-slate-400">
+            CrewAI and LangGraph are great <em>execution</em> frameworks. OpenSpawn is{" "}
+            <em>coordination infrastructure</em>. They solve different problems — and they work
+            together.
+          </p>
+          <div className="mb-8 overflow-x-auto rounded-xl border border-white/10 bg-navy-900/50">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="px-5 py-3 text-left font-medium text-slate-400">Feature</th>
+                  <th className="px-5 py-3 text-left font-semibold text-cyan-400">OpenSpawn</th>
+                  <th className="px-5 py-3 text-left font-semibold text-violet-400">CrewAI</th>
+                  <th className="px-5 py-3 text-left font-semibold text-emerald-400">LangGraph</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-slate-400">
+                {[
+                  ["Real device support", "✅ via OpenClaw", "❌", "❌"],
+                  ["Org as code (ORG.md)", "✅ Markdown file", "Python code", "Python code"],
+                  ["Budget & governance", "✅ Built-in", "❌", "❌"],
+                  ["MCP native", "✅ 7 tools", "Plugins", "LangChain tools"],
+                  ["Live dashboard", "✅ React + SSE", "❌", "❌"],
+                  ["Framework agnostic", "✅ A2A / MCP", "❌", "❌"],
+                ].map(([feature, os, crewai, lg]) => (
+                  <tr key={feature}>
+                    <td className="px-5 py-2.5 font-medium text-slate-300">{feature}</td>
+                    <td className="px-5 py-2.5">{os}</td>
+                    <td className="px-5 py-2.5">{crewai}</td>
+                    <td className="px-5 py-2.5">{lg}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="text-center">
+            <a
+              href="/docs/comparison"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              Full framework comparison →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ── Open Source CTA ───────────────────────────────────────────────── */}
       <section className="section-py-lg text-center">
         <div className="mx-auto max-w-2xl">

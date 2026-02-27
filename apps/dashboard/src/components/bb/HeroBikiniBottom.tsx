@@ -7,7 +7,7 @@
  * prefers-reduced-motion: respected via bb-tokens.css media query.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Play, Waves } from 'lucide-react';
 import { BubbleField } from './BubbleField';
 import { KelpSilhouette } from './KelpSilhouette';
@@ -62,8 +62,26 @@ interface HeroBikiniBottomProps {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
+// Hook to pause ambient animations when section is off-screen
+function useAmbientPause(ref: React.RefObject<HTMLElement | null>) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref]);
+  return visible;
+}
+
 export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: HeroBikiniBottomProps) {
   const pageRef = useRef<HTMLDivElement>(null);
+  const causticRef = useRef<HTMLDivElement>(null);
+  const causticVisible = useAmbientPause(causticRef);
   useScrollReveal(pageRef as React.RefObject<HTMLElement>);
 
   return (
@@ -86,7 +104,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
         }}
       >
         {/* ── Multi-layer caustic light effects ── */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <div ref={causticRef} className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
           {/* Layer 1 — blue, slow sweep */}
           <div
             className="absolute rounded-full"
@@ -96,6 +114,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
               background: 'radial-gradient(ellipse, rgba(74,174,217,1) 0%, transparent 70%)',
               opacity: 0.06,
               animation: 'bb-caustic 16s ease-in-out infinite',
+              animationPlayState: causticVisible ? 'running' : 'paused',
             }}
           />
           {/* Layer 2 — green, mid-speed */}
@@ -106,8 +125,13 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
               top: '30%', right: '-5vw',
               background: 'radial-gradient(ellipse, rgba(46,204,113,1) 0%, transparent 70%)',
               opacity: 0.04,
-              animation: 'bb-caustic-2 11s 4s ease-in-out infinite',
-            }}
+              '--bb-caustic-rotate': '-3deg',
+              '--bb-caustic-drift': '20px',
+              '--bb-caustic-min': '0.03',
+              '--bb-caustic-max': '0.06',
+              animation: 'bb-caustic 11s 4s ease-in-out infinite',
+              animationPlayState: causticVisible ? 'running' : 'paused',
+            } as React.CSSProperties}
           />
           {/* Layer 3 — sandy highlight, center-bottom */}
           <div
@@ -117,8 +141,13 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
               bottom: '10%', left: '30%',
               background: 'radial-gradient(ellipse, rgba(244,197,66,1) 0%, transparent 70%)',
               opacity: 0.03,
-              animation: 'bb-caustic-3 19s 8s ease-in-out infinite',
-            }}
+              '--bb-caustic-rotate': '5deg',
+              '--bb-caustic-drift': '0px',
+              '--bb-caustic-min': '0.02',
+              '--bb-caustic-max': '0.05',
+              animation: 'bb-caustic 19s 8s ease-in-out infinite',
+              animationPlayState: causticVisible ? 'running' : 'paused',
+            } as React.CSSProperties}
           />
           {/* Layer 4 — deep blue drift, top-right */}
           <div
@@ -128,8 +157,13 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
               top: '15%', right: '20%',
               background: 'radial-gradient(ellipse, rgba(26,125,181,1) 0%, transparent 70%)',
               opacity: 0.05,
-              animation: 'bb-caustic-2 14s 2s ease-in-out infinite',
-            }}
+              '--bb-caustic-rotate': '-3deg',
+              '--bb-caustic-drift': '20px',
+              '--bb-caustic-min': '0.03',
+              '--bb-caustic-max': '0.06',
+              animation: 'bb-caustic 14s 2s ease-in-out infinite',
+              animationPlayState: causticVisible ? 'running' : 'paused',
+            } as React.CSSProperties}
           />
         </div>
 
@@ -138,7 +172,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
 
         {/* ── Nav ── */}
         <nav className="relative z-30 flex items-center justify-between px-6 py-4 md:px-10 md:py-6">
-          <div className="flex items-center gap-2" style={{ animation: 'bb-fade-up 0.6s 0.1s ease forwards', opacity: 0 }}>
+          <div className="flex items-center gap-2" style={{ animation: 'bb-enter-up 0.6s 0.1s ease forwards', opacity: 0, '--bb-enter-y': '20px' } as React.CSSProperties}>
             <span className="text-2xl" role="img" aria-label="pineapple">🍍</span>
             <span
               className="font-extrabold text-lg tracking-tight"
@@ -147,7 +181,7 @@ export function HeroBikiniBottom({ onWatchLive, onGitHub, agentCount = 22 }: Her
               BikiniBottom
             </span>
           </div>
-          <div className="flex items-center gap-3" style={{ animation: 'bb-fade-up 0.6s 0.2s ease forwards', opacity: 0 }}>
+          <div className="flex items-center gap-3" style={{ animation: 'bb-enter-up 0.6s 0.2s ease forwards', opacity: 0, '--bb-enter-y': '20px' } as React.CSSProperties}>
             {onGitHub && (
               <button
                 onClick={onGitHub}

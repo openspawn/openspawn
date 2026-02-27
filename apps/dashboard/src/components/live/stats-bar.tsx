@@ -5,7 +5,7 @@
  * CSS animations only — no motion/react.
  */
 
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import type { Stats } from './replay-data';
 
 interface StatsBarProps {
@@ -123,10 +123,10 @@ export function StatsBar({ stats }: StatsBarProps) {
     stats.budgetUsed > 65 ? 'stat-flash-warn' :
     'stat-flash-kelp';
 
-  // Crisis jitter on queue
+  // Crisis pulse on queue (was jitter — replaced per UX feedback)
   const queueJitter = stats.queueSize > 2000
-    ? { animation: 'bb-jitter 0.5s ease-in-out infinite' }
-    : {};
+    ? { animation: 'bb-pulse-ring 1.5s ease-in-out infinite', '--bb-ring-color': 'rgba(255, 71, 87, 0.4)' } as React.CSSProperties
+    : {} as React.CSSProperties;
 
   return (
     <div

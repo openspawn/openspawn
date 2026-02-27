@@ -1,9 +1,10 @@
 /**
  * LiveTickerFeed — auto-scrolling live activity ticker for the landing page.
+ *
+ * NOTE: All animations use plain CSS — no motion/react.
  */
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 
 export interface TickerMessage {
@@ -71,31 +72,26 @@ export function LiveTickerFeed({ messages, onJoinWatch }: LiveTickerFeedProps) {
         className="h-48 overflow-y-auto scrollbar-none px-0 py-1"
         style={{ scrollBehavior: 'smooth' }}
       >
-        <AnimatePresence initial={false}>
-          {messages.map(msg => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
-              className={`
-                flex items-start gap-2 px-4 py-2
-                border-b border-[rgba(74,174,217,0.06)]
-                ${BORDER_STYLE[msg.type]}
-              `}
-            >
-              <span className="shrink-0 text-base leading-none mt-0.5">{msg.agentEmoji}</span>
-              <div className="min-w-0">
-                <span className="text-[#4AAED9] text-[11px] font-['Nunito'] font-semibold mr-1.5">
-                  {msg.agentName}:
-                </span>
-                <span className={`text-[11px] font-['Nunito'] ${TYPE_STYLE[msg.type]}`}>
-                  {msg.text}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {messages.map(msg => (
+          <div
+            key={msg.id}
+            className={`
+              flex items-start gap-2 px-4 py-2
+              border-b border-[rgba(74,174,217,0.06)]
+              ${BORDER_STYLE[msg.type]}
+            `}
+          >
+            <span className="shrink-0 text-base leading-none mt-0.5">{msg.agentEmoji}</span>
+            <div className="min-w-0">
+              <span className="text-[#4AAED9] text-[11px] font-['Nunito'] font-semibold mr-1.5">
+                {msg.agentName}:
+              </span>
+              <span className={`text-[11px] font-['Nunito'] ${TYPE_STYLE[msg.type]}`}>
+                {msg.text}
+              </span>
+            </div>
+          </div>
+        ))}
 
         {messages.length === 0 && (
           <div className="h-full flex items-center justify-center">
