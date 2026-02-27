@@ -170,6 +170,41 @@ preset: standard
 
 **Relationship to CONTRIBUTING.md:** If the repo has a `CONTRIBUTING.md`, agents should read it. The SDLC section in ORG.md is the organizational policy; CONTRIBUTING.md is the repo-level implementation. They should align — if they conflict, CONTRIBUTING.md wins for that repo.
 
+#### Workspace Strategy
+
+Agents that touch code need isolated working directories. The spec supports a `### Repository` subsection that defines how agents share a codebase:
+
+```markdown
+### Repository
+
+clone: /opt/org/openspawn
+strategy: worktree-per-agent
+
+#### Worktrees
+- designer → /opt/org/openspawn-designer
+- web-eng → /opt/org/openspawn-web-eng
+- docs-writer → /opt/org/openspawn-docs
+```
+
+**`worktree-per-agent`** (recommended default):
+- One shared `.git` directory — single object store, single fetch updates all refs
+- Each agent gets a dedicated worktree on a unique branch
+- Orphan histories are **structurally impossible** — `git worktree add` always branches from the real tree
+- The org boot sequence creates worktrees; agents never run `git init` or `git clone`
+
+**Rules enforced by the strategy:**
+- **One branch per worktree.** Two worktrees cannot check out the same branch.
+- **Serialize fetches.** One fetch before spawning a batch of agents — not per-agent. Prevents `.git/index.lock` contention.
+- **No `git stash`.** Stash is shared across worktrees. Agents commit or discard instead.
+- **Worktree naming:** `<repo>-<agent-role>` (e.g., `openspawn-designer`)
+- **Cleanup on deactivation.** When an agent is removed or a sub-agent finishes, `git worktree prune` reclaims its directory.
+
+**Alternative strategies:**
+- `clone-per-agent` — full clone per agent. Higher disk usage but zero contention. Use for large teams or repos with submodules.
+- `shared` — all agents use the same working directory. Only viable for single-writer orgs (one agent writes, others read).
+
+**Why this is in the spec:** The Feb 27 incident happened because a sub-agent was given a repo path and told to "work on the codebase." It did what made sense locally: `git init`. By making workspace setup an org-level concern — defined in ORG.md, executed by the boot sequence — agents never have to figure out repository access on their own.
+
 ---
 
 ### 1.4 Structure
