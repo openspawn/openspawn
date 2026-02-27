@@ -15,9 +15,6 @@ import {
   Layers,
   CheckCircle,
 } from "lucide-react";
-// Tremor disabled — incompatible with React 19 (crashes @headlessui __store)
-// import { TremorCreditArea } from "../components/charts/tremor-credit-area";
-// import { TremorTaskDonut } from "../components/charts/tremor-task-donut";
 import { StaggerContainer, StaggerItem } from "../components/stagger";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";

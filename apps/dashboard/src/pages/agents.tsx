@@ -2,8 +2,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "motion/react";
 import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network, BarChart3 } from "lucide-react";
-// Tremor disabled — incompatible with React 19
-// import { TremorCreditsByAgent, TremorTasksOverTime } from "../components/charts/tremor-agent-metrics";
 import { HoverLiftCard } from "../components/motion-primitives";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
