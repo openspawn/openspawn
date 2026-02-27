@@ -34,6 +34,7 @@ An ORG.md file has five sections, each defined by a top-level heading. All secti
 
 ## Identity
 ## Culture  
+## SDLC
 ## Structure
 ## Policies
 ## Playbooks
@@ -107,7 +108,71 @@ preset: startup
 
 ---
 
-### 1.3 Structure
+### 1.3 SDLC
+
+How the organization develops, ships, and maintains software. Like Culture, this supports presets for common patterns — so every org inherits sane defaults without writing rules from scratch.
+
+```markdown
+## SDLC
+
+preset: standard
+```
+
+**Available presets:**
+
+| Preset | Branch strategy | PRs required | Deploy verification | Orphan branches |
+|--------|----------------|--------------|--------------------|-----------------| 
+| `standard` | Trunk-based, branch off `main` | Yes, targeting `main` | Smoke test required | Forbidden |
+| `strict` | Same as standard + mandatory review, max 500 LOC per PR | Yes, with approval | Full E2E suite | Forbidden |
+| `solo` | Trunk-based, direct push allowed | Optional | Manual spot-check | Forbidden |
+| `research` | Feature branches, long-lived OK | Yes | Optional | Forbidden |
+
+All presets share one invariant: **orphan branches are always forbidden.** Agents will take the path of least resistance — `git init` "works" locally but creates parallel histories that can't merge. The spec prevents this by default.
+
+**Full example with overrides:**
+
+```markdown
+## SDLC
+
+preset: standard
+
+### Source Control
+- **Branch strategy:** trunk-based — always branch off `main`
+- **Branch naming:** `<role>/<feature>` (e.g., `web-eng/auth-flow`)
+- **Orphan branches:** forbidden — never `git init`, never create disconnected history
+- **Direct push to main:** never
+- **Pre-work ritual:** `git fetch origin && git checkout -b <branch> origin/main`
+
+### Pull Requests
+- **Required:** yes — every change, even typo fixes
+- **Target:** `main`
+- **Max size:** 500 lines (soft), 1000 lines (hard)
+- **Naming:** conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- **Scope:** one feature per PR — don't accumulate large batches
+
+### Quality Gates
+- **Pre-merge:** typecheck passes (`tsc --noEmit`), lint clean, tests pass
+- **Post-deploy:** smoke test required (Playwright or equivalent)
+- **Dependency additions:** must be checked for framework compatibility
+
+### Deploy
+- **Pipeline:** PR merge → build → deploy → verify → announce
+- **Verification:** HTTP 200 on primary routes + no client-side JS errors
+- **Communication:** post to #alerts (or equivalent channel) on every deploy
+
+### Incident Response
+- **Flag immediately** in the team channel — don't wait
+- **Document:** what happened, root cause, what changed
+- **Post-mortem:** update SDLC rules if a process gap caused the incident
+```
+
+**Why this matters:** Without explicit SDLC rules, agents default to whatever works locally. A sub-agent that doesn't know the branching strategy will `git init` a fresh repo, accumulate 66 commits on an orphan branch, and create a production incident when someone tries to merge it. SDLC defaults make the wrong thing hard and the right thing obvious.
+
+**Relationship to CONTRIBUTING.md:** If the repo has a `CONTRIBUTING.md`, agents should read it. The SDLC section in ORG.md is the organizational policy; CONTRIBUTING.md is the repo-level implementation. They should align — if they conflict, CONTRIBUTING.md wins for that repo.
+
+---
+
+### 1.4 Structure
 
 The org chart. Departments, roles, and hierarchy — defined as nested markdown.
 
@@ -195,7 +260,7 @@ Owns content, campaigns, and public presence.
 
 ---
 
-### 1.4 Policies
+### 1.5 Policies
 
 Rules that govern how the organization operates. Budget, routing, permissions, and constraints.
 
@@ -239,7 +304,7 @@ If no match is found, task goes to the COO for manual delegation.
 
 ---
 
-### 1.5 Playbooks
+### 1.6 Playbooks
 
 Reusable procedures for common situations. Like runbooks in ops, but for your agent org.
 
