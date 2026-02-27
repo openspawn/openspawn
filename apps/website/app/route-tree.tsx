@@ -82,7 +82,19 @@ const softwareApplicationSchema = {
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Linux, macOS, Windows",
   description:
-    "Multi-agent orchestration platform. Define AI agent organizations in a markdown file, deploy with npx openspawn init.",
+    "OpenSpawn is a multi-agent orchestration platform. Graduate from sub-agents: define persistent AI agent organizations in a single markdown file (ORG.md), deploy with `npx openspawn init my-org`. Includes 10-level agent hierarchy, budget control, A2A protocol, MCP tools server, and live dashboard.",
+  featureList: [
+    "Persistent agents with continuous memory",
+    "10-level agent hierarchy with delegation and escalation",
+    "Per-agent budget control and cost tracking",
+    "ORG.md — organization as code in markdown",
+    "A2A Protocol — Agent-to-Agent coordination",
+    "MCP Tools Server — 7 tools for Claude Desktop / Cursor",
+    "Real-time live dashboard",
+    "Device and node orchestration via OpenClaw",
+    "Model router — local-first with Ollama, cloud fallback",
+    "MIT open source",
+  ],
   offers: {
     "@type": "Offer",
     price: "0.00",
@@ -95,6 +107,9 @@ const softwareApplicationSchema = {
     "@type": "Organization",
     name: "OpenSpawn",
   },
+  sameAs: ["https://github.com/openspawn/openspawn"],
+  installUrl: `${BASE_URL}/getting-started`,
+  releaseNotes: `${BASE_URL}/docs`,
 };
 
 const gettingStartedHowToSchema = {
@@ -219,10 +234,11 @@ const indexRoute = createRoute({
   component: LandingPage,
   meta: () =>
     buildMeta({
-      title: "OpenSpawn — Multi-Agent Orchestration Platform",
+      title: "OpenSpawn — Graduate from Sub-Agents to a Full AI Agent Org",
       description:
-        "Build and run organizations of AI agents that control real devices, phones, and IoT. Open source, TypeScript-first, zero config. npx openspawn init my-org.",
+        "OpenSpawn gives AI agents persistence, hierarchy, and budget control. Define your agent org in ORG.md, boot with npx openspawn init, and graduate from sub-agents. Open source, MIT licensed.",
       path: "/",
+      ogTitle: "OpenSpawn — Graduate from Sub-Agents",
       schemaLd: softwareApplicationSchema,
     }),
 });
