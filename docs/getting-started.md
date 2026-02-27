@@ -4,9 +4,12 @@ audience: developers, AI agents
 prerequisites: Node.js 18+
 time_estimate: 10 minutes
 difficulty: beginner
+related: [agent-quickstart.md, templates-guide.md, org-md-reference.md, mcp-reference.md, FAQ.md, troubleshooting.md]
 ---
 
 # Getting Started with OpenSpawn
+
+**What you'll learn:** How to install OpenSpawn, scaffold an org from a template, understand ORG.md structure, validate and generate configs, preview the dashboard, and connect real AI models.
 
 **What you'll have in ~10 minutes:** a local org of AI agents, coordinated by a markdown file, visible in a real-time dashboard — with tasks flowing through a hierarchy you define.
 
@@ -279,10 +282,15 @@ Edit `openspawn.config.json`:
 
 ---
 
-## What's next?
+## Next steps
 
 - **Full CLI reference:** `openspawn --help`
-- **All MCP tools:** See `docs/llms.txt`
-- **Templates deep dive:** See `docs/templates-guide.md`
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — every tool with parameters
+- **Templates deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 4 templates
+- **ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md) — every field and example
+- **Communication protocol:** [`docs/communication-protocol.md`](./communication-protocol.md) — save tokens with efficient agent communication
+- **Top 20 FAQ:** [`docs/FAQ.md`](./FAQ.md)
+- **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md)
+- **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — agent-first version of this guide
 - **Live demo:** https://bikinibottom.ai/app/ (22 agents, 5 departments)
 - **ORG.md spec:** https://bikinibottom.ai/org-md

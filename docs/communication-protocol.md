@@ -1,5 +1,9 @@
 # OpenSpawn Communication Protocol v1
 
+**What you'll learn:** The 4 message types agents use to communicate, decision trees for when to send (and when not to), the 3-turn rule, shared file conventions, and anti-patterns that waste tokens.
+
+> **TL;DR:** Every message costs money. Silence = success. Write files instead of sending messages. Only push urgent things. There are exactly 4 message types: TASK, RESULT, ESCALATION, DECISION. No ACKs. No courtesy messages.
+
 > Every message costs money. This protocol eliminates the 40-60% of tokens agents waste on coordination overhead.
 
 ---
@@ -312,3 +316,12 @@ A: Update their SOUL.md to include the protocol rules. If they persist, it's a m
 
 **Q: Can I modify this protocol for my org?**
 A: Yes, but keep the core invariants: no ACKs, files over chat, 3-turn limit, deterministic routing. These are the rules that actually move the needle on token waste.
+
+---
+
+## Next steps
+
+- **MCP tools for messaging:** [`docs/mcp-reference.md`](./mcp-reference.md) — `message_send`, `message_read`, `escalation_create` and more
+- **Org structure (routing):** [`docs/org-md-reference.md`](./org-md-reference.md) — define who handles what in ORG.md
+- **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — see protocol in practice
+- **Common errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — fix escalation and messaging issues

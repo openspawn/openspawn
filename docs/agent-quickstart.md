@@ -4,9 +4,12 @@ audience: AI agents (LLMs) that need to coordinate other agents
 prerequisites: Node.js 18+, npm
 time_estimate: 10 minutes
 commands_used: [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
+related: [llms.txt, mcp-reference.md, communication-protocol.md, FAQ.md, troubleshooting.md]
 ---
 
 # Agent Quickstart
+
+**What you'll learn:** How to go from zero to a running multi-agent org in 3 commands — templates, ORG.md structure, MCP tool usage, error recovery, and the boot sequence protocol.
 
 You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file.
 
@@ -345,7 +348,12 @@ See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md`
 
 ## Next steps
 
-- Customize your ORG.md: add agents, change levels, write playbooks
-- Connect real models: set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
-- Read the full reference: `docs/llms.txt`
-- See the live demo: https://bikinibottom.ai/app/
+- **Customize your ORG.md:** add agents, change levels, write playbooks — see [`docs/org-md-reference.md`](./org-md-reference.md)
+- **Connect real models:** set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — full parameter reference
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — save 50-70% on coordination tokens
+- **Template deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 4 templates
+- **Top 20 FAQ:** [`docs/FAQ.md`](./FAQ.md) — common questions answered
+- **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — common issues and fixes
+- **Full reference:** [`docs/llms.txt`](./llms.txt)
+- **Live demo:** https://bikinibottom.ai/app/
