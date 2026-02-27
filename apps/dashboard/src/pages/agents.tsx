@@ -2,7 +2,8 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "motion/react";
 import { Bot, MoreVertical, Plus, Coins, Edit, Eye, Ban, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network, BarChart3 } from "lucide-react";
-import { TremorCreditsByAgent, TremorTasksOverTime } from "../components/charts/tremor-agent-metrics";
+// Tremor disabled — incompatible with React 19
+// import { TremorCreditsByAgent, TremorTasksOverTime } from "../components/charts/tremor-agent-metrics";
 import { HoverLiftCard } from "../components/motion-primitives";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -762,8 +763,8 @@ function AgentMetricsTab() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <TremorTasksOverTime data={tasksOverTime} />
-      <TremorCreditsByAgent data={creditsByAgent} />
+      <div className="p-4 text-sm text-muted-foreground rounded-lg border">Charts temporarily disabled</div>
+      <div className="p-4 text-sm text-muted-foreground rounded-lg border">Charts temporarily disabled</div>
     </div>
   );
 }
