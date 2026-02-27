@@ -2,9 +2,14 @@
 purpose: Choose and customize OpenSpawn org templates
 audience: developers, AI agents
 prerequisites: openspawn CLI installed
+related: [getting-started.md, org-md-reference.md, agent-quickstart.md]
 ---
 
 # Templates Guide
+
+**What you'll learn:** The four OpenSpawn org templates — what they include, when to use each, how to customize them, and how to combine roles from multiple templates.
+
+> **Quick answer:** Use `assistant-team` if you're not sure. It's the most flexible starting point. All templates are just starting points — edit the generated `ORG.md` freely.
 
 OpenSpawn ships four org templates. Each produces a complete, ready-to-run ORG.md with roles, hierarchy, culture, policies, and playbooks.
 
@@ -265,3 +270,13 @@ Or override individual settings after the preset.
 | `Agent reports to unknown agent` | Check `Reports to` matches an existing agent name exactly |
 | `Validation failed after customization` | Run `openspawn validate` and fix each listed issue |
 | `Circular reporting chain` | No agent can report to itself or create a loop. Check hierarchy. |
+
+---
+
+## Next steps
+
+- **Full ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md) — every field and example
+- **MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — how agents interact with the org
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — how agents talk to each other
+- **Troubleshooting:** [`docs/troubleshooting.md`](./troubleshooting.md) — fix common errors
+- **Live demo:** https://bikinibottom.ai/app/
