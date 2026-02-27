@@ -14,8 +14,11 @@ const ALL_ROUTES = [
   },
   { path: "/docs/protocols/a2a", expectedHeading: /a2a/i },
   { path: "/docs/protocols/mcp", expectedHeading: /mcp/i },
+  { path: "/docs/protocols/mcp-reference", expectedHeading: /mcp tools/i },
   { path: "/docs/features/dashboard", expectedHeading: /dashboard/i },
   { path: "/docs/features/model-router", expectedHeading: /model router/i },
+  { path: "/docs/reference/org-md-reference", expectedHeading: /org\.md reference/i },
+  { path: "/docs/comparison", expectedHeading: /vs crewai vs langgraph/i },
 ];
 
 test.describe("Route tree — every route renders", () => {

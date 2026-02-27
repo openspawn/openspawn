@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 
 const sidebar = [
+  { label: "⚡ Quick Start (5 min)", to: "/getting-started" },
   { label: "Overview", to: "/docs" },
   { label: "Getting Started", to: "/docs/getting-started" },
   { label: "How It Works", to: "/docs/how-it-works" },
@@ -30,6 +31,7 @@ const sidebar = [
     children: [
       { label: "A2A Protocol", to: "/docs/protocols/a2a" },
       { label: "MCP Tools", to: "/docs/protocols/mcp" },
+      { label: "MCP Reference", to: "/docs/protocols/mcp-reference" },
     ],
   },
   {
@@ -39,6 +41,21 @@ const sidebar = [
       { label: "Model Router", to: "/docs/features/model-router" },
     ],
   },
+  {
+    label: "Agent Guide",
+    children: [
+      { label: "Agent Quickstart", to: "/docs/agent-quickstart" },
+      { label: "Templates Guide", to: "/docs/templates" },
+      { label: "Communication Protocol", to: "/docs/communication-protocol" },
+    ],
+  },
+  {
+    label: "Reference",
+    children: [
+      { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
+    ],
+  },
+  { label: "Comparison", to: "/docs/comparison" },
 ];
 
 // Flat ordered list for prev/next navigation
@@ -53,8 +70,14 @@ const flatPages = [
   { label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" },
   { label: "A2A Protocol", to: "/docs/protocols/a2a" },
   { label: "MCP Tools", to: "/docs/protocols/mcp" },
+  { label: "MCP Reference", to: "/docs/protocols/mcp-reference" },
   { label: "Dashboard", to: "/docs/features/dashboard" },
   { label: "Model Router", to: "/docs/features/model-router" },
+  { label: "Agent Quickstart", to: "/docs/agent-quickstart" },
+  { label: "Templates Guide", to: "/docs/templates" },
+  { label: "Communication Protocol", to: "/docs/communication-protocol" },
+  { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
+  { label: "Comparison", to: "/docs/comparison" },
 ];
 
 export function DocsLayout({ children }: { children: ReactNode }) {

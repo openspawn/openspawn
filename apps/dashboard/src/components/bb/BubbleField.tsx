@@ -1,9 +1,11 @@
 /**
  * BubbleField — organic floating bubble particles for underwater atmosphere.
- * POLISH PASS: Varied drift directions, sizes, speeds, opacities, border widths.
- * Uses bb-bubble-float, bb-bubble-drift-left, bb-bubble-drift-right keyframes.
+ * Uses bb-bubble-float keyframe with CSS custom properties for drift variation.
+ * IntersectionObserver pauses animation when off-screen.
  * CSS animations only — no motion/react.
  */
+
+import { useEffect, useRef, useState } from 'react';
 
 interface BubbleFieldProps {
   count?: number;
@@ -24,6 +26,20 @@ interface BubbleDef {
 }
 
 export function BubbleField({ count = 18, className = '' }: BubbleFieldProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Deterministic bubbles via prime-based seed — stable across renders
   const bubbles: BubbleDef[] = Array.from({ length: count }, (_, i) => {
     const seed = i * 7919 + 31;  // prime-based, offset to avoid i=0 edge
@@ -52,17 +68,21 @@ export function BubbleField({ count = 18, className = '' }: BubbleFieldProps) {
   });
 
   const getAnimation = (b: BubbleDef) => {
-    const name =
-      b.drift === 'left'  ? 'bb-bubble-drift-left' :
-      b.drift === 'right' ? 'bb-bubble-drift-right' :
-      'bb-bubble-float';
-    return `${name} ${b.duration}s ease-in-out ${b.delay}s infinite`;
+    return `bb-bubble-float ${b.duration}s ease-in-out ${b.delay}s infinite`;
+  };
+
+  const getDriftVars = (b: BubbleDef): React.CSSProperties => {
+    if (b.drift === 'left') return { '--bb-drift-x1': '0px', '--bb-drift-x2': '-12px', '--bb-drift-x3': '4px' } as React.CSSProperties;
+    if (b.drift === 'right') return { '--bb-drift-x1': '0px', '--bb-drift-x2': '10px', '--bb-drift-x3': '-2px' } as React.CSSProperties;
+    return { '--bb-drift-x1': '0px', '--bb-drift-x2': '8px', '--bb-drift-x3': '-4px' } as React.CSSProperties;
   };
 
   return (
     <div
+      ref={containerRef}
       className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}
       aria-hidden="true"
+      style={{ animationPlayState: isVisible ? 'running' : 'paused' }}
     >
       {bubbles.map(b => (
         <div
@@ -74,7 +94,6 @@ export function BubbleField({ count = 18, className = '' }: BubbleFieldProps) {
             left:    `${b.left}%`,
             bottom:  `${b.bottom}%`,
             opacity: b.opacity,
-            // Glass-like bubble with internal highlight
             background: `radial-gradient(
               circle at ${b.shine}% ${b.shine}%,
               rgba(232, 248, 255, 0.7) 0%,
@@ -86,6 +105,8 @@ export function BubbleField({ count = 18, className = '' }: BubbleFieldProps) {
               ? `inset 0 -2px 4px rgba(74,174,217,0.2), 0 0 ${Math.round(b.size * 0.5)}px rgba(74,174,217,0.1)`
               : undefined,
             animation: getAnimation(b),
+            animationPlayState: isVisible ? 'running' : 'paused',
+            ...getDriftVars(b),
           }}
         />
       ))}

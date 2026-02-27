@@ -58,3 +58,4 @@ __pycache__/
 
 # Production secrets
 .env.production
+node_modules

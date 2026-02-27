@@ -1,59 +1,38 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from '@tanstack/react-router';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { IntroCard } from '../components/live/intro-card';
 import { OrgChartLive, type AgentNodeState, type EdgeAnimation } from '../components/live/org-chart-live';
 import { MobileOrgChart } from '../components/live/MobileOrgChart';
 import { LiveFeed, type FeedMessage } from '../components/live/live-feed';
 import { StatsBar } from '../components/live/stats-bar';
 import { OpenSpawnBadge } from '../components/live/OpenSpawnBadge';
-import { TIMELINE, ACTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
+import { TIMELINE, ACTS, AGENTS, type Stats, type ReplayEvent, type SpawnedAgent } from '../components/live/replay-data';
+import { getActiveAnnotation, type Annotation } from '../components/live/live-view-annotations';
+import { AgentControlPanel, TaskControlBar, AgentContextMenu, AGENT_DEPARTMENTS, type AgentControlState, type AgentControlStatus, type Department } from '../components/controls';
+import { agentUpdateStatus, agentFire, agentRegister, escalate, eventList, taskList, McpError } from '../services/mcp-client';
+import { useMcpOrgStatus } from '../hooks/use-mcp';
+import '../components/controls/control-animations.css';
 
 // ── Variable tick timing ──────────────────────────────────────────────────────
-//
-// Dramatic pauses fire BEFORE the specified tick (pre-event delay).
-// Act timings:
-//   Act I   (0–10):   400ms — brisk
-//   Act II  (11–40):  500ms — steady; spawn burst (19–26) = 300ms
-//   Act III (41–90):  rising 450 → crisis 350 → dead-stop 600
-//   Act IV  (91–120): 600ms — breathing room
-//   Act V   (121–150):500ms
 
 const PRE_PAUSE_TICKS: Record<number, number> = {
-  1:   1000,   // Before Plankton's mega-order
-  13:  900,    // Before SpongeBob's first escalation
-  56:  800,    // Before Squidward overwhelmed
-  70:  800,    // Before escalation to Mr. Krabs 🚨
-  92:  900,    // Before Mr. Krabs's decision
-  138: 1500,   // Before final completion
+  1:   1000,
+  13:  900,
+  56:  800,
+  70:  800,
+  92:  900,
+  138: 1500,
 };
 
 function getTickDelay(nextTick: number): number {
-  // Dramatic pre-event pauses override everything
   if (PRE_PAUSE_TICKS[nextTick] !== undefined) return PRE_PAUSE_TICKS[nextTick];
-
-  // Act I: brisk setup (0–10)
   if (nextTick <= 10) return 400;
-
-  // Spawn burst: rapid-fire (19–26)
   if (nextTick >= 19 && nextTick <= 26) return 300;
-
-  // Act II: steady cooking (11–40)
   if (nextTick <= 40) return 500;
-
-  // Act III rising tension (41–55)
   if (nextTick <= 55) return 450;
-
-  // Act III crisis peak (56–75): frantic
   if (nextTick <= 75) return 350;
-
-  // Act III dead stop (76–90): uncomfortable silence
   if (nextTick <= 90) return 600;
-
-  // Act IV resolution (91–120): breathing room
   if (nextTick <= 120) return 600;
-
-  // Act V victory (121–150)
   return 500;
 }
 
@@ -95,7 +74,6 @@ function useReplay() {
     setFinished(false);
   }, []);
 
-  // Process events for a given tick
   const processEvents = useCallback((currentTick: number) => {
     const events = TIMELINE.filter((e: ReplayEvent) => e.tick === currentTick);
     let changed = false;
@@ -179,7 +157,6 @@ function useReplay() {
             },
           ];
 
-          // Edge animations for delegation/escalation/reassign
           if ((event.type === 'delegation' || event.type === 'reassign') && d.from && d.to) {
             edgeAnimsRef.current = [
               ...edgeAnimsRef.current,
@@ -202,7 +179,6 @@ function useReplay() {
         }
       }
 
-      // Update Squidward's queue badge
       if (statsRef.current.queueSize > 0) {
         nodeStatesRef.current = {
           ...nodeStatesRef.current,
@@ -214,7 +190,6 @@ function useReplay() {
       }
     }
 
-    // Clean up old edge animations (>2s old)
     const now = Date.now();
     const before = edgeAnimsRef.current.length;
     edgeAnimsRef.current = edgeAnimsRef.current.filter(a => now - a.timestamp < 2000);
@@ -223,36 +198,26 @@ function useReplay() {
     if (changed) forceUpdate(n => n + 1);
   }, []);
 
-  // Variable-speed tick engine using setTimeout (instead of flat setInterval)
   useEffect(() => {
     if (!running) return;
     if (tick < 0) return;
-
     const nextTick = tick + 1;
     if (nextTick > 150) {
       setRunning(false);
       setFinished(true);
       return;
     }
-
     const delay = getTickDelay(nextTick);
-    const timer = setTimeout(() => {
-      setTick(nextTick);
-    }, delay);
-
+    const timer = setTimeout(() => setTick(nextTick), delay);
     return () => clearTimeout(timer);
   }, [tick, running]);
 
-  // Process events when tick changes
   useEffect(() => {
     if (tick >= 0) processEvents(tick);
   }, [tick, processEvents]);
 
   return {
-    tick,
-    running,
-    finished,
-    start,
+    tick, running, finished, start,
     act: ACTS[actRef.current] || ACTS[0],
     stats: statsRef.current,
     nodeStates: nodeStatesRef.current,
@@ -267,9 +232,8 @@ function useReplay() {
 
 // ── Progress Bar ─────────────────────────────────────────────────────────────
 
-function ProgressHeader({ act, tick, pattiesDelivered }: { act: typeof ACTS[0]; tick: number; pattiesDelivered: number }) {
+function ProgressHeader({ act, pattiesDelivered }: { act: typeof ACTS[0]; pattiesDelivered: number }) {
   const pct = Math.min(100, (pattiesDelivered / 10000) * 100);
-
   return (
     <div className="shrink-0 space-y-2 px-4 py-3 border-b" style={{ background: 'rgba(6,42,69,0.9)', borderColor: 'rgba(74,174,217,0.2)', backdropFilter: 'blur(8px)' }}>
       <div className="flex items-center justify-between">
@@ -297,7 +261,7 @@ function ProgressHeader({ act, tick, pattiesDelivered }: { act: typeof ACTS[0]; 
   );
 }
 
-// ── Act Banner CSS animations ─────────────────────────────────────────────────
+// ── Act Banner CSS ───────────────────────────────────────────────────────────
 const ACT_BANNER_STYLES = `
   @keyframes act-overlay-in {
     from { opacity: 0; backdrop-filter: blur(0px); }
@@ -308,10 +272,10 @@ const ACT_BANNER_STYLES = `
     to   { opacity: 1; transform: translateY(0); letter-spacing: 0.3em; }
   }
   @keyframes act-title-stamp {
-    0%   { opacity: 0; transform: scale(1.18) translateY(-6px); letter-spacing: 0.05em; filter: blur(6px); }
-    60%  { opacity: 1; transform: scale(0.98) translateY(1px); letter-spacing: -0.03em; filter: blur(0); }
+    0%   { opacity: 0; transform: scale(1.18) translateY(-6px); filter: blur(6px); }
+    60%  { opacity: 1; transform: scale(0.98) translateY(1px); filter: blur(0); }
     80%  { transform: scale(1.01); }
-    100% { opacity: 1; transform: scale(1); letter-spacing: -0.01em; }
+    100% { opacity: 1; transform: scale(1); }
   }
   @keyframes act-narrative-in {
     from { opacity: 0; transform: translateY(10px); }
@@ -321,13 +285,12 @@ const ACT_BANNER_STYLES = `
     from { width: 0; opacity: 0; }
     to   { width: 80px; opacity: 1; }
   }
-  @keyframes act-overlay-out {
-    from { opacity: 1; }
-    to   { opacity: 0; }
+  @keyframes annotation-slide-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-
   @media (prefers-reduced-motion: reduce) {
-    .act-overlay, .act-label, .act-title, .act-narrative, .act-line {
+    .act-overlay, .act-label, .act-title, .act-narrative, .act-line, .annotation-bubble {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
@@ -336,12 +299,9 @@ const ACT_BANNER_STYLES = `
   }
 `;
 
-// ── Act Banner (CSS-only, no motion/react) ───────────────────────────────────
-
 function ActBanner({ banner }: { banner: { num: number; name: string; narrative: string } | null }) {
   const [visible, setVisible] = useState(false);
   const [content, setContent] = useState<typeof banner>(null);
-  // Key increments each time a new banner appears → forces re-mount → re-triggers animations
   const [animKey, setAnimKey] = useState(0);
 
   useEffect(() => {
@@ -369,79 +329,79 @@ function ActBanner({ banner }: { banner: { num: number; name: string; narrative:
           animation: visible ? 'act-overlay-in 0.4s ease forwards' : undefined,
         }}
       >
-        {/* Decorative top line */}
         <div
           key={`line-top-${animKey}`}
           className="act-line h-px mb-6"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.6), transparent)',
-            animation: 'act-line-expand 0.5s 0.1s ease forwards',
-            width: 0,
-            opacity: 0,
-          }}
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.6), transparent)', animation: 'act-line-expand 0.5s 0.1s ease forwards', width: 0, opacity: 0 }}
         />
-
-        {/* Act number label */}
         <div
           key={`label-${animKey}`}
           className="act-label text-xs font-bold uppercase mb-2"
-          style={{
-            color: 'rgba(244,197,66,0.7)',
-            fontFamily: 'Nunito, sans-serif',
-            animation: 'act-label-rise 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) forwards',
-            opacity: 0,
-            letterSpacing: '0.3em',
-          }}
+          style={{ color: 'rgba(244,197,66,0.7)', fontFamily: 'Nunito, sans-serif', animation: 'act-label-rise 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) forwards', opacity: 0, letterSpacing: '0.3em' }}
         >
           ── Act {content.num} ──
         </div>
-
-        {/* Title — cinematic stamp */}
         <div
           key={`title-${animKey}`}
           className="act-title text-2xl md:text-4xl font-black tracking-tight mb-3"
-          style={{
-            color: '#F4C542',
-            fontFamily: '"Baloo 2", cursive',
-            textShadow: '0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2)',
-            animation: 'act-title-stamp 0.55s 0.12s cubic-bezier(0.34,1.56,0.64,1) forwards',
-            opacity: 0,
-          }}
+          style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive', textShadow: '0 0 40px rgba(244,197,66,0.5)', animation: 'act-title-stamp 0.55s 0.12s cubic-bezier(0.34,1.56,0.64,1) forwards', opacity: 0 }}
         >
           {content.name.replace(/^Act \w+: /, '')}
         </div>
-
-        {/* Narrative */}
         <div
           key={`narrative-${animKey}`}
           className="act-narrative text-sm max-w-sm text-center px-6"
-          style={{
-            color: 'rgba(184,228,247,0.55)',
-            fontFamily: 'Nunito, sans-serif',
-            animation: 'act-narrative-in 0.5s 0.3s ease forwards',
-            opacity: 0,
-          }}
+          style={{ color: 'rgba(184,228,247,0.55)', fontFamily: 'Nunito, sans-serif', animation: 'act-narrative-in 0.5s 0.3s ease forwards', opacity: 0 }}
         >
           {content.narrative}
         </div>
-
-        {/* Decorative bottom line */}
         <div
           key={`line-bot-${animKey}`}
           className="act-line h-px mt-6"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.4), transparent)',
-            animation: 'act-line-expand 0.5s 0.2s ease forwards',
-            width: 0,
-            opacity: 0,
-          }}
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(244,197,66,0.4), transparent)', animation: 'act-line-expand 0.5s 0.2s ease forwards', width: 0, opacity: 0 }}
         />
       </div>
     </>
   );
 }
 
-// ── Completion Overlay (CSS-only) ────────────────────────────────────────────
+// ── Annotation Bubble ────────────────────────────────────────────────────────
+
+function AnnotationBubble({ annotation }: { annotation: Annotation | null }) {
+  if (!annotation) return null;
+  return (
+    <div
+      key={annotation.id}
+      className="annotation-bubble absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-20 rounded-xl px-4 py-3"
+      style={{
+        background: 'rgba(6,42,69,0.95)',
+        border: `1px solid ${annotation.color}40`,
+        boxShadow: `0 0 20px ${annotation.color}20`,
+        backdropFilter: 'blur(8px)',
+        animation: 'annotation-slide-in 0.3s ease forwards',
+      }}
+    >
+      <div className="flex items-start gap-2">
+        <span className="text-lg shrink-0">{annotation.icon}</span>
+        <p
+          className="text-xs leading-relaxed"
+          style={{ color: 'rgba(184,228,247,0.8)', fontFamily: 'Nunito, sans-serif' }}
+        >
+          {annotation.text}
+        </p>
+      </div>
+      <div
+        className="mt-2 flex items-center gap-1.5"
+      >
+        <span className="text-[10px]" style={{ color: 'rgba(74,174,217,0.4)', fontFamily: 'Nunito, sans-serif' }}>
+          🪸 OpenSpawn feature
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ── Completion Overlay ───────────────────────────────────────────────────────
 
 const COMPLETION_STYLES = `
   @keyframes completion-stamp {
@@ -454,142 +414,240 @@ const COMPLETION_STYLES = `
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes completion-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
   @keyframes completion-glow-pulse {
     0%, 100% { text-shadow: 0 0 40px rgba(244,197,66,0.5), 0 0 80px rgba(244,197,66,0.2); }
     50%       { text-shadow: 0 0 60px rgba(244,197,66,0.8), 0 0 120px rgba(244,197,66,0.35); }
   }
+  @keyframes completion-stat-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .completion-stamp, .completion-subtitle, .completion-glow { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+    .completion-stamp, .completion-subtitle, .completion-glow, .completion-stat {
+      animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important;
+    }
   }
 `;
 
-function CompletionOverlay({ finished, onReplay }: { finished: boolean; onReplay: () => void }) {
+interface CompletionProps {
+  finished: boolean;
+  onReplay: () => void;
+  stats: Stats;
+  messageCount: number;
+  spawnedCount: number;
+}
+
+function CompletionOverlay({ finished, onReplay, stats, messageCount, spawnedCount }: CompletionProps) {
+  // Count escalations from messages
+  const escalationCount = 2; // known from timeline: tick 13 & tick 70
+
   return (
     <>
       <style>{COMPLETION_STYLES}</style>
       <div
-        className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm"
+        className="absolute inset-0 z-30 flex items-center justify-center backdrop-blur-sm overflow-y-auto"
         style={{
-          background: 'rgba(3,14,26,0.92)',
+          background: 'rgba(3,14,26,0.94)',
           opacity: finished ? 1 : 0,
           pointerEvents: finished ? 'auto' : 'none',
           transition: 'opacity 0.5s ease',
         }}
       >
-      <div className="text-center max-w-lg px-8">
-        {/* Stamp entrance for the big number */}
-        <div
-          className="completion-stamp text-6xl md:text-7xl font-black mb-2"
-          style={{
-            fontFamily: '"Baloo 2", cursive',
-            color: '#F4C542',
-            animation: finished ? 'completion-stamp 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards, completion-glow-pulse 3s 1s ease-in-out infinite' : 'none',
-            opacity: finished ? undefined : 0,
-          }}
-        >
-          🍔 10,000
-        </div>
-        <div
-          className="completion-subtitle text-lg font-semibold mb-6"
-          style={{
-            color: '#4AE88A',
-            fontFamily: '"Baloo 2", cursive',
-            animation: finished ? 'completion-subtitle 0.6s 0.35s ease forwards' : 'none',
-            opacity: finished ? undefined : 0,
-          }}
-        >
-          🎉 PATTIES DELIVERED! 🎉
-        </div>
-        <p className="text-lg mb-8" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
-          22 agents. 5 departments. One{' '}
-          <code
-            className="px-1.5 py-0.5 rounded text-sm"
-            style={{ color: '#F4C542', background: 'rgba(244,197,66,0.1)' }}
-          >
-            ORG.md
-          </code>
-          .
-        </p>
-
-        {/* Navigation buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
-          <Link
-            to="/"
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
+        <div className="text-center max-w-lg px-6 py-8">
+          {/* Big number */}
+          <div
+            className="completion-stamp text-5xl md:text-7xl font-black mb-2"
             style={{
-              background: 'rgba(244,197,66,0.15)',
-              border: '1px solid rgba(244,197,66,0.4)',
+              fontFamily: '"Baloo 2", cursive',
               color: '#F4C542',
-              fontFamily: 'Nunito, sans-serif',
+              animation: finished ? 'completion-stamp 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards, completion-glow-pulse 3s 1s ease-in-out infinite' : 'none',
+              opacity: finished ? undefined : 0,
             }}
           >
-            Explore the Dashboard <ArrowRight className="w-4 h-4" />
-          </Link>
-          <a
-            href="/org-md"
-            target="_blank"
-            rel="noopener"
-            className="px-6 py-3 rounded-xl font-medium transition-all"
+            🍔 10,000
+          </div>
+          <div
+            className="completion-subtitle text-lg font-semibold mb-8"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(184,228,247,0.6)',
-              fontFamily: 'Nunito, sans-serif',
+              color: '#4AE88A',
+              fontFamily: '"Baloo 2", cursive',
+              animation: finished ? 'completion-subtitle 0.6s 0.35s ease forwards' : 'none',
+              opacity: finished ? undefined : 0,
             }}
           >
-            See the ORG.md →
-          </a>
+            🎉 PATTIES DELIVERED! 🎉
+          </div>
+
+          {/* Summary stats grid */}
+          <div
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 completion-stat"
+            style={{
+              animation: finished ? 'completion-stat-in 0.5s 0.6s ease forwards' : 'none',
+              opacity: finished ? undefined : 0,
+            }}
+          >
+            {[
+              { label: 'Agents Used', value: `${22 + spawnedCount}`, icon: '🤖' },
+              { label: 'Messages', value: `${messageCount}`, icon: '💬' },
+              { label: 'Escalations', value: `${escalationCount}`, icon: '🚨' },
+              { label: 'Revenue', value: `${stats.revenue.toLocaleString()} cr`, icon: '💰' },
+            ].map(s => (
+              <div
+                key={s.label}
+                className="rounded-xl p-3"
+                style={{
+                  background: 'rgba(6,42,69,0.7)',
+                  border: '1px solid rgba(74,174,217,0.15)',
+                }}
+              >
+                <div className="text-lg mb-1">{s.icon}</div>
+                <div className="text-lg font-bold" style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}>
+                  {s.value}
+                </div>
+                <div className="text-[10px]" style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Value proposition */}
+          <div
+            className="completion-stat rounded-2xl p-6 mb-6 text-center"
+            style={{
+              background: 'rgba(6,42,69,0.8)',
+              border: '1px solid rgba(74,174,217,0.3)',
+              animation: finished ? 'completion-stat-in 0.5s 0.8s ease forwards' : 'none',
+              opacity: finished ? undefined : 0,
+            }}
+          >
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="text-2xl">🪸</span>
+              <span className="text-lg font-black" style={{ color: '#4AAED9', fontFamily: '"Baloo 2", cursive' }}>
+                OpenSpawn
+              </span>
+            </div>
+            <p className="text-base font-semibold mb-2" style={{ color: '#B8E4F7', fontFamily: 'Nunito, sans-serif' }}>
+              This is what OpenSpawn does.
+            </p>
+            <p className="text-sm mb-1" style={{ color: 'rgba(184,228,247,0.55)', fontFamily: 'Nunito, sans-serif' }}>
+              Graduate from sub-agents.
+            </p>
+            <p className="text-sm mb-5" style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}>
+              Persistent agents · Org hierarchy · Cross-department comms · Auto-escalation
+            </p>
+            <a
+              href="https://openspawn.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm"
+              style={{
+                background: 'linear-gradient(135deg, #4AAED9 0%, #1A7DB5 100%)',
+                color: '#fff',
+                fontFamily: 'Nunito, sans-serif',
+                textDecoration: 'none',
+              }}
+            >
+              Try it → npx openspawn start <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          {/* Replay */}
           <button
             onClick={onReplay}
-            className="px-6 py-3 font-medium transition-all cursor-pointer"
+            className="px-6 py-3 font-medium cursor-pointer"
             style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'Nunito, sans-serif', background: 'none', border: 'none' }}
           >
             Replay ↻
           </button>
         </div>
+      </div>
+    </>
+  );
+}
 
-        {/* OpenSpawn CTA block — upgraded from tiny footnote */}
-        <div
-          className="rounded-2xl p-6 text-left"
+// ── Mobile Tab Bar ───────────────────────────────────────────────────────────
+
+type MobileTab = 'org' | 'feed' | 'stats';
+
+function MobileTabBar({ active, onChange }: { active: MobileTab; onChange: (t: MobileTab) => void }) {
+  const tabs: { id: MobileTab; label: string; icon: string }[] = [
+    { id: 'org', label: 'Org Chart', icon: '🏢' },
+    { id: 'feed', label: 'Live Feed', icon: '💬' },
+    { id: 'stats', label: 'Stats', icon: '📊' },
+  ];
+
+  return (
+    <div
+      className="flex md:hidden shrink-0"
+      style={{
+        background: 'rgba(6,42,69,0.95)',
+        borderBottom: '1px solid rgba(74,174,217,0.15)',
+      }}
+    >
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold border-none cursor-pointer"
           style={{
-            background: 'rgba(6,42,69,0.8)',
-            border: '1px solid rgba(74,174,217,0.3)',
+            background: active === tab.id ? 'rgba(74,174,217,0.1)' : 'transparent',
+            borderBottom: active === tab.id ? '2px solid #4AAED9' : '2px solid transparent',
+            color: active === tab.id ? '#4AAED9' : 'rgba(184,228,247,0.4)',
+            fontFamily: 'Nunito, sans-serif',
+            transition: 'color 0.2s, background 0.2s',
           }}
         >
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">🪸</span>
-            <span className="text-lg font-black" style={{ color: '#4AAED9', fontFamily: '"Baloo 2", cursive' }}>
-              OpenSpawn
-            </span>
-          </div>
-          <p className="text-sm mb-1" style={{ color: '#B8E4F7', fontFamily: 'Nunito, sans-serif' }}>
-            This entire operation ran on OpenSpawn.
-          </p>
-          <p className="text-sm mb-4" style={{ color: 'rgba(184,228,247,0.6)', fontFamily: 'Nunito, sans-serif' }}>
-            22 AI agents. 5 departments. One ORG.md file. No engineers babysitting the process.
-          </p>
-          <a
-            href="https://openspawn.ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all"
+          <span>{tab.icon}</span>
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Mobile Stats Panel (full-screen view) ────────────────────────────────────
+
+function MobileStatsPanel({ stats }: { stats: Stats }) {
+  const items = [
+    { icon: '🔥', label: 'Kitchen Rate', value: `${stats.kitchenRate}/tick`, color: '#F4C542' },
+    { icon: '📦', label: 'Queue', value: stats.queueSize.toLocaleString(), color: stats.queueSize > 2000 ? '#FF4757' : stats.queueSize > 1000 ? '#F4C542' : '#4AE88A' },
+    { icon: '🚚', label: 'Delivery Rate', value: `${stats.deliveryRate}/tick`, color: '#4AE88A' },
+    { icon: '💰', label: 'Revenue', value: `${stats.revenue.toLocaleString()} cr`, color: '#F4C542' },
+    { icon: '📊', label: 'Margin', value: `${stats.margin.toFixed(1)}%`, color: '#B8E4F7' },
+    { icon: '🦀', label: 'Budget Used', value: `${stats.budgetUsed}%`, color: stats.budgetUsed > 85 ? '#FF4757' : stats.budgetUsed > 65 ? '#F4C542' : '#4AE88A' },
+    { icon: '🍔', label: 'Produced', value: stats.pattiesProduced.toLocaleString(), color: '#F4C542' },
+    { icon: '✅', label: 'Delivered', value: stats.pattiesDelivered.toLocaleString(), color: '#4AE88A' },
+  ];
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: 'linear-gradient(180deg, #062A45 0%, #030E1A 100%)' }}>
+      <div className="grid grid-cols-2 gap-3">
+        {items.map(item => (
+          <div
+            key={item.label}
+            className="rounded-xl p-3"
             style={{
-              background: 'rgba(74,174,217,0.2)',
-              border: '1px solid rgba(74,174,217,0.5)',
-              color: '#4AAED9',
-              fontFamily: 'Nunito, sans-serif',
+              background: 'rgba(6,42,69,0.85)',
+              border: '1px solid rgba(74,174,217,0.12)',
             }}
           >
-            Build your own org → <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">{item.icon}</span>
+              <span className="text-[11px]" style={{ color: 'rgba(184,228,247,0.4)', fontFamily: 'Nunito, sans-serif' }}>
+                {item.label}
+              </span>
+            </div>
+            <div
+              className="text-xl font-bold"
+              style={{ color: item.color, fontFamily: '"Baloo 2", cursive' }}
+            >
+              {item.value}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
-    </>
   );
 }
 
@@ -599,8 +657,95 @@ export function LiveViewPage() {
   const [showIntro, setShowIntro] = useState(() => {
     return !localStorage.getItem('live-intro-seen');
   });
+  const [mobileTab, setMobileTab] = useState<MobileTab>('org');
 
+  // Agent control state
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [agentOverrides, setAgentOverrides] = useState<Record<string, { paused?: boolean; department?: Department; modelTier?: 'sonnet' | 'opus' }>>({});
+  const [firedAgents, setFiredAgents] = useState<Set<string>>(new Set());
+  const [contextMenu, setContextMenu] = useState<{ agentId: string; x: number; y: number } | null>(null);
+
+  const getAgentControlState = useCallback((agentId: string, nodeStates: Record<string, AgentNodeState>): AgentControlState | null => {
+    const agentDef = AGENTS[agentId];
+    if (!agentDef) return null;
+    const overrides = agentOverrides[agentId] || {};
+    const nodeState = nodeStates[agentId];
+    const baseStatus = nodeState?.status || 'idle';
+    const status: AgentControlStatus = overrides.paused ? 'paused' : baseStatus;
+    return {
+      id: agentId,
+      name: agentDef.name,
+      emoji: agentDef.emoji,
+      avatarUrl: agentDef.avatarUrl,
+      status,
+      department: overrides.department || AGENT_DEPARTMENTS[agentId] || 'Operations',
+      modelTier: overrides.modelTier || 'sonnet',
+    };
+  }, [agentOverrides]);
+
+  const handlePauseResume = useCallback((agentId: string) => {
+    const wasPaused = !!agentOverrides[agentId]?.paused;
+    const newStatus = wasPaused ? 'working' : 'paused';
+    agentUpdateStatus(agentId, newStatus).catch((err: unknown) =>
+      console.warn('[MCP] agentUpdateStatus failed:', err instanceof Error ? err.message : err),
+    );
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], paused: !prev[agentId]?.paused },
+    }));
+  }, [agentOverrides]);
+
+  const handleReassign = useCallback((agentId: string, department: Department) => {
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], department },
+    }));
+  }, []);
+
+  const handleFire = useCallback((agentId: string) => {
+    agentFire(agentId).catch((err: unknown) =>
+      console.warn('[MCP] agentFire failed:', err instanceof Error ? err.message : err),
+    );
+    setFiredAgents(prev => new Set([...prev, agentId]));
+    setSelectedAgentId(null);
+  }, []);
+
+  const handleModelChange = useCallback((agentId: string, tier: 'sonnet' | 'opus') => {
+    setAgentOverrides(prev => ({
+      ...prev,
+      [agentId]: { ...prev[agentId], modelTier: tier },
+    }));
+  }, []);
+
+  const handleHire = useCallback((role: string, department: Department, modelTier: 'sonnet' | 'opus') => {
+    const id = `agent-${role.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+    agentRegister({ id, name: role, role, department, model: modelTier }).catch((err: unknown) =>
+      console.warn('[MCP] agentRegister failed:', err instanceof Error ? err.message : err),
+    );
+    console.log(`[LiveView] hire-agent: role=${role}, dept=${department}, tier=${modelTier}`);
+  }, []);
+
+  const handleEscalate = useCallback(() => {
+    escalate('Dashboard user escalation', 'high').catch((err: unknown) =>
+      console.warn('[MCP] escalate failed:', err instanceof Error ? err.message : err),
+    );
+    console.log('[LiveView] escalate: sending to CEO agent');
+  }, []);
+
+  const handleViewPlan = useCallback(() => {
+    console.log('[LiveView] view-plan: opening PLAN.md');
+  }, []);
+
+  const mcpOrg = useMcpOrgStatus();
   const replay = useReplay();
+  const annotation = getActiveAnnotation(replay.tick);
+
+  // Auto-switch mobile tab to feed during key moments
+  useEffect(() => {
+    if (replay.tick === 13 || replay.tick === 70) {
+      setMobileTab('feed');
+    }
+  }, [replay.tick]);
 
   const handleStart = useCallback(() => {
     localStorage.setItem('live-intro-seen', '1');
@@ -612,7 +757,6 @@ export function LiveViewPage() {
     replay.start();
   }, [replay.start]);
 
-  // Auto-start if intro already seen
   useEffect(() => {
     if (!showIntro && !replay.running && !replay.finished && replay.tick < 0) {
       replay.start();
@@ -621,10 +765,10 @@ export function LiveViewPage() {
 
   return (
     <div className="relative h-screen w-full text-white flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, #062A45 0%, #030E1A 100%)' }}>
-      {/* BikiniBottom ocean background */}
+      {/* Ocean background */}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 80%, rgba(11,94,138,0.3) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(26,125,181,0.2) 0%, transparent 50%)' }} />
 
-      {/* Ambient caustic light effects — subtle underwater atmosphere */}
+      {/* Ambient caustics */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div style={{
           position: 'absolute', borderRadius: '50%',
@@ -633,20 +777,6 @@ export function LiveViewPage() {
           opacity: 0.04,
           animation: 'bb-caustic 18s ease-in-out infinite',
         }} />
-        <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '40vw', height: '30vh', bottom: '10%', right: '-8vw',
-          background: 'radial-gradient(ellipse, rgba(46,204,113,1) 0%, transparent 70%)',
-          opacity: 0.025,
-          animation: 'bb-caustic-2 13s 6s ease-in-out infinite',
-        }} />
-        <div style={{
-          position: 'absolute', borderRadius: '50%',
-          width: '35vw', height: '25vh', top: '40%', left: '30%',
-          background: 'radial-gradient(ellipse, rgba(26,125,181,1) 0%, transparent 70%)',
-          opacity: 0.03,
-          animation: 'bb-caustic-3 22s 3s ease-in-out infinite',
-        }} />
       </div>
 
       {/* Intro overlay */}
@@ -654,18 +784,19 @@ export function LiveViewPage() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col h-full">
-        {/* Top: Progress header */}
-        <ProgressHeader act={replay.act} tick={replay.tick} pattiesDelivered={replay.pattiesDelivered} />
+        {/* Persistent OpenSpawn banner — always visible at top */}
+        <OpenSpawnBadge
+          variant="desktop"
+          spawnedAgents={replay.spawnedAgents}
+          pattiesDelivered={replay.pattiesDelivered}
+          finished={replay.finished}
+        />
 
-        {/* Mobile: OpenSpawn badge strip (below header, above org chart) */}
-        <div className="flex md:hidden">
-          <OpenSpawnBadge
-            variant="mobile"
-            spawnedAgents={replay.spawnedAgents}
-            pattiesDelivered={replay.pattiesDelivered}
-            finished={replay.finished}
-          />
-        </div>
+        {/* Progress header */}
+        <ProgressHeader act={replay.act} pattiesDelivered={replay.pattiesDelivered} />
+
+        {/* Mobile tab bar */}
+        <MobileTabBar active={mobileTab} onChange={setMobileTab} />
 
         {/* Middle: Org Chart + Feed */}
         <div className="flex-1 min-h-0 flex flex-col md:flex-row">
@@ -676,43 +807,103 @@ export function LiveViewPage() {
               edgeAnimations={replay.edgeAnimations}
               reassignedEdges={replay.reassignedEdges}
               spawnedAgents={replay.spawnedAgents}
+              onAgentClick={(agentId) => { if (!firedAgents.has(agentId)) setSelectedAgentId(agentId); }}
+              onAgentContextMenu={(agentId, x, y) => { if (!firedAgents.has(agentId)) setContextMenu({ agentId, x, y }); }}
             />
-
-            {/* Desktop OpenSpawn badge — bottom-left of org chart panel */}
-            <OpenSpawnBadge
-              variant="desktop"
-              spawnedAgents={replay.spawnedAgents}
-              pattiesDelivered={replay.pattiesDelivered}
-              finished={replay.finished}
-            />
-
-            {/* Act banner overlay */}
             <ActBanner banner={replay.actBanner} />
+            <AnnotationBubble annotation={annotation} />
           </div>
 
-          {/* Mobile Org Chart (<md) — compact department cards */}
-          <div className="flex md:hidden w-full overflow-y-auto" style={{ maxHeight: '45vh' }}>
-            <MobileOrgChart
-              nodeStates={replay.nodeStates}
-              spawnedAgents={replay.spawnedAgents}
-            />
+          {/* Mobile: one panel at a time */}
+          <div className="flex md:hidden flex-1 min-h-0 relative">
+            {mobileTab === 'org' && (
+              <div className="w-full h-full overflow-y-auto">
+                <MobileOrgChart
+                  nodeStates={replay.nodeStates}
+                  spawnedAgents={replay.spawnedAgents}
+                />
+              </div>
+            )}
+            {mobileTab === 'feed' && (
+              <div className="w-full h-full">
+                <LiveFeed messages={replay.messages} />
+              </div>
+            )}
+            {mobileTab === 'stats' && (
+              <MobileStatsPanel stats={replay.stats} />
+            )}
+            {/* Mobile annotation */}
+            <AnnotationBubble annotation={annotation} />
           </div>
 
-          {/* Live Feed - 40% */}
+          {/* Desktop Live Feed - 40% */}
           <div
-            className="flex-[2] min-h-0"
+            className="hidden md:flex flex-[2] min-h-0"
             style={{ borderLeft: '1px solid rgba(74,174,217,0.1)' }}
           >
             <LiveFeed messages={replay.messages} />
           </div>
         </div>
 
-        {/* Bottom: Stats bar */}
-        <StatsBar stats={replay.stats} />
+        {/* Desktop stats bar */}
+        <div className="hidden md:flex">
+          <StatsBar stats={replay.stats} />
+        </div>
 
         {/* Finished overlay */}
-        <CompletionOverlay finished={replay.finished} onReplay={handleReplay} />
+        <CompletionOverlay
+          finished={replay.finished}
+          onReplay={handleReplay}
+          stats={replay.stats}
+          messageCount={replay.messages.length}
+          spawnedCount={replay.spawnedAgents.length}
+        />
       </div>
+
+      {/* Task Control Bar */}
+      <TaskControlBar
+        onHire={handleHire}
+        onEscalate={handleEscalate}
+        onViewPlan={handleViewPlan}
+      />
+
+      {/* Agent Control Panel (slide-in) */}
+      {selectedAgentId && (() => {
+        const agentState = getAgentControlState(selectedAgentId, replay.nodeStates);
+        if (!agentState) return null;
+        return (
+          <AgentControlPanel
+            agent={agentState}
+            onClose={() => setSelectedAgentId(null)}
+            onPauseResume={handlePauseResume}
+            onReassign={handleReassign}
+            onFire={handleFire}
+            onModelChange={handleModelChange}
+          />
+        );
+      })()}
+
+      {/* Agent Context Menu */}
+      {contextMenu && (
+        <AgentContextMenu
+          agentId={contextMenu.agentId}
+          agentName={AGENTS[contextMenu.agentId]?.name || contextMenu.agentId}
+          x={contextMenu.x}
+          y={contextMenu.y}
+          isPaused={!!agentOverrides[contextMenu.agentId]?.paused}
+          onClose={() => setContextMenu(null)}
+          onViewLogs={(id) => {
+            eventList({ agent_id: id }).then(
+              (events) => console.log(`[LiveView] logs for ${id}:`, events),
+              (err: unknown) => console.warn('[MCP] eventList failed:', err instanceof Error ? err.message : err),
+            );
+          }}
+          onSendMessage={(id) => console.log(`[LiveView] send-message: ${id}`)}
+          onReassign={(id) => { setContextMenu(null); setSelectedAgentId(id); }}
+          onPauseResume={(id) => { handlePauseResume(id); setContextMenu(null); }}
+          onFire={(id) => { handleFire(id); setContextMenu(null); }}
+        />
+      )}
     </div>
   );
 }
