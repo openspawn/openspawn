@@ -19,9 +19,7 @@ console.log(
   'color: #64748b'
 );
 import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
-// TourProvider/TourBar/TourSpotlight removed — they call useNavigate/useLocation
-// outside RouterProvider, causing __store crash. Re-add inside router layout when needed.
-// import { TourProvider, TourBar, TourSpotlight } from "../components/tour";
+// Tour components moved inside RouterProvider (routes.tsx) — they need router context
 import { AuthProvider, SidePanelProvider } from "../contexts";
 import { router } from "../routes";
 import type { ReactNode } from "react";
@@ -79,7 +77,6 @@ export function App() {
             <SidePanelProvider>
             <DemoWrapper>
               <OfflineIndicator />
-              <CommandPalette />
               <WelcomeScreen />
               <FeatureTour />
               <CompletionCelebration />
