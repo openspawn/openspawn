@@ -15,9 +15,9 @@ import {
   Layers,
   CheckCircle,
 } from "lucide-react";
-// Tremor wraps recharts v2 internally — replaces custom SVG charts
-import { TremorCreditArea } from "../components/charts/tremor-credit-area";
-import { TremorTaskDonut } from "../components/charts/tremor-task-donut";
+// Tremor disabled — incompatible with React 19 (crashes @headlessui __store)
+// import { TremorCreditArea } from "../components/charts/tremor-credit-area";
+// import { TremorTaskDonut } from "../components/charts/tremor-task-donut";
 import { StaggerContainer, StaggerItem } from "../components/stagger";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -274,11 +274,11 @@ export function DashboardPage() {
   }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, reviewTasks, tasks.length, totalCreditsEarned, totalCreditsSpent, sparklines, navigate]);
 
   function renderCreditChart() {
-    return <TremorCreditArea creditHistory={creditHistory} />;
+    return <Card><CardContent className="p-4 text-sm text-muted-foreground">Credit chart temporarily disabled</CardContent></Card>;
   }
 
     function renderTasksChart() {
-    return <TremorTaskDonut tasksByStatus={tasksByStatus} />;
+    return <Card><CardContent className="p-4 text-sm text-muted-foreground">Task donut temporarily disabled</CardContent></Card>;
   }
 
     function renderRecentActivity() {
