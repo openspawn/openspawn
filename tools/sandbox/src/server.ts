@@ -688,6 +688,102 @@ export function startServer(sim: Simulation): void {
       return;
     }
 
+    // ── Live Ingest API — receive real agent events ───────────────────────
+    // POST /api/ingest — accepts ACP-style events from real agent systems
+    // Used by the CEO agent to pipe live org activity into the dashboard
+    if (path === '/api/ingest' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+      req.on('end', () => {
+        try {
+          const event = JSON.parse(body);
+          const { type, from, to, task, taskId, status, timestamp, data } = event;
+          const ts = timestamp ? new Date(timestamp).getTime() : Date.now();
+
+          if (type === 'agent_activate') {
+            // Add or activate an agent
+            const existing = sim.agents.find(a => a.id === (event.agentId || from));
+            if (!existing) {
+              sim.agents.push({
+                id: event.agentId || from,
+                name: event.name || from,
+                role: event.role || 'worker',
+                level: event.level ?? 4,
+                domain: event.domain || 'Engineering',
+                avatar: event.avatar,
+                avatarColor: event.avatarColor,
+                avatarUrl: event.avatarUrl,
+                parentId: event.parentId,
+                status: 'active',
+                systemPrompt: '',
+                taskIds: [],
+                recentMessages: [],
+                trigger: 'event-driven',
+                inbox: [],
+                stats: { tasksCompleted: 0, tasksFailed: 0, messagesSent: 0, creditsEarned: 0, creditsSpent: 0 },
+              });
+            } else {
+              existing.status = 'active';
+            }
+            sim.events.push({ type: 'agent_activated', agentId: event.agentId || from, message: `${event.name || from} activated`, timestamp: ts });
+            sim.events.length; // SSE auto-emits via sim.onEvent through push to sim.events
+          }
+
+          else if (type === 'task_delegate') {
+            const id = taskId || `LIVE-${Date.now().toString(36)}`;
+            const newTask = {
+              id,
+              title: task || 'Untitled task',
+              description: event.description || task || '',
+              priority: (event.priority || 'normal') as 'low' | 'normal' | 'high' | 'critical',
+              status: 'assigned' as const,
+              assigneeId: to,
+              creatorId: from,
+              createdAt: ts,
+              updatedAt: ts,
+              activityLog: [],
+              acked: false,
+            };
+            sim.tasks.push(newTask);
+            // Mark assignee as busy
+            const assignee = sim.agents.find(a => a.id === to);
+            if (assignee) { assignee.status = 'busy'; assignee.taskIds.push(id); }
+            sim.events.push({ type: 'task_delegated', agentId: from, taskId: id, message: `${from} → ${to}: ${task}`, timestamp: ts });
+            
+          }
+
+          else if (type === 'task_update') {
+            const t = sim.tasks.find(t => t.id === taskId);
+            if (t) {
+              if (status) t.status = status;
+              t.updatedAt = ts;
+              if (status === 'done') {
+                const agent = sim.agents.find(a => a.id === t.assigneeId);
+                if (agent) {
+                  agent.stats.tasksCompleted++;
+                  agent.taskIds = agent.taskIds.filter(id => id !== taskId);
+                  if (agent.taskIds.length === 0) agent.status = 'idle';
+                }
+              }
+              sim.events.push({ type: 'task_updated', taskId, message: `${taskId} → ${status}`, timestamp: ts });
+              
+            }
+          }
+
+          else if (type === 'message') {
+            sim.events.push({ type: 'acp_message', agentId: from, message: `${from} → ${to}: ${event.content || data?.content || ''}`, timestamp: ts });
+            
+          }
+
+          json(res, { ok: true, received: type });
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON', detail: String(e) }));
+        }
+      });
+      return;
+    }
+
     // Health check
     if (path === '/api/health') {
       json(res, { status: 'ok', tick: (sim as any).tick ?? 0, agents: sim.agents.length, tasks: sim.tasks.length });
