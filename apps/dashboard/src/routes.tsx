@@ -8,6 +8,8 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { Layout } from "./components";
 import { ProtectedRoute } from "./components/protected-route";
+import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
+import { CommandPalette } from "./components/command-palette";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";
 import { KanbanPage } from "./pages/kanban";
 import { RouterPage } from "./pages/router";
@@ -72,8 +74,19 @@ function LayoutWithTransitions() {
 }
 
 // Root route
+function RootComponent() {
+  return (
+    <TourProvider>
+      <CommandPalette />
+      <TourBar />
+      <TourSpotlight />
+      <Outlet />
+    </TourProvider>
+  );
+}
+
 const rootRoute = createRootRoute({
-  component: Outlet,
+  component: RootComponent,
 });
 
 // Intro page — standalone, no layout
