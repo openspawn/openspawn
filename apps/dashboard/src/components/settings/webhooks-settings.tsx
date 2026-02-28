@@ -118,7 +118,10 @@ export function WebhooksSettings() {
 
   const handleCreateWebhook = async () => {
     setIsCreating(true);
-    // TODO: Implement actual API call
+    // DEFERRED: Webhook creation is currently UI-only with local state.
+    // When the webhooks API is ready, replace the simulate delay below with:
+    //   await apiClient.createWebhook({ name, url, events, hookType, canBlock, timeoutMs })
+    // and handle the returned ID from the server instead of generating a random one.
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const newWebhook: WebhookData = {

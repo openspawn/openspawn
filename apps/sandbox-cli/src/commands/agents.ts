@@ -199,7 +199,10 @@ ${pc.cyan("Examples:")}
     .action(async (id: string) => {
       try {
         await withSpinner(`Activating agent ${pc.cyan(id)}...`, async () => {
-          // TODO: Implement activation endpoint
+          // DEFERRED: Agent activation endpoint does not exist yet.
+          // When the API exposes it, replace with:
+          //   await createClient().updateAgentStatus(id, 'active')
+          // Expected route: POST /agents/:id/activate
           await new Promise((r) => setTimeout(r, 500));
         });
         outputSuccess(`Agent ${id} activated`);
@@ -216,7 +219,10 @@ ${pc.cyan("Examples:")}
     .action(async (id: string, opts: { reason?: string }) => {
       try {
         await withSpinner(`Suspending agent ${pc.cyan(id)}...`, async () => {
-          // TODO: Implement suspension endpoint
+          // DEFERRED: Agent suspension endpoint does not exist yet.
+          // When the API exposes it, replace with:
+          //   await createClient().updateAgentStatus(id, 'suspended', opts.reason)
+          // Expected route: POST /agents/:id/suspend  { reason }
           await new Promise((r) => setTimeout(r, 500));
         });
         outputSuccess(`Agent ${id} suspended`);
