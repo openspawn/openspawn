@@ -8,6 +8,7 @@ import {
   escalate, resolveEscalation, listEscalations,
   getEvents, orgStatus, logEvent,
 } from './db.js';
+import { parseTaskResult } from './schemas.js';
 
 const DB_PATH = process.env.OPENSPAWN_DB ?? 'openspawn.db';
 const PORT = parseInt(process.env.OPENSPAWN_PORT ?? '8787');
@@ -91,17 +92,36 @@ server.tool('task_claim', 'Claim an unassigned task', {
   }
 });
 
-server.tool('task_complete', 'Mark a task as done', {
-  task_id: z.string(),
-  agent_id: z.string(),
-}, async (params) => {
-  try {
-    completeTask(db, params.task_id, params.agent_id);
-    return { content: [{ type: 'text', text: `Task ${params.task_id} completed` }] };
-  } catch (e: any) {
-    return { content: [{ type: 'text', text: `Error: ${e.message}` }], isError: true };
-  }
-});
+server.tool(
+  'task_complete',
+  'Mark a task as done. The result field accepts either a plain string (wrapped as freeform) or a JSON-encoded structured result matching one of: pr_merged, file_created, docs_updated, config_changed, research_complete, error, escalation, freeform.',
+  {
+    task_id: z.string(),
+    agent_id: z.string(),
+    result: z
+      .union([
+        z.string().describe('Plain text summary (wrapped as freeform) or JSON-encoded TaskResult'),
+        z.record(z.string(), z.unknown()).describe('Structured TaskResult object'),
+      ])
+      .optional()
+      .describe(
+        'Task result — plain string or structured object with a "type" discriminant. ' +
+        'Supported types: pr_merged, file_created, docs_updated, config_changed, ' +
+        'research_complete, error, escalation, freeform.',
+      ),
+  },
+  async (params) => {
+    try {
+      const validated = params.result !== undefined
+        ? parseTaskResult(params.result)
+        : undefined;
+      completeTask(db, params.task_id, params.agent_id, validated);
+      return { content: [{ type: 'text', text: `Task ${params.task_id} completed` }] };
+    } catch (e: any) {
+      return { content: [{ type: 'text', text: `Error: ${e.message}` }], isError: true };
+    }
+  },
+);
 
 server.tool('task_list', 'List tasks with optional filters', {
   status: z.string().optional(),

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   created_at  TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
   completed_at TEXT,
+  result      TEXT,
   metadata    TEXT,
   FOREIGN KEY (assignee) REFERENCES agents(id),
   FOREIGN KEY (parent_id) REFERENCES tasks(id)
@@ -146,15 +147,21 @@ export function claimTask(db: Database.Database, taskId: string, agentId: string
   logEvent(db, agentId, 'task.claim', { taskId }, taskId);
 }
 
-export function completeTask(db: Database.Database, taskId: string, agentId: string) {
+export function completeTask(
+  db: Database.Database,
+  taskId: string,
+  agentId: string,
+  result?: import('./schemas.js').TaskResult,
+) {
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as any;
   if (!task) throw new Error(`Task ${taskId} not found`);
 
   db.prepare(`
-    UPDATE tasks SET status = 'done', completed_at = datetime('now'), updated_at = datetime('now')
+    UPDATE tasks
+    SET status = 'done', completed_at = datetime('now'), updated_at = datetime('now'), result = ?
     WHERE id = ?
-  `).run(taskId);
-  logEvent(db, agentId, 'task.complete', { taskId }, taskId);
+  `).run(result ? JSON.stringify(result) : null, taskId);
+  logEvent(db, agentId, 'task.complete', { taskId, result }, taskId);
 }
 
 export function listTasks(db: Database.Database, filters?: {
