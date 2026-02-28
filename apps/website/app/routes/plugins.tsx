@@ -66,7 +66,7 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
     navigator.clipboard.writeText(`openspawn plugin add ${plugin.slug}`).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    }).catch(() => { /* noop */ });
   };
 
   return (

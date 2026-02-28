@@ -32,13 +32,13 @@ type templateChoice struct {
 
 // Model is the bubbletea model for the init wizard.
 type Model struct {
-	step       step
-	templates  []templateChoice
-	cursor     int
-	teamInput  textinput.Model
-	answers    Answers
-	cancelled  bool
-	width      int
+	step      step
+	templates []templateChoice
+	cursor    int
+	teamInput textinput.Model
+	answers   Answers
+	cancelled bool
+	width     int
 }
 
 // TemplateInfo is the minimal info the wizard needs about each template.

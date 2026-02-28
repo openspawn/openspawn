@@ -58,6 +58,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'TASK-0001',
         message: 'Handle this please',
+        raw: '',
       };
 
       executeDecision(coo, decision, ctx);
@@ -78,6 +79,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'TASK-0001',
         message: 'Take this',
+        raw: '',
       }, ctx);
 
       const delegationMsg = task.activityLog.find(m => m.type === 'delegation');
@@ -97,6 +99,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'TASK-0001',
         message: 'Do it',
+        raw: '',
       }, ctx);
 
       expect(task.acked).toBe(true);
@@ -114,6 +117,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'TASK-0001',
         message: 'Go',
+        raw: '',
       }, ctx);
 
       expect(coo.stats.messagesSent).toBe(1);
@@ -129,6 +133,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'new: Build the API',
         message: 'Build it',
+        raw: '',
       }, ctx);
 
       expect(ctx.tasks).toHaveLength(1);
@@ -146,6 +151,7 @@ describe('decision-executor', () => {
         target: 'nonexistent',
         task: 'TASK-0001',
         message: 'Go',
+        raw: '',
       }, ctx);
 
       // Task should remain unchanged
@@ -165,6 +171,7 @@ describe('decision-executor', () => {
         target: 'coo',
         task: 'TASK-0001',
         message: 'Blocked on this',
+        raw: '',
       }, ctx);
 
       const escMsg = task.activityLog.find(m => m.type === 'escalation');
@@ -184,6 +191,7 @@ describe('decision-executor', () => {
         target: 'coo',
         task: 'TASK-0001',
         message: 'Stuck',
+        raw: '',
       }, ctx);
 
       expect(lead.stats.messagesSent).toBe(1);
@@ -199,6 +207,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-9999',
         message: 'Help',
+        raw: '',
       }, ctx);
 
       expect(orphan.stats.messagesSent).toBe(0);
@@ -217,6 +226,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-0001',
         message: 'All done',
+        raw: '',
       }, ctx);
 
       expect(task.status).toBe('done');
@@ -233,6 +243,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-0001',
         message: 'Done',
+        raw: '',
       }, ctx);
 
       expect(worker.stats.tasksCompleted).toBe(1);
@@ -250,6 +261,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-0001',
         message: 'Done',
+        raw: '',
       }, ctx);
 
       expect(worker.stats.creditsEarned).toBe(50); // high priority = 50
@@ -267,6 +279,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-0001',
         message: 'Done',
+        raw: '',
       }, ctx);
 
       expect(worker.stats.creditsEarned).toBe(100);
@@ -284,6 +297,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'TASK-0001',
         message: 'Finished it',
+        raw: '',
       }, ctx);
 
       const completionMsg = task.activityLog.find(m => m.type === 'completion');
@@ -302,6 +316,7 @@ describe('decision-executor', () => {
         target: 'none',
         task: 'NONEXISTENT',
         message: 'Done',
+        raw: '',
       }, ctx);
 
       expect(worker.stats.tasksCompleted).toBe(0);
@@ -319,6 +334,7 @@ describe('decision-executor', () => {
         target: 'lead',
         task: 'none',
         message: 'How is everything going?',
+        raw: '',
       }, ctx);
 
       expect(coo.stats.messagesSent).toBe(1);
@@ -342,6 +358,7 @@ describe('decision-executor', () => {
         target: 'alice',
         task: 'Engineering',
         message: 'Welcome aboard!',
+        raw: '',
       }, ctx);
 
       expect(ctx.agents).toHaveLength(2);
@@ -359,6 +376,7 @@ describe('decision-executor', () => {
         target: 'New Worker',
         task: 'Marketing',
         message: 'Hired!',
+        raw: '',
       }, ctx);
 
       expect(ctx.agents).toHaveLength(2);
@@ -378,6 +396,7 @@ describe('decision-executor', () => {
         target: 'bob',
         task: 'Finance',
         message: 'Welcome!',
+        raw: '',
       }, ctx);
 
       const bob = ctx.agents.find(a => a.id === 'bob');
@@ -399,6 +418,7 @@ describe('decision-executor', () => {
         target: 'coo',
         task: 'TASK-0001',
         message: 'Blocked',
+        raw: '',
       }, ctx);
 
       // COO should have the escalation in inbox (event-driven + escalation is in triggerOn)
@@ -418,6 +438,7 @@ describe('decision-executor', () => {
           target: 'lead',
           task: 'none',
           message: `Message ${i}`,
+          raw: '',
         }, ctx);
       }
 

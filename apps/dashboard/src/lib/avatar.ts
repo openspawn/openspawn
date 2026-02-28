@@ -158,7 +158,7 @@ export function getAvatarSettings() {
 }
 
 // Get the DiceBear style object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- DiceBear style types are incompatible across packages
+ 
 function getStyle(styleKey: AvatarStyleKey): import('@dicebear/core').Style<Record<string, unknown>> {
   const s = AVATAR_STYLES[styleKey]?.style || AVATAR_STYLES.bottts.style;
   return s as import('@dicebear/core').Style<Record<string, unknown>>;

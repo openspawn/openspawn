@@ -17,8 +17,8 @@ import (
 )
 
 var (
-	startPort    int
-	startNoBoot  bool
+	startPort   int
+	startNoBoot bool
 )
 
 var startCmd = &cobra.Command{

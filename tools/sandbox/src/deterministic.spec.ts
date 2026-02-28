@@ -27,7 +27,7 @@ function makeLead(id: string, name: string, parentId: string, domain = 'Engineer
   return makeAgentPublic(id, name, 'lead', 7, domain, parentId, `Test lead for ${domain}`);
 }
 
-function makeWorker(id: string, name: string, parentId: string, domain = 'Engineering'): SandboxAgent {
+function makeWorker(id: string, name: string, parentId: string | undefined, domain = 'Engineering'): SandboxAgent {
   return makeAgentPublic(id, name, 'worker', 4, domain, parentId, `Test worker in ${domain}`);
 }
 
