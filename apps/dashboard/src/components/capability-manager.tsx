@@ -93,7 +93,9 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
   const handleAddCapability = async () => {
     if (!newCapability.trim()) return;
     
-    // TODO: Implement API call
+    // DEFERRED: Capability creation is not yet persisted to the backend.
+    // Wire to the addAgentCapability GraphQL mutation when available:
+    //   addAgentCapability({ variables: { agentId, capability: newCapability, proficiency: newProficiency } })
     const newCap: Capability = {
       id: `cap-${Date.now()}`,
       capability: newCapability.toLowerCase().trim(),
@@ -109,7 +111,9 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
 
   const handleRemoveCapability = async (id: string) => {
     setRemoving(id);
-    // TODO: Implement API call
+    // DEFERRED: Capability removal is not yet wired to the backend.
+    // Wire to the removeAgentCapability GraphQL mutation when available:
+    //   removeAgentCapability({ variables: { capabilityId: id } })
     await new Promise((r) => setTimeout(r, 500));
     setAgentCapabilities(agentCapabilities.filter((c) => c.id !== id));
     setRemoving(null);
@@ -119,7 +123,10 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
     if (!matchQuery.trim()) return;
     
     setSearching(true);
-    // TODO: Implement API call
+    // DEFERRED: Capability search is not yet wired to the backend.
+    // Wire to the findAgentsByCapability GraphQL query when available:
+    //   const { data } = await findAgentsByCapability({ variables: { query: matchQuery } })
+    // For now, uses MOCK_MATCHES to demonstrate the UI.
     await new Promise((r) => setTimeout(r, 800));
     setMatches(MOCK_MATCHES);
     setSearching(false);
