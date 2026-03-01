@@ -11,7 +11,7 @@ related: [agent-quickstart.md, templates-guide.md, org-md-reference.md, mcp-refe
 
 **What you'll learn:** How to install OpenSpawn, scaffold an org from a template, understand ORG.md structure, validate and generate configs, preview the dashboard, and connect real AI models.
 
-**What you'll have in ~10 minutes:** a local org of AI agents, coordinated by a markdown file, visible in a real-time dashboard — with tasks flowing through a hierarchy you define.
+**What you'll have in ~10 minutes:** a local org of AI agents, coordinated by a single markdown file, visible in a real-time dashboard — with tasks flowing through a hierarchy you define.
 
 ## What is OpenSpawn?
 
@@ -20,6 +20,8 @@ OpenSpawn is a **coordination layer for AI agents**. It is not an agent framewor
 ```
 ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything
 ```
+
+**The key idea:** One file — `ORG.md` — defines your entire agent organization. Roles, hierarchy, culture, budget policies, and operating procedures all live in one readable, version-controlled markdown file.
 
 > **Q: How is this different from CrewAI / LangGraph / AutoGen?**
 > - Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together.
@@ -57,10 +59,71 @@ Do you have multiple agents that need to work together?
 
 ---
 
-## Step 1 — Scaffold your org
+## Step 1 — Start with ORG.md
+
+**ORG.md is the heart of OpenSpawn.** Before you run a single command, it's worth understanding what you're building toward.
+
+Here's a real ORG.md for a SaaS customer onboarding team — the scenario we'll use throughout this guide:
+
+```markdown
+# Customer Onboarding Org
+
+## Identity
+- **Mission:** Onboard new enterprise customers end-to-end in under 48 hours
+- **Industry:** SaaS / Enterprise Software
+
+## Culture
+preset: agency
+
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns the customer relationship from signed contract to go-live.
+- **Level:** 7
+- **Department:** Customer Success
+- **Reports to:** Human Principal
+
+#### Data Migration Specialist — Senior Data Engineer
+Ingests customer data, validates schema compatibility, verifies migration.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Integration Engineer — Platform Integration Specialist
+Connects customer's existing tools (CRM, ERP, SSO) to the platform.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Success Agent — Customer Success Representative
+Conducts go-live check-in, validates first successful workflow.
+- **Level:** 4
+- **Department:** Customer Success
+- **Reports to:** Onboarding Lead
+
+## Policies
+### Budget
+- **Per-agent limit:** 800 credits/customer
+- **Overage behavior:** pause and escalate
+
+## Playbooks
+### 48-Hour Onboarding Track
+1. Onboarding Lead creates PLAN.md and assigns tasks
+2. Migration and Integration work in parallel (hours 2–24)
+3. Success Agent conducts go-live validation (hours 40–48)
+```
+
+This one file defines the entire onboarding team. OpenSpawn parses it, generates OpenClaw configs, and routes tasks through the hierarchy automatically.
+
+> **Q: What if I just want to start fast without writing ORG.md from scratch?**
+> - Use a template: `openspawn init my-org --template=saas-onboarding`
+
+---
+
+## Step 2 — Scaffold your org
 
 ```bash
-npx openspawn init my-org
+npx openspawn init my-org --template=saas-onboarding
 cd my-org
 ```
 
@@ -75,20 +138,23 @@ my-org/
 
 > **Q: Can I skip the wizard?**
 > ```bash
-> openspawn init my-org --template=assistant-team --non-interactive
+> openspawn init my-org --template=saas-onboarding --non-interactive
 > ```
 
 > **Q: What templates are available?**
-> | Template | Best for |
-> |----------|----------|
-> | `assistant-team` | Solo operator who needs a full team |
-> | `content-agency` | Content production pipeline |
-> | `dev-shop` | Software development team |
-> | `research-lab` | Research & analysis |
+> | Template | Industry | Use case |
+> |----------|----------|---------|
+> | `saas-onboarding` | SaaS | Customer onboarding pipeline |
+> | `incident-response` | DevOps | Production incident management |
+> | `contract-review` | Legal | Contract review and risk analysis |
+> | `compliance-monitoring` | Fintech | Transaction monitoring and reporting |
+> | `game-live-ops` | Gaming | Live operations and player engagement |
+> | `catalog-management` | E-commerce | Product catalog and pricing |
+> | `clinical-trials` | Healthcare | Clinical trial data processing |
 
 ---
 
-## Step 2 — Review your ORG.md
+## Step 3 — Review your ORG.md
 
 Open `ORG.md`. You'll see five sections:
 
@@ -103,10 +169,11 @@ Open `ORG.md`. You'll see five sections:
 Each agent in Structure looks like:
 
 ```markdown
-### Oscar — Chief of Staff
-The coordinator. Manages priorities, delegates to specialists.
-- **Level:** 10
-- **Domain:** Operations
+### Onboarding Lead — Customer Onboarding Manager
+The coordinator. Receives new customer intake, creates the onboarding plan,
+assigns work to specialists, and tracks progress to go-live.
+- **Level:** 7
+- **Department:** Customer Success
 - **Reports to:** Human Principal
 ```
 
@@ -121,7 +188,7 @@ The coordinator. Manages priorities, delegates to specialists.
 
 ---
 
-## Step 3 — Validate
+## Step 4 — Validate
 
 ```bash
 openspawn validate
@@ -131,9 +198,9 @@ Expected output:
 ```
 ✅ ORG.md is valid
 
-  Organization:  My Org
-  Agents:        8
-  Culture:       startup
+  Organization:  Customer Onboarding Org
+  Agents:        4
+  Culture:       agency
 ```
 
 ### Error recovery
@@ -147,7 +214,7 @@ Expected output:
 
 ---
 
-## Step 4 — Generate OpenClaw configs
+## Step 5 — Generate OpenClaw configs
 
 ```bash
 openspawn start
@@ -162,11 +229,11 @@ openspawn status
 Displays a table of all agents:
 
 ```
-Name       Level  Model   Workspace              Reports To
-Oscar      L10    opus    workspace-oscar         Human Principal
-Radar      L7     opus    workspace-radar         Oscar
-Forge      L7     opus    workspace-forge         Oscar
-Ink        L4     sonnet  workspace-ink           Muse
+Name                        Level  Model   Workspace                        Reports To
+Onboarding Lead             L7     opus    workspace-onboarding-lead        Human Principal
+Data Migration Specialist   L5     sonnet  workspace-data-migration          Onboarding Lead
+Integration Engineer        L5     sonnet  workspace-integration-engineer    Onboarding Lead
+Success Agent               L4     sonnet  workspace-success-agent          Onboarding Lead
 ```
 
 > **Q: What happens after init?**
@@ -179,7 +246,7 @@ Ink        L4     sonnet  workspace-ink           Muse
 
 ---
 
-## Step 5 — Preview
+## Step 6 — Preview
 
 ```bash
 npx openspawn preview
@@ -187,7 +254,7 @@ npx openspawn preview
 
 Opens the dashboard at http://localhost:3333. You'll see:
 - Network graph of your agent hierarchy
-- Task timeline
+- Task timeline (onboarding tasks flowing through the team)
 - Agent details and credit balances
 - Real-time SSE event stream
 
@@ -203,13 +270,13 @@ Opens the dashboard at http://localhost:3333. You'll see:
 
 ---
 
-## Step 6 — Customize
+## Step 7 — Customize your ORG.md
 
 ### Change the culture preset
 
 ```markdown
 ## Culture
-preset: agency
+preset: enterprise
 ```
 
 | Preset | Escalation | Progress | Hierarchy depth |
@@ -226,11 +293,11 @@ preset: agency
 Add under `## Structure`:
 
 ```markdown
-#### DataBot — Data Analyst
-Crunches numbers, builds dashboards, surfaces insights.
+#### QA Validator — Onboarding Quality Analyst
+Reviews completed onboarding configurations for errors before go-live.
 - **Level:** 4
-- **Domain:** Analytics
-- **Reports to:** Oscar
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
 ```
 
 ### Set budget policies
@@ -239,7 +306,7 @@ Crunches numbers, builds dashboards, surfaces insights.
 ## Policies
 
 ### Budget
-- **Per-agent limit:** 500 credits/period
+- **Per-agent limit:** 800 credits/customer
 - **Alert threshold:** 80%
 - **Overage behavior:** pause and escalate
 ```
@@ -249,17 +316,16 @@ Crunches numbers, builds dashboards, surfaces insights.
 ```markdown
 ## Playbooks
 
-### New Feature Request
-1. Oscar receives request from Human Principal
-2. Oscar delegates to Forge (engineering)
-3. Forge breaks into sub-tasks, assigns to available agents
-4. Each agent ACKs and begins work
-5. On completion, results flow back up the chain
+### Escalation: Blocked Migration
+1. Data Migration Specialist writes blocker to ESCALATION.md
+2. Escalates to Onboarding Lead via escalation_create
+3. Onboarding Lead engages engineering support within 1 hour
+4. Customer notified with revised ETA within 30 minutes
 ```
 
 ---
 
-## Step 7 — Connect real models (optional)
+## Step 8 — Connect real models (optional)
 
 Edit `openspawn.config.json`:
 
@@ -282,15 +348,38 @@ Edit `openspawn.config.json`:
 
 ---
 
+## The ORG.md mental model
+
+Every OpenSpawn feature flows from ORG.md:
+
+```
+ORG.md defines:
+  → who the agents are (Structure)
+  → how they communicate (Culture)
+  → what they can spend (Policies)
+  → how they handle common situations (Playbooks)
+
+OpenSpawn executes:
+  → parses ORG.md
+  → generates OpenClaw configs
+  → routes tasks through the hierarchy
+  → enforces budgets and escalation chains
+  → shows everything in the dashboard
+```
+
+ORG.md is version-controlled, reviewable in pull requests, and readable by any human or AI on your team. The document IS the system.
+
+---
+
 ## Next steps
 
 - **Full CLI reference:** `openspawn --help`
 - **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — every tool with parameters
-- **Templates deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 4 templates
+- **Templates deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 7 industry templates
 - **ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md) — every field and example
 - **Communication protocol:** [`docs/communication-protocol.md`](./communication-protocol.md) — save tokens with efficient agent communication
-- **Top 20 FAQ:** [`docs/FAQ.md`](./FAQ.md)
+- **Top FAQ:** [`docs/FAQ.md`](./FAQ.md)
 - **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md)
 - **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — agent-first version of this guide
-- **Live demo:** https://bikinibottom.ai/app/ (22 agents, 5 departments)
-- **ORG.md spec:** https://bikinibottom.ai/org-md
+- **Live demo:** https://openspawn.dev/app/
+- **ORG.md spec:** https://openspawn.dev/org-md

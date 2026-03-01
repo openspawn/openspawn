@@ -6,7 +6,7 @@ related: [agent-quickstart.md, getting-started.md, mcp-reference.md, troubleshoo
 
 # OpenSpawn FAQ
 
-**What you'll learn:** Answers to the 20 most common questions about OpenSpawn — what it is, how to use it, how it compares to alternatives, and how agents interact with it.
+**What you'll learn:** Answers to the most common questions about OpenSpawn — what it is, how to use it, how it applies to real industry scenarios, and how agents interact with it.
 
 > **TL;DR for agents:** OpenSpawn is a coordination layer. You define an org in `ORG.md`, run `openspawn start`, and agents communicate via MCP tools at `POST /mcp`. If you're blocked, escalate up the chain. If you're done, `task_complete`.
 
@@ -46,7 +46,7 @@ Your agents keep running as-is. OpenSpawn adds the coordination layer on top.
 **No.** Demo/simulation mode works out of the box:
 
 ```bash
-npx openspawn init my-org --template=assistant-team --non-interactive
+npx openspawn init my-org --template=saas-onboarding --non-interactive
 cd my-org
 openspawn preview
 # Open http://localhost:3333
@@ -75,7 +75,7 @@ Optional: paid hosted tier (in development) for teams that don't want to self-ho
 ### Q7: What are the three commands to get a running org?
 
 ```bash
-openspawn init my-org --template=assistant-team --yes
+openspawn init my-org --template=saas-onboarding --yes
 cd my-org
 openspawn start
 openspawn status
@@ -88,11 +88,14 @@ openspawn status
 ### Q8: Which template should I use?
 
 ```
-What's your primary output?
-├── Code/software      → dev-shop
-├── Content            → content-agency
-├── Research/analysis  → research-lab
-└── Mix / solo op      → assistant-team
+What's your domain?
+├── Customer success / SaaS    → saas-onboarding
+├── Infrastructure / DevOps    → incident-response
+├── Legal                      → contract-review
+├── Finance / Compliance       → compliance-monitoring
+├── Gaming / live service      → game-live-ops
+├── E-commerce / retail        → catalog-management
+└── Healthcare / life sciences → clinical-trials
 ```
 
 All templates are starting points — edit the generated `ORG.md` freely.
@@ -171,7 +174,7 @@ Presets are shorthand for configuring communication norms. Use one line:
 
 ```markdown
 ## Culture
-preset: startup
+preset: agency
 ```
 
 | Preset | Escalation | Progress | Best for |
@@ -211,7 +214,7 @@ Full tool reference: [`docs/mcp-reference.md`](./mcp-reference.md)
 **No.** `task_claim` is **atomic** — only one agent wins the claim, the other gets an error. This prevents duplicate work by design.
 
 ```
-tool: task_claim { task_id: "abc123", agent_id: "engineer-1" }
+tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
 ```
 
 ### Q17: What happens when an agent is blocked?
@@ -251,9 +254,79 @@ Instead of sending messages, agents write to shared workspace files:
 
 ---
 
+## Industry Scenarios
+
+### Q20: Can I use OpenSpawn for compliance monitoring?
+
+**Yes.** The `compliance-monitoring` template is purpose-built for fintech compliance teams. It models:
+- Transaction ingestion and normalization (Transaction Analyst)
+- AML/BSA rule application and OFAC screening (Rule Engine Agent)
+- SAR/CTR filing and regulatory reporting (Report Generator)
+- Compliance Lead oversight with human approval gates for all filings
+
+The template includes a zero-tolerance OFAC escalation playbook and a full SAR filing workflow, with audit trails required for regulatory inspection.
+
+```bash
+openspawn init my-compliance-org --template=compliance-monitoring
+```
+
+### Q21: How would I set up a contract review pipeline?
+
+Use the `contract-review` template. The pipeline flows:
+1. **Clause Extractor** reads the contract and categorizes all key clauses (liability, indemnification, IP, etc.)
+2. **Risk Analyst** compares each clause against your negotiation playbook and flags deviations
+3. **Summary Writer** produces an attorney-ready package with risk register and recommended redlines
+4. **Senior Reviewer** approves before delivery to business stakeholders
+
+```bash
+openspawn init my-legal-org --template=contract-review
+```
+
+Update the Policies section with your company's specific playbook reference and risk thresholds.
+
+### Q22: Can I use OpenSpawn for customer onboarding?
+
+**Yes.** The `saas-onboarding` template models a 48-hour enterprise onboarding track. Each new customer becomes a task in the onboarding org. The Onboarding Lead coordinates Data Migration, Integration Engineering, and Customer Success in parallel — with handoff protocols at each stage.
+
+The template is designed so each customer's onboarding is repeatable, documented, and trackable from kickoff to go-live.
+
+### Q23: How would I handle a production incident with OpenSpawn?
+
+Use the `incident-response` template. When an alert fires:
+1. Incident Commander activates and assigns Diagnostics and Comms agents simultaneously
+2. Diagnostics Agent pulls metrics, traces, and logs to identify root cause
+3. Remediation Agent executes fix with explicit Commander go-ahead
+4. Comms Agent keeps stakeholders informed throughout
+
+The template uses the `military` culture preset — mandatory acks, every-5-minute progress updates, and immediate escalation. No silent failures.
+
+### Q24: Can I use OpenSpawn for a gaming live ops team?
+
+**Yes.** The `game-live-ops` template covers:
+- 24/7 economy metric monitoring with guardrails (max 15% parameter change without approval)
+- Automated content generation on the weekly calendar
+- Player sentiment monitoring across app stores and social
+- Economy exploit response playbook with escalation thresholds
+
+```bash
+openspawn init my-game-org --template=game-live-ops
+```
+
+### Q25: How does OpenSpawn handle regulatory compliance requirements like audit trails?
+
+For regulated industries (fintech, healthcare, legal), the ORG.md Policies section can specify:
+- Audit trail requirements (every agent action logged with source reference and agent ID)
+- Human approval gates for specific action types
+- Data handling restrictions (what agents can read vs. write)
+- Mandatory quality checkpoints before phase transitions
+
+The `clinical-trials` template is the most comprehensive example — it models 21 CFR Part 11 audit trail requirements and CDISC data standards compliance into the agent workflow.
+
+---
+
 ## Troubleshooting
 
-### Q20: Where do I go when something's broken?
+### Q26: Where do I go when something's broken?
 
 1. Run `openspawn validate` — catches most config issues
 2. Check [`docs/troubleshooting.md`](./troubleshooting.md) — common errors and fixes
@@ -269,4 +342,4 @@ Instead of sending messages, agents write to shared workspace files:
 - **Full setup walkthrough:** [`docs/getting-started.md`](./getting-started.md)
 - **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md)
 - **Fix a specific error:** [`docs/troubleshooting.md`](./troubleshooting.md)
-- **Live demo:** https://bikinibottom.ai/app/
+- **Live demo:** https://openspawn.dev/app/

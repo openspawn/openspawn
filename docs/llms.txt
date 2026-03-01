@@ -2,6 +2,45 @@
 
 > OpenSpawn is an open-source coordination layer for AI agent organizations. You define your entire agent org — roles, hierarchy, culture, policies — in a single markdown file (ORG.md), and OpenSpawn parses it, spawns agents, routes tasks through the hierarchy, and gives you a real-time dashboard. It is infrastructure, not a framework: it works with any agent stack (OpenClaw, LangGraph, CrewAI, AutoGen, raw API calls).
 
+## The Core Idea: ORG.md
+
+**One file defines your entire agent organization.** ORG.md is the heart of OpenSpawn.
+
+```markdown
+# My Org Name
+
+## Identity
+Mission, industry context, pain solved.
+Becomes ambient context for every agent.
+
+## Culture
+preset: agency
+Communication norms and escalation speed.
+
+## Structure
+
+### Lead Agent — Title
+Description of what this agent does.
+- **Level:** 7
+- **Department:** Operations
+- **Reports to:** Human Principal
+
+#### Worker Agent — Title
+Description of responsibilities.
+- **Level:** 5
+- **Reports to:** Lead Agent
+
+## Policies
+Budget limits, permission guardrails, human approval thresholds.
+
+## Playbooks
+Step-by-step procedures for standard scenarios.
+```
+
+Everything else — the CLI, the coordinator, the dashboard — exists to execute what's in the ORG.md.
+
+---
+
 ## When to use OpenSpawn vs sub-agents
 
 ```
@@ -26,8 +65,8 @@ Key difference: sub-agents are ephemeral (spawn, do work, die). OpenSpawn agents
 # Install CLI
 npm install -g openspawn
 
-# Create a new org from template
-openspawn init my-org --template=assistant-team
+# Create a new org from a real-world industry template
+openspawn init my-org --template=saas-onboarding
 cd my-org
 
 # Preview in dashboard (no API keys needed)
@@ -42,6 +81,26 @@ pnpm exec nx serve sandbox
 
 ---
 
+## Industry Templates
+
+OpenSpawn ships seven real-world org templates. Each produces a complete ORG.md:
+
+| Template | Industry | Pain solved |
+|----------|---------|-------------|
+| `saas-onboarding` | SaaS | Enterprise customer onboarding in 48 hours |
+| `incident-response` | DevOps / SRE | Minimize MTTR, automate incident coordination |
+| `contract-review` | Legal | Contract review pipeline against company playbook |
+| `compliance-monitoring` | Fintech | AML/BSA monitoring, SAR/CTR filing automation |
+| `game-live-ops` | Gaming | Economy monitoring, content generation, player sentiment |
+| `catalog-management` | E-commerce | Competitor monitoring, dynamic pricing, content refresh |
+| `clinical-trials` | Healthcare | Clinical data processing, regulatory submission prep |
+
+```bash
+openspawn init my-org --template=<template-name>
+```
+
+---
+
 ## CLI Commands
 
 ### `openspawn init [directory]`
@@ -49,13 +108,13 @@ Create a new agent organization.
 
 | Flag | Description |
 |------|-------------|
-| `-t, --template` | Template name: `assistant-team`, `content-agency`, `dev-shop`, `research-lab` |
+| `-t, --template` | Template name — see Industry Templates table above |
 | `--non-interactive` | Skip wizard, use defaults |
 
 ```bash
 openspawn init my-org
-openspawn init my-org --template=dev-shop
-openspawn init my-org --template=assistant-team --non-interactive
+openspawn init my-org --template=incident-response
+openspawn init my-org --template=saas-onboarding --non-interactive
 ```
 
 ### `openspawn validate [file]`
@@ -167,7 +226,7 @@ OpenSpawn exposes tools via MCP (Streamable HTTP at `POST /mcp`). Agents authent
 | `consensus_vote` | Submit vote | `consensusId`, `vote` (approve/reject), `reason?` |
 | `consensus_status` | Check consensus status | `consensusId` |
 
-### Coordination Tools (PR #426)
+### Coordination Tools
 
 SQLite-backed coordination server for multi-agent task management. Exposed via MCP.
 
@@ -215,18 +274,23 @@ A single markdown file that defines your entire agent organization. Five optiona
 1. **Identity** — Name, mission, values, industry context. Becomes ambient context for all agents.
 2. **Culture** — Communication norms. Use a preset (`startup`, `enterprise`, `agency`, `research`, `military`, `remote-async`) or customize individual parameters.
 3. **Structure** — Agent roles with name, level (L1-L10), domain, reporting hierarchy, avatar.
-4. **Policies** — Budget limits, department caps, permission levels.
-5. **Playbooks** — Step-by-step procedures for common scenarios (escalation, handoff, rush hour).
+4. **Policies** — Budget limits, department caps, permission levels, human approval thresholds.
+5. **Playbooks** — Step-by-step procedures for common scenarios (escalation, handoff, regulatory events).
 
-### Templates
-Pre-built ORG.md files for common team shapes:
+The ORG.md IS the product. Everything else exists to execute what's in it.
 
-| Template | Description | Roles |
-|----------|-------------|-------|
-| `assistant-team` | Personal AI team for solo operator | Chief of staff, research, content (strategy + writer + design), engineering, security, quality |
-| `content-agency` | Content production pipeline | Research, strategy, writing, design |
-| `dev-shop` | Software development team | Lead, frontend, backend, QA |
-| `research-lab` | Research & analysis team | High autonomy, exploration budget |
+### Industry Templates
+Pre-built ORG.md files modeled on real organizational pain points:
+
+| Template | Description | Key roles |
+|----------|-------------|-----------|
+| `saas-onboarding` | 48-hour enterprise onboarding pipeline | Onboarding Lead, Data Migration, Integration, Success |
+| `incident-response` | Production incident coordination | Incident Commander, Diagnostics, Remediation, Comms |
+| `contract-review` | Contract review against company playbook | Senior Reviewer, Clause Extractor, Risk Analyst, Summary Writer |
+| `compliance-monitoring` | AML/BSA transaction monitoring | Compliance Lead, Transaction Analyst, Rule Engine, Report Generator |
+| `game-live-ops` | Live service game operations | Ops Director, Economy Tuner, Content Generator, Player Support |
+| `catalog-management` | E-commerce catalog optimization | Catalog Manager, Price Optimizer, Content Writer, Competitor Monitor |
+| `clinical-trials` | Clinical data processing for regulatory submission | Study Director, Data Analyst, Protocol Validator, Regulatory Writer |
 
 ### Agent Communication Protocol (ACP)
 How agents communicate through the hierarchy. Four message types:
@@ -307,7 +371,7 @@ A: Run `openspawn start` to generate `openclaw-patch.json`, then apply it to you
 A: OpenClaw `agents.list` entries with `id`, `model`, `workspace`, and `subagents.allowAgents` for managers. L7+ agents get opus, L6- get sonnet. The highest-level agent gets `default: true`. All agents get `tools.profile: "full"`.
 
 **Q: How do agents coordinate work?**
-A: Via MCP coordination tools (PR #426). `task_create` assigns work, `task_claim` prevents duplicate effort (atomic — only one agent wins), `task_complete` records results with artifacts. Use `org_status` for a full overview.
+A: Via MCP coordination tools. `task_create` assigns work, `task_claim` prevents duplicate effort (atomic — only one agent wins), `task_complete` records results with artifacts. Use `org_status` for a full overview.
 
 **Q: How do I escalate an issue?**
 A: `escalation_create { issue: "deployment failed", severity: "high" }`. Escalations are tracked and can be filtered by severity. Resolve them with the escalation workflow.
@@ -318,11 +382,17 @@ A: No. `task_claim` is atomic — only one agent wins the claim, the other gets 
 **Q: How is this different from CrewAI/LangGraph/AutoGen?**
 A: Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together: build agents with your framework, coordinate them with OpenSpawn.
 
+**Q: Can I use OpenSpawn for compliance monitoring?**
+A: Yes. The `compliance-monitoring` template is purpose-built for fintech compliance. It models transaction monitoring, AML/BSA rule application, OFAC screening, and SAR/CTR filing — with full audit trails.
+
+**Q: How would I set up a contract review pipeline?**
+A: Use the `contract-review` template. Clause Extractor → Risk Analyst → Summary Writer → Senior Reviewer approval. Updates to the Policies section let you enforce your specific playbook rules.
+
 ---
 
 ## Links
 
 - GitHub: https://github.com/openspawn/openspawn
-- Live Demo: https://bikinibottom.ai/app/
-- Docs: https://bikinibottom.ai/docs
-- ORG.md Spec: https://bikinibottom.ai/org-md
+- Live Demo: https://openspawn.dev/app/
+- Docs: https://openspawn.dev/docs
+- ORG.md Spec: https://openspawn.dev/org-md
