@@ -19,6 +19,8 @@ interface TaskStore {
   tasks: RepoTask[];
 }
 
+// Try local data first (baked into build), then GitHub, then demo
+const LOCAL_URL = '/data/tasks.json';
 const GITHUB_RAW_URL =
   'https://raw.githubusercontent.com/openspawn/openspawn/main/.openspawn/tasks.json';
 
@@ -102,11 +104,17 @@ export function useRepoTasks() {
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await fetch(GITHUB_RAW_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Try local static file first (baked into Docker build)
+      let res = await fetch(LOCAL_URL, { cache: 'no-store' });
+      let src: 'github' | 'demo' = 'github';
+      if (!res.ok) {
+        // Fall back to GitHub raw content
+        res = await fetch(GITHUB_RAW_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      }
       const data: TaskStore = await res.json();
       setTasks(data.tasks);
-      setSource('github');
+      setSource(src);
       setError(null);
     } catch {
       setTasks(DEMO_TASKS);
