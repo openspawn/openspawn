@@ -17,7 +17,9 @@ COPY tools/sandbox/src/ ./tools/sandbox/src/
 COPY tools/sandbox/ORG.md ./tools/sandbox/
 COPY tools/sandbox/org/ ./tools/sandbox/org/
 
+ARG VITE_DASHBOARD_THEME=bikinibottom
 ENV VITE_SANDBOX_MODE=true
+ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
 RUN pnpm nx run dashboard:build --configuration=production
 RUN pnpm nx run website:build
 
