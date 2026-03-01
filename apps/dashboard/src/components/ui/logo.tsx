@@ -18,7 +18,7 @@ export function Logo({ size = 'md', className = '', style }: LogoProps) {
   return (
     <span
       role="img"
-      aria-label="BikiniBottom"
+      aria-label="OpenSpawn"
       className={`flex-shrink-0 leading-none select-none ${className}`}
       style={{ fontSize: px, lineHeight: 1, ...style }}
     >

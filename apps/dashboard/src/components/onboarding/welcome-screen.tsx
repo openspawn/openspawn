@@ -75,7 +75,7 @@ export function WelcomeScreen() {
                 transition={{ delay: 0.3 }}
                 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3"
               >
-                BikiniBottom
+                OpenSpawn
               </motion.h1>
 
               {/* Tagline */}

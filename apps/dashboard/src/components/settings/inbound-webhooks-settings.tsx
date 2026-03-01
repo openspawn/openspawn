@@ -241,7 +241,7 @@ export function InboundWebhooksSettings() {
               Inbound Webhooks
             </CardTitle>
             <CardDescription>
-              Allow external services to create tasks in BikiniBottom via HTTP POST
+              Allow external services to create tasks in OpenSpawn via HTTP POST
             </CardDescription>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
