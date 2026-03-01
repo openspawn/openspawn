@@ -18,239 +18,381 @@ interface Template {
 
 const TEMPLATES: Template[] = [
   {
-    id: "startup",
-    name: "Startup",
+    id: "saas-onboarding",
+    name: "SaaS Customer Onboarding",
     description:
-      "A lean 4-agent org built for speed. CEO delegates directly to an engineer, designer, and writer — no layers, maximum velocity.",
+      "Manual onboarding takes 2–3 days per customer across 4 teams. This agent org handles data migration, config, integration testing, and success check-in — end to end.",
     emoji: "🚀",
     agentCount: 4,
     badgeColor: "cyan",
-    badgeLabel: "FAST-MOVING",
-    orgMd: `# 🚀 Startup Org
+    badgeLabel: "SAAS",
+    orgMd: `# customer-onboarding
+> Mission: Onboard new enterprise customers end-to-end
 
 ## Identity
-A lean, early-stage startup built for speed and product-market fit.
-Every agent owns their domain completely and operates with high autonomy.
+- **Industry:** SaaS
+- **Pain:** Manual onboarding takes 2-3 days per customer, 4 teams
 
 ## Culture
-- **Preset:** move-fast
-- **Escalation:** immediate — don't block, escalate now
-- **Progress updates:** on every task completion
+- **Preset:** professional
+- **Escalation:** 30 min — customers can't wait
+- **Progress updates:** on every milestone
 - **Ack required:** yes
 
 ## Policies
-- **Per-agent limit:** $30/day
-- **Alert threshold:** $100/week
+- **Per-agent limit:** 500 credits/period
+- **Alert threshold:** 80%
+- **Period:** daily
 
 ## Structure
 
-### CEO — Alex Chen
-- **Level:** 10
-- **Domain:** Executive
-
-#### Lead Engineer — Sam Park
+### Onboarding Lead
+Owns the full customer journey from contract-signed to go-live.
 - **Level:** 7
-- **Domain:** Engineering
-- **Reports to:** Alex Chen
+- **Model:** claude-sonnet
+- **Domain:** operations
 
-#### Product Designer — Jordan Lee
+#### Data Migration Specialist
+Moves and validates customer data from legacy systems safely.
 - **Level:** 5
-- **Domain:** Design
-- **Reports to:** Alex Chen
+- **Model:** claude-haiku
+- **Domain:** data
 
-#### Content Writer — Morgan Davis
+#### Integration Engineer
+Configures API connectors, runs integration tests, documents endpoints.
+- **Level:** 5
+- **Model:** claude-haiku
+- **Domain:** engineering
+
+#### Success Agent
+Schedules check-ins, collects health scores, flags churn risk early.
 - **Level:** 4
-- **Domain:** Content
-- **Reports to:** Alex Chen
+- **Model:** ollama/qwen2.5
+- **Domain:** success
 `,
   },
   {
-    id: "dev-team",
-    name: "Dev Team",
+    id: "incident-response",
+    name: "DevOps Incident Response",
     description:
-      "A full engineering squad — Tech Lead anchors 4 engineers and a QA specialist. Structured for parallel development with quality gates.",
-    emoji: "🛠️",
-    agentCount: 6,
+      "3am pages, 45-min MTTR, context-switching between 6 tools. This agent org detects, diagnoses, drafts the fix, coordinates rollback, and handles comms — autonomously.",
+    emoji: "🚨",
+    agentCount: 4,
     badgeColor: "violet",
-    badgeLabel: "ENGINEERING",
-    orgMd: `# 🛠️ Dev Team
+    badgeLabel: "DEVOPS",
+    orgMd: `# incident-response
+> Mission: Detect, diagnose, and remediate production incidents
 
 ## Identity
-High-performance engineering team delivering quality software at velocity.
-Structured for parallel development with clear ownership and peer review.
+- **Industry:** DevOps / Platform Engineering
+- **Pain:** 3am pages, 45-min MTTR, context-switching between 6 tools
 
 ## Culture
-- **Preset:** engineering
-- **Escalation:** 30 minutes — try once, then escalate
-- **Progress updates:** on blocker or completion
+- **Preset:** ops
+- **Escalation:** immediate — production is down
+- **Progress updates:** every 5 minutes during active incident
 - **Ack required:** yes
 
 ## Policies
-- **Per-agent limit:** $20/day
-- **Alert threshold:** $80/week
+- **Per-agent limit:** 1000 credits/incident
+- **Alert threshold:** 90%
+- **Overage:** pause and escalate to human
 
 ## Structure
 
-### Engineering
+### Incident Commander
+Coordinates all agents, owns runbook execution, drives MTTR down.
+- **Level:** 8
+- **Model:** claude-opus
+- **Domain:** incident management
 
-#### Tech Lead — Riley Johnson
-- **Level:** 9
-- **Domain:** Engineering
-
-#### Senior Engineer — Alex Kim
+#### Diagnostics Agent
+Reads logs, traces, metrics. Identifies root cause and blast radius.
 - **Level:** 6
-- **Domain:** Backend
-- **Reports to:** Riley Johnson
+- **Model:** claude-sonnet
+- **Domain:** observability
 
-#### Engineer — Jamie Chen
+#### Remediation Agent
+Drafts and applies fixes: rollbacks, config changes, service restarts.
+- **Level:** 6
+- **Model:** claude-sonnet
+- **Domain:** infrastructure
+
+#### Comms Agent
+Drafts status page updates, Slack messages, and post-mortems.
 - **Level:** 4
-- **Count:** 3
-- **Domain:** Engineering
-- **Reports to:** Riley Johnson
-
-#### QA Engineer — Casey Williams
-- **Level:** 5
-- **Domain:** Quality Assurance
-- **Reports to:** Riley Johnson
+- **Model:** claude-haiku
+- **Domain:** communications
 `,
   },
   {
-    id: "marketing-agency",
-    name: "Marketing Agency",
+    id: "contract-review",
+    name: "Legal Contract Review",
     description:
-      "Creative powerhouse with a Director driving a content writer, designer, and social media manager. Content at scale.",
-    emoji: "📣",
+      "Junior associates spend 80+ hrs/week on manual contract review. This agent org extracts clauses, compares against playbook, flags risks, and drafts the summary memo.",
+    emoji: "⚖️",
     agentCount: 4,
     badgeColor: "amber",
-    badgeLabel: "CREATIVE",
-    orgMd: `# 📣 Marketing Agency
+    badgeLabel: "LEGAL",
+    orgMd: `# contract-review
+> Mission: Review and analyze contracts against company playbook
 
 ## Identity
-A results-driven marketing agency delivering creative campaigns across
-channels. Quality, consistency, and brand voice in every output.
+- **Industry:** Legal / Corporate
+- **Pain:** Junior associates spend 80+ hrs/week on manual review
 
 ## Culture
-- **Preset:** creative
-- **Escalation:** same-day — creative blocks need fast unblocking
-- **Progress updates:** daily standup + on delivery
+- **Preset:** professional
+- **Escalation:** flag ambiguous clauses to Senior Reviewer immediately
+- **Progress updates:** on each clause batch completion
 - **Ack required:** yes
 
 ## Policies
-- **Per-agent limit:** $25/day
-- **Alert threshold:** $90/week
+- **Per-agent limit:** 800 credits/contract
+- **Alert threshold:** 85%
+- **Period:** per-job
 
 ## Structure
 
-### Marketing
-
-#### Marketing Director — Sam Rivera
-- **Level:** 9
-- **Domain:** Marketing
-
-#### Content Writer — Taylor Brooks
-- **Level:** 5
-- **Domain:** Content
-- **Reports to:** Sam Rivera
-
-#### Creative Designer — Alex Nguyen
-- **Level:** 5
-- **Domain:** Design
-- **Reports to:** Sam Rivera
-
-#### Social Media Manager — Jordan Kim
-- **Level:** 4
-- **Domain:** Social Media
-- **Reports to:** Sam Rivera
-`,
-  },
-  {
-    id: "customer-support",
-    name: "Customer Support",
-    description:
-      "A tiered support org — Manager coordinates 3 frontline agents with an escalation specialist handling tough cases.",
-    emoji: "🎧",
-    agentCount: 5,
-    badgeColor: "emerald",
-    badgeLabel: "SUPPORT",
-    orgMd: `# 🎧 Customer Support Org
-
-## Identity
-Customer-first support operation committed to fast resolution times and
-high satisfaction scores. Escalation paths are clear and respected.
-
-## Culture
-- **Preset:** support
-- **Escalation:** 15 minutes — customers can't wait
-- **Progress updates:** on every ticket status change
-- **Ack required:** yes
-
-## Policies
-- **Per-agent limit:** $15/day
-- **Alert threshold:** $60/week
-
-## Structure
-
-### Support
-
-#### Support Manager — Morgan Chen
-- **Level:** 9
-- **Domain:** Customer Support
-
-#### Support Agent — Riley Johnson
-- **Level:** 4
-- **Count:** 3
-- **Domain:** Tier 1 Support
-- **Reports to:** Morgan Chen
-
-#### Escalation Specialist — Jamie Park
+### Senior Reviewer
+Owns the final risk assessment. Signs off on all flagged clauses.
 - **Level:** 7
-- **Domain:** Tier 2 Support
-- **Reports to:** Morgan Chen
+- **Model:** claude-opus
+- **Domain:** legal review
+
+#### Clause Extractor
+Parses contract text, identifies and tags all material clauses by type.
+- **Level:** 5
+- **Model:** claude-sonnet
+- **Domain:** document processing
+
+#### Risk Analyst
+Compares extracted clauses against company playbook. Scores risk.
+- **Level:** 5
+- **Model:** claude-sonnet
+- **Domain:** risk analysis
+
+#### Summary Writer
+Drafts the review memo with key findings, red flags, and recommendations.
+- **Level:** 4
+- **Model:** claude-haiku
+- **Domain:** writing
 `,
   },
   {
-    id: "research-lab",
-    name: "Research Lab",
+    id: "compliance-monitoring",
+    name: "Fintech Compliance",
     description:
-      "Academic-style org with a Lead Researcher directing two analysts and a technical writer. Evidence-based, citation-heavy.",
-    emoji: "🔬",
+      "Manual transaction monitoring misses 15% of anomalies. This agent org scans transactions, applies rules, generates SAR-ready reports, and escalates automatically.",
+    emoji: "🏦",
     agentCount: 4,
-    badgeColor: "slate",
-    badgeLabel: "RESEARCH",
-    orgMd: `# 🔬 Research Lab
+    badgeColor: "emerald",
+    badgeLabel: "FINTECH",
+    orgMd: `# compliance-monitoring
+> Mission: Monitor transactions and generate compliance reports
 
 ## Identity
-Rigorous, evidence-based research organization. Every claim is cited,
-every conclusion is validated. We publish findings, not opinions.
+- **Industry:** Fintech / Banking
+- **Pain:** Manual monitoring misses 15% of anomalies; reports take days
 
 ## Culture
-- **Preset:** academic
-- **Escalation:** when blocked on access or conflicting data
-- **Progress updates:** weekly summary + on milestone
+- **Preset:** compliance
+- **Escalation:** immediate on high-risk flags — regulatory exposure
+- **Progress updates:** every batch completion + daily summary
+- **Ack required:** yes
+
+## Policies
+- **Per-agent limit:** 600 credits/day
+- **Alert threshold:** 80%
+- **Period:** daily
+
+## Structure
+
+### Compliance Lead
+Owns regulatory posture. Reviews high-risk flags, approves SAR filings.
+- **Level:** 7
+- **Model:** claude-opus
+- **Domain:** compliance
+
+#### Transaction Analyst
+Ingests transaction feeds, applies anomaly detection, scores risk.
+- **Level:** 5
+- **Model:** claude-sonnet
+- **Domain:** transaction analysis
+
+#### Rule Engine Agent
+Applies AML/KYC rules, jurisdiction-specific thresholds, and watchlists.
+- **Level:** 5
+- **Model:** claude-sonnet
+- **Domain:** rule processing
+
+#### Report Generator
+Drafts compliance reports, SAR narratives, and audit-ready summaries.
+- **Level:** 4
+- **Model:** claude-haiku
+- **Domain:** reporting
+`,
+  },
+  {
+    id: "game-live-ops",
+    name: "Gaming Live Ops",
+    description:
+      "Player churn from stale content and unbalanced economy. This agent org monitors metrics, tunes the economy, generates seasonal content, and handles support escalations.",
+    emoji: "🎮",
+    agentCount: 4,
+    badgeColor: "violet",
+    badgeLabel: "GAMING",
+    orgMd: `# game-live-ops
+> Mission: Maintain healthy game economy and player engagement
+
+## Identity
+- **Industry:** Gaming / Live Service
+- **Pain:** Player churn from stale content and unbalanced economy
+
+## Culture
+- **Preset:** creative-ops
+- **Escalation:** 1 hour for economy anomalies — snowball risk
+- **Progress updates:** daily metrics digest + on content release
 - **Ack required:** no
 
 ## Policies
-- **Per-agent limit:** $40/day
-- **Alert threshold:** $150/week
+- **Per-agent limit:** 400 credits/day
+- **Alert threshold:** 75%
+- **Period:** daily
 
 ## Structure
 
-### Research
+### Ops Director
+Owns game health KPIs. Coordinates content and economy agents.
+- **Level:** 7
+- **Model:** claude-sonnet
+- **Domain:** live operations
 
-#### Lead Researcher — Dr. Avery Liu
-- **Level:** 9
-- **Domain:** Research Leadership
-
-#### Research Analyst — Casey Morgan
+#### Economy Tuner
+Analyzes sink/source ratios, adjusts drop rates, models inflation curves.
 - **Level:** 6
-- **Count:** 2
-- **Domain:** Data Analysis
-- **Reports to:** Dr. Avery Liu
+- **Model:** claude-sonnet
+- **Domain:** game economy
 
-#### Technical Writer — Sam Brooks
+#### Content Generator
+Writes event descriptions, NPC dialogue, seasonal challenges, patch notes.
 - **Level:** 5
-- **Domain:** Documentation
-- **Reports to:** Dr. Avery Liu
+- **Model:** claude-haiku
+- **Domain:** content creation
+
+#### Player Support
+Triages support tickets, issues compensation, escalates exploits.
+- **Level:** 4
+- **Model:** ollama/qwen2.5
+- **Domain:** player support
+`,
+  },
+  {
+    id: "catalog-management",
+    name: "E-commerce Catalog",
+    description:
+      "10,000 SKUs, competitors change prices daily, descriptions go stale. This agent org monitors competitors, optimizes pricing, rewrites descriptions, and flags anomalies.",
+    emoji: "🛒",
+    agentCount: 4,
+    badgeColor: "amber",
+    badgeLabel: "E-COMMERCE",
+    orgMd: `# catalog-management
+> Mission: Keep product catalog competitive and optimized
+
+## Identity
+- **Industry:** E-commerce / Retail
+- **Pain:** 10k SKUs, daily competitor price changes, stale descriptions
+
+## Culture
+- **Preset:** ops
+- **Escalation:** 2 hours for price anomalies — margin impact
+- **Progress updates:** daily pricing digest + on content batch
+- **Ack required:** yes for price changes >15%
+
+## Policies
+- **Per-agent limit:** 300 credits/day
+- **Alert threshold:** 80%
+- **Period:** daily
+
+## Structure
+
+### Catalog Manager
+Owns catalog quality and pricing strategy. Reviews agent recommendations.
+- **Level:** 7
+- **Model:** claude-sonnet
+- **Domain:** catalog management
+
+#### Price Optimizer
+Monitors competitor prices, applies margin rules, recommends adjustments.
+- **Level:** 6
+- **Model:** claude-sonnet
+- **Domain:** pricing
+
+#### Content Writer
+Rewrites product descriptions, generates SEO copy, updates attributes.
+- **Level:** 5
+- **Model:** claude-haiku
+- **Domain:** content
+
+#### Competitor Monitor
+Tracks competitor SKUs, prices, availability. Feeds data to Price Optimizer.
+- **Level:** 4
+- **Model:** ollama/qwen2.5
+- **Domain:** competitive intelligence
+`,
+  },
+  {
+    id: "clinical-trial-processing",
+    name: "Healthcare Clinical Trials",
+    description:
+      "Regulatory submissions take months of manual data processing. This agent org parses study data, validates protocols, drafts regulatory sections, and tracks submission status.",
+    emoji: "🏥",
+    agentCount: 4,
+    badgeColor: "slate",
+    badgeLabel: "HEALTHCARE",
+    orgMd: `# clinical-trial-processing
+> Mission: Process clinical trial data and prepare regulatory submissions
+
+## Identity
+- **Industry:** Healthcare / Pharma
+- **Pain:** Regulatory submissions take months of manual data processing
+
+## Culture
+- **Preset:** compliance
+- **Escalation:** immediate on data integrity issues — patient safety
+- **Progress updates:** on each study milestone
+- **Ack required:** yes — all outputs require Study Director sign-off
+
+## Policies
+- **Per-agent limit:** 1000 credits/study
+- **Alert threshold:** 85%
+- **Period:** per-study
+
+## Structure
+
+### Study Director
+Owns submission integrity and regulatory strategy. Final sign-off authority.
+- **Level:** 8
+- **Model:** claude-opus
+- **Domain:** clinical research
+
+#### Data Analyst
+Parses raw study data, runs statistical validations, generates tables/figures.
+- **Level:** 6
+- **Model:** claude-sonnet
+- **Domain:** biostatistics
+
+#### Protocol Validator
+Cross-checks data against approved protocol. Flags deviations.
+- **Level:** 5
+- **Model:** claude-sonnet
+- **Domain:** protocol compliance
+
+#### Regulatory Writer
+Drafts CSR sections, prepares eCTD modules, formats for FDA/EMA submission.
+- **Level:** 5
+- **Model:** claude-haiku
+- **Domain:** regulatory writing
 `,
   },
 ];
@@ -627,8 +769,9 @@ export function TemplatesPage() {
             <span className="gradient-text">Starter Orgs</span>
           </h1>
           <p className="mx-auto max-w-xl text-lg text-slate-400 leading-relaxed md:text-xl">
-            Five battle-tested ORG.md configurations ready to copy, adapt, and
-            spawn. From solo startups to full research labs.
+            Seven industry-ready ORG.md templates. SaaS onboarding, incident response, legal
+            review, compliance, live ops, e-commerce, and clinical trials — pick one and
+            have agents running in minutes.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
@@ -656,7 +799,7 @@ export function TemplatesPage() {
             </h2>
             <div className="h-px flex-1 bg-white/5" />
             <span className="text-sm text-slate-500">
-              {TEMPLATES.length} templates
+              {TEMPLATES.length} industry templates
             </span>
           </div>
 
@@ -705,18 +848,16 @@ export function TemplatesPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://bikinibottom.ai/app/"
-                target="_blank"
-                rel="noopener"
+                href="/docs/getting-started"
                 className="rounded-lg bg-cyan-500 px-6 py-2.5 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400"
               >
-                Try Live Demo →
+                Get Started →
               </a>
               <a
-                href="/docs/getting-started"
+                href="/docs/tutorials/your-first-org-md"
                 className="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-300 ring-1 ring-white/10 transition hover:bg-white/5"
               >
-                Getting Started →
+                ORG.md Tutorial →
               </a>
             </div>
           </div>

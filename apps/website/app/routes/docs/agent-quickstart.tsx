@@ -521,7 +521,7 @@ openspawn consensus --results
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
-          to="/docs/org-reference"
+          to="/docs/templates"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
@@ -534,7 +534,7 @@ openspawn consensus --results
         </Link>
 
         <Link
-          to="/docs/models"
+          to="/docs/comparison"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
@@ -546,7 +546,7 @@ openspawn consensus --results
         </Link>
 
         <Link
-          to="/docs/cli-reference"
+          to="/getting-started"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
@@ -558,7 +558,7 @@ openspawn consensus --results
         </Link>
 
         <Link
-          to="/docs/demo"
+          to="/app/live"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">

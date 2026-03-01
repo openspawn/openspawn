@@ -135,8 +135,10 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
         team={team}
         parentTeams={parentTeams}
         onSave={(updated) => {
-          // TODO: persist to API when available
-          console.log('Team updated:', updated);
+          // DEFERRED: Team edits are not yet persisted to the backend.
+          // Wire to the updateTeam GraphQL mutation when it is available:
+          //   updateTeam({ variables: { id: updated.id, input: updated } })
+          console.log('Team updated (local only, not persisted):', updated);
         }}
       />
       {team && (
@@ -146,8 +148,10 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
           team={team}
           memberCount={members.length}
           onConfirm={() => {
-            // TODO: persist to API when available
-            console.log('Team deleted:', team.id);
+            // DEFERRED: Team deletion is not yet wired to the backend.
+            // Wire to the deleteTeam GraphQL mutation when it is available:
+            //   deleteTeam({ variables: { id: team.id } })
+            console.log('Team deleted (local only, not persisted):', team.id);
           }}
         />
       )}

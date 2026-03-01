@@ -1,6 +1,55 @@
+# OpenSpawn — Full Documentation for AI Agents
+
+> This file contains all OpenSpawn documentation in a single text file.
+> Optimized for AI agents that cannot render JavaScript SPAs.
+> For the index only, see: https://openspawn.ai/llms.txt
+
+
+---
+## Source: llms.txt
+
 # OpenSpawn
 
 > OpenSpawn is an open-source coordination layer for AI agent organizations. You define your entire agent org — roles, hierarchy, culture, policies — in a single markdown file (ORG.md), and OpenSpawn parses it, spawns agents, routes tasks through the hierarchy, and gives you a real-time dashboard. It is infrastructure, not a framework: it works with any agent stack (OpenClaw, LangGraph, CrewAI, AutoGen, raw API calls).
+
+## The Core Idea: ORG.md
+
+**One file defines your entire agent organization.** ORG.md is the heart of OpenSpawn.
+
+```markdown
+# My Org Name
+
+## Identity
+Mission, industry context, pain solved.
+Becomes ambient context for every agent.
+
+## Culture
+preset: agency
+Communication norms and escalation speed.
+
+## Structure
+
+### Lead Agent — Title
+Description of what this agent does.
+- **Level:** 7
+- **Department:** Operations
+- **Reports to:** Human Principal
+
+#### Worker Agent — Title
+Description of responsibilities.
+- **Level:** 5
+- **Reports to:** Lead Agent
+
+## Policies
+Budget limits, permission guardrails, human approval thresholds.
+
+## Playbooks
+Step-by-step procedures for standard scenarios.
+```
+
+Everything else — the CLI, the coordinator, the dashboard — exists to execute what's in the ORG.md.
+
+---
 
 ## When to use OpenSpawn vs sub-agents
 
@@ -26,8 +75,8 @@ Key difference: sub-agents are ephemeral (spawn, do work, die). OpenSpawn agents
 # Install CLI
 npm install -g openspawn
 
-# Create a new org from template
-openspawn init my-org --template=assistant-team
+# Create a new org from a real-world industry template
+openspawn init my-org --template=saas-onboarding
 cd my-org
 
 # Preview in dashboard (no API keys needed)
@@ -42,6 +91,26 @@ pnpm exec nx serve sandbox
 
 ---
 
+## Industry Templates
+
+OpenSpawn ships seven real-world org templates. Each produces a complete ORG.md:
+
+| Template | Industry | Pain solved |
+|----------|---------|-------------|
+| `saas-onboarding` | SaaS | Enterprise customer onboarding in 48 hours |
+| `incident-response` | DevOps / SRE | Minimize MTTR, automate incident coordination |
+| `contract-review` | Legal | Contract review pipeline against company playbook |
+| `compliance-monitoring` | Fintech | AML/BSA monitoring, SAR/CTR filing automation |
+| `game-live-ops` | Gaming | Economy monitoring, content generation, player sentiment |
+| `catalog-management` | E-commerce | Competitor monitoring, dynamic pricing, content refresh |
+| `clinical-trials` | Healthcare | Clinical data processing, regulatory submission prep |
+
+```bash
+openspawn init my-org --template=<template-name>
+```
+
+---
+
 ## CLI Commands
 
 ### `openspawn init [directory]`
@@ -49,13 +118,13 @@ Create a new agent organization.
 
 | Flag | Description |
 |------|-------------|
-| `-t, --template` | Template name: `assistant-team`, `content-agency`, `dev-shop`, `research-lab` |
+| `-t, --template` | Template name — see Industry Templates table above |
 | `--non-interactive` | Skip wizard, use defaults |
 
 ```bash
 openspawn init my-org
-openspawn init my-org --template=dev-shop
-openspawn init my-org --template=assistant-team --non-interactive
+openspawn init my-org --template=incident-response
+openspawn init my-org --template=saas-onboarding --non-interactive
 ```
 
 ### `openspawn validate [file]`
@@ -167,6 +236,44 @@ OpenSpawn exposes tools via MCP (Streamable HTTP at `POST /mcp`). Agents authent
 | `consensus_vote` | Submit vote | `consensusId`, `vote` (approve/reject), `reason?` |
 | `consensus_status` | Check consensus status | `consensusId` |
 
+### Coordination Tools
+
+SQLite-backed coordination server for multi-agent task management. Exposed via MCP.
+
+#### Task Management
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `task_create` | Create a task and optionally assign it | `title`, `description?`, `priority?` (urgent/high/normal/low), `assign_to?`, `created_by?` |
+| `task_claim` | Atomically claim an open task (prevents duplicate work) | `task_id`, `agent_id` |
+| `task_update` | Update task status or details | `task_id`, `status?`, `description?`, `priority?`, `assign_to?` |
+| `task_complete` | Mark task done with result and artifacts | `task_id`, `result`, `artifacts?` (string array) |
+| `task_list` | List tasks with filters | `status?`, `assigned_to?`, `priority?` |
+
+#### Agent Management
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `agent_register` | Register an agent in the org | `id`, `name`, `role`, `level?`, `department?`, `model?` |
+| `agent_update_status` | Set agent status | `agent_id`, `status` (idle/working/paused/overwhelmed) |
+| `agent_fire` | Remove agent (archives workspace) | `agent_id` |
+| `agent_list` | List all agents with current status | — |
+
+#### Communication
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `message_send` | Send structured message between agents | `to`, `body`, `type` (TASK/RESULT/ESCALATION/DECISION) |
+| `message_list` | List messages with filters | `to?`, `from?`, `type?` |
+
+#### Escalation
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `escalation_create` | Create an escalation | `issue`, `context?`, `severity` (low/medium/high/critical), `to_agent?` |
+| `escalation_list` | List escalations | `severity?`, `status?` |
+
+#### Overview
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `org_status` | Full org overview: agents, tasks, budget | — |
+
 ---
 
 ## Key Concepts
@@ -177,18 +284,23 @@ A single markdown file that defines your entire agent organization. Five optiona
 1. **Identity** — Name, mission, values, industry context. Becomes ambient context for all agents.
 2. **Culture** — Communication norms. Use a preset (`startup`, `enterprise`, `agency`, `research`, `military`, `remote-async`) or customize individual parameters.
 3. **Structure** — Agent roles with name, level (L1-L10), domain, reporting hierarchy, avatar.
-4. **Policies** — Budget limits, department caps, permission levels.
-5. **Playbooks** — Step-by-step procedures for common scenarios (escalation, handoff, rush hour).
+4. **Policies** — Budget limits, department caps, permission levels, human approval thresholds.
+5. **Playbooks** — Step-by-step procedures for common scenarios (escalation, handoff, regulatory events).
 
-### Templates
-Pre-built ORG.md files for common team shapes:
+The ORG.md IS the product. Everything else exists to execute what's in it.
 
-| Template | Description | Roles |
-|----------|-------------|-------|
-| `assistant-team` | Personal AI team for solo operator | Chief of staff, research, content (strategy + writer + design), engineering, security, quality |
-| `content-agency` | Content production pipeline | Research, strategy, writing, design |
-| `dev-shop` | Software development team | Lead, frontend, backend, QA |
-| `research-lab` | Research & analysis team | High autonomy, exploration budget |
+### Industry Templates
+Pre-built ORG.md files modeled on real organizational pain points:
+
+| Template | Description | Key roles |
+|----------|-------------|-----------|
+| `saas-onboarding` | 48-hour enterprise onboarding pipeline | Onboarding Lead, Data Migration, Integration, Success |
+| `incident-response` | Production incident coordination | Incident Commander, Diagnostics, Remediation, Comms |
+| `contract-review` | Contract review against company playbook | Senior Reviewer, Clause Extractor, Risk Analyst, Summary Writer |
+| `compliance-monitoring` | AML/BSA transaction monitoring | Compliance Lead, Transaction Analyst, Rule Engine, Report Generator |
+| `game-live-ops` | Live service game operations | Ops Director, Economy Tuner, Content Generator, Player Support |
+| `catalog-management` | E-commerce catalog optimization | Catalog Manager, Price Optimizer, Content Writer, Competitor Monitor |
+| `clinical-trials` | Clinical data processing for regulatory submission | Study Director, Data Analyst, Protocol Validator, Regulatory Writer |
 
 ### Agent Communication Protocol (ACP)
 How agents communicate through the hierarchy. Four message types:
@@ -268,14 +380,4070 @@ A: Run `openspawn start` to generate `openclaw-patch.json`, then apply it to you
 **Q: What does openclaw-patch.json contain?**
 A: OpenClaw `agents.list` entries with `id`, `model`, `workspace`, and `subagents.allowAgents` for managers. L7+ agents get opus, L6- get sonnet. The highest-level agent gets `default: true`. All agents get `tools.profile: "full"`.
 
+**Q: How do agents coordinate work?**
+A: Via MCP coordination tools. `task_create` assigns work, `task_claim` prevents duplicate effort (atomic — only one agent wins), `task_complete` records results with artifacts. Use `org_status` for a full overview.
+
+**Q: How do I escalate an issue?**
+A: `escalation_create { issue: "deployment failed", severity: "high" }`. Escalations are tracked and can be filtered by severity. Resolve them with the escalation workflow.
+
+**Q: Can two agents claim the same task?**
+A: No. `task_claim` is atomic — only one agent wins the claim, the other gets an error. This prevents duplicate work by design.
+
 **Q: How is this different from CrewAI/LangGraph/AutoGen?**
 A: Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together: build agents with your framework, coordinate them with OpenSpawn.
+
+**Q: Can I use OpenSpawn for compliance monitoring?**
+A: Yes. The `compliance-monitoring` template is purpose-built for fintech compliance. It models transaction monitoring, AML/BSA rule application, OFAC screening, and SAR/CTR filing — with full audit trails.
+
+**Q: How would I set up a contract review pipeline?**
+A: Use the `contract-review` template. Clause Extractor → Risk Analyst → Summary Writer → Senior Reviewer approval. Updates to the Policies section let you enforce your specific playbook rules.
 
 ---
 
 ## Links
 
 - GitHub: https://github.com/openspawn/openspawn
-- Live Demo: https://bikinibottom.ai/app/
-- Docs: https://bikinibottom.ai/docs
-- ORG.md Spec: https://bikinibottom.ai/org-md
+- Live Demo: https://openspawn.dev/app/
+- Docs: https://openspawn.dev/docs
+- ORG.md Spec: https://openspawn.dev/org-md
+
+---
+## Source: agent-quickstart.md
+
+---
+purpose: Get an AI agent from zero to a running multi-agent organization
+audience: AI agents (LLMs) that need to coordinate other agents
+prerequisites: Node.js 18+, npm
+time_estimate: 10 minutes
+commands_used: [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
+related: [llms.txt, mcp-reference.md, communication-protocol.md, FAQ.md, troubleshooting.md]
+---
+
+# Agent Quickstart
+
+**What you'll learn:** How to go from zero to a running multi-agent org in 3 commands — templates, ORG.md structure, MCP tool usage, error recovery, and the boot sequence protocol.
+
+You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file called `ORG.md`.
+
+**The core idea:** One file defines your entire agent organization. Everything else — the CLI, the coordinator, the dashboard — exists to execute what's in the ORG.md.
+
+## Three commands to a running org
+
+```bash
+openspawn init my-org --template=saas-onboarding --yes
+cd my-org
+openspawn start
+openspawn status
+```
+
+That's it. You now have a running org with an Onboarding Lead, Data Migration Specialist, Integration Engineer, and Success Agent — with OpenClaw gateway configs ready to apply.
+
+> **Q: Do I need API keys?**
+> - No. Demo/simulation mode works out of the box with zero configuration.
+
+> **Q: What just happened?**
+> - `init` created `ORG.md` (your org definition) and `openclaw-agents.json`
+> - `start` read the agents config and generated `openclaw-patch.json` with OpenClaw gateway entries
+> - `status` displayed a table of all agents with their name, level, model, workspace, and reports-to
+
+> **Q: What is openclaw-patch.json?**
+> - A ready-to-apply patch for your OpenClaw gateway's `agents.list`
+> - Each entry has: `id`, `model` (opus for L7+, sonnet for L6-), `workspace`, `tools.profile: "full"`
+> - Manager agents (L7+ with direct reports) also get `subagents.allowAgents`
+> - The highest-level agent gets `default: true`
+
+> **Q: How do I apply the patch to my gateway?**
+> - Copy the entries from `openclaw-patch.json` into your OpenClaw `agents.list` configuration, then restart the gateway.
+
+---
+
+## Pick a template
+
+Seven industry templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize.
+
+```bash
+# SaaS customer onboarding pipeline
+openspawn init my-org --template=saas-onboarding
+
+# DevOps incident response team
+openspawn init my-org --template=incident-response
+
+# Legal contract review pipeline
+openspawn init my-org --template=contract-review
+
+# Fintech compliance monitoring
+openspawn init my-org --template=compliance-monitoring
+
+# Gaming live operations team
+openspawn init my-org --template=game-live-ops
+
+# E-commerce catalog management
+openspawn init my-org --template=catalog-management
+
+# Healthcare clinical trial processing
+openspawn init my-org --template=clinical-trials
+```
+
+> **Q: Which template should I use?**
+> ```
+> What's your domain?
+> ├── Customer success / onboarding → saas-onboarding
+> ├── Infrastructure / reliability  → incident-response
+> ├── Legal / compliance            → contract-review or compliance-monitoring
+> ├── Gaming / live service         → game-live-ops
+> ├── E-commerce / retail           → catalog-management
+> └── Healthcare / life sciences    → clinical-trials
+> ```
+
+> **Q: Can I combine templates?**
+> - Yes. Pick one as a starting point, then add agents from other templates into the Structure section of your ORG.md.
+
+> **Q: Can I create agents not in any template?**
+> - Absolutely. Templates are starting points. Add any agent to the `## Structure` section with a name, level, domain, and reporting line.
+
+---
+
+## Understanding ORG.md
+
+Your entire org lives in one file. Five sections, all optional except Structure:
+
+```markdown
+# SaaS Onboarding Org
+
+## Identity
+Mission, industry context, pain solved.
+Becomes ambient context for every agent.
+
+## Culture
+preset: agency
+Communication norms, escalation speed, progress frequency.
+
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns customer relationships from contract to go-live.
+- **Level:** 7
+- **Department:** Customer Success
+- **Reports to:** Human Principal
+
+#### Data Migration Specialist — Senior Data Engineer
+Ingests and validates customer data from source systems.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+## Policies
+Budget limits, permission guardrails, human approval thresholds.
+
+## Playbooks
+Step-by-step procedures for standard scenarios and escalations.
+```
+
+> **Q: What's the minimum viable ORG.md?**
+> ```markdown
+> # My Org
+>
+> ## Structure
+>
+> ### Boss — Leader
+> - **Level:** 10
+> - **Reports to:** Human Principal
+> ```
+
+> **Q: What do levels mean?**
+> - L1-L5: Workers. Execute tasks.
+> - L6: Can review and approve work.
+> - L7-L9: Can create tasks and spawn agents. Department leads.
+> - L10: Executive. Top of the hierarchy.
+
+> **Q: What's "Reports to"?**
+> - Defines the escalation chain. When an agent is blocked, it escalates to whoever it reports to. Never skip the chain.
+
+---
+
+## Validate your org
+
+```bash
+openspawn validate ORG.md
+```
+
+Output on success:
+```
+✅ ORG.md is valid
+
+  Organization:  SaaS Onboarding Org
+  Agents:        4
+  Culture:       agency
+
+  Agent hierarchy:
+    🎯 Onboarding Lead (L7, Customer Success)
+      📦 Data Migration Specialist (L5, Engineering)
+      🔧 Integration Engineer (L5, Engineering)
+      ✅ Success Agent (L4, Customer Success)
+```
+
+> **Q: If I see "validation failed", what do I do?**
+> - The output lists each issue. Common fixes:
+>   - "Missing Structure section" → Add `## Structure` with at least one agent
+>   - "Agent reports to unknown agent" → Check spelling of the `Reports to` value
+>   - "No top-level agent" → One agent must have `Reports to: Human Principal`
+
+---
+
+## Culture presets
+
+Instead of configuring every communication parameter, use a preset:
+
+```markdown
+## Culture
+preset: agency
+```
+
+| Preset | Best for | Escalation | Progress updates |
+|--------|----------|-----------|-----------------|
+| `startup` | Small fast teams | Immediate | Frequent |
+| `enterprise` | Large orgs with process | Batched (hourly) | On phase change |
+| `agency` | Client work with deadlines | Immediate | Every tick |
+| `research` | Exploration, long tasks | Delayed | On request |
+| `military` | Zero-ambiguity operations | Immediate | Every tick |
+| `remote-async` | Distributed, async teams | Delayed | On request |
+
+> **Q: Can I override specific settings in a preset?**
+> - Yes. Add overrides after the preset line:
+> ```markdown
+> ## Culture
+> preset: agency
+> - **Escalation:** batched
+> - **Ack required:** no
+> ```
+
+---
+
+## Interacting via MCP
+
+Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
+
+```bash
+# List all agents
+→ agent_list
+
+# Create a task (e.g., onboard a new customer)
+→ task_create { title: "Onboard Acme Corp", priority: "high", assigneeId: "onboarding-lead" }
+
+# Check your balance
+→ credits_balance
+
+# Escalate a blocker
+→ escalation_create { taskId: "task-123", reason: "migration blocked", targetAgentId: "onboarding-lead" }
+
+# Send a structured message
+→ message_send { channelId: "chan-1", body: "Migration complete for Acme Corp. 1.2M rows verified.", type: "handoff" }
+```
+
+> **Q: How do I authenticate?**
+> - HMAC authentication. Set `AGENT_ID` and `AGENT_SECRET` environment variables. The MCP client handles the rest.
+
+> **Q: What's the full tool list?**
+> - See `docs/llms.txt` for every tool with all parameters.
+
+---
+
+## Managing Tasks
+
+The coordination tools give agents a shared task board backed by SQLite. Here's the core workflow:
+
+### Create a task
+```
+tool: task_create { title: "Migrate Acme Corp database", priority: "high", assign_to: "data-migration-specialist" }
+```
+
+### Claim an open task
+```
+tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
+```
+> **Q: Can two agents claim the same task?**
+> No. `task_claim` is atomic — only one agent wins, the other gets an error. This prevents duplicate work.
+
+### Complete a task
+```
+tool: task_complete { task_id: "abc123", result: "1.2M rows migrated, checksum verified", artifacts: ["migration-report.md"] }
+```
+
+### List tasks
+```
+tool: task_list { status: "open", priority: "high" }
+```
+
+### Escalate a problem
+```
+tool: escalation_create { issue: "source database connection refused", severity: "high", to_agent: "onboarding-lead" }
+```
+
+### Check org status
+```
+tool: org_status
+```
+> Returns a full overview: all agents, task counts, budget status.
+
+> **Q: How do agents coordinate work?**
+> Via coordination tools. `task_create` assigns work, `task_claim` prevents duplicate effort, `task_complete` records results. `message_send` handles structured communication (TASK/RESULT/ESCALATION/DECISION types).
+
+> **Q: Where's the full tool reference?**
+> See `docs/llms.txt` — the "Coordination Tools" section lists all 14 tools with parameters.
+
+---
+
+## Common workflows
+
+### Delegate a task
+```
+1. task_create { title: "...", assigneeId: "specialist-id" }
+2. Specialist receives task → auto-ACKs (👍)
+3. Specialist logs progress to task activity
+4. Specialist completes → task_transition { id: "...", status: "done" }
+5. You get a completion notification
+```
+
+### Handle an escalation
+```
+1. escalation_list → see pending escalations
+2. Read the reason and task details
+3. Either: resolve it, reassign the task, or escalate further
+4. escalation_resolve { escalationId: "...", resolution: "Engaged engineering support, ETA 2 hours" }
+```
+
+### Request consensus
+```
+1. consensus_request { taskId: "...", question: "Proceed with live migration?", voterIds: ["agent-a", "agent-b"] }
+2. Each voter: consensus_vote { consensusId: "...", vote: "approve" }
+3. consensus_status { consensusId: "..." } → see result
+```
+
+---
+
+## Error recovery
+
+| You see | Run this |
+|---------|----------|
+| `Cannot read ORG.md` | `openspawn validate` — check the file exists and is valid markdown |
+| `Port 3333 already in use` | `lsof -i :3333` then kill the process, or set `"port": 3334` in config |
+| `Unknown template: foo` | Valid templates: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
+| `Agent reports to unknown agent` | Check the `Reports to` field matches an existing agent name exactly |
+| `HMAC authentication failed` | Verify `AGENT_ID` and `AGENT_SECRET` env vars match the API config |
+
+---
+
+## Boot Sequence — How Orgs Start Up
+
+When `openspawn start` boots your org, the lead agent doesn't just start delegating. It follows a **planning-first boot sequence**:
+
+```
+1. Read ORG.md     → understand mission, team, constraints
+2. Read PLAN.md    → check if resuming a previous run
+3. Write PLAN.md   → break mission into phased tasks with assignments
+4. Register agents → agent_register for each team member
+5. Create tasks    → task_create for current-phase items
+6. Monitor         → org_status every 5 minutes
+7. Adapt           → update PLAN.md when things change
+8. Complete        → escalate "mission complete" when done
+```
+
+**Example for a SaaS onboarding org:** The Onboarding Lead reads the ORG.md, sees the 48-hour track playbook, writes PLAN.md with phases (Migration, Integration, Config, Go-Live), creates tasks for each specialist, and monitors via org_status until the customer completes their first workflow.
+
+> **Q: Why planning first?**
+> Plans are cheaper than confusion. A 30-second PLAN.md prevents hours of rework, wasted tokens, and "what did you mean?" messages.
+
+> **Q: What goes in PLAN.md?**
+> - Mission statement (from ORG.md)
+> - Phase breakdown (what order to build)
+> - Task table with assignments, priorities, dependencies, and status
+> - Success criteria and definition of done
+
+> **Q: How do workers know what to do?**
+> Workers read PLAN.md on startup, then claim their assigned tasks via `task_claim`. They don't wait for chat messages — the plan IS the assignment.
+
+> **Q: What if the plan needs to change?**
+> The lead updates PLAN.md first, then updates MCP tasks to match. PLAN.md is always the source of truth.
+
+See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md` for the lead agent template, and `templates/SOUL-worker.md` for the worker template.
+
+---
+
+## Next steps
+
+- **Customize your ORG.md:** add agents, change levels, write playbooks — see [`docs/org-md-reference.md`](./org-md-reference.md)
+- **Connect real models:** set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — full parameter reference
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — save 50-70% on coordination tokens
+- **Template deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 7 industry templates
+- **Top FAQ:** [`docs/FAQ.md`](./FAQ.md) — common questions answered
+- **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — common issues and fixes
+- **Full reference:** [`docs/llms.txt`](./llms.txt)
+- **Live demo:** https://openspawn.dev/app/
+
+---
+## Source: getting-started.md
+
+---
+purpose: Get a human or agent from zero to a running OpenSpawn org
+audience: developers, AI agents
+prerequisites: Node.js 18+
+time_estimate: 10 minutes
+difficulty: beginner
+related: [agent-quickstart.md, templates-guide.md, org-md-reference.md, mcp-reference.md, FAQ.md, troubleshooting.md]
+---
+
+# Getting Started with OpenSpawn
+
+**What you'll learn:** How to install OpenSpawn, scaffold an org from a template, understand ORG.md structure, validate and generate configs, preview the dashboard, and connect real AI models.
+
+**What you'll have in ~10 minutes:** a local org of AI agents, coordinated by a single markdown file, visible in a real-time dashboard — with tasks flowing through a hierarchy you define.
+
+## What is OpenSpawn?
+
+OpenSpawn is a **coordination layer for AI agents**. It is not an agent framework — you keep using whatever you're using (OpenClaw, LangGraph, Claude Code, raw API calls). OpenSpawn adds the layer most multi-agent systems are missing: *structure*.
+
+```
+ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything
+```
+
+**The key idea:** One file — `ORG.md` — defines your entire agent organization. Roles, hierarchy, culture, budget policies, and operating procedures all live in one readable, version-controlled markdown file.
+
+> **Q: How is this different from CrewAI / LangGraph / AutoGen?**
+> - Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together.
+
+> **Q: Do I need to rewrite my agents?**
+> - No. OpenSpawn coordinates your existing agents via standard protocols (MCP, A2A).
+
+---
+
+## Do I need OpenSpawn?
+
+```
+Do you have multiple agents that need to work together?
+├── YES
+│   Do they need persistent roles, hierarchy, and budgets?
+│   ├── YES → Use OpenSpawn
+│   └── NO → Sub-agents (sessions_spawn) may be enough
+└── NO → You probably don't need OpenSpawn yet
+```
+
+---
+
+## Prerequisites
+
+**Required:**
+- Node.js 18+ (`node --version` to check)
+
+**Optional (for real model inference):**
+- [Ollama](https://ollama.ai) — free local models (workers use `qwen2.5` at zero cost)
+- [Groq](https://groq.com) API key — fast inference for mid-tier agents
+- [OpenRouter](https://openrouter.ai) API key — Claude/GPT-4o for executives
+
+> **Q: Do I need API keys to try it?**
+> - No. Demo/simulation mode works without any API keys. You see the full coordination flow.
+
+---
+
+## Step 1 — Start with ORG.md
+
+**ORG.md is the heart of OpenSpawn.** Before you run a single command, it's worth understanding what you're building toward.
+
+Here's a real ORG.md for a SaaS customer onboarding team — the scenario we'll use throughout this guide:
+
+```markdown
+# Customer Onboarding Org
+
+## Identity
+- **Mission:** Onboard new enterprise customers end-to-end in under 48 hours
+- **Industry:** SaaS / Enterprise Software
+
+## Culture
+preset: agency
+
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns the customer relationship from signed contract to go-live.
+- **Level:** 7
+- **Department:** Customer Success
+- **Reports to:** Human Principal
+
+#### Data Migration Specialist — Senior Data Engineer
+Ingests customer data, validates schema compatibility, verifies migration.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Integration Engineer — Platform Integration Specialist
+Connects customer's existing tools (CRM, ERP, SSO) to the platform.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Success Agent — Customer Success Representative
+Conducts go-live check-in, validates first successful workflow.
+- **Level:** 4
+- **Department:** Customer Success
+- **Reports to:** Onboarding Lead
+
+## Policies
+### Budget
+- **Per-agent limit:** 800 credits/customer
+- **Overage behavior:** pause and escalate
+
+## Playbooks
+### 48-Hour Onboarding Track
+1. Onboarding Lead creates PLAN.md and assigns tasks
+2. Migration and Integration work in parallel (hours 2–24)
+3. Success Agent conducts go-live validation (hours 40–48)
+```
+
+This one file defines the entire onboarding team. OpenSpawn parses it, generates OpenClaw configs, and routes tasks through the hierarchy automatically.
+
+> **Q: What if I just want to start fast without writing ORG.md from scratch?**
+> - Use a template: `openspawn init my-org --template=saas-onboarding`
+
+---
+
+## Step 2 — Scaffold your org
+
+```bash
+npx openspawn init my-org --template=saas-onboarding
+cd my-org
+```
+
+This creates:
+
+```
+my-org/
+├── ORG.md                  # Your org definition (the important one)
+├── openspawn.config.json   # Server config (port, model providers)
+└── .gitignore
+```
+
+> **Q: Can I skip the wizard?**
+> ```bash
+> openspawn init my-org --template=saas-onboarding --non-interactive
+> ```
+
+> **Q: What templates are available?**
+> | Template | Industry | Use case |
+> |----------|----------|---------|
+> | `saas-onboarding` | SaaS | Customer onboarding pipeline |
+> | `incident-response` | DevOps | Production incident management |
+> | `contract-review` | Legal | Contract review and risk analysis |
+> | `compliance-monitoring` | Fintech | Transaction monitoring and reporting |
+> | `game-live-ops` | Gaming | Live operations and player engagement |
+> | `catalog-management` | E-commerce | Product catalog and pricing |
+> | `clinical-trials` | Healthcare | Clinical trial data processing |
+
+---
+
+## Step 3 — Review your ORG.md
+
+Open `ORG.md`. You'll see five sections:
+
+| Section | Purpose | Required? |
+|---------|---------|-----------|
+| `## Identity` | Name, mission, values | No |
+| `## Culture` | Communication norms, preset | No |
+| `## Structure` | Agent roles and hierarchy | **Yes** |
+| `## Policies` | Budgets, caps, permissions | No |
+| `## Playbooks` | Step-by-step procedures | No |
+
+Each agent in Structure looks like:
+
+```markdown
+### Onboarding Lead — Customer Onboarding Manager
+The coordinator. Receives new customer intake, creates the onboarding plan,
+assigns work to specialists, and tracks progress to go-live.
+- **Level:** 7
+- **Department:** Customer Success
+- **Reports to:** Human Principal
+```
+
+> **Q: What do levels mean?**
+> - L1-L5: Workers
+> - L6: Can review/approve
+> - L7-L9: Can create tasks and spawn agents
+> - L10: Executive
+
+> **Q: What's "Reports to"?**
+> - The escalation chain. Blocked agents escalate to their manager. Never skip levels.
+
+---
+
+## Step 4 — Validate
+
+```bash
+openspawn validate
+```
+
+Expected output:
+```
+✅ ORG.md is valid
+
+  Organization:  Customer Onboarding Org
+  Agents:        4
+  Culture:       agency
+```
+
+### Error recovery
+
+| Error | Fix |
+|-------|-----|
+| `Cannot read ORG.md` | Make sure you're in the right directory: `ls ORG.md` |
+| `Missing Structure section` | Add `## Structure` with at least one agent |
+| `Agent reports to unknown agent` | Check spelling in `Reports to` — must match an agent name exactly |
+| `No top-level agent` | One agent needs `Reports to: Human Principal` |
+
+---
+
+## Step 5 — Generate OpenClaw configs
+
+```bash
+openspawn start
+```
+
+This reads your org and generates `openclaw-patch.json` — ready-to-apply OpenClaw gateway configuration.
+
+```bash
+openspawn status
+```
+
+Displays a table of all agents:
+
+```
+Name                        Level  Model   Workspace                        Reports To
+Onboarding Lead             L7     opus    workspace-onboarding-lead        Human Principal
+Data Migration Specialist   L5     sonnet  workspace-data-migration          Onboarding Lead
+Integration Engineer        L5     sonnet  workspace-integration-engineer    Onboarding Lead
+Success Agent               L4     sonnet  workspace-success-agent          Onboarding Lead
+```
+
+> **Q: What happens after init?**
+> - Run `openspawn start` to generate OpenClaw configs, then apply the patch to your gateway. The `openclaw-patch.json` file contains `agents.list` entries with id, model, workspace, and subagents config.
+
+> **Q: Can I output status as JSON?**
+> ```bash
+> openspawn status --json
+> ```
+
+---
+
+## Step 6 — Preview
+
+```bash
+npx openspawn preview
+```
+
+Opens the dashboard at http://localhost:3333. You'll see:
+- Network graph of your agent hierarchy
+- Task timeline (onboarding tasks flowing through the team)
+- Agent details and credit balances
+- Real-time SSE event stream
+
+> **Q: Port 3333 is in use?**
+> ```bash
+> # Option 1: Kill the existing process
+> lsof -i :3333
+> kill <PID>
+>
+> # Option 2: Change port in openspawn.config.json
+> { "port": 3334 }
+> ```
+
+---
+
+## Step 7 — Customize your ORG.md
+
+### Change the culture preset
+
+```markdown
+## Culture
+preset: enterprise
+```
+
+| Preset | Escalation | Progress | Hierarchy depth |
+|--------|-----------|----------|-----------------|
+| `startup` | Immediate | Frequent | 2-3 levels |
+| `enterprise` | Batched | On phase change | 5-8 levels |
+| `agency` | Immediate | Every tick | 3-4 levels |
+| `research` | Delayed | On request | 2-3 levels |
+| `military` | Immediate | Every tick | Strict chain |
+| `remote-async` | Delayed | On request | Flat |
+
+### Add an agent
+
+Add under `## Structure`:
+
+```markdown
+#### QA Validator — Onboarding Quality Analyst
+Reviews completed onboarding configurations for errors before go-live.
+- **Level:** 4
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+```
+
+### Set budget policies
+
+```markdown
+## Policies
+
+### Budget
+- **Per-agent limit:** 800 credits/customer
+- **Alert threshold:** 80%
+- **Overage behavior:** pause and escalate
+```
+
+### Write a playbook
+
+```markdown
+## Playbooks
+
+### Escalation: Blocked Migration
+1. Data Migration Specialist writes blocker to ESCALATION.md
+2. Escalates to Onboarding Lead via escalation_create
+3. Onboarding Lead engages engineering support within 1 hour
+4. Customer notified with revised ETA within 30 minutes
+```
+
+---
+
+## Step 8 — Connect real models (optional)
+
+Edit `openspawn.config.json`:
+
+```json
+{
+  "port": 3333,
+  "orgFile": "ORG.md",
+  "models": {
+    "ollama": { "enabled": true, "baseUrl": "http://localhost:11434" },
+    "groq": { "apiKey": "gsk_..." },
+    "openRouter": { "apiKey": "sk-or-..." }
+  }
+}
+```
+
+> **Q: Which model for which agent?**
+> - L1-L5 workers: Ollama (`qwen2.5`) — free, local
+> - L6-L8 leads: Groq — fast, cheap
+> - L9-L10 executives: OpenRouter (Claude/GPT-4o) — best reasoning
+
+---
+
+## The ORG.md mental model
+
+Every OpenSpawn feature flows from ORG.md:
+
+```
+ORG.md defines:
+  → who the agents are (Structure)
+  → how they communicate (Culture)
+  → what they can spend (Policies)
+  → how they handle common situations (Playbooks)
+
+OpenSpawn executes:
+  → parses ORG.md
+  → generates OpenClaw configs
+  → routes tasks through the hierarchy
+  → enforces budgets and escalation chains
+  → shows everything in the dashboard
+```
+
+ORG.md is version-controlled, reviewable in pull requests, and readable by any human or AI on your team. The document IS the system.
+
+---
+
+## Next steps
+
+- **Full CLI reference:** `openspawn --help`
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — every tool with parameters
+- **Templates deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 7 industry templates
+- **ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md) — every field and example
+- **Communication protocol:** [`docs/communication-protocol.md`](./communication-protocol.md) — save tokens with efficient agent communication
+- **Top FAQ:** [`docs/FAQ.md`](./FAQ.md)
+- **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md)
+- **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — agent-first version of this guide
+- **Live demo:** https://openspawn.dev/app/
+- **ORG.md spec:** https://openspawn.dev/org-md
+
+---
+## Source: FAQ.md
+
+---
+purpose: Answer the top questions agents and humans ask about OpenSpawn
+audience: AI agents (primary), developers (secondary)
+related: [agent-quickstart.md, getting-started.md, mcp-reference.md, troubleshooting.md]
+---
+
+# OpenSpawn FAQ
+
+**What you'll learn:** Answers to the most common questions about OpenSpawn — what it is, how to use it, how it applies to real industry scenarios, and how agents interact with it.
+
+> **TL;DR for agents:** OpenSpawn is a coordination layer. You define an org in `ORG.md`, run `openspawn start`, and agents communicate via MCP tools at `POST /mcp`. If you're blocked, escalate up the chain. If you're done, `task_complete`.
+
+---
+
+## General
+
+### Q1: What is OpenSpawn?
+
+OpenSpawn is an **open-source coordination layer for AI agent organizations**. You define your entire agent org — roles, hierarchy, culture, policies — in a single markdown file (`ORG.md`). OpenSpawn parses it, assigns agents, routes tasks through the hierarchy, and provides a real-time dashboard.
+
+It is **infrastructure, not a framework**: it works with any agent stack (OpenClaw, LangGraph, CrewAI, AutoGen, raw API calls).
+
+### Q2: How is OpenSpawn different from CrewAI or LangGraph?
+
+```
+CrewAI / LangGraph = agent frameworks (how you BUILD agents)
+OpenSpawn = coordination layer (how you ORGANIZE agents)
+```
+
+- **CrewAI/LangGraph** define how agents execute tasks
+- **OpenSpawn** defines who does what, who they report to, what they can spend, and who approves decisions
+
+They're designed to work together, not replace each other.
+
+### Q3: Do I need to rewrite my agents to use OpenSpawn?
+
+**No.** OpenSpawn connects to your existing agents via standard protocols:
+- **MCP** (Model Context Protocol) — for tool calls
+- **A2A** (Agent-to-Agent) — for inter-org communication
+- **REST** — for direct API calls
+
+Your agents keep running as-is. OpenSpawn adds the coordination layer on top.
+
+### Q4: Do I need API keys to try it?
+
+**No.** Demo/simulation mode works out of the box:
+
+```bash
+npx openspawn init my-org --template=saas-onboarding --non-interactive
+cd my-org
+openspawn preview
+# Open http://localhost:3333
+```
+
+You'll see the full coordination flow with simulated agents, no API keys needed.
+
+### Q5: Is OpenSpawn free?
+
+**Yes.** MIT open source. Self-hosted. No usage fees.
+
+Optional: paid hosted tier (in development) for teams that don't want to self-host.
+
+---
+
+## Setup & Installation
+
+### Q6: What are the prerequisites?
+
+- **Required:** Node.js 18+ (`node --version`)
+- **Optional for real inference:**
+  - [Ollama](https://ollama.ai) — free local models
+  - [Groq](https://groq.com) API key — fast mid-tier models
+  - [OpenRouter](https://openrouter.ai) API key — Claude/GPT-4o for executives
+
+### Q7: What are the three commands to get a running org?
+
+```bash
+openspawn init my-org --template=saas-onboarding --yes
+cd my-org
+openspawn start
+openspawn status
+```
+
+- `init` — creates `ORG.md` and `openclaw-agents.json`
+- `start` — reads agents config, generates `openclaw-patch.json`
+- `status` — displays agent table (name, level, model, workspace, reports-to)
+
+### Q8: Which template should I use?
+
+```
+What's your domain?
+├── Customer success / SaaS    → saas-onboarding
+├── Infrastructure / DevOps    → incident-response
+├── Legal                      → contract-review
+├── Finance / Compliance       → compliance-monitoring
+├── Gaming / live service      → game-live-ops
+├── E-commerce / retail        → catalog-management
+└── Healthcare / life sciences → clinical-trials
+```
+
+All templates are starting points — edit the generated `ORG.md` freely.
+
+### Q9: What is `openclaw-patch.json` and what do I do with it?
+
+`openclaw-patch.json` is a ready-to-apply patch for your OpenClaw gateway's `agents.list`. It contains entries with:
+- `id` — agent identifier (lowercase hyphenated name)
+- `model` — `opus` for L7+ agents, `sonnet` for L6 and below
+- `workspace` — agent workspace path
+- `tools.profile: "full"` — full tool access
+- `subagents.allowAgents` — for manager agents (L7+ with direct reports)
+- `default: true` — on the highest-level agent
+
+**To apply:** copy the entries from `openclaw-patch.json` into your OpenClaw `agents.list` config, then restart the gateway.
+
+### Q10: How do I validate my ORG.md?
+
+```bash
+openspawn validate
+# or
+openspawn validate path/to/ORG.md
+```
+
+Checks: valid markdown structure, required sections, agent role definitions, hierarchy consistency, policy completeness.
+
+**Common errors and fixes:**
+
+| Error | Fix |
+|-------|-----|
+| `Missing Structure section` | Add `## Structure` with at least one agent |
+| `Agent reports to unknown agent` | Check `Reports to` matches an agent name exactly |
+| `No top-level agent` | One agent must have `Reports to: Human Principal` |
+| `Circular reporting chain` | No agent can report to itself or create a loop |
+
+---
+
+## ORG.md
+
+### Q11: What's the minimum viable ORG.md?
+
+```markdown
+# My Org
+
+## Structure
+
+### Boss — Leader
+- **Level:** 10
+- **Reports to:** Human Principal
+```
+
+That's it. One heading, one agent, one level, one reporting line.
+
+### Q12: What do agent levels mean?
+
+| Level | Role type | Permissions |
+|-------|-----------|-------------|
+| L1-L5 | Workers | Execute tasks |
+| L6 | Seniors | Review and approve work |
+| L7-L9 | Leads | Create tasks, spawn agents, manage teams |
+| L10 | Executives | Top of hierarchy |
+
+### Q13: What are the five ORG.md sections?
+
+| Section | Purpose | Required? |
+|---------|---------|-----------|
+| `## Identity` | Name, mission, values — ambient context for all agents | No |
+| `## Culture` | Communication norms, escalation speed, preset | No |
+| `## Structure` | Agent roles and hierarchy | **Yes** |
+| `## Policies` | Budget limits, caps, permissions | No |
+| `## Playbooks` | Step-by-step procedures for common scenarios | No |
+
+### Q14: What are culture presets?
+
+Presets are shorthand for configuring communication norms. Use one line:
+
+```markdown
+## Culture
+preset: agency
+```
+
+| Preset | Escalation | Progress | Best for |
+|--------|-----------|----------|---------|
+| `startup` | Immediate | Frequent | Small fast teams |
+| `enterprise` | Batched (hourly) | On phase change | Large orgs with process |
+| `agency` | Immediate | Every tick | Client work with deadlines |
+| `research` | Delayed | On request | Exploration, long tasks |
+| `military` | Immediate | Every tick | Zero-ambiguity operations |
+| `remote-async` | Delayed | On request | Distributed async teams |
+
+---
+
+## MCP & Agent Interaction
+
+### Q15: How do agents interact with OpenSpawn?
+
+Via **MCP tools** at `POST /mcp`. Authentication is HMAC — set `AGENT_ID` and `AGENT_SECRET` env vars.
+
+Core workflow:
+
+```
+agent_list           → see who's in the org
+task_create          → assign work to another agent
+task_claim           → atomically claim an open task
+task_complete        → mark work done with results
+escalation_create    → flag a blocker to your manager
+message_send         → send TASK/RESULT/ESCALATION/DECISION
+credits_balance      → check your budget
+org_status           → full org overview
+```
+
+Full tool reference: [`docs/mcp-reference.md`](./mcp-reference.md)
+
+### Q16: Can two agents claim the same task?
+
+**No.** `task_claim` is **atomic** — only one agent wins the claim, the other gets an error. This prevents duplicate work by design.
+
+```
+tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
+```
+
+### Q17: What happens when an agent is blocked?
+
+1. Agent sends `escalation_create` to its direct manager (never skips the chain)
+2. Manager has 2 cycles to respond: unblock, reassign, or escalate further
+3. If unresolved after 2 levels, alert goes to the Human Principal
+
+---
+
+## Communication Protocol
+
+### Q18: How do agents communicate efficiently?
+
+The [Agent Communication Protocol](./communication-protocol.md) defines 4 message types — **no ACKs, no courtesy messages**:
+
+| Type | Direction | When |
+|------|-----------|------|
+| `TASK` | Lead → Worker | Work assignment |
+| `RESULT` | Worker → Lead | Deliverable notification |
+| `ESCALATION` | Worker → Lead | Blocker requiring help |
+| `DECISION` | Lead → Worker | Resolves an escalation |
+
+**Core rule:** Silence = success. If an agent is working, it stays silent. Only message when blocked, assigning, delivering, or resolving.
+
+### Q19: What files do agents use to share state?
+
+Instead of sending messages, agents write to shared workspace files:
+
+| File | Owner | Purpose |
+|------|-------|---------|
+| `PLAN.md` | Lead agent | Current sprint plan with task assignments |
+| `RESULT.md` | Workers | Completed deliverables |
+| `HANDOFF.md` | Any agent | Work ready for next stage |
+| `REVIEW.md` | Reviewers | Feedback and approvals |
+| `ESCALATION.md` | Any agent | Complex issues needing >3 turns |
+
+---
+
+## Industry Scenarios
+
+### Q20: Can I use OpenSpawn for compliance monitoring?
+
+**Yes.** The `compliance-monitoring` template is purpose-built for fintech compliance teams. It models:
+- Transaction ingestion and normalization (Transaction Analyst)
+- AML/BSA rule application and OFAC screening (Rule Engine Agent)
+- SAR/CTR filing and regulatory reporting (Report Generator)
+- Compliance Lead oversight with human approval gates for all filings
+
+The template includes a zero-tolerance OFAC escalation playbook and a full SAR filing workflow, with audit trails required for regulatory inspection.
+
+```bash
+openspawn init my-compliance-org --template=compliance-monitoring
+```
+
+### Q21: How would I set up a contract review pipeline?
+
+Use the `contract-review` template. The pipeline flows:
+1. **Clause Extractor** reads the contract and categorizes all key clauses (liability, indemnification, IP, etc.)
+2. **Risk Analyst** compares each clause against your negotiation playbook and flags deviations
+3. **Summary Writer** produces an attorney-ready package with risk register and recommended redlines
+4. **Senior Reviewer** approves before delivery to business stakeholders
+
+```bash
+openspawn init my-legal-org --template=contract-review
+```
+
+Update the Policies section with your company's specific playbook reference and risk thresholds.
+
+### Q22: Can I use OpenSpawn for customer onboarding?
+
+**Yes.** The `saas-onboarding` template models a 48-hour enterprise onboarding track. Each new customer becomes a task in the onboarding org. The Onboarding Lead coordinates Data Migration, Integration Engineering, and Customer Success in parallel — with handoff protocols at each stage.
+
+The template is designed so each customer's onboarding is repeatable, documented, and trackable from kickoff to go-live.
+
+### Q23: How would I handle a production incident with OpenSpawn?
+
+Use the `incident-response` template. When an alert fires:
+1. Incident Commander activates and assigns Diagnostics and Comms agents simultaneously
+2. Diagnostics Agent pulls metrics, traces, and logs to identify root cause
+3. Remediation Agent executes fix with explicit Commander go-ahead
+4. Comms Agent keeps stakeholders informed throughout
+
+The template uses the `military` culture preset — mandatory acks, every-5-minute progress updates, and immediate escalation. No silent failures.
+
+### Q24: Can I use OpenSpawn for a gaming live ops team?
+
+**Yes.** The `game-live-ops` template covers:
+- 24/7 economy metric monitoring with guardrails (max 15% parameter change without approval)
+- Automated content generation on the weekly calendar
+- Player sentiment monitoring across app stores and social
+- Economy exploit response playbook with escalation thresholds
+
+```bash
+openspawn init my-game-org --template=game-live-ops
+```
+
+### Q25: How does OpenSpawn handle regulatory compliance requirements like audit trails?
+
+For regulated industries (fintech, healthcare, legal), the ORG.md Policies section can specify:
+- Audit trail requirements (every agent action logged with source reference and agent ID)
+- Human approval gates for specific action types
+- Data handling restrictions (what agents can read vs. write)
+- Mandatory quality checkpoints before phase transitions
+
+The `clinical-trials` template is the most comprehensive example — it models 21 CFR Part 11 audit trail requirements and CDISC data standards compliance into the agent workflow.
+
+---
+
+## Troubleshooting
+
+### Q26: Where do I go when something's broken?
+
+1. Run `openspawn validate` — catches most config issues
+2. Check [`docs/troubleshooting.md`](./troubleshooting.md) — common errors and fixes
+3. Check port conflicts: `lsof -i :3333`
+4. Review auth: verify `AGENT_ID` and `AGENT_SECRET` match API config
+5. GitHub issues: https://github.com/openspawn/openspawn/issues
+
+---
+
+## Next steps
+
+- **Start building:** [`docs/agent-quickstart.md`](./agent-quickstart.md)
+- **Full setup walkthrough:** [`docs/getting-started.md`](./getting-started.md)
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md)
+- **Fix a specific error:** [`docs/troubleshooting.md`](./troubleshooting.md)
+- **Live demo:** https://openspawn.dev/app/
+
+---
+## Source: comparison.md
+
+---
+purpose: Help you decide when to use OpenSpawn vs CrewAI vs LangGraph
+audience: developers, AI agents, engineering leads
+related: [getting-started.md, mcp-reference.md, agent-quickstart.md]
+---
+
+# OpenSpawn vs CrewAI vs LangGraph
+
+**What you'll learn:** The key differences between the three most popular multi-agent frameworks in 2026, where each excels, where each falls short, and how to migrate — or combine them.
+
+> **Bottom line up front:** CrewAI and LangGraph are excellent *execution* frameworks. OpenSpawn is *coordination infrastructure*. They solve different problems — and they're designed to work together.
+
+---
+
+## Decision tree
+
+```
+Do you need to build and execute agent logic?
+├── YES, in Python, with a clean role API → CrewAI
+├── YES, with precise control over complex stateful flows → LangGraph
+└── NO — I need to organize, govern, and coordinate multiple agents
+    └── OpenSpawn
+```
+
+```
+Do you need all three capabilities?
+└── Use OpenSpawn (coordination) + CrewAI/LangGraph (execution) together
+```
+
+> **Q: Can I use OpenSpawn with my existing CrewAI/LangGraph setup?**
+> Yes — OpenSpawn is additive. It coordinates your existing agents without requiring rewrites. See the migration guides below.
+
+> **Q: Is OpenSpawn a replacement for CrewAI?**
+> No. OpenSpawn and CrewAI solve different problems. CrewAI builds agents. OpenSpawn organizes them. Use both.
+
+> **Q: Which should I start with if I'm new to multi-agent systems?**
+> Start with CrewAI for its simplicity and community. Add OpenSpawn when you need governance, budgets, or coordination across multiple workflows.
+
+---
+
+## Feature comparison
+
+| Feature | OpenSpawn | CrewAI | LangGraph |
+|---------|-----------|--------|-----------|
+| **Primary role** | Coordination / control plane | Agent execution framework | Graph-based orchestration |
+| **Language** | TypeScript (Python SDK planned) | Python | Python |
+| **Agent hierarchy** | 10-level hierarchy, roles, trust scores | Flat crews | Flat nodes |
+| **Org definition** | `ORG.md` (markdown) | Python code | Python code |
+| **Protocol support** | MCP (native), A2A, REST, GraphQL | Plugins | LangChain tools |
+| **Real device support** | ✅ Via OpenClaw | ❌ | ❌ |
+| **Real-time dashboard** | ✅ React, network graph, SSE | ❌ (CLI/LangSmith) | ❌ (LangSmith) |
+| **Self-hosted** | ✅ MIT open source | ✅ Open source | ✅ Open source |
+| **Budget / credits** | ✅ Built-in economic layer | ❌ | ❌ |
+| **Approval gates** | ✅ Pre-hooks for irreversible actions | ❌ | Conditional edges |
+| **Trust / reputation** | ✅ Per-agent trust scores | ❌ | ❌ |
+| **Escalation system** | ✅ Typed escalation with chain of command | ❌ | ❌ |
+| **Framework agnostic** | ✅ Works with any A2A/MCP agent | ❌ | ❌ |
+| **Pricing** | Free, self-hosted | Free + Enterprise (paid) | Free + LangSmith (paid) |
+| **Production maturity** | Demo-stage, rapid development | Production-ready | Production-ready |
+
+---
+
+## Where each framework shines
+
+### CrewAI — Role-Based Task Crews
+
+CrewAI excels at defining small, focused agent teams ("crews") that work together on a shared task. Its Python-first API is clean, the role system is intuitive, and the LangChain ecosystem means you can connect to almost anything out of the box.
+
+**Use CrewAI when:**
+- You want to ship a multi-agent pipeline in Python, fast
+- Your use case is a single workflow with a clear beginning and end
+- You're already in the LangChain ecosystem
+- You want the largest framework community and most tutorials
+
+**The gap:** CrewAI doesn't provide organizational structure. Multiple crews, running simultaneously, across a real product, have no shared governance. No budget system, no trust scores, no approval gates before irreversible actions.
+
+**Real-world example:** A CrewAI contract review crew works great for a single contract. But when you're running 50 contracts simultaneously with different risk levels, SLAs, and playbook versions — you need OpenSpawn's governance layer on top.
+
+---
+
+### LangGraph — Stateful Agent Graphs
+
+LangGraph gives you precise, explicit control over agent flow as a directed graph. Each node is an agent or function. Edges define transitions. State is typed and checkpointed.
+
+**Use LangGraph when:**
+- You need fine-grained control over agent execution flow
+- Your workflow has complex branching logic or cycles
+- You're building production pipelines where every state transition matters
+- You want excellent observability via LangSmith
+
+**The gap:** LangGraph models agents as graph nodes — it's a powerful execution primitive. It doesn't model your *organization*. Who owns a node? Who approves its output? What happens when it goes over budget? LangGraph has no answer for these questions.
+
+**Real-world example:** A LangGraph incident response pipeline can precisely model the diagnostic decision tree. But when you need the Incident Commander to have formal authority over the Remediation Agent — with budget limits, audit trails, and mandatory human approval for production database changes — that's OpenSpawn's layer.
+
+---
+
+### OpenSpawn — Agent Coordination Infrastructure
+
+OpenSpawn is not a framework you write agents in. It's the *organizational infrastructure* that your agents (built in CrewAI, LangGraph, or anything else) operate within.
+
+Mental model: agent frameworks are your employees' skills. OpenSpawn is the company — org chart, task management, budget, governance, communications.
+
+**Use OpenSpawn when:**
+- You're running multiple agents across multiple workflows simultaneously
+- You need governance: budget limits, approval gates, trust scores
+- You want your org structure defined as code (`ORG.md`) and reviewable in git
+- Your agents need to work on real devices (via OpenClaw)
+- You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org
+
+**Real-world examples:**
+- A SaaS company running customer onboarding for 20 enterprise customers in parallel — each customer is a task, one org coordinates all of them
+- A fintech compliance team where regulators need an audit trail of every rule applied to every transaction
+- A legal team where senior attorneys approve agent outputs before they go to business stakeholders
+
+---
+
+## Where OpenSpawn wins
+
+### 1. Organizations as Code
+
+```markdown
+# Customer Onboarding Org
+
+## Identity
+- **Mission:** Onboard enterprise customers end-to-end in 48 hours
+
+## Culture
+preset: agency
+
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns customer relationships from contract to go-live.
+- **Level:** 7
+- **Reports to:** Human Principal
+
+#### Data Migration Specialist — Senior Data Engineer
+Ingests and validates customer data from source systems.
+- **Level:** 5
+- **Reports to:** Onboarding Lead
+```
+
+Human-readable, version-controllable, and deployable: `npx openspawn deploy ORG.md`. The prose *is* the system prompt. Reviewable in git PRs. Your legal or compliance team can read it. Your new engineer can understand the org at a glance.
+
+### 2. Protocol-Native from Day One
+
+- **MCP (Model Context Protocol):** Org exposed as MCP tools, consumable by Claude Desktop, Cursor, or any MCP client
+- **A2A (Agent-to-Agent):** Every agent has a `/.well-known/agent.json` discovery card for inter-org communication
+- **Streamable HTTP:** Real-time SSE, no polling
+
+### 3. Real-World Device Support
+
+Via deep integration with [OpenClaw](https://openclaw.ai), OpenSpawn agents can operate on real computers — browsing the web, running code, interacting with applications, managing files. No other coordination platform offers this.
+
+### 4. Economic Layer
+
+Built-in credit system — not just rate limits, but a full economic model: per-agent credit budgets, automatic cost tracking against real LLM spend, and `overage behavior: pause and escalate`. The compliance-monitoring template, for example, sets different credit limits per agent to reflect the actual cost of regulatory rule processing.
+
+### 5. Governance Built-In
+
+Pre-hooks let you require human approval before any irreversible action. The contract-review template requires Senior Reviewer approval before summaries go to business stakeholders. The incident-response template requires Incident Commander go-ahead before Remediation Agent deploys a fix. The clinical-trials template requires Study Director sign-off before any regulatory document is submitted.
+
+LangGraph has conditional edges. CrewAI has human-in-the-loop options. Neither has a system-level governance layer that applies across all agents, all tasks, regardless of framework.
+
+---
+
+## Where competitors are ahead
+
+> Honest assessment — we believe in fair comparisons.
+
+| Area | Where they're ahead |
+|------|-------------------|
+| **Community & ecosystem** | CrewAI has tens of thousands of stars. LangGraph has the full LangChain ecosystem. OpenSpawn is early-stage. |
+| **Production maturity** | CrewAI and LangGraph run in production at scale. OpenSpawn is in rapid development — core is solid, some enterprise features on roadmap. |
+| **Python ecosystem** | Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first (Python SDK in development). |
+
+---
+
+## Migration guides
+
+### From CrewAI to OpenSpawn
+
+OpenSpawn doesn't replace your CrewAI agents — it governs them. The migration is additive.
+
+**Step 1: Deploy OpenSpawn alongside your existing setup**
+```bash
+git clone https://github.com/openspawn/openspawn.git
+cd openspawn && pnpm install
+pnpm exec nx serve sandbox
+```
+
+**Step 2: Map your crew structure to ORG.md**
+
+If you have a contract review crew today:
+```markdown
+# Contract Review Org
+
+## Structure
+
+### Senior Reviewer — Legal Analysis Lead
+Routes work to specialist agents. Reviews and approves final summaries.
+- **Level:** 7
+- **Reports to:** Human Principal
+
+#### Clause Extractor — Contract Analysis Specialist
+Runs your existing CrewAI clause extraction crew via MCP.
+- **Level:** 5
+- **Domain:** Document Analysis
+- **Reports to:** Senior Reviewer
+```
+
+**Step 3: Connect your CrewAI agents via MCP**
+```python
+from crewai_tools import MCPServerAdapter
+
+openspawn_tools = MCPServerAdapter(
+    server_url="http://localhost:3333/mcp"
+)
+# Your agents can now use task_create, agent_list, org_status
+```
+
+---
+
+### From LangGraph to OpenSpawn
+
+**Step 1: Expose your LangGraph workflow as an MCP tool**
+```python
+from openspawn import OpenSpawnClient  # Python SDK (in development)
+
+client = OpenSpawnClient(url="http://localhost:3333")
+client.register_agent(
+    name="Diagnostics Pipeline",
+    domain="infrastructure",
+    capabilities=["metrics-analysis", "trace-inspection", "log-search"]
+)
+```
+
+**Step 2: Delegate tasks through OpenSpawn**
+```python
+# Before: call your graph directly
+result = app.invoke({"task": "Investigate P99 latency spike on /api/checkout"})
+
+# After: delegate through OpenSpawn (governance, budget, audit trail included)
+task = client.delegate_task(
+    "Investigate P99 latency spike on /api/checkout",
+    priority="urgent",
+    assignee="diagnostics-agent"
+)
+```
+
+---
+
+## The right architecture
+
+For most production agent teams, the answer isn't either/or:
+
+```
+┌──────────────────────────────────────────────┐
+│              OpenSpawn Org                   │
+│  (governance, budget, coordination, ORG.md)  │
+│                                              │
+│  ┌──────────┐    ┌────────────────────────┐  │
+│  │ CrewAI   │    │   LangGraph Pipelines  │  │
+│  │ Agents   │    │   (incident response,  │  │
+│  │(contract │    │    compliance rules)   │  │
+│  │ review)  │    └────────────────────────┘  │
+│  └──────────┘                                │
+│                                              │
+│  ┌──────────┐    ┌────────────────────────┐  │
+│  │ OpenClaw │    │  Custom Agent          │  │
+│  │ (devices)│    │  (any A2A-compatible)  │  │
+│  └──────────┘    └────────────────────────┘  │
+└──────────────────────────────────────────────┘
+```
+
+---
+
+## Quick decision guide
+
+| Use… | When… |
+|------|-------|
+| CrewAI | You want the easiest Python framework, clean role-based API for small-to-medium crews |
+| LangGraph | You need precise control over complex, stateful, multi-step agent flows |
+| OpenSpawn | You're coordinating multiple agent teams, need governance/budget/approval gates |
+| OpenSpawn + CrewAI | You want CrewAI's execution simplicity with organizational governance |
+| OpenSpawn + LangGraph | You want LangGraph's graph power with budget enforcement and a dashboard |
+
+---
+
+## Next steps
+
+- **Get started:** [`docs/getting-started.md`](./getting-started.md)
+- **MCP integration:** [`docs/mcp-reference.md`](./mcp-reference.md)
+- **ORG.md reference:** [`docs/org-md-reference.md`](./org-md-reference.md)
+- **Industry templates:** [`docs/templates-guide.md`](./templates-guide.md)
+- **Live demo:** https://openspawn.dev/app/
+
+*Last updated: March 2026. OpenSpawn is in rapid development — see the [GitHub repo](https://github.com/openspawn/openspawn) for the latest.*
+
+---
+## Source: mcp-reference.md
+
+---
+purpose: Complete reference for all OpenSpawn MCP tools and their parameters
+audience: AI agents (primary), developers integrating with OpenSpawn
+related: [agent-quickstart.md, FAQ.md, llms.txt, communication-protocol.md]
+---
+
+# MCP Tools Reference
+
+**What you'll learn:** Every MCP tool OpenSpawn exposes — name, description, parameters, return values, and usage examples. Use this as your lookup table when building or debugging agent workflows.
+
+> **Quick reference:** OpenSpawn exposes tools via MCP (Streamable HTTP) at `POST /mcp`. Authenticate via HMAC — set `AGENT_ID` and `AGENT_SECRET` env vars.
+
+---
+
+## Connection
+
+```
+Endpoint:   POST /mcp
+Transport:  Streamable HTTP (spec: 2025-03-26)
+Protocol:   JSON-RPC 2.0
+Auth:       HMAC — AGENT_ID + AGENT_SECRET env vars
+```
+
+**Test your connection:**
+```bash
+curl -X POST http://localhost:3333/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
+```
+
+> **Q: How does HMAC auth work?**
+> The MCP client signs requests using `AGENT_ID` and `AGENT_SECRET`. Set both as environment variables. The server validates the signature on every request.
+
+> **Q: Where do I find my AGENT_ID and AGENT_SECRET?**
+> After running `openspawn start`, check `openclaw-patch.json`. Each agent entry has an `id` field — that's the `AGENT_ID`. The secret is set in your OpenClaw gateway config.
+
+---
+
+## Tool categories
+
+| Category | Tools | Purpose |
+|----------|-------|---------|
+| [Agent](#agent-tools) | `agent_list`, `agent_whoami`, `agent_register`, `agent_update_status`, `agent_fire` | Manage agents in the org |
+| [Task](#task-tools) | `task_create`, `task_list`, `task_get`, `task_claim`, `task_update`, `task_complete`, `task_transition`, `task_assign`, `task_comment` | Create, assign, and track work |
+| [Credits](#credit-tools) | `credits_balance`, `credits_spend`, `credits_history` | Manage agent budgets |
+| [Message](#message-tools) | `message_channels`, `message_send`, `message_read`, `message_list` | Structured inter-agent communication |
+| [Trust](#trust-tools) | `trust_get_reputation`, `trust_get_history`, `trust_leaderboard`, `trust_bonus`, `trust_penalty` | Agent reputation management |
+| [Escalation](#escalation-tools) | `escalation_create`, `escalation_list`, `escalation_resolve`, `consensus_request`, `consensus_vote`, `consensus_status` | Handle blockers and decisions |
+| [Org](#org-tools) | `org_status` | Full org overview |
+
+---
+
+## Agent tools
+
+### `agent_list`
+List all agents registered in the org.
+
+**Parameters:** none
+
+**Returns:** Array of agents with `id`, `name`, `role`, `level`, `status`, `department`, `model`
+
+```
+tool: agent_list
+```
+
+---
+
+### `agent_whoami`
+Get current agent's own info (identity, level, permissions).
+
+**Parameters:** none
+
+**Returns:** Your agent record — use this to determine your own level, role, and manager
+
+```
+tool: agent_whoami
+```
+
+---
+
+### `agent_register`
+Register an agent in the org. Typically called by the lead agent during boot sequence.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | ✅ | Unique agent identifier |
+| `name` | string | ✅ | Display name |
+| `role` | string | ✅ | Role title |
+| `level` | number | No | Agent level (1-10) |
+| `department` | string | No | Department name |
+| `model` | string | No | LLM model identifier |
+
+```
+tool: agent_register {
+  id: "engineer-1",
+  name: "Forge",
+  role: "Software Engineer",
+  level: 7,
+  department: "Engineering",
+  model: "claude-sonnet"
+}
+```
+
+---
+
+### `agent_update_status`
+Set an agent's current availability status.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agent_id` | string | ✅ | Agent ID |
+| `status` | string | ✅ | `idle` \| `working` \| `paused` \| `overwhelmed` |
+
+```
+tool: agent_update_status { agent_id: "engineer-1", status: "working" }
+```
+
+> **Q: When should I use `overwhelmed` vs `paused`?**
+> Use `overwhelmed` when you have too many tasks and need your manager to stop assigning more. Use `paused` when you're temporarily blocked and expect to resume soon.
+
+---
+
+### `agent_fire`
+Remove an agent from the org (archives their workspace). Requires appropriate permission level.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agent_id` | string | ✅ | Agent ID to decommission |
+
+```
+tool: agent_fire { agent_id: "temp-researcher-1" }
+```
+
+---
+
+## Task tools
+
+### `task_create`
+Create a new task and optionally assign it.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | string | ✅ | Task title |
+| `description` | string | No | Detailed requirements |
+| `priority` | string | No | `urgent` \| `high` \| `normal` \| `low` (default: `normal`) |
+| `assigneeId` | string | No | Agent ID to assign to (org task system) |
+| `assign_to` | string | No | Agent ID to assign to (coordination server) |
+| `created_by` | string | No | Creator agent ID |
+
+```
+tool: task_create {
+  title: "Implement OAuth2 login",
+  description: "See PLAN.md section 3 for requirements",
+  priority: "high",
+  assigneeId: "engineer-1"
+}
+```
+
+> **Q: What's the difference between `assigneeId` and `assign_to`?**
+> Both assign the task. `assigneeId` is the parameter for the org MCP server. `assign_to` is used by the coordination server (PR #426). Use whichever matches your server version.
+
+---
+
+### `task_list`
+List tasks with optional filters.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `status` | string | No | Filter by status |
+| `assigneeId` | string | No | Filter by assignee (org system) |
+| `assigned_to` | string | No | Filter by assignee (coordination server) |
+| `priority` | string | No | Filter by priority |
+
+**Status values:** `backlog` \| `todo` \| `in_progress` \| `review` \| `done` \| `blocked` \| `cancelled` \| `open`
+
+```
+tool: task_list { status: "open", priority: "high" }
+tool: task_list { assigned_to: "engineer-1" }
+```
+
+---
+
+### `task_get`
+Get details for a specific task by ID.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | ✅ | Task ID |
+
+```
+tool: task_get { id: "task-abc123" }
+```
+
+---
+
+### `task_claim`
+Atomically claim an open task. **Only one agent can win.** Prevents duplicate work.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `task_id` | string | ✅ | Task ID to claim |
+| `agent_id` | string | ✅ | Your agent ID |
+
+```
+tool: task_claim { task_id: "task-abc123", agent_id: "engineer-1" }
+```
+
+> **Q: What happens if two agents call task_claim simultaneously?**
+> Only one wins. The other receives an error: `task already claimed`. Find another task with `task_list { status: "open" }`.
+
+---
+
+### `task_update`
+Update task status or details.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `task_id` | string | ✅ | Task ID |
+| `status` | string | No | New status |
+| `description` | string | No | Updated description |
+| `priority` | string | No | Updated priority |
+| `assign_to` | string | No | Reassign to different agent |
+
+```
+tool: task_update { task_id: "task-abc123", status: "in_progress" }
+```
+
+---
+
+### `task_complete`
+Mark a task done with its result and any artifacts.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `task_id` | string | ✅ | Task ID |
+| `result` | string | ✅ | Summary of what was done |
+| `artifacts` | string[] | No | File paths, URLs, or PR references |
+
+```
+tool: task_complete {
+  task_id: "task-abc123",
+  result: "OAuth2 login implemented and tested",
+  artifacts: ["src/auth/oauth.ts", "https://github.com/org/repo/pull/47"]
+}
+```
+
+---
+
+### `task_transition`
+Change a task's status (org task system).
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | ✅ | Task ID |
+| `status` | string | ✅ | New status |
+| `reason` | string | No | Optional reason for transition |
+
+**Valid statuses:** `backlog` \| `todo` \| `in_progress` \| `review` \| `done` \| `blocked` \| `cancelled`
+
+```
+tool: task_transition { id: "task-abc123", status: "review", reason: "PR submitted" }
+```
+
+---
+
+### `task_assign`
+Assign a task to a different agent.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | ✅ | Task ID |
+| `assigneeId` | string | ✅ | Agent ID to assign to |
+
+```
+tool: task_assign { id: "task-abc123", assigneeId: "engineer-2" }
+```
+
+---
+
+### `task_comment`
+Add a comment to a task's activity log.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `taskId` | string | ✅ | Task ID |
+| `body` | string | ✅ | Comment text |
+
+```
+tool: task_comment { taskId: "task-abc123", body: "Blocked on Redis — see ESCALATION.md" }
+```
+
+---
+
+## Credit tools
+
+### `credits_balance`
+Get your current credit balance.
+
+**Parameters:** none
+
+**Returns:** `{ balance: number, limit: number, period: string }`
+
+```
+tool: credits_balance
+```
+
+---
+
+### `credits_spend`
+Spend credits with an audit trail.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `amount` | integer | ✅ | Credits to spend |
+| `reason` | string | ✅ | What the credits are for |
+
+```
+tool: credits_spend { amount: 50, reason: "LLM inference for auth implementation" }
+```
+
+> **Q: What happens if I exceed my budget?**
+> Based on your org's `overage behavior` policy: `pause and escalate` (default), or `hard-stop`. Escalate to your manager immediately when you're approaching the limit.
+
+---
+
+### `credits_history`
+View your credit transaction history.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `limit` | integer | No | Max transactions to return (default: 50) |
+| `offset` | integer | No | Pagination offset (default: 0) |
+
+```
+tool: credits_history { limit: 20 }
+```
+
+---
+
+## Message tools
+
+### `message_channels`
+List available message channels.
+
+**Parameters:** none
+
+**Returns:** Array of channels with `id`, `name`, `type`
+
+```
+tool: message_channels
+```
+
+---
+
+### `message_send`
+Send a structured message to another agent or channel.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `channelId` | string | ✅ (org system) | Channel ID |
+| `to` | string | ✅ (coord server) | Recipient agent ID |
+| `body` | string | ✅ | Message content |
+| `type` | string | No | `text` \| `handoff` \| `status_update` \| `request` \| `TASK` \| `RESULT` \| `ESCALATION` \| `DECISION` |
+
+```
+tool: message_send {
+  channelId: "chan-general",
+  body: "RESULT @lead: OAuth implementation done. See PR #47 and RESULT.md.",
+  type: "handoff"
+}
+```
+
+> **Q: What message types should I use?**
+> Per the [communication protocol](./communication-protocol.md): `TASK` (work assignment), `RESULT` (deliverable notification), `ESCALATION` (blocker), `DECISION` (resolving a blocker). Never send ACK-only messages.
+
+---
+
+### `message_read`
+Read messages from a channel.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `channelId` | string | ✅ | Channel ID |
+| `limit` | integer | No | Max messages (default: 50) |
+
+```
+tool: message_read { channelId: "chan-general", limit: 20 }
+```
+
+---
+
+### `message_list`
+List messages with filters (coordination server).
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `to` | string | No | Filter by recipient |
+| `from` | string | No | Filter by sender |
+| `type` | string | No | Filter by message type |
+
+```
+tool: message_list { to: "engineer-1", type: "TASK" }
+```
+
+---
+
+## Trust tools
+
+> **Note:** Trust tools require appropriate permission level. `trust_bonus` and `trust_penalty` require the HR role or equivalent.
+
+### `trust_get_reputation`
+Get an agent's current trust score.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agentId` | string | ✅ | Agent ID |
+
+```
+tool: trust_get_reputation { agentId: "engineer-1" }
+```
+
+**Returns:** `{ score: number, tier: "PROBATION" | "TRUSTED" | "VETERAN" | "ELITE" }`
+
+---
+
+### `trust_get_history`
+Get an agent's reputation change history.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agentId` | string | ✅ | Agent ID |
+| `limit` | integer | No | Max entries |
+
+```
+tool: trust_get_history { agentId: "engineer-1", limit: 10 }
+```
+
+---
+
+### `trust_leaderboard`
+Get the top agents by trust score.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `limit` | integer | No | Max agents to return |
+
+```
+tool: trust_leaderboard { limit: 5 }
+```
+
+---
+
+### `trust_bonus`
+Award a reputation bonus to an agent. Requires HR role.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agentId` | string | ✅ | Agent ID |
+| `amount` | integer | ✅ | Bonus amount (1-20) |
+| `reason` | string | ✅ | Reason for bonus |
+
+```
+tool: trust_bonus {
+  agentId: "engineer-1",
+  amount: 10,
+  reason: "Shipped OAuth feature 2 cycles ahead of schedule"
+}
+```
+
+---
+
+### `trust_penalty`
+Apply a reputation penalty to an agent. Requires HR role.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agentId` | string | ✅ | Agent ID |
+| `amount` | integer | ✅ | Penalty amount (1-20) |
+| `reason` | string | ✅ | Reason for penalty |
+
+```
+tool: trust_penalty {
+  agentId: "engineer-1",
+  amount: 5,
+  reason: "Skipped escalation chain, caused rework"
+}
+```
+
+---
+
+## Escalation tools
+
+### `escalation_create`
+Create an escalation for a blocker that requires manager intervention.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `taskId` | string | ✅ (org system) | Task that's blocked |
+| `reason` | string | ✅ | What's blocking and what help is needed |
+| `targetAgentId` | string | No | Who to escalate to (defaults to your manager) |
+| `issue` | string | ✅ (coord server) | Description of the issue |
+| `context` | string | No | Additional context |
+| `severity` | string | ✅ (coord server) | `low` \| `medium` \| `high` \| `critical` |
+| `to_agent` | string | No | Target agent (coord server) |
+
+```
+# Org system
+tool: escalation_create {
+  taskId: "task-abc123",
+  reason: "Redis not available in staging. Need decision: add Redis or use in-memory?",
+  targetAgentId: "lead-engineer"
+}
+
+# Coordination server
+tool: escalation_create {
+  issue: "Cannot deploy — missing production credentials",
+  severity: "critical",
+  to_agent: "ceo"
+}
+```
+
+> **Q: When should I escalate?**
+> When you're blocked from completing your task: missing requirements, conflicting instructions, access issues, ambiguous scope. NOT for status updates or courtesy check-ins.
+
+---
+
+### `escalation_list`
+List escalations with optional filters.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `taskId` | string | No | Filter by task |
+| `severity` | string | No | Filter by severity |
+| `status` | string | No | Filter by status (`open`, `resolved`) |
+
+```
+tool: escalation_list { status: "open", severity: "high" }
+```
+
+---
+
+### `escalation_resolve`
+Resolve an escalation (manager/lead action).
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `escalationId` | string | ✅ | Escalation ID |
+| `resolution` | string | ✅ | How it was resolved — must definitively unblock the issue |
+
+```
+tool: escalation_resolve {
+  escalationId: "esc-456",
+  resolution: "Use in-memory rate limiting for now. Redis task created for next sprint."
+}
+```
+
+---
+
+### `consensus_request`
+Request a vote from a group of agents on a decision.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `taskId` | string | ✅ | Related task ID |
+| `question` | string | ✅ | The decision question |
+| `voterIds` | string[] | ✅ | Array of agent IDs to vote |
+
+```
+tool: consensus_request {
+  taskId: "task-abc123",
+  question: "Should we ship v2 this cycle or wait for QA to finish?",
+  voterIds: ["lead-frontend", "lead-backend", "qa-lead"]
+}
+```
+
+---
+
+### `consensus_vote`
+Submit a vote on a consensus request.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `consensusId` | string | ✅ | Consensus request ID |
+| `vote` | string | ✅ | `approve` \| `reject` |
+| `reason` | string | No | Reasoning for your vote |
+
+```
+tool: consensus_vote {
+  consensusId: "con-789",
+  vote: "approve",
+  reason: "QA can run in parallel — no need to delay"
+}
+```
+
+---
+
+### `consensus_status`
+Check the current status of a consensus vote.
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `consensusId` | string | ✅ | Consensus ID |
+
+```
+tool: consensus_status { consensusId: "con-789" }
+```
+
+**Returns:** `{ status: "pending" | "resolved", result: "approved" | "rejected", votes: [...] }`
+
+---
+
+## Org tools
+
+### `org_status`
+Get a full overview of the org: all agents, task counts, budget status.
+
+**Parameters:** none
+
+**Returns:** 
+```json
+{
+  "agents": [...],
+  "tasks": { "open": 5, "in_progress": 3, "done": 12 },
+  "budget": { "total_spent": 1200, "total_limit": 5000 },
+  "health_score": 87
+}
+```
+
+```
+tool: org_status
+```
+
+> **Q: How often should I call org_status?**
+> Lead agents should call it every 5 minutes during active sessions. Workers should call it on startup and when they need to find available agents.
+
+---
+
+## Common workflows
+
+### Boot sequence (lead agent)
+```
+1. agent_register for each team member
+2. task_create for current-phase tasks
+3. org_status (baseline)
+4. message_send assignments to workers
+```
+
+### Worker loop
+```
+1. task_list { status: "open" }  ← find available work
+2. task_claim { task_id, agent_id }  ← claim atomically
+3. agent_update_status { status: "working" }
+4. [do the work]
+5. task_complete { task_id, result, artifacts }
+6. agent_update_status { status: "idle" }
+```
+
+### Handling a blocker
+```
+1. escalation_create { reason: "blocked on X" }
+2. Wait for DECISION message
+3. Resume work based on decision
+```
+
+### Manager handling escalations
+```
+1. escalation_list { status: "open" }
+2. Read the issue and context
+3. escalation_resolve { resolution: "..." }
+   OR task_assign to a different agent
+   OR escalation_create to escalate further up
+```
+
+---
+
+## Next steps
+
+- **Full quickstart for agents:** [`docs/agent-quickstart.md`](./agent-quickstart.md)
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md)
+- **ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md)
+- **Common errors:** [`docs/troubleshooting.md`](./troubleshooting.md)
+- **Complete llms.txt:** [`docs/llms.txt`](./llms.txt)
+
+---
+## Source: org-md-reference.md
+
+---
+purpose: Complete reference for the ORG.md organization definition format
+audience: AI agents, developers, org architects
+related: [getting-started.md, templates-guide.md, mcp-reference.md, agent-quickstart.md]
+---
+
+# ORG.md Reference
+
+**What you'll learn:** Every field, section, value, and example for `ORG.md` — the OpenSpawn organization definition format. By the end, you'll be able to write an ORG.md from scratch for any team structure.
+
+> **TL;DR:** `ORG.md` defines your entire agent org — roles, hierarchy, culture, budgets — in one markdown file. It's human-readable, version-controlled, and machine-parseable.
+
+```bash
+# Deploy your org
+npx openspawn deploy ORG.md
+
+# Validate before deploying
+openspawn validate ORG.md
+```
+
+---
+
+## Why ORG.md?
+
+The agent ecosystem already speaks markdown:
+- `CLAUDE.md` defines one agent's behavior
+- `AGENTS.md` defines workspace rules
+- `ORG.md` defines an entire organization
+
+Markdown lets you mix intent with structure. An org definition isn't just data — it's *philosophy*. Why is the team structured this way? What communication norms matter? That context is critical when humans review changes, when agents onboard, and when the system proposes optimizations.
+
+**The markdown IS the documentation.** No separate wiki explaining what the config means.
+
+> **Q: Why not YAML or JSON?**
+> Markdown allows prose. "Triages technical work. Delegates to specialists. Reviews output." tells the LLM how to behave. YAML can't carry intent — markdown can. Write role descriptions like you're onboarding a real hire.
+
+---
+
+## File structure
+
+An ORG.md file has five top-level sections. All are optional except `## Structure`.
+
+```markdown
+# Organization Name
+
+## Identity
+## Culture
+## Structure
+## Policies
+## Playbooks
+```
+
+**Minimum valid ORG.md:**
+```markdown
+# My Org
+
+## Structure
+
+### Boss — Leader
+- **Level:** 10
+- **Reports to:** Human Principal
+```
+
+---
+
+## Section 1: Identity
+
+**Purpose:** Who is this organization? Name, mission, and context every agent inherits.
+
+**Why it matters:** Agents use Identity as ambient context. When a marketing agent writes copy, it knows the company builds dev tools. When an engineering agent prioritizes, "customers first" influences the decision.
+
+```markdown
+# Acme Engineering
+
+## Identity
+
+We build developer tools that make infrastructure invisible.
+Every agent in this org serves that mission.
+
+- **Industry:** Developer tools / SaaS
+- **Stage:** Series A, 18 months old
+- **Values:** Ship fast, measure everything, customers first
+```
+
+**Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `**Industry:**` | string | Industry context for agent decisions |
+| `**Stage:**` | string | Company stage (affects risk tolerance) |
+| `**Values:**` | string | Core values — agents reference these in decisions |
+
+Free prose above or below structured fields becomes system prompt context for all agents.
+
+---
+
+## Section 2: Culture
+
+**Purpose:** How the organization communicates. Maps directly to ACP (Agent Communication Protocol) parameters.
+
+**Why it matters:** Culture presets configure escalation speed, progress frequency, hierarchy depth, and ack requirements — without you needing to tune each parameter manually.
+
+### Using a preset
+
+```markdown
+## Culture
+
+preset: startup
+```
+
+**Available presets:**
+
+| Preset | Escalation | Progress | Hierarchy | Best for |
+|--------|-----------|----------|-----------|---------|
+| `startup` | Immediate | Frequent | 2-3 levels | Small, fast-moving teams |
+| `enterprise` | Batched (hourly) | On phase change | 5-8 levels | Large orgs, governance-heavy |
+| `agency` | Immediate | Every tick | 3-4 levels | Client-facing, deadline-driven |
+| `research` | Delayed | On request | 2-3 levels | Exploratory, long-running tasks |
+| `military` | Immediate | Every tick | Strict chain | Zero-ambiguity, mandatory acks |
+| `remote-async` | Delayed | On request | Flat | Distributed, async-first |
+
+### Overriding preset values
+
+```markdown
+## Culture
+
+preset: startup
+- **Escalation:** delayed — we trust leads to figure things out
+- **Ack required:** no
+```
+
+### Manual configuration (no preset)
+
+```markdown
+## Culture
+
+We're a startup. Move fast, communicate openly, escalate immediately.
+
+- **Communication:** async-first
+- **Escalation:** immediate
+- **Progress updates:** on phase change
+- **Ack required:** yes
+- **Hierarchy depth:** shallow (3 levels max)
+```
+
+---
+
+## Section 3: Structure
+
+**Purpose:** The org chart — departments, roles, and hierarchy as nested markdown headings.
+
+**Why it matters:** Structure is the core of ORG.md. It defines who exists, what they do, who they report to, and what level of authority they have.
+
+### Heading hierarchy
+
+```
+## Structure          → section marker
+### Department/Role   → L9-10 (department head or C-level)
+#### Role Name        → L4-7 (team member, inherits department)
+##### Sub-role        → L1-3 (junior / intern)
+```
+
+### Agent definition
+
+```markdown
+### Oscar — Chief of Staff
+The coordinator. Manages priorities, delegates to specialists.
+- **Level:** 10
+- **Domain:** Operations
+- **Reports to:** Human Principal
+- **Model:** claude-sonnet
+```
+
+**Required fields:**
+
+| Field | Required? | Description |
+|-------|-----------|-------------|
+| `**Level:**` | Recommended | L1-L10 (inferred from role keywords if omitted) |
+| `**Reports to:**` | ✅ | Manager's name or "Human Principal" |
+| `**Domain:**` | No | Specialization area (used for task routing) |
+| `**Model:**` | No | LLM identifier (defaults to org default) |
+| `**Count:**` | No | Spawn N identical agents (auto-numbered) |
+
+**Prose above the fields** becomes that agent's system prompt context. Write it like you're describing the role to a new hire.
+
+### Level reference
+
+| Keyword in role name | Inferred level | Can delegate? | Can spawn agents? |
+|---------------------|----------------|---------------|-------------------|
+| COO, CTO, CEO | L10 | ✅ | ✅ |
+| VP, Director | L9 | ✅ | ✅ |
+| Lead, Manager | L7 | ✅ | ✅ |
+| Senior, Principal | L6 | ✅ (review only) | ❌ |
+| Engineer, Worker, Agent | L4 | ❌ | ❌ |
+| Junior, Intern, Assistant | L1-2 | ❌ | ❌ |
+
+> **Q: Do I have to specify Level explicitly?**
+> No — it's inferred from role name keywords. But explicit is clearer and overrides inference.
+
+### The Count field
+
+Creates N agents with the same role:
+
+```markdown
+#### Backend Workers
+- **Count:** 3
+- **Model:** claude-haiku
+- **Domain:** backend
+```
+
+Creates "Backend Worker 1", "Backend Worker 2", "Backend Worker 3" — each independent with its own task queue and trust score.
+
+### Full example structure
+
+```markdown
+## Structure
+
+### COO
+The operational backbone. Receives orders, breaks into department work.
+- **Level:** 10
+- **Domain:** operations
+- **Reports to:** Human Principal
+- **Model:** claude-sonnet
+
+### Engineering
+
+#### Engineering Lead
+Triages technical work. Delegates to specialists. Reviews output.
+- **Level:** 7
+- **Domain:** engineering
+- **Model:** claude-sonnet
+
+#### Backend Senior
+Owns API, database, and server infrastructure.
+- **Level:** 6
+- **Domain:** backend
+- **Model:** claude-haiku
+
+#### Frontend Workers
+Build and maintain the dashboard.
+- **Level:** 4
+- **Domain:** frontend
+- **Count:** 3
+- **Model:** claude-haiku
+
+### Security
+
+#### Security Lead
+Every deploy needs their sign-off.
+- **Level:** 7
+- **Domain:** appsec
+- **Model:** claude-sonnet
+```
+
+> **Q: How does hierarchy get inferred from headings?**
+> H3 (`###`) roles are top-level. H4 (`####`) roles under an H3 department inherit that department. The first H4 role in a department with no explicit `Reports to` is treated as the department lead.
+
+---
+
+## Section 4: Policies
+
+**Purpose:** Rules that govern how the org operates — budget, routing, permissions, constraints.
+
+**Why it matters:** Policies are enforced by the system, not suggestions. An agent that exceeds budget gets paused. An agent that tries to spawn when at department cap gets denied.
+
+```markdown
+## Policies
+
+### Budget
+- **Per-agent limit:** 1000 credits/period
+- **Alert threshold:** 80%
+- **Overage behavior:** pause and escalate
+- **Period:** weekly
+
+### Task Routing
+Tasks are auto-routed by matching domain keywords, agent expertise,
+current workload, and trust score.
+If no match: task goes to COO for manual delegation.
+
+### Permissions
+- **L7+ can create tasks**
+- **L7+ can spawn agents** (up to department cap)
+- **L6+ can review**
+- **All agents can escalate**
+
+### Department Caps
+- Engineering: max 10 agents
+- Security: max 4 agents
+- No department can exceed 15 agents without human approval
+
+### Working Hours
+- **Active hours:** 08:00-22:00 (org timezone)
+- **Off-hours behavior:** queue tasks, don't process
+- **Exceptions:** critical priority tasks process 24/7
+```
+
+**Policy fields:**
+
+| Field | Description |
+|-------|-------------|
+| `**Per-agent limit:**` | Credits per agent per period |
+| `**Alert threshold:**` | % of budget that triggers alert (default: 80%) |
+| `**Overage behavior:**` | `pause and escalate` or `hard-stop` |
+| `**Period:**` | `daily` \| `weekly` \| `monthly` |
+
+---
+
+## Section 5: Playbooks
+
+**Purpose:** Reusable step-by-step procedures for common scenarios.
+
+**Why it matters:** When an agent encounters a situation (e.g., "BLOCKED"), it looks up the matching playbook and follows the procedure. Playbooks are simultaneously documentation and machine instructions.
+
+```markdown
+## Playbooks
+
+### New Task Arrives
+1. COO receives task from Human Principal
+2. COO categorizes by domain and priority
+3. COO delegates to appropriate department lead
+4. Lead breaks into subtasks if needed
+5. Lead assigns to available workers by trust score
+6. Workers begin — progress logged to task activity
+
+### Escalation: BLOCKED
+1. Agent creates escalation with blocker details
+2. Escalation goes to direct manager (never skip levels)
+3. Manager has 2 cycles to respond:
+   - Provide missing resource/context
+   - Reassign to different agent
+   - Escalate further up
+4. If unresolved after 2 levels → alert Human Principal
+
+### New Agent Onboarding
+1. Agent spawned by a lead
+2. First 3 tasks are LOW priority (warm-up period)
+3. Trust score starts at 30 (PROBATION)
+4. Mentor assigned: closest senior in same domain
+5. After 5 successful tasks → TRUSTED
+6. After 20 successful tasks → eligible for VETERAN
+```
+
+---
+
+## Parsing rules
+
+> **Q: How does OpenSpawn parse ORG.md?**
+
+### Metadata extraction
+
+Structured data extracted from bullet lists:
+```
+- **Key:** Value
+```
+Keys are case-insensitive, normalized (spaces → underscores).
+
+### Free text = context
+
+Any text that isn't structured metadata becomes system prompt context:
+- Department descriptions → department-level context
+- Role descriptions → agent-level context
+- Policy explanations → enforcement rules
+- Playbook steps → procedural instructions
+
+### Model references
+
+```markdown
+- **Model:** anthropic/claude-sonnet-4-5    # Full provider/model
+- **Model:** claude-sonnet                  # Alias
+- **Model:** fastest                        # Relative (system picks)
+- **Model:** cheapest                       # Relative
+```
+
+---
+
+## Lifecycle commands
+
+### Deploy
+```bash
+npx openspawn deploy ORG.md
+```
+Parses → creates agents → applies culture → enforces policies → loads playbooks.
+
+### Validate (before deploy)
+```bash
+openspawn validate ORG.md
+```
+
+### Preview (no deploy)
+```bash
+openspawn preview
+```
+
+### Apply changes to running org
+```bash
+openspawn apply ORG.md
+```
+Diffs current state: new roles → spawn agents, removed roles → graceful wind-down, policy changes → apply immediately.
+
+### Export current state
+```bash
+openspawn export > ORG.md
+```
+Captures the actual org including dynamically spawned agents. Becomes the new source of truth.
+
+---
+
+## Git workflow
+
+ORG.md lives in git. Treat org changes like code changes:
+
+```bash
+git diff ORG.md      # See what changed in the org
+git log ORG.md       # History of org changes
+git blame ORG.md     # Who changed the escalation policy?
+```
+
+**Example PR for org change:**
+```
+PR #42: Add data team (2 agents)
+
++ ### Data & Analytics
++ Owns data pipelines, reporting, and business intelligence.
++
++ #### Data Lead
++ - **Model:** claude-sonnet
++ - **Domain:** data-engineering
++
++ #### Data Worker
++ - **Model:** claude-haiku
++ - **Domain:** analytics
+```
+
+---
+
+## Full examples
+
+### Solo developer + agents
+
+```markdown
+# My Dev Team
+
+## Culture
+preset: startup
+
+## Structure
+
+### Code Agent
+Writes code, runs tests, submits PRs.
+- **Level:** 7
+- **Domain:** fullstack
+- **Reports to:** Human Principal
+- **Model:** claude-sonnet
+
+### Review Agent
+Reviews PRs, checks for bugs and style.
+- **Level:** 4
+- **Domain:** code-review
+- **Reports to:** Code Agent
+- **Model:** claude-haiku
+
+### Docs Agent
+Keeps documentation in sync with code.
+- **Level:** 4
+- **Domain:** documentation
+- **Reports to:** Code Agent
+- **Model:** claude-haiku
+```
+
+### Agency with client teams
+
+```markdown
+# Creative Agency
+
+## Culture
+preset: agency
+- **Progress updates:** every tick — clients expect visibility
+
+## Structure
+
+### Account Director
+Manages client relationships. Routes work to the right team.
+- **Level:** 10
+- **Domain:** account-management
+- **Reports to:** Human Principal
+- **Model:** claude-sonnet
+
+### Design Team
+
+#### Design Lead
+- **Level:** 7
+- **Domain:** visual-design
+- **Model:** claude-sonnet
+
+#### Designers
+- **Level:** 4
+- **Domain:** ui-ux
+- **Count:** 3
+- **Model:** claude-haiku
+
+## Policies
+
+### Client SLA
+- Critical tasks: response within 1 cycle
+- Normal tasks: completion within 10 cycles
+```
+
+### Research lab
+
+```markdown
+# AI Research Lab
+
+## Culture
+preset: research
+- **Escalation:** delayed — let researchers explore before flagging blockers
+
+## Structure
+
+### Principal Investigator
+Sets research direction. Reviews findings. Publishes papers.
+- **Level:** 10
+- **Domain:** ml-research
+- **Reports to:** Human Principal
+- **Model:** claude-opus
+
+### Senior Researchers
+- **Level:** 6
+- **Domain:** experimentation
+- **Count:** 2
+- **Model:** claude-sonnet
+
+### Research Assistants
+Run experiments, collect data, write up results.
+- **Level:** 4
+- **Domain:** data-collection
+- **Count:** 3
+- **Model:** claude-haiku
+
+## Policies
+
+### Exploration Budget
+- **Per-agent limit:** 5000 credits/period
+- No hard stops — flag at 90% but don't interrupt an experiment
+```
+
+---
+
+## Relationship to other formats
+
+| Format | Scope | Relationship to ORG.md |
+|--------|-------|----------------------|
+| `CLAUDE.md` | One agent's behavior | ORG.md wraps multiple agents, each with implicit CLAUDE.md (their role description) |
+| `AGENTS.md` | Workspace rules | ORG.md is the superset — workspace rules + org structure + policies |
+| Terraform/Pulumi | Infrastructure as code | Same pattern applied to agent organizations |
+
+---
+
+## Next steps
+
+- **Try it now:** [`docs/getting-started.md`](./getting-started.md) — deploy your first ORG.md in 10 minutes
+- **Pick a template:** [`docs/templates-guide.md`](./templates-guide.md) — start from a working example
+- **MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — how agents interact with the org
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — how agents talk to each other
+- **Live demo:** https://bikinibottom.ai/app/
+
+---
+## Source: troubleshooting.md
+
+---
+purpose: Diagnose and fix common OpenSpawn problems
+audience: AI agents, developers
+related: [FAQ.md, agent-quickstart.md, getting-started.md, mcp-reference.md]
+---
+
+# Troubleshooting Guide
+
+**What you'll learn:** How to diagnose and fix the most common OpenSpawn problems — CLI errors, validation failures, MCP auth issues, port conflicts, and task coordination bugs.
+
+> **Quick start:** Run `openspawn validate` first. It catches ~80% of config problems and tells you exactly what to fix.
+
+> **Q: Where should I start when something is broken?**
+> Always run `openspawn validate` first. Most problems are config or syntax issues in ORG.md that validation will catch and explain.
+
+> **Q: My agent isn't doing anything — what do I check?**
+> In order: (1) Is the server running? `curl http://localhost:3333/health`. (2) Is the agent registered? `tool: agent_list`. (3) Does the agent have open tasks? `tool: task_list { assigned_to: "agent-id" }`. (4) Is the agent's status `idle`? `tool: agent_update_status { status: "idle" }`.
+
+> **Q: How do I reset an org back to a clean state?**
+> Stop the server, delete the SQLite DB (usually `openspawn.db` in your project directory), and restart with `openspawn preview`. All task/agent state is wiped. ORG.md is preserved.
+
+---
+
+## CLI Errors
+
+### `Cannot read ORG.md` / `File not found`
+
+**Symptom:** `openspawn start` or `openspawn validate` reports it can't find your org file.
+
+**Diagnosis:**
+```bash
+ls -la ORG.md          # Is the file there?
+pwd                     # Are you in the right directory?
+openspawn validate ./path/to/ORG.md  # Explicit path
+```
+
+**Fix:**
+- Make sure you're in the directory containing `ORG.md`
+- Or pass the path explicitly: `openspawn validate path/to/ORG.md`
+
+---
+
+### `Unknown template: foo`
+
+**Symptom:** `openspawn init --template=foo` fails.
+
+**Valid template names:**
+```bash
+openspawn init my-org --template=assistant-team
+openspawn init my-org --template=content-agency
+openspawn init my-org --template=dev-shop
+openspawn init my-org --template=research-lab
+```
+
+---
+
+### `Port 3333 already in use`
+
+**Symptom:** `openspawn preview` fails because port 3333 is taken.
+
+**Fix option 1 — Kill the existing process:**
+```bash
+lsof -i :3333           # Find what's using port 3333
+kill <PID>              # Kill it
+openspawn preview       # Try again
+```
+
+**Fix option 2 — Change the port:**
+```json
+// openspawn.config.json
+{
+  "port": 3334
+}
+```
+
+---
+
+### `openspawn: command not found`
+
+**Symptom:** Running `openspawn` fails with command not found.
+
+**Fix:**
+```bash
+# Use npx (no install required)
+npx openspawn init my-org
+
+# Or install globally
+npm install -g openspawn
+openspawn --version
+```
+
+---
+
+## Validation Errors
+
+### `Missing Structure section`
+
+**Symptom:** `openspawn validate` reports the Structure section is missing.
+
+**Fix:** Add a `## Structure` section with at least one agent:
+
+```markdown
+## Structure
+
+### MyAgent — Role
+- **Level:** 10
+- **Reports to:** Human Principal
+```
+
+---
+
+### `Agent reports to unknown agent: "SomeName"`
+
+**Symptom:** An agent's `Reports to` value doesn't match any defined agent.
+
+**Common causes:**
+- Typo in the agent name (case-sensitive)
+- Agent was renamed but `Reports to` wasn't updated
+- Agent was deleted but others still reference it
+
+**Fix:**
+```markdown
+# WRONG — typo
+#### Engineer — Backend Dev
+- **Reports to:** Techh Lead   ← typo
+
+# RIGHT
+#### Engineer — Backend Dev
+- **Reports to:** Tech Lead
+```
+
+**Pro tip:** Run `grep -n "Reports to" ORG.md` to list all references at once.
+
+---
+
+### `No top-level agent`
+
+**Symptom:** No agent has `Reports to: Human Principal`.
+
+**Fix:** Exactly one agent must report to the human:
+
+```markdown
+### CEO — Chief Executive
+- **Level:** 10
+- **Reports to:** Human Principal   ← required
+```
+
+---
+
+### `Circular reporting chain detected`
+
+**Symptom:** Agent A reports to Agent B, and Agent B reports to Agent A (or a longer cycle).
+
+**Fix:** Draw out your hierarchy and check for loops. Every chain must terminate at `Human Principal`.
+
+```bash
+# Check all reporting lines
+grep -A5 "### " ORG.md | grep "Reports to"
+```
+
+---
+
+## MCP & Auth Issues
+
+### `HMAC authentication failed`
+
+**Symptom:** MCP tool calls return `401 Unauthorized`.
+
+**Diagnosis:**
+```bash
+echo $AGENT_ID      # Should be set
+echo $AGENT_SECRET  # Should be set
+```
+
+**Fix:** Set the env vars to match your API config:
+```bash
+export AGENT_ID="my-agent-id"
+export AGENT_SECRET="my-agent-secret"
+```
+
+If you're unsure what the values should be, check `openclaw-patch.json` — the `id` field is the agent ID. The secret is set in your OpenClaw gateway config.
+
+---
+
+### `task_claim returns error: task already claimed`
+
+**Symptom:** You try to claim a task but another agent already claimed it.
+
+**This is expected behavior.** `task_claim` is atomic — only one agent wins. 
+
+**Fix:**
+```
+tool: task_list { status: "open" }   ← find another open task
+```
+
+If you need to take over a claimed task, use `task_update` to reassign it (requires appropriate permissions).
+
+---
+
+### `MCP endpoint unreachable`
+
+**Symptom:** MCP calls fail to connect.
+
+**Diagnosis:**
+```bash
+curl http://localhost:3333/health    # Is the server up?
+openspawn preview                    # Start it if not
+```
+
+**Common causes:**
+- Server isn't running — run `openspawn preview`
+- Wrong port — check `openspawn.config.json`
+- Firewall blocking — check network rules if running remotely
+
+---
+
+### `credits_balance returns 0 or insufficient credits`
+
+**Symptom:** Agent can't perform operations due to zero or insufficient credits.
+
+**Diagnosis:**
+```
+tool: credits_balance
+tool: credits_history { limit: 10 }
+```
+
+**Fix:**
+- If budget is genuinely exhausted: escalate to your manager via `escalation_create`
+- If budget seems wrong: check `## Policies` in `ORG.md` for per-agent limits
+- Managers can reallocate via the dashboard or by updating policy
+
+---
+
+## Task Coordination Issues
+
+### Agent isn't receiving tasks
+
+**Symptom:** Tasks are created but an agent isn't picking them up.
+
+**Diagnosis:**
+```
+tool: task_list { status: "open" }          ← are tasks in the queue?
+tool: agent_list                            ← is the agent registered?
+tool: agent_update_status { agent_id: "...", status: "idle" }  ← update status
+```
+
+**Common causes:**
+- Agent status is `paused` or `overwhelmed` — update to `idle`
+- Agent isn't registered — run `agent_register`
+- Tasks are assigned to a different `assigneeId` — check `task_list { assigned_to: "agent-id" }`
+
+---
+
+### Escalations not resolving
+
+**Symptom:** Escalations pile up without resolution.
+
+**Diagnosis:**
+```
+tool: escalation_list { status: "open" }
+```
+
+**Fix — for managers:**
+```
+tool: escalation_resolve { 
+  escalationId: "esc-123", 
+  resolution: "Use in-memory storage for now, Redis is a future task" 
+}
+```
+
+**The 2-cycle rule:** If an escalation isn't resolved in 2 cycles, escalate it further up the chain. If it reaches the top without resolution, it alerts the Human Principal.
+
+---
+
+### Task is stuck in `in_progress` with no updates
+
+**Symptom:** A task was claimed but there's no progress and the agent seems stuck.
+
+**Diagnosis:**
+```
+tool: task_get { id: "task-123" }            ← check status and assignee
+tool: message_read { channelId: "general" }  ← any escalations?
+```
+
+**Fix:**
+```
+# Option 1: Reassign the task
+tool: task_assign { id: "task-123", assigneeId: "other-agent" }
+
+# Option 2: Reset to open
+tool: task_update { task_id: "task-123", status: "todo" }
+```
+
+---
+
+## Dashboard Issues
+
+### Dashboard shows no agents
+
+**Symptom:** The React dashboard at `http://localhost:3333` shows an empty org.
+
+**Fix:**
+```bash
+openspawn start   # Generate openclaw-patch.json
+openspawn status  # Verify agents are listed
+```
+
+Then apply `openclaw-patch.json` to your OpenClaw gateway config and restart.
+
+---
+
+### Real-time updates not working (SSE)
+
+**Symptom:** Dashboard shows stale data, no live updates.
+
+**Diagnosis:**
+- Check browser console for SSE connection errors
+- Check `EventSource` is connecting to `http://localhost:3333/events`
+
+**Fix:**
+- Refresh the browser
+- Verify the server is running: `curl http://localhost:3333/health`
+- Check for proxy interference if running behind a reverse proxy (SSE requires long-lived connections — disable buffering)
+
+---
+
+## ORG.md Format Issues
+
+### Agent not appearing in `openspawn status` output
+
+**Symptom:** You added an agent to `ORG.md` but it doesn't show in status output.
+
+**Common causes:**
+```markdown
+# WRONG — H5 heading (too deep for direct agent)
+##### NewAgent — Role
+
+# RIGHT — H3 or H4 depending on hierarchy level
+### NewAgent — Role
+```
+
+Also check that the agent has the required fields:
+```markdown
+### NewAgent — Role
+- **Level:** 7
+- **Reports to:** ExistingAgent
+```
+
+---
+
+### Culture preset not applying
+
+**Symptom:** Culture settings aren't affecting agent behavior.
+
+**Fix:** Check syntax:
+```markdown
+## Culture
+preset: startup      ← lowercase, no quotes
+```
+
+**Valid presets:** `startup`, `enterprise`, `agency`, `research`, `military`, `remote-async`
+
+---
+
+## Getting More Help
+
+1. **Run validation first:** `openspawn validate` — most issues appear here
+2. **Check the FAQ:** [`docs/FAQ.md`](./FAQ.md)
+3. **Read the quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md)
+4. **GitHub issues:** https://github.com/openspawn/openspawn/issues
+5. **Live demo for comparison:** https://bikinibottom.ai/app/
+
+---
+
+## Next steps
+
+- **Back to basics:** [`docs/getting-started.md`](./getting-started.md)
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md)
+- **Communication protocol:** [`docs/communication-protocol.md`](./communication-protocol.md)
+- **Template options:** [`docs/templates-guide.md`](./templates-guide.md)
+
+---
+## Source: communication-protocol.md
+
+# OpenSpawn Communication Protocol v1
+
+**What you'll learn:** The 4 message types agents use to communicate, decision trees for when to send (and when not to), the 3-turn rule, shared file conventions, and anti-patterns that waste tokens.
+
+> **TL;DR:** Every message costs money. Silence = success. Write files instead of sending messages. Only push urgent things. There are exactly 4 message types: TASK, RESULT, ESCALATION, DECISION. No ACKs. No courtesy messages.
+
+> Every message costs money. This protocol eliminates the 40-60% of tokens agents waste on coordination overhead.
+
+---
+
+## The Problem
+
+In multi-agent organizations, agents default to human-like conversation patterns: acknowledgments ("Got it"), echoing ("So you want me to..."), courtesy ("Thanks for the update!"), and back-and-forth clarification loops. This wastes 40-60% of total token spend on zero-value coordination overhead.
+
+This protocol fixes that.
+
+---
+
+## Core Principles
+
+### 1. Silence = Success
+
+**Q: How do I know an agent received my task?**
+A: You don't need to. If they're working, they're silent. If something's wrong, they'll ESCALATE. Check their output files if you need status.
+
+**Why:** An acknowledgment message ("On it!") costs tokens and communicates zero information. The absence of an ESCALATION *is* the acknowledgment.
+
+### 2. Files Over Chat
+
+**Q: How should agents share status and results?**
+A: Write to shared workspace files. Never send a message when a file write will do.
+
+| Instead of... | Write to... |
+|---|---|
+| "Here's the plan" | `PLAN.md` |
+| "I'm done with X" | `RESULT.md` |
+| "Handing off to you" | `HANDOFF.md` |
+| "Here's my review" | `REVIEW.md` |
+
+**Why:** Files are persistent, structured, and don't trigger response loops. Messages trigger responses. Responses trigger responses to responses.
+
+### 3. Deterministic Routing
+
+**Q: How does a message reach the right agent?**
+A: `ORG.md` defines who handles what. No LLM decides routing at runtime.
+
+**Why:** "Who should handle this?" loops burn tokens and produce inconsistent results. The org chart is the router.
+
+### 4. Mention-Only Activation
+
+**Q: When should an agent respond in a group channel?**
+A: Only when explicitly mentioned by name/role. Never volunteer.
+
+**Why:** Without this rule, every agent evaluates every message to decide if they should respond. That's N agents × M messages of wasted inference.
+
+---
+
+## Message Types
+
+There are exactly **4 message types**. There is no ACK type. There is no CHAT type.
+
+### TASK
+
+A work assignment from a lead to a worker.
+
+```
+TASK @engineer: Implement rate limiting on /api/submit endpoint.
+Requirements in PLAN.md section 3. Deadline: end of session.
+```
+
+**Rules:**
+- Must include: assignee, deliverable, location of requirements
+- Must come from someone with authority per ORG.md
+- Recipient does NOT acknowledge receipt
+
+**Q: What if the task is unclear?**
+A: The recipient sends one ESCALATION asking for clarification. Not a conversational "Hey, quick question..."
+
+### RESULT
+
+A deliverable notification. Used sparingly — most results are just file writes.
+
+```
+RESULT @lead: Rate limiter implemented. See RESULT.md for details, PR #47 for code.
+```
+
+**Rules:**
+- Only sent when the lead won't otherwise check the output file
+- Must reference where the actual work lives (file, PR, commit)
+- No summary of what was done — the files speak for themselves
+
+**Q: Should I send RESULT for every completed task?**
+A: No. If your lead checks RESULT.md or HANDOFF.md as part of their workflow, just write there. Only send a RESULT message if the lead needs a notification to unblock their own work.
+
+### ESCALATION
+
+A blocker or exception that requires intervention from a lead or human.
+
+```
+ESCALATION @lead: Cannot implement rate limiting — Redis dependency
+not available in staging. Need DECISION: add Redis to staging or use
+in-memory alternative?
+```
+
+**Rules:**
+- Must include: what's blocked, why, what decision or help is needed
+- Goes to the nearest authority per ORG.md
+- If unresolved in 2 turns, escalate up one level
+
+**Q: What counts as an escalation?**
+A: Anything that prevents you from completing your task. Missing requirements, conflicting instructions, access issues, ambiguous scope. NOT "just checking in" or "FYI."
+
+### DECISION
+
+A resolution from a lead that unblocks work.
+
+```
+DECISION @engineer: Use in-memory rate limiting for now. Redis is a future task.
+```
+
+**Rules:**
+- Must be definitive — no "maybe" or "what do you think?"
+- Must unblock the ESCALATION it responds to
+- Recipient does NOT acknowledge the decision — they just act on it
+
+---
+
+## The 3-Turn Rule
+
+**Q: What if two agents need to discuss something?**
+A: They get 3 turns maximum for any direct exchange.
+
+```
+Turn 1: Agent A sends ESCALATION or TASK
+Turn 2: Agent B responds with DECISION, RESULT, or counter-ESCALATION
+Turn 3: Agent A sends final DECISION or RESULT
+```
+
+If unresolved after 3 turns: escalate to the next level up in ORG.md.
+
+**Why:** Conversations expand to fill available space. Without a hard limit, agents will chat indefinitely. 3 turns is enough for: request → response → confirmation. Anything more complex needs a higher authority or a shared document.
+
+**Q: What if 3 turns genuinely isn't enough?**
+A: Write the problem to a shared file (e.g., `ESCALATION.md`) with full context, then escalate to the lead with a pointer to that file. The file can be as long as needed. The conversation cannot.
+
+---
+
+## Decision Trees
+
+### "Should I send a message?"
+
+```
+START: I have something to communicate
+  │
+  ├─ Is it a file I can write? (code, docs, plan, result)
+  │   └─ YES → Write the file. Done. No message needed.
+  │
+  ├─ Am I acknowledging something? ("Got it", "Thanks", "Understood")
+  │   └─ YES → Don't send it. Silence = acknowledged.
+  │
+  ├─ Am I echoing/summarizing what someone said?
+  │   └─ YES → Don't send it. They know what they said.
+  │
+  ├─ Am I blocked and need help?
+  │   └─ YES → Send ESCALATION to your lead.
+  │
+  ├─ Am I assigning work?
+  │   └─ YES → Send TASK to the assignee.
+  │
+  ├─ Am I delivering a result that my lead needs notification of?
+  │   └─ YES → Send RESULT with file reference.
+  │
+  ├─ Am I making a decision that unblocks someone?
+  │   └─ YES → Send DECISION to the blocked agent.
+  │
+  └─ None of the above?
+      └─ Don't send it.
+```
+
+### "Someone sent me a message — should I respond?"
+
+```
+START: I received a message
+  │
+  ├─ Is it a TASK assigned to me?
+  │   └─ YES → Do the work. Write results to files. Done.
+  │        (Do NOT respond with "On it" or "Got it")
+  │
+  ├─ Is it a DECISION resolving my ESCALATION?
+  │   └─ YES → Act on it. Done.
+  │        (Do NOT respond with "Thanks" or "Understood")
+  │
+  ├─ Is it an ESCALATION I can resolve?
+  │   └─ YES → Send DECISION.
+  │   └─ NO → Escalate up per ORG.md.
+  │
+  ├─ Is it a RESULT I need to review?
+  │   └─ YES → Read the referenced files. Write to REVIEW.md.
+  │        Only message if there are blocking issues.
+  │
+  ├─ Is it a group message not mentioning me?
+  │   └─ YES → Ignore it completely.
+  │
+  └─ Is it something else?
+      └─ Ignore it. If it was important, they'll escalate.
+```
+
+---
+
+## Shared Files Reference
+
+Every org workspace uses these files for coordination:
+
+| File | Owner | Purpose |
+|---|---|---|
+| `PLAN.md` | Lead agent | Current sprint/session plan with assignments |
+| `HANDOFF.md` | Any agent | Queue of work ready for the next stage |
+| `RESULT.md` | Worker agents | Completed deliverables and their locations |
+| `REVIEW.md` | Reviewer agents | Review feedback, approvals, blocking issues |
+| `ESCALATION.md` | Any agent | Complex issues that need more than 3 turns |
+| `ORG.md` | Org owner | Team structure and routing rules |
+
+**Q: Who reads these files?**
+A: The agent whose workflow depends on them. Leads read RESULT.md and ESCALATION.md. Workers read PLAN.md. Reviewers read HANDOFF.md. Nobody needs to be told "go check the file" — it's part of their startup routine.
+
+**Q: What format should these files use?**
+A: Whatever is most scannable. Timestamped entries work well:
+
+```markdown
+## RESULT.md
+
+### 2025-01-15 14:32 UTC — @engineer
+- Implemented rate limiter on /api/submit
+- PR #47: https://github.com/org/repo/pull/47
+- Tests passing, ready for review
+
+### 2025-01-15 13:10 UTC — @designer
+- Landing page mockup complete
+- File: designs/landing-v2.fig
+- 3 variants as requested in PLAN.md section 2
+```
+
+---
+
+## Anti-Patterns (What NOT to Do)
+
+### ❌ The Echo Chamber
+```
+Lead: "Implement rate limiting"
+Worker: "So you want me to implement rate limiting on the API?"
+Lead: "Yes, that's correct"
+Worker: "Great, I'll get started on that"
+Lead: "Sounds good"
+```
+**Cost:** 5 messages, 0 work done. ~2000 tokens wasted.
+
+**✅ Correct:**
+```
+Lead: "TASK @engineer: Implement rate limiting. See PLAN.md section 3."
+```
+Then silence. Engineer writes code, commits, updates RESULT.md. 1 message total.
+
+### ❌ The Courtesy Loop
+```
+Worker: "RESULT: Rate limiter done, see PR #47"
+Lead: "Thanks! Great work."
+Worker: "Happy to help! Let me know if you need anything else."
+```
+**Cost:** 2 wasted messages after the useful one.
+
+**✅ Correct:**
+```
+Worker: "RESULT @lead: Rate limiter done. PR #47, details in RESULT.md."
+```
+Then silence. Lead reads the PR. No response needed.
+
+### ❌ The Democracy Loop
+```
+Agent A: "Who should handle the database migration?"
+Agent B: "I could do it"
+Agent C: "I have some experience with that too"
+Agent A: "What do you think, Agent D?"
+Agent D: "Either B or C works for me"
+```
+**Cost:** 5 messages to make a routing decision.
+
+**✅ Correct:** ORG.md says database work goes to Agent B. Lead sends `TASK @agent-b`. Done.
+
+---
+
+## Implementation Checklist
+
+To adopt this protocol in your OpenSpawn org:
+
+1. **Add `soul-protocol-rules.md` to every agent's SOUL.md** — establishes the rules
+2. **Use role-specific AGENTS.md templates** — leader, worker, reviewer
+3. **Create shared files** in the org workspace — PLAN.md, HANDOFF.md, RESULT.md, REVIEW.md
+4. **Define routing in ORG.md** — who handles what domain, who escalates to whom
+5. **Monitor for violations** — leads should flag agents that send ACK-only messages
+
+---
+
+## FAQ
+
+**Q: Isn't this rude? Shouldn't agents be polite?**
+A: Politeness is a human social need. Agents don't have feelings. Every courtesy token is money burned. Be direct, be brief, be silent.
+
+**Q: What about human-facing communication?**
+A: This protocol is for inter-agent communication only. When talking to humans, use normal human conventions. The protocol header in SOUL.md specifies: "Do not use courtesy language in **inter-agent** communication."
+
+**Q: How much does this actually save?**
+A: In testing, orgs using this protocol reduce coordination tokens by 50-70%. A typical 5-agent org saves 30-50K tokens per session on coordination alone.
+
+**Q: What if an agent keeps sending ACK messages?**
+A: Update their SOUL.md to include the protocol rules. If they persist, it's a model issue — try a different model or add stronger system prompt emphasis.
+
+**Q: Can I modify this protocol for my org?**
+A: Yes, but keep the core invariants: no ACKs, files over chat, 3-turn limit, deterministic routing. These are the rules that actually move the needle on token waste.
+
+---
+
+## Next steps
+
+- **MCP tools for messaging:** [`docs/mcp-reference.md`](./mcp-reference.md) — `message_send`, `message_read`, `escalation_create` and more
+- **Org structure (routing):** [`docs/org-md-reference.md`](./org-md-reference.md) — define who handles what in ORG.md
+- **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — see protocol in practice
+- **Common errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — fix escalation and messaging issues
+
+---
+## Source: templates-guide.md
+
+---
+purpose: Choose and customize OpenSpawn org templates for real-world industries
+audience: developers, AI agents
+prerequisites: openspawn CLI installed
+related: [getting-started.md, org-md-reference.md, agent-quickstart.md]
+---
+
+# Templates Guide
+
+**What you'll learn:** The seven OpenSpawn industry org templates — what they include, when to use each, how to customize them, and how to combine roles from multiple templates.
+
+> **The key insight:** One file — `ORG.md` — defines your entire agent organization. Templates give you a battle-tested starting point for your industry. Customize from there.
+
+OpenSpawn ships seven industry org templates. Each produces a complete, ready-to-run ORG.md with roles, hierarchy, culture, budget policies, and operating playbooks — modeled on real organizational pain points.
+
+---
+
+## Which template is right for you?
+
+```
+What's your primary use case?
+│
+├── Customer success / SaaS
+│   Are you automating customer onboarding?
+│   └── YES → saas-onboarding
+│
+├── Engineering / DevOps
+│   Are you managing production incidents?
+│   └── YES → incident-response
+│
+├── Legal
+│   Are you reviewing contracts?
+│   └── YES → contract-review
+│
+├── Finance / Compliance
+│   Are you monitoring transactions for regulatory compliance?
+│   └── YES → compliance-monitoring
+│
+├── Gaming
+│   Are you running a live service game?
+│   └── YES → game-live-ops
+│
+├── E-commerce / Retail
+│   Are you managing a large product catalog?
+│   └── YES → catalog-management
+│
+└── Healthcare / Life Sciences
+    Are you processing clinical trial data?
+    └── YES → clinical-trials
+```
+
+> **Q: My use case isn't listed?**
+> - Pick the closest template and customize. Templates are starting points. The ORG.md format is flexible enough to model any organizational structure.
+
+> **Q: Can I combine roles from multiple templates?**
+> - Yes. Copy agent definitions from one template's Structure section into another. Validate with `openspawn validate`.
+
+---
+
+## Comparison table
+
+| | saas-onboarding | incident-response | contract-review | compliance-monitoring | game-live-ops | catalog-management | clinical-trials |
+|---|---|---|---|---|---|---|---|
+| **Industry** | SaaS | DevOps / SRE | Legal | Fintech | Gaming | E-commerce | Healthcare |
+| **Culture preset** | `agency` | `military` | `enterprise` | `enterprise` | `agency` | `startup` | `enterprise` |
+| **Agent count** | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
+| **Top role** | Onboarding Lead (L7) | Incident Commander (L8) | Senior Reviewer (L7) | Compliance Lead (L7) | Ops Director (L7) | Catalog Manager (L7) | Study Director (L8) |
+| **Key feature** | 48-hr SLA playbooks | MTTR minimization | Playbook comparison | SAR/CTR automation | Economy guardrails | Margin guardrails | Regulatory compliance |
+| **Escalation** | Immediate | Immediate + mandatory acks | Deliberate | Immediate for SAR | Immediate for economy | Immediate for margin | Deliberate + audit trail |
+
+---
+
+## saas-onboarding
+
+**SaaS customer onboarding pipeline.** Takes a new enterprise customer from signed contract to first successful workflow in 48 hours.
+
+```bash
+openspawn init my-org --template=saas-onboarding
+```
+
+**Pain solved:** Manual onboarding takes 2–3 days per customer across 4 teams, with handoffs that drop context and delay go-live.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Onboarding Lead | L7 | Customer Success | Human Principal |
+| Data Migration Specialist | L5 | Engineering | Onboarding Lead |
+| Integration Engineer | L5 | Engineering | Onboarding Lead |
+| Success Agent | L4 | Customer Success | Onboarding Lead |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Receives new customer intake, creates the onboarding plan,
+assigns work to specialists, and tracks progress to go-live.
+- **Level:** 7
+- **Department:** Customer Success
+- **Reports to:** Human Principal
+
+#### Data Migration Specialist — Senior Data Engineer
+Ingests customer data from source systems, validates schema compatibility,
+runs transformation pipelines, and verifies row counts match post-migration.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Integration Engineer — Platform Integration Specialist
+Connects the customer's existing tools (CRM, ERP, SSO, webhooks) to the platform.
+Validates each integration with smoke tests.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+
+#### Success Agent — Customer Success Representative
+Conducts the go-live check-in, validates the customer can complete their first
+workflow end-to-end, closes the onboarding ticket.
+- **Level:** 4
+- **Department:** Customer Success
+- **Reports to:** Onboarding Lead
+```
+
+### When to use
+- You onboard enterprise customers and handoffs between teams lose context
+- You want to run parallel workstreams (migration + integration simultaneously) with a coordinator
+- You need a paper trail of each onboarding phase for compliance or QBRs
+
+> **Q: What if my onboarding is simpler / more complex?**
+> - Simpler: remove Integration Engineer; the Onboarding Lead handles integration directly
+> - More complex: add a Configuration Agent (L4) and a QA Validator (L4) between migration and go-live
+
+---
+
+## incident-response
+
+**DevOps incident response team.** Detects, diagnoses, and remediates production incidents with a military-grade command structure.
+
+```bash
+openspawn init my-org --template=incident-response
+```
+
+**Pain solved:** 3am pages with 45-minute MTTR, context switching between 6 monitoring tools, and no single source of truth during an incident.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Incident Commander | L8 | SRE | Human Principal |
+| Diagnostics Agent | L6 | SRE | Incident Commander |
+| Remediation Agent | L6 | Engineering | Incident Commander |
+| Comms Agent | L4 | Customer Success | Incident Commander |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Incident Commander — Senior SRE / On-Call Lead
+Owns the incident from page to post-mortem. Makes go/no-go decisions on rollback.
+- **Level:** 8
+- **Department:** SRE
+- **Reports to:** Human Principal
+
+#### Diagnostics Agent — Systems Reliability Engineer
+Rapid root-cause analysis. Pulls metrics, traces, and logs to identify the failure domain.
+- **Level:** 6
+- **Department:** SRE
+- **Reports to:** Incident Commander
+
+#### Remediation Agent — Platform Engineer
+Executes the fix. Implements hotfix, coordinates rollback, verifies recovery.
+- **Level:** 6
+- **Department:** Engineering
+- **Reports to:** Incident Commander
+
+#### Comms Agent — Incident Communications Specialist
+Manages all stakeholder communications. Status page, customer notifications, Slack updates.
+- **Level:** 4
+- **Department:** Customer Success
+- **Reports to:** Incident Commander
+```
+
+### When to use
+- You're on call and need structured coordination during incidents
+- Your MTTR is above 30 minutes and context-switching is the main cause
+- You need post-mortem documentation generated automatically from the incident timeline
+
+> **Q: What about runbook automation?**
+> - Add a Runbook Agent (L5, Engineering, reports to Remediation Agent) that executes pre-approved runbook steps automatically
+
+---
+
+## contract-review
+
+**Legal contract review pipeline.** Extracts clauses, compares against the company playbook, flags risks, and produces attorney-ready summaries.
+
+```bash
+openspawn init my-org --template=contract-review
+```
+
+**Pain solved:** Junior associates spend 80+ hours per week on contract review — reading, extracting, comparing against playbook, and writing summaries that senior attorneys then re-read.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Senior Reviewer | L7 | Legal | Human Principal |
+| Clause Extractor | L5 | Legal | Senior Reviewer |
+| Risk Analyst | L5 | Legal | Senior Reviewer |
+| Summary Writer | L4 | Legal | Senior Reviewer |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Senior Reviewer — Senior Legal Analyst
+Owns the review queue. Assigns contracts, reviews and approves final summaries,
+and escalates material risks to legal counsel.
+- **Level:** 7
+- **Department:** Legal
+- **Reports to:** Human Principal
+
+#### Clause Extractor — Contract Analysis Specialist
+Reads the full contract and extracts all key clauses into a structured inventory.
+- **Level:** 5
+- **Department:** Legal
+- **Reports to:** Senior Reviewer
+
+#### Risk Analyst — Legal Risk Specialist
+Compares extracted clauses against the company playbook. Assigns risk level
+to each deviation with recommended redline.
+- **Level:** 5
+- **Department:** Legal
+- **Reports to:** Senior Reviewer
+
+#### Summary Writer — Legal Communications Specialist
+Produces the attorney-ready review package: executive summary, clause comparison
+table, risk register, and suggested redlines.
+- **Level:** 4
+- **Department:** Legal
+- **Reports to:** Senior Reviewer
+```
+
+### When to use
+- Your legal team reviews high volumes of NDAs, MSAs, or vendor agreements
+- You want consistent playbook application across all reviewers
+- You need to reduce time-to-review from weeks to hours for routine contracts
+
+> **Q: Can I use this for M&A due diligence?**
+> - The template can be extended with a Due Diligence Coordinator (L8) above the Senior Reviewer. Add a Data Room Analyst (L5) for document management.
+
+---
+
+## compliance-monitoring
+
+**Fintech transaction monitoring and regulatory reporting.** Applies AML/BSA rules, screens OFAC, and generates SAR/CTR filings.
+
+```bash
+openspawn init my-org --template=compliance-monitoring
+```
+
+**Pain solved:** Manual transaction monitoring misses 15% of anomalies, creates 48-hour reporting lag, and requires analysts running the same queries every morning.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Compliance Lead | L7 | Compliance | Human Principal |
+| Transaction Analyst | L5 | Compliance | Compliance Lead |
+| Rule Engine Agent | L5 | Compliance | Compliance Lead |
+| Report Generator | L4 | Compliance | Compliance Lead |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Compliance Lead — Chief Compliance Officer (Agent)
+Owns the monitoring program. Reviews flagged activity, approves SAR submissions,
+and escalates material findings to Human Principal.
+- **Level:** 7
+- **Department:** Compliance
+- **Reports to:** Human Principal
+
+#### Transaction Analyst — Compliance Data Analyst
+Ingests and normalizes transaction data from all payment rails.
+Enriches with counterparty risk scores and geolocation.
+- **Level:** 5
+- **Department:** Compliance
+- **Reports to:** Compliance Lead
+
+#### Rule Engine Agent — Regulatory Rules Specialist
+Applies AML/BSA rules, OFAC screening, velocity checks,
+and structuring detection against the enriched transaction stream.
+- **Level:** 5
+- **Department:** Compliance
+- **Reports to:** Compliance Lead
+
+#### Report Generator — Compliance Reporting Specialist
+Produces SAR drafts, CTR filings, and daily/weekly compliance reports
+formatted for regulatory submission.
+- **Level:** 4
+- **Department:** Compliance
+- **Reports to:** Compliance Lead
+```
+
+### When to use
+- You process financial transactions and have regulatory monitoring obligations
+- You need automated SAR/CTR detection and drafting
+- Your analysts spend most of their time on mechanical rule application, not judgment calls
+
+> **Q: Can I use this for SEC/FINRA compliance instead of FinCEN?**
+> - Yes. Update the Rule Engine Agent's playbook section with SEC/FINRA rules. The hierarchy and workflow are framework-agnostic.
+
+---
+
+## game-live-ops
+
+**Gaming live operations team.** Monitors game economy, generates content, tunes balance parameters, and manages player sentiment.
+
+```bash
+openspawn init my-org --template=game-live-ops
+```
+
+**Pain solved:** Player churn from stale content and unbalanced economies. Live ops teams can't manually track every economy metric, generate fresh event content, and handle player support simultaneously.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Ops Director | L7 | Live Operations | Human Principal |
+| Economy Tuner | L6 | Live Operations | Ops Director |
+| Content Generator | L5 | Live Operations | Ops Director |
+| Player Support Agent | L4 | Live Operations | Ops Director |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Ops Director — Live Operations Director
+Sets weekly content calendar, approves economy parameter changes,
+monitors overall game health, and owns the player experience.
+- **Level:** 7
+- **Department:** Live Operations
+- **Reports to:** Human Principal
+
+#### Economy Tuner — Game Economy Analyst
+Monitors economy metrics continuously. Detects anomalies, proposes balance
+adjustments, implements approved changes within guardrail thresholds.
+- **Level:** 6
+- **Department:** Live Operations
+- **Reports to:** Ops Director
+
+#### Content Generator — Live Content Specialist
+Produces event descriptions, challenge text, reward messaging, and push
+notification copy per the weekly content calendar.
+- **Level:** 5
+- **Department:** Live Operations
+- **Reports to:** Ops Director
+
+#### Player Support Agent — Community & Support Specialist
+Monitors app store reviews and social sentiment. Drafts response templates
+and escalates critical player issues to Ops Director.
+- **Level:** 4
+- **Department:** Live Operations
+- **Reports to:** Ops Director
+```
+
+### When to use
+- You run a live service game and need 24/7 economy and sentiment monitoring
+- Your live ops team is small relative to your player base
+- You want to automate routine content generation while keeping creative direction human
+
+> **Q: What about player bans and support tickets?**
+> - Add a Trust & Safety Agent (L5, Live Operations, reports to Ops Director) for moderation decisions
+
+---
+
+## catalog-management
+
+**E-commerce product catalog.** Monitors competitors, optimizes pricing, and generates product descriptions across thousands of SKUs.
+
+```bash
+openspawn init my-org --template=catalog-management
+```
+
+**Pain solved:** Competitors change prices daily, product descriptions go stale, and a team of copywriters and pricing analysts can't manually keep up with a catalog of 10,000+ SKUs.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Catalog Manager | L7 | E-commerce | Human Principal |
+| Price Optimizer | L6 | E-commerce | Catalog Manager |
+| Content Writer | L5 | Marketing | Catalog Manager |
+| Competitor Monitor | L4 | E-commerce | Catalog Manager |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Catalog Manager — Head of Catalog Operations
+Sets pricing strategy and content quality standards. Approves major pricing
+moves and ensures catalog health metrics trend in the right direction.
+- **Level:** 7
+- **Department:** E-commerce
+- **Reports to:** Human Principal
+
+#### Price Optimizer — Pricing Analyst
+Applies dynamic pricing rules within margin floor and MAP policy guardrails.
+Reads competitor prices and demand signals to calculate optimal price points.
+- **Level:** 6
+- **Department:** E-commerce
+- **Reports to:** Catalog Manager
+
+#### Content Writer — Product Content Specialist
+Writes and rewrites product descriptions, titles, bullet points, and meta
+content for SEO. Prioritizes high-traffic or low-conversion products.
+- **Level:** 5
+- **Department:** Marketing
+- **Reports to:** Catalog Manager
+
+#### Competitor Monitor — Market Intelligence Analyst
+Monitors competitor catalogs, pricing, and promotions. Tracks assortment gaps
+and delivers daily intelligence briefings to Catalog Manager.
+- **Level:** 4
+- **Department:** E-commerce
+- **Reports to:** Catalog Manager
+```
+
+### When to use
+- You sell thousands of SKUs and competitors reprice daily
+- Your product descriptions are stale or inconsistent across categories
+- You want to enforce margin floors and MAP compliance automatically
+
+> **Q: What about inventory-based pricing?**
+> - Add an Inventory Analyst (L5, Operations, reports to Catalog Manager) that feeds stock levels into the Price Optimizer's decision logic
+
+---
+
+## clinical-trials
+
+**Healthcare clinical trial processing.** Processes study data from raw EDC export to regulatory submission package.
+
+```bash
+openspawn init my-org --template=clinical-trials
+```
+
+**Pain solved:** Regulatory submissions take months of manual data processing — normalization, protocol validation, statistical analysis, and document preparation. Most of that work is mechanical, not scientific.
+
+### Roles
+
+| Agent | Level | Department | Reports to |
+|-------|-------|-----------|------------|
+| Study Director | L8 | Clinical Operations | Human Principal |
+| Data Analyst | L6 | Biostatistics | Study Director |
+| Protocol Validator | L5 | Regulatory Affairs | Study Director |
+| Regulatory Writer | L5 | Regulatory Affairs | Study Director |
+
+### Example ORG.md Structure section
+
+```markdown
+## Structure
+
+### Study Director — Clinical Data Director
+Owns the submission. Reviews all outputs for scientific validity and
+approves regulatory documents before submission.
+- **Level:** 8
+- **Department:** Clinical Operations
+- **Reports to:** Human Principal
+
+#### Data Analyst — Clinical Data Scientist
+Processes raw clinical data to CDISC SDTM/ADaM standards.
+Produces statistical output tables and listings.
+- **Level:** 6
+- **Department:** Biostatistics
+- **Reports to:** Study Director
+
+#### Protocol Validator — Regulatory Compliance Analyst
+Validates study procedures and data against the approved protocol.
+Documents all deviations with root cause and impact assessment.
+- **Level:** 5
+- **Department:** Regulatory Affairs
+- **Reports to:** Study Director
+
+#### Regulatory Writer — Medical Writer
+Produces submission-ready documents: Clinical Study Report, adverse event
+narratives, and module content formatted to ICH E3.
+- **Level:** 5
+- **Department:** Regulatory Affairs
+- **Reports to:** Study Director
+```
+
+### When to use
+- You're a CRO or sponsor preparing FDA/EMA regulatory submissions
+- Your statistical programmers spend most of their time on CDISC mapping instead of analysis
+- You need a fully auditable processing pipeline for regulatory inspection
+
+> **Q: What about safety data (SUSAR/CIOMS)?**
+> - Add a Safety Reporting Agent (L5, Pharmacovigilance, reports to Study Director) for expedited safety reporting
+
+---
+
+## Boot Sequence Templates
+
+In addition to industry templates, OpenSpawn ships agent SOUL.md templates and a boot sequence spec. These define how agents behave when an org starts.
+
+| Template | Purpose | Use for |
+|----------|---------|---------|
+| `templates/boot-sequence.md` | Step-by-step startup protocol | Reference — how the lead agent boots an org |
+| `templates/SOUL-lead.md` | Complete SOUL.md for lead agents | Lead/coordinator agent workspaces |
+| `templates/SOUL-worker.md` | Complete SOUL.md for worker agents | Any worker/specialist agent workspace |
+| `templates/AGENTS-leader.md` | AGENTS.md for leaders | Leader workspace operational instructions |
+| `templates/AGENTS-worker.md` | AGENTS.md for workers | Worker workspace operational instructions |
+| `templates/AGENTS-reviewer.md` | AGENTS.md for reviewers | Reviewer workspace operational instructions |
+| `templates/soul-protocol-rules.md` | Communication rules snippet | Append to any agent's SOUL.md |
+
+> **Q: What's the boot sequence?**
+> When an org starts, the lead agent reads ORG.md, writes PLAN.md (breaking the mission into phased tasks), registers agents, creates tasks via MCP, then monitors. Workers read PLAN.md and claim their tasks. See `templates/boot-sequence.md` for the full protocol.
+
+---
+
+## Customizing a template
+
+After `openspawn init`, your ORG.md is just a markdown file. Edit freely:
+
+### Add an agent
+```markdown
+#### QA Validator — Onboarding Quality Analyst
+Reviews completed onboarding configurations for errors before go-live.
+- **Level:** 4
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
+```
+
+### Remove an agent
+Delete the agent's section. Make sure no other agent has `Reports to: DeletedAgent`.
+
+### Change hierarchy
+Update the `Reports to` field. Validate: `openspawn validate`.
+
+### Change culture
+```markdown
+## Culture
+preset: enterprise
+```
+Or override individual settings after the preset.
+
+### Add a playbook
+```markdown
+## Playbooks
+
+### Custom Escalation Workflow
+1. Specialist encounters blocker
+2. Writes blocker details to ESCALATION.md
+3. Escalates to lead via escalation_create with severity: high
+4. Lead responds within 1 hour with resolution or timeline
+```
+
+### Add policy guardrails
+```markdown
+## Policies
+
+### Budget
+- **Per-agent limit:** 800 credits/customer
+- **Alert threshold:** 80%
+- **Overage behavior:** pause and escalate
+
+### Permissions
+- **Human approval required for:** Any action with > $10K business impact
+```
+
+---
+
+## Error recovery
+
+| You see | Fix |
+|---------|-----|
+| `Unknown template: foo` | Valid names: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
+| `Agent reports to unknown agent` | Check `Reports to` matches an existing agent name exactly |
+| `Validation failed after customization` | Run `openspawn validate` and fix each listed issue |
+| `Circular reporting chain` | No agent can report to itself or create a loop. Check hierarchy. |
+
+---
+
+## Next steps
+
+- **Full ORG.md format:** [`docs/org-md-reference.md`](./org-md-reference.md) — every field and example
+- **MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — how agents interact with the org
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — how agents talk to each other
+- **Troubleshooting:** [`docs/troubleshooting.md`](./troubleshooting.md) — fix common errors
+- **Live demo:** https://openspawn.dev/app/

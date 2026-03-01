@@ -4,22 +4,27 @@ audience: AI agents (LLMs) that need to coordinate other agents
 prerequisites: Node.js 18+, npm
 time_estimate: 10 minutes
 commands_used: [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
+related: [llms.txt, mcp-reference.md, communication-protocol.md, FAQ.md, troubleshooting.md]
 ---
 
 # Agent Quickstart
 
-You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file.
+**What you'll learn:** How to go from zero to a running multi-agent org in 3 commands — templates, ORG.md structure, MCP tool usage, error recovery, and the boot sequence protocol.
+
+You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file called `ORG.md`.
+
+**The core idea:** One file defines your entire agent organization. Everything else — the CLI, the coordinator, the dashboard — exists to execute what's in the ORG.md.
 
 ## Three commands to a running org
 
 ```bash
-openspawn init my-org --template=assistant-team --yes
+openspawn init my-org --template=saas-onboarding --yes
 cd my-org
 openspawn start
 openspawn status
 ```
 
-That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — with OpenClaw gateway configs ready to apply.
+That's it. You now have a running org with an Onboarding Lead, Data Migration Specialist, Integration Engineer, and Success Agent — with OpenClaw gateway configs ready to apply.
 
 > **Q: Do I need API keys?**
 > - No. Demo/simulation mode works out of the box with zero configuration.
@@ -42,29 +47,40 @@ That's it. You now have a running org with a chief of staff, research analyst, c
 
 ## Pick a template
 
-Four templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize.
+Seven industry templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize.
 
 ```bash
-# Personal AI team (chief of staff + specialists)
-openspawn init my-org --template=assistant-team
+# SaaS customer onboarding pipeline
+openspawn init my-org --template=saas-onboarding
 
-# Content production pipeline
-openspawn init my-org --template=content-agency
+# DevOps incident response team
+openspawn init my-org --template=incident-response
 
-# Software development team
-openspawn init my-org --template=dev-shop
+# Legal contract review pipeline
+openspawn init my-org --template=contract-review
 
-# Research & analysis team
-openspawn init my-org --template=research-lab
+# Fintech compliance monitoring
+openspawn init my-org --template=compliance-monitoring
+
+# Gaming live operations team
+openspawn init my-org --template=game-live-ops
+
+# E-commerce catalog management
+openspawn init my-org --template=catalog-management
+
+# Healthcare clinical trial processing
+openspawn init my-org --template=clinical-trials
 ```
 
 > **Q: Which template should I use?**
 > ```
-> What's your primary output?
-> ├── Code/software → dev-shop
-> ├── Content (blogs, social, docs) → content-agency
-> ├── Research/analysis → research-lab
-> └── Mix of everything → assistant-team
+> What's your domain?
+> ├── Customer success / onboarding → saas-onboarding
+> ├── Infrastructure / reliability  → incident-response
+> ├── Legal / compliance            → contract-review or compliance-monitoring
+> ├── Gaming / live service         → game-live-ops
+> ├── E-commerce / retail           → catalog-management
+> └── Healthcare / life sciences    → clinical-trials
 > ```
 
 > **Q: Can I combine templates?**
@@ -80,35 +96,35 @@ openspawn init my-org --template=research-lab
 Your entire org lives in one file. Five sections, all optional except Structure:
 
 ```markdown
-# My Org Name
+# SaaS Onboarding Org
 
 ## Identity
-Mission, values, industry context.
+Mission, industry context, pain solved.
 Becomes ambient context for every agent.
 
 ## Culture
-preset: startup
+preset: agency
 Communication norms, escalation speed, progress frequency.
 
 ## Structure
 
-### CEO — Chief Executive
-Runs everything. Delegates to department heads.
-- **Level:** 10
-- **Domain:** Executive
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns customer relationships from contract to go-live.
+- **Level:** 7
+- **Department:** Customer Success
 - **Reports to:** Human Principal
 
-#### Engineer — Software Developer
-Writes code, ships features.
-- **Level:** 7
-- **Domain:** Engineering
-- **Reports to:** CEO
+#### Data Migration Specialist — Senior Data Engineer
+Ingests and validates customer data from source systems.
+- **Level:** 5
+- **Department:** Engineering
+- **Reports to:** Onboarding Lead
 
 ## Policies
-Budget limits, department caps, permission levels.
+Budget limits, permission guardrails, human approval thresholds.
 
 ## Playbooks
-Step-by-step procedures for escalation, handoff, etc.
+Step-by-step procedures for standard scenarios and escalations.
 ```
 
 > **Q: What's the minimum viable ORG.md?**
@@ -143,19 +159,15 @@ Output on success:
 ```
 ✅ ORG.md is valid
 
-  Organization:  My Org
-  Agents:        8
-  Culture:       startup
+  Organization:  SaaS Onboarding Org
+  Agents:        4
+  Culture:       agency
 
   Agent hierarchy:
-    🎯 Oscar (L10, Operations)
-      🔭 Radar (L7, Research)
-      💡 Muse (L7, Content Strategy)
-        ✍️ Ink (L4, Writing)
-        📸 Lens (L4, Visual Design)
-      🔧 Forge (L7, Engineering)
-      🛡️ Shield (L7, Security)
-      📚 Guru (L7, Quality)
+    🎯 Onboarding Lead (L7, Customer Success)
+      📦 Data Migration Specialist (L5, Engineering)
+      🔧 Integration Engineer (L5, Engineering)
+      ✅ Success Agent (L4, Customer Success)
 ```
 
 > **Q: If I see "validation failed", what do I do?**
@@ -172,7 +184,7 @@ Instead of configuring every communication parameter, use a preset:
 
 ```markdown
 ## Culture
-preset: startup
+preset: agency
 ```
 
 | Preset | Best for | Escalation | Progress updates |
@@ -188,7 +200,7 @@ preset: startup
 > - Yes. Add overrides after the preset line:
 > ```markdown
 > ## Culture
-> preset: startup
+> preset: agency
 > - **Escalation:** batched
 > - **Ack required:** no
 > ```
@@ -203,17 +215,17 @@ Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
 # List all agents
 → agent_list
 
-# Create a task
-→ task_create { title: "Write blog post", priority: "high", assigneeId: "ink" }
+# Create a task (e.g., onboard a new customer)
+→ task_create { title: "Onboard Acme Corp", priority: "high", assigneeId: "onboarding-lead" }
 
 # Check your balance
 → credits_balance
 
 # Escalate a blocker
-→ escalation_create { taskId: "task-123", reason: "blocked", targetAgentId: "oscar" }
+→ escalation_create { taskId: "task-123", reason: "migration blocked", targetAgentId: "onboarding-lead" }
 
-# Send a message
-→ message_send { channelId: "chan-1", body: "Handoff: blog post ready for review", type: "handoff" }
+# Send a structured message
+→ message_send { channelId: "chan-1", body: "Migration complete for Acme Corp. 1.2M rows verified.", type: "handoff" }
 ```
 
 > **Q: How do I authenticate?**
@@ -226,23 +238,23 @@ Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
 
 ## Managing Tasks
 
-The coordination tools (PR #426) give agents a shared task board backed by SQLite. Here's the core workflow:
+The coordination tools give agents a shared task board backed by SQLite. Here's the core workflow:
 
 ### Create a task
 ```
-tool: task_create { title: "Implement auth API", priority: "high", assign_to: "engineer-1" }
+tool: task_create { title: "Migrate Acme Corp database", priority: "high", assign_to: "data-migration-specialist" }
 ```
 
 ### Claim an open task
 ```
-tool: task_claim { task_id: "abc123", agent_id: "engineer-1" }
+tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
 ```
 > **Q: Can two agents claim the same task?**
 > No. `task_claim` is atomic — only one agent wins, the other gets an error. This prevents duplicate work.
 
 ### Complete a task
 ```
-tool: task_complete { task_id: "abc123", result: "PR #42 merged", artifacts: ["src/auth.ts"] }
+tool: task_complete { task_id: "abc123", result: "1.2M rows migrated, checksum verified", artifacts: ["migration-report.md"] }
 ```
 
 ### List tasks
@@ -252,7 +264,7 @@ tool: task_list { status: "open", priority: "high" }
 
 ### Escalate a problem
 ```
-tool: escalation_create { issue: "deployment failed", severity: "high", to_agent: "ceo" }
+tool: escalation_create { issue: "source database connection refused", severity: "high", to_agent: "onboarding-lead" }
 ```
 
 ### Check org status
@@ -273,10 +285,10 @@ tool: org_status
 
 ### Delegate a task
 ```
-1. task_create { title: "...", assigneeId: "worker-id" }
-2. Worker receives task → auto-ACKs (👍)
-3. Worker logs progress to task activity
-4. Worker completes → task_transition { id: "...", status: "done" }
+1. task_create { title: "...", assigneeId: "specialist-id" }
+2. Specialist receives task → auto-ACKs (👍)
+3. Specialist logs progress to task activity
+4. Specialist completes → task_transition { id: "...", status: "done" }
 5. You get a completion notification
 ```
 
@@ -285,12 +297,12 @@ tool: org_status
 1. escalation_list → see pending escalations
 2. Read the reason and task details
 3. Either: resolve it, reassign the task, or escalate further
-4. escalation_resolve { escalationId: "...", resolution: "Reassigned to Forge" }
+4. escalation_resolve { escalationId: "...", resolution: "Engaged engineering support, ETA 2 hours" }
 ```
 
 ### Request consensus
 ```
-1. consensus_request { taskId: "...", question: "Ship v2 now?", voterIds: ["agent-a", "agent-b"] }
+1. consensus_request { taskId: "...", question: "Proceed with live migration?", voterIds: ["agent-a", "agent-b"] }
 2. Each voter: consensus_vote { consensusId: "...", vote: "approve" }
 3. consensus_status { consensusId: "..." } → see result
 ```
@@ -303,7 +315,7 @@ tool: org_status
 |---------|----------|
 | `Cannot read ORG.md` | `openspawn validate` — check the file exists and is valid markdown |
 | `Port 3333 already in use` | `lsof -i :3333` then kill the process, or set `"port": 3334` in config |
-| `Unknown template: foo` | Valid templates: `assistant-team`, `content-agency`, `dev-shop`, `research-lab` |
+| `Unknown template: foo` | Valid templates: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
 | `Agent reports to unknown agent` | Check the `Reports to` field matches an existing agent name exactly |
 | `HMAC authentication failed` | Verify `AGENT_ID` and `AGENT_SECRET` env vars match the API config |
 
@@ -323,6 +335,8 @@ When `openspawn start` boots your org, the lead agent doesn't just start delegat
 7. Adapt           → update PLAN.md when things change
 8. Complete        → escalate "mission complete" when done
 ```
+
+**Example for a SaaS onboarding org:** The Onboarding Lead reads the ORG.md, sees the 48-hour track playbook, writes PLAN.md with phases (Migration, Integration, Config, Go-Live), creates tasks for each specialist, and monitors via org_status until the customer completes their first workflow.
 
 > **Q: Why planning first?**
 > Plans are cheaper than confusion. A 30-second PLAN.md prevents hours of rework, wasted tokens, and "what did you mean?" messages.
@@ -345,7 +359,12 @@ See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md`
 
 ## Next steps
 
-- Customize your ORG.md: add agents, change levels, write playbooks
-- Connect real models: set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
-- Read the full reference: `docs/llms.txt`
-- See the live demo: https://bikinibottom.ai/app/
+- **Customize your ORG.md:** add agents, change levels, write playbooks — see [`docs/org-md-reference.md`](./org-md-reference.md)
+- **Connect real models:** set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
+- **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — full parameter reference
+- **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — save 50-70% on coordination tokens
+- **Template deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 7 industry templates
+- **Top FAQ:** [`docs/FAQ.md`](./FAQ.md) — common questions answered
+- **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — common issues and fixes
+- **Full reference:** [`docs/llms.txt`](./llms.txt)
+- **Live demo:** https://openspawn.dev/app/

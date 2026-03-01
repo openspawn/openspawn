@@ -614,8 +614,11 @@ function SettingsTab({ agent }: { agent: Agent }) {
   }, [name, role, domain, agent]);
 
   const handleSave = () => {
-    // TODO: Implement mutation
-    console.log("Saving changes:", { name, role, domain });
+    // DEFERRED: Agent profile edits are not yet persisted to the backend.
+    // Wire to the updateAgent GraphQL mutation when available:
+    //   updateAgent({ variables: { id: agent.id, name, role, domain } })
+    // and call refetch() or update the Apollo cache on success.
+    console.log("Saving changes (local only, not persisted):", { name, role, domain });
     setHasChanges(false);
   };
 

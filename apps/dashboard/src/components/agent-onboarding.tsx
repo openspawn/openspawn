@@ -62,7 +62,10 @@ export function AgentOnboarding() {
 
   const handleActivate = async (id: string) => {
     setActivating(id);
-    // TODO: Implement API call
+    // DEFERRED: Agent activation is not yet wired to the backend.
+    // Wire to the activateAgent GraphQL mutation when available:
+    //   activateAgent({ variables: { pendingAgentId: id } })
+    // then refetch or update local state on success.
     await new Promise((r) => setTimeout(r, 1000));
     setPending(pending.filter((p) => p.id !== id));
     setActivating(null);
@@ -70,7 +73,9 @@ export function AgentOnboarding() {
 
   const handleReject = async (id: string) => {
     setRejecting(id);
-    // TODO: Implement API call
+    // DEFERRED: Agent rejection is not yet wired to the backend.
+    // Wire to the rejectAgent GraphQL mutation when available:
+    //   rejectAgent({ variables: { pendingAgentId: id } })
     await new Promise((r) => setTimeout(r, 1000));
     setPending(pending.filter((p) => p.id !== id));
     setRejecting(null);
