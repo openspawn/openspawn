@@ -12,6 +12,7 @@ import { delegateCommand } from './commands/delegate.js';
 import { escalateCommand } from './commands/escalate.js';
 import { reportCommand } from './commands/report.js';
 import { budgetCommand } from './commands/budget.js';
+import { orgCommand } from './commands/org.js';
 
 const HELP = `
 openspawn - Multi-agent organization CLI
@@ -22,6 +23,7 @@ Commands:
   init [name]                  Scaffold ORG.md + .openspawn/
   start                        Start MCP server
   status                       Show org status
+  org                          Show org tree
   hire <name> [options]        Add agent to org
   fire <name>                  Remove agent from org
   task list                    List all tasks
@@ -70,6 +72,7 @@ async function main() {
     case 'init': return initCommand(rest, ctx);
     case 'start': return startCommand(rest, ctx);
     case 'status': return statusCommand(rest, ctx);
+    case 'org': return orgCommand(rest, ctx);
     case 'hire': return hireCommand(rest, ctx);
     case 'fire': return fireCommand(rest, ctx);
     case 'task': return taskCommand(rest, ctx);
