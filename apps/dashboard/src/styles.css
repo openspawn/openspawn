@@ -1,4 +1,8 @@
 @import "tailwindcss";
+
+/* BB tokens are always loaded (they use :root overrides).
+   When VITE_DASHBOARD_THEME=openspawn, the [data-theme="openspawn"] selector
+   overrides them back to clean shadcn values via higher specificity. */
 @import "./styles/bb-tokens.css";
 
 @layer base {
@@ -213,6 +217,45 @@
   }
 
   /* ========================================
+     Theme: OpenSpawn (clean team dashboard)
+     Near-black + cyan primary, Inter font
+     ======================================== */
+  [data-theme="openspawn"] {
+    --background: 220 20% 4%;
+    --foreground: 210 10% 93%;
+    --card: 220 20% 7%;
+    --card-foreground: 210 10% 93%;
+    --popover: 220 20% 9%;
+    --popover-foreground: 210 10% 93%;
+    --primary: 192 91% 50%;
+    --primary-foreground: 220 20% 4%;
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 210 10% 93%;
+    --muted: 220 15% 12%;
+    --muted-foreground: 215 10% 50%;
+    --accent: 220 15% 14%;
+    --accent-foreground: 210 10% 93%;
+    --success: 160 84% 39%;
+    --success-foreground: 160 84% 95%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 20% 10%;
+    --destructive: 350 89% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 192 91% 50%;
+    --info-foreground: 220 20% 4%;
+    --special: 258 90% 66%;
+    --special-foreground: 258 90% 95%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 192 91% 50%;
+    --radius: 0.5rem;
+
+    /* Reset BB font overrides */
+    --bb-font-display: 'Inter', system-ui, sans-serif;
+    --bb-font-body: 'Inter', system-ui, sans-serif;
+  }
+
+  /* ========================================
      Density: Compact
      ======================================== */
   .density-compact {
@@ -233,6 +276,17 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  /* OpenSpawn theme: use Inter, override BB fonts */
+  [data-theme="openspawn"] body,
+  [data-theme="openspawn"] {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  [data-theme="openspawn"] h1,
+  [data-theme="openspawn"] h2,
+  [data-theme="openspawn"] h3 {
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   /* Smooth theme transitions */

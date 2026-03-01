@@ -62,7 +62,11 @@ import { PhaseTransitionOverlay } from "./phase-transition-overlay";
 import { ScenarioEventToasts } from "./scenario-event-toasts";
 import { FirstVisitOverlay } from "./first-visit-overlay";
 import { Toaster } from "sonner";
+import { isBBTheme } from "../lib/dashboard-theme";
 import type { ReactNode } from "react";
+
+const BRAND_NAME = isBBTheme ? "BikiniBottom" : "OpenSpawn";
+const BRAND_SUBTITLE = isBBTheme ? "Multi-Agent Coordination" : "Team Dashboard";
 
 interface LayoutProps {
   children: ReactNode;
@@ -192,12 +196,14 @@ export function Layout({ children }: LayoutProps) {
   return (
     <TooltipProvider>
       <div className="flex h-screen bg-background relative">
-        {/* Bikini Bottom ambient backdrop */}
-        <div
-          className="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/app/bikini-bottom-bg.jpg)', opacity: 0.06 }}
-          aria-hidden="true"
-        />
+        {/* Bikini Bottom ambient backdrop — only in BB theme */}
+        {isBBTheme && (
+          <div
+            className="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: 'url(/app/bikini-bottom-bg.jpg)', opacity: 0.06 }}
+            aria-hidden="true"
+          />
+        )}
         {/* Sidebar */}
         <motion.aside
           className="hidden flex-shrink-0 flex-col border-r border-border lg:flex overflow-hidden"
@@ -207,7 +213,7 @@ export function Layout({ children }: LayoutProps) {
           {/* Logo */}
           <div className={cn("flex h-16 items-center gap-2 border-b border-border relative overflow-hidden", sidebarCollapsed ? "justify-center px-2" : "px-4")}>
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
-            <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+            <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
             {!sidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
@@ -217,10 +223,10 @@ export function Layout({ children }: LayoutProps) {
                 className="flex flex-col overflow-hidden whitespace-nowrap"
               >
                 <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  BikiniBottom
+                  {BRAND_NAME}
                 </span>
                 <span className="text-[9px] text-muted-foreground tracking-wide">
-                  Multi-Agent Coordination
+                  {BRAND_SUBTITLE}
                 </span>
               </motion.div>
             )}
@@ -533,13 +539,13 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex h-16 items-center justify-between border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <div className="flex items-center gap-2">
-              <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
               <div className="flex flex-col">
               <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                BikiniBottom
+                {BRAND_NAME}
               </span>
               <span className="text-[9px] text-muted-foreground tracking-wide">
-                Multi-Agent Coordination
+                {BRAND_SUBTITLE}
               </span>
             </div>
             </div>
@@ -667,13 +673,13 @@ export function Layout({ children }: LayoutProps) {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Logo size="sm" style={{ animation: "wave-subtle 6s ease-in-out infinite" }} />
+              <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
               <div className="flex flex-col">
               <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                BikiniBottom
+                {BRAND_NAME}
               </span>
               <span className="text-[9px] text-muted-foreground tracking-wide">
-                Multi-Agent Coordination
+                {BRAND_SUBTITLE}
               </span>
             </div>
             </div>

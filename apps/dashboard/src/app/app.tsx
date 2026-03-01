@@ -8,12 +8,15 @@ import { isSandboxMode } from "../graphql/fetcher";
 import { CommandPalette } from "../components/command-palette";
 import { OfflineIndicator } from "../components/offline-indicator";
 
+import { isBBTheme } from "../lib/dashboard-theme";
+
 declare const __COMMIT_SHA__: string;
 declare const __BUILD_TIME__: string;
 
 // Log build info to console
+const brand = isBBTheme ? '🌊 BikiniBottom' : '⚡ OpenSpawn';
 console.log(
-  `%c🌊 BikiniBottom %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
+  `%c${brand} %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
   'color: #06b6d4; font-weight: bold; font-size: 14px',
   'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
   'color: #64748b'

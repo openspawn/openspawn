@@ -7,6 +7,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { DASHBOARD_THEME, isOpenSpawnTheme } from "../lib/dashboard-theme";
+
 // Named ocean themes
 export const THEME_NAMES = [
   "deep-ocean",
@@ -14,6 +16,7 @@ export const THEME_NAMES = [
   "arctic-ice",
   "bioluminescent",
   "midnight-abyss",
+  "openspawn",
 ] as const;
 
 export type OceanTheme = (typeof THEME_NAMES)[number];
@@ -65,6 +68,13 @@ export const THEMES: ThemeDefinition[] = [
     isDark: true,
     swatches: ["hsl(0,0%,0%)", "hsl(210,50%,55%)", "hsl(210,40%,50%)"],
   },
+  {
+    id: "openspawn",
+    label: "OpenSpawn",
+    description: "Clean dark cyan",
+    isDark: true,
+    swatches: ["hsl(220,20%,4%)", "hsl(192,91%,50%)", "hsl(220,15%,14%)"],
+  },
 ];
 
 const THEME_STORAGE_KEY = "bb-theme";
@@ -99,7 +109,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "deep-ocean",
+  defaultTheme = isOpenSpawnTheme ? "openspawn" : "deep-ocean",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<OceanTheme>(() => {
     if (typeof window === "undefined") return defaultTheme;

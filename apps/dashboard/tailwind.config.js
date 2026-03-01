@@ -8,6 +8,7 @@ module.exports = {
         'portrait': { 'raw': '(orientation: portrait)' },
       },
       fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['"Baloo 2"', 'cursive'],
         body: ['Nunito', 'sans-serif'],
       },
