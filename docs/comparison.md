@@ -74,6 +74,8 @@ CrewAI excels at defining small, focused agent teams ("crews") that work togethe
 
 **The gap:** CrewAI doesn't provide organizational structure. Multiple crews, running simultaneously, across a real product, have no shared governance. No budget system, no trust scores, no approval gates before irreversible actions.
 
+**Real-world example:** A CrewAI contract review crew works great for a single contract. But when you're running 50 contracts simultaneously with different risk levels, SLAs, and playbook versions — you need OpenSpawn's governance layer on top.
+
 ---
 
 ### LangGraph — Stateful Agent Graphs
@@ -88,11 +90,13 @@ LangGraph gives you precise, explicit control over agent flow as a directed grap
 
 **The gap:** LangGraph models agents as graph nodes — it's a powerful execution primitive. It doesn't model your *organization*. Who owns a node? Who approves its output? What happens when it goes over budget? LangGraph has no answer for these questions.
 
+**Real-world example:** A LangGraph incident response pipeline can precisely model the diagnostic decision tree. But when you need the Incident Commander to have formal authority over the Remediation Agent — with budget limits, audit trails, and mandatory human approval for production database changes — that's OpenSpawn's layer.
+
 ---
 
 ### OpenSpawn — Agent Coordination Infrastructure
 
-OpenSpawn is not a framework you write agents in. It's the *company infrastructure* that your agents (built in CrewAI, LangGraph, or anything else) operate within.
+OpenSpawn is not a framework you write agents in. It's the *organizational infrastructure* that your agents (built in CrewAI, LangGraph, or anything else) operate within.
 
 Mental model: agent frameworks are your employees' skills. OpenSpawn is the company — org chart, task management, budget, governance, communications.
 
@@ -103,6 +107,11 @@ Mental model: agent frameworks are your employees' skills. OpenSpawn is the comp
 - Your agents need to work on real devices (via OpenClaw)
 - You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org
 
+**Real-world examples:**
+- A SaaS company running customer onboarding for 20 enterprise customers in parallel — each customer is a task, one org coordinates all of them
+- A fintech compliance team where regulators need an audit trail of every rule applied to every transaction
+- A legal team where senior attorneys approve agent outputs before they go to business stakeholders
+
 ---
 
 ## Where OpenSpawn wins
@@ -110,29 +119,28 @@ Mental model: agent frameworks are your employees' skills. OpenSpawn is the comp
 ### 1. Organizations as Code
 
 ```markdown
-# My Engineering Org
+# Customer Onboarding Org
+
+## Identity
+- **Mission:** Onboard enterprise customers end-to-end in 48 hours
 
 ## Culture
-preset: startup
+preset: agency
 
 ## Structure
 
-### COO
-Receives orders, delegates to departments.
-- **Model:** claude-sonnet
+### Onboarding Lead — Customer Onboarding Manager
+The quarterback. Owns customer relationships from contract to go-live.
+- **Level:** 7
+- **Reports to:** Human Principal
 
-### Engineering
-
-#### Engineering Lead
-- **Model:** claude-sonnet
-- **Domain:** engineering
-
-#### Backend Workers
-- **Model:** claude-haiku
-- **Count:** 3
+#### Data Migration Specialist — Senior Data Engineer
+Ingests and validates customer data from source systems.
+- **Level:** 5
+- **Reports to:** Onboarding Lead
 ```
 
-Human-readable, version-controllable, and deployable: `npx openspawn deploy ORG.md`. The prose *is* the system prompt. Reviewable in git PRs.
+Human-readable, version-controllable, and deployable: `npx openspawn deploy ORG.md`. The prose *is* the system prompt. Reviewable in git PRs. Your legal or compliance team can read it. Your new engineer can understand the org at a glance.
 
 ### 2. Protocol-Native from Day One
 
@@ -146,11 +154,13 @@ Via deep integration with [OpenClaw](https://openclaw.ai), OpenSpawn agents can 
 
 ### 4. Economic Layer
 
-Built-in credit system — not just rate limits, but a full economic model: per-agent credit budgets, automatic cost tracking against real LLM spend, and `overage behavior: pause and escalate`.
+Built-in credit system — not just rate limits, but a full economic model: per-agent credit budgets, automatic cost tracking against real LLM spend, and `overage behavior: pause and escalate`. The compliance-monitoring template, for example, sets different credit limits per agent to reflect the actual cost of regulatory rule processing.
 
 ### 5. Governance Built-In
 
-Pre-hooks let you require human approval before any irreversible action. LangGraph has conditional edges. CrewAI has human-in-the-loop options. Neither has a system-level governance layer that applies across all agents, all tasks, regardless of framework.
+Pre-hooks let you require human approval before any irreversible action. The contract-review template requires Senior Reviewer approval before summaries go to business stakeholders. The incident-response template requires Incident Commander go-ahead before Remediation Agent deploys a fix. The clinical-trials template requires Study Director sign-off before any regulatory document is submitted.
+
+LangGraph has conditional edges. CrewAI has human-in-the-loop options. Neither has a system-level governance layer that applies across all agents, all tasks, regardless of framework.
 
 ---
 
@@ -180,18 +190,23 @@ pnpm exec nx serve sandbox
 ```
 
 **Step 2: Map your crew structure to ORG.md**
+
+If you have a contract review crew today:
 ```markdown
-# My Crew Org
+# Contract Review Org
 
 ## Structure
 
-### Coordinator
-Routes work to specialist agents.
-- **Model:** claude-sonnet
+### Senior Reviewer — Legal Analysis Lead
+Routes work to specialist agents. Reviews and approves final summaries.
+- **Level:** 7
+- **Reports to:** Human Principal
 
-### Research Crew
-Runs your existing CrewAI research crew via MCP.
-- **Domain:** research
+#### Clause Extractor — Contract Analysis Specialist
+Runs your existing CrewAI clause extraction crew via MCP.
+- **Level:** 5
+- **Domain:** Document Analysis
+- **Reports to:** Senior Reviewer
 ```
 
 **Step 3: Connect your CrewAI agents via MCP**
@@ -214,21 +229,22 @@ from openspawn import OpenSpawnClient  # Python SDK (in development)
 
 client = OpenSpawnClient(url="http://localhost:3333")
 client.register_agent(
-    name="Research Pipeline",
-    domain="research",
-    capabilities=["web-search", "summarization"]
+    name="Diagnostics Pipeline",
+    domain="infrastructure",
+    capabilities=["metrics-analysis", "trace-inspection", "log-search"]
 )
 ```
 
 **Step 2: Delegate tasks through OpenSpawn**
 ```python
 # Before: call your graph directly
-result = app.invoke({"task": "Research quantum computing trends"})
+result = app.invoke({"task": "Investigate P99 latency spike on /api/checkout"})
 
 # After: delegate through OpenSpawn (governance, budget, audit trail included)
 task = client.delegate_task(
-    "Research quantum computing trends",
-    priority="medium"
+    "Investigate P99 latency spike on /api/checkout",
+    priority="urgent",
+    assignee="diagnostics-agent"
 )
 ```
 
@@ -239,20 +255,22 @@ task = client.delegate_task(
 For most production agent teams, the answer isn't either/or:
 
 ```
-┌──────────────────────────────────────┐
-│            OpenSpawn Org             │
-│  (governance, budget, coordination)  │
-│                                      │
-│  ┌──────────┐    ┌────────────────┐  │
-│  │ CrewAI   │    │   LangGraph    │  │
-│  │ Agents   │    │   Pipelines    │  │
-│  └──────────┘    └────────────────┘  │
-│                                      │
-│  ┌──────────┐    ┌────────────────┐  │
-│  │ OpenClaw │    │  Custom Agent  │  │
-│  │ (devices)│    │  (any A2A)     │  │
-│  └──────────┘    └────────────────┘  │
-└──────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│              OpenSpawn Org                   │
+│  (governance, budget, coordination, ORG.md)  │
+│                                              │
+│  ┌──────────┐    ┌────────────────────────┐  │
+│  │ CrewAI   │    │   LangGraph Pipelines  │  │
+│  │ Agents   │    │   (incident response,  │  │
+│  │(contract │    │    compliance rules)   │  │
+│  │ review)  │    └────────────────────────┘  │
+│  └──────────┘                                │
+│                                              │
+│  ┌──────────┐    ┌────────────────────────┐  │
+│  │ OpenClaw │    │  Custom Agent          │  │
+│  │ (devices)│    │  (any A2A-compatible)  │  │
+│  └──────────┘    └────────────────────────┘  │
+└──────────────────────────────────────────────┘
 ```
 
 ---
@@ -274,6 +292,7 @@ For most production agent teams, the answer isn't either/or:
 - **Get started:** [`docs/getting-started.md`](./getting-started.md)
 - **MCP integration:** [`docs/mcp-reference.md`](./mcp-reference.md)
 - **ORG.md reference:** [`docs/org-md-reference.md`](./org-md-reference.md)
-- **Live demo:** https://bikinibottom.ai/app/
+- **Industry templates:** [`docs/templates-guide.md`](./templates-guide.md)
+- **Live demo:** https://openspawn.dev/app/
 
-*Last updated: February 2026. OpenSpawn is in rapid development — see the [GitHub repo](https://github.com/openspawn/openspawn) for the latest.*
+*Last updated: March 2026. OpenSpawn is in rapid development — see the [GitHub repo](https://github.com/openspawn/openspawn) for the latest.*

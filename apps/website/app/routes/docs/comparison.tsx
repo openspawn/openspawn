@@ -151,30 +151,39 @@ export function ComparisonPage() {
       </p>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">2. ORG.md — Organizations as Code</h3>
-      <CodeBlock title="ORG.md">{`# My Engineering Org
+      <CodeBlock title="ORG.md — SaaS Onboarding">{`# customer-onboarding
+> Mission: Onboard new enterprise customers end-to-end
 
 ## Culture
-preset: startup
+- Preset: professional
+- Escalation: 30 min — customers can't wait
 
 ## Structure
 
-### COO
-Receives orders, delegates to departments.
+### Onboarding Lead
+Owns the full customer journey from contract-signed to go-live.
+- **Level:** 7
 - **Model:** claude-sonnet
 
-### Engineering
-
-#### Engineering Lead
-- **Model:** claude-sonnet
-- **Domain:** engineering
-
-#### Backend Workers
+#### Data Migration Specialist
+Moves and validates customer data from legacy systems safely.
+- **Level:** 5
 - **Model:** claude-haiku
-- **Count:** 3`}</CodeBlock>
+
+#### Integration Engineer
+Configures API connectors, runs integration tests, documents endpoints.
+- **Level:** 5
+- **Model:** claude-haiku
+
+#### Success Agent
+Schedules check-ins, collects health scores, flags churn risk early.
+- **Level:** 4
+- **Model:** ollama/qwen2.5`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         Human-readable, version-controllable, and deployable:{" "}
         <code className="inline-code">npx openspawn deploy ORG.md</code>. The prose{" "}
-        <em>is</em> the system prompt.
+        <em>is</em> the system prompt. See all{" "}
+        <a href="/templates" className="text-cyan-400 hover:text-cyan-300 transition">industry templates →</a>
       </p>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">3. Protocol-Native from Day One</h3>
@@ -258,17 +267,22 @@ cd openspawn && pnpm install
 pnpm exec nx serve sandbox`}</CodeBlock>
 
       <p className="mb-2 text-slate-300 font-semibold">Step 2: Map your crew structure to ORG.md</p>
-      <CodeBlock title="ORG.md">{`# My Crew Org
+      <CodeBlock title="ORG.md — Incident Response">{`# incident-response
+> Mission: Detect, diagnose, and remediate production incidents
 
 ## Structure
 
-### Coordinator
-Routes work to specialist agents.
-- **Model:** claude-sonnet
+### Incident Commander
+Coordinates all agents, owns runbook execution, drives MTTR down.
+- **Level:** 8
+- **Model:** claude-opus
 
-### Research Crew
-Runs your existing CrewAI research crew via MCP.
-- **Domain:** research`}</CodeBlock>
+### Diagnostics
+#### Diagnostics Agent
+Reads logs, traces, metrics. Runs your existing CrewAI pipeline via MCP.
+- **Level:** 6
+- **Model:** claude-sonnet
+- **Domain:** observability`}</CodeBlock>
 
       <p className="mb-2 text-slate-300 font-semibold">Step 3: Connect your CrewAI agents via MCP</p>
       <CodeBlock title="python">{`from crewai_tools import MCPServerAdapter

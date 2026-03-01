@@ -121,8 +121,8 @@ export function GettingStartedPage() {
           Getting Started with OpenSpawn
         </h1>
         <p className="mx-auto max-w-xl text-lg text-slate-400">
-          Install OpenSpawn, create an ORG.md, and boot a multi-agent organization
-          on OpenClaw in under 5 minutes.
+          Install OpenSpawn, pick an industry template (or write your own ORG.md), and boot a
+          multi-agent organization on OpenClaw in under 5 minutes.
         </p>
       </div>
 
@@ -172,12 +172,14 @@ openspawn v0.3.0`}
 🪸 OpenSpawn — Create a new org
 
 ? What kind of org? (Use arrow keys)
-❯ Dev Shop — engineering team with leads + workers
-  Content Agency — writers, editors, designers
-  Research Lab — analysts + synthesizer
-  Assistant Team — general-purpose agent pool
+❯ SaaS Onboarding — data migration, integrations, success check-in
+  DevOps Incident Response — detect, diagnose, remediate, communicate
+  Legal Contract Review — clause extraction, risk analysis, summary
+  Fintech Compliance — transaction monitoring, rules, reporting
+  E-commerce Catalog — pricing, descriptions, competitor monitoring
   Custom — start from scratch
 
+? Template: saas-onboarding
 ? Org name: my-org
 ? Primary model provider: OpenRouter
 
@@ -211,34 +213,44 @@ openspawn v0.3.0`}
             organization — hierarchy, roles, models, and policies.
           </p>
           <Terminal title="my-org/ORG.md">
-{`# My Org
+{`# customer-onboarding
+> Mission: Onboard new enterprise customers end-to-end
 
 ## Identity
-A fast-moving dev team. We ship code.
-- **Industry:** Technology
-- **Stage:** Early
+- **Industry:** SaaS
+- **Pain:** Manual onboarding takes 2-3 days per customer, 4 teams
 
 ## Culture
-preset: startup
+- **Preset:** professional
+- **Escalation:** 30 min — customers can't wait
+- **Progress updates:** on every milestone
+- **Ack required:** yes
 
 ## Structure
 
-### COO
-Receives tasks, delegates to leads, ensures nothing falls through.
+### Onboarding Lead
+Owns the full customer journey from contract-signed to go-live.
+- **Level:** 7
 - **Model:** claude-sonnet
 - **Domain:** operations
 
-### Engineering
-#### Engineering Lead
-Triages technical work. Breaks projects into tasks.
+#### Data Migration Specialist
+Moves and validates customer data from legacy systems safely.
+- **Level:** 5
+- **Model:** claude-haiku
+- **Domain:** data
+
+#### Integration Engineer
+Configures API connectors, runs integration tests, documents endpoints.
+- **Level:** 5
 - **Model:** claude-haiku
 - **Domain:** engineering
 
-#### Workers
-Write code, run tests, build APIs.
+#### Success Agent
+Schedules check-ins, collects health scores, flags churn risk early.
+- **Level:** 4
 - **Model:** ollama/qwen2.5
-- **Domain:** backend
-- **Count:** 2
+- **Domain:** success
 
 ## Policies
 ### Budget
@@ -283,14 +295,14 @@ $ openspawn start
 
 🚀 OpenSpawn starting...
    Parsing ORG.md...
-   ✓ Found 5 agents (1 COO, 1 Lead, 2 Workers, 1 Observer)
-   ✓ Applied culture: startup
+   ✓ Found 4 agents (template: saas-onboarding)
+   ✓ Applied culture: professional
    ✓ Loaded policies: budget limits, routing rules
    Spawning agents on OpenClaw...
-   ✓ COO .................. claude-sonnet   L10  operations
-   ✓ Engineering Lead ..... claude-haiku    L7   engineering
-   ✓ Worker 1 ............. ollama/qwen2.5  L4   backend
-   ✓ Worker 2 ............. ollama/qwen2.5  L4   backend
+   ✓ Onboarding Lead .............. claude-sonnet   L7  operations
+   ✓ Data Migration Specialist .... claude-haiku    L5  data
+   ✓ Integration Engineer ......... claude-haiku    L5  engineering
+   ✓ Success Agent ................ ollama/qwen2.5  L4  success
 
    Dashboard:  http://localhost:3333/app/
    A2A:        http://localhost:3333/.well-known/agent.json
@@ -325,14 +337,14 @@ $ openspawn start
           <Terminal title="terminal">
 {`$ openspawn status
 
-┌─────────────────────┬──────────┬───────┬──────────┐
-│ Agent               │ Status   │ Trust │ Tasks    │
-├─────────────────────┼──────────┼───────┼──────────┤
-│ COO                 │ idle     │ 72    │ 3 done   │
-│ Engineering Lead    │ working  │ 58    │ 2 active │
-│ Worker 1            │ working  │ 35    │ 1 active │
-│ Worker 2            │ idle     │ 31    │ 1 done   │
-└─────────────────────┴──────────┴───────┴──────────┘
+┌──────────────────────────────┬──────────┬───────┬──────────┐
+│ Agent                        │ Status   │ Trust │ Tasks    │
+├──────────────────────────────┼──────────┼───────┼──────────┤
+│ Onboarding Lead              │ idle     │ 72    │ 3 done   │
+│ Data Migration Specialist    │ working  │ 58    │ 2 active │
+│ Integration Engineer         │ working  │ 35    │ 1 active │
+│ Success Agent                │ idle     │ 31    │ 1 done   │
+└──────────────────────────────┴──────────┴───────┴──────────┘
 
 Health: 84/100  |  Tasks: 4 total, 2 active, 2 done
 
@@ -411,7 +423,7 @@ Done. Results are in ./output/`}
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Terminal title="terminal">
-{`$ npx openspawn init my-org`}
+{`$ npx openspawn init my-org --template saas-onboarding`}
             </Terminal>
           </div>
           <div className="mt-6 flex flex-wrap justify-center gap-4">

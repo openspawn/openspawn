@@ -678,6 +678,26 @@ body {
   color: var(--os-text-primary);
 }
 
+/* ── ORG.md transformation arrows ───────────────────────────────────────── */
+@keyframes arrowPulse {
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50%       { opacity: 1;   transform: translateX(4px); }
+}
+
+.org-transform-arrow {
+  display: inline-block;
+  animation: arrowPulse 2s ease-in-out infinite;
+}
+
+/* ── Industry scenario cards ─────────────────────────────────────────────── */
+.scenario-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.scenario-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
 /* ── Reduced-motion overrides ────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .gradient-text-animated,
@@ -687,7 +707,8 @@ body {
   .live-dot,
   .stat-pop,
   .install-cmd,
-  .tagline-word {
+  .tagline-word,
+  .org-transform-arrow {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
