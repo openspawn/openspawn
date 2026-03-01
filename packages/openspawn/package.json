@@ -1,10 +1,10 @@
 {
-  "name": "@openspawn/openspawn",
+  "name": "openspawn",
   "version": "0.1.0",
   "description": "Standalone MCP server and CLI for OpenSpawn multi-agent organizations",
   "type": "module",
   "bin": {
-    "openspawn": "./dist/cli/index.js"
+    "openspawn": "dist/cli/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,11 +17,32 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0"
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^3.0.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openspawn/openspawn.git",
+    "directory": "packages/openspawn"
+  },
+  "keywords": [
+    "multi-agent",
+    "agent",
+    "mcp",
+    "cli",
+    "org",
+    "orchestration",
+    "a2a"
+  ],
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
 }
