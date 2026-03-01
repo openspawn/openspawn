@@ -28,6 +28,7 @@ import {
   PanelLeft,
   Star,
   Layers,
+  ClipboardList,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
@@ -80,6 +81,7 @@ const navigation: { name: string; href: string; icon: typeof LayoutDashboard; to
   { name: "Network", href: "/network", icon: Network, tourId: "network" },
   { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks" },
   { name: "Kanban", href: "/kanban", icon: Layers },
+  { name: "Task Board", href: "/task-board", icon: ClipboardList },
   { name: "Agents", href: "/agents", icon: Users, tourId: "agents" },
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Model Router", href: "/router", icon: GitBranch },
