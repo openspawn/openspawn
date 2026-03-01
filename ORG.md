@@ -39,3 +39,9 @@
 - **Level:** 4
 - **Domain:** engineering
 - **Reports To:** Dennis
+
+#### docs-writer — Technical Writer
+
+- **Level:** 4
+- **Domain:** engineering
+- **Reports To:** Dennis
