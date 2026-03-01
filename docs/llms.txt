@@ -1,3 +1,6 @@
+> Full documentation (all pages): https://openspawn.ai/llms-full.txt
+> Index only (this file): https://openspawn.ai/llms.txt
+
 # OpenSpawn
 
 > OpenSpawn is an open-source coordination layer for AI agent organizations. You define your entire agent org — roles, hierarchy, culture, policies — in a single markdown file (ORG.md), and OpenSpawn parses it, spawns agents, routes tasks through the hierarchy, and gives you a real-time dashboard. It is infrastructure, not a framework: it works with any agent stack (OpenClaw, LangGraph, CrewAI, AutoGen, raw API calls).
