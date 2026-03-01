@@ -12,6 +12,7 @@ import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
 import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";
 import { KanbanPage } from "./pages/kanban";
+import { TaskBoardPage } from "./pages/task-board";
 import { RouterPage } from "./pages/router";
 import { DashboardPage } from "./pages/dashboard";
 import { NetworkPage } from "./pages/network";
@@ -171,6 +172,12 @@ const kanbanRoute = createRoute({
   component: KanbanPage,
 });
 
+const taskBoardRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/task-board",
+  component: TaskBoardPage,
+});
+
 const statusRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/status",
@@ -203,6 +210,7 @@ const layoutChildren = [
   settingsRoute,
   statusRoute,
   kanbanRoute,
+  taskBoardRoute,
 ];
 
 const rootChildren = [
