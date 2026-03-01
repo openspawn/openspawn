@@ -136,7 +136,11 @@ ${pc.cyan("Examples:")}
       try {
         const data = await withSpinner("Fetching transactions...", async () => {
           const client = createClient();
-          // TODO: Use actual API endpoint
+          // DEFERRED: Transaction history endpoint does not exist yet.
+          // When the API exposes it, replace with:
+          //   return client.getTransactionHistory(agentId, { limit: parseInt(opts.limit), type: opts.type })
+          // Expected route: GET /credits/history?agentId=&limit=&type=
+          void client; // suppress unused-var warning until wired
           return { data: [] as Transaction[] };
         });
 
@@ -228,7 +232,12 @@ ${pc.cyan("Examples:")}
         await withSpinner(
           `Granting ${colors.credit(opts.amount.toLocaleString())} credits to ${pc.cyan(opts.to)}...`,
           async () => {
-            // TODO: Implement grant endpoint
+            // DEFERRED: Credit grant endpoint does not exist yet.
+            // When the API exposes it, replace with:
+            //   await client.grantCredits(opts.to, opts.amount, opts.reason)
+            // Expected route: POST /credits/grant  { toAgentId, amount, reason }
+            const client = createClient();
+            void client; // suppress unused-var warning until wired
             await new Promise((r) => setTimeout(r, 500));
           },
           { successText: `Granted ${opts.amount.toLocaleString()} credits to ${opts.to}` }

@@ -48,7 +48,10 @@ export function ApiKeySettings() {
 
   const handleCreateKey = async () => {
     setIsCreating(true);
-    // TODO: Implement actual API call
+    // DEFERRED: API key creation is currently UI-only with local state.
+    // When the API keys endpoint is ready, replace the simulated delay with:
+    //   const { secret, key } = await apiClient.createApiKey({ name, scopes })
+    // The server should return the actual secret (shown once) and key metadata.
     await new Promise((resolve) => setTimeout(resolve, 1000));
     
     const mockSecret = `osp_${Math.random().toString(36).substring(2)}${Math.random().toString(36).substring(2)}`;

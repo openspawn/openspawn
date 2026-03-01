@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
@@ -91,38 +91,85 @@ const ecosystemItems = [
   { name: "Custom" },
 ];
 
-// ─── "Seen in" / early-adopter logos bar ─────────────────────────────────────
+// ─── Industry scenarios ───────────────────────────────────────────────────────
+const industryScenarios = [
+  {
+    emoji: "🚀",
+    title: "SaaS Onboarding",
+    pain: "Manual onboarding takes 2–3 days per customer across 4 teams",
+    template: "saas-onboarding",
+    color: "cyan",
+  },
+  {
+    emoji: "🚨",
+    title: "DevOps Incident Response",
+    pain: "3am pages, 45-min MTTR, context-switching between 6 tools",
+    template: "incident-response",
+    color: "rose",
+  },
+  {
+    emoji: "⚖️",
+    title: "Legal Contract Review",
+    pain: "Junior associates spend 80+ hrs/week on manual contract review",
+    template: "contract-review",
+    color: "violet",
+  },
+  {
+    emoji: "🏦",
+    title: "Fintech Compliance",
+    pain: "Manual transaction monitoring misses 15% of anomalies",
+    template: "compliance-monitoring",
+    color: "emerald",
+  },
+  {
+    emoji: "🎮",
+    title: "Gaming Live Ops",
+    pain: "Player churn from stale content and unbalanced economy",
+    template: "game-live-ops",
+    color: "amber",
+  },
+  {
+    emoji: "🛒",
+    title: "E-commerce Catalog",
+    pain: "10,000 SKUs, competitors change prices daily, descriptions go stale",
+    template: "catalog-management",
+    color: "slate",
+  },
+];
+
+// ─── Early adopters ───────────────────────────────────────────────────────────
 const earlyAdopters = [
   { name: "OpenClaw", emoji: "🦞" },
-  { name: "BikiniBottom Demo", emoji: "🍍" },
+  { name: "SaaS Teams", emoji: "🚀" },
   { name: "Internal Labs", emoji: "🔬" },
   { name: "Indie Builders", emoji: "🛠️" },
 ];
 
 // ─── ORG.md snippets ──────────────────────────────────────────────────────────
-const orgMdSnippet = `# 🪸 MyOrg
-> Mission: Ship great software faster
+const orgMdSaasSnippet = `# customer-onboarding
+> Mission: Onboard new enterprise customers end-to-end
 
-## Teams
-- 🔬 Research (lead: Analyst)
-- 🛠️ Engineering (lead: Architect)
+## Culture
+- Preset: professional
+- Escalation: 30 min — customers can't wait
 
-## Policies
-- All tasks require peer review
-- Escalate critical issues to Manager`;
+## Structure
 
-const openclawJsonSnippet = `{
-  "agents": {
-    "list": [
-      { "id": "analyst",   "model": "opus"   },
-      { "id": "architect", "model": "sonnet" },
-      { "id": "reviewer",  "model": "sonnet" }
-    ]
-  },
-  "tools": {
-    "agentToAgent": { "enabled": true }
-  }
-}`;
+### Onboarding Lead (level 7)
+Owns the entire customer journey from contract to go-live.
+- Model: claude-sonnet
+
+#### Data Migration Specialist (level 5)
+Moves and validates customer data from legacy systems.
+- Model: claude-haiku
+
+#### Integration Engineer (level 5)
+Configures API connectors and runs integration tests.
+- Model: claude-haiku
+
+#### Success Agent (level 4)
+Schedules check-ins, collects feedback, flags churn risk.
+- Model: ollama/qwen2.5`;
 
 const orgMdPivotSnippet = `# 🪸 MyOrg
 
@@ -137,9 +184,22 @@ const orgMdPivotSnippet = `# 🪸 MyOrg
 - L1-6: polling (Sonnet, budget-capped)
 - All PRs require peer review`;
 
+const openclawJsonSnippet = `{
+  "agents": {
+    "list": [
+      { "id": "onboarding-lead", "model": "sonnet" },
+      { "id": "data-migration",  "model": "haiku"  },
+      { "id": "integration-eng", "model": "haiku"  },
+      { "id": "success-agent",   "model": "qwen2.5" }
+    ]
+  },
+  "tools": {
+    "agentToAgent": { "enabled": true }
+  }
+}`;
+
 // ─── Tagline word reveal helper ───────────────────────────────────────────────
 function TaglineWords({ text }: { text: string }) {
-  // Split on spaces but preserve periods as part of the word they're attached to
   const words = text.split(" ");
   return (
     <span aria-label={text}>
@@ -176,6 +236,16 @@ function useScrollReveal() {
   }, []);
 }
 
+// ─── Industry scenario color map ──────────────────────────────────────────────
+const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string }> = {
+  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400" },
+  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400" },
+  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400" },
+  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400" },
+  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400" },
+  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400" },
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function LandingPage() {
   const [agentCount, setAgentCount] = useState(22);
@@ -184,10 +254,6 @@ export function LandingPage() {
   useScrollReveal();
 
   useEffect(() => {
-    fetch("https://bikinibottom.ai/api/health")
-      .then((r) => r.json())
-      .then((d) => { if (d.agents) setAgentCount(d.agents); })
-      .catch(() => {});
     fetch("https://api.github.com/repos/openspawn/openspawn")
       .then((r) => r.json())
       .then((d) => { if (d.stargazers_count) setStars(d.stargazers_count); })
@@ -217,8 +283,8 @@ export function LandingPage() {
           </span>
           <span className="hidden h-3 w-px bg-white/10 sm:block" />
           <span className="flex items-center gap-1.5">
-            <span className="text-emerald-400 font-semibold">🏢 5</span>
-            departments orchestrated
+            <span className="text-emerald-400 font-semibold">🏢 6</span>
+            industry templates
           </span>
           <span className="hidden h-3 w-px bg-white/10 sm:block" />
           <span className="flex items-center gap-1.5">
@@ -258,7 +324,7 @@ export function LandingPage() {
         </div>
 
         <div className="relative mx-auto max-w-4xl text-center">
-          {/* Coral emoji — floats gently */}
+          {/* Icon — floats gently */}
           <div className="animate-fade-in-up mb-6">
             <span className="coral-float text-6xl md:text-8xl" role="img" aria-label="coral">
               🪸
@@ -266,10 +332,13 @@ export function LandingPage() {
           </div>
 
           {/* Category badge */}
-          <div className="animate-fade-in-up animate-delay-100 mb-5">
+          <div className="animate-fade-in-up animate-delay-100 mb-3 flex flex-wrap items-center justify-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400">
               <span className="live-dot h-1.5 w-1.5 rounded-full bg-cyan-400 inline-block" />
               Multi-Agent Platform
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-300">
+              🎓 Graduate from sub-agents
             </span>
           </div>
 
@@ -278,15 +347,16 @@ export function LandingPage() {
             <span className="gradient-text-animated">OpenSpawn</span>
           </h1>
 
-          {/* THE tagline — word-by-word reveal, maximum impact */}
+          {/* THE tagline */}
           <p className="mb-3 text-2xl font-bold text-slate-100 md:text-3xl lg:text-4xl leading-tight tracking-tight">
-            <TaglineWords text="Your agents. Your devices. Your rules." />
+            <TaglineWords text="Your agents. Your org. Your rules." />
           </p>
 
           {/* Sub-copy */}
           <p className="animate-fade-in-up animate-delay-300 mx-auto mb-10 max-w-xl text-base text-slate-400 md:text-lg leading-relaxed">
-            Orchestrate agent teams across devices, nodes, and services — with the structure
-            your org actually needs. No competitor brings agents into the physical world like this.
+            Sub-agents are great for simple tasks. But when you need a full team — with persistent
+            memory, coordination, and budget control — you need an org.{" "}
+            <span className="text-slate-300">OpenSpawn gives your agents structure.</span>
           </p>
 
           {/* CTAs */}
@@ -296,13 +366,11 @@ export function LandingPage() {
             </Button>
             <Button
               as="a"
-              href="https://bikinibottom.ai/app/"
-              target="_blank"
-              rel="noopener"
+              href="/templates"
               variant="neutral"
               size="lg"
             >
-              🍍 Watch 22 SpongeBob Agents Run a Company →
+              🏭 Browse Industry Templates →
             </Button>
           </div>
 
@@ -345,6 +413,176 @@ export function LandingPage() {
           {/* Terminal demo */}
           <div className="animate-fade-in-up animate-delay-600">
             <TerminalDemo />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ORG.MD HERO — "One file. Your entire agent organization."
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section aria-labelledby="org-md-hero" className="section-py-lg">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-12">
+            <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
+              ORG.md
+            </span>
+            <h2 id="org-md-hero" className="text-3xl font-extrabold text-slate-100 md:text-4xl lg:text-5xl tracking-tight">
+              One file.{" "}
+              <span className="gradient-text">Your entire agent organization.</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-slate-400 leading-relaxed">
+              Define your team in markdown. OpenSpawn reads it, spawns the agents, and keeps them
+              coordinated. The document <em>is</em> the configuration.
+            </p>
+          </div>
+
+          {/* Transformation: ORG.md → Agents → Results */}
+          <div className="reveal grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-start">
+
+            {/* Column 1: ORG.md file */}
+            <div className="overflow-hidden rounded-xl border border-cyan-500/30 bg-navy-900/80 ring-1 ring-cyan-500/10">
+              <div className="flex items-center gap-2 border-b border-white/5 bg-cyan-500/[0.04] px-4 py-3">
+                <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+                <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+                <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+                <span className="ml-2 text-xs text-cyan-400 font-mono font-semibold">ORG.md</span>
+                <span className="ml-auto text-xs text-slate-600">source of truth</span>
+              </div>
+              <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-slate-300 font-mono">
+                <code>{orgMdSaasSnippet}</code>
+              </pre>
+            </div>
+
+            {/* Arrow 1 */}
+            <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
+              <div className="org-transform-arrow text-2xl text-cyan-500/60">→</div>
+              <span className="text-xs text-slate-600 text-center">openspawn<br />start</span>
+            </div>
+            <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
+
+            {/* Column 2: Running agents */}
+            <div className="overflow-hidden rounded-xl border border-violet-500/20 bg-navy-900/80">
+              <div className="flex items-center gap-2 border-b border-white/5 bg-violet-500/[0.03] px-4 py-3">
+                <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="ml-1 text-xs text-violet-300 font-semibold">Running Agents</span>
+              </div>
+              <div className="p-4 space-y-2">
+                {[
+                  { emoji: "🎯", name: "Onboarding Lead", level: "L7", model: "sonnet", status: "working" },
+                  { emoji: "🤖", name: "Data Migration Specialist", level: "L5", model: "haiku", status: "working" },
+                  { emoji: "🤖", name: "Integration Engineer", level: "L5", model: "haiku", status: "idle" },
+                  { emoji: "🤖", name: "Success Agent", level: "L4", model: "qwen2.5", status: "idle" },
+                ].map((agent) => (
+                  <div key={agent.name} className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
+                    <span className="text-sm">{agent.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-slate-200 truncate">{agent.name}</p>
+                      <p className="text-xs text-slate-600">{agent.level} · {agent.model}</p>
+                    </div>
+                    <span className={`shrink-0 text-xs font-medium ${agent.status === "working" ? "text-emerald-400" : "text-slate-600"}`}>
+                      {agent.status === "working" ? "● working" : "○ idle"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Arrow 2 */}
+            <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
+              <div className="org-transform-arrow text-2xl text-cyan-500/60" style={{ animationDelay: "0.3s" }}>→</div>
+              <span className="text-xs text-slate-600 text-center">24 hrs<br />later</span>
+            </div>
+            <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
+
+            {/* Column 3: Results */}
+            <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-navy-900/80">
+              <div className="flex items-center gap-2 border-b border-white/5 bg-emerald-500/[0.03] px-4 py-3">
+                <span className="text-xs text-emerald-400 font-semibold">✓ Results</span>
+              </div>
+              <div className="p-4 space-y-3">
+                {[
+                  { icon: "✅", text: "Customer data migrated (3,847 records)" },
+                  { icon: "✅", text: "CRM integration tested & configured" },
+                  { icon: "✅", text: "Slack workspace provisioned" },
+                  { icon: "✅", text: "Success check-in scheduled (Day 7)" },
+                  { icon: "📊", text: "Total cost: $1.24 · Time: 6h 12m" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs text-slate-400">
+                    <span className="mt-0.5 shrink-0">{item.icon}</span>
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+                <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2">
+                  <p className="text-xs font-semibold text-emerald-400">Onboarding complete 🎉</p>
+                  <p className="text-xs text-slate-500 mt-0.5">2 days → 6 hours</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="reveal mt-8 text-center">
+            <a href="/org-md" className="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+              Learn about ORG.md →
+            </a>
+            <span className="mx-4 text-slate-700">·</span>
+            <a href="/templates" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 transition-colors">
+              Browse templates →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          INDUSTRY SCENARIOS
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section aria-labelledby="industry-scenarios" className="section-py-lg">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <span className="inline-block rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-violet-400 mb-4">
+              Industry Scenarios
+            </span>
+            <h2 id="industry-scenarios" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Real workflows. Real teams.{" "}
+              <span className="gradient-text">One ORG.md each.</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-slate-400">
+              Every scenario ships as a ready-to-use ORG.md template. Pick one, customize it,
+              and have a working agent org in minutes.
+            </p>
+          </div>
+
+          <div className="reveal-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {industryScenarios.map((scenario) => {
+              const c = scenarioColorMap[scenario.color];
+              return (
+                <div
+                  key={scenario.title}
+                  className={`reveal group rounded-xl border ${c.border} ${c.bg} p-5 transition-all duration-200 hover:scale-[1.02]`}
+                >
+                  <div className="mb-3 text-3xl">{scenario.emoji}</div>
+                  <h3 className={`mb-1.5 font-bold ${c.text}`}>{scenario.title}</h3>
+                  <p className="mb-4 text-sm text-slate-500 leading-relaxed">{scenario.pain}</p>
+                  <a
+                    href={`/templates#${scenario.template}`}
+                    className={`inline-flex items-center gap-1 text-xs font-semibold ${c.text} opacity-70 hover:opacity-100 transition-opacity`}
+                  >
+                    See ORG.md
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="reveal mt-8 text-center">
+            <a
+              href="/templates"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20"
+            >
+              View all 7 industry templates →
+            </a>
           </div>
         </div>
       </section>
@@ -410,6 +648,169 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── "Graduate from sub-agents" — Why not just use sub-agents? ───── */}
+      <section aria-labelledby="why-not-subagents" className="section-py-lg">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <span className="inline-block rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-violet-400 mb-4">
+              Why OpenSpawn
+            </span>
+            <h2 id="why-not-subagents" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Why not just use <span className="gradient-text">sub-agents?</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-slate-400">
+              Sub-agents are ephemeral — they run once and disappear. OpenSpawn gives your agents
+              persistence, hierarchy, and governance. It's the difference between a freelancer and
+              a company.
+            </p>
+          </div>
+          <div className="reveal grid gap-4 sm:grid-cols-2">
+            {/* Sub-agent column */}
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-2xl">🤖</span>
+                <h3 className="font-semibold text-slate-300">Sub-agent (typical)</h3>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Spawned once, forgets everything after</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are equal</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go wrong</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No visibility into what agents are actually doing</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Org structure lives only in the prompt</li>
+              </ul>
+            </div>
+            {/* OpenSpawn column */}
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-6 ring-1 ring-cyan-500/10">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-2xl">🪸</span>
+                <h3 className="font-semibold text-cyan-300">OpenSpawn org</h3>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Persistent agents with continuous memory</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> 10-level hierarchy — delegation &amp; escalation built in</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Per-agent credit budgets with automatic tracking</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Typed escalation chain of command</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Live dashboard: network graph, task timeline, cost</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Org structure version-controlled in <code className="font-mono text-xs bg-white/10 px-1 rounded">ORG.md</code></li>
+              </ul>
+            </div>
+          </div>
+          <div className="reveal mt-6 text-center">
+            <a
+              href="/docs/comparison"
+              className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              Full framework comparison (vs CrewAI, LangGraph)
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3 Core Benefits ───────────────────────────────────────────────── */}
+      <section aria-labelledby="core-benefits" className="section-py">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <h2 id="core-benefits" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Three things sub-agents can't do
+            </h2>
+          </div>
+          <div className="reveal grid gap-6 sm:grid-cols-3">
+            <div className="rounded-xl border border-violet-500/20 bg-gradient-to-br from-violet-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">🧠</div>
+              <h3 className="mb-2 font-bold text-slate-100">Persistent Agents</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Your agents run continuously. They remember past tasks, build context over time,
+                and improve their trust score with every successful completion.
+              </p>
+            </div>
+            <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">🏢</div>
+              <h3 className="mb-2 font-bold text-slate-100">Team Coordination</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Hierarchy, delegation, and escalation built in. Agents route tasks up and down
+                the org chart — no manual wiring required.
+              </p>
+            </div>
+            <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.07] to-transparent p-6 text-center">
+              <div className="mb-3 text-4xl">💰</div>
+              <h3 className="mb-2 font-bold text-slate-100">Budget Control</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Per-agent credit limits, automatic cost tracking, and configurable overage
+                behavior. Know exactly what your org costs before the bill lands.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works — 3 steps ────────────────────────────────────────── */}
+      <section aria-labelledby="how-it-works" className="section-py-lg">
+        <div className="mx-auto max-w-4xl">
+          <div className="reveal text-center mb-12">
+            <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
+              How It Works
+            </span>
+            <h2 id="how-it-works" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              From zero to running org in{" "}
+              <span className="gradient-text">3 commands</span>
+            </h2>
+          </div>
+          <ol className="reveal grid gap-6 sm:grid-cols-3" role="list">
+            {/* Step 1 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">1</span>
+                <h3 className="font-bold text-slate-100">Init</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>npx openspawn init my-org</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                An interactive wizard creates your <code className="text-xs font-mono text-slate-300">ORG.md</code> — the single file that defines
+                your entire agent organization.
+              </p>
+            </li>
+            {/* Step 2 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">2</span>
+                <h3 className="font-bold text-slate-100">Start</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>openspawn start</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                Agents spawn in sandboxed containers, load their roles from ORG.md, and begin
+                listening for tasks immediately. Dashboard at <code className="text-xs font-mono text-slate-300">localhost:3333</code>.
+              </p>
+            </li>
+            {/* Step 3 */}
+            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">3</span>
+                <h3 className="font-bold text-slate-100">Done</h3>
+              </div>
+              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
+                <code>openspawn done</code>
+              </pre>
+              <p className="text-sm text-slate-400">
+                When the work is complete, graceful shutdown collects all artifacts, task logs,
+                and cost summaries into a portable archive.
+              </p>
+            </li>
+          </ol>
+          <div className="reveal mt-8 text-center">
+            <a href="/getting-started" className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan">
+              Get Started in 5 Minutes →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════════════════════════════════════
           CAPABILITY GRID — Staggered scroll reveal
           ═══════════════════════════════════════════════════════════════════════ */}
@@ -427,67 +828,12 @@ export function LandingPage() {
               physical world.
             </p>
           </div>
-          {/* Cards: reveal-stagger enables nth-child delay cascade */}
           <div className="reveal-stagger grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => (
               <div key={f.title} className="reveal">
                 <FeatureCard {...f} />
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Live demo callout ──────────────────────────────────────────────── */}
-      <section className="section-py-lg">
-        <div className="mx-auto max-w-5xl text-center">
-          <div className="reveal mb-6">
-            <span className="inline-block rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-amber-400">
-              Live Demo
-            </span>
-          </div>
-          <h2 className="reveal mb-4 text-3xl font-bold text-slate-100 md:text-4xl">
-            See it running. <span className="gradient-text">Right now.</span>
-          </h2>
-          <p className="reveal mx-auto mb-10 max-w-xl text-slate-400">
-            We deployed a real OpenSpawn org using SpongeBob characters as agents. Watch 22 agents
-            in 5 departments run a full company in real-time.
-          </p>
-          <a
-            href="https://bikinibottom.ai/app/"
-            target="_blank"
-            rel="noopener"
-            className="reveal inline-block"
-          >
-            <div className="group overflow-hidden rounded-xl border border-white/10 bg-navy-900/50 shadow-2xl shadow-cyan-500/5 transition-all duration-300 hover:border-cyan-500/20 hover:shadow-cyan-500/10">
-              <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
-                <div className="h-3 w-3 rounded-full bg-red-500/70" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500/70" />
-                <div className="h-3 w-3 rounded-full bg-green-500/70" />
-                <span className="ml-2 text-xs text-slate-500">bikinibottom.ai/app</span>
-                <span className="ml-auto flex items-center gap-1.5 text-xs text-emerald-400">
-                  <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block" />
-                  Live
-                </span>
-              </div>
-              <img src="/og-image.jpg" alt="OpenSpawn Dashboard — BikiniBottom Demo" className="w-full opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-          </a>
-          <p className="reveal mt-6 text-sm text-slate-500">
-            🍍 <strong className="text-slate-300">BikiniBottom</strong> — 22 SpongeBob agents · 5 departments · Real-time coordination
-          </p>
-          <div className="reveal mt-4">
-            <a
-              href="https://bikinibottom.ai/app/"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:gap-3"
-            >
-              Watch 22 SpongeBob agents run a company in real-time
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
           </div>
         </div>
       </section>
@@ -596,7 +942,7 @@ export function LandingPage() {
               <span className="ml-2 text-xs text-slate-500">ORG.md</span>
             </div>
             <pre className="overflow-x-auto p-4 text-sm leading-relaxed text-slate-300">
-              <code>{orgMdSnippet}</code>
+              <code>{orgMdSaasSnippet}</code>
             </pre>
           </div>
         </div>
@@ -607,10 +953,10 @@ export function LandingPage() {
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-8 sm:gap-12 text-center">
           {[
             { value: String(agentCount), label: "Agents Live", color: "text-cyan-400" },
-            { value: "5",  label: "Departments",  color: "text-violet-400" },
-            { value: "7",  label: "MCP Tools",    color: "text-emerald-400" },
-            { value: "3",  label: "LLM Providers", color: "text-amber-400" },
-            { value: "∞",  label: "Devices Possible", color: "text-rose-400" },
+            { value: "6",  label: "Industry Templates", color: "text-violet-400" },
+            { value: "7",  label: "MCP Tools",          color: "text-emerald-400" },
+            { value: "3",  label: "LLM Providers",      color: "text-amber-400" },
+            { value: "∞",  label: "Devices Possible",   color: "text-rose-400" },
           ].map((stat, i) => (
             <div key={stat.label}>
               <div
@@ -678,6 +1024,37 @@ export function LandingPage() {
             >
               Full framework comparison →
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Ready to graduate? — Final CTA ───────────────────────────────── */}
+      <section aria-labelledby="graduate-cta" className="section-py-lg">
+        <div className="mx-auto max-w-3xl">
+          <div className="reveal overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.08] via-violet-500/[0.04] to-transparent p-10 text-center md:p-16">
+            <div className="mb-4 text-5xl">🎓</div>
+            <h2 id="graduate-cta" className="mb-4 text-3xl font-extrabold text-slate-100 md:text-4xl tracking-tight">
+              Ready to graduate?
+            </h2>
+            <p className="mx-auto mb-8 max-w-lg text-slate-400 leading-relaxed">
+              Sub-agents are training wheels. OpenSpawn is the real company — persistent agents,
+              hierarchy, budget control, and full visibility. Deploy your first org in 5 minutes.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="/getting-started"
+                className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-8 py-3.5 font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan"
+              >
+                Get Started →
+              </a>
+              <a
+                href="/templates"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20"
+              >
+                Browse industry templates
+              </a>
+            </div>
+            <p className="mt-6 text-xs text-slate-600">MIT licensed · No account required · Runs locally</p>
           </div>
         </div>
       </section>

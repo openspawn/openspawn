@@ -182,9 +182,13 @@ ${pc.cyan("Examples:")}
     .description("Show unread message count")
     .action(async () => {
       try {
-        // TODO: Implement unread endpoint
+        // DEFERRED: Unread message count endpoint does not exist yet.
+        // When the API exposes it, replace with:
+        //   const { data } = await createClient().getUnreadCount()
+        //   console.log(`  📬 ${pc.bold(String(data.count))} unread messages`)
+        // Expected route: GET /messages/unread
         console.log();
-        console.log(`  📬 ${pc.bold("0")} unread messages`);
+        console.log(`  📬 ${pc.bold("0")} unread messages (endpoint not yet implemented)`);
         console.log();
       } catch (err) {
         outputError(err instanceof Error ? err.message : String(err));
