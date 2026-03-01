@@ -1,7 +1,8 @@
-// ── MCP Server (Streamable HTTP) ─────────────────────────────────────────────
+// ── MCP Server (Streamable HTTP + stdio) ─────────────────────────────────────
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from 'node:http';
 import { registerTools } from './tools.js';
 
@@ -9,10 +10,11 @@ export interface ServerOptions {
   dir: string;
   orgFile?: string;
   port?: number;
+  stdio?: boolean;
 }
 
 export async function startMcpServer(opts: ServerOptions): Promise<void> {
-  const { dir, orgFile, port = 3456 } = opts;
+  const { dir, orgFile, port = 3456, stdio = false } = opts;
 
   const server = new McpServer({
     name: 'openspawn',
@@ -20,6 +22,12 @@ export async function startMcpServer(opts: ServerOptions): Promise<void> {
   });
 
   registerTools(server, dir, orgFile);
+
+  if (stdio) {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    return;
+  }
 
   const httpServer = createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === '/mcp') {

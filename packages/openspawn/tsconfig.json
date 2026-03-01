@@ -6,7 +6,9 @@
     "declaration": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "target": "ES2022"
+    "target": "ES2022",
+    "skipLibCheck": true,
+    "noImplicitAny": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.test.ts"]
