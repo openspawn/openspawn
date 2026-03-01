@@ -92,7 +92,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               marginBottom: "0.5rem",
             }}
           >
-            A runtime error crashed the app. SpongeBob is already on it.
+            A runtime error crashed the app. The team is already on it.
           </p>
 
           {/* Error detail — collapsible via details/summary */}

@@ -20,6 +20,7 @@ import { IntroPage } from "./pages/intro";
 import { MobileStatusPage } from "./pages/mobile-status";
 import { LiveViewPage } from "./pages/live-view";
 import { isSandboxMode } from "./graphql/fetcher";
+import { isBBTheme } from "./lib/dashboard-theme";
 import type { ReactNode } from "react";
 
 // Check for demo/sandbox mode via URL param or env
@@ -214,8 +215,7 @@ const layoutChildren = [
 ];
 
 const rootChildren = [
-  introRoute,
-  liveRoute,
+  ...(isBBTheme ? [introRoute, liveRoute] : []),
   layoutRoute.addChildren(layoutChildren),
   ...(!isDemoMode && !isSandboxMode ? [loginRoute, authCallbackRoute] : []),
 ];
