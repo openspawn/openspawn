@@ -70,7 +70,7 @@ export function PwaInstallPrompt() {
 
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-cyan-50">
-                    Install BikiniBottom
+                    Install OpenSpawn
                   </h3>
                   <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
                     Add to your home screen for the full ocean experience

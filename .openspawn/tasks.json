@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "task-001",
+      "description": "Homepage positioning refresh — persistent governed orgs",
+      "assignee": "dennis",
+      "status": "done",
+      "createdAt": "2026-03-01T19:07:48.803Z",
+      "updatedAt": "2026-03-01T19:07:48.804Z"
+    },
+    {
+      "id": "task-002",
+      "description": "MCP server + CLI skeleton (13 tools, 10 commands)",
+      "assignee": "dennis",
+      "status": "done",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-003",
+      "description": "Team ORG.md + org tree command",
+      "assignee": "dennis",
+      "status": "done",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-004",
+      "description": "npm publish — openspawn@0.1.0",
+      "assignee": "dennis",
+      "status": "done",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-005",
+      "description": "README + getting started guide",
+      "assignee": "dennis",
+      "status": "done",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-006",
+      "description": "Tone cleanup — additive not competitive",
+      "assignee": "dennis",
+      "status": "in-progress",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-007",
+      "description": "Dogfood task flow — use openspawn for real work",
+      "status": "open",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-008",
+      "description": "End-to-end demo recording for homepage",
+      "status": "open",
+      "createdAt": "2026-03-01T19:07:48.805Z",
+      "updatedAt": "2026-03-01T19:07:48.805Z"
+    },
+    {
+      "id": "task-009",
+      "description": "Deploy homepage with new positioning",
+      "status": "open",
+      "createdAt": "2026-03-01T19:07:48.806Z",
+      "updatedAt": "2026-03-01T19:07:48.806Z"
+    }
+  ],
+  "budgets": {}
+}

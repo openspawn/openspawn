@@ -1,6 +1,6 @@
 {
-  "name": "BikiniBottom Dashboard",
-  "short_name": "BikiniBottom",
+  "name": "OpenSpawn Dashboard",
+  "short_name": "OpenSpawn",
   "description": "Multi-agent coordination platform dashboard",
   "start_url": ".",
   "display": "standalone",
