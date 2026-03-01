@@ -2,7 +2,7 @@
 
 **Persistent governed organizations for AI agents.**
 
-While other tools give you ephemeral agent teams that forget everything when the session ends, OpenSpawn builds persistent organizations — with memory, hierarchy, budgets, and governance that survive across sessions.
+OpenSpawn adds organizational structure to your AI agents — persistent memory, hierarchy, budgets, and governance that compound across sessions. Works with any agent framework.
 
 [![npm](https://img.shields.io/npm/v/openspawn)](https://www.npmjs.com/package/openspawn)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/openspawn/openspawn/blob/main/LICENSE)
@@ -157,11 +157,11 @@ When running as an MCP server, OpenSpawn exposes 13 tools:
 3. **MCP Server** — Any MCP-compatible agent connects and participates in the org.
 4. **CLI** — Human operators manage the org from the terminal.
 
-## Why Not Just Use Sub-Agents?
+## What OpenSpawn Adds
 
-| | OpenSpawn | Ephemeral Teams |
+| | With OpenSpawn | Without |
 |---|---|---|
-| **Memory** | Persistent across sessions | Dies with the window |
+| **Memory** | Persistent across sessions | Session-scoped |
 | **Hierarchy** | 10-level (L1–L10) | Flat (lead/teammate) |
 | **Budget control** | Per-agent limits + tracking | None |
 | **Escalation** | Typed chain of command | Ad-hoc |

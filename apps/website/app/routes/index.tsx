@@ -338,7 +338,7 @@ export function LandingPage() {
               Persistent Agent Organizations
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-300">
-              🏛️ Beyond ephemeral teams
+              🧩 Adds structure to any agent
             </span>
           </div>
 
@@ -354,10 +354,9 @@ export function LandingPage() {
 
           {/* Sub-copy */}
           <p className="animate-fade-in-up animate-delay-300 mx-auto mb-10 max-w-xl text-base text-slate-400 md:text-lg leading-relaxed">
-            Ephemeral agent teams forget everything when the session ends. OpenSpawn builds
-            persistent organizations — with memory, hierarchy, budgets, and governance that survive
-            across sessions.{" "}
-            <span className="text-slate-300">Infrastructure for agent companies, not coding sprints.</span>
+            Your agents are powerful. OpenSpawn gives them structure — persistent memory,
+            hierarchy, budgets, and governance that compound across sessions.{" "}
+            <span className="text-slate-300">Add an org chart to any agent stack.</span>
           </p>
 
           {/* CTAs */}
@@ -657,12 +656,12 @@ export function LandingPage() {
               Why OpenSpawn
             </span>
             <h2 id="why-not-subagents" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              Why not just use <span className="gradient-text">ephemeral teams?</span>
+              What OpenSpawn <span className="gradient-text">adds</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400">
-              Agent teams are going mainstream — even Anthropic ships them now. But session-scoped
-              teams forget everything when the window closes. OpenSpawn gives your agents persistence,
-              hierarchy, and governance. It's the difference between a sprint and a company.
+              Agent teams are going mainstream. OpenSpawn adds the organizational layer —
+              persistence, hierarchy, and governance — so your agents can grow from a sprint
+              into a company.
             </p>
           </div>
           <div className="reveal grid gap-4 sm:grid-cols-2">
@@ -670,10 +669,10 @@ export function LandingPage() {
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-2xl">🤖</span>
-                <h3 className="font-semibold text-slate-300">Ephemeral teams</h3>
+                <h3 className="font-semibold text-slate-300">Without OpenSpawn</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-500">
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Session-scoped — memory dies with the window</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Session-scoped memory</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are equal</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go wrong</li>
@@ -983,10 +982,10 @@ export function LandingPage() {
           <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">
             How We Compare
           </h2>
-          <p className="mb-4 text-center text-lg font-semibold text-slate-300">vs CrewAI, LangGraph &amp; Claude Code Teams</p>
+          <p className="mb-4 text-center text-lg font-semibold text-slate-300">vs CrewAI &amp; LangGraph</p>
           <p className="mx-auto mb-10 max-w-xl text-center text-slate-400">
-            CrewAI, LangGraph, and Claude Code Teams are great for <em>execution</em>. OpenSpawn is{" "}
-            <em>coordination infrastructure</em> — persistent orgs that outlive any single session.
+            CrewAI and LangGraph are great <em>execution</em> frameworks. OpenSpawn adds the{" "}
+            <em>coordination layer</em> — persistent orgs, governance, and budgets on top of any framework.
           </p>
           <div className="mb-8 overflow-x-auto rounded-xl border border-white/10 bg-navy-900/50">
             <table className="w-full text-sm">
@@ -996,25 +995,23 @@ export function LandingPage() {
                   <th className="px-5 py-3 text-left font-semibold text-cyan-400">OpenSpawn</th>
                   <th className="px-5 py-3 text-left font-semibold text-violet-400">CrewAI</th>
                   <th className="px-5 py-3 text-left font-semibold text-emerald-400">LangGraph</th>
-                  <th className="px-5 py-3 text-left font-semibold text-rose-400">Claude Code Teams</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-slate-400">
                 {[
-                  ["Real device support", "✅ via OpenClaw", "❌", "❌", "❌"],
-                  ["Persistent agents", "✅ Cross-session", "❌", "❌", "❌ Session-only"],
-                  ["Org as code (ORG.md)", "✅ Markdown file", "Python code", "Python code", "Natural language"],
-                  ["Budget & governance", "✅ Built-in", "❌", "❌", "❌"],
-                  ["10-level hierarchy", "✅ L1–L10", "❌", "❌", "Lead/teammate only"],
-                  ["Live dashboard", "✅ React + SSE", "❌", "❌", "❌"],
-                  ["Framework agnostic", "✅ A2A / MCP", "❌", "❌", "❌ Claude only"],
-                ].map(([feature, os, crewai, lg, claude]) => (
+                  ["Real device support", "✅ via OpenClaw", "❌", "❌"],
+                  ["Persistent agents", "✅ Cross-session", "❌", "❌"],
+                  ["Org as code (ORG.md)", "✅ Markdown file", "Python code", "Python code"],
+                  ["Budget & governance", "✅ Built-in", "❌", "❌"],
+                  ["10-level hierarchy", "✅ L1–L10", "❌", "❌"],
+                  ["Live dashboard", "✅ React + SSE", "❌", "❌"],
+                  ["Framework agnostic", "✅ A2A / MCP", "❌", "❌"],
+                ].map(([feature, os, crewai, lg]) => (
                   <tr key={feature}>
                     <td className="px-5 py-2.5 font-medium text-slate-300">{feature}</td>
                     <td className="px-5 py-2.5">{os}</td>
                     <td className="px-5 py-2.5">{crewai}</td>
                     <td className="px-5 py-2.5">{lg}</td>
-                    <td className="px-5 py-2.5">{claude}</td>
                   </tr>
                 ))}
               </tbody>
