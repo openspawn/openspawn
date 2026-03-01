@@ -136,6 +136,20 @@ When running as an MCP server, OpenSpawn exposes 13 tools:
 | `budget_spend` | Record spend |
 | `report` | Report status/completion |
 
+## ORG.md Format Reference
+
+- **`# Org Name`** — Top-level heading is the org name
+- **`## Culture`** — Preset, escalation speed, ack requirements
+- **`## Policies`** — Per-agent budgets, alert thresholds
+- **`## Structure`** — Agent hierarchy (required)
+  - **`### Name — Role`** — Top-level agent or department
+  - **`#### Name — Role`** — Agent under a department
+- **`- **Reports To:** parent-name`** — Override structural hierarchy (for cross-department reporting)
+- **`- **Count:** N`** — Spawn N copies of an agent (e.g. worker pool)
+- **`- **Level:** N`** — Authority level (1-10, higher = more authority)
+- **`- **Domain:** name`** — Functional area
+- **`- **Model:** model-name`** — LLM model assignment
+
 ## How It Works
 
 1. **ORG.md** — Your org chart in markdown. Agents, hierarchy, policies, culture. Version-controlled, diffable.
