@@ -21,12 +21,12 @@ const PRIORITY_STYLES: Record<TaskPriority, { badge: string; glow?: string }> = 
 };
 
 const AVATAR_COLORS: Record<string, string> = {
-  'SpongeBob': 'bg-yellow-500',
-  'Patrick': 'bg-pink-400',
-  'Squidward': 'bg-teal-500',
+  'Agent Alpha': 'bg-yellow-500',
+  'Agent Bravo': 'bg-pink-400',
+  'Agent Charlie': 'bg-teal-500',
   'Sandy': 'bg-amber-600',
-  'Mr. Krabs': 'bg-red-500',
-  'Plankton': 'bg-green-600',
+  'Agent Lead': 'bg-red-500',
+  'Agent Delta': 'bg-green-600',
   'Gary': 'bg-blue-400',
   'Karen': 'bg-purple-500',
 };

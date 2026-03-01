@@ -187,7 +187,7 @@ export function StatsBar({ stats }: StatsBarProps) {
       <div className="flex items-center gap-2">
         <span>🦀</span>
         <span style={{ color: 'rgba(184,228,247,0.4)' }}>
-          {stats.budgetUsed > 85 ? 'Mr. Krabs is sweating:' : 'Budget:'}
+          {stats.budgetUsed > 85 ? 'Budget critical:' : 'Budget:'}
         </span>
         <StatValue value={`${stats.budgetUsed}%`} color={budgetColor} flashClass={budgetFlash} />
         <MiniBar value={stats.budgetUsed} max={100} color={budgetColor} />
