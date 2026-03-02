@@ -38,7 +38,7 @@ import { AppService } from "./app.service";
       type: "postgres",
       url: process.env["DATABASE_URL"],
       entities,
-      synchronize: false,
+      synchronize: process.env["TYPEORM_SYNC"] === "true",
       logging: process.env["NODE_ENV"] === "development",
     }),
 
