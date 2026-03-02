@@ -74,6 +74,7 @@ import { UserRolesGuard, PermissionsGuard } from "./user-roles.guard";
     PermissionsGuard,
   ],
   exports: [
+    UsersModule,
     AuthService,
     TokensService,
     TotpService,
