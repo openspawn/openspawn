@@ -1,0 +1,16 @@
+{
+  "name": "@openspawn/test-utils",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5",
+    "@testing-library/react": ">=14",
+    "@testing-library/jest-dom": ">=6",
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vitest": ">=1"
+  }
+}

@@ -1,0 +1,68 @@
+import { vi } from "vitest";
+
+/**
+ * Browser API mocks for test environments.
+ * Call this in your test setup file or import it as a side-effect.
+ */
+export function setupBrowserMocks() {
+  // Mock IntersectionObserver
+  global.IntersectionObserver = class IntersectionObserver {
+    readonly root = null;
+    readonly rootMargin = "0px";
+    readonly thresholds = [0];
+    observe() {
+      /* noop */
+    }
+    unobserve() {
+      /* noop */
+    }
+    disconnect() {
+      /* noop */
+    }
+    takeRecords() {
+      return [];
+    }
+  } as unknown as typeof IntersectionObserver;
+
+  // Mock ResizeObserver
+  global.ResizeObserver = class ResizeObserver {
+    observe() {
+      /* noop */
+    }
+    unobserve() {
+      /* noop */
+    }
+    disconnect() {
+      /* noop */
+    }
+  };
+
+  // Mock localStorage
+  const localStorageMock = {
+    getItem: vi.fn(() => null),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+    length: 0,
+    key: vi.fn(() => null),
+  };
+  Object.defineProperty(window, "localStorage", { value: localStorageMock });
+
+  // Mock matchMedia
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(prefers-color-scheme: dark)",
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
+// Auto-run when imported as side-effect
+setupBrowserMocks();
