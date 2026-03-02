@@ -1,6 +1,6 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider, SidePanelProvider } from "../contexts";
+import { SidePanelProvider } from "@openspawn/dashboard-data";
 import { router } from "../routes";
 
 declare const __COMMIT_SHA__: string;
@@ -26,13 +26,11 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <SidePanelProvider>
-          <RouterProvider router={router} />
-        </SidePanelProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <SidePanelProvider>
+        <RouterProvider router={router} />
+      </SidePanelProvider>
+    </QueryClientProvider>
   );
 }
 
