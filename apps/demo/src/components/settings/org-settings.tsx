@@ -3,7 +3,7 @@ import { Building2, Users, Save, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { useAuth } from "../../contexts";
+import { useAuth } from "../../contexts/auth-context";
 
 interface OrgMember {
   id: string;

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { User, Shield, Key, Building2, Palette, Webhook, WebhookIcon, Github } from "lucide-react";
+import { User, Key, Building2, Palette, Webhook, WebhookIcon, Github } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { PageHeader } from "../components/ui/page-header";
 import { ProfileSettings } from "../components/settings/profile-settings";
-import { SecuritySettings } from "../components/settings/security-settings";
 import { ApiKeySettings } from "../components/settings/api-key-settings";
 import { OrgSettings } from "../components/settings/org-settings";
 import { AppearanceSettings } from "../components/settings/appearance-settings";
@@ -22,7 +21,7 @@ export function SettingsPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-8 lg:w-[1120px] scrollbar-hide">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-7 lg:w-[980px] scrollbar-hide">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile</span>
@@ -30,10 +29,6 @@ export function SettingsPage() {
           <TabsTrigger value="appearance" className="flex items-center gap-2">
             <Palette className="h-4 w-4" />
             <span className="hidden sm:inline">Appearance</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
           </TabsTrigger>
           <TabsTrigger value="api-keys" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
@@ -63,10 +58,6 @@ export function SettingsPage() {
 
         <TabsContent value="appearance">
           <AppearanceSettings />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <SecuritySettings />
         </TabsContent>
 
         <TabsContent value="api-keys">
