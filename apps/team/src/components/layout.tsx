@@ -13,11 +13,9 @@ import {
   MessageSquare,
   Layers,
   ClipboardList,
-  LogOut,
   PanelLeft,
 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { useAuth } from "../contexts";
 import type { ReactNode } from "react";
 
 const BRAND_NAME = "OpenSpawn";
@@ -68,7 +66,6 @@ function useSidebarCollapsed() {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
-  const { user, logout } = useAuth();
   const { collapsed, toggle: toggleCollapse } = useSidebarCollapsed();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -139,15 +136,6 @@ export function Layout({ children }: LayoutProps) {
             <PanelLeft className="h-4 w-4" />
             {!collapsed && <span>Collapse</span>}
           </button>
-          {user && (
-            <button
-              onClick={() => logout()}
-              className="flex items-center gap-2 w-full rounded-lg px-3 py-2 text-xs text-white/40 hover:text-white/60 hover:bg-white/5 transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              {!collapsed && <span>Sign out</span>}
-            </button>
-          )}
         </div>
       </aside>
 

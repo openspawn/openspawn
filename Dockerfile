@@ -1,7 +1,7 @@
-# ── BikiniBottom Live Demo ────────────────────────────────────────────────────
-# Lean build: dashboard static files + sandbox server only
+# ── OpenSpawn Platform ────────────────────────────────────────────────────────
+# Builds: demo dashboard, team dashboard, website, sandbox server
 
-# Stage 1: Build dashboard
+# Stage 1: Build all apps
 FROM node:24-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -21,6 +21,7 @@ ARG VITE_DASHBOARD_THEME=bikinibottom
 ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
 RUN pnpm nx run dashboard:build --configuration=production
+RUN pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
 
 # Stage 2: Minimal runtime
@@ -39,11 +40,13 @@ COPY tools/sandbox/src/ ./src/
 COPY tools/sandbox/ORG.md ./
 COPY tools/sandbox/org/ ./org/
 
-# Copy built dashboard and website
+# Copy built apps
 COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
+COPY --from=build /app/dist/apps/team ./team-dist
 COPY --from=build /app/dist/apps/website ./website-dist
 
 ENV WEBSITE_DIR=/app/website-dist
+ENV TEAM_DIR=/app/team-dist
 ENV NODE_ENV=production
 ENV SANDBOX_PORT=3333
 ENV SERVE_DASHBOARD=1
