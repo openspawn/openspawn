@@ -1,0 +1,12 @@
+export { DashboardPage } from "./dashboard";
+export { AgentsPage } from "./agents";
+export { TasksPage } from "./tasks";
+export { EventsPage } from "./events";
+export { MessagesPage } from "./messages";
+export { SettingsPage } from "./settings";
+export { CreditsPage } from "./credits";
+export { KanbanPage } from "./kanban";
+export { TaskBoardPage } from "./task-board";
+export { NetworkPage } from "./network";
+export { LoginPage } from "./login";
+export { AuthCallbackPage } from "./auth-callback";
