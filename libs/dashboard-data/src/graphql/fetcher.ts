@@ -32,19 +32,18 @@ export function setSandboxFetcher(fn: FetcherFn) { _sandboxFetcher = fn; }
 // Use the same host as the dashboard, but port 3000 for the API
 // This allows LAN access without hardcoding IPs
 function getApiUrl(): string {
-  // Always derive from current location in browser for LAN compatibility
-  // This ensures accessing from 192.168.x.x uses that IP, not localhost
+  // Explicit API URL takes priority (production deployments)
+  if (_env.VITE_API_URL) {
+    console.log("[GraphQL] Using VITE_API_URL:", _env.VITE_API_URL);
+    return _env.VITE_API_URL;
+  }
+
+  // Auto-detect from current location for LAN/dev compatibility
   if (typeof window !== "undefined" && window.location?.hostname) {
     const { protocol, hostname } = window.location;
     const url = `${protocol}//${hostname}:3000/api/v1/graphql`;
     console.log("[GraphQL] Auto-detected API URL:", url);
     return url;
-  }
-
-  // Fallback for SSR or non-browser environments
-  if (_env.VITE_API_URL) {
-    console.log("[GraphQL] Using VITE_API_URL:", _env.VITE_API_URL);
-    return _env.VITE_API_URL;
   }
 
   return "http://localhost:3000/api/v1/graphql";
