@@ -44,6 +44,9 @@
       "@openspawn/design-tokens/*": [
         "libs/design-tokens/src/*"
       ],
+      "@openspawn/dashboard-data": [
+        "libs/dashboard-data/src/index.ts"
+      ],
       "@openspawn/dashboard-ui": [
         "libs/dashboard-ui/src/index.ts"
       ]
