@@ -7,10 +7,9 @@ import {
 } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { Layout } from "./components";
-import { ProtectedRoute } from "./components/protected-route";
 import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";
+import { TasksPage, AgentsPage, CreditsPage, EventsPage, SettingsPage, MessagesPage } from "./pages";
 import { KanbanPage } from "./pages/kanban";
 import { TaskBoardPage } from "./pages/task-board";
 import { RouterPage } from "./pages/router";
@@ -19,13 +18,7 @@ import { NetworkPage } from "./pages/network";
 import { IntroPage } from "./pages/intro";
 import { MobileStatusPage } from "./pages/mobile-status";
 import { LiveViewPage } from "./pages/live-view";
-import { isSandboxMode } from "./graphql/fetcher";
 import { isBBTheme } from "./lib/dashboard-theme";
-import type { ReactNode } from "react";
-
-// Check for demo/sandbox mode via URL param or env
-const urlParams = new URLSearchParams(window.location.search);
-const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
 
 const reduceMotion =
   typeof window !== "undefined" &&
@@ -43,20 +36,11 @@ const transition = reduceMotion
   ? { duration: 0 }
   : { duration: 0.25, ease: [0, 0, 0.2, 1] as [number, number, number, number] };
 
-// In demo/sandbox mode, skip auth protection
-function MaybeProtectedRoute({ children }: { children: ReactNode }) {
-  if (isDemoMode || isSandboxMode) {
-    return <>{children}</>;
-  }
-  return <ProtectedRoute>{children}</ProtectedRoute>;
-}
-
 // Layout wrapper with page transitions
 function LayoutWithTransitions() {
   const location = useLocation();
   return (
-    <MaybeProtectedRoute>
-      <Layout>
+    <Layout>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -71,7 +55,6 @@ function LayoutWithTransitions() {
           </motion.div>
         </AnimatePresence>
       </Layout>
-    </MaybeProtectedRoute>
   );
 }
 
@@ -185,19 +168,6 @@ const statusRoute = createRoute({
   component: MobileStatusPage,
 });
 
-// Auth routes — only in non-sandbox mode
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-  component: LoginPage,
-});
-
-const authCallbackRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/auth/callback",
-  component: AuthCallbackPage,
-});
-
 // Build route tree
 const layoutChildren = [
   indexRoute,
@@ -217,7 +187,6 @@ const layoutChildren = [
 const rootChildren = [
   ...(isBBTheme ? [introRoute, liveRoute] : []),
   layoutRoute.addChildren(layoutChildren),
-  ...(!isDemoMode && !isSandboxMode ? [loginRoute, authCallbackRoute] : []),
 ];
 
 const routeTree = rootRoute.addChildren(rootChildren);

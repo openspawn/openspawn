@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { useAuth } from "../../contexts";
+import { useAuth } from "../../contexts/auth-context";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 

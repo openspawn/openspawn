@@ -49,7 +49,7 @@ import {
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useDemo } from "../demo";
 import { DemoControls } from "../demo/DemoControls";
-import { useAuth } from "../contexts";
+import { useAuth } from "../contexts/auth-context";
 import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";

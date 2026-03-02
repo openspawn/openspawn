@@ -23,7 +23,8 @@ console.log(
 );
 import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
 // Tour components moved inside RouterProvider (routes.tsx) — they need router context
-import { AuthProvider, SidePanelProvider } from "../contexts";
+import { AuthProvider } from "../contexts/auth-context";
+import { SidePanelProvider } from "../contexts";
 import { router } from "../routes";
 import type { ReactNode } from "react";
 
