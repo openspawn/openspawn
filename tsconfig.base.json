@@ -49,6 +49,9 @@
       ],
       "@openspawn/dashboard-ui": [
         "libs/dashboard-ui/src/index.ts"
+      ],
+      "@openspawn/test-utils": [
+        "libs/test-utils/src/index.ts"
       ]
     }
   },
