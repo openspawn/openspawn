@@ -1,7 +1,7 @@
 # Development overrides - use with: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 services:
   # Only start postgres and litellm for local development
-  # API, MCP, and dashboard run on host via pnpm nx serve
+  # API, MCP, and demo run on host via pnpm nx serve
 
   api:
     profiles: ["full"]
@@ -9,7 +9,7 @@ services:
   mcp:
     profiles: ["full"]
 
-  dashboard:
+  demo:
     profiles: ["full"]
 
   langfuse:

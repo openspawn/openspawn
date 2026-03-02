@@ -1,0 +1,97 @@
+import { RouterProvider } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NotificationProvider } from "../components";
+import { ThemeProvider } from "../components/theme-provider";
+import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
+import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
+import { isSandboxMode } from "../graphql/fetcher";
+import { CommandPalette } from "../components/command-palette";
+import { OfflineIndicator } from "../components/offline-indicator";
+
+import { isBBTheme } from "../lib/dashboard-theme";
+
+declare const __COMMIT_SHA__: string;
+declare const __BUILD_TIME__: string;
+
+// Log build info to console
+const brand = isBBTheme ? '🌊 BikiniBottom' : '⚡ OpenSpawn';
+console.log(
+  `%c${brand} %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
+  'color: #06b6d4; font-weight: bold; font-size: 14px',
+  'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
+  'color: #64748b'
+);
+import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
+// Tour components moved inside RouterProvider (routes.tsx) — they need router context
+import { AuthProvider, SidePanelProvider } from "../contexts";
+import { router } from "../routes";
+import type { ReactNode } from "react";
+
+// Check for demo/sandbox mode via URL param or env
+const urlParams = new URLSearchParams(window.location.search);
+const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
+const scenarioParam = urlParams.get('scenario') || 'acmetech';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: (isDemoMode || isSandboxMode) ? 1000 * 5 : 1000 * 60,
+      gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      // No global refetchInterval — SSE tick_complete events drive invalidation
+      // (see useSandboxTickInvalidation in layout.tsx)
+    },
+  },
+});
+
+// Wrapper that conditionally applies DemoProvider
+function DemoWrapper({ children }: { children: ReactNode }) {
+  if (!isDemoMode) {
+    return <>{children}</>;
+  }
+  
+  return (
+    <DemoProvider scenario={scenarioParam} autoPlay={false} initialSpeed={1}>
+      {children}
+      <DemoWelcome />
+      <DemoControls />
+    </DemoProvider>
+  );
+}
+
+function KeyboardShortcutsWrapper({ children }: { children: ReactNode }) {
+  const { helpOpen, setHelpOpen } = useKeyboardShortcuts();
+  return (
+    <>
+      {children}
+      <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+    </>
+  );
+}
+
+export function App() {
+  return (
+    <ThemeProvider defaultTheme="deep-ocean">
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <NotificationProvider>
+            <OnboardingProvider>
+            <SidePanelProvider>
+            <DemoWrapper>
+              <OfflineIndicator />
+              <WelcomeScreen />
+              <FeatureTour />
+              <CompletionCelebration />
+              <RouterProvider router={router} />
+            </DemoWrapper>
+            </SidePanelProvider>
+            </OnboardingProvider>
+          </NotificationProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

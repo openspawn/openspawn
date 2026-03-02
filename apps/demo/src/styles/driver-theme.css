@@ -1,0 +1,51 @@
+/* driver.js ocean theme overrides */
+.driver-popover {
+  background: rgb(15, 23, 42) !important; /* navy-900 */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgb(203, 213, 225) !important; /* slate-300 */
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.driver-popover .driver-popover-title {
+  color: rgb(241, 245, 249) !important; /* slate-100 */
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+
+.driver-popover .driver-popover-description {
+  color: rgb(148, 163, 184) !important; /* slate-400 */
+}
+
+.driver-popover .driver-popover-progress-text {
+  color: rgb(100, 116, 139) !important; /* slate-500 */
+}
+
+.driver-popover button.driver-popover-next-btn {
+  background: rgb(34, 211, 238) !important; /* cyan-400 */
+  color: rgb(2, 6, 23) !important; /* navy-950 */
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+.driver-popover button.driver-popover-prev-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgb(203, 213, 225) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  text-shadow: none !important;
+}
+
+.driver-popover button.driver-popover-close-btn {
+  color: rgb(100, 116, 139) !important; /* slate-500 */
+}
+
+.driver-popover .driver-popover-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.driver-overlay {
+  background: rgba(2, 6, 23, 0.75) !important; /* navy-950 overlay */
+}
