@@ -1,0 +1,997 @@
+/**
+ * BikiniBottom Design Tokens
+ * CSS Custom Properties — --bb-* prefix
+ *
+ * IMPORTANT: These are intentionally different from OpenSpawn's --os-* tokens.
+ * If it looks like OpenSpawn, it failed as a white-label demo.
+ *
+ * OpenSpawn uses: near-black #020817 + cyan #22d3ee
+ * BikiniBottom uses: ocean blue #062A45 + sandy yellow #F4C542
+ *
+ * Usage: import this file into the BikiniBottom dashboard's styles.css
+ * (replace or layer on top of the existing OpenSpawn variables)
+ */
+
+/* ============================================================
+   BIKINI BOTTOM GLOBAL TOKENS
+   ============================================================ */
+
+:root {
+  /* ── Color: Sandy (Primary Brand) ──────────────────────────
+   * SpongeBob's sandy/pineapple yellow — the primary brand color.
+   * This REPLACES cyan as the primary action color.
+   */
+  --bb-sandy-50:        #FFFBEB;
+  --bb-sandy-100:       #FEF3C7;
+  --bb-sandy-200:       #FDE68A;
+  --bb-sandy-300:       #FCD34D;
+  --bb-sandy-400:       #F4C542;   /* ← PRIMARY brand color */
+  --bb-sandy-500:       #EAB308;
+  --bb-sandy-600:       #D4952A;
+  --bb-sandy-700:       #B45309;
+  --bb-sandy-800:       #92400E;
+  --bb-sandy-900:       #78350F;
+
+  /* ── Color: Ocean Blue (Background) ────────────────────────
+   * The underwater world — rich ocean blue replacing pitch-black.
+   * Lighter and warmer than OpenSpawn's #020817.
+   */
+  --bb-ocean-abyss:     #030E1A;   /* deepest background (OLED mode) */
+  --bb-ocean-900:       #062A45;   /* primary background — the ocean floor */
+  --bb-ocean-800:       #0B3D60;   /* card backgrounds */
+  --bb-ocean-700:       #0B5E8A;   /* surface elements */
+  --bb-ocean-600:       #1A7DB5;   /* interactive surfaces */
+  --bb-ocean-500:       #2E97D1;   /* borders, dividers */
+  --bb-ocean-400:       #4AAED9;   /* secondary text, muted */
+  --bb-ocean-300:       #7EC8E8;   /* placeholder text */
+  --bb-ocean-200:       #B8E4F7;   /* primary text on dark bg */
+  --bb-ocean-100:       #D6F0FA;   /* near-white text */
+  --bb-ocean-50:        #E8F8FF;   /* bubble white (near pure white) */
+
+  /* ── Color: Coral (Alerts, Accents) ────────────────────────
+   * Coral reef pinks — for errors, urgency, highlights.
+   */
+  --bb-coral-900:       #7F1D1D;
+  --bb-coral-700:       #B91C1C;
+  --bb-coral-500:       #FF4757;   /* hot coral — error / critical */
+  --bb-coral-400:       #FF6B6B;   /* coral — warning accent */
+  --bb-coral-300:       #FF8E8E;
+  --bb-coral-200:       #FFB3B3;   /* soft coral — subtle */
+  --bb-coral-100:       #FFD9D9;
+
+  /* ── Color: Kelp Green (Success, Active) ───────────────────
+   * Healthy kelp — for success states and active agents.
+   */
+  --bb-kelp-900:        #064E3B;
+  --bb-kelp-700:        #065F46;
+  --bb-kelp-600:        #1A8A4A;
+  --bb-kelp-500:        #2ECC71;   /* kelp green — success */
+  --bb-kelp-400:        #4AE88A;   /* bright kelp — glowing active */
+  --bb-kelp-300:        #6EF2A4;
+  --bb-kelp-200:        #A7F3C8;
+  --bb-kelp-100:        #D1FAE5;
+
+  /* ── Color: Character Accents ───────────────────────────────
+   * Specific character brand colors for cards and identity.
+   */
+  --bb-krabby-red:      #C0392B;   /* Mr. Krabs */
+  --bb-pineapple:       #FFD43B;   /* SpongeBob's house */
+  --bb-squid-purple:    #9B59B6;   /* Squidward / Squilliam */
+  --bb-sandy-teal:      #16A085;   /* Sandy Cheeks */
+  --bb-pearl-pink:      #FF85C2;   /* Pearl Krabs */
+  --bb-plankton-green:  #1E8449;   /* Plankton */
+  --bb-patrick-salmon:  #F1948A;   /* Patrick Star */
+  --bb-dutchman-mist:   #76D7C4;   /* Flying Dutchman */
+
+  /* ── Semantic Color Assignments ─────────────────────────────
+   * These map design tokens to UI roles.
+   * Override the --background, --primary etc. for shadcn compat.
+   */
+
+  /* Override OpenSpawn/shadcn variables with BB values */
+  --background:         210 90% 8%;   /* --bb-ocean-900 equivalent */
+  --foreground:         197 62% 93%;  /* --bb-ocean-200 equivalent */
+  --card:               210 85% 12%;  /* --bb-ocean-800 equivalent */
+  --card-foreground:    197 62% 93%;
+  --popover:            210 85% 14%;
+  --popover-foreground: 197 62% 93%;
+  --primary:            44 89% 61%;   /* --bb-sandy-400 — YELLOW primary */
+  --primary-foreground: 210 90% 8%;   /* dark text on yellow */
+  --secondary:          199 65% 28%;  /* --bb-ocean-700 */
+  --secondary-foreground: 197 62% 93%;
+  --muted:              210 75% 18%;
+  --muted-foreground:   199 55% 55%;  /* --bb-ocean-400 */
+  --accent:             149 62% 49%;  /* --bb-kelp-500 */
+  --accent-foreground:  210 90% 8%;
+  --destructive:        355 100% 65%; /* --bb-coral-500 */
+  --destructive-foreground: 0 0% 98%;
+  --success:            150 70% 49%;  /* --bb-kelp-500 */
+  --success-foreground: 150 70% 10%;
+  --warning:            44 89% 61%;   /* --bb-sandy-400 */
+  --warning-foreground: 44 20% 10%;
+  --border:             199 60% 28%;  /* --bb-ocean-500 ish */
+  --input:              199 60% 28%;
+  --ring:               44 89% 61%;   /* sandy yellow ring focus */
+  --radius:             0.75rem;      /* slightly more rounded than OpenSpawn */
+
+  /* ── Typography ─────────────────────────────────────────────
+   * Playful, warm fonts. See bikinibottom-redesign.md for rationale.
+   */
+  --bb-font-display:    'Baloo 2', 'Fredoka One', cursive;
+  --bb-font-body:       'Nunito', 'DM Sans', system-ui, sans-serif;
+  --bb-font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Type Scale ──────────────────────────────────────────── */
+  --bb-text-hero:       clamp(3rem, 8vw, 6rem);
+  --bb-text-title:      clamp(1.75rem, 4vw, 3rem);
+  --bb-text-heading:    1.25rem;
+  --bb-text-body:       1rem;
+  --bb-text-small:      0.875rem;
+  --bb-text-tiny:       0.75rem;
+
+  /* Font weights */
+  --bb-weight-display:  800;         /* hero text, agent names */
+  --bb-weight-heading:  700;
+  --bb-weight-body:     500;         /* Nunito reads better at 500 */
+  --bb-weight-label:    600;
+
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --bb-space-xs:        0.25rem;
+  --bb-space-sm:        0.5rem;
+  --bb-space-md:        1rem;
+  --bb-space-lg:        1.5rem;
+  --bb-space-xl:        2rem;
+  --bb-space-2xl:       3rem;
+  --bb-space-3xl:       4rem;
+  --bb-space-hero:      clamp(3rem, 8vh, 6rem);  /* hero vertical padding */
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --bb-radius-sm:       0.375rem;
+  --bb-radius-md:       0.75rem;    /* more rounded than OpenSpawn's 0.5rem */
+  --bb-radius-lg:       1rem;
+  --bb-radius-xl:       1.5rem;
+  --bb-radius-card:     1.25rem;    /* character cards */
+  --bb-radius-pill:     9999px;     /* status badges */
+  --bb-radius-bubble:   50%;        /* avatar circles */
+
+  /* ── Elevation / Shadow ──────────────────────────────────── */
+  --bb-shadow-sm:       0 2px 8px rgba(6, 42, 69, 0.4);
+  --bb-shadow-md:       0 4px 16px rgba(6, 42, 69, 0.5), 0 0 0 1px rgba(74, 174, 217, 0.1);
+  --bb-shadow-lg:       0 8px 32px rgba(6, 42, 69, 0.6), 0 0 0 1px rgba(74, 174, 217, 0.15);
+  --bb-shadow-card:     0 4px 20px rgba(6, 42, 69, 0.5), 0 1px 4px rgba(244, 197, 66, 0.1);
+
+  /* Glow effects for active states */
+  --bb-glow-sandy:      0 0 16px rgba(244, 197, 66, 0.5), 0 0 32px rgba(244, 197, 66, 0.25);
+  --bb-glow-kelp:       0 0 16px rgba(74, 232, 138, 0.5), 0 0 32px rgba(74, 232, 138, 0.25);
+  --bb-glow-coral:      0 0 16px rgba(255, 71, 87, 0.5), 0 0 32px rgba(255, 71, 87, 0.25);
+  --bb-glow-ocean:      0 0 16px rgba(74, 174, 217, 0.4), 0 0 32px rgba(74, 174, 217, 0.2);
+
+  /* ── Gradients ───────────────────────────────────────────── */
+  --bb-gradient-hero:
+    radial-gradient(ellipse at 20% 80%, rgba(11, 94, 138, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(26, 125, 181, 0.4) 0%, transparent 50%),
+    linear-gradient(180deg, #062A45 0%, #030E1A 100%);
+
+  --bb-gradient-card:
+    linear-gradient(135deg, rgba(26, 125, 181, 0.15) 0%, rgba(11, 61, 96, 0.4) 100%);
+
+  --bb-gradient-sandy:
+    linear-gradient(135deg, #F4C542 0%, #EAB308 100%);
+
+  --bb-gradient-kelp:
+    linear-gradient(135deg, #4AE88A 0%, #2ECC71 100%);
+
+  --bb-gradient-coral:
+    linear-gradient(135deg, #FF8E8E 0%, #FF4757 100%);
+
+  /* ── Animation Timing ────────────────────────────────────── */
+  --bb-duration-fast:   150ms;
+  --bb-duration-base:   250ms;
+  --bb-duration-slow:   500ms;
+  --bb-duration-bob:    2s;
+  --bb-duration-bubble: 12s;
+  --bb-duration-kelp:   4s;
+  --bb-duration-swim:   30s;
+
+  --bb-ease-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);  /* bouncy hover */
+  --bb-ease-wave:       cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --bb-ease-float:      ease-in-out;
+
+  /* ── Z-Index Scale ───────────────────────────────────────── */
+  --bb-z-ocean:         0;      /* underwater background */
+  --bb-z-kelp:          10;     /* kelp silhouettes */
+  --bb-z-bubbles:       20;     /* floating bubbles */
+  --bb-z-content:       30;     /* main content */
+  --bb-z-feed:          40;     /* live feed sidebar */
+  --bb-z-overlay:       50;     /* panels, side panels */
+  --bb-z-modal:         60;     /* modals */
+  --bb-z-toast:         70;     /* toast notifications */
+  --bb-z-top:           80;     /* act banners, critical overlays */
+}
+
+/* ============================================================
+   BASE STYLES
+   Apply BikiniBottom's font stack globally
+   ============================================================ */
+
+.bb-theme,
+.bb-theme * {
+  font-family: var(--bb-font-body);
+}
+
+.bb-theme h1,
+.bb-theme h2,
+.bb-theme h3,
+.bb-theme .bb-display {
+  font-family: var(--bb-font-display);
+  font-weight: var(--bb-weight-display);
+}
+
+.bb-theme code,
+.bb-theme pre,
+.bb-theme .bb-mono {
+  font-family: var(--bb-font-mono);
+}
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   Consolidated: use CSS custom properties for variation.
+   --bb-bob-y: bob distance (default -4px)
+   --bb-sway-angle: kelp sway amplitude (default 3deg)
+   --bb-sway-scale: kelp sway scaleY delta (default 0.01)
+   --bb-ring-color: pulse ring color (default sandy)
+   --bb-caustic-rotate: caustic rotation (default 2deg)
+   --bb-caustic-drift: caustic translateX (default 0px)
+   --bb-enter-y: enter translateY distance (default 12px)
+   --bb-enter-blur: enter blur (default 0px)
+   --bb-enter-skew: enter skewY (default 0deg)
+   --bb-flash-color: feed flash rgb (default coral)
+   ============================================================ */
+
+@keyframes bb-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(var(--bb-bob-y, -4px)); }
+}
+
+@keyframes bb-bubble-float {
+  0% {
+    transform: translateY(0) translateX(var(--bb-drift-x1, 0px)) scale(1);
+    opacity: 0;
+  }
+  5% { opacity: 0.5; }
+  50% {
+    transform: translateY(-50vh) translateX(var(--bb-drift-x2, 8px)) scale(0.9);
+    opacity: 0.4;
+  }
+  95% { opacity: 0.2; }
+  100% {
+    transform: translateY(-100vh) translateX(var(--bb-drift-x3, -4px)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes bb-kelp-sway {
+  0%, 100% {
+    transform: skewX(0deg) scaleY(1);
+    transform-origin: bottom center;
+  }
+  25% {
+    transform: skewX(var(--bb-sway-angle, 3deg)) scaleY(calc(1 + var(--bb-sway-scale, 0.01)));
+    transform-origin: bottom center;
+  }
+  75% {
+    transform: skewX(calc(-1 * var(--bb-sway-angle, 3deg))) scaleY(calc(1 - var(--bb-sway-scale, 0.01)));
+    transform-origin: bottom center;
+  }
+}
+
+@keyframes bb-swim {
+  0%   { transform: translateX(110vw); }
+  100% { transform: translateX(-20vw); }
+}
+
+@keyframes bb-caustic {
+  0%, 100% {
+    opacity: var(--bb-caustic-min, 0.04);
+    transform: scale(1) rotate(0deg) translateX(0px);
+  }
+  33% {
+    opacity: var(--bb-caustic-max, 0.07);
+    transform: scale(1.1) rotate(var(--bb-caustic-rotate, 2deg)) translateX(var(--bb-caustic-drift, 0px));
+  }
+  66% {
+    opacity: calc((var(--bb-caustic-min, 0.04) + var(--bb-caustic-max, 0.07)) / 2);
+    transform: scale(0.95) rotate(calc(-0.5 * var(--bb-caustic-rotate, 2deg))) translateX(calc(-0.5 * var(--bb-caustic-drift, 0px)));
+  }
+}
+
+@keyframes bb-pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0px var(--bb-ring-color, rgba(244, 197, 66, 0.4)); }
+  50%       { box-shadow: 0 0 0 8px transparent; }
+}
+
+@keyframes bb-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes bb-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--bb-enter-y, 12px)) skewY(var(--bb-enter-skew, 0deg));
+    filter: blur(var(--bb-enter-blur, 0px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes bb-enter-scale {
+  from {
+    opacity: 0;
+    transform: scale(var(--bb-enter-from-scale, 0.92));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bb-cta-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(244, 197, 66, 0.5),
+      0 0 40px rgba(244, 197, 66, 0.25),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 32px rgba(244, 197, 66, 0.7),
+      0 0 64px rgba(244, 197, 66, 0.35),
+      0 0 90px rgba(244, 197, 66, 0.15),
+      0 4px 20px rgba(6, 42, 69, 0.4);
+  }
+}
+
+@keyframes bb-act-enter {
+  0% {
+    opacity: 0;
+    transform: scale(1.04) translateY(-6px);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.99) translateY(1px);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes bb-feed-flash {
+  0%   { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.35); }
+  60%  { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.20); }
+  100% { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.12); }
+}
+
+@keyframes bb-stat-tick {
+  0%   { color: #fff; text-shadow: 0 0 16px rgba(244, 197, 66, 0.9); }
+  40%  { color: #F4C542; text-shadow: 0 0 8px rgba(244, 197, 66, 0.5); }
+  100% { color: #F4C542; text-shadow: none; }
+}
+
+@keyframes bb-swim-bob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25%       { transform: translateY(-5px) rotate(-1deg); }
+  75%       { transform: translateY(3px) rotate(1deg); }
+}
+
+/* ============================================================
+   ANIMATION UTILITIES
+   ============================================================ */
+
+.bb-bob         { animation: bb-bob var(--bb-duration-bob) var(--bb-ease-float) infinite; will-change: transform; }
+.bb-bob-fast    { --bb-bob-y: -3px; animation: bb-bob 1s var(--bb-ease-float) infinite; will-change: transform; }
+.bb-sway        { animation: bb-kelp-sway var(--bb-duration-kelp) var(--bb-ease-float) infinite; will-change: transform; }
+
+/* Status-based animation helpers */
+[data-status="working"]     { --bb-bob-y: -3px; animation: bb-bob 1s ease-in-out infinite; }
+[data-status="overwhelmed"] { --bb-bob-y: -2px; animation: bb-bob 0.6s ease-in-out infinite; }
+[data-status="idle"]        { animation: bb-bob 2.5s ease-in-out infinite; }
+[data-status="busy"]        { --bb-bob-y: -3px; animation: bb-bob 1.2s ease-in-out infinite; }
+
+/* ============================================================
+   COMPONENT TOKENS: CHARACTER CARDS
+   ============================================================ */
+
+.bb-character-card {
+  --bb-card-bg:         rgba(11, 61, 96, 0.6);
+  --bb-card-border:     rgba(74, 174, 217, 0.2);
+  --bb-card-hover-bg:   rgba(26, 125, 181, 0.2);
+  --bb-card-hover-border: rgba(244, 197, 66, 0.4);
+
+  background: var(--bb-card-bg);
+  border: 1px solid var(--bb-card-border);
+  border-radius: var(--bb-radius-card);
+  box-shadow: var(--bb-shadow-card);
+  transition:
+    border-color var(--bb-duration-base) ease,
+    box-shadow var(--bb-duration-base) ease,
+    transform var(--bb-duration-base) var(--bb-ease-bounce);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.bb-character-card:hover {
+  border-color: var(--bb-card-hover-border);
+  box-shadow: var(--bb-shadow-card), var(--bb-glow-sandy);
+  transform: translateY(-3px) scale(1.01);
+}
+
+/* Per-character accent overrides */
+.bb-card-krabs       { --bb-card-hover-border: rgba(192, 57, 43, 0.6); }
+.bb-card-spongebob   { --bb-card-hover-border: rgba(255, 212, 59, 0.7); }
+.bb-card-squidward   { --bb-card-hover-border: rgba(155, 89, 182, 0.5); }
+.bb-card-squilliam   { --bb-card-hover-border: rgba(99, 102, 241, 0.6); }
+.bb-card-sandy       { --bb-card-hover-border: rgba(22, 160, 133, 0.6); }
+.bb-card-karen       { --bb-card-hover-border: rgba(74, 174, 217, 0.7); }
+.bb-card-plankton    { --bb-card-hover-border: rgba(30, 132, 73, 0.6); }
+.bb-card-patrick     { --bb-card-hover-border: rgba(241, 148, 138, 0.6); }
+
+/* ============================================================
+   COMPONENT TOKENS: STATUS BADGES
+   ============================================================ */
+
+.bb-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--bb-radius-pill);
+  font-family: var(--bb-font-body);
+  font-size: var(--bb-text-tiny);
+  font-weight: var(--bb-weight-label);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.bb-status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bb-status-idle {
+  background: rgba(74, 174, 217, 0.1);
+  color: var(--bb-ocean-400);
+  border: 1px solid rgba(74, 174, 217, 0.2);
+}
+.bb-status-idle::before {
+  background: var(--bb-ocean-400);
+}
+
+.bb-status-working {
+  background: rgba(244, 197, 66, 0.15);
+  color: var(--bb-sandy-400);
+  border: 1px solid rgba(244, 197, 66, 0.3);
+  --bb-ring-color: rgba(244, 197, 66, 0.4);
+  animation: bb-pulse-ring 2s ease-in-out infinite;
+}
+.bb-status-working::before {
+  background: var(--bb-sandy-400);
+  --bb-bob-y: -3px;
+  animation: bb-bob 0.8s ease-in-out infinite;
+}
+
+.bb-status-busy {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--bb-coral-400);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
+}
+.bb-status-busy::before {
+  background: var(--bb-coral-400);
+}
+
+.bb-status-overwhelmed {
+  background: rgba(255, 71, 87, 0.2);
+  color: var(--bb-coral-500);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1s ease-in-out infinite;
+}
+.bb-status-overwhelmed::before {
+  background: var(--bb-coral-500);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 0.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   COMPONENT TOKENS: BUTTONS
+   ============================================================ */
+
+/* Primary CTA — Sandy Yellow (NOT cyan like OpenSpawn) */
+.bb-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--bb-gradient-sandy);
+  color: var(--bb-ocean-900);
+  font-family: var(--bb-font-display);
+  font-size: 1.125rem;
+  font-weight: var(--bb-weight-display);
+  border-radius: var(--bb-radius-lg);
+  border: none;
+  cursor: pointer;
+  transition:
+    transform var(--bb-duration-fast) var(--bb-ease-bounce),
+    box-shadow var(--bb-duration-base) ease;
+  box-shadow: var(--bb-glow-sandy);
+}
+
+.bb-btn-primary:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--bb-glow-sandy), 0 8px 24px rgba(244, 197, 66, 0.3);
+}
+
+.bb-btn-primary:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Secondary — Ghost ocean */
+.bb-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: rgba(74, 174, 217, 0.1);
+  color: var(--bb-ocean-200);
+  font-family: var(--bb-font-body);
+  font-size: 1rem;
+  font-weight: var(--bb-weight-heading);
+  border-radius: var(--bb-radius-lg);
+  border: 1px solid rgba(74, 174, 217, 0.3);
+  cursor: pointer;
+  transition:
+    background var(--bb-duration-base) ease,
+    border-color var(--bb-duration-base) ease,
+    transform var(--bb-duration-fast) var(--bb-ease-bounce);
+  backdrop-filter: blur(8px);
+}
+
+.bb-btn-secondary:hover {
+  background: rgba(74, 174, 217, 0.2);
+  border-color: rgba(74, 174, 217, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   COMPONENT TOKENS: LAYOUT
+   ============================================================ */
+
+.bb-page {
+  min-height: 100vh;
+  background: var(--bb-gradient-hero);
+  font-family: var(--bb-font-body);
+  color: var(--bb-ocean-200);
+  overflow-x: hidden;
+}
+
+.bb-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bb-space-hero) var(--bb-space-xl);
+  text-align: center;
+  overflow: hidden;
+}
+
+.bb-hero-title {
+  font-family: var(--bb-font-display);
+  font-size: var(--bb-text-hero);
+  font-weight: var(--bb-weight-display);
+  color: var(--bb-sandy-400);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 60px rgba(244, 197, 66, 0.3);
+  margin: 0;
+}
+
+.bb-hero-subtitle {
+  font-family: var(--bb-font-body);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: var(--bb-weight-body);
+  color: var(--bb-ocean-300);
+  max-width: 600px;
+  margin: var(--bb-space-lg) auto;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   BUBBLE FIELD UTILITY CLASSES
+   ============================================================ */
+
+.bb-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(184, 228, 247, 0.6),
+    rgba(74, 174, 217, 0.15)
+  );
+  border: 1px solid rgba(184, 228, 247, 0.3);
+  pointer-events: none;
+  animation: bb-bubble-float var(--bb-duration-bubble) var(--bb-ease-float) infinite;
+}
+
+/* ============================================================
+   ORG CHART OVERRIDES
+   Restyle ReactFlow nodes to match BikiniBottom theme
+   ============================================================ */
+
+/* Background color for the org chart area */
+.bb-org-chart .react-flow__background {
+  background: var(--bb-ocean-900);
+}
+
+.bb-org-chart .react-flow__background pattern circle {
+  fill: rgba(74, 174, 217, 0.08);
+}
+
+/* Edge style override */
+.bb-org-chart .react-flow__edge-path {
+  stroke: rgba(74, 174, 217, 0.2);
+  stroke-width: 1.5;
+}
+
+/* Node container ring colors by status */
+.bb-agent-ring[data-status="working"] {
+  border-color: var(--bb-sandy-400);
+  box-shadow: var(--bb-glow-sandy);
+  --bb-ring-color: rgba(244, 197, 66, 0.4);
+  animation: bb-pulse-ring 2s ease-in-out infinite;
+}
+
+.bb-agent-ring[data-status="busy"] {
+  border-color: var(--bb-coral-400);
+  box-shadow: var(--bb-glow-coral);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
+}
+
+.bb-agent-ring[data-status="overwhelmed"] {
+  border-color: var(--bb-coral-500);
+  box-shadow: var(--bb-glow-coral);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 0.8s ease-in-out infinite;
+}
+
+.bb-agent-ring[data-status="idle"] {
+  border-color: rgba(74, 174, 217, 0.3);
+  box-shadow: none;
+}
+
+/* Node inner background */
+.bb-agent-inner {
+  background: radial-gradient(
+    circle at center,
+    var(--bb-ocean-800),
+    var(--bb-ocean-900)
+  );
+}
+
+/* ============================================================
+   LIVE FEED OVERRIDES
+   ============================================================ */
+
+.bb-feed {
+  background: rgba(6, 42, 69, 0.8);
+  border-left: 1px solid rgba(74, 174, 217, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.bb-feed-message {
+  padding: var(--bb-space-sm) var(--bb-space-md);
+  border-bottom: 1px solid rgba(74, 174, 217, 0.08);
+  font-family: var(--bb-font-body);
+  font-size: var(--bb-text-small);
+  color: var(--bb-ocean-300);
+  transition: background var(--bb-duration-fast) ease;
+}
+
+.bb-feed-message:hover {
+  background: rgba(74, 174, 217, 0.05);
+}
+
+.bb-feed-message[data-type="escalation"] {
+  border-left: 3px solid var(--bb-coral-500);
+  padding-left: calc(var(--bb-space-md) - 3px);
+  color: var(--bb-coral-300);
+}
+
+.bb-feed-message[data-type="completion"] {
+  border-left: 3px solid var(--bb-kelp-500);
+  padding-left: calc(var(--bb-space-md) - 3px);
+  color: var(--bb-kelp-300);
+}
+
+/* ============================================================
+   STATS BAR OVERRIDES
+   ============================================================ */
+
+.bb-stats-bar {
+  background: rgba(6, 42, 69, 0.9);
+  border-top: 1px solid rgba(74, 174, 217, 0.2);
+  backdrop-filter: blur(12px);
+  padding: var(--bb-space-md) var(--bb-space-lg);
+}
+
+.bb-stat-value {
+  font-family: var(--bb-font-display);
+  font-weight: var(--bb-weight-display);
+  color: var(--bb-sandy-400);
+  font-size: 1.5rem;
+}
+
+.bb-stat-label {
+  font-family: var(--bb-font-body);
+  font-size: var(--bb-text-tiny);
+  font-weight: var(--bb-weight-label);
+  color: var(--bb-ocean-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bb-stat-crisis .bb-stat-value {
+  color: var(--bb-coral-400);
+  --bb-ring-color: rgba(255, 71, 87, 0.4);
+  animation: bb-pulse-ring 1.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   SCROLLBAR STYLING — Bubbly
+   ============================================================ */
+
+.bb-theme ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.bb-theme ::-webkit-scrollbar-track {
+  background: rgba(6, 42, 69, 0.5);
+}
+
+.bb-theme ::-webkit-scrollbar-thumb {
+  background: rgba(74, 174, 217, 0.3);
+  border-radius: var(--bb-radius-pill);
+}
+
+.bb-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 174, 217, 0.5);
+}
+
+/* ============================================================
+   PROGRESS BAR — Krabby Patty Progress
+   ============================================================ */
+
+.bb-progress-track {
+  height: 8px;
+  background: rgba(74, 174, 217, 0.1);
+  border-radius: var(--bb-radius-pill);
+  overflow: hidden;
+}
+
+.bb-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bb-sandy-400) 0%, var(--bb-kelp-400) 100%);
+  border-radius: var(--bb-radius-pill);
+  box-shadow: 0 0 12px rgba(244, 197, 66, 0.4);
+  transition: width 500ms ease-out;
+}
+
+/* ============================================================
+   LIGHT CAUSTICS BACKGROUND EFFECT
+   (hero section only — too distracting in dashboard)
+   ============================================================ */
+
+.bb-caustics::before,
+.bb-caustics::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 40%;
+  animation: bb-caustic 12s ease-in-out infinite;
+}
+
+.bb-caustics::before {
+  background: radial-gradient(ellipse 80% 60% at 30% 40%, rgba(74, 174, 217, 0.08) 0%, transparent 70%);
+  animation-delay: 0s;
+}
+
+.bb-caustics::after {
+  background: radial-gradient(ellipse 70% 50% at 70% 60%, rgba(46, 204, 113, 0.05) 0%, transparent 70%);
+  animation-delay: -6s;
+}
+
+/* ============================================================
+   POLISH PASS — Utility classes for consolidated keyframes
+   Caustic/kelp/bubble variations use CSS custom properties
+   on the consolidated keyframes above.
+   ============================================================ */
+
+/* ── Utility Classes ─────────────────────────────────────────── */
+
+/* CTA button — irresistible glow pulse */
+.bb-cta-pulse {
+  animation: bb-cta-glow 2.5s ease-in-out infinite;
+}
+
+.bb-cta-pulse:hover {
+  animation-play-state: paused;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    0 0 40px rgba(244, 197, 66, 0.8),
+    0 0 80px rgba(244, 197, 66, 0.4),
+    0 8px 32px rgba(6, 42, 69, 0.5) !important;
+}
+
+/* Scroll-reveal — applied via JS IntersectionObserver */
+.bb-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bb-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bb-reveal-delay-1 { transition-delay: 0.1s; }
+.bb-reveal-delay-2 { transition-delay: 0.2s; }
+.bb-reveal-delay-3 { transition-delay: 0.3s; }
+.bb-reveal-delay-4 { transition-delay: 0.4s; }
+.bb-reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Hero title words — stagger reveal */
+.bb-hero-word {
+  display: inline-block;
+  opacity: 0;
+  --bb-enter-y: 0.5em;
+  --bb-enter-skew: 2deg;
+  --bb-enter-blur: 4px;
+  animation: bb-enter-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-hero-word:nth-child(1) { animation-delay: 0.2s; }
+.bb-hero-word:nth-child(2) { animation-delay: 0.45s; }
+.bb-hero-word:nth-child(3) { animation-delay: 0.65s; }
+.bb-hero-word:nth-child(4) { animation-delay: 0.82s; }
+.bb-hero-word:nth-child(5) { animation-delay: 0.95s; }
+
+/* Hero subtitle and CTA fade-up */
+.bb-fade-up-1 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.0s ease forwards; }
+.bb-fade-up-2 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.3s ease forwards; }
+.bb-fade-up-3 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.5s ease forwards; }
+.bb-fade-up-4 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.7s ease forwards; }
+
+/* Act banner enter */
+.bb-act-enter {
+  animation: bb-act-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bb-act-title {
+  --bb-enter-from-scale: 1.2;
+  animation: bb-enter-scale 0.45s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Feed entry animations */
+.bb-feed-entry {
+  --bb-enter-y: 8px;
+  animation: bb-enter-up 0.22s ease forwards;
+}
+
+.bb-feed-entry-escalation {
+  --bb-flash-r: 255; --bb-flash-g: 71; --bb-flash-b: 87;
+  animation: bb-feed-flash 0.6s ease forwards;
+  border-left: 4px solid #FF4757;
+}
+
+.bb-feed-entry-completion {
+  --bb-flash-r: 74; --bb-flash-g: 232; --bb-flash-b: 138;
+  animation: bb-feed-flash 0.5s ease forwards;
+  border-left: 4px solid #4AE88A;
+}
+
+/* Stat value flash when it changes */
+.bb-stat-changed {
+  animation: bb-stat-tick 0.5s ease forwards;
+}
+
+/* Stamp for completion screen */
+.bb-stamp {
+  --bb-enter-from-scale: 1.4;
+  animation: bb-enter-scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Pill shimmer */
+.bb-pill-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 174, 217, 0.1) 0%,
+    rgba(74, 174, 217, 0.25) 40%,
+    rgba(74, 174, 217, 0.1) 80%
+  );
+  background-size: 200% auto;
+  animation: bb-shimmer 3s linear infinite;
+}
+
+/* ── prefers-reduced-motion — respect user preferences ──────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all ambient animations */
+  .bb-bob,
+  .bb-bob-fast,
+  .bb-sway,
+  .bb-cta-pulse,
+  .bb-hero-word,
+  .bb-fade-up-1,
+  .bb-fade-up-2,
+  .bb-fade-up-3,
+  .bb-fade-up-4,
+  .bb-reveal,
+  .bb-pill-shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  /* Disable bubble float */
+  .bb-bubble,
+  [style*="bb-bubble-float"] {
+    animation: none !important;
+    opacity: 0.3;
+  }
+
+  /* Disable kelp sway */
+  [style*="bb-kelp-sway"] {
+    animation: none !important;
+  }
+
+  /* Disable character swim */
+  [style*="bb-swim"] {
+    animation: none !important;
+    display: none;
+  }
+
+  /* Keep status badges readable but static */
+  .bb-status-working,
+  .bb-status-busy,
+  .bb-status-overwhelmed {
+    animation: none !important;
+  }
+
+  /* Keep transitions minimal */
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
