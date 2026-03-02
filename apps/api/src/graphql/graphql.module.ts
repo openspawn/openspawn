@@ -40,6 +40,15 @@ import {
       playground: process.env["NODE_ENV"] !== "production",
       introspection: process.env["NODE_ENV"] !== "production",
       context: ({ req }: { req: unknown }) => ({ req }),
+      formatError: (error) => {
+        if (process.env["NODE_ENV"] === "production") {
+          const code = error.extensions?.code ?? "INTERNAL_SERVER_ERROR";
+          if (code === "INTERNAL_SERVER_ERROR") {
+            return { message: "Internal server error", extensions: { code } };
+          }
+        }
+        return error;
+      },
     }),
     AgentsModule,
     TasksModule,
