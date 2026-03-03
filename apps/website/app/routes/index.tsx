@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { GitBranch, FlaskConical, LifeBuoy, Workflow } from "lucide-react";
 import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
@@ -137,6 +138,42 @@ const industryScenarios = [
   },
 ];
 
+// ─── Use Cases ────────────────────────────────────────────────────────────────
+const useCases = [
+  {
+    icon: GitBranch,
+    title: "Software Development Team",
+    description:
+      "AI agents as your dev team: designer, engineer, QA, and docs writer collaborate in parallel on feature branches. Each agent has a defined role scoped to their specialty, with a clear escalation path to the tech lead when blockers arise. Ship faster without merge conflicts between humans and agents.",
+    agentCount: "4 agents",
+    color: "cyan" as const,
+  },
+  {
+    icon: FlaskConical,
+    title: "Research Organization",
+    description:
+      "Coordinate research agents across data collection, analysis, and report generation — all within per-agent budget controls. Analyst agents synthesize findings, scout agents surface new sources, and an archivist maintains institutional memory across every project. Reproducible research at machine speed.",
+    agentCount: "6 agents",
+    color: "violet" as const,
+  },
+  {
+    icon: LifeBuoy,
+    title: "Customer Support",
+    description:
+      "Route tickets through triage, specialist, and escalation agents with automatic SLA tracking. Triage agents classify and prioritize inbound requests, specialists resolve within defined scopes, and escalation agents loop in humans only when needed. Mean resolution time drops from hours to minutes.",
+    agentCount: "4 agents",
+    color: "amber" as const,
+  },
+  {
+    icon: Workflow,
+    title: "Content Pipeline",
+    description:
+      "Writer, editor, and publisher agents collaborate with approval workflows and configurable quality gates. Content moves through a structured pipeline — drafted, reviewed, revised, and published — with a full audit trail at every step. Scale your content output without scaling your headcount.",
+    agentCount: "3 agents",
+    color: "emerald" as const,
+  },
+];
+
 // ─── Early adopters ───────────────────────────────────────────────────────────
 const earlyAdopters = [
   { name: "OpenClaw", emoji: "🦞" },
@@ -237,13 +274,13 @@ function useScrollReveal() {
 }
 
 // ─── Industry scenario color map ──────────────────────────────────────────────
-const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string }> = {
-  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400" },
-  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400" },
-  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400" },
-  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400" },
-  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400" },
-  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400" },
+const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string; iconContainer: string }> = {
+  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400",    iconContainer: "bg-cyan-500/10 border border-cyan-500/20"    },
+  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400",    iconContainer: "bg-rose-500/10 border border-rose-500/20"    },
+  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400",  iconContainer: "bg-violet-500/10 border border-violet-500/20"  },
+  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400", iconContainer: "bg-emerald-500/10 border border-emerald-500/20" },
+  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400",   iconContainer: "bg-amber-500/10 border border-amber-500/20"   },
+  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400",   iconContainer: "bg-white/5 border border-white/10"             },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -1023,6 +1060,70 @@ export function LandingPage() {
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
             >
               Full framework comparison →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          USE CASES — Real-world agent team patterns
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <section aria-labelledby="use-cases" className="section-py-lg">
+        <div className="mx-auto max-w-5xl">
+          <div className="reveal text-center mb-10">
+            <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
+              Use Cases
+            </span>
+            <h2 id="use-cases" className="text-3xl font-bold text-slate-100 md:text-4xl">
+              Your org, your domain.{" "}
+              <span className="gradient-text">Any team. Any scale.</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-slate-400">
+              OpenSpawn orgs map directly to real teams. Spin up agent organizations for any
+              workflow in minutes — persistent, coordinated, and cost-aware from day one.
+            </p>
+          </div>
+
+          <div className="reveal-stagger grid gap-5 sm:grid-cols-2">
+            {useCases.map((uc) => {
+              const c = scenarioColorMap[uc.color];
+              const Icon = uc.icon;
+              return (
+                <div
+                  key={uc.title}
+                  className={`reveal group rounded-xl border ${c.border} ${c.bg} p-6 transition-all duration-200 hover:scale-[1.02]`}
+                >
+                  {/* Card header: icon + agent count badge */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${c.iconContainer}`}
+                    >
+                      <Icon className={`h-5 w-5 ${c.text}`} aria-hidden="true" />
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full border ${c.border} bg-black/20 px-2.5 py-1 text-xs font-semibold ${c.text}`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
+                      {uc.agentCount}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="mb-2 font-bold text-slate-100">{uc.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-slate-500 leading-relaxed">{uc.description}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="reveal mt-8 text-center">
+            <a
+              href="/templates"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20"
+            >
+              Browse all industry templates →
             </a>
           </div>
         </div>
