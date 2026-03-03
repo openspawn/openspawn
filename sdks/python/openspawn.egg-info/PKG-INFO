@@ -1,0 +1,217 @@
+Metadata-Version: 2.4
+Name: openspawn
+Version: 2026.3.3
+Summary: Python SDK for OpenSpawn — Coordination layer for AI agent organizations
+Author-email: OpenSpawn <hello@openspawn.ai>
+License: MIT
+Project-URL: Homepage, https://openspawn.ai
+Project-URL: Documentation, https://openspawn.ai/docs
+Project-URL: Repository, https://github.com/openspawn/openspawn
+Project-URL: Bug Tracker, https://github.com/openspawn/openspawn/issues
+Keywords: ai,agents,multi-agent,coordination,orchestration,mcp,a2a,openspawn,crewai,langchain,autogen
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: httpx>=0.24.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+
+# OpenSpawn Python SDK
+
+**Coordination layer for AI agent organizations.**
+
+Define roles, hierarchy, and policies in a single markdown file. OpenSpawn handles task routing, credit budgets, escalations, and gives you a real-time dashboard.
+
+This SDK lets you integrate OpenSpawn into Python-based agent frameworks like **CrewAI**, **LangGraph**, or **AutoGen**.
+
+## Installation
+
+```bash
+pip install openspawn
+```
+
+## Quick Start
+
+```python
+from openspawn import OpenSpawn, TaskPriority
+
+# Initialize client
+client = OpenSpawn(
+    api_url="https://api.openspawn.ai",  # or your self-hosted instance
+    api_key="your-api-key",
+    org_id="your-org-id"
+)
+
+# Create a task
+task = client.tasks.create(
+    title="Build new feature",
+    description="Implement user authentication",
+    priority=TaskPriority.HIGH,
+    assignee_agent_id="engineer-1"
+)
+
+# List tasks
+tasks = client.tasks.list(status="pending")
+for task in tasks:
+    print(f"{task.title} - {task.status}")
+
+# Update task status
+client.tasks.transition(task.id, status="in_progress")
+
+# List agents
+agents = client.agents.list()
+for agent in agents:
+    print(f"{agent.name} (L{agent.level} {agent.role})")
+
+# Send a message
+client.messages.send(
+    content="Feature deployed!",
+    channel_id="engineering"
+)
+
+# Check credit balance
+balance = client.credits.balance("engineer-1")
+print(f"Balance: {balance.balance} credits")
+```
+
+## Integration with CrewAI
+
+```python
+from crewai import Agent, Task, Crew
+from openspawn import OpenSpawn
+
+# Wrap CrewAI with OpenSpawn coordination
+client = OpenSpawn(org_id="my-crew")
+
+# Define agents
+engineer = Agent(
+    role="Senior Engineer",
+    goal="Build features",
+    backstory="10 years of Python experience"
+)
+
+# Create corresponding OpenSpawn agent
+client.agents.register(
+    name="engineer-1",
+    role="Senior Engineer",
+    level=6,  # L6 = Senior
+    domain="engineering"
+)
+
+# When you create a CrewAI task, mirror it in OpenSpawn
+crew_task = Task(description="Build auth", agent=engineer)
+openspawn_task = client.tasks.create(
+    title="Build auth",
+    assignee_agent_id="engineer-1",
+    priority="high"
+)
+
+# Run crew
+crew = Crew(agents=[engineer], tasks=[crew_task])
+result = crew.kickoff()
+
+# Mark complete in OpenSpawn
+client.tasks.transition(openspawn_task.id, status="done")
+```
+
+## Integration with LangGraph
+
+```python
+from langgraph.graph import StateGraph
+from openspawn import OpenSpawn
+
+client = OpenSpawn(org_id="my-langgraph-org")
+
+# Define your LangGraph workflow
+workflow = StateGraph(...)
+
+# Wrap nodes to report to OpenSpawn
+def engineering_node(state):
+    task = client.tasks.create(
+        title="Process engineering request",
+        assignee_agent_id="engineer-agent"
+    )
+    
+    # Do work
+    result = do_engineering_work(state)
+    
+    # Mark done
+    client.tasks.transition(task.id, status="done")
+    return result
+
+workflow.add_node("engineer", engineering_node)
+```
+
+## API Reference
+
+### `OpenSpawn(api_url, api_key, org_id, timeout=30)`
+
+Main client class.
+
+**Environment variables:**
+- `OPENSPAWN_API_KEY` — API key
+- `OPENSPAWN_ORG_ID` — Organization ID
+
+### `client.tasks`
+
+- `create(title, description, priority, assignee_agent_id)` → Task
+- `list(status=None, assignee_agent_id=None)` → list[Task]
+- `get(task_id)` → Task
+- `transition(task_id, status)` → Task
+- `assign(task_id, assignee_agent_id)` → Task
+
+### `client.agents`
+
+- `list()` → list[Agent]
+- `get(agent_id)` → Agent
+- `register(name, role, level)` → Agent
+
+### `client.messages`
+
+- `send(content, channel_id=None, recipient_agent_id=None)` → Message
+- `list(channel_id, limit=50)` → list[Message]
+
+### `client.credits`
+
+- `balance(agent_id)` → CreditBalance
+
+### `client.escalations`
+
+- `list_open()` → list[Escalation]
+- `resolve(escalation_id)` → Escalation
+
+## Models
+
+All API responses are returned as dataclass instances:
+
+- `Agent` — Agent metadata (id, name, role, level, domain, trust_score)
+- `Task` — Task data (id, title, status, priority, assignee)
+- `TaskStatus` — Enum: pending, claimed, in_progress, review, done, failed, cancelled
+- `TaskPriority` — Enum: critical, high, medium, low
+- `Channel` — Message channel
+- `Message` — Chat message
+- `CreditBalance` — Agent credit balance
+- `Escalation` — Task escalation
+
+## License
+
+MIT — see [LICENSE](https://github.com/openspawn/openspawn/blob/main/LICENSE)
+
+## Links
+
+- **Docs:** https://openspawn.ai/docs
+- **GitHub:** https://github.com/openspawn/openspawn
+- **Website:** https://openspawn.ai
+- **npm CLI:** `npx openspawn init my-org`

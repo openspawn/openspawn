@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+openspawn/__init__.py
+openspawn/client.py
+openspawn/models.py
+openspawn/py.typed
+openspawn.egg-info/PKG-INFO
+openspawn.egg-info/SOURCES.txt
+openspawn.egg-info/dependency_links.txt
+openspawn.egg-info/requires.txt
+openspawn.egg-info/top_level.txt
+tests/test_client.py
