@@ -403,9 +403,9 @@ A: Use the `contract-review` template. Clause Extractor → Risk Analyst → Sum
 ## Links
 
 - GitHub: https://github.com/openspawn/openspawn
-- Live Demo: https://openspawn.dev/app/
-- Docs: https://openspawn.dev/docs
-- ORG.md Spec: https://openspawn.dev/org-md
+- Live Demo: https://openspawn.ai/app/
+- Docs: https://openspawn.ai/docs
+- ORG.md Spec: https://openspawn.ai/org-md
 
 ---
 ## Source: agent-quickstart.md
@@ -779,7 +779,7 @@ See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md`
 - **Top FAQ:** [`docs/FAQ.md`](./FAQ.md) — common questions answered
 - **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md) — common issues and fixes
 - **Full reference:** [`docs/llms.txt`](./llms.txt)
-- **Live demo:** https://openspawn.dev/app/
+- **Live demo:** https://openspawn.ai/app/
 
 ---
 ## Source: getting-started.md
@@ -1167,8 +1167,8 @@ ORG.md is version-controlled, reviewable in pull requests, and readable by any h
 - **Top FAQ:** [`docs/FAQ.md`](./FAQ.md)
 - **Fix errors:** [`docs/troubleshooting.md`](./troubleshooting.md)
 - **Agent quickstart:** [`docs/agent-quickstart.md`](./agent-quickstart.md) — agent-first version of this guide
-- **Live demo:** https://openspawn.dev/app/
-- **ORG.md spec:** https://openspawn.dev/org-md
+- **Live demo:** https://openspawn.ai/app/
+- **ORG.md spec:** https://openspawn.ai/org-md
 
 ---
 ## Source: FAQ.md
@@ -1517,7 +1517,7 @@ The `clinical-trials` template is the most comprehensive example — it models 2
 - **Full setup walkthrough:** [`docs/getting-started.md`](./getting-started.md)
 - **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md)
 - **Fix a specific error:** [`docs/troubleshooting.md`](./troubleshooting.md)
-- **Live demo:** https://openspawn.dev/app/
+- **Live demo:** https://openspawn.ai/app/
 
 ---
 ## Source: comparison.md
@@ -1817,7 +1817,7 @@ For most production agent teams, the answer isn't either/or:
 - **MCP integration:** [`docs/mcp-reference.md`](./mcp-reference.md)
 - **ORG.md reference:** [`docs/org-md-reference.md`](./org-md-reference.md)
 - **Industry templates:** [`docs/templates-guide.md`](./templates-guide.md)
-- **Live demo:** https://openspawn.dev/app/
+- **Live demo:** https://openspawn.ai/app/
 
 *Last updated: March 2026. OpenSpawn is in rapid development — see the [GitHub repo](https://github.com/openspawn/openspawn) for the latest.*
 
@@ -4446,4 +4446,4 @@ Or override individual settings after the preset.
 - **MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — how agents interact with the org
 - **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — how agents talk to each other
 - **Troubleshooting:** [`docs/troubleshooting.md`](./troubleshooting.md) — fix common errors
-- **Live demo:** https://openspawn.dev/app/
+- **Live demo:** https://openspawn.ai/app/
