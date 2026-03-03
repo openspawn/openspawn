@@ -8,9 +8,11 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "esbuild apps/sandbox-cli/src/main.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/apps/sandbox-cli/openspawn.cjs --external:fsevents"
+        "command": "esbuild apps/sandbox-cli/src/main.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/apps/sandbox-cli/openspawn.cjs --external:fsevents --minify-whitespace --minify-syntax --tree-shaking=true"
       },
-      "outputs": ["{workspaceRoot}/dist/apps/sandbox-cli"]
+      "outputs": [
+        "{workspaceRoot}/dist/apps/sandbox-cli"
+      ]
     },
     "serve": {
       "executor": "nx:run-commands",
