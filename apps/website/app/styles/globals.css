@@ -732,3 +732,49 @@ body {
     animation: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTERACTIVE CLI DEMO — "See it in action" section
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── CSS typewriter animation for command lines ───────────────────────────── */
+/*  width animates from 0 → calc(--char-count * 1ch) using steps(N, end).    */
+/*  --char-count and animation-timing-function are set inline per element.    */
+@keyframes cliTyping {
+  from { width: 0; }
+  to   { width: calc(var(--char-count, 60) * 1ch); }
+}
+
+.cli-typing-cmd {
+  overflow: hidden;
+  white-space: nowrap;
+  /* Duration and timing-function (steps(N, end)) are set via inline style */
+  animation-name: cliTyping;
+  animation-fill-mode: forwards;
+  display: block;
+}
+
+/* ── Fade-in for output lines ─────────────────────────────────────────────── */
+@keyframes cliFadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cli-output-line {
+  animation: cliFadeIn 0.22s ease forwards;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cli-typing-cmd {
+    animation: none !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+
+  .cli-output-line {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
