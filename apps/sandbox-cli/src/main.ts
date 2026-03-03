@@ -8,6 +8,7 @@ import {
   createAuthCommand,
   createCreditsCommand,
   createInitCommand,
+  createPreviewCommand,
   createMessagesCommand,
   createTasksCommand,
 } from "./commands/index.js";
@@ -60,6 +61,7 @@ program.on("option:version", () => {
 
 // Register commands
 program.addCommand(createInitCommand());
+program.addCommand(createPreviewCommand());
 program.addCommand(createAuthCommand());
 program.addCommand(createAgentsCommand());
 program.addCommand(createTasksCommand());
