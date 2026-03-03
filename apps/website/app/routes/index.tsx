@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TerminalDemo } from "../components/terminal-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
@@ -91,28 +91,68 @@ const ecosystemItems = [
   { name: "Custom" },
 ];
 
-// ─── Industry scenarios ───────────────────────────────────────────────────────
+// ─── Industry scenarios — enhanced with mini-orgmd & agent metadata ───────────
 const industryScenarios = [
   {
     emoji: "🚀",
     title: "SaaS Onboarding",
-    pain: "Manual onboarding takes 2–3 days per customer across 4 teams",
+    pain: "2–3 days per customer across 4 teams",
     template: "saas-onboarding",
     color: "cyan",
+    agentCount: 4,
+    setupMin: 15,
+    miniOrgMd: [
+      "### Onboarding Lead (L7)",
+      "#### Data Migration Specialist (L5)",
+      "#### Integration Engineer (L5)",
+      "#### Success Agent (L4)",
+    ],
+    agentList: [
+      { name: "Onboarding Lead", level: "L7", model: "claude-sonnet" },
+      { name: "Data Migration Specialist", level: "L5", model: "claude-haiku" },
+      { name: "Integration Engineer", level: "L5", model: "claude-haiku" },
+      { name: "Success Agent", level: "L4", model: "qwen2.5" },
+    ],
   },
   {
     emoji: "🚨",
     title: "DevOps Incident Response",
-    pain: "3am pages, 45-min MTTR, context-switching between 6 tools",
+    pain: "3am pages, 45-min MTTR, 6 tools",
     template: "incident-response",
     color: "rose",
+    agentCount: 3,
+    setupMin: 10,
+    miniOrgMd: [
+      "### Incident Commander (L7)",
+      "#### Diagnostics Agent (L5)",
+      "#### Remediation Agent (L5)",
+    ],
+    agentList: [
+      { name: "Incident Commander", level: "L7", model: "claude-sonnet" },
+      { name: "Diagnostics Agent", level: "L5", model: "claude-haiku" },
+      { name: "Remediation Agent", level: "L5", model: "claude-haiku" },
+    ],
   },
   {
     emoji: "⚖️",
     title: "Legal Contract Review",
-    pain: "Junior associates spend 80+ hrs/week on manual contract review",
+    pain: "Junior associates spend 80+ hrs/week on manual review",
     template: "contract-review",
     color: "violet",
+    agentCount: 4,
+    setupMin: 20,
+    miniOrgMd: [
+      "### Senior Counsel Agent (L7)",
+      "#### Risk Analyzer (L5)",
+      "#### Clause Extractor (L5)",
+      "#### Summary Writer (L4)",
+    ],
+    agentList: [
+      { name: "Senior Counsel Agent", level: "L7", model: "claude-opus" },
+      { name: "Risk Analyzer", level: "L5", model: "claude-sonnet" },
+      { name: "Clause Extractor", level: "L5", model: "claude-haiku" },
+      { name: "Summary Writer", level: "L4", model: "claude-haiku" },
+    ],
   },
   {
     emoji: "🏦",
@@ -120,6 +160,18 @@ const industryScenarios = [
     pain: "Manual transaction monitoring misses 15% of anomalies",
     template: "compliance-monitoring",
     color: "emerald",
+    agentCount: 3,
+    setupMin: 12,
+    miniOrgMd: [
+      "### Compliance Officer (L7)",
+      "#### Transaction Monitor (L5)",
+      "#### Audit Reporter (L4)",
+    ],
+    agentList: [
+      { name: "Compliance Officer", level: "L7", model: "claude-sonnet" },
+      { name: "Transaction Monitor", level: "L5", model: "claude-haiku" },
+      { name: "Audit Reporter", level: "L4", model: "qwen2.5" },
+    ],
   },
   {
     emoji: "🎮",
@@ -127,13 +179,39 @@ const industryScenarios = [
     pain: "Player churn from stale content and unbalanced economy",
     template: "game-live-ops",
     color: "amber",
+    agentCount: 4,
+    setupMin: 18,
+    miniOrgMd: [
+      "### Live Ops Director (L7)",
+      "#### Economy Balancer (L5)",
+      "#### Content Curator (L5)",
+      "#### Churn Predictor (L4)",
+    ],
+    agentList: [
+      { name: "Live Ops Director", level: "L7", model: "claude-sonnet" },
+      { name: "Economy Balancer", level: "L5", model: "claude-haiku" },
+      { name: "Content Curator", level: "L5", model: "claude-haiku" },
+      { name: "Churn Predictor", level: "L4", model: "qwen2.5" },
+    ],
   },
   {
     emoji: "🛒",
     title: "E-commerce Catalog",
-    pain: "10,000 SKUs, competitors change prices daily, descriptions go stale",
+    pain: "10,000 SKUs, daily price changes, stale descriptions",
     template: "catalog-management",
     color: "slate",
+    agentCount: 3,
+    setupMin: 10,
+    miniOrgMd: [
+      "### Catalog Manager (L7)",
+      "#### Price Monitor (L5)",
+      "#### Content Agent (L5)",
+    ],
+    agentList: [
+      { name: "Catalog Manager", level: "L7", model: "claude-sonnet" },
+      { name: "Price Monitor", level: "L5", model: "claude-haiku" },
+      { name: "Content Agent", level: "L5", model: "claude-haiku" },
+    ],
   },
 ];
 
@@ -146,30 +224,34 @@ const earlyAdopters = [
 ];
 
 // ─── ORG.md snippets ──────────────────────────────────────────────────────────
-const orgMdSaasSnippet = `# customer-onboarding
-> Mission: Onboard new enterprise customers end-to-end
+const orgMdSaasLines = [
+  "# customer-onboarding",
+  "> Mission: Onboard new enterprise customers end-to-end",
+  "",
+  "## Culture",
+  "- Preset: professional",
+  "- Escalation: 30 min — customers can't wait",
+  "",
+  "## Structure",
+  "",
+  "### Onboarding Lead (level 7)",
+  "Owns the entire customer journey from contract to go-live.",
+  "- Model: claude-sonnet",
+  "",
+  "#### Data Migration Specialist (level 5)",
+  "Moves and validates customer data from legacy systems.",
+  "- Model: claude-haiku",
+  "",
+  "#### Integration Engineer (level 5)",
+  "Configures API connectors and runs integration tests.",
+  "- Model: claude-haiku",
+  "",
+  "#### Success Agent (level 4)",
+  "Schedules check-ins, collects feedback, flags churn risk.",
+  "- Model: ollama/qwen2.5",
+];
 
-## Culture
-- Preset: professional
-- Escalation: 30 min — customers can't wait
-
-## Structure
-
-### Onboarding Lead (level 7)
-Owns the entire customer journey from contract to go-live.
-- Model: claude-sonnet
-
-#### Data Migration Specialist (level 5)
-Moves and validates customer data from legacy systems.
-- Model: claude-haiku
-
-#### Integration Engineer (level 5)
-Configures API connectors and runs integration tests.
-- Model: claude-haiku
-
-#### Success Agent (level 4)
-Schedules check-ins, collects feedback, flags churn risk.
-- Model: ollama/qwen2.5`;
+const orgMdSaasSnippet = orgMdSaasLines.join("\n");
 
 const orgMdPivotSnippet = `# 🪸 MyOrg
 
@@ -197,6 +279,249 @@ const openclawJsonSnippet = `{
     "agentToAgent": { "enabled": true }
   }
 }`;
+
+// ─── Syntax coloring for ORG.md lines ────────────────────────────────────────
+function colorizeOrgMdLine(line: string) {
+  if (line === "") return <span>&nbsp;</span>;
+  if (line.startsWith("# ")) {
+    return <span className="text-cyan-300 font-bold">{line}</span>;
+  }
+  if (line.startsWith("> ")) {
+    return <span className="italic text-violet-300 opacity-90">{line}</span>;
+  }
+  if (line.startsWith("## ")) {
+    return <span className="text-violet-400 font-semibold">{line}</span>;
+  }
+  if (line.startsWith("### ")) {
+    return <span className="text-slate-100 font-semibold">{line}</span>;
+  }
+  if (line.startsWith("#### ")) {
+    return <span className="text-slate-300">{line}</span>;
+  }
+  if (line.includes("Model:") || line.includes("model:")) {
+    const key = line.includes("Model:") ? "Model:" : "model:";
+    const idx = line.indexOf(key);
+    return (
+      <span>
+        <span className="text-slate-500">{line.slice(0, idx)}</span>
+        <span className="text-amber-400">{key}</span>
+        <span className="text-emerald-400">{line.slice(idx + key.length)}</span>
+      </span>
+    );
+  }
+  if (line.startsWith("- ")) {
+    return <span className="text-slate-400">{line}</span>;
+  }
+  return <span className="text-slate-500">{line}</span>;
+}
+
+// ─── ORG.md Live Preview component ───────────────────────────────────────────
+function OrgMdLivePreview() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("orgmd-active");
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const agents = [
+    {
+      emoji: "🎯",
+      name: "Onboarding Lead",
+      level: "L7",
+      model: "claude-sonnet",
+      status: "active" as const,
+      task: "Reviewing customer requirements doc",
+    },
+    {
+      emoji: "📦",
+      name: "Data Migration",
+      level: "L5",
+      model: "claude-haiku",
+      status: "active" as const,
+      task: "Importing 3,847 records — 68% done",
+    },
+    {
+      emoji: "🔗",
+      name: "Integration Eng",
+      level: "L5",
+      model: "claude-haiku",
+      status: "working" as const,
+      task: "Configuring CRM webhook endpoints",
+    },
+    {
+      emoji: "✉️",
+      name: "Success Agent",
+      level: "L4",
+      model: "qwen2.5",
+      status: "queued" as const,
+      task: "Queued: schedule Day-7 check-in",
+    },
+  ];
+
+  // Lines appear at 0.05 + i * 0.09s each — last line ~2.2s
+  // Agents appear starting at 2.4s
+  const agentBaseDelay = 2.4;
+
+  return (
+    <div
+      ref={sectionRef}
+      className="orgmd-preview grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start"
+    >
+      {/* ── Left: ORG.md "being written" ──────────────────────────────────── */}
+      <div className="overflow-hidden rounded-xl border border-cyan-500/30 bg-navy-900/90 ring-1 ring-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.06)]">
+        {/* Window chrome */}
+        <div className="flex items-center gap-2 border-b border-white/[0.06] bg-cyan-500/[0.04] px-4 py-2.5">
+          <div className="flex gap-1.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+            <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+          </div>
+          <span className="ml-2 flex-1 font-mono text-xs font-semibold text-cyan-400">
+            ORG.md
+          </span>
+          <span className="orgmd-cursor font-mono text-sm text-cyan-400/80">█</span>
+          <span className="ml-2 text-xs text-slate-600">source of truth</span>
+        </div>
+
+        {/* Code with staggered line reveal */}
+        <pre className="overflow-x-auto p-4 font-mono text-[0.72rem] leading-relaxed text-slate-300">
+          {orgMdSaasLines.map((line, i) => (
+            <span
+              key={i}
+              className="code-line"
+              style={{ animationDelay: `${0.05 + i * 0.09}s` }}
+            >
+              {colorizeOrgMdLine(line)}
+            </span>
+          ))}
+        </pre>
+      </div>
+
+      {/* ── Right: Running org visualization ──────────────────────────────── */}
+      <div className="flex flex-col gap-3">
+        {/* Status header */}
+        <div className="agent-card-anim flex items-center gap-2" style={{ animationDelay: `${agentBaseDelay - 0.2}s` }}>
+          <span className="live-dot h-2 w-2 rounded-full bg-emerald-400 inline-block" />
+          <span className="text-xs font-semibold text-emerald-400">
+            Live Org — customer-onboarding
+          </span>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[0.65rem] text-slate-500">
+            openspawn start ✓
+          </span>
+        </div>
+
+        {/* Agent cards */}
+        {agents.map((agent, i) => (
+          <div
+            key={agent.name}
+            className={`agent-card-anim relative overflow-hidden rounded-xl border px-4 py-3 transition-all duration-200 ${
+              agent.status === "active"
+                ? "border-emerald-500/25 bg-emerald-500/[0.04] agent-pulse"
+                : agent.status === "working"
+                ? "border-cyan-500/20 bg-cyan-500/[0.03]"
+                : "border-white/[0.06] bg-white/[0.02]"
+            }`}
+            style={{ animationDelay: `${agentBaseDelay + i * 0.32}s` }}
+          >
+            {/* Active indicator bar */}
+            {(agent.status === "active" || agent.status === "working") && (
+              <div
+                className={`absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl ${
+                  agent.status === "active" ? "bg-emerald-400" : "bg-cyan-400"
+                }`}
+              />
+            )}
+
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 text-xl">{agent.emoji}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-200">
+                    {agent.name}
+                  </span>
+                  <span className="font-mono text-[0.65rem] text-slate-600">
+                    {agent.level}
+                  </span>
+                </div>
+                <p className="mt-0.5 truncate text-[0.72rem] text-slate-500">
+                  {agent.task}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span
+                  className={`text-[0.65rem] font-semibold ${
+                    agent.status === "active"
+                      ? "text-emerald-400"
+                      : agent.status === "working"
+                      ? "text-cyan-400"
+                      : "text-slate-600"
+                  }`}
+                >
+                  {agent.status === "active"
+                    ? "● active"
+                    : agent.status === "working"
+                    ? "◎ working"
+                    : "○ queued"}
+                </span>
+                <span className="font-mono text-[0.6rem] text-slate-700">
+                  {agent.model}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Live metrics */}
+        <div
+          className="agent-card-anim grid grid-cols-3 gap-3 rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3"
+          style={{ animationDelay: `${agentBaseDelay + 4 * 0.32}s` }}
+        >
+          <div className="text-center">
+            <div className="text-xl font-bold text-cyan-400">4</div>
+            <div className="mt-0.5 text-[0.65rem] text-slate-600">agents</div>
+          </div>
+          <div className="border-x border-white/[0.05] text-center">
+            <div className="text-xl font-bold text-emerald-400">3</div>
+            <div className="mt-0.5 text-[0.65rem] text-slate-600">tasks live</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-amber-400">$0.47</div>
+            <div className="mt-0.5 text-[0.65rem] text-slate-600">cost so far</div>
+          </div>
+        </div>
+
+        {/* Task flow indicator */}
+        <div
+          className="agent-card-anim flex items-center gap-2 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2"
+          style={{ animationDelay: `${agentBaseDelay + 5 * 0.32}s` }}
+        >
+          <span className="text-[0.65rem] text-slate-600">Task flow:</span>
+          <div className="flex items-center gap-1 font-mono text-[0.65rem]">
+            <span className="text-slate-400">Lead</span>
+            <span className="task-arrow text-cyan-500/60">→</span>
+            <span className="text-slate-400">Migration</span>
+            <span className="task-arrow text-cyan-500/60" style={{ animationDelay: "0.3s" }}>→</span>
+            <span className="text-slate-400">Eng</span>
+            <span className="task-arrow text-cyan-500/60" style={{ animationDelay: "0.6s" }}>→</span>
+            <span className="text-slate-400">Success</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Tagline word reveal helper ───────────────────────────────────────────────
 function TaglineWords({ text }: { text: string }) {
@@ -237,14 +562,98 @@ function useScrollReveal() {
 }
 
 // ─── Industry scenario color map ──────────────────────────────────────────────
-const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string }> = {
-  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400" },
-  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400" },
-  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400" },
-  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400" },
-  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400" },
-  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400" },
+const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string; tag: string }> = {
+  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400",    tag: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" },
+  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400",    tag: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
+  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400",  tag: "bg-violet-500/10 text-violet-400 border-violet-500/20" },
+  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400", tag: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400",   tag: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
+  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400",   tag: "bg-white/5 text-slate-400 border-white/10" },
 };
+
+// ─── How It Works visual panels ───────────────────────────────────────────────
+function HiwStepFile() {
+  return (
+    <div className="hiw-panel">
+      <div style={{ position: "relative" }}>
+        <div className="hiw-file">
+          <div className="hiw-file-line cyan" style={{ width: "85%" }} />
+          <div className="hiw-file-line violet" style={{ width: "65%" }} />
+          <div className="hiw-file-line dim" style={{ width: "55%" }} />
+          <div className="hiw-file-line cyan" style={{ width: "75%" }} />
+          <div className="hiw-file-line dim" style={{ width: "45%" }} />
+          <div className="hiw-file-line violet" style={{ width: "60%" }} />
+          <div className="hiw-file-line dim" style={{ width: "50%" }} />
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-0.5rem",
+            right: "-2.5rem",
+            fontFamily: "var(--os-font-mono)",
+            fontSize: "0.6rem",
+            color: "rgba(34,211,238,0.7)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          ORG.md ✓
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HiwStepTerminal() {
+  return (
+    <div className="hiw-panel">
+      <div className="hiw-terminal">
+        <div className="hiw-terminal-header">
+          <div className="hiw-terminal-dot" style={{ background: "#ef4444aa" }} />
+          <div className="hiw-terminal-dot" style={{ background: "#eab308aa" }} />
+          <div className="hiw-terminal-dot" style={{ background: "#22c55eaa" }} />
+        </div>
+        <div className="hiw-terminal-body">
+          <div style={{ color: "rgba(148,163,184,0.7)" }}>$ openspawn start</div>
+          <div style={{ color: "rgba(52,211,153,0.9)" }}>▶ Spawning agents...</div>
+          <div style={{ color: "rgba(34,211,238,0.9)" }}>✓ 4 agents ready</div>
+          <div style={{ color: "rgba(167,139,250,0.8)" }}>📊 Dashboard: :3333</div>
+          <div style={{ color: "rgba(148,163,184,0.5)" }}>
+            <span style={{ color: "rgba(34,211,238,0.7)" }}>▊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HiwStepAgents() {
+  return (
+    <div className="hiw-panel">
+      <div className="hiw-agents">
+        <div className="hiw-agent-row">
+          <div className="hiw-agent-dot" style={{ background: "#34d399" }} />
+          <span style={{ color: "rgba(203,213,225,0.9)" }}>🎯 Onboarding Lead</span>
+          <span style={{ marginLeft: "auto", color: "rgba(52,211,153,0.8)", fontSize: "0.55rem" }}>● active</span>
+        </div>
+        <div className="hiw-agent-row">
+          <div className="hiw-agent-dot" style={{ background: "#22d3ee" }} />
+          <span>📦 Data Migration</span>
+          <span style={{ marginLeft: "auto", color: "rgba(34,211,238,0.8)", fontSize: "0.55rem" }}>◎ working</span>
+        </div>
+        <div className="hiw-agent-row">
+          <div className="hiw-agent-dot" style={{ background: "#22d3ee" }} />
+          <span>🔗 Integration Eng</span>
+          <span style={{ marginLeft: "auto", color: "rgba(34,211,238,0.8)", fontSize: "0.55rem" }}>◎ working</span>
+        </div>
+        <div className="hiw-agent-row" style={{ opacity: 0.6 }}>
+          <div className="hiw-agent-dot" style={{ background: "#64748b" }} />
+          <span>✉️ Success Agent</span>
+          <span style={{ marginLeft: "auto", color: "rgba(100,116,139,0.8)", fontSize: "0.55rem" }}>○ queued</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function LandingPage() {
@@ -295,86 +704,62 @@ export function LandingPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          HERO — Atmospheric, unforgettable
+          HERO
           ═══════════════════════════════════════════════════════════════════════ */}
       <section className="grain-overlay relative overflow-hidden pb-24 pt-28 md:pt-36">
-        {/* Animated gradient orbs */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
             className="orb-drift absolute left-1/2 top-0 -translate-x-1/2 h-[700px] w-[900px]"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(6,182,212,0.07) 0%, transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(6,182,212,0.07) 0%, transparent 70%)" }}
           />
           <div
             className="orb-drift-alt absolute right-0 top-32 h-[500px] w-[500px]"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(139,92,246,0.06) 0%, transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(139,92,246,0.06) 0%, transparent 70%)" }}
           />
           <div
             className="orb-drift absolute -left-20 bottom-0 h-[400px] w-[400px]"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(245,158,11,0.04) 0%, transparent 70%)",
-            }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(245,158,11,0.04) 0%, transparent 70%)" }}
           />
         </div>
 
         <div className="relative mx-auto max-w-4xl text-center">
-          {/* Icon — floats gently */}
           <div className="animate-fade-in-up mb-6">
-            <span className="coral-float text-6xl md:text-8xl" role="img" aria-label="coral">
-              🪸
-            </span>
+            <span className="coral-float text-6xl md:text-8xl" role="img" aria-label="coral">🪸</span>
           </div>
 
-          {/* Category badge */}
           <div className="animate-fade-in-up animate-delay-100 mb-3 flex flex-wrap items-center justify-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400">
               <span className="live-dot h-1.5 w-1.5 rounded-full bg-cyan-400 inline-block" />
-              Multi-Agent Platform
+              Persistent Agent Organizations
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-300">
-              🎓 Graduate from sub-agents
+              🧩 Adds structure to any agent
             </span>
           </div>
 
-          {/* Headline */}
           <h1 className="animate-fade-in-up animate-delay-100 mb-5 text-5xl font-extrabold tracking-tight sm:text-6xl md:text-8xl">
             <span className="gradient-text-animated">OpenSpawn</span>
           </h1>
 
-          {/* THE tagline */}
           <p className="mb-3 text-2xl font-bold text-slate-100 md:text-3xl lg:text-4xl leading-tight tracking-tight">
-            <TaglineWords text="Your agents. Your org. Your rules." />
+            <TaglineWords text="Your agents remember. Your org endures." />
           </p>
 
-          {/* Sub-copy */}
           <p className="animate-fade-in-up animate-delay-300 mx-auto mb-10 max-w-xl text-base text-slate-400 md:text-lg leading-relaxed">
-            Sub-agents are great for simple tasks. But when you need a full team — with persistent
-            memory, coordination, and budget control — you need an org.{" "}
-            <span className="text-slate-300">OpenSpawn gives your agents structure.</span>
+            Your agents are powerful. OpenSpawn gives them structure — persistent memory,
+            hierarchy, budgets, and governance that compound across sessions.{" "}
+            <span className="text-slate-300">Add an org chart to any agent stack.</span>
           </p>
 
-          {/* CTAs */}
           <div className="animate-fade-in-up animate-delay-400 mb-10 flex flex-wrap items-center justify-center gap-4">
             <Button as="a" href="/docs/getting-started" variant="primary" size="lg" className="glow-cyan">
               Get Started →
             </Button>
-            <Button
-              as="a"
-              href="/templates"
-              variant="neutral"
-              size="lg"
-            >
+            <Button as="a" href="/templates" variant="neutral" size="lg">
               🏭 Browse Industry Templates →
             </Button>
           </div>
 
-          {/* Protocol badges */}
           <div className="animate-fade-in-up animate-delay-500 mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <ProtocolBadge label="A2A Protocol" />
             <ProtocolBadge label="MCP" />
@@ -386,7 +771,6 @@ export function LandingPage() {
             <ProtocolBadge label="Python" variant="core" />
           </div>
 
-          {/* Install command — pulse ring */}
           <div className="animate-fade-in-up animate-delay-600 mb-16">
             <div className="install-cmd group relative mx-auto inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-mono text-sm text-slate-300 hover:border-white/20 hover:bg-white/[0.08] transition-colors duration-200">
               <span className="text-cyan-500/60 select-none">$</span>
@@ -410,7 +794,6 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* Terminal demo */}
           <div className="animate-fade-in-up animate-delay-600">
             <TerminalDemo />
           </div>
@@ -418,11 +801,11 @@ export function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          ORG.MD HERO — "One file. Your entire agent organization."
+          ORG.MD LIVE PREVIEW — "One file. Your entire agent organization."
           ═══════════════════════════════════════════════════════════════════════ */}
       <section aria-labelledby="org-md-hero" className="section-py-lg">
         <div className="mx-auto max-w-5xl">
-          <div className="reveal text-center mb-12">
+          <div className="reveal text-center mb-10">
             <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
               ORG.md
             </span>
@@ -431,92 +814,35 @@ export function LandingPage() {
               <span className="gradient-text">Your entire agent organization.</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400 leading-relaxed">
-              Define your team in markdown. OpenSpawn reads it, spawns the agents, and keeps them
-              coordinated. The document <em>is</em> the configuration.
+              Write a markdown file. OpenSpawn reads it, spawns the agents, and keeps them
+              coordinated — live. Watch the file become a running org.
             </p>
           </div>
 
-          {/* Transformation: ORG.md → Agents → Results */}
-          <div className="reveal grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-start">
+          {/* Live preview — side by side */}
+          <div className="reveal">
+            <OrgMdLivePreview />
+          </div>
 
-            {/* Column 1: ORG.md file */}
-            <div className="overflow-hidden rounded-xl border border-cyan-500/30 bg-navy-900/80 ring-1 ring-cyan-500/10">
-              <div className="flex items-center gap-2 border-b border-white/5 bg-cyan-500/[0.04] px-4 py-3">
-                <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-                <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
-                <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
-                <span className="ml-2 text-xs text-cyan-400 font-mono font-semibold">ORG.md</span>
-                <span className="ml-auto text-xs text-slate-600">source of truth</span>
-              </div>
-              <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-slate-300 font-mono">
-                <code>{orgMdSaasSnippet}</code>
-              </pre>
+          {/* Bottom result strip */}
+          <div className="reveal mt-6 overflow-hidden rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04]">
+            <div className="flex items-center gap-3 border-b border-white/[0.05] px-5 py-2.5">
+              <span className="text-xs font-semibold text-emerald-400">✓ 24 hours later — Results</span>
+              <span className="ml-auto text-xs text-slate-600">customer-onboarding · run #1</span>
             </div>
-
-            {/* Arrow 1 */}
-            <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
-              <div className="org-transform-arrow text-2xl text-cyan-500/60">→</div>
-              <span className="text-xs text-slate-600 text-center">openspawn<br />start</span>
-            </div>
-            <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
-
-            {/* Column 2: Running agents */}
-            <div className="overflow-hidden rounded-xl border border-violet-500/20 bg-navy-900/80">
-              <div className="flex items-center gap-2 border-b border-white/5 bg-violet-500/[0.03] px-4 py-3">
-                <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block" />
-                <span className="ml-1 text-xs text-violet-300 font-semibold">Running Agents</span>
-              </div>
-              <div className="p-4 space-y-2">
-                {[
-                  { emoji: "🎯", name: "Onboarding Lead", level: "L7", model: "sonnet", status: "working" },
-                  { emoji: "🤖", name: "Data Migration Specialist", level: "L5", model: "haiku", status: "working" },
-                  { emoji: "🤖", name: "Integration Engineer", level: "L5", model: "haiku", status: "idle" },
-                  { emoji: "🤖", name: "Success Agent", level: "L4", model: "qwen2.5", status: "idle" },
-                ].map((agent) => (
-                  <div key={agent.name} className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
-                    <span className="text-sm">{agent.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-slate-200 truncate">{agent.name}</p>
-                      <p className="text-xs text-slate-600">{agent.level} · {agent.model}</p>
-                    </div>
-                    <span className={`shrink-0 text-xs font-medium ${agent.status === "working" ? "text-emerald-400" : "text-slate-600"}`}>
-                      {agent.status === "working" ? "● working" : "○ idle"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Arrow 2 */}
-            <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
-              <div className="org-transform-arrow text-2xl text-cyan-500/60" style={{ animationDelay: "0.3s" }}>→</div>
-              <span className="text-xs text-slate-600 text-center">24 hrs<br />later</span>
-            </div>
-            <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
-
-            {/* Column 3: Results */}
-            <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-navy-900/80">
-              <div className="flex items-center gap-2 border-b border-white/5 bg-emerald-500/[0.03] px-4 py-3">
-                <span className="text-xs text-emerald-400 font-semibold">✓ Results</span>
-              </div>
-              <div className="p-4 space-y-3">
-                {[
-                  { icon: "✅", text: "Customer data migrated (3,847 records)" },
-                  { icon: "✅", text: "CRM integration tested & configured" },
-                  { icon: "✅", text: "Slack workspace provisioned" },
-                  { icon: "✅", text: "Success check-in scheduled (Day 7)" },
-                  { icon: "📊", text: "Total cost: $1.24 · Time: 6h 12m" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-slate-400">
-                    <span className="mt-0.5 shrink-0">{item.icon}</span>
-                    <span>{item.text}</span>
-                  </div>
-                ))}
-                <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2">
-                  <p className="text-xs font-semibold text-emerald-400">Onboarding complete 🎉</p>
-                  <p className="text-xs text-slate-500 mt-0.5">2 days → 6 hours</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 px-5 py-3">
+              {[
+                { icon: "✅", text: "Customer data migrated (3,847 records)" },
+                { icon: "✅", text: "CRM integration tested & configured" },
+                { icon: "✅", text: "Slack workspace provisioned" },
+                { icon: "✅", text: "Day-7 success check-in scheduled" },
+                { icon: "📊", text: "Total cost: $1.24 · Time: 6h 12m · Saved: 41 hours" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs text-slate-400">
+                  <span>{item.icon}</span>
+                  <span>{item.text}</span>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -533,7 +859,7 @@ export function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          INDUSTRY SCENARIOS
+          INDUSTRY SCENARIOS — Enhanced with mini-ORG.md + hover expand
           ═══════════════════════════════════════════════════════════════════════ */}
       <section aria-labelledby="industry-scenarios" className="section-py-lg">
         <div className="mx-auto max-w-5xl">
@@ -557,11 +883,46 @@ export function LandingPage() {
               return (
                 <div
                   key={scenario.title}
-                  className={`reveal group rounded-xl border ${c.border} ${c.bg} p-5 transition-all duration-200 hover:scale-[1.02]`}
+                  className={`reveal scenario-card-wrap group rounded-xl border ${c.border} ${c.bg} p-5 cursor-default`}
                 >
-                  <div className="mb-3 text-3xl">{scenario.emoji}</div>
-                  <h3 className={`mb-1.5 font-bold ${c.text}`}>{scenario.title}</h3>
-                  <p className="mb-4 text-sm text-slate-500 leading-relaxed">{scenario.pain}</p>
+                  {/* Card header */}
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className="text-3xl">{scenario.emoji}</span>
+                    <span className={`rounded-full border px-2 py-0.5 text-[0.6rem] font-semibold ${c.tag}`}>
+                      {scenario.agentCount} agents · {scenario.setupMin} min setup
+                    </span>
+                  </div>
+
+                  {/* Title + pain */}
+                  <h3 className={`mb-1 font-bold ${c.text}`}>{scenario.title}</h3>
+                  <p className="mb-3 text-xs text-slate-500 leading-relaxed">{scenario.pain}</p>
+
+                  {/* Mini ORG.md preview — always visible */}
+                  <div className="mini-orgmd mb-3 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2">
+                    {scenario.miniOrgMd.map((line, i) => (
+                      <div key={i} className={`${
+                        line.startsWith("### ") ? `font-semibold ${c.text} opacity-90` :
+                        line.startsWith("#### ") ? "text-slate-400 pl-2" : "text-slate-500"
+                      }`}>
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hover-expand: full agent list */}
+                  <div className="scenario-expand">
+                    <div className="mb-3 space-y-1">
+                      {scenario.agentList.map((agent, i) => (
+                        <div key={i} className="flex items-center gap-2 text-[0.68rem] text-slate-500">
+                          <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${c.dot}`} />
+                          <span className="text-slate-400 font-medium">{agent.name}</span>
+                          <span className="ml-auto font-mono text-slate-600">{agent.level} · {agent.model}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA */}
                   <a
                     href={`/templates#${scenario.template}`}
                     className={`inline-flex items-center gap-1 text-xs font-semibold ${c.text} opacity-70 hover:opacity-100 transition-opacity`}
@@ -591,15 +952,12 @@ export function LandingPage() {
       <section className="section-py">
         <div className="mx-auto max-w-5xl">
           <div className="reveal rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.07] to-violet-500/[0.04] p-8 text-center md:p-14">
-            {/* Icon row */}
             <div className="mb-5 flex items-center justify-center gap-3 text-4xl">
               {["📱", "💻", "📷", "🌐"].map((icon, i) => (
                 <span
                   key={icon}
                   className="inline-block"
-                  style={{
-                    animation: `coralFloat ${4 + i * 0.5}s ease-in-out ${i * 0.4}s infinite`,
-                  }}
+                  style={{ animation: `coralFloat ${4 + i * 0.5}s ease-in-out ${i * 0.4}s infinite` }}
                 >
                   {icon}
                 </span>
@@ -648,7 +1006,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ── "Graduate from sub-agents" — Why not just use sub-agents? ───── */}
+      {/* ── "Graduate from sub-agents" ────────────────────────────────────── */}
       <section aria-labelledby="why-not-subagents" className="section-py-lg">
         <div className="mx-auto max-w-5xl">
           <div className="reveal text-center mb-10">
@@ -656,23 +1014,22 @@ export function LandingPage() {
               Why OpenSpawn
             </span>
             <h2 id="why-not-subagents" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              Why not just use <span className="gradient-text">sub-agents?</span>
+              What OpenSpawn <span className="gradient-text">adds</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400">
-              Sub-agents are ephemeral — they run once and disappear. OpenSpawn gives your agents
-              persistence, hierarchy, and governance. It's the difference between a freelancer and
-              a company.
+              Agent teams are going mainstream. OpenSpawn adds the organizational layer —
+              persistence, hierarchy, and governance — so your agents can grow from a sprint
+              into a company.
             </p>
           </div>
           <div className="reveal grid gap-4 sm:grid-cols-2">
-            {/* Sub-agent column */}
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-2xl">🤖</span>
-                <h3 className="font-semibold text-slate-300">Sub-agent (typical)</h3>
+                <h3 className="font-semibold text-slate-300">Without OpenSpawn</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-500">
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Spawned once, forgets everything after</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Session-scoped memory</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are equal</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps</li>
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go wrong</li>
@@ -680,7 +1037,6 @@ export function LandingPage() {
                 <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Org structure lives only in the prompt</li>
               </ul>
             </div>
-            {/* OpenSpawn column */}
             <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-6 ring-1 ring-cyan-500/10">
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-2xl">🪸</span>
@@ -697,10 +1053,7 @@ export function LandingPage() {
             </div>
           </div>
           <div className="reveal mt-6 text-center">
-            <a
-              href="/docs/comparison"
-              className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
+            <a href="/docs/comparison" className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
               Full framework comparison (vs CrewAI, LangGraph)
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -715,7 +1068,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <div className="reveal text-center mb-10">
             <h2 id="core-benefits" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              Three things sub-agents can't do
+              Three things ephemeral teams can't do
             </h2>
           </div>
           <div className="reveal grid gap-6 sm:grid-cols-3">
@@ -747,7 +1100,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* ── How it works — 3 steps ────────────────────────────────────────── */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          HOW IT WORKS — Visual 3-step flow
+          ═══════════════════════════════════════════════════════════════════════ */}
       <section aria-labelledby="how-it-works" className="section-py-lg">
         <div className="mx-auto max-w-4xl">
           <div className="reveal text-center mb-12">
@@ -758,61 +1113,95 @@ export function LandingPage() {
               From zero to running org in{" "}
               <span className="gradient-text">3 commands</span>
             </h2>
+            <p className="mt-4 mx-auto max-w-xl text-slate-400">
+              No YAML. No Python classes. Just markdown that becomes infrastructure.
+            </p>
           </div>
-          <ol className="reveal grid gap-6 sm:grid-cols-3" role="list">
-            {/* Step 1 */}
-            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">1</span>
-                <h3 className="font-bold text-slate-100">Init</h3>
+
+          <ol className="reveal-stagger grid gap-5 sm:grid-cols-3" role="list">
+            {/* ── Step 1: Write ORG.md ────────────────────────── */}
+            <li className="reveal relative rounded-xl border border-white/10 bg-navy-900/80 p-5 sm:step-connector">
+              {/* Visual illustration */}
+              <HiwStepFile />
+
+              {/* Step header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="hiw-step-num">1</div>
+                <div>
+                  <h3 className="font-bold text-slate-100 text-sm">Write ORG.md</h3>
+                  <p className="text-[0.65rem] text-slate-600 font-mono">npx openspawn init</p>
+                </div>
               </div>
-              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
-                <code>npx openspawn init my-org</code>
-              </pre>
-              <p className="text-sm text-slate-400">
-                An interactive wizard creates your <code className="text-xs font-mono text-slate-300">ORG.md</code> — the single file that defines
-                your entire agent organization.
+
+              <p className="text-sm text-slate-400 leading-relaxed">
+                An interactive wizard scaffolds your{" "}
+                <code className="text-xs font-mono text-slate-300 bg-white/10 px-1 rounded">ORG.md</code>{" "}
+                — the single file defining your entire agent org: hierarchy, models, budgets, policies.
               </p>
+
+              {/* Connector arrow (desktop) */}
+              <div className="hidden sm:block absolute right-[-1.1rem] top-[3.5rem] z-10 text-xl text-cyan-500/40 select-none">→</div>
             </li>
-            {/* Step 2 */}
-            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">2</span>
-                <h3 className="font-bold text-slate-100">Start</h3>
+
+            {/* ── Step 2: Run openspawn start ─────────────────── */}
+            <li className="reveal relative rounded-xl border border-white/10 bg-navy-900/80 p-5">
+              {/* Visual illustration */}
+              <HiwStepTerminal />
+
+              {/* Step header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="hiw-step-num">2</div>
+                <div>
+                  <h3 className="font-bold text-slate-100 text-sm">Run openspawn start</h3>
+                  <p className="text-[0.65rem] text-slate-600 font-mono">one command</p>
+                </div>
               </div>
-              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
-                <code>openspawn start</code>
-              </pre>
-              <p className="text-sm text-slate-400">
+
+              <p className="text-sm text-slate-400 leading-relaxed">
                 Agents spawn in sandboxed containers, load their roles from ORG.md, and begin
-                listening for tasks immediately. Dashboard at <code className="text-xs font-mono text-slate-300">localhost:3333</code>.
+                listening for tasks. Dashboard live at{" "}
+                <code className="text-xs font-mono text-slate-300 bg-white/10 px-1 rounded">localhost:3333</code>.
               </p>
+
+              {/* Connector arrow (desktop) */}
+              <div className="hidden sm:block absolute right-[-1.1rem] top-[3.5rem] z-10 text-xl text-cyan-500/40 select-none">→</div>
             </li>
-            {/* Step 3 */}
-            <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">3</span>
-                <h3 className="font-bold text-slate-100">Done</h3>
+
+            {/* ── Step 3: Agents work ─────────────────────────── */}
+            <li className="reveal rounded-xl border border-white/10 bg-navy-900/80 p-5">
+              {/* Visual illustration */}
+              <HiwStepAgents />
+
+              {/* Step header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="hiw-step-num">3</div>
+                <div>
+                  <h3 className="font-bold text-slate-100 text-sm">Agents work</h3>
+                  <p className="text-[0.65rem] text-slate-600 font-mono">you watch the dashboard</p>
+                </div>
               </div>
-              <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
-                <code>openspawn done</code>
-              </pre>
-              <p className="text-sm text-slate-400">
-                When the work is complete, graceful shutdown collects all artifacts, task logs,
-                and cost summaries into a portable archive.
+
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Agents coordinate via the A2A protocol — delegating tasks, escalating blockers,
+                tracking costs, and building persistent memory across every run.
               </p>
             </li>
           </ol>
-          <div className="reveal mt-8 text-center">
+
+          <div className="reveal mt-10 text-center">
             <a href="/getting-started" className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan">
               Get Started in 5 Minutes →
+            </a>
+            <span className="mx-4 text-slate-700">·</span>
+            <a href="/org-md" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 transition-colors">
+              ORG.md reference →
             </a>
           </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          CAPABILITY GRID — Staggered scroll reveal
+          CAPABILITY GRID
           ═══════════════════════════════════════════════════════════════════════ */}
       <section className="section-py-lg">
         <div className="mx-auto max-w-6xl">
@@ -850,7 +1239,6 @@ export function LandingPage() {
             policies, and coordination. Version-controlled in markdown.
           </p>
           <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
-            {/* Left panel: openclaw.json */}
             <div className="reveal code-block-hover overflow-hidden rounded-xl border border-white/10 bg-navy-900/80">
               <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
                 <div className="h-3 w-3 rounded-full bg-red-500/70" />
@@ -862,10 +1250,8 @@ export function LandingPage() {
                 <code>{openclawJsonSnippet}</code>
               </pre>
             </div>
-            {/* Arrow */}
             <div className="reveal hidden text-4xl text-cyan-500/50 md:block">→</div>
             <div className="reveal text-2xl text-cyan-500/50 md:hidden">↓</div>
-            {/* Right panel: ORG.md */}
             <div className="reveal code-block-hover overflow-hidden rounded-xl border border-cyan-500/20 bg-navy-900/80 ring-1 ring-cyan-500/10">
               <div className="flex items-center gap-2 border-b border-white/5 bg-white/5 px-4 py-3">
                 <div className="h-3 w-3 rounded-full bg-red-500/70" />
@@ -952,17 +1338,14 @@ export function LandingPage() {
       <section className="border-y border-white/5 section-py reveal">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-8 sm:gap-12 text-center">
           {[
-            { value: String(agentCount), label: "Agents Live", color: "text-cyan-400" },
-            { value: "6",  label: "Industry Templates", color: "text-violet-400" },
-            { value: "7",  label: "MCP Tools",          color: "text-emerald-400" },
-            { value: "3",  label: "LLM Providers",      color: "text-amber-400" },
-            { value: "∞",  label: "Devices Possible",   color: "text-rose-400" },
+            { value: String(agentCount), label: "Agents Live",         color: "text-cyan-400" },
+            { value: "6",               label: "Industry Templates",   color: "text-violet-400" },
+            { value: "7",               label: "MCP Tools",            color: "text-emerald-400" },
+            { value: "3",               label: "LLM Providers",        color: "text-amber-400" },
+            { value: "∞",               label: "Devices Possible",     color: "text-rose-400" },
           ].map((stat, i) => (
             <div key={stat.label}>
-              <div
-                className={`stat-pop text-4xl font-bold ${stat.color}`}
-                style={{ animationDelay: `${i * 0.07}s` }}
-              >
+              <div className={`stat-pop text-4xl font-bold ${stat.color}`} style={{ animationDelay: `${i * 0.07}s` }}>
                 {stat.value}
               </div>
               <div className="mt-1 text-sm text-slate-500">{stat.label}</div>
@@ -979,14 +1362,11 @@ export function LandingPage() {
               How We Compare
             </span>
           </div>
-          <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">
-            How We Compare
-          </h2>
+          <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">How We Compare</h2>
           <p className="mb-4 text-center text-lg font-semibold text-slate-300">vs CrewAI &amp; LangGraph</p>
           <p className="mx-auto mb-10 max-w-xl text-center text-slate-400">
-            CrewAI and LangGraph are great <em>execution</em> frameworks. OpenSpawn is{" "}
-            <em>coordination infrastructure</em>. They solve different problems — and they work
-            together.
+            CrewAI and LangGraph are great <em>execution</em> frameworks. OpenSpawn adds the{" "}
+            <em>coordination layer</em> — persistent orgs, governance, and budgets on top of any framework.
           </p>
           <div className="mb-8 overflow-x-auto rounded-xl border border-white/10 bg-navy-900/50">
             <table className="w-full text-sm">
@@ -1000,12 +1380,13 @@ export function LandingPage() {
               </thead>
               <tbody className="divide-y divide-white/5 text-slate-400">
                 {[
-                  ["Real device support", "✅ via OpenClaw", "❌", "❌"],
-                  ["Org as code (ORG.md)", "✅ Markdown file", "Python code", "Python code"],
-                  ["Budget & governance", "✅ Built-in", "❌", "❌"],
-                  ["MCP native", "✅ 7 tools", "Plugins", "LangChain tools"],
-                  ["Live dashboard", "✅ React + SSE", "❌", "❌"],
-                  ["Framework agnostic", "✅ A2A / MCP", "❌", "❌"],
+                  ["Real device support",   "✅ via OpenClaw",  "❌",         "❌"],
+                  ["Persistent agents",     "✅ Cross-session", "❌",         "❌"],
+                  ["Org as code (ORG.md)",  "✅ Markdown file", "Python code","Python code"],
+                  ["Budget & governance",   "✅ Built-in",      "❌",         "❌"],
+                  ["10-level hierarchy",    "✅ L1–L10",        "❌",         "❌"],
+                  ["Live dashboard",        "✅ React + SSE",   "❌",         "❌"],
+                  ["Framework agnostic",    "✅ A2A / MCP",     "❌",         "❌"],
                 ].map(([feature, os, crewai, lg]) => (
                   <tr key={feature}>
                     <td className="px-5 py-2.5 font-medium text-slate-300">{feature}</td>
@@ -1018,17 +1399,14 @@ export function LandingPage() {
             </table>
           </div>
           <div className="text-center">
-            <a
-              href="/docs/comparison"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-            >
+            <a href="/docs/comparison" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10">
               Full framework comparison →
             </a>
           </div>
         </div>
       </section>
 
-      {/* ── Ready to graduate? — Final CTA ───────────────────────────────── */}
+      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
       <section aria-labelledby="graduate-cta" className="section-py-lg">
         <div className="mx-auto max-w-3xl">
           <div className="reveal overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.08] via-violet-500/[0.04] to-transparent p-10 text-center md:p-16">
@@ -1041,16 +1419,10 @@ export function LandingPage() {
               hierarchy, budget control, and full visibility. Deploy your first org in 5 minutes.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="/getting-started"
-                className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-8 py-3.5 font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan"
-              >
+              <a href="/getting-started" className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-8 py-3.5 font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan">
                 Get Started →
               </a>
-              <a
-                href="/templates"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20"
-              >
+              <a href="/templates" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 font-semibold text-slate-200 transition hover:bg-white/10 hover:border-white/20">
                 Browse industry templates
               </a>
             </div>
@@ -1068,13 +1440,7 @@ export function LandingPage() {
             real-world agent org.
           </p>
           <div className="reveal flex flex-wrap items-center justify-center gap-4">
-            <Button
-              as="a"
-              href="https://github.com/openspawn/openspawn"
-              target="_blank"
-              rel="noopener"
-              variant="neutral"
-            >
+            <Button as="a" href="https://github.com/openspawn/openspawn" target="_blank" rel="noopener" variant="neutral">
               ⭐ {stars ? `${stars.toLocaleString()} Stars on GitHub` : "Star on GitHub"}
             </Button>
             <Button as="a" href="/docs/getting-started" variant="ghost">
