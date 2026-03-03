@@ -291,7 +291,7 @@ openspawn_tools = MCPServerAdapter(
     server_url="http://localhost:3333/mcp"
 )
 
-# Your agents can now delegate_task, list_agents, get_org_stats`}</CodeBlock>
+# Your agents can now task_create, agent_list, org_status`}</CodeBlock>
 
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Switching From LangGraph to OpenSpawn</h2>
 
@@ -313,7 +313,7 @@ client.register_agent(
 result = app.invoke({"task": "Research quantum computing trends"})
 
 # After: delegate through OpenSpawn (governance, budget, audit trail included)
-task = client.delegate_task(
+task = client.task_create(
     "Research quantum computing trends",
     priority="medium"
 )`}</CodeBlock>

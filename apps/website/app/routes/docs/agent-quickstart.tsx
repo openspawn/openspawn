@@ -341,28 +341,29 @@ values: [speed, autonomy]`}
       </p>
 
       <CodeBlock title="MCP tool examples">
-        {`# Delegate a task
-mcp.call("openspawn/delegate", {
-  to: "engineer",
-  task: "Implement the login endpoint",
+        {`# Create and assign a task
+task_create {
+  title: "Implement the login endpoint",
+  assigneeId: "engineer",
   priority: "high"
-})
+}
 
 # Check agent status
-mcp.call("openspawn/status", { agent: "engineer" })
+agent_whoami
 
 # Escalate an issue
-mcp.call("openspawn/escalate", {
-  from: "engineer",
+escalation_create {
+  taskId: "task-abc123",
   reason: "Blocked on database credentials",
-  to: "ceo"
-})
+  targetAgentId: "ceo"
+}
 
 # Request consensus
-mcp.call("openspawn/consensus", {
+consensus_request {
+  taskId: "task-abc123",
   question: "Should we use PostgreSQL or SQLite?",
-  voters: ["engineer", "security-auditor", "ceo"]
-})`}
+  voterIds: ["engineer", "security-auditor", "ceo"]
+}`}
       </CodeBlock>
 
       <div className="mb-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
@@ -521,7 +522,7 @@ openspawn consensus --results
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
-          to="/docs/templates"
+          to="/docs/reference/org-md-reference"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
@@ -534,39 +535,38 @@ openspawn consensus --results
         </Link>
 
         <Link
-          to="/docs/comparison"
+          to="/docs/getting-started"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
-            Connect real models →
+            Getting Started →
           </h3>
           <p className="text-sm text-slate-400">
-            Configure API keys and model providers for production deployments.
+            Step-by-step guide to deploying your first OpenSpawn org.
           </p>
         </Link>
 
         <Link
-          to="/getting-started"
+          to="/docs/protocols/mcp-reference"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
-            Full CLI reference →
+            MCP Tools Reference →
           </h3>
           <p className="text-sm text-slate-400">
-            Every command, flag, and option for the OpenSpawn CLI.
+            Every MCP tool, parameter, and return value for programmatic access.
           </p>
         </Link>
 
         <Link
-          to="/app/live"
+          to="/templates"
           className="group rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition hover:border-cyan-500/50"
         >
           <h3 className="mb-1 font-semibold text-slate-100 group-hover:text-cyan-400">
-            See live demo →
+            Explore Templates →
           </h3>
           <p className="text-sm text-slate-400">
-            Watch a multi-agent org handle tasks, escalations, and consensus in
-            real time.
+            Ready-to-deploy ORG.md templates for common agent team structures.
           </p>
         </Link>
       </div>
