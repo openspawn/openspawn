@@ -10,6 +10,25 @@ title: FAQ
 
 ---
 
+## Top 10 Quick Answers
+
+These are the questions people ask most often. Longer answers are in the sections below.
+
+| # | Question | Short answer |
+|---|----------|-------------|
+| 1 | **What is OpenSpawn?** | An open-source coordination layer for AI agent orgs — defined in one markdown file (`ORG.md`). |
+| 2 | **Do I need to rewrite my agents?** | No. OpenSpawn connects to existing agents via MCP, A2A, or REST. |
+| 3 | **Do I need API keys to try it?** | No. `npx openspawn init my-org && openspawn start` works offline with simulated agents. |
+| 4 | **What Node.js version do I need?** | Node 18 or later. Check with `node --version`. |
+| 5 | **My ORG.md agents aren't showing up — why?** | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Run `openspawn validate`. |
+| 6 | **I get `Invalid credentials` from the API.** | Clock skew or wrong signature message format. See [Auth Errors](./guides/troubleshooting#5-api-auth-errors). |
+| 7 | **Why is my task stuck and won't transition?** | `DONE` and `CANCELLED` are terminal — create a new task. `IN_PROGRESS → DONE` is invalid; go through `REVIEW` first. |
+| 8 | **How do I fix port conflicts?** | `lsof -i :3456` (MCP) or `lsof -i :3333` (sandbox), kill the process, or start with `--port`. |
+| 9 | **The dashboard goes blank / SSE drops.** | Proxy timeout. Set `proxy_read_timeout 86400s` (nginx) or `flush_interval -1` (Caddy). |
+| 10 | **How do I debug a broken setup?** | `openspawn validate` → check port → inspect `.openspawn/tasks.json` → see [Troubleshooting Guide](./guides/troubleshooting). |
+
+---
+
 ## General
 
 ### Q1: What is OpenSpawn?
@@ -326,11 +345,26 @@ The `clinical-trials` template is the most comprehensive example — it models 2
 
 ### Q26: Where do I go when something's broken?
 
-1. Run `openspawn validate` — catches most config issues
-2. Check [`docs/troubleshooting.md`](./troubleshooting.md) — common errors and fixes
-3. Check port conflicts: `lsof -i :3333`
-4. Review auth: verify `AGENT_ID` and `AGENT_SECRET` match API config
-5. GitHub issues: https://github.com/openspawn/openspawn/issues
+1. Run `openspawn validate` — catches most config errors
+2. Read the [full Troubleshooting Guide](./guides/troubleshooting) — covers all error messages with exact fixes
+3. Check port conflicts: `lsof -i :3456` (MCP) and `lsof -i :3333` (sandbox)
+4. Review auth: verify `AGENT_ID` / `AGENT_SECRET`, timestamp skew (±5 min window), and nonce uniqueness
+5. Check task state: `DONE` and `CANCELLED` are terminal — can't be re-opened
+6. GitHub issues: https://github.com/openspawn/openspawn/issues
+
+**Common error → fix table:**
+
+| Error | Fix |
+|-------|-----|
+| `ORG.md not found at ...` | Run from the right directory or pass `--dir` |
+| `Unnamed Org` in dashboard | Add `# My Org Name` as the first H1 in ORG.md |
+| `Invalid transition: {from} → {to}` | Check the [task state machine](./guides/troubleshooting#7-task-state-machine) |
+| `Request timestamp outside valid window` | Sync system clock: `ntpdate -u pool.ntp.org` |
+| `Nonce already used` | Generate a fresh UUID nonce per request |
+| `Invalid credentials` (HMAC) | Verify signature message format: `METHOD+PATH+TIMESTAMP+NONCE+BODY` |
+| `API key missing required scope` | Regenerate key with correct scopes in dashboard |
+| `Cannot delegate to agent of equal or higher level` | Delegation only flows downward in the hierarchy |
+| `EADDRINUSE :::3456` | Kill existing process on that port or use `--port` flag |
 
 ---
 
