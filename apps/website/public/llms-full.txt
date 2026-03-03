@@ -1567,7 +1567,7 @@ Do you need all three capabilities?
 | Feature | OpenSpawn | CrewAI | LangGraph |
 |---------|-----------|--------|-----------|
 | **Primary role** | Coordination / control plane | Agent execution framework | Graph-based orchestration |
-| **Language** | TypeScript-first (REST + MCP for any language) | Python | Python |
+| **Language** | TypeScript + Python SDKs | Python | Python |
 | **Agent hierarchy** | 10-level hierarchy, roles, trust scores | Flat crews | Flat nodes |
 | **Org definition** | `ORG.md` (markdown) | Python code | Python code |
 | **Protocol support** | MCP (native), A2A, REST, GraphQL | Plugins | LangChain tools |
@@ -1696,7 +1696,7 @@ LangGraph has conditional edges. CrewAI has human-in-the-loop options. Neither h
 |------|-------------------|
 | **Community & ecosystem** | CrewAI has tens of thousands of stars. LangGraph has the full LangChain ecosystem. OpenSpawn is early-stage. |
 | **Production maturity** | CrewAI and LangGraph run in production at scale. OpenSpawn is in rapid development — core is solid, some enterprise features on roadmap. |
-| **Python ecosystem** | Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first (REST + MCP for any language). |
+| **Python ecosystem** | Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript + Python SDKs. |
 
 ---
 

@@ -38,7 +38,7 @@ export function ComparisonPage() {
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
               ["Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration"],
-              ["Languages", "TypeScript-first (REST + MCP for any language)", "Python", "Python"],
+              ["Languages", "TypeScript + Python SDKs", "Python", "Python"],
               ["Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes"],
               ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"],
               ["Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools"],
@@ -296,7 +296,7 @@ openspawn_tools = MCPServerAdapter(
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Switching From LangGraph to OpenSpawn</h2>
 
       <p className="mb-2 text-slate-300 font-semibold">Step 1: Expose your LangGraph workflow as an MCP tool</p>
-      <CodeBlock title="python">{`import requests  # Any language via REST API
+      <CodeBlock title="python">{`from openspawn import OpenSpawn  # Python SDK: pip install openspawn
 from langgraph.graph import StateGraph
 
 app = workflow.compile()
