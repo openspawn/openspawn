@@ -16,6 +16,7 @@ RUN pnpm install --frozen-lockfile
 COPY tools/sandbox/src/ ./tools/sandbox/src/
 COPY tools/sandbox/ORG.md ./tools/sandbox/
 COPY tools/sandbox/org/ ./tools/sandbox/org/
+COPY scripts/ ./scripts/
 
 ARG VITE_DASHBOARD_THEME=openspawn
 ENV VITE_SANDBOX_MODE=true
