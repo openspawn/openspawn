@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestj
 
 import { AgentRole, Proficiency, generateSigningSecret, encryptSecret } from "@openspawn/shared-types";
 
-import { CurrentAgent, Roles, type AuthenticatedAgent , Public } from "../auth";
+import { CurrentAgent, Roles, type AuthenticatedAgent } from "../auth";
 
 import { AgentsService } from "./agents.service";
 import { AgentOnboardingService, type SpawnAgentDto } from "./agent-onboarding.service";
@@ -26,7 +26,6 @@ export class AgentsController {
    * Register a new agent - HR role only (Talent Agent)
    * Returns the plaintext secret ONCE
    */
-  @Public()
   @Post("register")
   @Roles(AgentRole.HR)
   async register(@CurrentAgent() actor: AuthenticatedAgent, @Body() dto: CreateAgentDto) {

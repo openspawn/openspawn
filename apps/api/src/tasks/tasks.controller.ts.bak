@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/commo
 
 import { EscalationReason, TaskStatus } from "@openspawn/shared-types";
 
-import { CurrentAgent, type AuthenticatedAgent, Public } from "../auth";
+import { CurrentAgent, type AuthenticatedAgent } from "../auth";
 
 import { AddCommentDto } from "./dto/add-comment.dto";
 import { AddDependencyDto } from "./dto/add-dependency.dto";
@@ -23,7 +23,6 @@ export class TasksController {
     private readonly routingService: TaskRoutingService,
   ) {}
 
-  @Public()
   @Post()
   async create(@CurrentAgent() agent: AuthenticatedAgent, @Body() dto: CreateTaskDto) {
     const task = await this.tasksService.create(agent.orgId, agent.id, dto);
