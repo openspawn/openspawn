@@ -17,9 +17,6 @@
       ],
       "outputs": [
         "{workspaceRoot}/dist/apps/website"
-      ],
-      "dependsOn": [
-        "generate-md"
       ]
     },
     "serve": {
