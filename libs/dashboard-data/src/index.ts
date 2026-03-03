@@ -17,7 +17,7 @@ export { useTasks, type Task } from "./hooks/use-tasks";
 export { useTouchDevice } from "./hooks/use-touch-device";
 
 // Services
-export { orgStatus, taskList, McpError } from "./services/mcp-client";
+export { orgStatus, taskList, taskCreate, taskClaim, taskComplete, agentList, agentRegister, agentUpdateStatus, agentFire, eventList, escalate, McpError } from "./services/mcp-client";
 
 // Contexts
 export { AuthProvider, useAuth, useOAuthCallback, type User } from "./contexts/auth-context";
