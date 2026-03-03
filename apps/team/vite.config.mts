@@ -11,7 +11,7 @@ const commitSha = (() => {
 })();
 const buildTime = new Date().toISOString();
 
-const basePath = '/app/';
+const basePath = process.env.VITE_BASE_PATH || '/app/';
 
 function fixBaseHref(): Plugin {
   return {
