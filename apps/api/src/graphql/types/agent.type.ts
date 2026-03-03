@@ -85,6 +85,9 @@ export class AgentType {
   @Field(() => String, { nullable: true })
   avatarColor?: string | null;
 
+  @Field(() => String, { nullable: true })
+  avatarUrl?: string | null;
+
   @Field(() => Date)
   createdAt!: Date;
 

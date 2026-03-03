@@ -614,7 +614,7 @@ export type WebhookType = {
   url: Scalars['String']['output'];
 };
 
-export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null, teamId?: string | null, avatar?: string | null, avatarColor?: string | null, avatarUrl?: string | null };
+export type AgentFieldsFragment = { id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null, teamId?: string | null, avatar?: string | null, avatarColor?: string | null };
 
 export type TasksQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -637,7 +637,7 @@ export type AgentsQueryVariables = Exact<{
 }>;
 
 
-export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null, teamId?: string | null, avatar?: string | null, avatarColor?: string | null, avatarUrl?: string | null }> };
+export type AgentsQuery = { agents: Array<{ id: string, agentId: string, name: string, role: AgentRole, mode: AgentMode, status: AgentStatus, level: number, model: string, currentBalance: number, budgetPeriodLimit?: number | null, budgetPeriodSpent: number, managementFeePct: number, parentId?: string | null, createdAt: string, updatedAt: string, trustScore: number, reputationLevel: ReputationLevel, tasksCompleted: number, tasksSuccessful: number, lastActivityAt?: string | null, lastPromotionAt?: string | null, lifetimeEarnings: number, domain?: string | null, teamId?: string | null, avatar?: string | null, avatarColor?: string | null }> };
 
 export type CreditHistoryQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
