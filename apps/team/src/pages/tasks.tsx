@@ -40,17 +40,24 @@ export function TasksPage() {
           {filtered.map((task) => (
             <div
               key={task.id}
-              className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-4"
+              className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
             >
-              <div className="space-y-1">
-                <div className="font-medium text-white text-sm">{task.title}</div>
-                {task.assignee && (
-                  <div className="text-xs text-white/40">Assigned to {task.assignee.name}</div>
-                )}
+              {/* Mobile: stacked layout; sm+: side-by-side */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <div className="space-y-1 min-w-0">
+                  <div className="font-medium text-white text-sm truncate">{task.title}</div>
+                  {task.assignee && (
+                    <div className="text-xs text-white/40 truncate">
+                      Assigned to {task.assignee.name}
+                    </div>
+                  )}
+                </div>
+                <div className="shrink-0 self-start sm:self-center">
+                  <Badge variant={task.status === TaskStatus.Done ? "default" : "secondary"}>
+                    {task.status}
+                  </Badge>
+                </div>
               </div>
-              <Badge variant={task.status === TaskStatus.Done ? "default" : "secondary"}>
-                {task.status}
-              </Badge>
             </div>
           ))}
         </div>

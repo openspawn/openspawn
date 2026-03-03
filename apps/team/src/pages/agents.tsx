@@ -1,12 +1,44 @@
 import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
+import { Search, Shield, Clock, TrendingUp } from "lucide-react";
 import { PageHeader, Badge, EmptyState } from "@openspawn/dashboard-ui";
 import { AgentStatus } from "@openspawn/dashboard-data";
 import { cn } from "../lib/utils";
-import { useAgents } from "../hooks";
+import { useAgents, useTasks } from "../hooks";
+
+function timeAgo(date: string | null | undefined): string {
+  if (!date) return "Never";
+  const diff = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function levelLabel(level: number): string {
+  if (level >= 10) return "CEO";
+  if (level >= 9) return "VP";
+  if (level >= 7) return "Lead";
+  if (level >= 5) return "Senior";
+  if (level >= 3) return "Junior";
+  return "Intern";
+}
+
+function initials(name: string) {
+  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+}
+
+const ROLE_COLORS: Record<string, string> = {
+  FOUNDER: "bg-amber-500/20 text-amber-400",
+  ADMIN:   "bg-cyan-500/20 text-cyan-400",
+  WORKER:  "bg-violet-500/20 text-violet-400",
+  HR:      "bg-emerald-500/20 text-emerald-400",
+};
 
 export function AgentsPage() {
   const { agents, loading } = useAgents();
+  const { tasks } = useTasks();
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -14,6 +46,12 @@ export function AgentsPage() {
     const q = search.toLowerCase();
     return agents.filter((a) => a.name.toLowerCase().includes(q));
   }, [agents, search]);
+
+  const tasksByAgent = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const t of tasks) if (t.assigneeId) m[t.assigneeId] = (m[t.assigneeId] || 0) + 1;
+    return m;
+  }, [tasks]);
 
   return (
     <div className="space-y-6">
@@ -38,22 +76,79 @@ export function AgentsPage() {
         <EmptyState title="No agents found" description="No agents match your search criteria." />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((agent) => (
-            <div
-              key={agent.id}
-              className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-white">{agent.name}</span>
-                <Badge variant={agent.status === AgentStatus.Active ? "default" : "secondary"}>
-                  {agent.status}
-                </Badge>
+          {filtered.map((agent) => {
+            const isActive = agent.status === AgentStatus.Active;
+            const taskCount = tasksByAgent[agent.id] || 0;
+            const completion = agent.tasksCompleted > 0
+              ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100)
+              : null;
+
+            return (
+              <div
+                key={agent.id}
+                className={cn(
+                  "rounded-xl border bg-white/[0.02] p-4 space-y-4 transition-colors",
+                  isActive ? "border-cyan-500/20" : "border-white/5"
+                )}
+              >
+                {/* Agent identity row */}
+                <div className="flex items-start gap-3">
+                  <div
+                    className={cn(
+                      "h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+                      ROLE_COLORS[agent.role ?? ""] ?? "bg-slate-500/20 text-slate-400"
+                    )}
+                  >
+                    {initials(agent.name)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-white text-sm truncate">{agent.name}</span>
+                      <Badge variant={isActive ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
+                        {agent.status}
+                      </Badge>
+                    </div>
+                    {agent.role && (
+                      <div className="text-xs text-white/40 mt-0.5">{agent.role}</div>
+                    )}
+                    {agent.level != null && (
+                      <div className="text-xs text-white/30">
+                        L{agent.level} · {levelLabel(agent.level)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats grid — stacks into 2-col on all sizes */}
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="rounded-lg bg-white/5 px-3 py-2">
+                    <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                      <Shield className="h-3 w-3" /> Trust
+                    </div>
+                    <div className="font-semibold text-white">{agent.trustScore ?? "—"}%</div>
+                  </div>
+                  <div className="rounded-lg bg-white/5 px-3 py-2">
+                    <div className="text-white/40 mb-0.5">Tasks</div>
+                    <div className="font-semibold text-white">{taskCount}</div>
+                  </div>
+                  {completion !== null && (
+                    <div className="rounded-lg bg-white/5 px-3 py-2">
+                      <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> Win rate
+                      </div>
+                      <div className="font-semibold text-white">{completion}%</div>
+                    </div>
+                  )}
+                  <div className="rounded-lg bg-white/5 px-3 py-2">
+                    <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> Last seen
+                    </div>
+                    <div className="font-semibold text-white truncate">{timeAgo(agent.lastActivityAt)}</div>
+                  </div>
+                </div>
               </div>
-              {agent.role && (
-                <div className="text-xs text-white/40">{agent.role}</div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

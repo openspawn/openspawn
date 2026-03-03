@@ -25,7 +25,7 @@ import {
   CircleDot,
 } from "lucide-react";
 import { useAgents, useTasks, useEvents } from "../hooks";
-import { AgentStatus } from "@openspawn/dashboard-data";
+import { AgentStatus, TaskStatus } from "@openspawn/dashboard-data";
 
 /* ── Helpers ────────────────────────────────────────────────────── */
 
@@ -180,7 +180,7 @@ function TaskRow({ task, index }: { task: any; index: number }) {
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            <Badge variant={priorityVariant(task.priority)} className="text-[10px] px-1.5 py-0">
+            <Badge variant={priorityVariant(task.priority)} className="hidden sm:inline-flex text-[10px] px-1.5 py-0">
               {task.priority}
             </Badge>
             <Badge variant={statusVariant(task.status)} className="text-[10px] px-1.5 py-0">
@@ -202,9 +202,9 @@ export function DashboardPage() {
 
   const stats = useMemo(() => {
     const active  = agents.filter(a => a.status === AgentStatus.Active);
-    const done    = tasks.filter(t => t.status === "DONE");
-    const wip     = tasks.filter(t => t.status === "IN_PROGRESS" || t.status === "CLAIMED");
-    const pending = tasks.filter(t => !["DONE", "IN_PROGRESS", "CLAIMED"].includes(t.status));
+    const done    = tasks.filter(t => t.status === TaskStatus.Done);
+    const wip     = tasks.filter(t => t.status === TaskStatus.InProgress || t.status === TaskStatus.Review);
+    const pending = tasks.filter(t => t.status === TaskStatus.Todo || t.status === TaskStatus.Backlog);
     const pct     = tasks.length ? Math.round((done.length / tasks.length) * 100) : 0;
     return { agents: agents.length, active: active.length, total: tasks.length,
              done: done.length, wip: wip.length, pending: pending.length,
@@ -231,7 +231,7 @@ export function DashboardPage() {
       <PageHeader title="Dashboard" description="Live overview of your agent organization" />
 
       {/* ── Stats Row ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/agents"><StatCard title="Agents" value={stats.agents} icon={Users}
           description={`${stats.active} active`} sparklineData={sparkA} sparklineColor="#06b6d4" /></Link>
         <Link to="/tasks"><StatCard title="Tasks" value={stats.total} icon={CheckSquare}
@@ -261,7 +261,7 @@ export function DashboardPage() {
                 initial={{ width: 0 }} animate={{ width: `${(stats.pending / stats.total) * 100}%` }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }} />}
             </div>
-            <div className="flex items-center gap-4 mt-2 text-[11px] text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" /> Done ({stats.done})</span>
               <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-cyan-500 inline-block" /> In Progress ({stats.wip})</span>
               <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500/40 inline-block" /> Pending ({stats.pending})</span>
