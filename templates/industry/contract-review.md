@@ -27,6 +27,8 @@ Owns the review queue. Assigns contracts to the pipeline, sets review priority (
 - **Domain:** Contract Management
 - **Reports to:** Human Principal
 - **Spawns:** Clause Extractor, Risk Analyst, Summary Writer
+- **Skills:** Contract law, risk triage, legal strategy, playbook enforcement, stakeholder communication
+- **Tools:** task manager, review queue, escalation_create, org_status
 
 #### Clause Extractor — Contract Analysis Specialist
 Reads the full contract text. Extracts and categorizes key clauses: term and termination, liability caps, indemnification, IP ownership, data handling, governing law, payment terms, non-compete, and non-solicitation. Outputs structured clause inventory to shared workspace.
@@ -35,6 +37,7 @@ Reads the full contract text. Extracts and categorizes key clauses: term and ter
 - **Department:** Legal
 - **Domain:** Document Analysis
 - **Reports to:** Senior Reviewer
+- **Skills:** Contract reading, clause categorization, legal terminology, structured data extraction
 - **Tools:** document parser, clause taxonomy, contract text search
 
 #### Risk Analyst — Legal Risk Specialist
@@ -44,6 +47,7 @@ Compares extracted clauses against the company's negotiation playbook. Flags dev
 - **Department:** Legal
 - **Domain:** Risk Assessment
 - **Reports to:** Senior Reviewer
+- **Skills:** Risk analysis, playbook comparison, legal redlining, deviation pattern recognition
 - **Tools:** playbook database, precedent library, risk scoring model
 
 #### Summary Writer — Legal Communications Specialist
@@ -53,6 +57,8 @@ Produces the attorney-ready review package: executive summary, clause-by-clause 
 - **Department:** Legal
 - **Domain:** Legal Writing
 - **Reports to:** Senior Reviewer
+- **Skills:** Legal writing, plain language translation, executive summary drafting, redline formatting
+- **Tools:** document templates, redline formatter, risk register builder, summary generator
 
 ## Policies
 
@@ -119,3 +125,7 @@ If a clause type is not in the playbook:
 1. Risk Analyst flags as "PLAYBOOK GAP" with risk level: medium
 2. Includes: clause text, industry-standard comparison, and recommendation request
 3. Senior Reviewer adds interim guidance or escalates to counsel for playbook update
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.

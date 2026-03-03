@@ -27,6 +27,8 @@ Owns the catalog. Sets pricing strategy and content quality standards, approves 
 - **Domain:** Catalog Strategy
 - **Reports to:** Human Principal
 - **Spawns:** Price Optimizer, Content Writer, Competitor Monitor
+- **Skills:** Pricing strategy, catalog operations, competitive analysis, content quality standards, P&L thinking
+- **Tools:** catalog dashboard, escalation_create, org_status, pricing approval workflow, task manager
 
 #### Price Optimizer — Pricing Analyst
 Applies dynamic pricing rules to maximize revenue per unit while maintaining competitive positioning. Reads competitor prices and demand signals, calculates optimal price points, and implements approved changes via the pricing API. Flags any price move outside policy guardrails.
@@ -35,6 +37,7 @@ Applies dynamic pricing rules to maximize revenue per unit while maintaining com
 - **Department:** E-commerce
 - **Domain:** Pricing Strategy
 - **Reports to:** Catalog Manager
+- **Skills:** Dynamic pricing algorithms, margin analysis, competitive benchmarking, demand forecasting, MAP compliance
 - **Tools:** pricing API, competitor price feeds, demand forecasting model, margin calculator
 
 #### Content Writer — Product Content Specialist
@@ -44,6 +47,7 @@ Writes and rewrites product descriptions, titles, bullet points, and meta conten
 - **Department:** Marketing
 - **Domain:** Content Production
 - **Reports to:** Catalog Manager
+- **Skills:** Product copywriting, SEO optimization, brand voice, category-specific content standards, conversion writing
 - **Tools:** product database, SEO keyword tool, brand guidelines, content CMS
 
 #### Competitor Monitor — Market Intelligence Analyst
@@ -53,6 +57,7 @@ Monitors competitor catalogs, pricing, and promotions across key rivals. Tracks 
 - **Department:** E-commerce
 - **Domain:** Market Intelligence
 - **Reports to:** Catalog Manager
+- **Skills:** Competitive intelligence, price monitoring, assortment gap analysis, promotional pattern recognition
 - **Tools:** price scraping feeds, competitor catalog API, promotion monitoring, market intelligence database
 
 ## Policies
@@ -111,3 +116,7 @@ If Competitor Monitor detects competitor has undercut our pricing on 50+ SKUs si
 3. Price Optimizer sets initial price based on competitive benchmarking and margin floor
 4. Competitor Monitor adds to monitoring list
 5. Catalog Manager approves and publishes
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.

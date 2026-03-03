@@ -27,6 +27,8 @@ Owns the monitoring program. Configures monitoring rules, reviews flagged activi
 - **Domain:** Regulatory Oversight
 - **Reports to:** Human Principal
 - **Spawns:** Transaction Analyst, Rule Engine Agent, Report Generator
+- **Skills:** AML/BSA regulatory framework, SAR/CTR decision-making, risk program governance, regulatory liaison
+- **Tools:** compliance dashboard, escalation_create, org_status, regulatory filing portal
 
 #### Transaction Analyst — Compliance Data Analyst
 Processes incoming transaction data. Ingests from payment rails, core banking feeds, and card processors. Normalizes and enriches data (merchant category, counterparty risk score, geolocation). Outputs enriched transaction stream to the Rule Engine.
@@ -35,6 +37,7 @@ Processes incoming transaction data. Ingests from payment rails, core banking fe
 - **Department:** Compliance
 - **Domain:** Data Engineering
 - **Reports to:** Compliance Lead
+- **Skills:** Data pipeline engineering, transaction normalization, counterparty enrichment, geolocation analysis
 - **Tools:** transaction database, enrichment APIs, data normalization pipelines
 
 #### Rule Engine Agent — Regulatory Rules Specialist
@@ -44,6 +47,7 @@ Applies compliance rules against the enriched transaction stream. Covers: AML tr
 - **Department:** Compliance
 - **Domain:** Regulatory Rules
 - **Reports to:** Compliance Lead
+- **Skills:** AML typologies, OFAC sanctions screening, structuring detection, velocity analysis, PEP identification
 - **Tools:** rules database, sanctions lists (OFAC/EU/UN), PEP databases, pattern detection models
 
 #### Report Generator — Compliance Reporting Specialist
@@ -53,6 +57,7 @@ Produces required regulatory reports: daily transaction summaries, weekly risk r
 - **Department:** Compliance
 - **Domain:** Regulatory Reporting
 - **Reports to:** Compliance Lead
+- **Skills:** SAR narrative writing, CTR formatting, regulatory report assembly, FinCEN filing standards
 - **Tools:** report templates, regulatory filing formats, document generator
 
 ## Policies
@@ -113,3 +118,7 @@ Produces required regulatory reports: daily transaction summaries, weekly risk r
 4. Human Principal (CCO) reviews and approves SAR draft
 5. Filed electronically within 30 days of detection
 6. Case closed in compliance log with SAR reference number
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.

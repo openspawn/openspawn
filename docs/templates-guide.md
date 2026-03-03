@@ -70,6 +70,125 @@ What's your primary use case?
 
 ---
 
+## Template Anatomy
+
+Every industry template is a single `ORG.md` file structured into four sections. Understanding the anatomy helps you customize confidently.
+
+```
+ORG.md
+├── ## Identity      — what this org does and why
+├── ## Culture       — how agents behave
+├── ## Structure     — the agent hierarchy
+├── ## Policies      — the guardrails
+└── ## Playbooks     — the workflows
+```
+
+### Identity — what this org does
+
+The `Identity` section is the mission statement. It answers three questions:
+- **Mission:** What is this org optimized to produce? (one sentence)
+- **Industry:** Where does it live?
+- **Pain solved:** What specific problem makes this org necessary?
+
+```markdown
+## Identity
+
+- **Mission:** Onboard new enterprise customers from signed contract to first workflow in under 48 hours
+- **Industry:** SaaS / Enterprise Software
+- **Pain solved:** Manual onboarding takes 2–3 days per customer, with handoffs that drop context and delay go-live
+```
+
+A strong mission statement is concrete enough to evaluate. "Process contracts quickly" is weak. "Review contracts against the company playbook, flag risks, and produce attorney-ready summaries in hours, not weeks" is strong.
+
+### Structure — the agent hierarchy
+
+The `Structure` section defines every agent: their role, level, department, reporting line, skills, and tools. Hierarchy is expressed by markdown heading depth — H3 for the lead, H4 for direct reports, H5 for sub-reports.
+
+```markdown
+## Structure
+
+### Onboarding Lead — Customer Onboarding Manager
+Description of role and responsibilities.
+- **Level:** 7
+- **Department:** Customer Success
+- **Domain:** Operations
+- **Reports to:** Human Principal
+- **Spawns:** Data Migration Specialist, Integration Engineer
+- **Skills:** Project management, customer communication, risk assessment
+- **Tools:** task manager, org_status, escalation_create
+
+#### Data Migration Specialist — Senior Data Engineer
+Description of role and responsibilities.
+- **Level:** 5
+- **Department:** Engineering
+- **Domain:** Data Engineering
+- **Reports to:** Onboarding Lead
+- **Skills:** SQL, ETL pipeline development, data validation
+- **Tools:** database access, ETL pipelines, schema validators
+```
+
+**Level conventions:**
+- Lead / Director: 7–8
+- Senior Specialist / Analyst: 5–6
+- Specialist / Support: 4
+
+**Spawns** lists every agent the lead creates when the org boots. Only the lead agent (H3) has a `Spawns` field.
+
+### Playbooks — the workflows
+
+The `Playbooks` section contains named, step-by-step workflows that describe how the org handles its most important processes. Every template ships with 2–4 playbooks. Each playbook answers: *which agent does what, in what order, and what triggers the next step?*
+
+```markdown
+## Playbooks
+
+### Standard Enterprise Onboarding (48-hour track)
+
+**Phase 1 — Kickoff (Hour 0–2)**
+1. Onboarding Lead reads customer intake form and creates PLAN.md
+2. Onboarding Lead creates tasks for each specialist with deadlines
+3. Onboarding Lead sends kickoff summary to customer
+
+**Phase 2 — Migration & Integration (Hour 2–24)**
+1. Data Migration Specialist begins source system analysis
+2. Integration Engineer maps integration requirements
+3. Both agents work in parallel; Onboarding Lead monitors via org_status
+```
+
+**Good playbooks are:**
+- Named for the scenario, not the steps ("SEV1 — Production Outage", not "Escalation Workflow 1")
+- Concrete: agent names, tool names, file names
+- Sequenced: numbered steps, clear handoff triggers
+- Bounded: escalation conditions and termination criteria
+
+**Playbook trigger conventions:**
+- Normal flow: numbered list top to bottom
+- Exception path: "If [condition]: ..." paragraph followed by numbered steps
+
+### Policies — the guardrails
+
+The `Policies` section defines the rules agents operate within. Three sub-sections appear in every template:
+
+```markdown
+## Policies
+
+### Budget
+- **Per-agent limit:** 800 credits/customer
+- **Alert threshold:** 70%
+- **Overage behavior:** Pause and escalate to Onboarding Lead
+
+### Permissions
+- **Data Migration Specialist:** Read access to customer source systems only
+- **Human approval required for:** Migrations over 1M rows
+
+### [Domain-Specific Guardrails]
+- Economy Tuner cannot change any parameter more than 15% in 24 hours
+- Price Optimizer cannot price below 20% gross margin floor
+```
+
+**The key principle:** Policies define where agents stop and ask. The narrower your policies, the more autonomy agents can exercise safely within them. Start conservative; expand as you build trust.
+
+---
+
 ## saas-onboarding
 
 **SaaS customer onboarding pipeline.** Takes a new enterprise customer from signed contract to first successful workflow in 48 hours.

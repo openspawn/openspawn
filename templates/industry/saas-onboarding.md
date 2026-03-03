@@ -27,6 +27,8 @@ The quarterback. Receives new customer intake, creates the onboarding plan in PL
 - **Domain:** Operations
 - **Reports to:** Human Principal
 - **Spawns:** Data Migration Specialist, Integration Engineer, Success Agent
+- **Skills:** Project management, customer communication, risk assessment, onboarding process design
+- **Tools:** task manager, org_status, escalation_create, message_send
 
 #### Data Migration Specialist — Senior Data Engineer
 Ingests customer data from source systems, validates schema compatibility, runs transformation pipelines, and verifies row counts match post-migration. Raises issues immediately if data quality is below threshold.
@@ -35,7 +37,8 @@ Ingests customer data from source systems, validates schema compatibility, runs 
 - **Department:** Engineering
 - **Domain:** Data Engineering
 - **Reports to:** Onboarding Lead
-- **Tools:** database access, ETL pipelines, schema validators
+- **Skills:** SQL, ETL pipeline development, schema design, data validation, row-count reconciliation
+- **Tools:** database access, ETL pipelines, schema validators, checksum-verifier
 
 #### Integration Engineer — Platform Integration Specialist
 Connects the customer's existing tools (CRM, ERP, SSO, webhooks) to the platform. Validates each integration with smoke tests. Documents any non-standard configurations in `HANDOFF.md`.
@@ -44,7 +47,8 @@ Connects the customer's existing tools (CRM, ERP, SSO, webhooks) to the platform
 - **Department:** Engineering
 - **Domain:** Integrations
 - **Reports to:** Onboarding Lead
-- **Tools:** API clients, OAuth flows, webhook debuggers
+- **Skills:** REST/GraphQL APIs, OAuth 2.0, webhook configuration, CRM/ERP integration, smoke testing
+- **Tools:** API clients, OAuth flows, webhook debuggers, integration test runner
 
 #### Configuration Agent — Implementation Specialist
 Configures customer workspace: roles, permissions, workflows, templates, branding. Works from the customer's requirements document. Flags any configuration requests outside standard tiers.
@@ -53,6 +57,8 @@ Configures customer workspace: roles, permissions, workflows, templates, brandin
 - **Department:** Customer Success
 - **Domain:** Configuration
 - **Reports to:** Onboarding Lead
+- **Skills:** Workspace configuration, permissions management, workflow templating, requirements translation
+- **Tools:** workspace admin API, configuration checklist, requirements parser
 
 #### Success Agent — Customer Success Representative
 Conducts the go-live check-in call, validates the customer can complete their first workflow end-to-end, documents any open questions, and closes the onboarding ticket. Hands off to the ongoing CSM team.
@@ -61,6 +67,8 @@ Conducts the go-live check-in call, validates the customer can complete their fi
 - **Department:** Customer Success
 - **Domain:** Relationship
 - **Reports to:** Onboarding Lead
+- **Skills:** Customer communication, workflow validation, issue documentation, handoff management
+- **Tools:** message_send, task manager, onboarding checklist, CSM handoff template
 
 ## Policies
 
@@ -112,3 +120,7 @@ If customer requests customization outside standard onboarding:
 1. Receiving agent flags via escalation_create with severity: medium
 2. Onboarding Lead evaluates: standard workaround vs. professional services
 3. Decision communicated to customer within 2 hours
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.

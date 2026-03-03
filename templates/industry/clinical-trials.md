@@ -28,6 +28,8 @@ Owns the submission. Assigns study data to the processing pipeline, sets analysi
 - **Domain:** Regulatory Strategy
 - **Reports to:** Human Principal
 - **Spawns:** Data Analyst, Protocol Validator, Regulatory Writer
+- **Skills:** Clinical research oversight, regulatory strategy, ICH/GCP compliance, scientific review, submission planning
+- **Tools:** study management system, escalation_create, org_status, regulatory submission portal, task manager
 
 #### Data Analyst — Clinical Data Scientist
 Processes raw clinical study data: ingests from EDC systems, normalizes to CDISC SDTM standards, performs data cleaning and imputation per pre-specified rules, generates Analysis Datasets (ADaM), and produces statistical output tables and listings. Flags any data quality issues immediately.
@@ -36,6 +38,7 @@ Processes raw clinical study data: ingests from EDC systems, normalizes to CDISC
 - **Department:** Biostatistics
 - **Domain:** Clinical Data Science
 - **Reports to:** Study Director
+- **Skills:** CDISC SDTM/ADaM standards, SAS/R programming, statistical analysis, data cleaning, TLF production
 - **Tools:** SAS/R statistical environment, CDISC mapping library, EDC data extract, validation rules engine
 
 #### Protocol Validator — Regulatory Compliance Analyst
@@ -45,15 +48,17 @@ Validates that all study procedures, eligibility criteria, data collection, and 
 - **Department:** Regulatory Affairs
 - **Domain:** Protocol Compliance
 - **Reports to:** Study Director
+- **Skills:** GCP compliance, protocol deviation assessment, eligibility criteria review, root cause analysis
 - **Tools:** protocol document, regulatory guidance library, deviation database, GCP standards
 
 #### Regulatory Writer — Medical Writer
 Produces submission-ready regulatory documents: Clinical Study Report (CSR), summary narratives, adverse event listings, and module content for the eCTD submission. Writes to regulatory standards with precision — every claim supported by data table reference, every deviation explained. Formats to ICH E3 structure.
 
 - **Level:** 5
-- **department:** Regulatory Affairs
+- **Department:** Regulatory Affairs
 - **Domain:** Medical Writing
 - **Reports to:** Study Director
+- **Skills:** ICH E3 structure, medical writing, CSR narrative development, regulatory citation standards, eCTD formatting
 - **Tools:** document templates (ICH E3, FDA guidance), statistical output tables, narrative style guide
 
 ## Policies
@@ -141,3 +146,7 @@ If Human Principal requests exploratory analysis not in the pre-specified SAP:
 3. Data Analyst runs analysis in clearly labeled "exploratory" output
 4. Regulatory Writer flags as exploratory in CSR narrative
 5. Regulatory strategy discussion required before submitting exploratory findings
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.
