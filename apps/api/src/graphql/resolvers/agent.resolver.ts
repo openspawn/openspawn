@@ -1,7 +1,7 @@
 import { Args, ID, Int, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 
 import { getReputationLevel, ReputationLevel } from "@openspawn/shared-types";
-import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
+import { OrgFromContext, validateOrgAccess, Public } from "../../auth/decorators";
 import { AgentsService, TrustService } from "../../agents";
 import {
   AgentType,
@@ -25,12 +25,13 @@ export class AgentResolver {
     private readonly trustService: TrustService,
   ) {}
 
+  @Public()
   @Query(() => [AgentType])
   async agents(
     @Args("orgId", { type: () => ID }) orgId: string,
     @OrgFromContext() authenticatedOrgId: string | undefined,
   ): Promise<AgentType[]> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     return this.agentsService.findAll(orgId);
   }
 
@@ -40,7 +41,7 @@ export class AgentResolver {
     @Args("id", { type: () => ID }) id: string,
     @OrgFromContext() authenticatedOrgId: string | undefined,
   ): Promise<AgentType | null> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     try {
       return await this.agentsService.findOne(orgId, id);
     } catch {
@@ -59,7 +60,7 @@ export class AgentResolver {
     @Args("agentId", { type: () => ID }) agentId: string,
     @OrgFromContext() authenticatedOrgId: string | undefined,
   ): Promise<AgentReputationType | null> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     try {
       const summary = await this.trustService.getReputationSummary(agentId);
       return {
@@ -85,7 +86,7 @@ export class AgentResolver {
     @OrgFromContext() authenticatedOrgId: string | undefined,
     @Args("limit", { type: () => Int, nullable: true }) limit?: number,
   ): Promise<ReputationHistoryEntryType[]> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     const result = await this.trustService.getReputationHistory(agentId, { limit });
     return result.events.map((e) => ({
       id: e.id,
@@ -104,7 +105,7 @@ export class AgentResolver {
     @OrgFromContext() authenticatedOrgId: string | undefined,
     @Args("limit", { type: () => Int, nullable: true }) limit?: number,
   ): Promise<LeaderboardEntryType[]> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     return this.trustService.getLeaderboard(orgId, limit ?? 10);
   }
 }

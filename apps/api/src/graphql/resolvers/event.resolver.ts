@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 
 import { Agent } from "@openspawn/database";
 
-import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
+import { OrgFromContext, validateOrgAccess, Public } from "../../auth/decorators";
 import { EventsService } from "../../events";
 import { EVENT_CREATED, PubSubProvider } from "../pubsub.provider";
 import { AgentType, EventType } from "../types";
@@ -26,6 +26,8 @@ export class EventResolver {
     private readonly agentRepository: Repository<Agent>,
   ) {}
 
+  @ Public()
+  @Public()
   @Query(() => [EventType])
   async events(
     @Args("orgId", { type: () => ID }) orgId: string,
@@ -33,7 +35,7 @@ export class EventResolver {
     @Args("page", { type: () => Int, defaultValue: 1 }) page: number,
     @OrgFromContext() authenticatedOrgId?: string,
   ): Promise<EventType[]> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     const { events } = await this.eventsService.findAll(orgId, {}, page, limit);
     return events;
   }
