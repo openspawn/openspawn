@@ -1,7 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
-import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { GqlThrottlerGuard } from "../common/gql-throttler.guard";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { entities } from "@openspawn/database";
@@ -68,7 +69,7 @@ import { AppService } from "./app.service";
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: GqlThrottlerGuard,
     },
   ],
 })

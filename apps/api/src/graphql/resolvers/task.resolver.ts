@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { Agent } from "@openspawn/database";
 import { TaskStatus } from "@openspawn/shared-types";
 
-import { OrgFromContext, validateOrgAccess } from "../../auth/decorators";
+import { OrgFromContext, validateOrgAccess, Public } from "../../auth/decorators";
 import { TasksService } from "../../tasks";
 import { PubSubProvider, TASK_UPDATED } from "../pubsub.provider";
 import { AgentType, ClaimTaskResultType, TaskRejectionType, TaskType } from "../types";
@@ -27,6 +27,8 @@ export class TaskResolver {
     private readonly agentRepository: Repository<Agent>,
   ) {}
 
+  @ Public()
+  @Public()
   @Query(() => [TaskType])
   async tasks(
     @Args("orgId", { type: () => ID }) orgId: string,
@@ -34,7 +36,7 @@ export class TaskResolver {
     @Args("assigneeId", { type: () => ID, nullable: true }) assigneeId?: string,
     @OrgFromContext() authenticatedOrgId?: string,
   ): Promise<TaskType[]> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     return this.tasksService.findAll(orgId, { status, assigneeId });
   }
 
@@ -44,7 +46,7 @@ export class TaskResolver {
     @Args("id", { type: () => ID }) id: string,
     @OrgFromContext() authenticatedOrgId?: string,
   ): Promise<TaskType | null> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     try {
       return await this.tasksService.findOne(orgId, id);
     } catch {
@@ -57,7 +59,7 @@ export class TaskResolver {
     @Args("orgId", { type: () => ID }) orgId: string,
     @OrgFromContext() authenticatedOrgId?: string,
   ): Promise<number> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     return this.tasksService.getClaimableTaskCount(orgId);
   }
 
@@ -67,7 +69,7 @@ export class TaskResolver {
     @Args("agentId", { type: () => ID }) agentId: string,
     @OrgFromContext() authenticatedOrgId?: string,
   ): Promise<ClaimTaskResultType> {
-    validateOrgAccess(orgId, authenticatedOrgId);
+    if (authenticatedOrgId) validateOrgAccess(orgId, authenticatedOrgId);
     return this.tasksService.claimNextTask(orgId, agentId);
   }
 
