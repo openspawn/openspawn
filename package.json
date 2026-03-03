@@ -27,7 +27,9 @@
     "sandbox:replay": "nx run sandbox:serve:replay",
     "sandbox:recordings": "nx run sandbox:recordings",
     "test:e2e": "nx run website:test:e2e",
-    "test:e2e:website": "cd apps/website && NODE_ENV=development LD_LIBRARY_PATH=$HOME/.playwright-libs:$LD_LIBRARY_PATH npx playwright test"
+    "test:e2e:website": "cd apps/website && NODE_ENV=development LD_LIBRARY_PATH=$HOME/.playwright-libs:$LD_LIBRARY_PATH npx playwright test",
+    "deadcode": "pnpm dlx knip --no-progress",
+    "deadcode:report": "pnpm dlx knip --no-progress > .artifacts/knip-report.txt 2>&1 || true"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
@@ -144,6 +146,7 @@
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
+    "knip": "^5.85.0",
     "msw": "^2.12.10",
     "nx": "22.4.5",
     "oxfmt": "^0.28.0",

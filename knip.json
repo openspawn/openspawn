@@ -1,0 +1,33 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["tools/sandbox/src/index.ts"],
+      "ignore": ["**/dist/**", "**/*.test.ts", "**/*.spec.ts"]
+    },
+    "apps/website": {
+      "entry": ["app/main.tsx", "app/routes/**/*.tsx"],
+      "ignore": ["**/dist/**"]
+    },
+    "apps/demo": {
+      "entry": ["src/main.tsx", "src/routes/**/*.tsx"],
+      "ignore": ["**/dist/**"]
+    },
+    "apps/team": {
+      "entry": ["src/main.tsx", "src/routes/**/*.tsx"],
+      "ignore": ["**/dist/**"]
+    },
+    "apps/api": {
+      "entry": ["src/main.ts"],
+      "ignore": ["**/dist/**"]
+    },
+    "libs/*": {
+      "entry": ["src/index.ts"],
+      "ignore": ["**/dist/**"]
+    },
+    "packages/openspawn": {
+      "entry": ["src/index.ts", "src/cli.ts"],
+      "ignore": ["**/dist/**"]
+    }
+  }
+}
