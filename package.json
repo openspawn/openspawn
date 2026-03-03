@@ -1,6 +1,6 @@
 {
   "name": "@openspawn/monorepo",
-  "version": "0.0.0",
+  "version": "2026.3.3",
   "private": true,
   "description": "Self-hosted platform for multi-agent coordination, communication, and economy management",
   "license": "MIT",
