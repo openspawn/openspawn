@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GitBranch, FlaskConical, LifeBuoy, Workflow } from "lucide-react";
 import { TerminalDemo } from "../components/terminal-demo";
+import { InteractiveCliDemo } from "../components/interactive-cli-demo";
 import { FeatureCard } from "../components/feature-card";
 import { ProtocolBadge } from "../components/protocol-badge";
 import { Button } from "../components/button";
@@ -1128,6 +1129,11 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SEE IT IN ACTION — Interactive CLI Demo
+          ═══════════════════════════════════════════════════════════════════════ */}
+      <InteractiveCliDemo />
 
       {/* ── Ready to graduate? — Final CTA ───────────────────────────────── */}
       <section aria-labelledby="graduate-cta" className="section-py-lg">
