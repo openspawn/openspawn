@@ -30,7 +30,6 @@ export const AgentFieldsFragmentDocument = graphql(`
     teamId
     avatar
     avatarColor
-    avatarUrl
   }
 `);
 
