@@ -30,13 +30,13 @@ export function MCPTools() {
           </thead>
           <tbody className="text-slate-300">
             {[
-              ["delegate_task", "Send a task to the agent org", "task"],
-              ["list_agents", "List all agents in the org", "—"],
-              ["get_agent", "Get details about a specific agent", "agentId"],
-              ["list_tasks", "List current tasks", "—"],
-              ["get_task", "Get task details", "taskId"],
-              ["send_message", "Send an ACP message to an agent", "agentId, message"],
-              ["get_org_stats", "Get organization-wide statistics", "—"],
+              ["task_create", "Create a task and optionally assign it", "title"],
+              ["agent_list", "List all agents in the org", "—"],
+              ["agent_whoami", "Get current agent's own info", "—"],
+              ["task_list", "List current tasks with optional filters", "—"],
+              ["task_get", "Get task details + activity log", "id"],
+              ["message_send", "Send a structured message to an agent or channel", "body"],
+              ["org_status", "Get organization-wide statistics", "—"],
             ].map(([tool, desc, params]) => (
               <tr key={tool} className="border-b border-white/5">
                 <td className="py-2 pr-4"><code className="inline-code">{tool}</code></td>

@@ -119,7 +119,7 @@ curl -X POST https://bikinibottom.ai/mcp \\
       {/* ── Available Tools ───────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Available Tools</h2>
       <p className="mb-6 text-slate-400">
-        OpenSpawn exposes 7 tools via MCP. All tools return JSON-encoded text content.
+        OpenSpawn exposes tools via MCP across 7 categories. All tools return JSON-encoded text content.
       </p>
 
       <div className="overflow-x-auto mb-8">
@@ -133,13 +133,19 @@ curl -X POST https://bikinibottom.ai/mcp \\
           </thead>
           <tbody className="text-slate-300">
             {[
-              ["delegate_task", "Send a task to the agent org", "task"],
-              ["list_agents", "List all agents in the org", "—"],
-              ["get_agent", "Get details about a specific agent", "agentId"],
-              ["list_tasks", "List current tasks", "—"],
-              ["get_task", "Get task details + activity log", "taskId"],
-              ["send_message", "Send an ACP message to an agent", "agentId, message"],
-              ["get_org_stats", "Get organization-wide statistics", "—"],
+              ["task_create", "Create a task and optionally assign it", "title"],
+              ["task_list", "List tasks with optional filters", "—"],
+              ["task_get", "Get full task details + activity log", "id"],
+              ["task_claim", "Atomically claim an open task", "task_id, agent_id"],
+              ["task_complete", "Mark a task done with result and artifacts", "task_id, result"],
+              ["agent_list", "List all agents in the org", "—"],
+              ["agent_whoami", "Get current agent's own info", "—"],
+              ["agent_register", "Register a new agent in the org", "id, name, role"],
+              ["message_send", "Send a structured message to an agent or channel", "body"],
+              ["message_read", "Read messages from a channel", "channelId"],
+              ["org_status", "Get organization-wide overview", "—"],
+              ["escalation_create", "Create an escalation for a blocker", "taskId, reason"],
+              ["trust_bonus", "Award a reputation bonus to an agent", "agentId, amount, reason"],
             ].map(([tool, desc, params]) => (
               <tr key={tool} className="border-b border-white/5">
                 <td className="py-2 pr-4"><code className="inline-code">{tool}</code></td>
@@ -151,13 +157,13 @@ curl -X POST https://bikinibottom.ai/mcp \\
         </table>
       </div>
 
-      {/* delegate_task */}
+      {/* task_create */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">delegate_task</code>
+        <code className="inline-code text-xl">task_create</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Send a task to the agent organization for processing. The task is routed by domain,
-        priority, and agent availability. This is the primary entry point for most workflows.
+        Create a new task and optionally assign it to a specific agent. The task is routed by
+        priority and agent availability. This is the primary entry point for most workflows.
       </p>
       <div className="overflow-x-auto mb-4">
         <table className="w-full text-sm border-collapse">
@@ -171,16 +177,28 @@ curl -X POST https://bikinibottom.ai/mcp \\
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">task</code></td>
+              <td className="py-2 pr-4"><code className="inline-code">title</code></td>
               <td className="py-2 pr-4">string</td>
               <td className="py-2 pr-4 text-emerald-400">✅</td>
-              <td className="py-2">Task description in natural language</td>
+              <td className="py-2">Task title</td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4"><code className="inline-code">description</code></td>
+              <td className="py-2 pr-4">string</td>
+              <td className="py-2 pr-4 text-slate-500">❌</td>
+              <td className="py-2">Detailed requirements</td>
             </tr>
             <tr>
               <td className="py-2 pr-4"><code className="inline-code">priority</code></td>
-              <td className="py-2 pr-4 text-xs"><code className="inline-code">"low" | "medium" | "high" | "critical"</code></td>
+              <td className="py-2 pr-4 text-xs"><code className="inline-code">"urgent" | "high" | "normal" | "low"</code></td>
               <td className="py-2 pr-4 text-slate-500">❌</td>
-              <td className="py-2">Task priority (default: <code className="inline-code">"medium"</code>)</td>
+              <td className="py-2">Task priority (default: <code className="inline-code">"normal"</code>)</td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4"><code className="inline-code">assigneeId</code></td>
+              <td className="py-2 pr-4">string</td>
+              <td className="py-2 pr-4 text-slate-500">❌</td>
+              <td className="py-2">Agent ID to assign to</td>
             </tr>
           </tbody>
         </table>
@@ -190,10 +208,11 @@ curl -X POST https://bikinibottom.ai/mcp \\
   "id": 1,
   "method": "tools/call",
   "params": {
-    "name": "delegate_task",
+    "name": "task_create",
     "arguments": {
-      "task": "Research the top 5 open-source vector databases and write a comparison doc",
-      "priority": "high"
+      "title": "Research the top 5 open-source vector databases and write a comparison doc",
+      "priority": "high",
+      "assigneeId": "agent-research-lead"
     }
   }
 }`}</CodeBlock>
@@ -205,101 +224,99 @@ curl -X POST https://bikinibottom.ai/mcp \\
   "isError": false
 }`}</CodeBlock>
 
-      {/* list_agents */}
+      {/* agent_list */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">list_agents</code>
+        <code className="inline-code text-xl">agent_list</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        List all agents in the organization, with optional filtering by status or domain.
+        List all agents registered in the organization.
       </p>
-      <CodeBlock title="Example — find all idle engineering agents">{`{
+      <CodeBlock title="Example — list all agents">{`{
   "jsonrpc": "2.0",
   "id": 2,
   "method": "tools/call",
   "params": {
-    "name": "list_agents",
-    "arguments": {
-      "status": "idle",
-      "domain": "engineering"
-    }
+    "name": "agent_list",
+    "arguments": {}
   }
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         <strong className="text-slate-200">Response fields:</strong>{" "}
         <code className="inline-code">id</code>, <code className="inline-code">name</code>,{" "}
-        <code className="inline-code">role</code>, <code className="inline-code">domain</code>,{" "}
-        <code className="inline-code">level</code>, <code className="inline-code">status</code>
+        <code className="inline-code">role</code>, <code className="inline-code">level</code>,{" "}
+        <code className="inline-code">status</code>, <code className="inline-code">department</code>,{" "}
+        <code className="inline-code">model</code>
       </p>
 
-      {/* get_agent */}
+      {/* agent_whoami */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">get_agent</code>
+        <code className="inline-code text-xl">agent_whoami</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Get detailed information about a specific agent, including their stats, inbox size, and
-        recent messages.
+        Get the current agent's own identity record — level, role, permissions, and manager.
+        No parameters required.
       </p>
       <CodeBlock title="Example">{`{
   "jsonrpc": "2.0",
   "id": 3,
   "method": "tools/call",
   "params": {
-    "name": "get_agent",
-    "arguments": { "agentId": "agent-backend-senior-1" }
+    "name": "agent_whoami",
+    "arguments": {}
   }
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         <strong className="text-slate-200">Response includes:</strong>{" "}
         <code className="inline-code">id</code>, <code className="inline-code">name</code>,{" "}
-        <code className="inline-code">role</code>, <code className="inline-code">domain</code>,{" "}
-        <code className="inline-code">level</code>, <code className="inline-code">status</code>,{" "}
-        <code className="inline-code">parentId</code>, <code className="inline-code">stats</code>,{" "}
-        <code className="inline-code">inboxSize</code>,{" "}
-        <code className="inline-code">recentMessages</code> (last 5)
+        <code className="inline-code">role</code>, <code className="inline-code">level</code>,{" "}
+        <code className="inline-code">status</code>, <code className="inline-code">department</code>,{" "}
+        <code className="inline-code">model</code>
       </p>
 
-      {/* list_tasks */}
+      {/* task_list */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">list_tasks</code>
+        <code className="inline-code text-xl">task_list</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        List tasks in the org, with filtering by status, assignee, and result limit.
+        List tasks in the org, with optional filtering by status, assignee, and priority.
       </p>
       <CodeBlock title="Example — find all blocked tasks">{`{
   "jsonrpc": "2.0",
   "id": 4,
   "method": "tools/call",
   "params": {
-    "name": "list_tasks",
+    "name": "task_list",
     "arguments": {
-      "status": "blocked",
-      "limit": 10
+      "status": "blocked"
     }
   }
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         Valid status values:{" "}
+        <code className="inline-code">backlog</code>,{" "}
         <code className="inline-code">todo</code>,{" "}
         <code className="inline-code">in_progress</code>,{" "}
         <code className="inline-code">review</code>,{" "}
         <code className="inline-code">done</code>,{" "}
-        <code className="inline-code">blocked</code>
+        <code className="inline-code">blocked</code>,{" "}
+        <code className="inline-code">cancelled</code>,{" "}
+        <code className="inline-code">open</code>
       </p>
 
-      {/* get_task */}
+      {/* task_get */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">get_task</code>
+        <code className="inline-code text-xl">task_get</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Get full details for a specific task, including its activity log and any block reasons.
+        Get full details for a specific task by ID, including its activity log and any block reasons.
       </p>
       <CodeBlock title="Example">{`{
   "jsonrpc": "2.0",
   "id": 5,
   "method": "tools/call",
   "params": {
-    "name": "get_task",
-    "arguments": { "taskId": "task-abc123" }
+    "name": "task_get",
+    "arguments": { "id": "task-abc123" }
   }
 }`}</CodeBlock>
       <Callout variant="info" className="mb-6">
@@ -308,43 +325,46 @@ curl -X POST https://bikinibottom.ai/mcp \\
         audit trail.
       </Callout>
 
-      {/* send_message */}
+      {/* message_send */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">send_message</code>
+        <code className="inline-code text-xl">message_send</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Send an ACP (Agent Communication Protocol) message directly to a specific agent. The
-        message appears in the agent's inbox on the next tick.
+        Send a structured message to another agent or channel. Use message types like{" "}
+        <code className="inline-code">TASK</code>, <code className="inline-code">RESULT</code>,{" "}
+        <code className="inline-code">ESCALATION</code>, or <code className="inline-code">DECISION</code>{" "}
+        to keep communications structured.
       </p>
       <CodeBlock title="Example — send a priority update">{`{
   "jsonrpc": "2.0",
   "id": 6,
   "method": "tools/call",
   "params": {
-    "name": "send_message",
+    "name": "message_send",
     "arguments": {
-      "agentId": "agent-engineering-lead",
-      "message": "The database migration has been approved. Proceed with the production deployment."
+      "channelId": "chan-engineering",
+      "body": "The database migration has been approved. Proceed with the production deployment.",
+      "type": "DECISION"
     }
   }
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         <strong className="text-slate-200">Response:</strong>{" "}
-        <code className="inline-code">{"{ \"sent\": true, \"to\": \"Engineering Lead\", \"messageId\": \"acp-...\" }"}</code>
+        <code className="inline-code">{"{ \"sent\": true, \"messageId\": \"acp-...\" }"}</code>
       </p>
 
-      {/* get_org_stats */}
+      {/* org_status */}
       <h3 className="mt-8 mb-2 text-xl font-semibold text-slate-200">
-        <code className="inline-code text-xl">get_org_stats</code>
+        <code className="inline-code text-xl">org_status</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Get a summary of organization-wide statistics: total agents, active agents, total tasks,
-        and completion rates. No parameters required.
+        Get a full overview of the org: all agents, task counts, budget status, and health score.
+        No parameters required.
       </p>
       <CodeBlock title="Response">{`{
   "content": [{
     "type": "text",
-    "text": "{\\"totalAgents\\":22,\\"activeAgents\\":14,\\"totalTasks\\":87,\\"completedTasks\\":63,\\"pendingTasks\\":24}"
+    "text": "{\\"agents\\":[...],\\"tasks\\":{\\"open\\":5,\\"in_progress\\":3,\\"done\\":12},\\"budget\\":{\\"total_spent\\":1200,\\"total_limit\\":5000},\\"health_score\\":87}"
   }],
   "isError": false
 }`}</CodeBlock>
@@ -396,24 +416,24 @@ def call_openspawn(method: str, params: dict) -> dict:
     return response.json()["result"]
 
 @tool
-def delegate_to_org(task: str, priority: str = "medium") -> str:
-    """Delegate a task to the OpenSpawn agent organization."""
+def create_task(title: str, priority: str = "normal") -> str:
+    """Create a task in the OpenSpawn agent organization."""
     result = call_openspawn("tools/call", {
-        "name": "delegate_task",
-        "arguments": {"task": task, "priority": priority}
+        "name": "task_create",
+        "arguments": {"title": title, "priority": priority}
     })
     return json.dumps(result["content"][0]["text"])
 
 @tool
-def get_org_stats() -> str:
-    """Get current organization statistics."""
+def get_org_status() -> str:
+    """Get current organization status and health."""
     result = call_openspawn("tools/call", {
-        "name": "get_org_stats",
+        "name": "org_status",
         "arguments": {}
     })
     return result["content"][0]["text"]
 
-tools = [delegate_to_org, get_org_stats]`}</CodeBlock>
+tools = [create_task, get_org_status]`}</CodeBlock>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Python (Direct)</h3>
       <CodeBlock title="python">{`import httpx, json
@@ -444,23 +464,26 @@ class OpenSpawnMCP:
             "clientInfo": {"name": "python-client", "version": "1.0"}
         })
 
-    def delegate_task(self, task: str, priority: str = "medium") -> dict:
+    def task_create(self, title: str, priority: str = "normal", assignee_id: str = None) -> dict:
+        args = {"title": title, "priority": priority}
+        if assignee_id:
+            args["assigneeId"] = assignee_id
         result = self._call("tools/call", {
-            "name": "delegate_task",
-            "arguments": {"task": task, "priority": priority}
+            "name": "task_create",
+            "arguments": args
         })
         return json.loads(result["content"][0]["text"])
 
-    def get_org_stats(self) -> dict:
+    def org_status(self) -> dict:
         result = self._call("tools/call", {
-            "name": "get_org_stats", "arguments": {}
+            "name": "org_status", "arguments": {}
         })
         return json.loads(result["content"][0]["text"])
 
 # Usage
 client = OpenSpawnMCP()
 client.initialize()
-task = client.delegate_task("Generate a weekly report on agent performance", "high")
+task = client.task_create("Generate a weekly report on agent performance", "high")
 print(f"Task created: {task['taskId']} — status: {task['status']}")`}</CodeBlock>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">TypeScript / Node.js</h3>
@@ -489,10 +512,10 @@ await mcpCall("initialize", {
   clientInfo: { name: "ts-client", version: "1.0" },
 });
 
-// Delegate a task
-const task = await toolCall("delegate_task", {
-  task: "Audit the API for security vulnerabilities",
-  priority: "critical",
+// Create a task
+const task = await toolCall("task_create", {
+  title: "Audit the API for security vulnerabilities",
+  priority: "urgent",
 });
 console.log(\`Task \${task.taskId} created, assigned to \${task.assigneeId}\`);`}</CodeBlock>
 

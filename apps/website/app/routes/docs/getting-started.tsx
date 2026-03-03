@@ -371,14 +371,14 @@ Write code, run tests, build APIs.
   }
 }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        This exposes 7 tools:{" "}
-        <code className="inline-code">delegate_task</code>,{" "}
-        <code className="inline-code">list_agents</code>,{" "}
-        <code className="inline-code">get_agent</code>,{" "}
-        <code className="inline-code">list_tasks</code>,{" "}
-        <code className="inline-code">get_task</code>,{" "}
-        <code className="inline-code">send_message</code>,{" "}
-        <code className="inline-code">get_org_stats</code>.
+        This exposes tools across 7 categories:{" "}
+        <code className="inline-code">task_create</code>,{" "}
+        <code className="inline-code">agent_list</code>,{" "}
+        <code className="inline-code">agent_whoami</code>,{" "}
+        <code className="inline-code">task_list</code>,{" "}
+        <code className="inline-code">task_get</code>,{" "}
+        <code className="inline-code">message_send</code>,{" "}
+        <code className="inline-code">org_status</code>, and more.
       </p>
 
       {/* Under the Hood */}
