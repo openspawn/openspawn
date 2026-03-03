@@ -1,6 +1,6 @@
 {
   "name": "openspawn",
-  "version": "0.1.0",
+  "version": "2026.3.3",
   "description": "Standalone MCP server and CLI for OpenSpawn multi-agent organizations",
   "type": "module",
   "bin": {
