@@ -1,0 +1,38 @@
+{
+  "name": "OpenSpawn Coordinator",
+  "description": "Multi-agent coordination layer. Define your AI agent organization in a single ORG.md file.",
+  "url": "https://openspawn.ai",
+  "version": "0.3.0",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "skills": [
+    {
+      "id": "org-management",
+      "name": "Organization Management",
+      "description": "Parse ORG.md files, manage agent hierarchy, coordinate tasks through organizational structure"
+    },
+    {
+      "id": "task-coordination",
+      "name": "Task Coordination",
+      "description": "Create, assign, claim, and complete tasks across agent teams with atomic claim prevention"
+    },
+    {
+      "id": "mcp-server",
+      "name": "MCP Tool Server",
+      "description": "Expose 30+ coordination tools via Model Context Protocol (Streamable HTTP)"
+    }
+  ],
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "provider": {
+    "organization": "OpenSpawn",
+    "url": "https://openspawn.ai"
+  },
+  "documentationUrl": "https://openspawn.ai/docs/getting-started",
+  "authentication": {
+    "schemes": ["hmac"]
+  }
+}
