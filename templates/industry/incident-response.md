@@ -28,6 +28,8 @@ Owns the incident from page to post-mortem. Activates the response team, makes g
 - **Domain:** Incident Management
 - **Reports to:** Human Principal
 - **Spawns:** Diagnostics Agent, Remediation Agent, Comms Agent
+- **Skills:** Incident command, root cause analysis, stakeholder communication, post-mortem facilitation, rollback decision-making
+- **Tools:** escalation_create, task_create, org_status, incident timeline tracker
 
 #### Diagnostics Agent — Systems Reliability Engineer
 Rapid root-cause analysis. Pulls metrics, traces, and logs from the monitoring stack; identifies the failure domain; narrows down to the specific component or change that caused the incident. Delivers a concise diagnosis to the Incident Commander.
@@ -36,6 +38,7 @@ Rapid root-cause analysis. Pulls metrics, traces, and logs from the monitoring s
 - **Department:** SRE
 - **Domain:** Diagnostics & Observability
 - **Reports to:** Incident Commander
+- **Skills:** Distributed systems debugging, log analysis, tracing, metrics interpretation, hypothesis-driven investigation
 - **Tools:** metrics dashboards, distributed tracing, log aggregation, deployment history
 
 #### Remediation Agent — Platform Engineer
@@ -45,6 +48,7 @@ Executes the fix. Implements hotfix, coordinates rollback, or applies configurat
 - **Department:** Engineering
 - **Domain:** Deployment & Operations
 - **Reports to:** Incident Commander
+- **Skills:** CI/CD operations, infrastructure as code, rollback procedures, hotfix development, feature flag management
 - **Tools:** CI/CD pipeline, infrastructure as code, feature flag system, deployment rollback tooling
 
 #### Comms Agent — Incident Communications Specialist
@@ -54,6 +58,7 @@ Manages all stakeholder communications. Writes and sends status page updates, dr
 - **Department:** Customer Success
 - **Domain:** Communications
 - **Reports to:** Incident Commander
+- **Skills:** Crisis communications, status page management, stakeholder messaging, incident timeline documentation
 - **Tools:** status page API, customer email, internal messaging
 
 ## Policies
@@ -120,3 +125,7 @@ Patch forward if:
 - Root cause is known, fix is < 30 lines of code
 - No user data at risk
 - Rollback would cause worse disruption (e.g., migration already applied)
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.

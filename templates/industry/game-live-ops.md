@@ -27,6 +27,8 @@ The strategic center of the live ops team. Sets weekly content calendar, approve
 - **Domain:** Game Strategy
 - **Reports to:** Human Principal
 - **Spawns:** Economy Tuner, Content Generator, Player Support Agent
+- **Skills:** Live ops strategy, content calendar management, economy oversight, KPI tracking, crisis response
+- **Tools:** game analytics dashboard, escalation_create, org_status, content calendar, task manager
 
 #### Economy Tuner — Game Economy Analyst
 Monitors game economy metrics continuously: currency inflation, item price drift, sink/faucet ratios, whale vs. F2P spending ratios, and retention curves by spending tier. Detects anomalies, proposes balance adjustments, and implements approved changes within guardrail thresholds.
@@ -35,6 +37,7 @@ Monitors game economy metrics continuously: currency inflation, item price drift
 - **Department:** Live Operations
 - **Domain:** Game Economy
 - **Reports to:** Ops Director
+- **Skills:** Game economy modeling, inflation analysis, sink/faucet design, A/B testing, telemetry interpretation
 - **Tools:** economy dashboard, telemetry pipeline, parameter configuration API, A/B test framework
 
 #### Content Generator — Live Content Specialist
@@ -44,6 +47,7 @@ Produces daily and weekly live content: event descriptions, challenge text, rewa
 - **Department:** Live Operations
 - **Domain:** Content Production
 - **Reports to:** Ops Director
+- **Skills:** Game copywriting, event design, localization string authoring, brand voice adherence, lore awareness
 - **Tools:** game CMS, localization database, asset library, content calendar
 
 #### Player Support Agent — Community & Support Specialist
@@ -53,6 +57,7 @@ Monitors app store reviews, social media sentiment, and in-game support tickets.
 - **Department:** Live Operations
 - **Domain:** Player Relations
 - **Reports to:** Ops Director
+- **Skills:** Sentiment analysis, app store monitoring, support ticket triage, community response drafting
 - **Tools:** review monitoring API, social listening, support ticket system, sentiment analysis
 
 ## Policies
@@ -111,3 +116,7 @@ If Player Support Agent detects review score drop > 0.3 stars in 24 hours or soc
 2. Ops Director determines root cause (economy, content, bug)
 3. Routes to appropriate specialist for investigation
 4. Player Support Agent drafts acknowledgment statement for Ops Director approval
+
+---
+
+> **Syntax reference:** See [ORG.md Reference](../../docs/org-md-reference.md) for complete field documentation and all supported options.
