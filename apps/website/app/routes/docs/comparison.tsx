@@ -38,7 +38,7 @@ export function ComparisonPage() {
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
               ["Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration"],
-              ["Languages", "TypeScript (Python SDK planned)", "Python", "Python"],
+              ["Languages", "TypeScript-first (REST + MCP for any language)", "Python", "Python"],
               ["Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes"],
               ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"],
               ["Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools"],
@@ -51,7 +51,7 @@ export function ComparisonPage() {
               ["Escalation System", "✅ Typed escalation with chain of command", "❌", "❌"],
               ["Framework Agnostic", "✅ Works with any A2A/MCP agent", "❌", "❌"],
               ["Pricing", "Free, self-hosted", "Free + Enterprise (paid)", "Free + LangSmith (paid)"],
-              ["Production Maturity", "Demo-stage, rapid development", "Production-ready", "Production-ready"],
+              ["Production Maturity", "Early-stage, actively developed", "Production-ready", "Production-ready"],
             ].map(([feature, os, crewai, langgraph]) => (
               <tr key={feature}>
                 <td className="py-2 pr-4 font-medium text-slate-300">{feature}</td>
@@ -248,7 +248,7 @@ Schedules check-ins, collects health scores, flags churn risk early.
           <p className="mb-2 text-sm font-semibold text-slate-200">Python Ecosystem</p>
           <p className="text-xs text-slate-400">
             Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first with a Python
-            SDK in development. If your team is all-Python, they'll feel more native today.
+            SDK on the roadmap. In the meantime, any language can integrate via REST API or MCP tools. If your team is all-Python, CrewAI/LangGraph will feel more native today.
           </p>
         </div>
       </div>
@@ -296,7 +296,7 @@ openspawn_tools = MCPServerAdapter(
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Switching From LangGraph to OpenSpawn</h2>
 
       <p className="mb-2 text-slate-300 font-semibold">Step 1: Expose your LangGraph workflow as an MCP tool</p>
-      <CodeBlock title="python">{`from openspawn import OpenSpawnClient  # Python SDK (in development)
+      <CodeBlock title="python">{`import requests  # Any language via REST API
 from langgraph.graph import StateGraph
 
 app = workflow.compile()

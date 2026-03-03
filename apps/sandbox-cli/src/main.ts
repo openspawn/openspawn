@@ -14,7 +14,8 @@ import {
 } from "./commands/index.js";
 import { setJsonOutput, icons, setDemoMode } from "./lib/output.js";
 
-const VERSION = "2026.3.3";
+declare const __CLI_VERSION__: string;
+const VERSION = typeof __CLI_VERSION__ !== "undefined" ? __CLI_VERSION__ : "dev";
 
 const banner = `
 ${pc.cyan("┌──────────────────────────────────────────┐")}
