@@ -882,3 +882,423 @@ describe("TasksService - Self-Claim Tasks", () => {
     });
   });
 });
+
+// =============================================================================
+// Additional coverage: create, findAll, findOne, approve, assign
+// =============================================================================
+
+describe("TasksService - create / findAll / findOne / approve / assign", () => {
+  let service: TasksService;
+  let taskRepo: Partial<Repository<Task>>;
+  let dependencyRepo: Partial<Repository<TaskDependency>>;
+  let tagRepo: Partial<Repository<TaskTag>>;
+  let commentRepo: Partial<Repository<TaskComment>>;
+  let taskIdentifierService: Partial<TaskIdentifierService>;
+  let taskTransitionService: Partial<TaskTransitionService>;
+  let eventsService: Partial<EventsService>;
+  let eventEmitter: Partial<EventEmitter2>;
+  let trustService: Partial<TrustService>;
+  let webhooksService: Partial<WebhooksService>;
+
+  const orgId = "org-abc";
+  const actorId = "actor-xyz";
+
+  const createMockTask = (overrides: Partial<Task> = {}): Task =>
+    ({
+      id: "task-1",
+      orgId,
+      identifier: "TASK-001",
+      title: "Test Task",
+      description: "A test task",
+      status: TaskStatus.BACKLOG,
+      priority: TaskPriority.NORMAL,
+      creatorId: actorId,
+      assigneeId: null,
+      approvalRequired: false,
+      approvedAt: undefined,
+      approvedBy: undefined,
+      metadata: {},
+      tags: [],
+      dependencies: [],
+      dependents: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...overrides,
+    }) as Task;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    taskRepo = {
+      findOne: vi.fn(),
+      save: vi.fn().mockImplementation((t) => Promise.resolve(t as Task)),
+      create: vi.fn().mockImplementation((data) => data as Task),
+      createQueryBuilder: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
+      }),
+      manager: {
+        transaction: vi.fn(),
+      } as any,
+    };
+
+    dependencyRepo = {
+      find: vi.fn().mockResolvedValue([]),
+      findOne: vi.fn().mockResolvedValue(null),
+      save: vi.fn(),
+      create: vi.fn().mockImplementation((data) => data),
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
+    };
+
+    tagRepo = {
+      create: vi.fn().mockImplementation((data) => data),
+      save: vi.fn().mockResolvedValue(undefined),
+    };
+
+    commentRepo = {
+      create: vi.fn().mockImplementation((data) => data),
+      save: vi.fn().mockResolvedValue(undefined),
+      find: vi.fn().mockResolvedValue([]),
+    };
+
+    taskIdentifierService = {
+      generateIdentifier: vi.fn().mockResolvedValue("TASK-042"),
+    };
+
+    taskTransitionService = {
+      validateTransition: vi.fn(),
+    };
+
+    eventsService = {
+      emit: vi.fn().mockResolvedValue(undefined),
+    };
+
+    eventEmitter = {
+      emit: vi.fn(),
+    };
+
+    trustService = {
+      recordTaskCompleted: vi.fn(),
+      recordTaskFailed: vi.fn(),
+      recordTaskRework: vi.fn(),
+    };
+
+    webhooksService = {
+      executePreHooks: vi.fn().mockResolvedValue({ allow: true }),
+    };
+
+    service = new TasksService(
+      taskRepo as Repository<Task>,
+      dependencyRepo as Repository<TaskDependency>,
+      tagRepo as Repository<TaskTag>,
+      commentRepo as Repository<TaskComment>,
+      taskIdentifierService as TaskIdentifierService,
+      taskTransitionService as TaskTransitionService,
+      eventsService as EventsService,
+      eventEmitter as EventEmitter2,
+      trustService as TrustService,
+      webhooksService as WebhooksService,
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // create
+  // ---------------------------------------------------------------------------
+  describe("create", () => {
+    it("should generate an identifier and save the task", async () => {
+      const savedTask = createMockTask({ id: "new-task", identifier: "TASK-042" });
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      const result = await service.create(orgId, actorId, {
+        title: "New Task",
+        priority: TaskPriority.HIGH,
+      });
+
+      expect(taskIdentifierService.generateIdentifier).toHaveBeenCalledWith(orgId);
+      expect(taskRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ orgId, title: "New Task" }),
+      );
+      expect(taskRepo.save).toHaveBeenCalled();
+      expect(result.id).toBe("new-task");
+    });
+
+    it("should default status to BACKLOG", async () => {
+      const savedTask = createMockTask({ status: TaskStatus.BACKLOG });
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      await service.create(orgId, actorId, { title: "Task", priority: TaskPriority.NORMAL });
+
+      expect(taskRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ status: TaskStatus.BACKLOG }),
+      );
+    });
+
+    it("should set creatorId to actorId", async () => {
+      const savedTask = createMockTask({ creatorId: actorId });
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      await service.create(orgId, actorId, { title: "Task", priority: TaskPriority.NORMAL });
+
+      expect(taskRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ creatorId: actorId }),
+      );
+    });
+
+    it("should emit task.created event", async () => {
+      const savedTask = createMockTask({ id: "event-task" });
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      await service.create(orgId, actorId, { title: "Task", priority: TaskPriority.NORMAL });
+
+      expect(eventsService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orgId,
+          type: "task.created",
+          actorId,
+          entityType: "task",
+        }),
+      );
+    });
+
+    it("should default approvalRequired to false", async () => {
+      const savedTask = createMockTask();
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      await service.create(orgId, actorId, { title: "Task", priority: TaskPriority.NORMAL });
+
+      expect(taskRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ approvalRequired: false }),
+      );
+    });
+
+    it("should set approvalRequired when provided in DTO", async () => {
+      const savedTask = createMockTask({ approvalRequired: true });
+      (taskRepo.save as Mock).mockResolvedValue(savedTask);
+      (taskRepo.findOne as Mock).mockResolvedValue(savedTask);
+
+      await service.create(orgId, actorId, {
+        title: "Approval Task",
+        priority: TaskPriority.HIGH,
+        approvalRequired: true,
+      });
+
+      expect(taskRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ approvalRequired: true }),
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // findAll
+  // ---------------------------------------------------------------------------
+  describe("findAll", () => {
+    it("should return all tasks for an org (no filters)", async () => {
+      const tasks = [createMockTask(), createMockTask({ id: "task-2" })];
+      const qb = {
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue(tasks),
+      };
+      (taskRepo.createQueryBuilder as Mock).mockReturnValue(qb);
+
+      const result = await service.findAll(orgId);
+
+      expect(qb.where).toHaveBeenCalledWith("task.org_id = :orgId", { orgId });
+      expect(result).toHaveLength(2);
+    });
+
+    it("should apply status filter when provided", async () => {
+      const qb = {
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
+      };
+      (taskRepo.createQueryBuilder as Mock).mockReturnValue(qb);
+
+      await service.findAll(orgId, { status: TaskStatus.IN_PROGRESS });
+
+      expect(qb.andWhere).toHaveBeenCalledWith("task.status = :status", {
+        status: TaskStatus.IN_PROGRESS,
+      });
+    });
+
+    it("should apply assigneeId filter when provided", async () => {
+      const qb = {
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
+      };
+      (taskRepo.createQueryBuilder as Mock).mockReturnValue(qb);
+
+      await service.findAll(orgId, { assigneeId: "agent-42" });
+
+      expect(qb.andWhere).toHaveBeenCalledWith("task.assignee_id = :assigneeId", {
+        assigneeId: "agent-42",
+      });
+    });
+
+    it("should return empty array when no tasks match", async () => {
+      const qb = {
+        where: vi.fn().mockReturnThis(),
+        andWhere: vi.fn().mockReturnThis(),
+        leftJoinAndSelect: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        getMany: vi.fn().mockResolvedValue([]),
+      };
+      (taskRepo.createQueryBuilder as Mock).mockReturnValue(qb);
+
+      const result = await service.findAll(orgId);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // findOne
+  // ---------------------------------------------------------------------------
+  describe("findOne", () => {
+    it("should return task when found", async () => {
+      const task = createMockTask({ id: "found-task" });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+
+      const result = await service.findOne(orgId, "found-task");
+
+      expect(result.id).toBe("found-task");
+      expect(taskRepo.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "found-task", orgId },
+        }),
+      );
+    });
+
+    it("should throw NotFoundException when task does not exist", async () => {
+      (taskRepo.findOne as Mock).mockResolvedValue(null);
+
+      await expect(service.findOne(orgId, "nonexistent")).rejects.toThrow();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // approve
+  // ---------------------------------------------------------------------------
+  describe("approve", () => {
+    it("should throw when task does not require approval", async () => {
+      const task = createMockTask({ approvalRequired: false });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+
+      await expect(service.approve(orgId, actorId, task.id)).rejects.toThrow();
+    });
+
+    it("should throw when task is already approved", async () => {
+      const task = createMockTask({
+        approvalRequired: true,
+        approvedAt: new Date(),
+      });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+
+      await expect(service.approve(orgId, actorId, task.id)).rejects.toThrow();
+    });
+
+    it("should set approvedAt and approvedBy on the task", async () => {
+      const task = createMockTask({
+        approvalRequired: true,
+        approvedAt: undefined,
+      });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+      (taskRepo.save as Mock).mockImplementation((t) => Promise.resolve(t));
+
+      const result = await service.approve(orgId, actorId, task.id);
+
+      expect(result.approvedAt).toBeInstanceOf(Date);
+      expect(result.approvedBy).toBe(actorId);
+    });
+
+    it("should emit task.approved event", async () => {
+      const task = createMockTask({ approvalRequired: true, approvedAt: undefined });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+      (taskRepo.save as Mock).mockImplementation((t) => Promise.resolve(t));
+
+      await service.approve(orgId, actorId, task.id);
+
+      expect(eventsService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orgId,
+          type: "task.approved",
+          actorId,
+          entityType: "task",
+          entityId: task.id,
+        }),
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // assign
+  // ---------------------------------------------------------------------------
+  describe("assign", () => {
+    it("should update assigneeId on the task", async () => {
+      const task = createMockTask({ assigneeId: null });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+      (taskRepo.save as Mock).mockImplementation((t) => Promise.resolve(t));
+
+      const result = await service.assign(orgId, actorId, task.id, "new-agent");
+
+      expect(result.assigneeId).toBe("new-agent");
+    });
+
+    it("should emit task.assigned event with previous and new assignee", async () => {
+      const task = createMockTask({ assigneeId: "old-agent" });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+      (taskRepo.save as Mock).mockImplementation((t) => Promise.resolve(t));
+
+      await service.assign(orgId, actorId, task.id, "new-agent");
+
+      expect(eventsService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orgId,
+          type: "task.assigned",
+          actorId,
+          entityId: task.id,
+          data: expect.objectContaining({
+            previousAssignee: "old-agent",
+            newAssignee: "new-agent",
+          }),
+        }),
+      );
+    });
+
+    it("should throw NotFoundException when task does not exist", async () => {
+      (taskRepo.findOne as Mock).mockResolvedValue(null);
+
+      await expect(
+        service.assign(orgId, actorId, "nonexistent", "agent-1"),
+      ).rejects.toThrow();
+    });
+
+    it("should save the task after updating the assignee", async () => {
+      const task = createMockTask({ assigneeId: null });
+      (taskRepo.findOne as Mock).mockResolvedValue(task);
+      (taskRepo.save as Mock).mockImplementation((t) => Promise.resolve(t));
+
+      await service.assign(orgId, actorId, task.id, "agent-1");
+
+      expect(taskRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({ assigneeId: "agent-1" }),
+      );
+    });
+  });
+});
