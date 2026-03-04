@@ -42,3 +42,14 @@ export * from "./lib/resolve-avatar-url";
 export { SANDBOX_URL } from "./lib/sandbox-url";
 export * from "./lib/status-colors";
 export * from "./lib/toast";
+
+
+// Document node exports (used by demo mock-fetcher)
+export {
+  TasksDocument,
+  TaskDocument,
+  AgentsDocument,
+  CreditHistoryDocument,
+  EventsDocument,
+  MessagesDocument,
+} from "./graphql/generated/graphql";
