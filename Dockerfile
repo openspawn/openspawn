@@ -21,7 +21,7 @@ COPY scripts/ ./scripts/
 ARG VITE_DASHBOARD_THEME=openspawn
 ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
-RUN pnpm nx run dashboard:build --configuration=production
+RUN pnpm nx run demo:build --configuration=production
 RUN pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
 
@@ -42,7 +42,7 @@ COPY tools/sandbox/ORG.md ./
 COPY tools/sandbox/org/ ./org/
 
 # Copy built apps
-COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
+COPY --from=build /app/dist/apps/demo ./dashboard-dist
 COPY --from=build /app/dist/apps/team ./team-dist
 COPY --from=build /app/dist/apps/website ./website-dist
 
