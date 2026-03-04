@@ -72,7 +72,7 @@ function SidePanelOverlay() {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
-      <div className="fixed inset-y-0 right-0 z-50">
+      <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]">
         <SidePanelShell title={title} onClose={closeSidePanel} width={width} onWidthChange={setWidth}>
           {content}
         </SidePanelShell>
