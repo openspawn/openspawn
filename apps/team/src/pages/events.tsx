@@ -21,11 +21,15 @@ export function EventsPage() {
               className="flex items-start gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-4"
             >
               <Activity className="h-4 w-4 text-white/30 mt-0.5 shrink-0" />
-              <div className="space-y-1 min-w-0">
-                <div className="text-sm text-white">{event.type}</div>
-                <div className="text-xs text-white/40">
-                  {event.actor && <span>Agent: {event.actor.name} · </span>}
-                  {new Date(event.createdAt).toLocaleString()}
+              <div className="space-y-1 min-w-0 flex-1">
+                <div className="text-sm text-white truncate">{event.type}</div>
+                <div className="text-xs text-white/40 flex flex-wrap gap-x-2 gap-y-0.5">
+                  {event.actor && (
+                    <span className="truncate max-w-[200px]">Agent: {event.actor.name}</span>
+                  )}
+                  <span className="shrink-0">
+                    {new Date(event.createdAt).toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>

@@ -9,7 +9,6 @@ import {
   Network,
   Settings,
   Menu,
-  X,
   MessageSquare,
   Layers,
   ClipboardList,
@@ -17,6 +16,11 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import type { ReactNode } from "react";
+import {
+  GlobalSearchTrigger,
+  GlobalSearchModal,
+  useGlobalSearchShortcut,
+} from "./global-search";
 
 const BRAND_NAME = "OpenSpawn";
 const BRAND_SUBTITLE = "Team Dashboard";
@@ -40,8 +44,6 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-const SIDEBAR_EXPANDED_W = 256;
-const SIDEBAR_COLLAPSED_W = 64;
 const SIDEBAR_STORAGE_KEY = "os-sidebar-collapsed";
 
 function useSidebarCollapsed() {
@@ -70,11 +72,14 @@ export function Layout({ children }: LayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isFullBleed = fullBleedRoutes.has(location.pathname);
-  const sidebarW = collapsed ? SIDEBAR_COLLAPSED_W : SIDEBAR_EXPANDED_W;
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useGlobalSearchShortcut(() => setSearchOpen(true));
 
   return (
     <div className="flex h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-      {/* Mobile overlay */}
+      <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      {/* Mobile overlay — tap outside to close */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
@@ -82,24 +87,30 @@ export function Layout({ children }: LayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar
+          Mobile: fixed, always full-width (w-64), slides in/out.
+          Desktop: relative in flex flow; width driven by collapsed state (w-16 / w-64).
+      */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/5 bg-[hsl(var(--card))] transition-all duration-200",
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-white/5 bg-[hsl(var(--card))]",
+          "transition-[width,transform] duration-200",
+          // Mobile: always 256 px, slide in/out
+          "w-64",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: relative in flow, width driven by collapse state
           "md:relative md:translate-x-0",
-          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          collapsed ? "md:w-16" : "md:w-64",
         )}
-        style={{ width: sidebarW }}
       >
         {/* Brand */}
-        <div className="flex h-16 items-center gap-3 border-b border-white/5 px-4">
+        <div className="flex h-16 items-center gap-3 border-b border-white/5 px-4 shrink-0">
           <span className="text-xl">⚡</span>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white">{BRAND_NAME}</span>
-              <span className="text-[10px] text-white/40">{BRAND_SUBTITLE}</span>
-            </div>
-          )}
+          {/* Always show brand text on mobile; hide when collapsed on desktop */}
+          <div className={cn("flex flex-col", collapsed && "md:hidden")}>
+            <span className="text-sm font-bold text-white">{BRAND_NAME}</span>
+            <span className="text-[10px] text-white/40">{BRAND_SUBTITLE}</span>
+          </div>
         </div>
 
         {/* Nav */}
@@ -116,44 +127,60 @@ export function Layout({ children }: LayoutProps) {
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                   active
                     ? "bg-white/10 text-white font-medium"
-                    : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                    : "text-white/50 hover:bg-white/5 hover:text-white/80",
+                  // Collapsed on desktop: center icon, hide label
+                  collapsed && "md:justify-center md:px-0",
                 )}
+                title={collapsed ? item.name : undefined}
                 onClick={() => setMobileOpen(false)}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
-                {!collapsed && <span>{item.name}</span>}
+                {/* Always show label on mobile; hide when desktop-collapsed */}
+                <span className={cn(collapsed && "md:hidden")}>{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom */}
-        <div className="border-t border-white/5 p-3 space-y-2">
+        <div className="border-t border-white/5 p-3 space-y-2 shrink-0">
+          {/* Collapse toggle — desktop only */}
           <button
             onClick={toggleCollapse}
             className="hidden md:flex items-center gap-2 w-full rounded-lg px-3 py-2 text-xs text-white/40 hover:text-white/60 hover:bg-white/5 transition-colors"
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <PanelLeft className="h-4 w-4" />
+            <PanelLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
             {!collapsed && <span>Collapse</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Mobile header */}
-        <header className="flex h-14 items-center gap-3 border-b border-white/5 px-4 md:hidden">
-          <button onClick={() => setMobileOpen(true)} className="text-white/60">
+      {/* Main content area */}
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+        {/* Mobile top bar — hamburger + brand + search trigger */}
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-white/5 px-4 md:hidden">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="text-white/60 hover:text-white transition-colors p-1 -ml-1 rounded-md hover:bg-white/5"
+            aria-label="Open navigation"
+          >
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-bold text-white">⚡ {BRAND_NAME}</span>
+          <span className="flex-1 text-sm font-bold text-white">⚡ {BRAND_NAME}</span>
+          <GlobalSearchTrigger onOpen={() => setSearchOpen(true)} />
         </header>
 
-        {/* Content */}
+        {/* Desktop search bar — visible above main content on md+ */}
+        <div className="hidden md:flex h-12 shrink-0 items-center border-b border-white/5 px-6">
+          <GlobalSearchTrigger onOpen={() => setSearchOpen(true)} />
+        </div>
+
+        {/* Page content */}
         <main
           className={cn(
             "flex-1 overflow-y-auto",
-            isFullBleed ? "" : "p-4 md:p-6 max-w-7xl mx-auto w-full"
+            isFullBleed ? "" : "p-4 md:p-6 max-w-7xl mx-auto w-full",
           )}
         >
           {children}
