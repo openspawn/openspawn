@@ -53,3 +53,4 @@ export {
   EventsDocument,
   MessagesDocument,
 } from "./graphql/generated/graphql";
+export { useDashboardPanels, registerPanelComponents } from "./hooks/use-dashboard-panels";

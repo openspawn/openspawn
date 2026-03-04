@@ -12,7 +12,6 @@ import { EventsPage } from "./pages/events";
 import { MessagesPage } from "./pages/messages";
 import { SettingsPage } from "./pages/settings";
 import { CreditsPage } from "./pages/credits";
-import { KanbanPage } from "./pages/kanban";
 import { TaskBoardPage } from "./pages/task-board";
 import { NetworkPage } from "./pages/network";
 
@@ -42,7 +41,6 @@ const eventsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/eve
 const messagesRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/messages", component: MessagesPage });
 const settingsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/settings", component: SettingsPage });
 const creditsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/credits", component: CreditsPage });
-const kanbanRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/kanban", component: KanbanPage });
 const taskBoardRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/task-board", component: TaskBoardPage });
 const networkRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/network", component: NetworkPage });
 
@@ -55,7 +53,6 @@ const routeTree = rootRoute.addChildren([
     messagesRoute,
     settingsRoute,
     creditsRoute,
-    kanbanRoute,
     taskBoardRoute,
     networkRoute,
   ]),

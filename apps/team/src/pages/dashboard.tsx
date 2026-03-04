@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
+import { useDashboardPanels } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import {
   PageHeader,
@@ -78,7 +79,7 @@ const ROLE_COLORS: Record<string, string> = {
 
 /* ── Agent Card ─────────────────────────────────────────────────── */
 
-function AgentCard({ agent, taskCount }: { agent: any; taskCount: number }) {
+function AgentCard({ agent, taskCount, onClick }: { agent: any; taskCount: number; onClick?: () => void }) {
   const completion = agent.tasksCompleted > 0
     ? agent.tasksSuccessful / agent.tasksCompleted
     : 0;
@@ -92,7 +93,7 @@ function AgentCard({ agent, taskCount }: { agent: any; taskCount: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
     >
-      <Link to="/agents" className="block group">
+      <div onClick={onClick} className="block group cursor-pointer">
         <Card className="hover:border-cyan-500/30 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/5 cursor-pointer">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
@@ -147,21 +148,21 @@ function AgentCard({ agent, taskCount }: { agent: any; taskCount: number }) {
             </div>
           </CardContent>
         </Card>
-      </Link>
+      </div>
     </motion.div>
   );
 }
 
 /* ── Task Row ───────────────────────────────────────────────────── */
 
-function TaskRow({ task, index }: { task: any; index: number }) {
+function TaskRow({ task, index, onClick }: { task: any; index: number; onClick?: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 25 }}
     >
-      <Link to="/tasks" className="block group">
+      <div onClick={onClick} className="block group cursor-pointer">
         <div className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
           <CircleDot className={`h-3.5 w-3.5 shrink-0 ${
             task.status === "DONE"        ? "text-emerald-400" :
@@ -188,7 +189,7 @@ function TaskRow({ task, index }: { task: any; index: number }) {
             </Badge>
           </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }
@@ -199,6 +200,7 @@ export function DashboardPage() {
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
   const { events } = useEvents();
+  const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
 
   const stats = useMemo(() => {
     const active  = agents.filter(a => a.status === AgentStatus.Active);
@@ -284,7 +286,7 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
             {agentsLoading && <div className="text-sm text-muted-foreground animate-pulse">Loading agents…</div>}
-            {agents.map(a => <AgentCard key={a.id} agent={a} taskCount={tasksByAgent[a.id] || 0} />)}
+            {agents.map(a => <AgentCard key={a.id} agent={a} taskCount={tasksByAgent[a.id] || 0} onClick={() => openAgentPanel(a.id)} />)}
             {!agentsLoading && agents.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-8">No agents registered yet</div>
             )}
@@ -304,7 +306,7 @@ export function DashboardPage() {
           <CardContent className="pt-0">
             {tasksLoading && <div className="text-sm text-muted-foreground animate-pulse">Loading tasks…</div>}
             <div className="divide-y divide-white/5">
-              {sortedTasks.slice(0, 8).map((t, i) => <TaskRow key={t.id} task={t} index={i} />)}
+              {sortedTasks.slice(0, 8).map((t, i) => <TaskRow key={t.id} task={t} index={i} onClick={() => openTaskPanel(t.id)} />)}
             </div>
             {!tasksLoading && tasks.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-8">

@@ -10,12 +10,13 @@ import {
   Settings,
   Menu,
   MessageSquare,
-  Layers,
   ClipboardList,
   PanelLeft,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import type { ReactNode } from "react";
+import { SidePanelShell } from "@openspawn/dashboard-ui";
+import { useSidePanel } from "@openspawn/dashboard-data";
 import {
   GlobalSearchTrigger,
   GlobalSearchModal,
@@ -35,7 +36,6 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Network", href: "/network", icon: Network },
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
-  { name: "Kanban", href: "/kanban", icon: Layers },
   { name: "Task Board", href: "/task-board", icon: ClipboardList },
   { name: "Agents", href: "/agents", icon: Users },
   { name: "Messages", href: "/messages", icon: MessageSquare },
@@ -64,6 +64,21 @@ function useSidebarCollapsed() {
   }, []);
 
   return { collapsed, toggle };
+}
+
+function SidePanelOverlay() {
+  const { isOpen, content, width, title, setWidth, closeSidePanel } = useSidePanel();
+  if (!isOpen || !content) return null;
+  return (
+    <>
+      <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
+      <div className="fixed inset-y-0 right-0 z-50">
+        <SidePanelShell title={title} onClose={closeSidePanel} width={width} onWidthChange={setWidth}>
+          {content}
+        </SidePanelShell>
+      </div>
+    </>
+  );
 }
 
 export function Layout({ children }: LayoutProps) {
@@ -186,6 +201,9 @@ export function Layout({ children }: LayoutProps) {
           {children}
         </main>
       </div>
+
+      {/* Shared SidePanel — slides in from right */}
+      <SidePanelOverlay />
     </div>
   );
 }

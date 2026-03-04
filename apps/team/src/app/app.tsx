@@ -1,6 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SidePanelProvider } from "@openspawn/dashboard-data";
+import { SidePanelProvider, registerPanelComponents } from "@openspawn/dashboard-data";
+import { AgentDetailPanel, TaskDetailPanel } from "@openspawn/dashboard-ui";
 import { router } from "../routes";
 
 declare const __COMMIT_SHA__: string;
@@ -12,6 +13,9 @@ console.log(
   'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
   'color: #64748b'
 );
+
+// Register shared panel components so useDashboardPanels() can render them
+registerPanelComponents({ AgentDetailPanel, TaskDetailPanel });
 
 const queryClient = new QueryClient({
   defaultOptions: {
