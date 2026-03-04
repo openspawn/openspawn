@@ -47,7 +47,7 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
   }, [width, onWidthChange]);
 
   return (
-    <div data-testid="side-panel" className="h-full flex flex-col bg-background relative overflow-x-hidden w-full md:w-auto">
+    <div data-testid="side-panel" className="h-full flex flex-col bg-[hsl(var(--background))] relative overflow-x-hidden w-full md:w-auto">
       {/* Drag handle on left edge */}
       <div
         onMouseDown={handleMouseDown}
