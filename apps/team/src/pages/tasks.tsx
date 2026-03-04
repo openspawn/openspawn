@@ -1,65 +1,71 @@
-import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
-import { PageHeader, Badge, EmptyState } from "@openspawn/dashboard-ui";
-import { TaskStatus } from "@openspawn/dashboard-data";
-import { useTasks } from "../hooks";
+import { PageHeader, Badge } from "@openspawn/dashboard-ui";
+import { useDashboardPanels } from "@openspawn/dashboard-data";
+import { useAgents, useTasks } from "../hooks";
+import { cn } from "../lib/utils";
+
+function priorityColor(p: string): string {
+  switch (p) {
+    case "URGENT": return "bg-red-500/20 text-red-400";
+    case "HIGH":   return "bg-amber-500/20 text-amber-400";
+    case "NORMAL": return "bg-blue-500/20 text-blue-400";
+    default:       return "bg-white/10 text-white/40";
+  }
+}
+
+function statusBadge(s: string): { variant: "default" | "secondary" | "destructive" | "outline"; label: string } {
+  switch (s) {
+    case "DONE":        return { variant: "default", label: "Done" };
+    case "IN_PROGRESS": return { variant: "secondary", label: "In Progress" };
+    case "BLOCKED":     return { variant: "destructive", label: "Blocked" };
+    case "REVIEW":      return { variant: "outline", label: "Review" };
+    case "TODO":        return { variant: "outline", label: "To Do" };
+    default:            return { variant: "outline", label: s };
+  }
+}
 
 export function TasksPage() {
   const { tasks, loading } = useTasks();
-  const [search, setSearch] = useState("");
+  const { agents } = useAgents();
+  const { openTaskPanel } = useDashboardPanels({ agents, tasks });
 
-  const filtered = useMemo(() => {
-    if (!search) return tasks;
-    const q = search.toLowerCase();
-    return tasks.filter((t) => t.title.toLowerCase().includes(q));
-  }, [tasks, search]);
+  // Sort: active first (in_progress, review, todo, blocked, backlog), then done/cancelled
+  const sorted = [...tasks].sort((a, b) => {
+    const order: Record<string, number> = { IN_PROGRESS: 0, REVIEW: 1, TODO: 2, BLOCKED: 3, BACKLOG: 4, DONE: 5, CANCELLED: 6 };
+    const ao = order[a.status] ?? 4;
+    const bo = order[b.status] ?? 4;
+    if (ao !== bo) return ao - bo;
+    const po: Record<string, number> = { URGENT: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
+    return (po[a.priority] ?? 2) - (po[b.priority] ?? 2);
+  });
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Tasks" description="Track and manage agent tasks" />
-
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-          <input
-            type="text"
-            placeholder="Search tasks..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder:text-white/30 focus:border-white/20 focus:outline-none"
-          />
-        </div>
-      </div>
-
+      <PageHeader title="Tasks" description={`${tasks.length} tasks across your organization`} />
       {loading ? (
-        <div className="text-white/40 text-sm">Loading tasks...</div>
-      ) : filtered.length === 0 ? (
-        <EmptyState title="No tasks" description="No tasks match your criteria." />
+        <div className="text-white/40 text-sm">Loading…</div>
+      ) : sorted.length === 0 ? (
+        <div className="text-center py-12 text-white/30">No tasks yet</div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((task) => (
-            <div
-              key={task.id}
-              className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
-            >
-              {/* Mobile: stacked layout; sm+: side-by-side */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div className="space-y-1 min-w-0">
-                  <div className="font-medium text-white text-sm truncate">{task.title}</div>
-                  {task.assignee && (
-                    <div className="text-xs text-white/40 truncate">
-                      Assigned to {task.assignee.name}
-                    </div>
-                  )}
+          {sorted.map(task => {
+            const sb = statusBadge(task.status);
+            return (
+              <button key={task.id} onClick={() => openTaskPanel(task.id)}
+                className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-all text-left cursor-pointer group">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono text-white/30">{task.identifier}</span>
+                    <Badge variant={sb.variant} className="text-[10px]">{sb.label}</Badge>
+                    <span className={cn("text-[10px] px-1.5 py-0.5 rounded font-medium", priorityColor(task.priority))}>{task.priority}</span>
+                  </div>
+                  <p className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{task.title}</p>
                 </div>
-                <div className="shrink-0 self-start sm:self-center">
-                  <Badge variant={task.status === TaskStatus.Done ? "default" : "secondary"}>
-                    {task.status}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          ))}
+                {task.assignee && (
+                  <span className="text-xs text-white/40 shrink-0">{task.assignee.name}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
