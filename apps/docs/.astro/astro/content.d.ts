@@ -208,6 +208,20 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"guides/troubleshooting.md": {
+	id: "guides/troubleshooting.md";
+  slug: "guides/troubleshooting";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/webhooks.md": {
+	id: "guides/webhooks.md";
+  slug: "guides/webhooks";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "index.mdx": {
 	id: "index.mdx";
   slug: "index";
@@ -225,6 +239,13 @@ declare module 'astro:content' {
 "reference/agent-config-compatibility.md": {
 	id: "reference/agent-config-compatibility.md";
   slug: "reference/agent-config-compatibility";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/api.md": {
+	id: "reference/api.md";
+  slug: "reference/api";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
