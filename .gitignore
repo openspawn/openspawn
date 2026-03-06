@@ -61,3 +61,15 @@ __pycache__/
 node_modules
 
 .pnpm-store/
+
+# CLI publish artifacts (built by CI)
+apps/sandbox-cli/publish/*.cjs
+
+# Local task state
+.openspawn/
+
+# Backup files
+*.bak
+
+# Astro build output
+apps/docs/.astro/
