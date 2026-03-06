@@ -751,7 +751,6 @@ export const AgentFieldsFragmentDoc = `
   teamId
   avatar
   avatarColor
-  avatarUrl
 }
     `;
 export const TasksDocument = `

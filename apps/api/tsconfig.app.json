@@ -5,7 +5,6 @@
     "module": "commonjs",
     "types": ["node"],
     "declaration": true,
-    "composite": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
@@ -17,13 +16,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
-  "references": [
-    {
-      "path": "../../libs/shared-types/tsconfig.lib.json"
-    },
-    {
-      "path": "../../libs/database/tsconfig.lib.json"
-    }
-  ]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
 }
