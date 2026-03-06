@@ -2,3 +2,19 @@ packages:
   - "apps/*"
   - "libs/*"
   - "packages/*"
+
+onlyBuiltDependencies:
+  - "@swc/core"
+  - bcrypt
+  - better-sqlite3
+  - esbuild
+  - nx
+  - sharp
+
+ignoredBuiltDependencies:
+  - "@apollo/protobufjs"
+  - "@nestjs/core"
+  - "@parcel/watcher"
+  - less
+  - msw
+  - unrs-resolver
