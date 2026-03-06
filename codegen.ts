@@ -2,10 +2,13 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema: "./schema.gql",
-  documents: ["apps/dashboard/src/**/*.tsx", "apps/dashboard/src/**/*.ts"],
+  documents: [
+    "libs/dashboard-data/src/**/*.ts",
+    "libs/dashboard-data/src/**/*.tsx",
+  ],
   ignoreNoDocuments: true,
   generates: {
-    "apps/dashboard/src/graphql/generated/": {
+    "libs/dashboard-data/src/graphql/generated/": {
       preset: "client",
       presetConfig: {
         fragmentMasking: false,
@@ -20,7 +23,7 @@ const config: CodegenConfig = {
         },
       },
     },
-    "apps/dashboard/src/graphql/generated/hooks.ts": {
+    "libs/dashboard-data/src/graphql/generated/hooks.ts": {
       plugins: ["typescript", "typescript-operations", "typescript-react-query"],
       config: {
         fetcher: {

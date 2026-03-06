@@ -6,9 +6,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'OpenSpawn Docs',
-      social: {
-        github: 'https://github.com/openspawn/openspawn',
-      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/openspawn/openspawn' },
+      ],
       sidebar: [
         {
           label: 'Getting Started',

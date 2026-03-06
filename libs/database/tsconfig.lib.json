@@ -5,8 +5,7 @@
     "declaration": true,
     "types": [
       "node"
-    ],
-    "composite": true
+    ]
   },
   "include": [
     "src/**/*.ts"
@@ -24,10 +23,5 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx"
-  ],
-  "references": [
-    {
-      "path": "../shared-types/tsconfig.lib.json"
-    }
   ]
 }
