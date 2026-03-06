@@ -1,102 +1,191 @@
-# AGENTS.md — BikiniBottom Development Guide
+# AGENTS.md — AI Agent Quick Reference
 
-## Project Overview
+Quick reference for AI agents working on OpenSpawn. Start here.
 
-BikiniBottom is a multi-agent coordination platform. The dashboard visualises agent activity, tasks, credits, network topology, and more. The sandbox server (`tools/sandbox/`) serves both the REST/SSE API and the pre-built dashboard on port 3333.
+## What Is This?
 
-## Tech Stack
+Multi-agent coordination platform. Agents get tasks, earn credits, communicate. Humans monitor via dashboard.
 
-| Layer | Technology |
-|-------|-----------|
-| Monorepo | Nx |
-| Frontend | React 19, TanStack Query, Framer Motion, Tailwind CSS |
-| Build | Vite |
-| Unit/Component Tests | Vitest |
-| E2E Tests | Playwright |
-| Package Manager | pnpm |
+**Stack**: NestJS API + React Dashboard + PostgreSQL + MCP Server
+**Package Manager**: pnpm
+**Build System**: Nx
 
-## Testing Pyramid
+---
+
+## Domains & Deployment
+
+| Domain | What | Container | Port |
+|--------|------|-----------|------|
+| **bikinibottom.ai** | Live demo (sandbox + dashboard + team) | `app` | 3333 |
+| **openspawn.ai** | Website + landing page | `platform` | 3334 |
+| **docs.openspawn.ai** | Astro/Starlight docs | Not yet deployed | — |
+
+Both containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml` and `deploy-platform.yml` workflows.
+
+---
+
+## Project Structure
 
 ```
-        ┌──────────┐
-        │  Deploy   │  ← smoke tests against production URL
-        │  Smoke    │
-       ┌┴──────────┴┐
-       │    E2E      │  ← Playwright against sandbox (port 3333)
-      ┌┴────────────┴┐
-      │  Component    │  ← Vitest + React Testing Library
-     ┌┴──────────────┴┐
-     │     Unit        │  ← Vitest (pure functions, utils)
-     └────────────────┘
+apps/
+  demo/            -> React dashboard (bikinibottom.ai)
+  team/            -> Internal team dashboard
+  website/         -> openspawn.ai marketing site
+  platform/        -> openspawn.ai landing page
+  api/             -> NestJS backend (REST + GraphQL)
+  docs/            -> Astro Starlight documentation
+  mcp/             -> MCP server for agent tools
+  sandbox-cli/     -> CLI entry point for sandbox
+  dashboard/       -> DEPRECATED — replaced by demo
+
+libs/
+  dashboard-data/  -> Shared hooks, auth, GraphQL, utilities
+  dashboard-ui/    -> Shared React UI components
+  design-tokens/   -> Design system (colors, spacing, typography)
+  database/        -> TypeORM entities
+  demo-data/       -> Simulation engine, scenarios, fixtures
+  shared-types/    -> Shared TypeScript types and enums
+  test-utils/      -> Shared test utilities
+
+tools/
+  sandbox/         -> Coordination sandbox server (SSE + MCP + A2A)
+
+packages/
+  openspawn/       -> npm CLI package (npx openspawn init)
+  coordinator/     -> Coordination server package
+  cli/             -> Go CLI (GoReleaser)
 ```
 
-### When to Write What
+---
 
-- **Unit tests** — Pure functions, utilities, data transformations (`apps/dashboard/src/lib/__tests__/`)
-- **Component tests** — React components in isolation with mocked data (`*.spec.tsx` next to component)
-- **E2E tests** — User flows, page loads, regression checks (`apps/dashboard/e2e/tests/`)
-- **Deploy smoke** — Post-deploy verification against live URL
-
-### Testing Requirements for PRs
-
-- All new utility functions must have unit tests
-- New pages must have at least a "renders without error" E2E test
-- Bug fixes should include a regression test
-- Run `npx nx test dashboard` and `npx nx typecheck dashboard` before pushing
-
-## Running Tests Locally
+## Commands
 
 ```bash
-# Unit + component tests
-npx nx test dashboard
+# Install
+pnpm install
 
-# Typecheck
-npx nx typecheck dashboard
+# Dev (API + Demo dashboard)
+pnpm exec nx run-many -t serve -p api,demo
 
-# E2E (builds dashboard + starts sandbox automatically)
-npx nx e2e dashboard
+# Dev (Sandbox + Dashboard together)
+pnpm run dev:sandbox
 
-# E2E with UI
-cd apps/dashboard/e2e && npx playwright test --ui
+# Build
+pnpm exec nx run-many -t build
+
+# Test
+pnpm exec nx test demo          # Unit tests
+pnpm exec nx e2e demo           # E2E tests
+
+# Lint & Format
+pnpm exec nx run-many -t lint
+pnpm exec oxfmt --write .
+
+# GraphQL codegen
+pnpm run codegen
+
+# Database
+pnpm exec nx run api:sync-schema
+pnpm exec nx run api:seed
 ```
 
-## Animation Rules
+---
 
-- **No Framer Motion `layout` on absolutely-positioned elements** — causes layout thrashing
-- **Respect `prefers-reduced-motion`** — wrap animations in media query checks or use Framer Motion's `useReducedMotion`
-- Keep animations under 300ms for UI interactions
-- Use `spring` transitions for natural feel
+## Key URLs (dev)
 
-## Production Build Rules
+- Demo dashboard: http://localhost:4200
+- Demo mode: http://localhost:4200/?demo=true
+- Sandbox: http://localhost:3333
+- API: http://localhost:3000
+- GraphQL: http://localhost:3000/graphql
 
-- **No hardcoded `localhost` URLs** — use `getSandboxUrl()` from `src/lib/sandbox-url.ts`
-- The `VITE_SANDBOX_URL` env var overrides the auto-detected URL
-- In production (port 80/443), `getSandboxUrl()` returns `''` (same-origin)
+---
 
-## Deploy Checklist
+## Architecture (1-minute version)
 
-1. `npx nx typecheck dashboard` passes
-2. `npx nx test dashboard` passes
-3. `npx nx build dashboard` succeeds
-4. E2E smoke tests pass against sandbox
-5. No `localhost` URLs in network requests (checked by E2E)
-6. PR approved and squash-merged
+1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
+2. **Demo app** (`apps/demo/`) is the React dashboard for bikinibottom.ai
+3. **API** (`apps/api/`) manages tasks, credits, messages (NestJS + TypeORM)
+4. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
+5. **Docker** builds demo + team + website, serves all via sandbox server on VPS
 
-## PR Conventions
+Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
-- Branch from `main`
-- Use conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
-- Squash merge to keep history clean
-- Delete branch after merge
+---
 
-## Key Directories
+## Database Entities
 
+| Entity | Purpose |
+|--------|---------|
+| `Agent` | AI agents with levels (L1-L10), parent hierarchy, balance |
+| `AgentCapability` | Skills per agent with proficiency level |
+| `Task` | Work items with Kanban status flow |
+| `TaskDependency` | Blocking relationships between tasks |
+| `CreditTransaction` | Debits/credits with audit trail |
+| `Channel` | Communication channels (task, DM, broadcast) |
+| `Message` | Messages in channels |
+| `Event` | Append-only system audit log |
+
+---
+
+## Conventions
+
+- **Commits**: Scoped conventional commits (`feat(scope):`, `fix(scope):`)
+- **Imports**: No barrel files, explicit paths
+- **Formatting**: oxfmt (Rust-based)
+- **Linting**: oxlint (type-aware)
+- **Components**: shadcn/ui patterns, Tailwind
+- **TypeScript**: No `any`, no `as` casts, prefer string enums
+
+---
+
+## Do Not
+
+- **Edit `apps/dashboard/`** — deprecated, use `apps/demo/` instead
+- **Use `npm` or `yarn`** — this project uses pnpm only
+- **Use `any` or `as` casts** — find the correct type
+- **Create barrel files** — use explicit import paths
+- **Commit generated files without running codegen** — run `pnpm run codegen` first
+
+---
+
+## After Making Changes
+
+Always run before finishing:
+
+```bash
+pnpm exec oxfmt --write .          # Format
+pnpm exec nx run-many -t lint      # Lint
 ```
-apps/dashboard/          — React dashboard app
-  src/lib/               — Utility functions
-  src/components/        — Shared components
-  src/pages/             — Route pages
-  e2e/                   — Playwright E2E tests (sandbox mode)
-tools/sandbox/           — Sandbox API server
-e2e/legacy/              — Legacy E2E tests (stale, targets dev ports)
-```
+
+---
+
+## Common Tasks
+
+### Add a new dashboard page
+1. Create `apps/demo/src/pages/my-page.tsx`
+2. Export from `apps/demo/src/pages/index.ts`
+3. Add route in `apps/demo/src/app/app.tsx`
+4. Add nav link in `apps/demo/src/components/layout.tsx`
+
+### Add a GraphQL query
+1. Add query to `apps/demo/src/graphql/operations.ts`
+2. Run `pnpm run codegen`
+3. Import hook from `libs/dashboard-data/src/graphql/generated/hooks`
+
+### Add demo data
+1. Add fixtures to `libs/demo-data/src/fixtures/`
+2. Export from `libs/demo-data/src/fixtures/index.ts`
+3. Update scenarios in `libs/demo-data/src/scenarios/`
+
+---
+
+## Deeper Docs
+
+| Topic | Document |
+|-------|----------|
+| Architecture & deployment | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Testing, PRs, dev guide | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Product requirements | [docs/openspawn/PRD.md](docs/openspawn/PRD.md) |
+| API reference (50+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md) |
+| Database schema | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md) |

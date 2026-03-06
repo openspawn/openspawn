@@ -1,29 +1,38 @@
-# 🏗️ Architecture
+# Architecture
 
-BikiniBottom is an Nx monorepo with a clear separation between API, dashboard, and shared libraries.
+OpenSpawn is an Nx monorepo — multi-agent coordination platform with React dashboards, NestJS API, and a sandbox server.
 
 ## Monorepo Structure
 
 ```
 apps/
-  api/            → NestJS backend (GraphQL + REST)
-  dashboard/      → React 19 frontend (Vite + TailwindCSS v4)
-  mcp/            → MCP server for AI tool integration
-  cli/            → Command-line interface
+  demo/            React dashboard (bikinibottom.ai)
+  team/            Internal team dashboard
+  website/         openspawn.ai marketing site
+  platform/        openspawn.ai landing page server
+  api/             NestJS backend (GraphQL + REST)
+  docs/            Astro Starlight documentation (docs.openspawn.ai)
+  mcp/             MCP server for AI tool integration
+  sandbox-cli/     CLI entry point for sandbox
+  dashboard/       DEPRECATED — replaced by demo
 
 libs/
-  database/       → TypeORM entities, migrations, data source
-  demo-data/      → Simulation engine, scenarios, fixtures
-  shared-types/   → Shared TypeScript types and enums
-  sdk/            → TypeScript SDK (@openspawn/sdk)
+  dashboard-data/  Shared hooks, auth, GraphQL, utilities
+  dashboard-ui/    Shared React UI components (shadcn/ui)
+  design-tokens/   Design system tokens (colors, spacing, typography)
+  database/        TypeORM entities, migrations, data source
+  demo-data/       Simulation engine, scenarios, fixtures
+  shared-types/    Shared TypeScript types and enums
+  test-utils/      Shared test utilities
 
-sdks/
-  python/         → Python SDK (openspawn-py)
+tools/
+  sandbox/         Coordination sandbox server (SSE + MCP + A2A)
+  sandbox-python/  Python sandbox variant
 
-skills/
-  openclaw/       → OpenClaw AgentSkill
-
-docs/             → Feature docs, strategy, roadmap
+packages/
+  openspawn/       npm CLI package (npx openspawn init)
+  coordinator/     Coordination server package
+  cli/             Go CLI (GoReleaser)
 ```
 
 ## Tech Stack
@@ -39,8 +48,44 @@ docs/             → Feature docs, strategy, roadmap
 | Graph Viz | @xyflow/react (ReactFlow) |
 | Build System | Nx |
 | Linting | oxlint + oxfmt |
-| Testing | Vitest |
+| Testing | Vitest + Playwright |
 | Language | TypeScript (strict, bundler resolution) |
+
+## Deployment Topology
+
+All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy for HTTPS termination.
+
+| Domain | Container | Port | Serves |
+|--------|-----------|------|--------|
+| bikinibottom.ai | `app` | 3333 | Sandbox server + demo + team + website (static) |
+| openspawn.ai | `platform` | 3334 | Platform landing page |
+| docs.openspawn.ai | — | — | Astro/Starlight docs (not yet deployed) |
+
+The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
+
+| Container | Domain | Port | Apps Served |
+|-----------|--------|------|-------------|
+| `app` (bikinibottom) | bikinibottom.ai | 3333 | sandbox server + demo + team + website |
+| `platform` | openspawn.ai | 3334 | platform landing page |
+
+### CI/CD Workflows
+
+| Workflow | Trigger | What it does |
+|----------|---------|-------------|
+| `ci.yml` | All PRs | Build, test, lint, codegen check |
+| `deploy.yml` | Push to main | Docker build + deploy to VPS (bikinibottom.ai) |
+| `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai) |
+| `pages.yml` | Push to main | GitHub Pages (Jekyll docs + demo) — may be removed |
+| `release-cli.yml` | Tag push | GoReleaser for packages/cli |
+
+### Docker Build (Dockerfile)
+
+The main Dockerfile builds three apps in a multi-stage build:
+1. `pnpm nx run demo:build` -> `dashboard-dist`
+2. `pnpm nx run team:build` -> `team-dist`
+3. `pnpm nx run website:build` -> `website-dist`
+
+The runtime stage runs `tools/sandbox/src/index.ts` which serves the API and all static apps.
 
 ## Key Patterns
 
@@ -57,8 +102,8 @@ Internal events use NestJS's `@OnEvent` decorators for decoupled communication:
 All external integrations (GitHub, Linear, future ones) implement `IntegrationProvider`:
 ```typescript
 interface IntegrationProvider {
-  processInboundWebhook(payload: any): Promise<void>;
-  syncOutbound(event: string, data: any): Promise<void>;
+  processInboundWebhook(payload: unknown): Promise<void>;
+  syncOutbound(event: string, data: unknown): Promise<void>;
 }
 ```
 

@@ -1,13 +1,13 @@
 # Contributing to OpenSpawn
 
-Welcome to OpenSpawn! We are building the coordination layer for AI agent organizations.
+Coordination layer for AI agent organizations.
 
 ## Quick Links
 
 - **GitHub:** https://github.com/openspawn/openspawn
-- **Vision:** VISION.md
 - **Website:** https://openspawn.ai
 - **Live Demo:** https://bikinibottom.ai
+- **Vision:** VISION.md
 
 ## How to Contribute
 
@@ -15,34 +15,6 @@ Welcome to OpenSpawn! We are building the coordination layer for AI agent organi
 2. **New features or architecture changes** — Start a GitHub Discussion or Issue first
 3. **Org templates** — Submit new industry templates via PR
 4. **Documentation** — Always welcome
-
-## Before You PR
-
-- Test locally: `pnpm install && pnpm test`
-- Ensure builds pass: `pnpm nx run-many -t build`
-- Keep PRs focused (one topic per PR)
-- Describe what and why in the PR description
-
-## Project Structure
-
-```
-apps/
-  demo/          # bikinibottom.ai — live demo dashboard
-  team/          # team.openspawn.ai — internal team dashboard
-  website/       # openspawn.ai — marketing site + docs
-  api/           # api.openspawn.ai — NestJS GraphQL + REST API
-  docs/          # Astro Starlight documentation site
-libs/
-  dashboard-ui/  # Shared React UI components
-  dashboard-data/ # Shared data fetching and state
-  design-tokens/ # Design system tokens (colors, spacing, typography)
-  database/      # TypeORM entities and database utilities
-  test-utils/    # Shared test utilities
-tools/
-  sandbox/       # Coordination sandbox server (SSE + MCP + A2A)
-packages/
-  openspawn/     # CLI package (npx openspawn init)
-```
 
 ## Development Setup
 
@@ -53,34 +25,76 @@ pnpm install
 pnpm test
 ```
 
-## AI-Assisted PRs Welcome
+## Testing
 
-Built with Claude, Codex, Cursor, or other AI tools? Great — just be transparent:
+**What to write when:**
 
-- Mark as AI-assisted in the PR title or description
-- Note the degree of testing (untested / lightly tested / fully tested)
+| Layer | Tool | When | Location |
+|-------|------|------|----------|
+| Unit | Vitest | Pure functions, utils, transforms | `apps/demo/src/lib/__tests__/` |
+| Component | Vitest + RTL | React components in isolation | `*.spec.tsx` next to component |
+| E2E | Playwright | User flows, page loads, regressions | `apps/demo/e2e/tests/` |
+| Smoke | curl/Playwright | Post-deploy verification | Against production URL |
+
+**PR requirements:**
+- New utility functions must have unit tests
+- New pages must have a "renders without error" E2E test
+- Bug fixes should include a regression test
+
+**Running tests:**
+
+```bash
+pnpm exec nx test demo           # Unit + component
+pnpm exec nx typecheck demo      # Type check
+pnpm exec nx e2e demo            # E2E (builds + starts sandbox)
+```
+
+## Animation Rules
+
+- No Framer Motion `layout` on absolutely-positioned elements (layout thrashing)
+- Respect `prefers-reduced-motion` via `useReducedMotion`
+- Keep interactions under 300ms, use `spring` transitions
+
+## Production Build Rules
+
+- No hardcoded `localhost` URLs — use `getSandboxUrl()` from `src/lib/sandbox-url.ts`
+- `VITE_SANDBOX_URL` env var overrides auto-detected URL
+- In production (port 80/443), `getSandboxUrl()` returns `''` (same-origin)
+
+## Deploy Checklist
+
+1. `pnpm exec nx typecheck demo` passes
+2. `pnpm exec nx test demo` passes
+3. `pnpm exec nx build demo` succeeds
+4. E2E smoke tests pass against sandbox
+5. No `localhost` URLs in network requests (checked by E2E)
+6. PR approved and squash-merged
+
+## PR Conventions
+
+- Branch from `main`
+- Scoped conventional commits: `feat(scope):`, `fix(scope):`, `chore(scope):`, `docs(scope):`
+- Squash merge, delete branch after
+
+## AI-Assisted PRs
+
+Welcome. Just be transparent:
+- Mark as AI-assisted in PR title or description
+- Note testing level (untested / lightly tested / fully tested)
 - Confirm you understand what the code does
-- Include prompts or session logs if helpful
-
-AI PRs are first-class citizens. We just want transparency so reviewers know what to look for.
 
 ## Org Templates
 
-We ship industry-specific org templates. To contribute a new template:
-
-1. Create a new directory under `tools/sandbox/org/`
-2. Write the ORG.md for your industry use case
-3. Include realistic agent roles, policies, and playbooks
-4. Add a brief README explaining the scenario
-5. Open a PR with the template name in the title
+To contribute a new template:
+1. Create directory under `tools/sandbox/org/`
+2. Write ORG.md with agent roles, policies, playbooks
+3. Add brief README, open PR
 
 ## Code Style
 
-- TypeScript throughout
-- ESLint + Prettier for formatting
-- Vitest for testing
-- Co-locate tests with source files when possible
+- TypeScript throughout, oxlint + oxfmt for linting/formatting
+- Vitest for testing, co-locate tests with source
 
-## Reporting Security Issues
+## Security
 
-See SECURITY.md for our security policy and responsible disclosure process.
+See SECURITY.md for responsible disclosure process.
