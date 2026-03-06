@@ -1,1 +1,1 @@
-export * from "@openspawn/dashboard-data";
+export * from "./gql";
