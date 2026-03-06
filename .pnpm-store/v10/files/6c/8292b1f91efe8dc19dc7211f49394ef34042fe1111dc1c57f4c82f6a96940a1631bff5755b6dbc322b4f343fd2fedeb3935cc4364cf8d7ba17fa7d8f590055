@@ -1,6 +1,0 @@
-export declare const test: () => {
-    executor: string;
-    cache: boolean;
-    dependsOn: string[];
-    inputs: string[];
-};

@@ -1,3 +1,0 @@
-import { type Tree } from '@nx/devkit';
-export default function installJiti(tree: Tree): Promise<import("@nx/devkit").GeneratorCallback>;
-//# sourceMappingURL=install-jiti.d.ts.map

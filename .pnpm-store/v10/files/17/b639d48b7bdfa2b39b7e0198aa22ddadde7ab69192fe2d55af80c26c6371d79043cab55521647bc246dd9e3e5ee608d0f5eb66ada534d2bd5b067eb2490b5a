@@ -1,5 +1,0 @@
-export declare const tidy: () => {
-    executor: string;
-    cache: boolean;
-    inputs: string[];
-};

@@ -1,3 +1,0 @@
-import { CreateNodesV2 } from '@nx/devkit';
-import { GoPluginOptions } from './types/go-plugin-options';
-export declare const createNodesV2: CreateNodesV2<GoPluginOptions>;

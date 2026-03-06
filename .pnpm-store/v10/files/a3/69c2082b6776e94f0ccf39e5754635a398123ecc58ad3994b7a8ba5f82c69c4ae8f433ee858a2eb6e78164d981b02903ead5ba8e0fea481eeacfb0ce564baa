@@ -1,3 +1,0 @@
-import { CreateDependencies } from '@nx/devkit';
-import { GoPluginOptions } from './types/go-plugin-options';
-export declare const createDependencies: CreateDependencies<GoPluginOptions>;

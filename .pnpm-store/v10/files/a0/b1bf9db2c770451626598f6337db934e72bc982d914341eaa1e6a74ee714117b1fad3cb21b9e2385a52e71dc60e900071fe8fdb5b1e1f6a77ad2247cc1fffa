@@ -1,7 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProjectTagsFromSchema = getProjectTagsFromSchema;
-function getProjectTagsFromSchema(options) {
-    return options.tags ? options.tags.split(',').map((s) => s.trim()) : [];
-}
-//# sourceMappingURL=get-project-tag-from-schema.js.map

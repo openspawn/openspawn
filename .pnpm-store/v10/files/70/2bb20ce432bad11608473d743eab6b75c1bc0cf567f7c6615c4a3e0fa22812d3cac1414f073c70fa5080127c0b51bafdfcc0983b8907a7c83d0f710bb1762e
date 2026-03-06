@@ -1,2 +1,0 @@
-export declare const sdl = "\n  directive @requiresScopes(\n    scopes: [[requiresScopes__Scope!]!]!\n  ) on FIELD_DEFINITION | OBJECT | INTERFACE | SCALAR | ENUM\n\n  scalar requiresScopes__Scope\n";
-//# sourceMappingURL=requires-scopes.d.ts.map

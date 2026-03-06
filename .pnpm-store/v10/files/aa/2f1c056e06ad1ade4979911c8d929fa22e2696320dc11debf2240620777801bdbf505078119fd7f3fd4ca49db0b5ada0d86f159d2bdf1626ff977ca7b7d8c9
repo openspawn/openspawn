@@ -1,2 +1,0 @@
-import { GoListType } from '../types/go-list-type';
-export declare const REGEXS: Record<GoListType | 'version', RegExp>;

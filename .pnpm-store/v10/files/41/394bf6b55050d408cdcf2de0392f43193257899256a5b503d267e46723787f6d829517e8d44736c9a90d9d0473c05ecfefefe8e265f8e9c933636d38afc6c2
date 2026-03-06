@@ -1,5 +1,0 @@
-import type { GeneratorCallback, Tree } from '@nx/devkit';
-import type { InitGeneratorOptions } from './schema';
-export declare function initGenerator(tree: Tree, options: InitGeneratorOptions): Promise<GeneratorCallback>;
-export default initGenerator;
-//# sourceMappingURL=init.d.ts.map

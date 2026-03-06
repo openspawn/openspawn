@@ -1,9 +1,0 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _auth = require("@verdaccio/auth");
-var _default = exports.default = _auth.Auth;
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfYXV0aCIsInJlcXVpcmUiLCJfZGVmYXVsdCIsImV4cG9ydHMiLCJkZWZhdWx0IiwiQXV0aCJdLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9saWIvYXV0aC50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBBdXRoIH0gZnJvbSAnQHZlcmRhY2Npby9hdXRoJztcblxuZXhwb3J0IGRlZmF1bHQgQXV0aDtcbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUEsSUFBQUEsS0FBQSxHQUFBQyxPQUFBO0FBQXVDLElBQUFDLFFBQUEsR0FBQUMsT0FBQSxDQUFBQyxPQUFBLEdBRXhCQyxVQUFJIiwiaWdub3JlTGlzdCI6W119

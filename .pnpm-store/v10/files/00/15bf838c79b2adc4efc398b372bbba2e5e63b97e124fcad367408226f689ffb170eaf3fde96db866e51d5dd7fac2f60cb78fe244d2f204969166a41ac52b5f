@@ -1,8 +1,0 @@
-import { GoListType } from '../types/go-list-type';
-/**
- * Parses a Go list (also support list with only one item).
- *
- * @param listType type of list to parse
- * @param content list to parse as a string
- */
-export declare const parseGoList: (listType: GoListType, content: string) => string[];

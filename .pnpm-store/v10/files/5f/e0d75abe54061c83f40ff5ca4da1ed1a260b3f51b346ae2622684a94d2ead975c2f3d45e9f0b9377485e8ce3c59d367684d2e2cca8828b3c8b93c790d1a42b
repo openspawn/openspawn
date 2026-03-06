@@ -1,4 +1,0 @@
-import { ASTVisitor } from "graphql";
-import type { SubgraphValidationContext } from "../../validation-context.cjs";
-export declare function ExternalRules(context: SubgraphValidationContext): ASTVisitor;
-//# sourceMappingURL=external.d.ts.map

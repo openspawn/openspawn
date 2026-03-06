@@ -1,7 +1,0 @@
-package main
-
-import "<%= moduleName %>/cmd"
-
-func main() {
-	cmd.Execute()
-}
