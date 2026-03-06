@@ -89,7 +89,7 @@ function extractBlocks(tsx: string): Block[] {
 
     // Paragraph text (anything with visible text after stripping tags)
     const text = stripTags(trimmed);
-    if (text.length > 3 && !text.startsWith("{") && !text.match(/^[<\/\{\}]/) &&
+    if (text.length > 3 && !text.startsWith("{") && !text.match(/^[</{}]/) &&
         !text.includes("className") && !text.includes("onClick") &&
         !text.includes("useState") && !text.includes("motion.")) {
       // Accumulate paragraph text

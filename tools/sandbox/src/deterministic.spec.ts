@@ -343,8 +343,8 @@ describe('DeterministicSimulation', () => {
 `;
       const parsed = parseOrgMdContent(orgMd);
 
-      const sim1 = new DeterministicSimulation([...parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } }))], DEFAULT_CONFIG, false, parsed, 123);
-      const sim2 = new DeterministicSimulation([...parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } }))], DEFAULT_CONFIG, false, parsed, 123);
+      const sim1 = new DeterministicSimulation(parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } })), DEFAULT_CONFIG, false, parsed, 123);
+      const sim2 = new DeterministicSimulation(parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } })), DEFAULT_CONFIG, false, parsed, 123);
 
       sim1.processOrder('Build the API backend');
       sim2.processOrder('Build the API backend');
@@ -381,8 +381,8 @@ describe('DeterministicSimulation', () => {
 `;
       const parsed = parseOrgMdContent(orgMd);
 
-      const sim1 = new DeterministicSimulation([...parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } }))], DEFAULT_CONFIG, false, parsed, 1);
-      const sim2 = new DeterministicSimulation([...parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } }))], DEFAULT_CONFIG, false, parsed, 999);
+      const sim1 = new DeterministicSimulation(parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } })), DEFAULT_CONFIG, false, parsed, 1);
+      const sim2 = new DeterministicSimulation(parsed.agents.map(a => ({ ...a, taskIds: [], recentMessages: [], inbox: [], stats: { ...a.stats } })), DEFAULT_CONFIG, false, parsed, 999);
 
       sim1.processOrder('Build the API backend');
       sim2.processOrder('Build the API backend');
