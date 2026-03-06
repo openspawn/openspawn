@@ -1,6 +1,0 @@
-'use strict';
-
-const SHARED_STRATEGY = 'loaded-first';
-
-exports.SHARED_STRATEGY = SHARED_STRATEGY;
-//# sourceMappingURL=constant.cjs.cjs.map

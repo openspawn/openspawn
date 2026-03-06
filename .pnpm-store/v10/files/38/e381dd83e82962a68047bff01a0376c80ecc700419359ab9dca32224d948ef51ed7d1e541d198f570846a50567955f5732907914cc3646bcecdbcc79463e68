@@ -1,8 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NX_PLUGIN_NAME = exports.GO_WORK_MINIMUM_VERSION = exports.GO_WORK_FILE = exports.GO_MOD_FILE = void 0;
-exports.GO_MOD_FILE = 'go.mod';
-exports.GO_WORK_FILE = 'go.work';
-exports.GO_WORK_MINIMUM_VERSION = '1.18';
-exports.NX_PLUGIN_NAME = '@naxodev/gonx';
-//# sourceMappingURL=constants.js.map

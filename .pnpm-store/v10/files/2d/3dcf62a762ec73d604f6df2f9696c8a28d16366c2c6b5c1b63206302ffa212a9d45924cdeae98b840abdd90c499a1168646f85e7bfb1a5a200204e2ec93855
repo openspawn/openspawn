@@ -1,5 +1,0 @@
-import type { HttpError } from 'http-errors';
-import type { Logger } from '@verdaccio/types';
-import { $NextFunctionVer, $RequestExtend, $ResponseExtend } from '../types';
-export declare const handleError: (logger: Logger) => (err: HttpError, req: $RequestExtend, res: $ResponseExtend, next: $NextFunctionVer) => any;
-export declare const errorReportingMiddleware: (logger: Logger) => (req: $RequestExtend, res: $ResponseExtend, next: $NextFunctionVer) => void;

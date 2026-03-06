@@ -1,8 +1,0 @@
-import { Method } from 'got-cjs';
-export type FetchOptions = {
-    body: string;
-    headers?: {};
-    method?: string;
-};
-export declare function verifyMethod(value: any): Method;
-export declare function notifyRequest(url: string, options: FetchOptions): Promise<boolean>;

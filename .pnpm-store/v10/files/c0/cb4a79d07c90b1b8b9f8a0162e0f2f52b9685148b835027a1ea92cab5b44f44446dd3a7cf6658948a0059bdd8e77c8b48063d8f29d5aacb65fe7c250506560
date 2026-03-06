@@ -1,5 +1,0 @@
-export declare const lint: () => {
-    executor: string;
-    cache: boolean;
-    inputs: string[];
-};

@@ -1,9 +1,0 @@
-/**
- * @template {object | object[]} T
- * @param {(function(T): boolean) | undefined} check check
- * @param {() => JsonObject} getSchema get schema fn
- * @param {ValidationErrorConfiguration} options options
- * @returns {function(T=): void} validate
- */
-declare const createSchemaValidation: (check: ((value: any) => boolean) | undefined, getSchema: () => any, options: any) => (value: any) => void;
-export { createSchemaValidation };

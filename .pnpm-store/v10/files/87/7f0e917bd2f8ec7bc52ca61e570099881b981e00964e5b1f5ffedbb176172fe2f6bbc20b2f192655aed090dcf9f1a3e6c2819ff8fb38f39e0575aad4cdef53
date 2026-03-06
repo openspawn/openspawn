@@ -1,3 +1,0 @@
-import { TargetConfiguration } from '@nx/devkit';
-import { GoPluginOptions } from '../../types/go-plugin-options';
-export declare function getTargetsByProjectType(projectRoot: string, options: GoPluginOptions): Record<string, TargetConfiguration<any>>;

@@ -1,3 +1,0 @@
-import { NxPlugin } from '@nx/devkit';
-declare const nxPlugin: NxPlugin;
-export = nxPlugin;

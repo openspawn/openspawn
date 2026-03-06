@@ -1,4 +1,0 @@
-import { Tree } from '@nx/devkit';
-import { GoBlueprintGeneratorSchema } from './schema';
-export declare function goBlueprintGenerator(tree: Tree, schema: GoBlueprintGeneratorSchema): Promise<void>;
-export default goBlueprintGenerator;

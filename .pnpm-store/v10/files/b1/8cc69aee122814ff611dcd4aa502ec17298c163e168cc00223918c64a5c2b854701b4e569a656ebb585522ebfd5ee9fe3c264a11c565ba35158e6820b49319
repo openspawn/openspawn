@@ -1,5 +1,0 @@
-import { Tree } from '@nx/devkit';
-import { InitGeneratorSchema } from '../schema';
-export declare function checkDependenciesInstalled(host: Tree, schema: InitGeneratorSchema): Promise<import("@nx/devkit").GeneratorCallback>;
-export declare function moveToDevDependencies(tree: Tree): () => void;
-//# sourceMappingURL=utils.d.ts.map

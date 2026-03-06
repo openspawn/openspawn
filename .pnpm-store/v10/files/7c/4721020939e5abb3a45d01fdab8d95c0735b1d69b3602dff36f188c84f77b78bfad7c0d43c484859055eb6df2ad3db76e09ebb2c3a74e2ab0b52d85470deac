@@ -1,5 +1,0 @@
-export declare const serve: () => {
-    executor: string;
-    continuous: boolean;
-    options: {};
-};

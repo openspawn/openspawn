@@ -1,4 +1,0 @@
-import { type Tree } from '@nx/devkit';
-import type { NormalizedJestProjectSchema } from '../schema';
-export declare function ensureDependencies(tree: Tree, options: Partial<NormalizedJestProjectSchema>): import("@nx/devkit").GeneratorCallback;
-//# sourceMappingURL=ensure-dependencies.d.ts.map

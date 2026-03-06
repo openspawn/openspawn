@@ -1,4 +1,0 @@
-import { Tree } from '@nx/devkit';
-import { NormalizedSchema } from '../schema';
-export declare function addRouting(host: Tree, options: NormalizedSchema): import("@nx/devkit").GeneratorCallback;
-//# sourceMappingURL=add-routing.d.ts.map
