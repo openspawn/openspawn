@@ -136,6 +136,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Linting**: oxlint (type-aware)
 - **Components**: shadcn/ui patterns, Tailwind
 - **TypeScript**: No `any`, no `as` casts, prefer string enums
+- **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/docs/`) to reflect changes
 
 ---
 
