@@ -123,6 +123,14 @@ Replaces the `derive_facts` stub in `enrichment.py`. New jobs:
 - Runs async via arq — never blocks memory storage
 - ~1000 calls/day at 100 agents x 10 memories/day
 
+### Hallucination Risk
+
+Entities extracted from low-confidence or hallucinated memories can pollute the graph. Mitigations:
+
+- **Confidence propagation:** entity confidence = weighted average of linked memory confidences. An entity backed only by low-confidence inferences scores low.
+- **Minimum confidence threshold:** entities with confidence < 20 are excluded from org-wide graph queries and visualization (still queryable via direct lookup).
+- **Evidence count signal:** entities with `mention_count == 1` from a single low-confidence memory are flagged as unverified in the UI.
+
 ---
 
 ## Privacy & Visibility
@@ -150,6 +158,8 @@ Consistent with existing memory visibility model. No surprising privacy leaks.
 ## GraphStore Protocol
 
 Pluggable storage backend, like `EmbeddingProvider`. Default: Postgres. Future: Neo4j, etc.
+
+**Module location:** `app/memory/graph/` — inside the memory module, respecting clean boundary rules (no other module imports from memory/ except via memory service).
 
 ```python
 class GraphStore(Protocol):
@@ -288,9 +298,11 @@ Four new tools for agents:
 
 ---
 
-## Dashboard: Graph Visualization
+## Dashboard: Graph Visualization + Unfinished Phase 2 Panels
 
 **Library:** Cytoscape.js
+
+### Graph Page (new)
 
 - Nodes = entities (colored by type, sized by mention_count)
 - Edges = relationships (weighted by strength, labeled by type)
@@ -300,6 +312,13 @@ Four new tools for agents:
 - Search within graph (find entity by name)
 - Layout: force-directed default
 - Top N entities by mention_count shown; filter/search to drill down
+
+### Memory Page Additions (unfinished Phase 2 frontend)
+
+These were designed in Phase 2 but only the backend was implemented. Ship with Phase 3:
+
+- **Feedback buttons** on memory search results (helpful/unhelpful) — wired to `POST /memory/{id}/feedback`
+- **Contradictions panel** showing linked contradiction pairs — wired to `GET /memory/contradictions` + `POST /memory/contradictions/{id}/resolve`
 
 ---
 
@@ -321,6 +340,34 @@ New Alembic migrations:
 
 ---
 
+## Testing
+
+### Unit Tests
+
+- GraphStore CRUD operations (upsert, find, merge entities)
+- Entity dedup logic (exact match, embedding similarity threshold)
+- Confidence propagation calculation
+- Overlap scoring (Jaccard similarity)
+- Gap detection logic
+- Agent File serialization/deserialization + format validation
+
+### Integration Tests
+
+- Store memory → extraction → entity appears in graph
+- Entity dedup across multiple memories from different agents
+- Visibility enforcement (private memory entities excluded from org graph)
+- Agent File export → import round-trip preserves data
+- Overlap matrix computation across 3+ agents
+
+### Load Tests
+
+- 50 concurrent memory stores triggering 50 concurrent entity extractions
+- Graph query latency at 10K, 50K, 100K entities
+- Cytoscape.js endpoint response time with 500-node limit
+- Overlap matrix computation at 20+ agents
+
+---
+
 ## Decisions Summary
 
 | Decision | Choice | Reasoning |
@@ -337,3 +384,6 @@ New Alembic migrations:
 | Extraction frequency | Every memory, async | arq worker pattern handles it cleanly |
 | Dashboard layout | Force-directed default | Most intuitive for knowledge graphs |
 | Extraction model | Claude Haiku | Fast, cheap, sufficient for structured extraction |
+| Graph module location | `app/memory/graph/` | Respects clean boundary rules from RFC |
+| Cognee for extraction | No — custom instructor + litellm | Matches existing patterns, full control over entity types/confidence (closes RFC "revisit" recommendation) |
+| Hallucination mitigation | Confidence propagation + min threshold (20) | Low-confidence entities excluded from org-wide views |
