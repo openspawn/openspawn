@@ -24,6 +24,9 @@ dependencies = [
   "voyageai>=0.3",
   "openai>=1.60",
   "tenacity>=9.0",
+  "logfire[fastapi,sqlalchemy]>=4.27.0",
+  "langfuse>=3.14.5",
+  "opentelemetry-instrumentation-httpx>=0.60b1",
 ]
 
 [project.optional-dependencies]

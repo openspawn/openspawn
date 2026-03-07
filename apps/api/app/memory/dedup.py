@@ -20,6 +20,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select, text
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from app.observability import get_langfuse
+
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -132,8 +134,18 @@ Rules:
 )
 async def _llm_decide(existing_content: str, new_content: str) -> DedupDecision:
     model = os.environ.get("DEDUP_MODEL", DEFAULT_DECISION_MODEL)
+
+    langfuse = get_langfuse()
+    generation = None
+    if langfuse:
+        trace = langfuse.trace(
+            name="dedup_llm_decide",
+            input={"existing": existing_content[:200], "new": new_content[:200]},
+        )
+        generation = trace.generation(name="instructor_dedup", model=model)
+
     client = instructor.from_litellm(litellm.acompletion)
-    return await client.chat.completions.create(
+    result = await client.chat.completions.create(
         model=model,
         response_model=DedupDecision,
         messages=[
@@ -147,6 +159,11 @@ async def _llm_decide(existing_content: str, new_content: str) -> DedupDecision:
         ],
         max_tokens=512,
     )
+
+    if generation:
+        generation.end(output={"action": result.action, "reasoning": result.reasoning})
+
+    return result
 
 
 async def run_dedup_pipeline(

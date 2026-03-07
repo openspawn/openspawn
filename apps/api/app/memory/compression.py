@@ -9,7 +9,12 @@ import os
 
 import instructor
 import litellm
+import structlog
 from pydantic import BaseModel, Field
+
+from app.observability import get_langfuse
+
+logger = structlog.get_logger()
 
 DEFAULT_MODEL = "anthropic/claude-haiku-4-5-20251001"
 
@@ -37,8 +42,14 @@ async def compress_to_facts(
     """
     llm_model = model or os.environ.get("COMPRESSION_MODEL", DEFAULT_MODEL)
 
+    langfuse = get_langfuse()
+    generation = None
+    if langfuse:
+        trace = langfuse.trace(name="compress_to_facts", input={"content": raw_content[:200]})
+        generation = trace.generation(name="instructor_compress", model=llm_model)
+
     client = instructor.from_litellm(litellm.acompletion)
-    return await client.chat.completions.create(
+    result = await client.chat.completions.create(
         model=llm_model,
         response_model=AtomicFacts,
         messages=[
@@ -49,3 +60,8 @@ async def compress_to_facts(
         ],
         max_tokens=1024,
     )
+
+    if generation:
+        generation.end(output={"fact_count": len(result.facts)})
+
+    return result
