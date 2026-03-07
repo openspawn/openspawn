@@ -14,13 +14,13 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ## Domains & Deployment
 
-| Domain                | What                                   | Container        | Port |
-| --------------------- | -------------------------------------- | ---------------- | ---- |
-| **bikinibottom.ai**   | Live demo (sandbox + dashboard + team) | `app`            | 3333 |
-| **openspawn.ai**      | Website + landing page                 | `platform`       | 3334 |
-| **docs.openspawn.ai** | Astro/Starlight docs                   | Not yet deployed | —    |
+| Domain                | What                                          | Container        | Port |
+| --------------------- | --------------------------------------------- | ---------------- | ---- |
+| **bikinibottom.ai**   | Live demo (sandbox + dashboard)               | `app`            | 3333 |
+| **openspawn.ai**      | API, website, landing page, MCP server        | `api` `platform` | 8000, 3334 |
+| **docs.openspawn.ai** | Astro/Starlight docs                          | GitHub Pages     | —    |
 
-Both containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml` and `deploy-platform.yml` workflows.
+All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
 ---
 
@@ -85,8 +85,16 @@ cd apps/api && uv run alembic upgrade head
 
 ---
 
-## Key URLs (dev)
+## Key URLs
 
+**Production:**
+- Demo: https://bikinibottom.ai
+- API: https://openspawn.ai/api/
+- API docs: https://openspawn.ai/api/docs
+- Website: https://openspawn.ai
+- Docs: https://docs.openspawn.ai
+
+**Dev:**
 - Demo dashboard: http://localhost:4200
 - Demo mode: http://localhost:4200/?demo=true
 - Sandbox: http://localhost:3333

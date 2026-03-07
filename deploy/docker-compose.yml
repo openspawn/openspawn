@@ -1,8 +1,9 @@
-# ── BikiniBottom + OpenSpawn VPS Docker Compose ──────────────────────────────
-# Two containers:
-#   - bikinibottom (port 3333) — BikiniBottom demo at bikinibottom.ai
-#   - openspawn-platform (port 3334) — OpenSpawn landing at openspawn.ai
-# System Caddy handles HTTPS reverse proxy (see /etc/caddy/Caddyfile on VPS)
+# ── OpenSpawn VPS Docker Compose ──────────────────────────────────────────────
+# Three services:
+#   - app (port 3333)      — BikiniBottom demo at bikinibottom.ai
+#   - api (port 8000)      — FastAPI backend at openspawn.ai/api/
+#   - platform (port 3334) — OpenSpawn landing at openspawn.ai
+# System Caddy handles HTTPS reverse proxy (see Caddyfile)
 #
 # Expected at /opt/bikinibottom/docker-compose.yml on the VPS
 
@@ -28,6 +29,45 @@ services:
       retries: 5
       start_period: 30s
 
+  api:
+    image: openspawn-api:latest
+    container_name: openspawn-api
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+    env_file:
+      - .env.production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: openspawn-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openspawn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-openspawn}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openspawn}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   platform:
     image: openspawn-platform:latest
     container_name: openspawn-platform
@@ -44,3 +84,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+
+volumes:
+  pgdata:
