@@ -51,6 +51,9 @@ ignore = [
   "E501", # line length handled by formatter
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports for column/relationship resolution
+
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
 
