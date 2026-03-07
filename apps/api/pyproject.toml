@@ -15,6 +15,7 @@ dependencies = [
   "structlog>=24.4",
   "httpx>=0.28",
   "pendulum>=3.0",
+  "alembic>=1.18.4",
 ]
 
 [project.optional-dependencies]
