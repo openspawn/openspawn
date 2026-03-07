@@ -26,6 +26,7 @@ import { IntroPage } from "./pages/intro";
 import { MobileStatusPage } from "./pages/mobile-status";
 import { LiveViewPage } from "./pages/live-view";
 import { MemoryPage } from "./pages/memory";
+import { GraphPage } from "./pages/graph";
 import { isBBTheme } from "./lib/dashboard-theme";
 
 const reduceMotion =
@@ -181,6 +182,12 @@ const memoryRoute = createRoute({
   component: MemoryPage,
 });
 
+const graphRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/graph",
+  component: GraphPage,
+});
+
 // Build route tree
 const layoutChildren = [
   indexRoute,
@@ -196,6 +203,7 @@ const layoutChildren = [
   kanbanRoute,
   taskBoardRoute,
   memoryRoute,
+  graphRoute,
 ];
 
 const rootChildren = [

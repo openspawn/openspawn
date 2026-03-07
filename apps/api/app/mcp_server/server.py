@@ -339,3 +339,45 @@ async def memory_feedback(memory_id: str, helpful: bool) -> str:
         json={"helpful": helpful},
     )
     return _format(result)
+
+
+# ═══════════════════════════════════════════════
+# Knowledge Graph Tools
+# ═══════════════════════════════════════════════
+
+
+@mcp.tool
+async def memory_graph_entities(
+    entity_type: str | None = None,
+    limit: int = 100,
+) -> str:
+    """List knowledge graph entities the calling agent knows about."""
+    params: dict[str, str] = {"limit": str(limit)}
+    if entity_type:
+        params["entity_type"] = entity_type
+    result = await _get_client().get("/memory/graph/entities", params=params)
+    return _format(result)
+
+
+@mcp.tool
+async def memory_graph_related(entity_id: str, hops: int = 1) -> str:
+    """Find entities related to a given entity (by ID) within N hops."""
+    result = await _get_client().get(
+        f"/memory/graph/entities/{entity_id}/neighbors",
+        params={"hops": str(hops)},
+    )
+    return _format(result)
+
+
+@mcp.tool
+async def memory_graph_who_knows(entity_id: str) -> str:
+    """Find which agents know about a given entity."""
+    result = await _get_client().get(f"/memory/graph/entities/{entity_id}/agents")
+    return _format(result)
+
+
+@mcp.tool
+async def memory_graph_gaps() -> str:
+    """Find knowledge gaps -- entities known by only one agent."""
+    result = await _get_client().get("/memory/graph/gaps")
+    return _format(result)

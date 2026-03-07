@@ -1,0 +1,372 @@
+import { AGENT_IDS } from "./agents";
+
+export const ENTITY_IDS = {
+  docker: "e0000000-0000-0000-0000-000000000001",
+  ciPipeline: "e0000000-0000-0000-0000-000000000002",
+  redis: "e0000000-0000-0000-0000-000000000003",
+  deployment: "e0000000-0000-0000-0000-000000000004",
+  caddy: "e0000000-0000-0000-0000-000000000005",
+  monitoring: "e0000000-0000-0000-0000-000000000006",
+  caching: "e0000000-0000-0000-0000-000000000007",
+  loadBalancing: "e0000000-0000-0000-0000-000000000008",
+  security: "e0000000-0000-0000-0000-000000000009",
+  postgres: "e0000000-0000-0000-0000-000000000010",
+  fastapi: "e0000000-0000-0000-0000-000000000011",
+  testing: "e0000000-0000-0000-0000-000000000012",
+  kubernetes: "e0000000-0000-0000-0000-000000000013",
+  structuredLogging: "e0000000-0000-0000-0000-000000000014",
+  authentication: "e0000000-0000-0000-0000-000000000015",
+  rateLimiting: "e0000000-0000-0000-0000-000000000016",
+  webhook: "e0000000-0000-0000-0000-000000000017",
+  pgvector: "e0000000-0000-0000-0000-000000000018",
+  nginx: "e0000000-0000-0000-0000-000000000019",
+  sslCertificates: "e0000000-0000-0000-0000-000000000020",
+} as const;
+
+export interface DemoEntity {
+  id: string;
+  name: string;
+  entityType: string;
+  description: string;
+  mentionCount: number;
+  confidence: number;
+  agentIds: string[];
+}
+
+export interface DemoRelationship {
+  id: string;
+  sourceEntityId: string;
+  targetEntityId: string;
+  relationshipType: string;
+  weight: number;
+  evidenceCount: number;
+}
+
+export const demoEntities: DemoEntity[] = [
+  {
+    id: ENTITY_IDS.docker,
+    name: "Docker",
+    entityType: "tool",
+    description: "Container runtime for packaging and deploying services",
+    mentionCount: 9,
+    confidence: 92,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.qaEngineer, AGENT_IDS.bugHunter],
+  },
+  {
+    id: ENTITY_IDS.ciPipeline,
+    name: "CI Pipeline",
+    entityType: "process",
+    description: "Continuous integration pipeline for automated build, test, and deploy",
+    mentionCount: 8,
+    confidence: 88,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.qaEngineer, AGENT_IDS.qaAutomation],
+  },
+  {
+    id: ENTITY_IDS.redis,
+    name: "Redis",
+    entityType: "tool",
+    description: "In-memory data store for caching and message brokering",
+    mentionCount: 6,
+    confidence: 85,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.analyst],
+  },
+  {
+    id: ENTITY_IDS.deployment,
+    name: "Deployment",
+    entityType: "process",
+    description: "Process of releasing code to production environments",
+    mentionCount: 7,
+    confidence: 90,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.techTalent, AGENT_IDS.qaEngineer],
+  },
+  {
+    id: ENTITY_IDS.caddy,
+    name: "Caddy",
+    entityType: "tool",
+    description: "Reverse proxy and web server with automatic HTTPS",
+    mentionCount: 4,
+    confidence: 78,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.frontendDev],
+  },
+  {
+    id: ENTITY_IDS.monitoring,
+    name: "Monitoring",
+    entityType: "concept",
+    description: "Observability stack for tracking system health and performance",
+    mentionCount: 5,
+    confidence: 72,
+    agentIds: [AGENT_IDS.bugHunter, AGENT_IDS.supportLead, AGENT_IDS.tier2Agent],
+  },
+  {
+    id: ENTITY_IDS.caching,
+    name: "Caching",
+    entityType: "concept",
+    description: "Strategy for storing frequently accessed data closer to consumers",
+    mentionCount: 4,
+    confidence: 68,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.analyst],
+  },
+  {
+    id: ENTITY_IDS.loadBalancing,
+    name: "Load Balancing",
+    entityType: "concept",
+    description: "Distributing traffic across multiple server instances",
+    mentionCount: 2,
+    confidence: 55,
+    agentIds: [AGENT_IDS.techTalent],
+  },
+  {
+    id: ENTITY_IDS.security,
+    name: "Security",
+    entityType: "concept",
+    description: "Application and infrastructure security practices",
+    mentionCount: 6,
+    confidence: 82,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.bugHunter, AGENT_IDS.tier2Agent],
+  },
+  {
+    id: ENTITY_IDS.postgres,
+    name: "PostgreSQL",
+    entityType: "tool",
+    description: "Primary relational database for persistent storage",
+    mentionCount: 8,
+    confidence: 91,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.analyst, AGENT_IDS.bookkeeper],
+  },
+  {
+    id: ENTITY_IDS.fastapi,
+    name: "FastAPI",
+    entityType: "tool",
+    description: "Python web framework for building the REST API",
+    mentionCount: 7,
+    confidence: 89,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.bugHunter, AGENT_IDS.frontendDev],
+  },
+  {
+    id: ENTITY_IDS.testing,
+    name: "Testing",
+    entityType: "process",
+    description: "Automated unit, integration, and end-to-end test suites",
+    mentionCount: 9,
+    confidence: 87,
+    agentIds: [AGENT_IDS.qaEngineer, AGENT_IDS.qaAutomation, AGENT_IDS.bugHunter, AGENT_IDS.codeReviewer],
+  },
+  {
+    id: ENTITY_IDS.kubernetes,
+    name: "Kubernetes",
+    entityType: "tool",
+    description: "Container orchestration platform for scaling services",
+    mentionCount: 3,
+    confidence: 48,
+    agentIds: [AGENT_IDS.techTalent],
+  },
+  {
+    id: ENTITY_IDS.structuredLogging,
+    name: "Structured Logging",
+    entityType: "concept",
+    description: "JSON-formatted log output for machine-parseable observability",
+    mentionCount: 3,
+    confidence: 62,
+    agentIds: [AGENT_IDS.bugHunter, AGENT_IDS.codeReviewer],
+  },
+  {
+    id: ENTITY_IDS.authentication,
+    name: "Authentication",
+    entityType: "concept",
+    description: "Identity verification and session management for API access",
+    mentionCount: 5,
+    confidence: 80,
+    agentIds: [AGENT_IDS.codeReviewer, AGENT_IDS.frontendDev],
+  },
+  {
+    id: ENTITY_IDS.rateLimiting,
+    name: "Rate Limiting",
+    entityType: "concept",
+    description: "Throttling mechanism to prevent API abuse",
+    mentionCount: 4,
+    confidence: 75,
+    agentIds: [AGENT_IDS.analyst, AGENT_IDS.codeReviewer],
+  },
+  {
+    id: ENTITY_IDS.webhook,
+    name: "Webhook",
+    entityType: "concept",
+    description: "HTTP callback for event-driven integrations",
+    mentionCount: 3,
+    confidence: 65,
+    agentIds: [AGENT_IDS.frontendDev, AGENT_IDS.tier2Agent],
+  },
+  {
+    id: ENTITY_IDS.pgvector,
+    name: "pgvector",
+    entityType: "tool",
+    description: "PostgreSQL extension for vector similarity search",
+    mentionCount: 2,
+    confidence: 42,
+    agentIds: [AGENT_IDS.analyst],
+  },
+  {
+    id: ENTITY_IDS.nginx,
+    name: "Nginx",
+    entityType: "tool",
+    description: "High-performance web server and reverse proxy",
+    mentionCount: 1,
+    confidence: 35,
+    agentIds: [AGENT_IDS.techTalent],
+  },
+  {
+    id: ENTITY_IDS.sslCertificates,
+    name: "SSL Certificates",
+    entityType: "concept",
+    description: "TLS certificates for encrypting traffic in transit",
+    mentionCount: 2,
+    confidence: 58,
+    agentIds: [AGENT_IDS.codeReviewer],
+  },
+];
+
+export const demoRelationships: DemoRelationship[] = [
+  {
+    id: "r0000000-0000-0000-0000-000000000001",
+    sourceEntityId: ENTITY_IDS.docker,
+    targetEntityId: ENTITY_IDS.deployment,
+    relationshipType: "used_in",
+    weight: 0.9,
+    evidenceCount: 7,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000002",
+    sourceEntityId: ENTITY_IDS.ciPipeline,
+    targetEntityId: ENTITY_IDS.testing,
+    relationshipType: "includes",
+    weight: 0.85,
+    evidenceCount: 6,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000003",
+    sourceEntityId: ENTITY_IDS.redis,
+    targetEntityId: ENTITY_IDS.caching,
+    relationshipType: "implements",
+    weight: 0.92,
+    evidenceCount: 5,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000004",
+    sourceEntityId: ENTITY_IDS.caddy,
+    targetEntityId: ENTITY_IDS.sslCertificates,
+    relationshipType: "manages",
+    weight: 0.88,
+    evidenceCount: 4,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000005",
+    sourceEntityId: ENTITY_IDS.fastapi,
+    targetEntityId: ENTITY_IDS.postgres,
+    relationshipType: "connects_to",
+    weight: 0.95,
+    evidenceCount: 8,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000006",
+    sourceEntityId: ENTITY_IDS.monitoring,
+    targetEntityId: ENTITY_IDS.structuredLogging,
+    relationshipType: "uses",
+    weight: 0.78,
+    evidenceCount: 3,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000007",
+    sourceEntityId: ENTITY_IDS.fastapi,
+    targetEntityId: ENTITY_IDS.rateLimiting,
+    relationshipType: "enforces",
+    weight: 0.82,
+    evidenceCount: 4,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000008",
+    sourceEntityId: ENTITY_IDS.fastapi,
+    targetEntityId: ENTITY_IDS.authentication,
+    relationshipType: "provides",
+    weight: 0.9,
+    evidenceCount: 5,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000009",
+    sourceEntityId: ENTITY_IDS.postgres,
+    targetEntityId: ENTITY_IDS.pgvector,
+    relationshipType: "extends_with",
+    weight: 0.7,
+    evidenceCount: 2,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000010",
+    sourceEntityId: ENTITY_IDS.ciPipeline,
+    targetEntityId: ENTITY_IDS.deployment,
+    relationshipType: "builds",
+    weight: 0.88,
+    evidenceCount: 6,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000011",
+    sourceEntityId: ENTITY_IDS.kubernetes,
+    targetEntityId: ENTITY_IDS.docker,
+    relationshipType: "runs",
+    weight: 0.75,
+    evidenceCount: 2,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000012",
+    sourceEntityId: ENTITY_IDS.caddy,
+    targetEntityId: ENTITY_IDS.nginx,
+    relationshipType: "replaced_by",
+    weight: 0.65,
+    evidenceCount: 1,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000013",
+    sourceEntityId: ENTITY_IDS.fastapi,
+    targetEntityId: ENTITY_IDS.webhook,
+    relationshipType: "provides",
+    weight: 0.72,
+    evidenceCount: 3,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000014",
+    sourceEntityId: ENTITY_IDS.caddy,
+    targetEntityId: ENTITY_IDS.loadBalancing,
+    relationshipType: "provides",
+    weight: 0.68,
+    evidenceCount: 2,
+  },
+  {
+    id: "r0000000-0000-0000-0000-000000000015",
+    sourceEntityId: ENTITY_IDS.security,
+    targetEntityId: ENTITY_IDS.authentication,
+    relationshipType: "includes",
+    weight: 0.86,
+    evidenceCount: 5,
+  },
+];
+
+export function getCytoscapeData() {
+  return {
+    nodes: demoEntities.map((e) => ({
+      data: {
+        id: e.id,
+        label: e.name,
+        type: e.entityType,
+        mention_count: e.mentionCount,
+        confidence: e.confidence,
+      },
+    })),
+    edges: demoRelationships.map((r) => ({
+      data: {
+        id: r.id,
+        source: r.sourceEntityId,
+        target: r.targetEntityId,
+        label: r.relationshipType,
+        weight: r.weight,
+      },
+    })),
+  };
+}

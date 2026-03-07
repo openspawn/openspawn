@@ -13,6 +13,7 @@ from app.models.enums import (
     ConsensusStatus,
     ConsensusType,
     CreditType,
+    EntityType,
     EscalationReason,
     EventSeverity,
     IdleReason,
@@ -30,6 +31,7 @@ from app.models.enums import (
 )
 from app.models.escalation import Escalation
 from app.models.event import Event
+from app.models.graph import GraphEntity, GraphRelationship, MemoryEntityLink
 from app.models.integration import GitHubConnection, IntegrationLink, LinearConnection
 from app.models.memory import Memory
 from app.models.message import Channel, Message
@@ -57,17 +59,21 @@ __all__ = [
     "CreditRateConfig",
     "CreditTransaction",
     "CreditType",
+    "EntityType",
     "Escalation",
     "EscalationReason",
     "Event",
     "EventSeverity",
     "GitHubConnection",
+    "GraphEntity",
+    "GraphRelationship",
     "IdempotencyKey",
     "IdleReason",
     "InboundWebhookKey",
     "IntegrationLink",
     "LinearConnection",
     "Memory",
+    "MemoryEntityLink",
     "MemorySource",
     "MemoryType",
     "MemoryVisibility",

@@ -3900,6 +3900,80 @@
         }
       }
     },
+    "/memory/contradictions": {
+      "get": {
+        "tags": [
+          "memory"
+        ],
+        "summary": "List Contradiction Pairs",
+        "operationId": "list_contradiction_pairs_memory_contradictions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_ContradictionPairResponse__"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/contradictions/{memory_id}/resolve": {
+      "post": {
+        "tags": [
+          "memory"
+        ],
+        "summary": "Resolve Contradiction Endpoint",
+        "operationId": "resolve_contradiction_endpoint_memory_contradictions__memory_id__resolve_post",
+        "parameters": [
+          {
+            "name": "memory_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Memory Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveContradictionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataMessageResponse_dict_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/memory/{memory_id}": {
       "get": {
         "tags": [
@@ -3979,6 +4053,562 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DataMessageResponse_dict_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/entities": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "List Entities",
+        "operationId": "list_entities_memory_graph_entities_get",
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_GraphEntityResponse__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/entities/{entity_id}": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Get Entity",
+        "operationId": "get_entity_memory_graph_entities__entity_id__get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_GraphEntityResponse_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/entities/{entity_id}/memories": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "List Entity Memories",
+        "operationId": "list_entity_memories_memory_graph_entities__entity_id__memories_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_dict__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/entities/{entity_id}/agents": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "List Entity Agents",
+        "operationId": "list_entity_agents_memory_graph_entities__entity_id__agents_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_UUID__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/entities/{entity_id}/neighbors": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Get Neighbors",
+        "operationId": "get_neighbors_memory_graph_entities__entity_id__neighbors_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "hops",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 3,
+              "minimum": 1,
+              "default": 1,
+              "title": "Hops"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_SubGraph_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/relationships": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Get Relationships",
+        "operationId": "get_relationships_memory_graph_relationships_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "both",
+              "title": "Direction"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_GraphRelationshipResponse__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/overlap": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Compute Overlap",
+        "operationId": "compute_overlap_memory_graph_overlap_get",
+        "parameters": [
+          {
+            "name": "agent_a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent A"
+            }
+          },
+          {
+            "name": "agent_b",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent B"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_OverlapResult_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/overlap/matrix": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Overlap Matrix",
+        "operationId": "overlap_matrix_memory_graph_overlap_matrix_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_OverlapResult__"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/gaps": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Find Gaps",
+        "operationId": "find_gaps_memory_graph_gaps_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_GapResult__"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/cytoscape": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Cytoscape Graph",
+        "operationId": "cytoscape_graph_memory_graph_cytoscape_get",
+        "parameters": [
+          {
+            "name": "entity_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Entity Type"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_CytoscapeGraph_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/agent-file/export/{agent_id}": {
+      "post": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Export Agent",
+        "operationId": "export_agent_memory_graph_agent_file_export__agent_id__post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Export Agent Memory Graph Agent File Export  Agent Id  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memory/graph/agent-file/import": {
+      "post": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Import Agent",
+        "operationId": "import_agent_memory_graph_agent_file_import_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Data"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Import Agent Memory Graph Agent File Import Post"
                 }
               }
             }
@@ -4844,6 +5474,22 @@
         ],
         "title": "ConsensusVoteResponse"
       },
+      "ContradictionPairResponse": {
+        "properties": {
+          "older_memory": {
+            "$ref": "#/components/schemas/MemoryResponse"
+          },
+          "newer_memory": {
+            "$ref": "#/components/schemas/MemoryResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "older_memory",
+          "newer_memory"
+        ],
+        "title": "ContradictionPairResponse"
+      },
       "CreateChannelDto": {
         "properties": {
           "name": {
@@ -5256,6 +5902,58 @@
         ],
         "title": "CreditType"
       },
+      "CytoscapeEdge": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CytoscapeEdge"
+      },
+      "CytoscapeGraph": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/CytoscapeNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/CytoscapeEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nodes",
+          "edges"
+        ],
+        "title": "CytoscapeGraph"
+      },
+      "CytoscapeNode": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "CytoscapeNode"
+      },
       "DataMessageResponse_AgentRegistrationResponse_": {
         "properties": {
           "data": {
@@ -5518,6 +6216,18 @@
         ],
         "title": "DataResponse[CreditStatsResponse]"
       },
+      "DataResponse_CytoscapeGraph_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CytoscapeGraph"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[CytoscapeGraph]"
+      },
       "DataResponse_EscalationResponse_": {
         "properties": {
           "data": {
@@ -5553,6 +6263,18 @@
           "data"
         ],
         "title": "DataResponse[GitHubConnectionResponse]"
+      },
+      "DataResponse_GraphEntityResponse_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GraphEntityResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[GraphEntityResponse]"
       },
       "DataResponse_HierarchyNode_": {
         "properties": {
@@ -5602,6 +6324,18 @@
         ],
         "title": "DataResponse[MessageResponse]"
       },
+      "DataResponse_OverlapResult_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OverlapResult"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[OverlapResult]"
+      },
       "DataResponse_ReputationSummary_": {
         "properties": {
           "data": {
@@ -5613,6 +6347,18 @@
           "data"
         ],
         "title": "DataResponse[ReputationSummary]"
+      },
+      "DataResponse_SubGraph_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SubGraph"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[SubGraph]"
       },
       "DataResponse_TaskCommentResponse_": {
         "properties": {
@@ -5744,6 +6490,22 @@
         ],
         "title": "DataResponse[list[ConsensusRequestResponse]]"
       },
+      "DataResponse_list_ContradictionPairResponse__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ContradictionPairResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[ContradictionPairResponse]]"
+      },
       "DataResponse_list_EscalationResponse__": {
         "properties": {
           "data": {
@@ -5760,6 +6522,22 @@
         ],
         "title": "DataResponse[list[EscalationResponse]]"
       },
+      "DataResponse_list_GapResult__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/GapResult"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[GapResult]]"
+      },
       "DataResponse_list_GitHubConnectionResponse__": {
         "properties": {
           "data": {
@@ -5775,6 +6553,38 @@
           "data"
         ],
         "title": "DataResponse[list[GitHubConnectionResponse]]"
+      },
+      "DataResponse_list_GraphEntityResponse__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEntityResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[GraphEntityResponse]]"
+      },
+      "DataResponse_list_GraphRelationshipResponse__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/GraphRelationshipResponse"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[GraphRelationshipResponse]]"
       },
       "DataResponse_list_IntegrationLinkResponse__": {
         "properties": {
@@ -5840,6 +6650,22 @@
         ],
         "title": "DataResponse[list[MessageResponse]]"
       },
+      "DataResponse_list_OverlapResult__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/OverlapResult"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[OverlapResult]]"
+      },
       "DataResponse_list_SearchResultResponse__": {
         "properties": {
           "data": {
@@ -5887,6 +6713,23 @@
           "data"
         ],
         "title": "DataResponse[list[TaskCommentResponse]]"
+      },
+      "DataResponse_list_UUID__": {
+        "properties": {
+          "data": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[UUID]]"
       },
       "DataResponse_list_dict__": {
         "properties": {
@@ -6119,6 +6962,34 @@
         ],
         "title": "EventSeverity"
       },
+      "GapResult": {
+        "properties": {
+          "entity_name": {
+            "type": "string",
+            "title": "Entity Name"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "agent_count": {
+            "type": "integer",
+            "title": "Agent Count"
+          },
+          "risk": {
+            "type": "string",
+            "title": "Risk"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entity_name",
+          "entity_type",
+          "agent_count",
+          "risk"
+        ],
+        "title": "GapResult"
+      },
       "GitHubConnectionResponse": {
         "properties": {
           "id": {
@@ -6206,6 +7077,128 @@
           "updated_at"
         ],
         "title": "GitHubConnectionResponse"
+      },
+      "GraphEntityResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "org_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Org Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "mention_count": {
+            "type": "integer",
+            "title": "Mention Count"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "org_id",
+          "name",
+          "entity_type",
+          "description",
+          "mention_count",
+          "confidence",
+          "last_seen_at",
+          "metadata",
+          "created_at"
+        ],
+        "title": "GraphEntityResponse"
+      },
+      "GraphRelationshipResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "org_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Org Id"
+          },
+          "source_entity_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Source Entity Id"
+          },
+          "target_entity_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Target Entity Id"
+          },
+          "relationship_type": {
+            "type": "string",
+            "title": "Relationship Type"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "evidence_count": {
+            "type": "integer",
+            "title": "Evidence Count"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "org_id",
+          "source_entity_id",
+          "target_entity_id",
+          "relationship_type",
+          "weight",
+          "evidence_count",
+          "last_seen_at",
+          "metadata"
+        ],
+        "title": "GraphRelationshipResponse"
       },
       "HTTPValidationError": {
         "properties": {
@@ -6706,6 +7699,49 @@
         ],
         "title": "MessageType"
       },
+      "OverlapResult": {
+        "properties": {
+          "agent_a": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent A"
+          },
+          "agent_b": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent B"
+          },
+          "jaccard_score": {
+            "type": "number",
+            "title": "Jaccard Score"
+          },
+          "shared_count": {
+            "type": "integer",
+            "title": "Shared Count"
+          },
+          "union_count": {
+            "type": "integer",
+            "title": "Union Count"
+          },
+          "shared_entities": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEntityResponse"
+            },
+            "type": "array",
+            "title": "Shared Entities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_a",
+          "agent_b",
+          "jaccard_score",
+          "shared_count",
+          "union_count",
+          "shared_entities"
+        ],
+        "title": "OverlapResult"
+      },
       "PaginatedResponse_CreditTransactionResponse_": {
         "properties": {
           "data": {
@@ -6969,6 +8005,20 @@
           "level"
         ],
         "title": "ReputationSummary"
+      },
+      "ResolveContradictionDto": {
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "title": "Strategy",
+            "description": "Resolution strategy: keep_newer, keep_older, merge, flag"
+          }
+        },
+        "type": "object",
+        "required": [
+          "strategy"
+        ],
+        "title": "ResolveContradictionDto"
       },
       "ResolveEscalationDto": {
         "properties": {
@@ -7381,6 +8431,19 @@
             ],
             "title": "Expires At"
           },
+          "ttl_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttl Seconds",
+            "description": "Optional TTL in seconds, sets expires_at"
+          },
           "metadata": {
             "additionalProperties": true,
             "type": "object",
@@ -7392,6 +8455,30 @@
           "content"
         ],
         "title": "StoreMemoryDto"
+      },
+      "SubGraph": {
+        "properties": {
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEntityResponse"
+            },
+            "type": "array",
+            "title": "Entities"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/GraphRelationshipResponse"
+            },
+            "type": "array",
+            "title": "Relationships"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entities",
+          "relationships"
+        ],
+        "title": "SubGraph"
       },
       "TaskCommentResponse": {
         "properties": {

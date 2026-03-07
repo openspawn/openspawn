@@ -56,6 +56,16 @@ class CreditType(enum.StrEnum):
     DEBIT = "debit"
 
 
+class EntityType(enum.StrEnum):
+    PERSON = "person"
+    TOOL = "tool"
+    CONCEPT = "concept"
+    PROCESS = "process"
+    SYSTEM = "system"
+    LOCATION = "location"
+    EVENT = "event"
+
+
 class EscalationReason(enum.StrEnum):
     BLOCKED_TIMEOUT = "BLOCKED_TIMEOUT"
     STALE_TASK = "STALE_TASK"

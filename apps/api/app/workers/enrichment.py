@@ -3,12 +3,13 @@
 Runs via arq on a cron schedule:
   - boost_co_retrieved: increment strength for frequently co-retrieved memories
   - identify_stale: flag low-confidence + low-access + old memories
-  - derive_facts: cluster related memories and extract derived facts (stub)
+  - extract_entities: LLM entity/relationship extraction from unprocessed memories
+  - merge_duplicate_entities: periodic entity dedup sweep (stub)
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 import structlog
 from arq import cron
@@ -18,9 +19,6 @@ from app.database import async_session
 from app.models.memory import Memory
 from app.workers.config import get_redis_settings
 from app.workers.expiry import expire_memories
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 logger = structlog.get_logger()
 
@@ -37,7 +35,7 @@ async def boost_co_retrieved(ctx: dict) -> int:
     """
     async with async_session() as session:
         # Find memories that share the same retrieval query within 24h
-        rows: Sequence[tuple[str]] = (
+        rows = (
             await session.execute(
                 text("""
                     SELECT m1.id
@@ -95,24 +93,79 @@ async def identify_stale(ctx: dict) -> int:
         return count
 
 
-async def derive_facts(ctx: dict) -> int:
-    """Cluster related memories and extract new derived facts.
+async def extract_entities(ctx: dict) -> None:
+    """Extract entities and relationships from recent unprocessed memories."""
+    from app.memory.graph.extraction import MIN_ENTITY_CONFIDENCE, extract_from_content
+    from app.memory.graph.postgres_store import PostgresGraphStore
 
-    Stub — will use instructor + litellm to generate derived facts
-    from clusters of semantically similar memories.
-    """
-    logger.info("derive_facts.done", derived=0)
-    return 0
+    async with async_session() as session:
+        result = await session.execute(
+            text("""
+                SELECT m.id, m.org_id, m.agent_id, m.content, m.confidence
+                FROM memories m
+                LEFT JOIN memory_entity_links mel ON mel.memory_id = m.id
+                WHERE mel.memory_id IS NULL
+                  AND m.created_at > NOW() - INTERVAL '24 hours'
+                  AND m.content IS NOT NULL
+                ORDER BY m.created_at DESC
+                LIMIT 100
+            """)
+        )
+        memories = result.fetchall()
+        if not memories:
+            logger.info("extract_entities: no unprocessed memories")
+            return
+
+        store = PostgresGraphStore(session)
+        for mem in memories:
+            if mem.confidence < MIN_ENTITY_CONFIDENCE:
+                continue
+            extraction = await extract_from_content(mem.content)
+            for entity in extraction.entities:
+                entity_id = await store.upsert_entity(
+                    org_id=mem.org_id,
+                    name=entity.name,
+                    entity_type=entity.entity_type,
+                    description=entity.description,
+                    embedding=None,
+                )
+                await store.link_memory_entity(mem.id, entity_id, mem.agent_id)
+
+            for rel in extraction.relationships:
+                source = await store.find_entity(mem.org_id, rel.source, "")
+                target = await store.find_entity(mem.org_id, rel.target, "")
+                if source and target:
+                    await store.upsert_relationship(
+                        org_id=mem.org_id,
+                        source_id=source.id,
+                        target_id=target.id,
+                        rel_type=rel.relationship_type,
+                        weight=rel.weight,
+                    )
+            await session.commit()
+        logger.info("extract_entities completed", processed=len(memories))
+
+
+async def merge_duplicate_entities(ctx: dict) -> None:
+    """Periodic entity dedup sweep via embedding similarity."""
+    logger.info("merge_duplicate_entities: stub")
 
 
 class WorkerSettings:
     """arq WorkerSettings — run with: arq app.workers.enrichment.WorkerSettings"""
 
-    functions: ClassVar[list] = [boost_co_retrieved, identify_stale, derive_facts, expire_memories]
+    functions: ClassVar[list] = [
+        boost_co_retrieved,
+        identify_stale,
+        extract_entities,
+        expire_memories,
+        merge_duplicate_entities,
+    ]
     cron_jobs: ClassVar[list] = [
         cron(boost_co_retrieved, hour={0, 6, 12, 18}),  # 4x daily
         cron(identify_stale, hour={3}),  # once daily at 3am
-        cron(derive_facts, hour={4}),  # once daily at 4am
+        cron(extract_entities, hour={4}),  # once daily at 4am
         cron(expire_memories, minute={0}),  # every hour
+        cron(merge_duplicate_entities, hour={5}),  # once daily at 5am
     ]
     redis_settings = get_redis_settings()
