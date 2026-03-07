@@ -10,7 +10,7 @@
 
 ## 1. Summary
 
-Add shared long-term memory to OpenSpawn so agents can store, search, and build on collective knowledge. This includes migrating the backend from NestJS to FastAPI, integrating Cognee as the memory engine, and dropping GraphQL in favor of REST-only with OpenAPI.
+Add shared long-term memory to OpenSpawn so agents can store, search, and build on collective knowledge. This includes migrating the backend from NestJS to FastAPI, a custom memory pipeline (`instructor` + `litellm` + `pgvector`), and dropping GraphQL in favor of REST-only with OpenAPI.
 
 ---
 
@@ -18,9 +18,9 @@ Add shared long-term memory to OpenSpawn so agents can store, search, and build 
 
 | Decision              | Choice                                                                            | Reasoning                                                                                                         |
 | --------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Backend framework     | FastAPI + SQLAlchemy (async)                                                      | Python-native AI ecosystem, Cognee direct import, less boilerplate                                                |
+| Backend framework     | FastAPI + SQLAlchemy (async)                                                      | Python-native AI ecosystem, less boilerplate                                                                      |
 | Package manager       | uv                                                                                | Current Python standard, replaces pip/virtualenv/pip-tools                                                        |
-| Memory engine         | Cognee (direct import)                                                            | Production-proven (1M+ pipelines/mo), handles compression, dedup, embedding, knowledge graph                      |
+| Memory engine         | Custom pipeline (instructor + litellm + pgvector)                                 | Cognee NO-GO (#536): lacks hybrid search, basic dedup only, schema conflicts. Custom gives full control           |
 | Embedding provider    | Voyage 3.5 (cloud, 1024d) / BGE-M3 via Ollama (self-hosted, 1024d)                | Best retrieval quality at pgvector-friendly dimensions                                                            |
 | Embedding dimensions  | 1024                                                                              | Sweet spot: pgvector perf + quality. Voyage and BGE-M3 both output 1024 natively                                  |
 | Vector storage        | Postgres + pgvector                                                               | Already using Postgres, no new infra                                                                              |
@@ -48,6 +48,7 @@ Add shared long-term memory to OpenSpawn so agents can store, search, and build 
 
 ### Deliberate omissions
 
+- **cognee / mem0 / zep** — evaluated in #536 spike; no hybrid search, basic dedup, schema conflicts. Revisit Cognee for Phase 3 knowledge graph
 - **langchain / llamaindex** — too opinionated for a platform we control
 - **celery** — overkill; arq is lighter and async-native
 - **stamina** — tenacity has higher LLM training coverage
@@ -74,11 +75,12 @@ FastAPI (Python)
   - Structured LLM I/O (instructor + litellm)
   |
   v
-Cognee (direct import)
-  - cognee.add()    -> ingest + compress
-  - cognee.cognify() -> extract entities, embed, build graph
-  - cognee.search()  -> hybrid retrieval
-  - cognee.memify()  -> background enrichment (Phase 2, via arq worker)
+Memory Pipeline (custom)
+  - instructor + litellm  -> LLM compression to atomic facts
+  - EmbeddingProvider      -> Voyage 3.5 / BGE-M3 via Ollama (1024d)
+  - Dedup pipeline         -> SHA-256 + vector similarity + LLM decision
+  - Hybrid search          -> pgvector cosine + tsvector BM25 + RRF
+  - Background enrichment  -> arq worker (Phase 2)
   |
   v
 Postgres + pgvector
@@ -98,19 +100,21 @@ Redis
 ```
 Store memory:
   Agent -> POST /memory -> FastAPI (auth, scope, rate limit)
-    -> cognee.add(content, dataset=org:agent)
-    -> cognee.cognify()
+    -> LLM compress to atomic facts (instructor + litellm)
+    -> 3-layer dedup (SHA-256 -> vector similarity -> LLM decision)
+    -> embed via EmbeddingProvider (Voyage 3.5 / BGE-M3)
+    -> store in Postgres + pgvector
     -> return memory ID
 
 Search memory:
   Agent -> GET /memory/search?query=... -> FastAPI (auth, scope, visibility filter)
-    -> cognee.search(query)
+    -> pgvector cosine similarity + tsvector BM25
+    -> Reciprocal Rank Fusion to merge rankings
     -> apply confidence, recency weighting, access tracking
     -> return ranked results
 
 Background enrichment (Phase 2):
-  arq worker -> cognee.memify()
-    -> prune stale, strengthen co-retrieved, derive new facts
+  arq worker -> prune stale, strengthen co-retrieved, derive new facts
 ```
 
 ---
@@ -265,23 +269,23 @@ Background enrichment (Phase 2):
 ```
 1. Input arrives (raw_content, up to 8K chars)
 2. Rate limit check (10/min, 1000/day, 100K/org) via limits
-3. Cognee compresses -> atomic facts with resolved references
+3. LLM compresses -> atomic facts with resolved references (instructor + litellm)
 4. SHA-256 hash each fact
 5. If hash exists for this agent -> NOOP (free, instant)
-6. If no hash match -> Cognee vector similarity check at 0.90
+6. If no hash match -> pgvector cosine similarity check at 0.90 threshold
 7. If vector match -> LLM decides ADD / UPDATE / NOOP / CONFLICT
    - Uses instructor for typed Pydantic response
    - Uses litellm for provider-agnostic LLM call
    - CONFLICT: keep both, flag contradiction, reduce old confidence
-8. Store memory with embedding via Cognee
+8. Store memory with embedding via EmbeddingProvider + pgvector
 9. Set confidence based on source tier
 ```
 
 ### Two-tier resilience
 
 - Fast path: store raw_content immediately, searchable right away
-- Async (arq worker): Cognee compression + embedding catches up
-- If Cognee/LLM is down, memories still stored and searchable (lower quality)
+- Async (arq worker): LLM compression + embedding catches up
+- If LLM/embedding provider is down, memories still stored and searchable (lower quality)
 - tenacity retries on transient failures
 
 ---
@@ -435,10 +439,10 @@ apps/api/                     # FastAPI application (Python, managed by uv)
   credits/                    # Credit engine (unique business logic)
   messages/                   # Message + channel CRUD
   events/                     # Append-only event log
-  memory/                     # Memory endpoints + Cognee integration
+  memory/                     # Memory endpoints + custom pipeline
     router.py                 # REST endpoints
     service.py                # Business logic (scoping, rate limiting, confidence)
-    cognee_adapter.py         # Cognee configuration + dataset mapping
+    compression.py            # LLM compression to atomic facts (instructor + litellm)
     dedup.py                  # Hash + vector + LLM dedup pipeline
     search.py                 # Hybrid search (pgvector + tsvector + RRF)
     providers/                # Embedding provider interface + implementations
@@ -466,7 +470,7 @@ libs/shared-types/            # Keep for frontend enum sharing
 | Signal                             | Action                     |
 | ---------------------------------- | -------------------------- |
 | Memory writes >10x task writes     | Independent scaling needed |
-| Cognee pipeline becomes bottleneck | Dedicated worker process   |
+| Memory pipeline becomes bottleneck | Dedicated worker process   |
 | Multiple external consumers        | Separate auth/routing      |
 
 ### How to extract (mechanical)
@@ -496,7 +500,7 @@ Estimated effort: 1-2 days.
 - Agent stores memory -> search returns it
 - Dedup prevents duplicate storage
 - Visibility rules enforced across agents
-- Cognee pipeline: add -> cognify -> search round-trip
+- Memory pipeline: store -> compress -> embed -> search round-trip
 - Migration validation: FastAPI endpoints match NestJS responses
 
 ### Load tests
@@ -528,9 +532,9 @@ Track A — API Rewrite:
 
 Track B — Memory System (parallel after #526):
 
-- #536 Cognee spike (validate assumptions — START EARLY)
+- #536 Cognee spike — NO-GO decision, validated custom pipeline path
 - #537 Memory entity + pgvector + Alembic migration
-- #538 Cognee integration + embedding providers
+- #538 Embedding providers (Voyage 3.5 / OpenAI / Ollama) + LLM compression
 - #539 Dedup pipeline (hash + vector + LLM via instructor/litellm)
 - #540 Hybrid search (pgvector + tsvector + RRF)
 - #541 Memory REST API + MCP tools + rate limiting + confidence
@@ -539,7 +543,7 @@ Track B — Memory System (parallel after #526):
 
 ### Phase 2: Intelligence (Issues #544-#547)
 
-- #544 cognee.memify() background enrichment (arq worker)
+- #544 Background enrichment pipeline (arq worker)
 - #545 Feedback loop + retrieval optimization
 - #546 Contradiction resolution
 - #547 Auto-expire time-bound memories
@@ -558,7 +562,7 @@ Track B — Memory System (parallel after #526):
 | ------------------------------------- | ----------------------------------------------------------------------------------- |
 | Memory explosion                      | Rate limiting (limits) + hash/vector dedup + Phase 2 pruning                        |
 | Hallucination poisoning               | Confidence scoring + corroboration boost + contradiction tracking                   |
-| Cognee dependency                     | Clean adapter boundary, fallback to instructor + litellm + pgvector custom pipeline |
+| LLM provider dependency               | instructor + litellm abstracts providers; tenacity retries; graceful degradation    |
 | FastAPI migration breaks clients      | Same REST routes + response shapes, integration tests comparing NestJS vs FastAPI   |
 | Embedding provider outage             | Two-tier write (store raw immediately via fast path, embed async via arq)           |
 | pgvector perf at scale                | 1024d optimized, HNSW index, separate Postgres option documented                    |
@@ -570,7 +574,7 @@ Track B — Memory System (parallel after #526):
 
 Architecture informed by:
 
-- Cognee: add/cognify/memify pipeline, knowledge graph (cognee.ai, $7.5M seed, 1M+ pipelines/mo)
+- Cognee: evaluated and rejected for Phase 1 (#536 spike — NO-GO). Revisit for Phase 3 knowledge graph
 - Supermemory: contradiction handling, auto-forget (#1 on LongMemEval/LoCoMo/ConvoMem)
 - Mem0: ADD/UPDATE/DELETE/NOOP consolidation pattern (26% accuracy boost)
 - SimpleMem: semantic compression, 30x token savings (arxiv 2601.02553)
@@ -585,8 +589,8 @@ Architecture informed by:
 
 ## 19. Resolved Questions
 
-1. **Cognee dataset mapping** — validate in spike (#536). If incompatible, build custom pipeline with instructor + litellm + pgvector.
-2. **Cognee + custom embedding provider** — validate in spike (#536). Fallback: use our own EmbeddingProvider interface independent of Cognee.
+1. **Memory engine** — Cognee evaluated in spike (#536), NO-GO. Custom pipeline with instructor + litellm + pgvector selected. See `docs/spikes/0536-cognee-findings.md`.
+2. **Embedding providers** — Custom EmbeddingProvider protocol with Voyage 3.5, OpenAI, and Ollama implementations. No dependency on Cognee.
 3. **Migrations** — Alembic. Stamp existing schema as baseline, all future changes through Alembic.
 4. **MCP server** — rewrite in Python using fastmcp standalone v3.1.0.
 5. **Sandbox server** — stays Node. Update to proxy API routes to FastAPI.
@@ -597,12 +601,12 @@ Architecture informed by:
 ## 20. Dependency Graph
 
 ```
-#536 (Cognee spike) ─────────────────────────────────┐
+#536 (Cognee spike — NO-GO) ─────────────────────────┐
                                                       v
 #525 (scaffold) -> #526 (models) -> #527 (alembic) -> #537 (memory entity)
                        |                                    |
                        v                                    v
-                   #528 (auth)                         #538 (Cognee integration)
+                   #528 (auth)                         #538 (embedding providers)
                        |                                    |
                        v                                    v
                    #529 (endpoints)                    #539 (dedup)
