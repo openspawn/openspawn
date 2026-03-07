@@ -20,10 +20,11 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
-# Scoring weights from RFC-0001
-VECTOR_WEIGHT = 0.6
-RECENCY_WEIGHT = 0.25
+# Scoring weights (updated with helpfulness signal)
+VECTOR_WEIGHT = 0.50
+RECENCY_WEIGHT = 0.20
 ACCESS_WEIGHT = 0.15
+HELPFULNESS_WEIGHT = 0.15
 
 # RRF constant (standard value from literature)
 RRF_K = 60
@@ -163,7 +164,8 @@ async def hybrid_search(
         SELECT m.id, m.content, m.raw_content, m.summary, m.type, m.source,
                m.confidence, m.strength, m.visibility, m.agent_id,
                m.created_at, m.occurred_at, m.access_count,
-               m.last_accessed_at, m.metadata
+               m.last_accessed_at, m.helpful_count, m.unhelpful_count,
+               m.metadata
         FROM memories m
         WHERE m.id IN ({id_list})
     """)
@@ -187,8 +189,12 @@ async def hybrid_search(
         recency = _recency_decay(row.last_accessed_at, now)
         access_norm = row.access_count / max_access if max_access > 0 else 0.0
 
+        helpfulness = row.helpful_count / max(1, row.helpful_count + row.unhelpful_count)
         combined_score = (
-            VECTOR_WEIGHT * vector_sim + RECENCY_WEIGHT * recency + ACCESS_WEIGHT * access_norm
+            VECTOR_WEIGHT * vector_sim
+            + RECENCY_WEIGHT * recency
+            + ACCESS_WEIGHT * access_norm
+            + HELPFULNESS_WEIGHT * helpfulness
         )
 
         results.append(
