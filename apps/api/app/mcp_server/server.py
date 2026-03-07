@@ -286,29 +286,56 @@ async def consensus_status(consensus_id: str) -> str:
 
 
 # ═══════════════════════════════════════════════
-# Memory Tools (stubs — depends on #536)
+# Memory Tools
 # ═══════════════════════════════════════════════
 
 
 @mcp.tool
-async def memory_store(key: str, value: str, tags: list[str] | None = None) -> str:
-    """Store a memory entry. (Stub — memory API not yet implemented)"""
-    return _format({"status": "stub", "message": "Memory API not yet available", "key": key})
+async def memory_store(
+    content: str,
+    source: str = "observation",
+    type: str = "episodic",
+    visibility: str = "shared",
+) -> str:
+    """Store a memory. Content is compressed and embedded for later retrieval."""
+    result = await _get_client().post(
+        "/memory",
+        json={"content": content, "source": source, "type": type, "visibility": visibility},
+    )
+    return _format(result)
 
 
 @mcp.tool
-async def memory_search(query: str, limit: int = 10) -> str:
-    """Search stored memories. (Stub — memory API not yet implemented)"""
-    return _format({"status": "stub", "message": "Memory API not yet available", "results": []})
+async def memory_search(query: str, limit: int = 10, type: str | None = None) -> str:
+    """Search memories using hybrid semantic + keyword search."""
+    params: dict[str, str] = {"query": query, "limit": str(limit)}
+    if type:
+        params["type"] = type
+    result = await _get_client().get("/memory/search", params=params)
+    return _format(result)
 
 
 @mcp.tool
-async def memory_list(tags: list[str] | None = None, limit: int = 50) -> str:
-    """List stored memories. (Stub — memory API not yet implemented)"""
-    return _format({"status": "stub", "message": "Memory API not yet available", "results": []})
+async def memory_list(
+    agent_id: str | None = None,
+    type: str | None = None,
+    limit: int = 50,
+) -> str:
+    """List memories with optional filters."""
+    params: dict[str, str] = {"limit": str(limit)}
+    if agent_id:
+        params["agent_id"] = agent_id
+    if type:
+        params["type"] = type
+    result = await _get_client().get("/memory", params=params)
+    return _format(result)
 
 
 @mcp.tool
 async def memory_feedback(memory_id: str, helpful: bool) -> str:
-    """Provide feedback on a memory entry. (Stub — memory API not yet implemented)"""
-    return _format({"status": "stub", "message": "Memory API not yet available"})
+    """Provide helpful/unhelpful feedback on a retrieved memory."""
+    result = await _get_client().post(
+        f"/memory/{memory_id}/feedback",
+        json={"helpful": helpful},
+    )
+    return _format(result)

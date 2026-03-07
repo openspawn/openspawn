@@ -12,6 +12,7 @@ from app.database import engine
 from app.events.router import router as events_router
 from app.integrations.router import router as integrations_router
 from app.logging import setup_logging
+from app.memory.router import router as memory_router
 from app.messages.router import router as messages_router
 from app.tasks.router import router as tasks_router
 
@@ -48,6 +49,7 @@ app.include_router(credits_router)
 app.include_router(messages_router)
 app.include_router(events_router)
 app.include_router(integrations_router)
+app.include_router(memory_router)
 
 
 @app.get("/health")
