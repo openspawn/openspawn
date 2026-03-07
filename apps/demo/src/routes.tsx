@@ -25,6 +25,7 @@ import { NetworkPage } from "./pages/network";
 import { IntroPage } from "./pages/intro";
 import { MobileStatusPage } from "./pages/mobile-status";
 import { LiveViewPage } from "./pages/live-view";
+import { MemoryPage } from "./pages/memory";
 import { isBBTheme } from "./lib/dashboard-theme";
 
 const reduceMotion =
@@ -174,6 +175,12 @@ const statusRoute = createRoute({
   component: MobileStatusPage,
 });
 
+const memoryRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/memory",
+  component: MemoryPage,
+});
+
 // Build route tree
 const layoutChildren = [
   indexRoute,
@@ -188,6 +195,7 @@ const layoutChildren = [
   statusRoute,
   kanbanRoute,
   taskBoardRoute,
+  memoryRoute,
 ];
 
 const rootChildren = [

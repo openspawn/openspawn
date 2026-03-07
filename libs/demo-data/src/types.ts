@@ -210,3 +210,27 @@ export interface DemoWebhook {
   lastError?: string;
   createdAt: string;
 }
+
+export type MemoryType = "episodic" | "semantic" | "graph";
+export type MemoryVisibility = "shared" | "private" | "targeted";
+export type MemorySource =
+  | "task_completion"
+  | "code_change"
+  | "observation"
+  | "inference"
+  | "unknown";
+
+export interface DemoMemory {
+  id: string;
+  agentId: string;
+  type: MemoryType;
+  visibility: MemoryVisibility;
+  source: MemorySource;
+  content: string;
+  tags: string[];
+  confidence: number;
+  accessCount: number;
+  lastAccessedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
