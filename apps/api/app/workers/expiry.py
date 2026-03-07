@@ -14,7 +14,7 @@ logger = structlog.get_logger()
 async def expire_memories(ctx: dict) -> int:
     """Soft-delete memories past their expires_at by setting metadata.expired = true."""
     async with async_session() as session:
-        result = await session.execute(
+        cursor = await session.execute(
             update(Memory)
             .where(Memory.expires_at < func.now())
             .where(
@@ -28,7 +28,7 @@ async def expire_memories(ctx: dict) -> int:
                 )
             )
         )
-        expired = result.rowcount
+        expired = getattr(cursor, "rowcount", 0) or 0
         await session.commit()
         logger.info("expire_memories.done", expired=expired)
         return expired

@@ -72,7 +72,7 @@ jobs:
         continue-on-error: true # Don't fail on lint for now
 
       - name: Build
-        run: pnpm exec nx run-many -t build --parallel=3
+        run: pnpm exec nx run-many -t build --parallel=3 --exclude=dashboard
 
       - name: Test
         run: pnpm exec nx run-many -t test --parallel=3

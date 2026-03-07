@@ -45,7 +45,7 @@ async def compress_to_facts(
     langfuse = get_langfuse()
     generation = None
     if langfuse:
-        trace = langfuse.trace(name="compress_to_facts", input={"content": raw_content[:200]})
+        trace = langfuse.trace(name="compress_to_facts", input={"content": raw_content[:200]})  # type: ignore[attr-defined]
         generation = trace.generation(name="instructor_compress", model=llm_model)
 
     client = instructor.from_litellm(litellm.acompletion)
