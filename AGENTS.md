@@ -135,6 +135,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Conventions
 
+- **PRs**: All changes go through pull requests — never push directly to `main`
 - **Commits**: Scoped conventional commits (`feat(scope):`, `fix(scope):`)
 - **Imports**: No barrel files, explicit paths
 - **Formatting**: oxfmt (Rust-based)
@@ -153,6 +154,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Use `any` or `as` casts** — find the correct type
 - **Create barrel files** — use explicit import paths
 - **Commit generated files without running codegen** — run `pnpm run codegen` first
+- **Push directly to `main`** — all changes require a PR
 
 ---
 

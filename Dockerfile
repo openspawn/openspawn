@@ -4,6 +4,7 @@
 # Stage 1: Build all apps
 FROM node:24-alpine AS build
 WORKDIR /app
+RUN apk add --no-cache python3 make g++
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
