@@ -10,8 +10,8 @@ import { Progress } from "../components/ui/progress";
 import { AgentAvatar } from "../components/agent-avatar";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { usePresence, useAgentHealth } from "../hooks";
-import { AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/shared-types";
 
 type Agent = AgentFieldsFragment;
 

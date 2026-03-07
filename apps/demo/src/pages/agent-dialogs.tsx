@@ -20,8 +20,8 @@ import {
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
 import { getStatusVariant } from "../lib/status-colors";
 import { REPUTATION_COLORS, REPUTATION_EMOJI } from "./agent-reputation-tab";
-import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/shared-types";
 
 type Agent = AgentFieldsFragment;
 

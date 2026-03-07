@@ -41,8 +41,8 @@ import { getParentTeams } from "../demo/teams";
 import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
 import { useTeams } from "../hooks";
-import { AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/shared-types";
 
 // Extracted sub-components
 import { AgentDetailsDialog, EditAgentDialog, AdjustCreditsDialog } from "./agent-dialogs";

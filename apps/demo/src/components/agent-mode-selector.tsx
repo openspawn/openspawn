@@ -11,8 +11,7 @@ import {
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-// Import the enum from generated types
-import { AgentMode } from "../graphql/generated/graphql";
+import { AgentMode } from "@openspawn/shared-types";
 
 interface AgentModeSelectorProps {
   value: AgentMode;

@@ -38,8 +38,8 @@ import { useAgents } from "../hooks/use-agents";
 import { useTeamStats } from "../hooks/use-teams";
 import { usePresence } from "../hooks/use-presence";
 import { useAgentHealth } from "../hooks/use-agent-health";
-import { AgentMode } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentMode } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/shared-types";
 
 type Agent = AgentFieldsFragment;
 
