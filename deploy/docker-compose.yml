@@ -9,7 +9,7 @@
 
 services:
   app:
-    image: bikinibottom:latest
+    image: ghcr.io/openspawn/openspawn:latest
     container_name: bikinibottom
     restart: unless-stopped
     environment:
@@ -30,7 +30,7 @@ services:
       start_period: 30s
 
   api:
-    image: openspawn-api:latest
+    image: ghcr.io/openspawn/openspawn-api:latest
     container_name: openspawn-api
     restart: unless-stopped
     environment:
@@ -69,7 +69,7 @@ services:
       start_period: 10s
 
   platform:
-    image: openspawn-platform:latest
+    image: ghcr.io/openspawn/openspawn-platform:latest
     container_name: openspawn-platform
     restart: unless-stopped
     environment:
