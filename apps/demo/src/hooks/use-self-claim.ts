@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDemo } from "../demo";
-import type { TaskStatus, TaskPriority } from "@openspawn/shared-types";
+import type { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 import type { DemoTask } from "@openspawn/demo-data";
 
 /** Shape returned by the claimNextTask mutation (or demo equivalent) */

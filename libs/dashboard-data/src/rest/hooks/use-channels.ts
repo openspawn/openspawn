@@ -5,7 +5,7 @@ export function useChannels() {
   return useQuery({
     queryKey: ["channels"],
     queryFn: async () => {
-      const { data, error } = await api.GET("/messages/channels");
+      const { data, error } = await api.GET("/channels");
       if (error) throw error;
       return data;
     },

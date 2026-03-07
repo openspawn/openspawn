@@ -7,7 +7,7 @@
 import { useMemo } from "react";
 import { useAgents } from "./use-agents";
 import { useTasks } from "./use-tasks";
-import { AgentStatus } from "@openspawn/shared-types";
+import { AgentStatus } from "../graphql/generated/hooks";
 
 export type PresenceStatus = "active" | "busy" | "idle" | "error";
 
@@ -55,7 +55,7 @@ export function usePresence(): {
 
     // Pick up to 4 active agents (agents with active status + tasks)
     // Mark 1 as error for visual variety
-    const activeAgents = agents.filter((a: any) => a.status === AgentStatus.Active);
+    const activeAgents = agents.filter((a: { status: string }) => a.status === AgentStatus.Active);
     let activeCount = 0;
     let errorSet = false;
 

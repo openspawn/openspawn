@@ -52,6 +52,16 @@ export { isDemoMode, isSandboxMode } from "./lib/mode";
 // GraphQL fetcher (legacy — kept for demo/sandbox mock compatibility)
 export { fetcher, graphqlClient, setDemoFetcher, setSandboxFetcher } from "./graphql/fetcher";
 
+// GraphQL-generated enums + types (legacy — still used by demo data layer)
+export {
+  AgentMode,
+  AgentRole,
+  AgentStatus,
+  TaskPriority,
+  TaskStatus,
+  type AgentFieldsFragment,
+} from "./graphql/generated/hooks";
+
 // Lib utilities
 export * from "./lib/avatar-utils";
 export * from "./lib/avatar";

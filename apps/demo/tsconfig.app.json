@@ -37,7 +37,7 @@
       "path": "../../libs/dashboard-ui"
     },
     {
-      "path": "../../libs/shared-types"
+      "path": "../../libs/shared-types/tsconfig.lib.json"
     }
   ]
 }

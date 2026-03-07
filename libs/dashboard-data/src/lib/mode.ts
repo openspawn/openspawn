@@ -5,7 +5,8 @@ const urlParams =
   typeof window !== "undefined" && window.location.search
     ? new URLSearchParams(window.location.search)
     : null;
-const _env = (typeof import.meta !== "undefined" && import.meta.env) || {};
+const _env: Record<string, string | undefined> =
+  (typeof import.meta !== "undefined" && import.meta.env) || {};
 
 export const isDemoMode =
   urlParams?.get("demo") === "true" ||

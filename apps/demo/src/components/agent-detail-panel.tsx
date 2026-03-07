@@ -26,8 +26,8 @@ import { Progress } from "./ui/progress";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
-import { AgentRole, TaskStatus } from "@openspawn/shared-types";
-import type { AgentFieldsFragment } from "@openspawn/shared-types";
+import { AgentRole, TaskStatus } from "@openspawn/dashboard-data";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 // recharts v3 has infinite-loop bug — using custom bars instead
 import { useContainerSize } from "../hooks/use-container-size";
 // ChartTooltip removed — using custom bars

@@ -38,8 +38,8 @@ import { useAgents } from "../hooks/use-agents";
 import { useTeamStats } from "../hooks/use-teams";
 import { usePresence } from "../hooks/use-presence";
 import { useAgentHealth } from "../hooks/use-agent-health";
-import { AgentMode } from "@openspawn/shared-types";
-import type { AgentFieldsFragment } from "@openspawn/shared-types";
+import { AgentMode } from "@openspawn/dashboard-data";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 type Agent = AgentFieldsFragment;
 
