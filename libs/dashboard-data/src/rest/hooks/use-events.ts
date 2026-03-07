@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../client";
 
-export function useEvents() {
+export function useEvents(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["events"],
     queryFn: async () => {
@@ -9,5 +9,6 @@ export function useEvents() {
       if (error) throw error;
       return data;
     },
+    enabled: options?.enabled ?? true,
   });
 }

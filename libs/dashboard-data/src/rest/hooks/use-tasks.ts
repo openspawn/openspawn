@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../client";
 
-export function useTasks() {
+export function useTasks(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
@@ -9,6 +9,7 @@ export function useTasks() {
       if (error) throw error;
       return data;
     },
+    enabled: options?.enabled ?? true,
   });
 }
 
