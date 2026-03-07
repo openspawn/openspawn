@@ -53,22 +53,7 @@ export default defineConfig(() => ({
     port: 4200,
     host: "0.0.0.0",
   },
-  plugins: [
-    react({
-      plugins: [
-        [
-          "@swc-contrib/plugin-graphql-codegen-client-preset",
-          {
-            artifactDirectory: "./src/graphql/generated",
-            gqlTagName: "graphql",
-          },
-        ],
-      ],
-    }),
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin(["*.md"]),
-    fixBaseHref(),
-  ],
+  plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"]), fixBaseHref()],
   // Uncomment this if you are using workers.
   // worker: {
   //   plugins: () => [ nxViteTsPaths() ],

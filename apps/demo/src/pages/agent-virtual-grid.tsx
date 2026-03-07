@@ -22,8 +22,8 @@ import { AgentModeBadge } from "../components/agent-mode-selector";
 import { usePresence, useAgentHealth } from "../hooks";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 import { TeamBadge } from "../components/team-badge";
-import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/shared-types";
 
 type Agent = AgentFieldsFragment;
 type DialogMode = "view" | "edit" | "credits" | null;

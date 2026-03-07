@@ -3,7 +3,7 @@
  * Polls /api/metrics/acp every 3s when in sandbox mode.
  */
 import { useQuery } from "@tanstack/react-query";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "../lib/mode";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 
 export interface ACPMetrics {

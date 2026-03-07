@@ -46,20 +46,11 @@ export {
 export { AuthProvider, useAuth, useOAuthCallback, type User } from "./contexts/auth-context";
 export { SidePanelProvider, useSidePanel } from "./contexts/side-panel-context";
 
-// GraphQL
-export {
-  fetcher,
-  isDemoMode,
-  isSandboxMode,
-  graphqlClient,
-  setDemoFetcher,
-  setSandboxFetcher,
-} from "./graphql/fetcher";
-export * from "./graphql/operations";
-// Re-export generated GraphQL types and hooks
-// Note: hooks.ts re-exports types from graphql.ts, so we only export hooks.ts to avoid conflicts
-export * from "./graphql/generated/hooks";
-export * from "./graphql/generated/gql";
+// Mode detection
+export { isDemoMode, isSandboxMode } from "./lib/mode";
+
+// GraphQL fetcher (legacy — kept for demo/sandbox mock compatibility)
+export { fetcher, graphqlClient, setDemoFetcher, setSandboxFetcher } from "./graphql/fetcher";
 
 // Lib utilities
 export * from "./lib/avatar-utils";
@@ -73,13 +64,8 @@ export { SANDBOX_URL } from "./lib/sandbox-url";
 export * from "./lib/status-colors";
 export * from "./lib/toast";
 
-// Document node exports (used by demo mock-fetcher)
-export {
-  TasksDocument,
-  TaskDocument,
-  AgentsDocument,
-  CreditHistoryDocument,
-  EventsDocument,
-  MessagesDocument,
-} from "./graphql/generated/graphql";
+// REST hooks + client
+export { api } from "./rest/client";
+export * from "./rest/hooks";
+
 export { useDashboardPanels, registerPanelComponents } from "./hooks/use-dashboard-panels";

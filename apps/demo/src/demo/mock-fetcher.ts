@@ -11,39 +11,18 @@ import type {
   DemoEvent,
   DemoMessage,
 } from "@openspawn/demo-data";
-import {
-  TasksDocument,
-  TaskDocument,
-  AgentsDocument,
-  CreditHistoryDocument,
-  EventsDocument,
-  MessagesDocument,
-} from "../graphql/generated/graphql";
 import { debug } from "../lib/debug";
 
-// Extract operation name from a DocumentNode at runtime
-
-import type { DocumentNode } from "graphql";
-
-function getOperationName(doc: DocumentNode): string {
-  const def = doc.definitions[0];
-  if ("name" in def && def.name) {
-    return def.name.value;
-  }
-  return "Unknown";
-}
-
-// Operation names derived from generated documents (type-safe)
+// Operation name constants (previously derived from GraphQL DocumentNodes)
 const OP = {
-  Tasks: getOperationName(TasksDocument),
-  Task: getOperationName(TaskDocument),
-  Agents: getOperationName(AgentsDocument),
-  CreditHistory: getOperationName(CreditHistoryDocument),
-  Events: getOperationName(EventsDocument),
-  Messages: getOperationName(MessagesDocument),
-  // Demo-only operations (not in codegen yet)
+  Tasks: "Tasks",
+  Task: "Task",
+  Agents: "Agents",
   Agent: "Agent",
+  CreditHistory: "CreditHistory",
   Credits: "Credits",
+  Events: "Events",
+  Messages: "Messages",
   AgentReputation: "AgentReputation",
   TrustLeaderboard: "TrustLeaderboard",
   ReputationHistory: "ReputationHistory",

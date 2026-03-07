@@ -37,7 +37,7 @@ import { getStatusVariant } from "../lib/status-colors";
 import { type Team, getTeamById, getSubTeams, getParentTeams, getTeamColor } from "../demo/teams";
 import { useAgents } from "../hooks/use-agents";
 import { useTeamStats } from "../hooks/use-teams";
-import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "@openspawn/shared-types";
 import { TeamDialog, DeleteTeamDialog } from "./team-management";
 import { Button } from "./ui/button";
 
