@@ -149,8 +149,25 @@ async def store_memory(
     session.add(memory)
     await session.flush()
 
+    # Two-tier resilience: enqueue background enrichment (best-effort)
+    await _enqueue_enrichment(memory.id)
+
     logger.info("memory.stored", memory_id=str(memory.id), source=source, confidence=confidence)
     return memory.id
+
+
+async def _enqueue_enrichment(memory_id: uuid.UUID) -> None:
+    """Best-effort enqueue of background enrichment via arq/Redis."""
+    try:
+        from arq import create_pool
+
+        from app.workers.config import get_redis_settings
+
+        pool = await create_pool(get_redis_settings())
+        await pool.enqueue_job("boost_co_retrieved", _job_id=f"enrich:{memory_id}")
+        await pool.close()
+    except Exception:
+        logger.warning("enrichment.enqueue_failed", memory_id=str(memory_id))
 
 
 async def get_memory(

@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "json"
 
+    # Redis (for arq workers)
+    redis_url: str = "redis://localhost:6379"
+
     # Observability (all optional)
     logfire_token: str | None = None
     langfuse_public_key: str | None = None
