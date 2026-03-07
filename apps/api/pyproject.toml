@@ -23,6 +23,7 @@ dependencies = [
   "litellm>=1.55",
   "voyageai>=0.3",
   "openai>=1.60",
+  "tenacity>=9.0",
 ]
 
 [project.optional-dependencies]
@@ -68,6 +69,7 @@ ignore = [
 "app/*/router.py" = ["TCH002", "TCH003"]  # FastAPI routes need runtime type imports
 "app/schemas/*.py" = ["TCH003"]  # Pydantic needs runtime type imports
 "app/mcp_server/*.py" = ["TCH002", "TCH003"]  # MCP tools need runtime type imports
+"app/memory/*.py" = ["TCH003"]  # Pydantic models need runtime type imports
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
