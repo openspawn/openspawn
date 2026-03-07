@@ -33,14 +33,11 @@ apps/
   website/         -> openspawn.ai marketing site
   platform/        -> openspawn.ai landing page
   api/             -> FastAPI backend (REST + OpenAPI) — Python, uv
-  api-nestjs/      -> NestJS backend (legacy, being replaced)
   docs/            -> Astro Starlight documentation
   mcp/             -> MCP server for agent tools
   sandbox-cli/     -> CLI entry point for sandbox
-  dashboard/       -> DEPRECATED — replaced by demo
-
 libs/
-  dashboard-data/  -> Shared hooks, auth, GraphQL, utilities
+  dashboard-data/  -> Shared hooks, auth, utilities
   dashboard-ui/    -> Shared React UI components
   design-tokens/   -> Design system (colors, spacing, typography)
   database/        -> TypeORM entities
@@ -68,9 +65,6 @@ pnpm install
 # Dev (FastAPI)
 cd apps/api && uv run uvicorn app.main:app --reload
 
-# Dev (Legacy NestJS API + Demo dashboard)
-pnpm exec nx run-many -t serve -p api-nestjs,demo
-
 # Dev (Sandbox + Dashboard together)
 pnpm run dev:sandbox
 
@@ -85,12 +79,8 @@ pnpm exec nx e2e demo           # E2E tests
 pnpm exec nx run-many -t lint
 pnpm exec oxfmt --write .
 
-# GraphQL codegen
-pnpm run codegen
-
-# Database
-pnpm exec nx run api:sync-schema
-pnpm exec nx run api:seed
+# Database (Alembic)
+cd apps/api && uv run alembic upgrade head
 ```
 
 ---
@@ -102,7 +92,6 @@ pnpm exec nx run api:seed
 - Sandbox: http://localhost:3333
 - API (FastAPI): http://localhost:8000
 - API docs: http://localhost:8000/docs
-- API (NestJS legacy): http://localhost:3000
 
 ---
 
@@ -149,7 +138,6 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 ## Do Not
 
 - **Edit `apps/dashboard/`** — deprecated, use `apps/demo/` instead
-- **Edit `apps/api-nestjs/`** — legacy, being replaced by `apps/api/` (FastAPI)
 - **Use `npm` or `yarn`** — this project uses pnpm only
 - **Use `any` or `as` casts** — find the correct type
 - **Create barrel files** — use explicit import paths
@@ -177,12 +165,6 @@ pnpm exec nx run-many -t lint      # Lint
 2. Export from `apps/demo/src/pages/index.ts`
 3. Add route in `apps/demo/src/app/app.tsx`
 4. Add nav link in `apps/demo/src/components/layout.tsx`
-
-### Add a GraphQL query
-
-1. Add query to `apps/demo/src/graphql/operations.ts`
-2. Run `pnpm run codegen`
-3. Import hook from `libs/dashboard-data/src/graphql/generated/hooks`
 
 ### Add demo data
 
