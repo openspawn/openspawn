@@ -8,8 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import AuthContext, require_auth
 from app.database import get_db
 from app.memory.schemas import (
+    ContradictionPairResponse,
     MemoryFeedbackDto,
     MemoryResponse,
+    ResolveContradictionDto,
     SearchResultResponse,
     StoreMemoryDto,
 )
@@ -102,6 +104,52 @@ async def list_all(
     return PaginatedResponse(
         data=[MemoryResponse.model_validate(m) for m in memories],
         meta=PaginationMeta(total=total, page=(offset // limit) + 1, limit=limit),
+    )
+
+
+@router.get("/contradictions")
+async def list_contradiction_pairs(
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataResponse[list[ContradictionPairResponse]]:
+    from app.memory.contradictions import list_contradictions
+
+    pairs = await list_contradictions(auth.org_id, db)
+    return DataResponse(
+        data=[
+            ContradictionPairResponse(
+                older_memory=MemoryResponse.model_validate(older),
+                newer_memory=MemoryResponse.model_validate(newer),
+            )
+            for older, newer in pairs
+        ]
+    )
+
+
+@router.post("/contradictions/{memory_id}/resolve")
+async def resolve_contradiction_endpoint(
+    memory_id: uuid.UUID,
+    dto: ResolveContradictionDto,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataMessageResponse[dict]:
+    from app.memory.contradictions import ResolutionStrategy, resolve_contradiction
+
+    try:
+        strategy = ResolutionStrategy(dto.strategy)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid strategy. Must be one of: {[s.value for s in ResolutionStrategy]}",
+        ) from e
+
+    mem = await resolve_contradiction(memory_id, strategy, db)
+    if not mem:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Memory not found")
+    await db.commit()
+    return DataMessageResponse(
+        data={"memory_id": str(memory_id)},
+        message=f"Contradiction resolved: {strategy.value}",
     )
 
 
