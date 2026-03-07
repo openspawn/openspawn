@@ -16,6 +16,7 @@ dependencies = [
   "httpx>=0.28",
   "pendulum>=3.0",
   "alembic>=1.18.4",
+  "cryptography>=46.0.5",
 ]
 
 [project.optional-dependencies]
@@ -50,10 +51,12 @@ select = [
 ]
 ignore = [
   "E501", # line length handled by formatter
+  "B008", # Depends() in function defaults is standard FastAPI pattern
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports for column/relationship resolution
+"app/auth/*.py" = ["TCH002"]  # FastAPI dependencies need runtime type annotations
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
