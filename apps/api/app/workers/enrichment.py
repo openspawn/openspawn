@@ -17,6 +17,7 @@ from sqlalchemy import and_, select, text
 from app.database import async_session
 from app.models.memory import Memory
 from app.workers.config import get_redis_settings
+from app.workers.expiry import expire_memories
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -107,10 +108,11 @@ async def derive_facts(ctx: dict) -> int:
 class WorkerSettings:
     """arq WorkerSettings — run with: arq app.workers.enrichment.WorkerSettings"""
 
-    functions: ClassVar[list] = [boost_co_retrieved, identify_stale, derive_facts]
+    functions: ClassVar[list] = [boost_co_retrieved, identify_stale, derive_facts, expire_memories]
     cron_jobs: ClassVar[list] = [
         cron(boost_co_retrieved, hour={0, 6, 12, 18}),  # 4x daily
         cron(identify_stale, hour={3}),  # once daily at 3am
         cron(derive_facts, hour={4}),  # once daily at 4am
+        cron(expire_memories, minute={0}),  # every hour
     ]
     redis_settings = get_redis_settings()

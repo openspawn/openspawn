@@ -7,12 +7,12 @@ class TestWorkerSettings:
     def test_functions_registered(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.functions) == 3
+        assert len(WorkerSettings.functions) == 4
 
     def test_cron_jobs_registered(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.cron_jobs) == 3
+        assert len(WorkerSettings.cron_jobs) == 4
 
     def test_functions_are_callable(self) -> None:
         from app.workers.enrichment import WorkerSettings

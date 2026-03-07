@@ -14,6 +14,9 @@ class StoreMemoryDto(BaseModel):
     target_agent_ids: list[uuid.UUID] | None = None
     occurred_at: datetime | None = None
     expires_at: datetime | None = None
+    ttl_seconds: int | None = Field(
+        default=None, ge=1, description="Optional TTL in seconds, sets expires_at"
+    )
     metadata: dict = Field(default_factory=dict)
 
 
