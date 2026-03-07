@@ -1193,6 +1193,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/memory/contradictions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Contradiction Pairs */
+        get: operations["list_contradiction_pairs_memory_contradictions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/contradictions/{memory_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Contradiction Endpoint */
+        post: operations["resolve_contradiction_endpoint_memory_contradictions__memory_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/memory/{memory_id}": {
         parameters: {
             query?: never;
@@ -1221,6 +1255,210 @@ export interface paths {
         put?: never;
         /** Feedback */
         post: operations["feedback_memory__memory_id__feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/entities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Entities */
+        get: operations["list_entities_memory_graph_entities_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/entities/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Entity */
+        get: operations["get_entity_memory_graph_entities__entity_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/entities/{entity_id}/memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Entity Memories */
+        get: operations["list_entity_memories_memory_graph_entities__entity_id__memories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/entities/{entity_id}/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Entity Agents */
+        get: operations["list_entity_agents_memory_graph_entities__entity_id__agents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/entities/{entity_id}/neighbors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Neighbors */
+        get: operations["get_neighbors_memory_graph_entities__entity_id__neighbors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/relationships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Relationships */
+        get: operations["get_relationships_memory_graph_relationships_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/overlap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compute Overlap */
+        get: operations["compute_overlap_memory_graph_overlap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/overlap/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overlap Matrix */
+        get: operations["overlap_matrix_memory_graph_overlap_matrix_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/gaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Find Gaps */
+        get: operations["find_gaps_memory_graph_gaps_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/cytoscape": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cytoscape Graph */
+        get: operations["cytoscape_graph_memory_graph_cytoscape_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/agent-file/export/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Export Agent */
+        post: operations["export_agent_memory_graph_agent_file_export__agent_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memory/graph/agent-file/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Agent */
+        post: operations["import_agent_memory_graph_agent_file_import_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1595,6 +1833,11 @@ export interface components {
              */
             created_at: string;
         };
+        /** ContradictionPairResponse */
+        ContradictionPairResponse: {
+            older_memory: components["schemas"]["MemoryResponse"];
+            newer_memory: components["schemas"]["MemoryResponse"];
+        };
         /** CreateChannelDto */
         CreateChannelDto: {
             /** Name */
@@ -1746,6 +1989,27 @@ export interface components {
          * @enum {string}
          */
         CreditType: "credit" | "debit";
+        /** CytoscapeEdge */
+        CytoscapeEdge: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        /** CytoscapeGraph */
+        CytoscapeGraph: {
+            /** Nodes */
+            nodes: components["schemas"]["CytoscapeNode"][];
+            /** Edges */
+            edges: components["schemas"]["CytoscapeEdge"][];
+        };
+        /** CytoscapeNode */
+        CytoscapeNode: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+        };
         /** DataMessageResponse[AgentRegistrationResponse] */
         DataMessageResponse_AgentRegistrationResponse_: {
             data: components["schemas"]["AgentRegistrationResponse"];
@@ -1865,6 +2129,10 @@ export interface components {
         DataResponse_CreditStatsResponse_: {
             data: components["schemas"]["CreditStatsResponse"];
         };
+        /** DataResponse[CytoscapeGraph] */
+        DataResponse_CytoscapeGraph_: {
+            data: components["schemas"]["CytoscapeGraph"];
+        };
         /** DataResponse[EscalationResponse] */
         DataResponse_EscalationResponse_: {
             data: components["schemas"]["EscalationResponse"];
@@ -1876,6 +2144,10 @@ export interface components {
         /** DataResponse[GitHubConnectionResponse] */
         DataResponse_GitHubConnectionResponse_: {
             data: components["schemas"]["GitHubConnectionResponse"];
+        };
+        /** DataResponse[GraphEntityResponse] */
+        DataResponse_GraphEntityResponse_: {
+            data: components["schemas"]["GraphEntityResponse"];
         };
         /** DataResponse[HierarchyNode] */
         DataResponse_HierarchyNode_: {
@@ -1893,9 +2165,17 @@ export interface components {
         DataResponse_MessageResponse_: {
             data: components["schemas"]["MessageResponse"];
         };
+        /** DataResponse[OverlapResult] */
+        DataResponse_OverlapResult_: {
+            data: components["schemas"]["OverlapResult"];
+        };
         /** DataResponse[ReputationSummary] */
         DataResponse_ReputationSummary_: {
             data: components["schemas"]["ReputationSummary"];
+        };
+        /** DataResponse[SubGraph] */
+        DataResponse_SubGraph_: {
+            data: components["schemas"]["SubGraph"];
         };
         /** DataResponse[TaskCommentResponse] */
         DataResponse_TaskCommentResponse_: {
@@ -1941,15 +2221,35 @@ export interface components {
             /** Data */
             data: components["schemas"]["ConsensusRequestResponse"][];
         };
+        /** DataResponse[list[ContradictionPairResponse]] */
+        DataResponse_list_ContradictionPairResponse__: {
+            /** Data */
+            data: components["schemas"]["ContradictionPairResponse"][];
+        };
         /** DataResponse[list[EscalationResponse]] */
         DataResponse_list_EscalationResponse__: {
             /** Data */
             data: components["schemas"]["EscalationResponse"][];
         };
+        /** DataResponse[list[GapResult]] */
+        DataResponse_list_GapResult__: {
+            /** Data */
+            data: components["schemas"]["GapResult"][];
+        };
         /** DataResponse[list[GitHubConnectionResponse]] */
         DataResponse_list_GitHubConnectionResponse__: {
             /** Data */
             data: components["schemas"]["GitHubConnectionResponse"][];
+        };
+        /** DataResponse[list[GraphEntityResponse]] */
+        DataResponse_list_GraphEntityResponse__: {
+            /** Data */
+            data: components["schemas"]["GraphEntityResponse"][];
+        };
+        /** DataResponse[list[GraphRelationshipResponse]] */
+        DataResponse_list_GraphRelationshipResponse__: {
+            /** Data */
+            data: components["schemas"]["GraphRelationshipResponse"][];
         };
         /** DataResponse[list[IntegrationLinkResponse]] */
         DataResponse_list_IntegrationLinkResponse__: {
@@ -1971,6 +2271,11 @@ export interface components {
             /** Data */
             data: components["schemas"]["MessageResponse"][];
         };
+        /** DataResponse[list[OverlapResult]] */
+        DataResponse_list_OverlapResult__: {
+            /** Data */
+            data: components["schemas"]["OverlapResult"][];
+        };
         /** DataResponse[list[SearchResultResponse]] */
         DataResponse_list_SearchResultResponse__: {
             /** Data */
@@ -1985,6 +2290,11 @@ export interface components {
         DataResponse_list_TaskCommentResponse__: {
             /** Data */
             data: components["schemas"]["TaskCommentResponse"][];
+        };
+        /** DataResponse[list[UUID]] */
+        DataResponse_list_UUID__: {
+            /** Data */
+            data: string[];
         };
         /** DataResponse[list[dict]] */
         DataResponse_list_dict__: {
@@ -2095,6 +2405,17 @@ export interface components {
          * @enum {string}
          */
         EventSeverity: "info" | "warning" | "error";
+        /** GapResult */
+        GapResult: {
+            /** Entity Name */
+            entity_name: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Agent Count */
+            agent_count: number;
+            /** Risk */
+            risk: string;
+        };
         /** GitHubConnectionResponse */
         GitHubConnectionResponse: {
             /**
@@ -2135,6 +2456,81 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** GraphEntityResponse */
+        GraphEntityResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /** Name */
+            name: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Description */
+            description: string;
+            /** Mention Count */
+            mention_count: number;
+            /** Confidence */
+            confidence: number;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** Metadata */
+            metadata: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** GraphRelationshipResponse */
+        GraphRelationshipResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /**
+             * Source Entity Id
+             * Format: uuid
+             */
+            source_entity_id: string;
+            /**
+             * Target Entity Id
+             * Format: uuid
+             */
+            target_entity_id: string;
+            /** Relationship Type */
+            relationship_type: string;
+            /** Weight */
+            weight: number;
+            /** Evidence Count */
+            evidence_count: number;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /** Metadata */
+            metadata: {
+                [key: string]: unknown;
+            };
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -2372,6 +2768,27 @@ export interface components {
          * @enum {string}
          */
         MessageType: "text" | "handoff" | "status_update" | "request";
+        /** OverlapResult */
+        OverlapResult: {
+            /**
+             * Agent A
+             * Format: uuid
+             */
+            agent_a: string;
+            /**
+             * Agent B
+             * Format: uuid
+             */
+            agent_b: string;
+            /** Jaccard Score */
+            jaccard_score: number;
+            /** Shared Count */
+            shared_count: number;
+            /** Union Count */
+            union_count: number;
+            /** Shared Entities */
+            shared_entities: components["schemas"]["GraphEntityResponse"][];
+        };
         /** PaginatedResponse[CreditTransactionResponse] */
         PaginatedResponse_CreditTransactionResponse_: {
             /** Data */
@@ -2462,6 +2879,14 @@ export interface components {
             success_rate: number;
             /** Level */
             level: string;
+        };
+        /** ResolveContradictionDto */
+        ResolveContradictionDto: {
+            /**
+             * Strategy
+             * @description Resolution strategy: keep_newer, keep_older, merge, flag
+             */
+            strategy: string;
         };
         /** ResolveEscalationDto */
         ResolveEscalationDto: {
@@ -2631,10 +3056,22 @@ export interface components {
             occurred_at?: string | null;
             /** Expires At */
             expires_at?: string | null;
+            /**
+             * Ttl Seconds
+             * @description Optional TTL in seconds, sets expires_at
+             */
+            ttl_seconds?: number | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
             };
+        };
+        /** SubGraph */
+        SubGraph: {
+            /** Entities */
+            entities: components["schemas"]["GraphEntityResponse"][];
+            /** Relationships */
+            relationships: components["schemas"]["GraphRelationshipResponse"][];
         };
         /** TaskCommentResponse */
         TaskCommentResponse: {
@@ -5450,6 +5887,61 @@ export interface operations {
             };
         };
     };
+    list_contradiction_pairs_memory_contradictions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_ContradictionPairResponse__"];
+                };
+            };
+        };
+    };
+    resolve_contradiction_endpoint_memory_contradictions__memory_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memory_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveContradictionDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataMessageResponse_dict_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_one_memory__memory_id__get: {
         parameters: {
             query?: never;
@@ -5503,6 +5995,372 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DataMessageResponse_dict_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_entities_memory_graph_entities_get: {
+        parameters: {
+            query?: {
+                entity_type?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_GraphEntityResponse__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_entity_memory_graph_entities__entity_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_GraphEntityResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_entity_memories_memory_graph_entities__entity_id__memories_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_dict__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_entity_agents_memory_graph_entities__entity_id__agents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_UUID__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_neighbors_memory_graph_entities__entity_id__neighbors_get: {
+        parameters: {
+            query?: {
+                hops?: number;
+            };
+            header?: never;
+            path: {
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_SubGraph_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_relationships_memory_graph_relationships_get: {
+        parameters: {
+            query: {
+                entity_id: string;
+                direction?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_GraphRelationshipResponse__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compute_overlap_memory_graph_overlap_get: {
+        parameters: {
+            query: {
+                agent_a: string;
+                agent_b: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_OverlapResult_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overlap_matrix_memory_graph_overlap_matrix_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_OverlapResult__"];
+                };
+            };
+        };
+    };
+    find_gaps_memory_graph_gaps_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_GapResult__"];
+                };
+            };
+        };
+    };
+    cytoscape_graph_memory_graph_cytoscape_get: {
+        parameters: {
+            query?: {
+                entity_type?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_CytoscapeGraph_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_agent_memory_graph_agent_file_export__agent_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_agent_memory_graph_agent_file_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
