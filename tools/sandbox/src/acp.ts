@@ -2,7 +2,7 @@
 // Extracted from deterministic.ts and decision-executor.ts to eliminate duplication.
 // Used by all simulation engines for creating and routing ACP messages.
 
-import type { SandboxAgent, ACPMessage } from './types.js';
+import type { SandboxAgent, ACPMessage } from "./types.js";
 
 let acpCounter = 0;
 
@@ -18,7 +18,7 @@ export function resetAcpCounter(): void {
 
 /** Create an ACP message */
 export function createACPMessage(
-  type: ACPMessage['type'],
+  type: ACPMessage["type"],
   from: string,
   to: string,
   taskId: string,
@@ -36,7 +36,7 @@ export function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
         agent.recentMessages = agent.recentMessages.slice(-10);
       }
     }
-    if (agent.id === msg.to && agent.trigger === 'event-driven') {
+    if (agent.id === msg.to && agent.trigger === "event-driven") {
       if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
         agent.inbox.push(msg);
       }

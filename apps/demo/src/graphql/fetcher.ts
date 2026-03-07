@@ -6,4 +6,11 @@ import { sandboxFetcher } from "../demo/sandbox-fetcher";
 setDemoFetcher(demoFetcher);
 setSandboxFetcher(sandboxFetcher);
 
-export { fetcher, isDemoMode, isSandboxMode, graphqlClient, setDemoFetcher, setSandboxFetcher } from "@openspawn/dashboard-data";
+export {
+  fetcher,
+  isDemoMode,
+  isSandboxMode,
+  graphqlClient,
+  setDemoFetcher,
+  setSandboxFetcher,
+} from "@openspawn/dashboard-data";

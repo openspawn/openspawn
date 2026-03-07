@@ -18,7 +18,7 @@ const Select = React.forwardRef<
       "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-center shadow-sm transition-colors",
       "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       "disabled:cursor-not-allowed disabled:opacity-50",
-      className
+      className,
     )}
     onChange={(e) => {
       onChange?.(e);
@@ -42,7 +42,7 @@ const SelectTrigger = React.forwardRef<
     className={cn(
       "flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm",
       "focus:outline-none focus:ring-1 focus:ring-ring",
-      className
+      className,
     )}
     {...props}
   >
@@ -60,7 +60,7 @@ function SelectContent({ children, className, ...props }: React.HTMLAttributes<H
     <div
       className={cn(
         "rounded-md border border-border bg-popover p-1 shadow-md text-popover-foreground",
-        className
+        className,
       )}
       {...props}
     >
@@ -75,7 +75,10 @@ const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <option
     ref={ref}
-    className={cn("relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm", className)}
+    className={cn(
+      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm",
+      className,
+    )}
     {...props}
   >
     {children}

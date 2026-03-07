@@ -13,7 +13,16 @@ export function ZeroConfigCliIllustration({ className = "" }: { className?: stri
       aria-hidden="true"
     >
       {/* ── Terminal window frame ─────────────────────────────────────────── */}
-      <rect x="4" y="6" width="92" height="88" rx="7" fill="rgba(13,17,23,0.95)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+      <rect
+        x="4"
+        y="6"
+        width="92"
+        height="88"
+        rx="7"
+        fill="rgba(13,17,23,0.95)"
+        stroke="rgba(255,255,255,0.08)"
+        strokeWidth="1"
+      />
 
       {/* Title bar */}
       <rect x="4" y="6" width="92" height="16" rx="7" fill="rgba(22,27,34,0.95)" />
@@ -79,8 +88,25 @@ export function ZeroConfigCliIllustration({ className = "" }: { className?: stri
       </rect>
 
       {/* ── Bottom badge: 30 seconds ──────────────────────────────────────── */}
-      <rect x="54" y="82" width="38" height="10" rx="3" fill="rgba(34,211,238,0.08)" stroke="rgba(34,211,238,0.20)" strokeWidth="0.8" />
-      <text x="73" y="89" textAnchor="middle" fontSize="5" fill="#22d3ee" fontFamily="monospace" fontWeight="700">
+      <rect
+        x="54"
+        y="82"
+        width="38"
+        height="10"
+        rx="3"
+        fill="rgba(34,211,238,0.08)"
+        stroke="rgba(34,211,238,0.20)"
+        strokeWidth="0.8"
+      />
+      <text
+        x="73"
+        y="89"
+        textAnchor="middle"
+        fontSize="5"
+        fill="#22d3ee"
+        fontFamily="monospace"
+        fontWeight="700"
+      >
         ⚡ 30s to running
       </text>
     </svg>

@@ -6,16 +6,19 @@ import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
 import { execSync } from "node:child_process";
 
 const commitSha = (() => {
-  try { return execSync('git rev-parse --short HEAD').toString().trim(); }
-  catch { return 'unknown'; }
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "unknown";
+  }
 })();
 const buildTime = new Date().toISOString();
 
-const basePath = process.env.VITE_BASE_PATH || '/app/';
+const basePath = process.env.VITE_BASE_PATH || "/app/";
 
 function fixBaseHref(): Plugin {
   return {
-    name: 'fix-base-href',
+    name: "fix-base-href",
     transformIndexHtml(html) {
       return html.replace('<base href="/" />', `<base href="${basePath}" />`);
     },
@@ -34,12 +37,7 @@ export default defineConfig(() => ({
     port: 4200,
     host: "0.0.0.0",
   },
-  plugins: [
-    react(),
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin(["*.md"]),
-    fixBaseHref(),
-  ],
+  plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(["*.md"]), fixBaseHref()],
   define: {
     __COMMIT_SHA__: JSON.stringify(commitSha),
     __BUILD_TIME__: JSON.stringify(buildTime),

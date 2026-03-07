@@ -27,7 +27,7 @@ test.describe("Landing Page", () => {
     // Wait for animation to complete, then verify the aria-label on the wrapping span
     await page.waitForTimeout(1500); // allow wordReveal animations to finish
     await expect(
-      page.locator('[aria-label="Your agents. Your devices. Your rules."]')
+      page.locator('[aria-label="Your agents. Your devices. Your rules."]'),
     ).toBeAttached();
   });
 
@@ -36,7 +36,7 @@ test.describe("Landing Page", () => {
     await expect(
       page.getByRole("heading", {
         name: /your agents.*your devices.*your rules/i,
-      })
+      }),
     ).toBeVisible();
   });
 
@@ -56,18 +56,12 @@ test.describe("Landing Page", () => {
     // GitHub link (external)
     const githubLink = nav.getByRole("link", { name: "GitHub" });
     await expect(githubLink).toBeVisible();
-    await expect(githubLink).toHaveAttribute(
-      "href",
-      "https://github.com/openspawn/openspawn"
-    );
+    await expect(githubLink).toHaveAttribute("href", "https://github.com/openspawn/openspawn");
 
     // Live Demo CTA
     const liveDemoLink = nav.getByRole("link", { name: /live demo/i });
     await expect(liveDemoLink).toBeVisible();
-    await expect(liveDemoLink).toHaveAttribute(
-      "href",
-      "https://bikinibottom.ai/app/"
-    );
+    await expect(liveDemoLink).toHaveAttribute("href", "https://bikinibottom.ai/app/");
   });
 
   test("feature cards render all 6 capabilities", async ({ page }) => {
@@ -81,9 +75,7 @@ test.describe("Landing Page", () => {
     ];
 
     for (const featureName of expectedFeatures) {
-      await expect(
-        page.getByRole("heading", { name: featureName, exact: true })
-      ).toBeVisible();
+      await expect(page.getByRole("heading", { name: featureName, exact: true })).toBeVisible();
     }
   });
 
@@ -109,37 +101,26 @@ test.describe("Landing Page", () => {
     await expect(footer.locator(".gradient-text").first()).toBeVisible();
 
     // Footer sections
-    await expect(
-      footer.getByRole("heading", { name: "Product" })
-    ).toBeVisible();
-    await expect(
-      footer.getByRole("heading", { name: "Features" })
-    ).toBeVisible();
-    await expect(
-      footer.getByRole("heading", { name: "Community" })
-    ).toBeVisible();
+    await expect(footer.getByRole("heading", { name: "Product" })).toBeVisible();
+    await expect(footer.getByRole("heading", { name: "Features" })).toBeVisible();
+    await expect(footer.getByRole("heading", { name: "Community" })).toBeVisible();
 
     // Key footer links
-    await expect(
-      footer.getByRole("link", { name: "Getting Started" })
-    ).toBeVisible();
-    await expect(
-      footer.getByRole("link", { name: "A2A Protocol" })
-    ).toBeVisible();
-    await expect(
-      footer.getByRole("link", { name: "GitHub" })
-    ).toBeVisible();
+    await expect(footer.getByRole("link", { name: "Getting Started" })).toBeVisible();
+    await expect(footer.getByRole("link", { name: "A2A Protocol" })).toBeVisible();
+    await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
 
     // Copyright notice (span inside the footer bottom bar)
     await expect(
-      footer.locator("span").filter({ hasText: /OpenSpawn.*MIT/i }).first()
+      footer
+        .locator("span")
+        .filter({ hasText: /OpenSpawn.*MIT/i })
+        .first(),
     ).toBeVisible();
   });
 
   test("install command snippet is shown in hero", async ({ page }) => {
     // The install command appears in the hero section (may appear in multiple places)
-    await expect(
-      page.getByText("npx openspawn init my-org").first()
-    ).toBeVisible();
+    await expect(page.getByText("npx openspawn init my-org").first()).toBeVisible();
   });
 });

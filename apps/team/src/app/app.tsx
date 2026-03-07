@@ -9,9 +9,9 @@ declare const __BUILD_TIME__: string;
 
 console.log(
   `%c⚡ OpenSpawn Team %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
-  'color: #06b6d4; font-weight: bold; font-size: 14px',
-  'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
-  'color: #64748b'
+  "color: #06b6d4; font-weight: bold; font-size: 14px",
+  "color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace",
+  "color: #64748b",
 );
 
 // Register shared panel components so useDashboardPanels() can render them

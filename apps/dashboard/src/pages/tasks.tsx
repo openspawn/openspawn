@@ -1,6 +1,25 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Plus, Search, GripVertical, X, Clock, User, Coins, Calendar, FileText, CheckCircle2, ArrowUpDown, AlertTriangle, RefreshCw, ShieldAlert, History, Webhook, Link2, Plug } from "lucide-react";
+import {
+  Plus,
+  Search,
+  GripVertical,
+  X,
+  Clock,
+  User,
+  Coins,
+  Calendar,
+  FileText,
+  CheckCircle2,
+  ArrowUpDown,
+  AlertTriangle,
+  RefreshCw,
+  ShieldAlert,
+  History,
+  Webhook,
+  Link2,
+  Plug,
+} from "lucide-react";
 import { HoverLiftCard } from "../components/motion-primitives";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -91,9 +110,9 @@ function formatDate(dateStr?: string | null) {
 function formatFullDate(dateStr?: string | null) {
   if (!dateStr) return "—";
   const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", { 
+  return date.toLocaleDateString("en-US", {
     weekday: "short",
-    month: "short", 
+    month: "short",
     day: "numeric",
     year: "numeric",
     hour: "2-digit",
@@ -101,7 +120,10 @@ function formatFullDate(dateStr?: string | null) {
   });
 }
 
-type AgentAvatarMap = Map<string, { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }>;
+type AgentAvatarMap = Map<
+  string,
+  { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }
+>;
 
 interface TaskCardProps {
   task: Task;
@@ -115,7 +137,7 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
   const createdViaWebhook = false; // TODO: Add metadata field to GraphQL schema when needed
-  
+
   return (
     <motion.div
       layout
@@ -125,18 +147,18 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
       onClick={onClick}
     >
-      <Card className={`cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20 min-h-[44px] ${
-        hasRejection ? 'border-amber-500/50 bg-amber-500/5' : ''
-      }`}>
+      <Card
+        className={`cursor-pointer transition-all hover:bg-accent/50 hover:shadow-md hover:border-primary/20 min-h-[44px] ${
+          hasRejection ? "border-amber-500/50 bg-amber-500/5" : ""
+        }`}
+      >
         <CardContent className={compact ? "p-2 sm:p-3" : "p-3"}>
           <div className="flex items-start gap-2">
             <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50 flex-shrink-0" />
             <div className="flex-1 min-w-0 space-y-2">
               {/* Header: ID + Priority */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-mono text-muted-foreground">
-                  {task.identifier}
-                </span>
+                <span className="text-xs font-mono text-muted-foreground">{task.identifier}</span>
                 <Badge variant={getPriorityVariant(task.priority)} className="text-xs">
                   {task.priority?.toLowerCase()}
                 </Badge>
@@ -151,29 +173,38 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                     webhook
                   </Badge>
                 )}
-                {(task as any).source === 'a2a' && (
-                  <Badge variant="outline" className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10">
+                {(task as any).source === "a2a" && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
+                  >
                     <Link2 className="w-3 h-3 mr-1" />
                     A2A
                   </Badge>
                 )}
-                {(task as any).source === 'mcp' && (
-                  <Badge variant="outline" className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10">
+                {(task as any).source === "mcp" && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10"
+                  >
                     <Plug className="w-3 h-3 mr-1" />
                     MCP
                   </Badge>
                 )}
                 {hasRejection && (
-                  <Badge variant="outline" className="text-xs text-amber-600 border-amber-500/50 bg-amber-500/10 animate-pulse">
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-amber-600 border-amber-500/50 bg-amber-500/10 animate-pulse"
+                  >
                     <AlertTriangle className="w-3 h-3 mr-1" />
                     needs fixes
                   </Badge>
                 )}
               </div>
-              
+
               {/* Title */}
               <p className="text-sm font-medium leading-tight">{task.title}</p>
-              
+
               {/* Rejection feedback preview */}
               {hasRejection && task.rejection && (
                 <div className="rounded-md bg-amber-500/10 border border-amber-500/30 px-2 py-1.5">
@@ -183,29 +214,45 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                   </p>
                 </div>
               )}
-              
+
               {/* Meta row: Assignee, Due date */}
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 {task.assignee ? (
                   <div className="flex items-center gap-1">
-                    {(() => { const a = agentMap.get(task.assigneeId!); return (
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
-                      style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                      {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
-                    </div>); })()}
+                    {(() => {
+                      const a = agentMap.get(task.assigneeId!);
+                      return (
+                        <div
+                          className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
+                          style={{
+                            backgroundColor: darkenForBackground(a?.avatarColor || "#71717a"),
+                          }}
+                        >
+                          {a?.avatarUrl ? (
+                            <img
+                              src={resolveAvatarUrl(a.avatarUrl)}
+                              alt=""
+                              className="w-full h-full rounded-full object-contain"
+                            />
+                          ) : (
+                            a?.avatar || "🤖"
+                          )}
+                        </div>
+                      );
+                    })()}
                     <span className="truncate max-w-[100px]">{task.assignee.name}</span>
                   </div>
                 ) : (
                   <span className="text-muted-foreground/50 italic">Unassigned</span>
                 )}
-                
+
                 {dueDate && (
-                  <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : ''}`}>
+                  <div className={`flex items-center gap-1 ${isOverdue ? "text-red-500" : ""}`}>
                     <Clock className="w-3 h-3" />
                     <span>{dueDate}</span>
                   </div>
                 )}
-                
+
                 {task.rejection?.rejectionCount && task.rejection.rejectionCount > 1 && (
                   <div className="flex items-center gap-1 text-amber-500">
                     <History className="w-3 h-3" />
@@ -230,26 +277,23 @@ interface TaskDetailSidebarProps {
 function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) {
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
   const hasRejection = task.rejection && task.status === "REVIEW";
-  
+
   return (
     <div className="h-full bg-background flex flex-col">
-
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm text-muted-foreground">{task.identifier}</span>
-          <Badge variant={getPriorityVariant(task.priority)}>
-            {task.priority?.toLowerCase()}
-          </Badge>
+          <Badge variant={getPriorityVariant(task.priority)}>{task.priority?.toLowerCase()}</Badge>
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>
-      
+
       {/* Rejection Banner */}
       {hasRejection && task.rejection && (
-        <motion.div 
+        <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           className="border-b border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-orange-500/15"
@@ -274,7 +318,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
                 </Badge>
               )}
             </div>
-            
+
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
               <h4 className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-1">
                 <ShieldAlert className="w-3 h-3" />
@@ -284,9 +328,13 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
                 {task.rejection.feedback}
               </p>
             </div>
-            
+
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="flex-1 border-amber-500/30 text-amber-600 hover:bg-amber-500/10">
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+              >
                 <RefreshCw className="w-3 h-3 mr-1" />
                 Resume Work
               </Button>
@@ -294,7 +342,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
           </div>
         </motion.div>
       )}
-      
+
       {/* Content */}
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6">
@@ -302,10 +350,10 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
           <div>
             <h2 className="text-xl font-semibold">{task.title}</h2>
           </div>
-          
+
           {/* Status */}
           <div className="flex items-center gap-4 flex-wrap">
-            <Badge 
+            <Badge
               variant={task.status === "DONE" ? "success" : hasRejection ? "warning" : "secondary"}
               className="text-sm px-3 py-1"
             >
@@ -322,7 +370,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </Badge>
             )}
           </div>
-          
+
           {/* Description */}
           {task.description && (
             <div className="space-y-2">
@@ -335,7 +383,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </p>
             </div>
           )}
-          
+
           {/* Details Grid */}
           <div className="grid grid-cols-2 gap-4">
             {/* Assignee */}
@@ -346,29 +394,45 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </div>
               {task.assignee ? (
                 <div className="flex items-center gap-2">
-                  {(() => { const a = agentMap.get(task.assigneeId!); return (
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
-                    style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                    {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
-                  </div>); })()}
+                  {(() => {
+                    const a = agentMap.get(task.assigneeId!);
+                    return (
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
+                        style={{
+                          backgroundColor: darkenForBackground(a?.avatarColor || "#71717a"),
+                        }}
+                      >
+                        {a?.avatarUrl ? (
+                          <img
+                            src={resolveAvatarUrl(a.avatarUrl)}
+                            alt=""
+                            className="w-full h-full rounded-full object-contain"
+                          />
+                        ) : (
+                          a?.avatar || "🤖"
+                        )}
+                      </div>
+                    );
+                  })()}
                   <span className="text-sm font-medium">{task.assignee.name}</span>
                 </div>
               ) : (
                 <span className="text-sm text-muted-foreground italic">Unassigned</span>
               )}
             </div>
-            
+
             {/* Due Date */}
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <Calendar className="w-3 h-3" />
                 Due Date
               </div>
-              <span className={`text-sm font-medium ${isOverdue ? 'text-red-500' : ''}`}>
+              <span className={`text-sm font-medium ${isOverdue ? "text-red-500" : ""}`}>
                 {task.dueDate ? formatDate(task.dueDate) : "—"}
               </span>
             </div>
-            
+
             {/* Created */}
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -377,7 +441,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </div>
               <span className="text-sm">{formatFullDate(task.createdAt)}</span>
             </div>
-            
+
             {/* Completed */}
             {task.completedAt && (
               <div className="space-y-1">
@@ -389,7 +453,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </div>
             )}
           </div>
-          
+
           {/* Live Activity Stream (sandbox mode) */}
           <SandboxActivityFeed taskId={task.identifier ?? task.id} />
 
@@ -404,7 +468,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
                 Approval Required
               </div>
               <p className="text-xs text-muted-foreground">
-                {task.approvedAt 
+                {task.approvedAt
                   ? `Approved on ${formatFullDate(task.approvedAt)}`
                   : "This task requires approval before completion."}
               </p>
@@ -412,7 +476,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
           )}
         </div>
       </ScrollArea>
-      
+
       {/* Footer Actions */}
       <div className="p-4 border-t border-border space-y-2">
         <div className="flex gap-2">
@@ -425,9 +489,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               Resume Work
             </Button>
           ) : (
-            <Button className="flex-1">
-              Edit Task
-            </Button>
+            <Button className="flex-1">Edit Task</Button>
           )}
         </div>
       </div>
@@ -435,13 +497,24 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
   );
 }
 
-function KanbanView({ tasks, onTaskClick, agentMap }: { tasks: Task[]; onTaskClick: (task: Task) => void; agentMap: AgentAvatarMap }) {
+function KanbanView({
+  tasks,
+  onTaskClick,
+  agentMap,
+}: {
+  tasks: Task[];
+  onTaskClick: (task: Task) => void;
+  agentMap: AgentAvatarMap;
+}) {
   return (
     <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-3 px-3 sm:-mx-4 sm:px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide">
       {statusColumns.map((column) => {
         const columnTasks = tasks.filter((t) => t.status?.toUpperCase() === column.id);
         return (
-          <div key={column.id} className="flex-shrink-0 w-[75vw] sm:w-[280px] md:w-72 snap-center sm:snap-start">
+          <div
+            key={column.id}
+            className="flex-shrink-0 w-[75vw] sm:w-[280px] md:w-72 snap-center sm:snap-start"
+          >
             <div className="flex items-center gap-2 mb-3 sticky top-0 bg-background/95 backdrop-blur-sm py-1 z-10">
               <div className={`w-2 h-2 rounded-full ${column.color}`} />
               <h3 className="font-medium text-sm">{column.label}</h3>
@@ -453,7 +526,13 @@ function KanbanView({ tasks, onTaskClick, agentMap }: { tasks: Task[]; onTaskCli
               <div className="space-y-2 pr-2">
                 <AnimatePresence mode="popLayout">
                   {columnTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} compact agentMap={agentMap} />
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onClick={() => onTaskClick(task)}
+                      compact
+                      agentMap={agentMap}
+                    />
                   ))}
                 </AnimatePresence>
                 {columnTasks.length === 0 && (
@@ -484,9 +563,10 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
         <AnimatePresence mode="popLayout">
           {tasks.map((task) => {
             const dueDate = formatDate(task.dueDate);
-            const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
+            const isOverdue =
+              task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
             const isSelected = task.id === selectedTaskId;
-            
+
             return (
               <motion.div
                 key={task.id}
@@ -505,7 +585,10 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                   <span className="font-mono text-xs sm:text-sm text-muted-foreground sm:w-20 flex-shrink-0">
                     {task.identifier}
                   </span>
-                  <Badge variant={getPriorityVariant(task.priority)} className="flex-shrink-0 sm:order-3">
+                  <Badge
+                    variant={getPriorityVariant(task.priority)}
+                    className="flex-shrink-0 sm:order-3"
+                  >
                     {task.priority?.toLowerCase()}
                   </Badge>
                   <Badge
@@ -521,14 +604,28 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                 <div className="flex items-center gap-3 sm:contents text-xs sm:text-sm pl-0 sm:pl-0">
                   {task.assignee ? (
                     <div className="flex items-center gap-1 sm:w-28 flex-shrink-0 sm:order-5">
-                      {(() => { const a = agentMap.get(task.assigneeId!); return (
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
-                        style={{ backgroundColor: darkenForBackground(a?.avatarColor || '#71717a') }}>
-                        {a?.avatarUrl ? <img src={resolveAvatarUrl(a.avatarUrl)} alt="" className="w-full h-full rounded-full object-contain" /> : (a?.avatar || '🤖')}
-                      </div>); })()}
-                      <span className="text-muted-foreground truncate">
-                        {task.assignee.name}
-                      </span>
+                      {(() => {
+                        const a = agentMap.get(task.assigneeId!);
+                        return (
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
+                            style={{
+                              backgroundColor: darkenForBackground(a?.avatarColor || "#71717a"),
+                            }}
+                          >
+                            {a?.avatarUrl ? (
+                              <img
+                                src={resolveAvatarUrl(a.avatarUrl)}
+                                alt=""
+                                className="w-full h-full rounded-full object-contain"
+                              />
+                            ) : (
+                              a?.avatar || "🤖"
+                            )}
+                          </div>
+                        );
+                      })()}
+                      <span className="text-muted-foreground truncate">{task.assignee.name}</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground/50 sm:w-28 flex-shrink-0 italic sm:order-5 hidden sm:inline">
@@ -536,7 +633,9 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                     </span>
                   )}
                   {dueDate && (
-                    <span className={`sm:w-16 flex-shrink-0 sm:order-6 ${isOverdue ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    <span
+                      className={`sm:w-16 flex-shrink-0 sm:order-6 ${isOverdue ? "text-red-500" : "text-muted-foreground"}`}
+                    >
                       {dueDate}
                     </span>
                   )}
@@ -581,11 +680,16 @@ export function TasksPage() {
   const [view, setView] = useState<"kanban" | "list" | "timeline">("kanban");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { openSidePanel, closeSidePanel } = useSidePanel();
-  
+
   const { agents } = useAgents();
   const agentMap = useMemo(() => {
-    const m = new Map<string, { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }>();
-    agents.forEach((a: any) => m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor, avatarUrl: a.avatarUrl }));
+    const m = new Map<
+      string,
+      { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }
+    >();
+    agents.forEach((a: any) =>
+      m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor, avatarUrl: a.avatarUrl }),
+    );
     return m;
   }, [agents]);
   const { teams: allTeams } = useTeams();
@@ -601,37 +705,36 @@ export function TasksPage() {
   // Filter and sort tasks for list view
   const filteredAndSortedTasks = useMemo(() => {
     let result = [...tasks];
-    
+
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(t => 
-        t.title.toLowerCase().includes(query) ||
-        t.identifier.toLowerCase().includes(query) ||
-        t.description?.toLowerCase().includes(query)
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(query) ||
+          t.identifier.toLowerCase().includes(query) ||
+          t.description?.toLowerCase().includes(query),
       );
     }
-    
+
     // Status filter
     if (statusFilter !== "all") {
-      result = result.filter(t => t.status?.toUpperCase() === statusFilter);
+      result = result.filter((t) => t.status?.toUpperCase() === statusFilter);
     }
-    
+
     // Priority filter
     if (priorityFilter !== "all") {
-      result = result.filter(t => t.priority?.toUpperCase() === priorityFilter);
+      result = result.filter((t) => t.priority?.toUpperCase() === priorityFilter);
     }
 
     // Team filter — filter tasks whose assignee belongs to the selected team
     if (teamFilterValue !== "all") {
       const teamAgentIds = new Set(
-        agents
-          .filter((a) => a.teamId === teamFilterValue)
-          .map((a) => a.id),
+        agents.filter((a) => a.teamId === teamFilterValue).map((a) => a.id),
       );
-      result = result.filter(t => t.assigneeId && teamAgentIds.has(t.assigneeId));
+      result = result.filter((t) => t.assigneeId && teamAgentIds.has(t.assigneeId));
     }
-    
+
     // Sort
     result.sort((a, b) => {
       let comparison = 0;
@@ -640,12 +743,14 @@ export function TasksPage() {
           comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
           break;
         case "priority":
-          comparison = (PRIORITY_ORDER[a.priority?.toUpperCase() || "NORMAL"] || 2) - 
-                       (PRIORITY_ORDER[b.priority?.toUpperCase() || "NORMAL"] || 2);
+          comparison =
+            (PRIORITY_ORDER[a.priority?.toUpperCase() || "NORMAL"] || 2) -
+            (PRIORITY_ORDER[b.priority?.toUpperCase() || "NORMAL"] || 2);
           break;
         case "status":
-          comparison = (STATUS_ORDER[a.status?.toUpperCase() || "BACKLOG"] || 3) - 
-                       (STATUS_ORDER[b.status?.toUpperCase() || "BACKLOG"] || 3);
+          comparison =
+            (STATUS_ORDER[a.status?.toUpperCase() || "BACKLOG"] || 3) -
+            (STATUS_ORDER[b.status?.toUpperCase() || "BACKLOG"] || 3);
           break;
         case "title":
           comparison = a.title.localeCompare(b.title);
@@ -653,13 +758,22 @@ export function TasksPage() {
       }
       return sortDirection === "desc" ? -comparison : comparison;
     });
-    
+
     return result;
-  }, [tasks, agents, searchQuery, statusFilter, priorityFilter, teamFilterValue, sortField, sortDirection]);
+  }, [
+    tasks,
+    agents,
+    searchQuery,
+    statusFilter,
+    priorityFilter,
+    teamFilterValue,
+    sortField,
+    sortDirection,
+  ]);
 
   function handleSort(field: SortField) {
     if (sortField === field) {
-      setSortDirection(d => d === "asc" ? "desc" : "asc");
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
       setSortDirection("desc");
@@ -669,16 +783,20 @@ export function TasksPage() {
   function handleTaskClick(task: Task) {
     setSelectedTask(task);
     openSidePanel(
-      <TaskDetailSidebar task={task} onClose={() => { setSelectedTask(null); closeSidePanel(); }} agentMap={agentMap} />,
-      { width: 480 }
+      <TaskDetailSidebar
+        task={task}
+        onClose={() => {
+          setSelectedTask(null);
+          closeSidePanel();
+        }}
+        agentMap={agentMap}
+      />,
+      { width: 480 },
     );
   }
 
   function handleAgentClick(agentId: string) {
-    openSidePanel(
-      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
-      { width: 520 }
-    );
+    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
   }
 
   if (loading) {
@@ -705,7 +823,10 @@ export function TasksPage() {
             <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
             <p className="text-muted-foreground">Manage and track agent tasks</p>
           </div>
-          <Button><Plus className="mr-2 h-4 w-4" />New Task</Button>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            New Task
+          </Button>
         </div>
         <Card>
           <CardContent>
@@ -714,7 +835,9 @@ export function TasksPage() {
               title="No tasks in the queue"
               description="Create your first task to start assigning work to your agents."
               ctaLabel="Create your first task →"
-              onCta={() => { /* TODO: open create task modal */ }}
+              onCta={() => {
+                /* TODO: open create task modal */
+              }}
             />
           </CardContent>
         </Card>
@@ -749,11 +872,11 @@ export function TasksPage() {
             Timeline
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="kanban" className="mt-4">
           <KanbanView tasks={tasks} onTaskClick={handleTaskClick} agentMap={agentMap} />
         </TabsContent>
-        
+
         <TabsContent value="list" className="mt-4 space-y-4">
           {/* Filters and Sort for List view */}
           <div className="space-y-3">
@@ -770,7 +893,7 @@ export function TasksPage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-3 items-center">
               {/* Status Filter */}
               <select
@@ -786,7 +909,7 @@ export function TasksPage() {
                 <option value="DONE">Done</option>
                 <option value="BLOCKED">Blocked</option>
               </select>
-              
+
               {/* Priority Filter */}
               <select
                 value={priorityFilter}
@@ -799,7 +922,7 @@ export function TasksPage() {
                 <option value="NORMAL">Normal</option>
                 <option value="LOW">Low</option>
               </select>
-              
+
               {/* Team Filter */}
               <TeamFilterDropdown
                 value={teamFilterValue}
@@ -820,21 +943,23 @@ export function TasksPage() {
                   >
                     {field === "created" ? "Date" : field}
                     {sortField === field && (
-                      <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                      <ArrowUpDown
+                        className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                      />
                     )}
                   </Button>
                 ))}
               </div>
             </div>
           </div>
-          
+
           {/* Results count */}
           <div className="text-sm text-muted-foreground">
             Showing {filteredAndSortedTasks.length} of {tasks.length} tasks
           </div>
-          
-          <ListView 
-            tasks={filteredAndSortedTasks} 
+
+          <ListView
+            tasks={filteredAndSortedTasks}
             onTaskClick={handleTaskClick}
             selectedTaskId={selectedTask?.id}
             agentMap={agentMap}
@@ -845,7 +970,6 @@ export function TasksPage() {
           <TaskTimeline onAgentClick={handleAgentClick} />
         </TabsContent>
       </Tabs>
-      
     </div>
   );
 }

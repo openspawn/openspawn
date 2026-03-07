@@ -38,17 +38,17 @@ import { SandboxControls } from "../components/sandbox-controls";
 // SandboxCommandBar rendered in layout.tsx (not here to avoid duplicate)
 
 function getEventIcon(type: string) {
-  if (type.includes('agent')) return <Bot className="h-4 w-4 text-violet-500" />;
-  if (type.includes('task')) return <CheckSquare className="h-4 w-4 text-cyan-500" />;
-  if (type.includes('credit')) return <Coins className="h-4 w-4 text-amber-500" />;
+  if (type.includes("agent")) return <Bot className="h-4 w-4 text-violet-500" />;
+  if (type.includes("task")) return <CheckSquare className="h-4 w-4 text-cyan-500" />;
+  if (type.includes("credit")) return <Coins className="h-4 w-4 text-amber-500" />;
   return <Activity className="h-4 w-4 text-muted-foreground" />;
 }
 
 function getEventBadgeVariant(type: string) {
-  if (type.includes('created') || type.includes('activated')) return "success";
-  if (type.includes('completed')) return "info";
-  if (type.includes('earned')) return "success";
-  if (type.includes('spent')) return "warning";
+  if (type.includes("created") || type.includes("activated")) return "success";
+  if (type.includes("completed")) return "info";
+  if (type.includes("earned")) return "success";
+  if (type.includes("spent")) return "warning";
   return "secondary";
 }
 
@@ -85,7 +85,7 @@ export function DashboardPage() {
   const [displayEvents, setDisplayEvents] = useState(events);
   const batchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isHighSpeed = speed > 1;
-  
+
   useEffect(() => {
     if (!isHighSpeed) {
       // Normal speed: update immediately
@@ -104,33 +104,33 @@ export function DashboardPage() {
 
   // Determine current phase based on task progress (for NovaTech scenario)
   const currentPhase = useMemo(() => {
-    if (scenario !== 'acmetech') return 'development';
-    
+    if (scenario !== "acmetech") return "development";
+
     // Count completed tasks per phase (based on task identifiers)
     const taskPhases = {
-      discovery: ['NT-001', 'NT-002', 'NT-003'],
-      definition: ['NT-004', 'NT-005', 'NT-006', 'NT-007'],
-      development: ['NT-008', 'NT-009', 'NT-010', 'NT-011', 'NT-012', 'NT-013'],
-      'go-to-market': ['NT-014', 'NT-015', 'NT-016', 'NT-017', 'NT-018'],
-      launch: ['NT-019', 'NT-020', 'NT-021'],
-      growth: ['NT-022', 'NT-023', 'NT-024'],
+      discovery: ["NT-001", "NT-002", "NT-003"],
+      definition: ["NT-004", "NT-005", "NT-006", "NT-007"],
+      development: ["NT-008", "NT-009", "NT-010", "NT-011", "NT-012", "NT-013"],
+      "go-to-market": ["NT-014", "NT-015", "NT-016", "NT-017", "NT-018"],
+      launch: ["NT-019", "NT-020", "NT-021"],
+      growth: ["NT-022", "NT-023", "NT-024"],
     };
 
-    const phases = ['discovery', 'definition', 'development', 'go-to-market', 'launch', 'growth'];
-    
+    const phases = ["discovery", "definition", "development", "go-to-market", "launch", "growth"];
+
     for (const phase of phases) {
       const phaseTasks = taskPhases[phase as keyof typeof taskPhases] || [];
-      const completedCount = phaseTasks.filter(id => 
-        tasks.find(t => t.identifier === id && t.status?.toUpperCase() === 'DONE')
+      const completedCount = phaseTasks.filter((id) =>
+        tasks.find((t) => t.identifier === id && t.status?.toUpperCase() === "DONE"),
       ).length;
-      
+
       // If any task in this phase is not done, this is the current phase
       if (completedCount < phaseTasks.length) {
         return phase;
       }
     }
-    
-    return 'growth'; // All done
+
+    return "growth"; // All done
   }, [tasks, scenario]);
 
   // Use real metrics from sandbox API when available, otherwise generate mock data
@@ -145,37 +145,77 @@ export function DashboardPage() {
     };
   }, [sandboxSparklines]);
 
-  const activeAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length, [agents]);
-  const pendingAgents = useMemo(() => agents.filter((a) => a.status?.toUpperCase() === "PENDING").length, [agents]);
-  const completedTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "DONE").length, [tasks]);
-  const inProgressTasks = useMemo(() => tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length, [tasks]);
-  const reviewTasks = useMemo(() => tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, [tasks]);
+  const activeAgents = useMemo(
+    () => agents.filter((a) => a.status?.toUpperCase() === "ACTIVE").length,
+    [agents],
+  );
+  const pendingAgents = useMemo(
+    () => agents.filter((a) => a.status?.toUpperCase() === "PENDING").length,
+    [agents],
+  );
+  const completedTasks = useMemo(
+    () => tasks.filter((t) => t.status?.toUpperCase() === "DONE").length,
+    [tasks],
+  );
+  const inProgressTasks = useMemo(
+    () => tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length,
+    [tasks],
+  );
+  const reviewTasks = useMemo(
+    () => tasks.filter((t) => t.status?.toUpperCase() === "REVIEW").length,
+    [tasks],
+  );
 
-  const totalCreditsEarned = useMemo(() => transactions
-    .filter((t) => t.type === "CREDIT")
-    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
-  
-  const totalCreditsSpent = useMemo(() => transactions
-    .filter((t) => t.type === "DEBIT")
-    .reduce((sum, t) => sum + t.amount, 0), [transactions]);
+  const totalCreditsEarned = useMemo(
+    () => transactions.filter((t) => t.type === "CREDIT").reduce((sum, t) => sum + t.amount, 0),
+    [transactions],
+  );
+
+  const totalCreditsSpent = useMemo(
+    () => transactions.filter((t) => t.type === "DEBIT").reduce((sum, t) => sum + t.amount, 0),
+    [transactions],
+  );
 
   // Real task status counts from simulation (normalized to uppercase)
-  const tasksByStatus = useMemo(() => [
-    { status: "Backlog", count: tasks.filter(t => t.status?.toUpperCase() === "BACKLOG").length, fill: "#64748b" },
-    { status: "To Do", count: tasks.filter(t => t.status?.toUpperCase() === "TODO").length, fill: "#f59e0b" },
-    { status: "In Progress", count: tasks.filter(t => t.status?.toUpperCase() === "IN_PROGRESS").length, fill: "#06b6d4" },
-    { status: "Review", count: tasks.filter(t => t.status?.toUpperCase() === "REVIEW").length, fill: "#8b5cf6" },
-    { status: "Done", count: tasks.filter(t => t.status?.toUpperCase() === "DONE").length, fill: "#10b981" },
-  ], [tasks]);
+  const tasksByStatus = useMemo(
+    () => [
+      {
+        status: "Backlog",
+        count: tasks.filter((t) => t.status?.toUpperCase() === "BACKLOG").length,
+        fill: "#64748b",
+      },
+      {
+        status: "To Do",
+        count: tasks.filter((t) => t.status?.toUpperCase() === "TODO").length,
+        fill: "#f59e0b",
+      },
+      {
+        status: "In Progress",
+        count: tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length,
+        fill: "#06b6d4",
+      },
+      {
+        status: "Review",
+        count: tasks.filter((t) => t.status?.toUpperCase() === "REVIEW").length,
+        fill: "#8b5cf6",
+      },
+      {
+        status: "Done",
+        count: tasks.filter((t) => t.status?.toUpperCase() === "DONE").length,
+        fill: "#10b981",
+      },
+    ],
+    [tasks],
+  );
 
   // Real credit flow - aggregate last N transactions into buckets
   const creditHistory = useMemo(() => {
     // Group transactions into time buckets (last 10 "periods")
     const bucketCount = 8;
     const sortedTx = [...transactions].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
-    
+
     if (sortedTx.length === 0) {
       return Array.from({ length: bucketCount }, (_, i) => ({
         period: `T${i + 1}`,
@@ -183,102 +223,138 @@ export function DashboardPage() {
         spent: 0,
       }));
     }
-    
+
     const txPerBucket = Math.max(1, Math.ceil(sortedTx.length / bucketCount));
     const buckets: { period: string; earned: number; spent: number }[] = [];
-    
+
     for (let i = 0; i < bucketCount; i++) {
       const start = i * txPerBucket;
       const end = Math.min(start + txPerBucket, sortedTx.length);
       const bucketTx = sortedTx.slice(start, end);
-      
+
       buckets.push({
         period: `T${i + 1}`,
-        earned: bucketTx
-          .filter(t => t.type === "CREDIT")
-          .reduce((sum, t) => sum + t.amount, 0),
-        spent: bucketTx
-          .filter(t => t.type === "DEBIT")
-          .reduce((sum, t) => sum + t.amount, 0),
+        earned: bucketTx.filter((t) => t.type === "CREDIT").reduce((sum, t) => sum + t.amount, 0),
+        spent: bucketTx.filter((t) => t.type === "DEBIT").reduce((sum, t) => sum + t.amount, 0),
       });
     }
-    
+
     return buckets;
   }, [transactions]);
 
   // Widget render map
-  const renderWidget = useCallback((id: string) => {
-    switch (id) {
-      case "stats-overview":
-        return (
-          <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <StaggerItem><StatCard
-              title="Active Agents"
-              value={activeAgents}
-              icon={Users}
-              description={pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined}
-              sparklineData={sparklines.agents}
-              sparklineColor="#06b6d4"
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Tasks In Progress"
-              value={inProgressTasks}
-              icon={CheckSquare}
-              description={`${reviewTasks} in review`}
-              sparklineData={sparklines.tasks}
-              sparklineColor="#06b6d4"
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Completed Tasks"
-              value={completedTasks}
-              icon={TrendingUp}
-              description={`${tasks.length} total tasks`}
-              sparklineData={sparklines.completed}
-              sparklineColor="#10b981"
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Credit Flow"
-              value={`+${totalCreditsEarned.toLocaleString()}`}
-              icon={Coins}
-              description={`-${totalCreditsSpent.toLocaleString()} spent`}
-              sparklineData={sparklines.credits}
-              sparklineColor="#f59e0b"
-            /></StaggerItem>
-          </StaggerContainer>
-        );
-      case "teams-overview":
-        return (
-          <TeamStatsCards
-            onTeamClick={(teamId) => navigate({ to: '/agents', search: { tab: 'teams', team: teamId } })}
-          />
-        );
-      case "credit-flow-chart":
-        return renderCreditChart();
-      case "tasks-by-status":
-        return renderTasksChart();
-      case "recent-activity":
-        return renderRecentActivity();
-      case "available-agents":
-        return (
-          <IdleAgentsWidget
-            maxCount={6}
-            onAgentClick={(agent) => navigate({ to: '/agents', search: { selected: agent.agentId } })}
-          />
-        );
-      default:
-        return null;
-    }
-  }, [activeAgents, pendingAgents, inProgressTasks, completedTasks, reviewTasks, tasks.length, totalCreditsEarned, totalCreditsSpent, sparklines, navigate]);
+  const renderWidget = useCallback(
+    (id: string) => {
+      switch (id) {
+        case "stats-overview":
+          return (
+            <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <StaggerItem>
+                <StatCard
+                  title="Active Agents"
+                  value={activeAgents}
+                  icon={Users}
+                  description={
+                    pendingAgents > 0 ? `+${pendingAgents} pending activation` : undefined
+                  }
+                  sparklineData={sparklines.agents}
+                  sparklineColor="#06b6d4"
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Tasks In Progress"
+                  value={inProgressTasks}
+                  icon={CheckSquare}
+                  description={`${reviewTasks} in review`}
+                  sparklineData={sparklines.tasks}
+                  sparklineColor="#06b6d4"
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Completed Tasks"
+                  value={completedTasks}
+                  icon={TrendingUp}
+                  description={`${tasks.length} total tasks`}
+                  sparklineData={sparklines.completed}
+                  sparklineColor="#10b981"
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Credit Flow"
+                  value={`+${totalCreditsEarned.toLocaleString()}`}
+                  icon={Coins}
+                  description={`-${totalCreditsSpent.toLocaleString()} spent`}
+                  sparklineData={sparklines.credits}
+                  sparklineColor="#f59e0b"
+                />
+              </StaggerItem>
+            </StaggerContainer>
+          );
+        case "teams-overview":
+          return (
+            <TeamStatsCards
+              onTeamClick={(teamId) =>
+                navigate({ to: "/agents", search: { tab: "teams", team: teamId } })
+              }
+            />
+          );
+        case "credit-flow-chart":
+          return renderCreditChart();
+        case "tasks-by-status":
+          return renderTasksChart();
+        case "recent-activity":
+          return renderRecentActivity();
+        case "available-agents":
+          return (
+            <IdleAgentsWidget
+              maxCount={6}
+              onAgentClick={(agent) =>
+                navigate({ to: "/agents", search: { selected: agent.agentId } })
+              }
+            />
+          );
+        default:
+          return null;
+      }
+    },
+    [
+      activeAgents,
+      pendingAgents,
+      inProgressTasks,
+      completedTasks,
+      reviewTasks,
+      tasks.length,
+      totalCreditsEarned,
+      totalCreditsSpent,
+      sparklines,
+      navigate,
+    ],
+  );
 
   function renderCreditChart() {
-    return <Card><CardContent className="p-4 text-sm text-muted-foreground">Credit chart temporarily disabled</CardContent></Card>;
+    return (
+      <Card>
+        <CardContent className="p-4 text-sm text-muted-foreground">
+          Credit chart temporarily disabled
+        </CardContent>
+      </Card>
+    );
   }
 
-    function renderTasksChart() {
-    return <Card><CardContent className="p-4 text-sm text-muted-foreground">Task donut temporarily disabled</CardContent></Card>;
+  function renderTasksChart() {
+    return (
+      <Card>
+        <CardContent className="p-4 text-sm text-muted-foreground">
+          Task donut temporarily disabled
+        </CardContent>
+      </Card>
+    );
   }
 
-    function renderRecentActivity() {
+  function renderRecentActivity() {
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -306,24 +382,27 @@ export function DashboardPage() {
                   initial={isHighSpeed ? false : { opacity: 0, x: -20, scale: 0.95 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                  transition={isHighSpeed
-                    ? { duration: 0.15 }
-                    : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
+                  transition={
+                    isHighSpeed
+                      ? { duration: 0.15 }
+                      : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
                   }
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-h-[44px]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="shrink-0">{getEventIcon(event.type)}</div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{event.actor?.name || "System"}</p>
+                      <p className="text-sm font-medium truncate">
+                        {event.actor?.name || "System"}
+                      </p>
                       <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-[300px]">
-                        {event.reasoning || event.type.replace(/\./g, ' → ')}
+                        {event.reasoning || event.type.replace(/\./g, " → ")}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 pl-7 sm:pl-0">
                     <Badge variant={getEventBadgeVariant(event.type)} className="text-xs">
-                      {event.type.split('.').pop()}
+                      {event.type.split(".").pop()}
                     </Badge>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatEventTime(event.createdAt, index, speed)}
@@ -336,7 +415,9 @@ export function DashboardPage() {
               <div className="flex flex-col items-center justify-center py-8">
                 <Activity className="h-8 w-8 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  {isSandboxMode ? "Waiting for agent activity..." : "No activity yet. Start the simulation to see events."}
+                  {isSandboxMode
+                    ? "Waiting for agent activity..."
+                    : "No activity yet. Start the simulation to see events."}
                 </p>
               </div>
             )}
@@ -352,20 +433,20 @@ export function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description={
-          isDemo && scenario === 'acmetech'
-            ? 'NovaTech AI — Product Launch Lifecycle'
-            : 'Overview of your multi-agent system'
+          isDemo && scenario === "acmetech"
+            ? "NovaTech AI — Product Launch Lifecycle"
+            : "Overview of your multi-agent system"
         }
         actions={
           !isSandboxMode ? (
-          <DashboardToolbar
-            editMode={layout.editMode}
-            setEditMode={layout.setEditMode}
-            widgets={layout.widgets}
-            toggleVisibility={layout.toggleVisibility}
-            applyPreset={layout.applyPreset}
-            resetLayout={layout.resetLayout}
-          />
+            <DashboardToolbar
+              editMode={layout.editMode}
+              setEditMode={layout.setEditMode}
+              widgets={layout.widgets}
+              toggleVisibility={layout.toggleVisibility}
+              applyPreset={layout.applyPreset}
+              resetLayout={layout.resetLayout}
+            />
           ) : undefined
         }
       />
@@ -374,65 +455,76 @@ export function DashboardPage() {
       <SandboxControls />
 
       {/* ACP Metrics (sandbox mode only) */}
-      {isSandboxMode && acpMetrics && (() => {
-        const escColor = acpMetrics.escalationRate < 0.1
-          ? "#10b981"
-          : acpMetrics.escalationRate < 0.3
-            ? "#f59e0b"
-            : "#ef4444";
-        const escLabel = acpMetrics.escalationRate < 0.1
-          ? "Healthy"
-          : acpMetrics.escalationRate < 0.3
-            ? "Elevated"
-            : "High";
-        return (
-          <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <StaggerItem><StatCard
-              title="Ack Latency"
-              value={`${acpMetrics.ackLatencyMs}ms`}
-              icon={Clock}
-              description={`${acpMetrics.totalAcks} acks received`}
-              sparklineColor="#06b6d4"
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Escalation Rate"
-              value={`${Math.round(acpMetrics.escalationRate * 100)}%`}
-              icon={AlertTriangle}
-              description={`${escLabel} · ${acpMetrics.totalEscalations} escalations`}
-              sparklineColor={escColor}
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Avg Delegation Depth"
-              value={acpMetrics.avgDelegationDepth.toFixed(1)}
-              icon={Layers}
-              description={`${acpMetrics.totalDelegations} total delegations`}
-              sparklineColor="#8b5cf6"
-            /></StaggerItem>
-            <StaggerItem><StatCard
-              title="Completion Rate"
-              value={`${Math.round(acpMetrics.completionRate * 100)}%`}
-              icon={CheckCircle}
-              description={`${acpMetrics.totalCompletions} completed`}
-              sparklineColor="#10b981"
-            /></StaggerItem>
-          </StaggerContainer>
-        );
-      })()}
+      {isSandboxMode &&
+        acpMetrics &&
+        (() => {
+          const escColor =
+            acpMetrics.escalationRate < 0.1
+              ? "#10b981"
+              : acpMetrics.escalationRate < 0.3
+                ? "#f59e0b"
+                : "#ef4444";
+          const escLabel =
+            acpMetrics.escalationRate < 0.1
+              ? "Healthy"
+              : acpMetrics.escalationRate < 0.3
+                ? "Elevated"
+                : "High";
+          return (
+            <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <StaggerItem>
+                <StatCard
+                  title="Ack Latency"
+                  value={`${acpMetrics.ackLatencyMs}ms`}
+                  icon={Clock}
+                  description={`${acpMetrics.totalAcks} acks received`}
+                  sparklineColor="#06b6d4"
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Escalation Rate"
+                  value={`${Math.round(acpMetrics.escalationRate * 100)}%`}
+                  icon={AlertTriangle}
+                  description={`${escLabel} · ${acpMetrics.totalEscalations} escalations`}
+                  sparklineColor={escColor}
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Avg Delegation Depth"
+                  value={acpMetrics.avgDelegationDepth.toFixed(1)}
+                  icon={Layers}
+                  description={`${acpMetrics.totalDelegations} total delegations`}
+                  sparklineColor="#8b5cf6"
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <StatCard
+                  title="Completion Rate"
+                  value={`${Math.round(acpMetrics.completionRate * 100)}%`}
+                  icon={CheckCircle}
+                  description={`${acpMetrics.totalCompletions} completed`}
+                  sparklineColor="#10b981"
+                />
+              </StaggerItem>
+            </StaggerContainer>
+          );
+        })()}
 
       {/* Phase Progress (NovaTech scenario only) */}
-      {isDemo && scenario === 'acmetech' && PROJECT_PHASES && (
+      {isDemo && scenario === "acmetech" && PROJECT_PHASES && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               🚀 Project Progress
-              <Badge variant="outline" className="ml-auto">Dashboard v2.0 Launch</Badge>
+              <Badge variant="outline" className="ml-auto">
+                Dashboard v2.0 Launch
+              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PhaseProgress 
-              phases={PROJECT_PHASES} 
-              currentPhase={currentPhase}
-            />
+            <PhaseProgress phases={PROJECT_PHASES} currentPhase={currentPhase} />
           </CardContent>
         </Card>
       )}

@@ -2,50 +2,50 @@
 // Serves live simulation state to the BikiniBottom dashboard
 // The dashboard polls this instead of using the in-memory SimulationEngine
 
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { getProvider, getProviderInfo, getModelName } from './llm.js';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
-import { join, dirname, extname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import type { Simulation } from './simulation.js';
-import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from './types.js';
-import { loadAgentConfig, type AgentConfig } from './config-loader.js';
-import { ScenarioEngine } from './scenario-engine.js';
-import { aiDevAgencyScenario } from './scenarios/ai-dev-agency.js';
-import type { DeterministicSimulation } from './deterministic.js';
-import { makeAgentPublic } from './agents.js';
-import { A2AServer } from './a2a-server.js';
-import { MCPServer } from './mcp-server.js';
-import { ModelRouter } from './model-router.js';
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { getProvider, getProviderInfo, getModelName } from "./llm.js";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, statSync } from "node:fs";
+import { join, dirname, extname } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { Simulation } from "./simulation.js";
+import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from "./types.js";
+import { loadAgentConfig, type AgentConfig } from "./config-loader.js";
+import { ScenarioEngine } from "./scenario-engine.js";
+import { aiDevAgencyScenario } from "./scenarios/ai-dev-agency.js";
+import type { DeterministicSimulation } from "./deterministic.js";
+import { makeAgentPublic } from "./agents.js";
+import { A2AServer } from "./a2a-server.js";
+import { MCPServer } from "./mcp-server.js";
+import { ModelRouter } from "./model-router.js";
 
-const SCENARIO_REGISTRY: Record<string, import('./scenario-types.js').ScenarioDefinition> = {
-  'ai-dev-agency': aiDevAgencyScenario,
+const SCENARIO_REGISTRY: Record<string, import("./scenario-types.js").ScenarioDefinition> = {
+  "ai-dev-agency": aiDevAgencyScenario,
 };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const ORG_DIR = join(__dirname, '..', 'org');
+const ORG_DIR = join(__dirname, "..", "org");
 
 const PORT = Number(process.env.SANDBOX_PORT) || 3333;
 
 // Map agent domain → dashboard team ID (must match apps/dashboard/src/demo/teams.ts)
 const DOMAIN_TEAM_MAP: Record<string, string> = {
-  'operations': 'team-operations',
-  'engineering': 'team-engineering',
-  'backend': 'team-backend',
-  'frontend': 'team-frontend',
-  'testing': 'team-testing',
-  'appsec': 'team-appsec',
-  'infrastructure security': 'team-infrastructure security',
-  'content strategy': 'team-content strategy',
-  'copywriting': 'team-copywriting',
-  'seo': 'team-seo',
-  'marketing': 'team-marketing',
-  'analytics': 'team-analytics',
-  'accounting': 'team-accounting',
-  'support': 'team-support',
-  'technical support': 'team-technical support',
-  'finance': 'team-finance',
+  operations: "team-operations",
+  engineering: "team-engineering",
+  backend: "team-backend",
+  frontend: "team-frontend",
+  testing: "team-testing",
+  appsec: "team-appsec",
+  "infrastructure security": "team-infrastructure security",
+  "content strategy": "team-content strategy",
+  copywriting: "team-copywriting",
+  seo: "team-seo",
+  marketing: "team-marketing",
+  analytics: "team-analytics",
+  accounting: "team-accounting",
+  support: "team-support",
+  "technical support": "team-technical support",
+  finance: "team-finance",
 };
 
 function domainToTeamId(domain: string): string {
@@ -56,14 +56,19 @@ function domainToTeamId(domain: string): string {
 // Map sandbox types to demo-data types (what the dashboard expects)
 function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
   const levelToRole: Record<string, string> = {
-    coo: 'MANAGER', talent: 'MANAGER', lead: 'MANAGER', senior: 'SENIOR', worker: 'WORKER', intern: 'WORKER',
+    coo: "MANAGER",
+    talent: "MANAGER",
+    lead: "MANAGER",
+    senior: "SENIOR",
+    worker: "WORKER",
+    intern: "WORKER",
   };
   const levelToReputation = (level: number) => {
-    if (level >= 9) return 'ELITE';
-    if (level >= 6) return 'VETERAN';
-    if (level >= 3) return 'TRUSTED';
-    if (level >= 2) return 'PROBATION';
-    return 'NEW';
+    if (level >= 9) return "ELITE";
+    if (level >= 6) return "VETERAN";
+    if (level >= 3) return "TRUSTED";
+    if (level >= 2) return "PROBATION";
+    return "NEW";
   };
 
   const trustScore = Math.min(100, 30 + agent.level * 7 + agent.stats.tasksCompleted * 2);
@@ -72,9 +77,9 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     id: agent.id,
     agentId: agent.id,
     name: agent.name,
-    role: agent.domain?.toUpperCase() ?? levelToRole[agent.role] ?? 'WORKER',
-    mode: agent.level >= 7 ? 'ORCHESTRATOR' : 'WORKER',
-    status: agent.status === 'busy' ? 'ACTIVE' : agent.status.toUpperCase(),
+    role: agent.domain?.toUpperCase() ?? levelToRole[agent.role] ?? "WORKER",
+    mode: agent.level >= 7 ? "ORCHESTRATOR" : "WORKER",
+    status: agent.status === "busy" ? "ACTIVE" : agent.status.toUpperCase(),
     level: agent.level,
     model: getModelName(),
     currentBalance: Math.max(0, agent.stats.creditsEarned - agent.stats.creditsSpent),
@@ -84,7 +89,7 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
     managementFeePct: agent.level >= 9 ? 5 : 10,
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString(),
-    parentId: agent.parentId === 'human-principal' ? null : (agent.parentId ?? null),
+    parentId: agent.parentId === "human-principal" ? null : (agent.parentId ?? null),
     domain: agent.domain ?? null,
     trustScore,
     reputationLevel: levelToReputation(agent.level),
@@ -104,18 +109,18 @@ function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
 }
 
 const taskStatusMap: Record<string, string> = {
-  backlog: 'BACKLOG',
-  pending: 'TODO',
-  assigned: 'TODO',
-  in_progress: 'IN_PROGRESS',
-  review: 'REVIEW',
-  done: 'DONE',
-  rejected: 'REVIEW',
-  blocked: 'BLOCKED',
+  backlog: "BACKLOG",
+  pending: "TODO",
+  assigned: "TODO",
+  in_progress: "IN_PROGRESS",
+  review: "REVIEW",
+  done: "DONE",
+  rejected: "REVIEW",
+  blocked: "BLOCKED",
 };
 
 function mapTask(task: SandboxTask, agents: SandboxAgent[]) {
-  const assignee = task.assigneeId ? agents.find(a => a.id === task.assigneeId) : null;
+  const assignee = task.assigneeId ? agents.find((a) => a.id === task.assigneeId) : null;
   return {
     id: task.id,
     identifier: task.id,
@@ -126,30 +131,36 @@ function mapTask(task: SandboxTask, agents: SandboxAgent[]) {
     assigneeId: task.assigneeId ?? null,
     assignee: assignee ? { id: assignee.id, name: assignee.name } : null,
     creatorId: task.creatorId,
-    source: task.creatorId === 'human-principal' ? 'a2a' as const :
-            task.creatorId?.includes('mcp') ? 'mcp' as const : 'internal' as const,
+    source:
+      task.creatorId === "human-principal"
+        ? ("a2a" as const)
+        : task.creatorId?.includes("mcp")
+          ? ("mcp" as const)
+          : ("internal" as const),
     approvalRequired: false,
     dueDate: null,
     createdAt: new Date(task.createdAt).toISOString(),
     updatedAt: new Date(task.updatedAt).toISOString(),
-    completedAt: task.status === 'done' ? new Date(task.updatedAt).toISOString() : null,
+    completedAt: task.status === "done" ? new Date(task.updatedAt).toISOString() : null,
     rejection: null,
   };
 }
 
 function mapEvent(event: SandboxEvent, agents: SandboxAgent[]) {
-  const actor = event.agentId ? agents.find(a => a.id === event.agentId) : null;
+  const actor = event.agentId ? agents.find((a) => a.id === event.agentId) : null;
   const severityMap: Record<string, string> = {
-    system: 'INFO', agent_action: 'INFO', error: 'ERROR',
+    system: "INFO",
+    agent_action: "INFO",
+    error: "ERROR",
   };
   return {
     id: `evt-${event.timestamp}-${Math.random().toString(36).slice(2, 8)}`,
     type: event.type,
     actorId: event.agentId ?? null,
     actor: actor ? { id: actor.id, name: actor.name } : null,
-    entityType: event.taskId ? 'task' : (event.agentId ? 'agent' : 'system'),
-    entityId: event.taskId ?? event.agentId ?? 'system',
-    severity: severityMap[event.type] ?? 'INFO',
+    entityType: event.taskId ? "task" : event.agentId ? "agent" : "system",
+    entityId: event.taskId ?? event.agentId ?? "system",
+    severity: severityMap[event.type] ?? "INFO",
     reasoning: event.message,
     createdAt: new Date(event.timestamp).toISOString(),
   };
@@ -169,14 +180,14 @@ function generateCredits(sim: Simulation) {
 
     credits.push({
       id: `credit-tick-${snap.tick}`,
-      agentId: 'system',
-      type: earned > spent ? 'CREDIT' : 'DEBIT',
+      agentId: "system",
+      type: earned > spent ? "CREDIT" : "DEBIT",
       amount: Math.abs(earned - spent),
       reason: `Tick ${snap.tick} activity`,
       balanceAfter: runningBalance,
       createdAt: new Date(snap.timestamp).toISOString(),
       sourceTaskId: null,
-      triggerType: 'system',
+      triggerType: "system",
     });
   }
 
@@ -186,26 +197,26 @@ function generateCredits(sim: Simulation) {
       credits.push({
         id: `credit-${agent.id}-earn`,
         agentId: agent.id,
-        type: 'CREDIT',
+        type: "CREDIT",
         amount: agent.stats.creditsEarned,
-        reason: 'Task completion rewards',
+        reason: "Task completion rewards",
         balanceAfter: agent.stats.creditsEarned - agent.stats.creditsSpent,
         createdAt: new Date().toISOString(),
         sourceTaskId: null,
-        triggerType: 'task_completion',
+        triggerType: "task_completion",
       });
     }
     if (agent.stats.creditsSpent > 0) {
       credits.push({
         id: `credit-${agent.id}-spend`,
         agentId: agent.id,
-        type: 'DEBIT',
+        type: "DEBIT",
         amount: agent.stats.creditsSpent,
-        reason: 'Model inference tokens',
+        reason: "Model inference tokens",
         balanceAfter: agent.stats.creditsEarned - agent.stats.creditsSpent,
         createdAt: new Date().toISOString(),
         sourceTaskId: null,
-        triggerType: 'model_usage',
+        triggerType: "model_usage",
       });
     }
   }
@@ -228,7 +239,12 @@ function collectAllMessages(agents: SandboxAgent[]): ACPMessage[] {
 }
 
 const acpTypeIcon: Record<string, string> = {
-  ack: '👍', completion: '✅', escalation: '🚨', delegation: '📋', progress: '📊', status_request: '💬',
+  ack: "👍",
+  completion: "✅",
+  escalation: "🚨",
+  delegation: "📋",
+  progress: "📊",
+  status_request: "💬",
 };
 
 // Generate messages from agent recentMessages (ACP format)
@@ -236,9 +252,9 @@ function generateMessages(agents: SandboxAgent[]) {
   const all = collectAllMessages(agents);
   const messages: Array<Record<string, unknown>> = [];
   for (const msg of all) {
-    const from = agents.find(a => a.id === msg.from);
-    const to = agents.find(a => a.id === msg.to);
-    const icon = acpTypeIcon[msg.type] || '💬';
+    const from = agents.find((a) => a.id === msg.from);
+    const to = agents.find((a) => a.id === msg.to);
+    const icon = acpTypeIcon[msg.type] || "💬";
     messages.push({
       id: msg.id,
       fromAgentId: msg.from,
@@ -256,17 +272,17 @@ function generateMessages(agents: SandboxAgent[]) {
       createdAt: new Date(msg.timestamp).toISOString(),
     });
   }
-  return messages.sort((a, b) =>
-    new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime()
+  return messages.sort(
+    (a, b) => new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime(),
   );
 }
 
 function json(res: ServerResponse, data: unknown) {
   res.writeHead(200, {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
   });
   res.end(JSON.stringify(data));
 }
@@ -282,27 +298,27 @@ export function startServer(sim: Simulation): void {
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     // CORS preflight
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
       res.writeHead(204, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
       });
       res.end();
       return;
     }
 
-    const url = new URL(req.url ?? '/', `http://localhost:${PORT}`);
+    const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
     const path = url.pathname;
 
     // ── A2A Protocol Endpoints ───────────────────────────────────────────────
 
     // Agent card discovery
-    if (path === '/.well-known/agent.json' && req.method === 'GET') {
+    if (path === "/.well-known/agent.json" && req.method === "GET") {
       res.writeHead(200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'A2A-Version': '0.3',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "A2A-Version": "0.3",
       });
       res.end(JSON.stringify(a2a.getControlPlaneCard()));
       return;
@@ -310,94 +326,102 @@ export function startServer(sim: Simulation): void {
 
     // Per-agent card: /agents/:id/.well-known/agent.json
     const agentCardMatch = path.match(/^\/agents\/([^/]+)\/.well-known\/agent\.json$/);
-    if (agentCardMatch && req.method === 'GET') {
+    if (agentCardMatch && req.method === "GET") {
       const card = a2a.getAgentCard(agentCardMatch[1]);
       if (!card) {
-        res.writeHead(404, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-        res.end(JSON.stringify({ code: 'AgentNotFound', message: 'Agent not found' }));
+        res.writeHead(404, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+        res.end(JSON.stringify({ code: "AgentNotFound", message: "Agent not found" }));
         return;
       }
       res.writeHead(200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'A2A-Version': '0.3',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "A2A-Version": "0.3",
       });
       res.end(JSON.stringify(card));
       return;
     }
 
     // Send message
-    if (path === '/a2a/message/send' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/a2a/message/send" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
-          const request = JSON.parse(body) as import('./a2a-types.js').SendMessageRequest;
+          const request = JSON.parse(body) as import("./a2a-types.js").SendMessageRequest;
           if (!request.message?.parts?.length) {
-            res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-            res.end(JSON.stringify({ code: 'InvalidRequest', message: 'message.parts required' }));
+            res.writeHead(400, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+            res.end(JSON.stringify({ code: "InvalidRequest", message: "message.parts required" }));
             return;
           }
           const task = a2a.handleSendMessage(request);
           // Emit SSE event for dashboard
-          const messageText = request.message?.parts
-            ?.filter((p: any) => p.kind === 'text')
-            .map((p: any) => p.text)
-            .join(' ') || 'unknown';
+          const messageText =
+            request.message?.parts
+              ?.filter((p: any) => p.kind === "text")
+              .map((p: any) => p.text)
+              .join(" ") || "unknown";
           sim.events.push({
-            type: 'a2a_task_received',
+            type: "a2a_task_received",
             agentId: null as any,
             message: `🔗 A2A: External task received — "${messageText.slice(0, 80)}"`,
             timestamp: Date.now(),
           });
           res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'A2A-Version': '0.3',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
         } catch (err: any) {
           const status = err?.status || 500;
-          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+          res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+          res.end(
+            JSON.stringify({
+              code: err?.code || "InternalError",
+              message: err?.message || String(err),
+            }),
+          );
         }
       });
       return;
     }
 
     // Stream message (SSE)
-    if (path === '/a2a/message/stream' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/a2a/message/stream" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
-          const request = JSON.parse(body) as import('./a2a-types.js').SendMessageRequest;
+          const request = JSON.parse(body) as import("./a2a-types.js").SendMessageRequest;
           if (!request.message?.parts?.length) {
-            res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-            res.end(JSON.stringify({ code: 'InvalidRequest', message: 'message.parts required' }));
+            res.writeHead(400, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+            res.end(JSON.stringify({ code: "InvalidRequest", message: "message.parts required" }));
             return;
           }
           a2a.handleStreamMessage(request, res);
         } catch (err: any) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-          res.end(JSON.stringify({ code: 'InvalidRequest', message: String(err) }));
+          res.writeHead(400, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+          res.end(JSON.stringify({ code: "InvalidRequest", message: String(err) }));
         }
       });
       return;
     }
 
     // List A2A tasks
-    if (path === '/a2a/tasks' && req.method === 'GET') {
+    if (path === "/a2a/tasks" && req.method === "GET") {
       const result = a2a.handleListTasks({
-        contextId: url.searchParams.get('contextId') || undefined,
-        status: url.searchParams.get('status') || undefined,
-        pageSize: url.searchParams.has('pageSize') ? parseInt(url.searchParams.get('pageSize')!, 10) : undefined,
-        pageToken: url.searchParams.get('pageToken') || undefined,
+        contextId: url.searchParams.get("contextId") || undefined,
+        status: url.searchParams.get("status") || undefined,
+        pageSize: url.searchParams.has("pageSize")
+          ? parseInt(url.searchParams.get("pageSize")!, 10)
+          : undefined,
+        pageToken: url.searchParams.get("pageToken") || undefined,
       });
       res.writeHead(200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'A2A-Version': '0.3',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "A2A-Version": "0.3",
       });
       res.end(JSON.stringify(result));
       return;
@@ -410,46 +434,56 @@ export function startServer(sim: Simulation): void {
       const action = a2aTaskMatch[2];
 
       // GET /a2a/tasks/:id
-      if (!action && req.method === 'GET') {
+      if (!action && req.method === "GET") {
         try {
-          const historyLength = url.searchParams.has('historyLength')
-            ? parseInt(url.searchParams.get('historyLength')!, 10)
+          const historyLength = url.searchParams.has("historyLength")
+            ? parseInt(url.searchParams.get("historyLength")!, 10)
             : undefined;
           const task = a2a.handleGetTask(taskId, historyLength);
           res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'A2A-Version': '0.3',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
         } catch (err: any) {
           const status = err?.status || 500;
-          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+          res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+          res.end(
+            JSON.stringify({
+              code: err?.code || "InternalError",
+              message: err?.message || String(err),
+            }),
+          );
         }
         return;
       }
 
       // POST /a2a/tasks/:id/cancel
-      if (action === '/cancel' && req.method === 'POST') {
+      if (action === "/cancel" && req.method === "POST") {
         try {
           const task = a2a.handleCancelTask(taskId);
           res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'A2A-Version': '0.3',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
         } catch (err: any) {
           const status = err?.status || 500;
-          res.writeHead(status, { 'Content-Type': 'application/json', 'A2A-Version': '0.3' });
-          res.end(JSON.stringify({ code: err?.code || 'InternalError', message: err?.message || String(err) }));
+          res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
+          res.end(
+            JSON.stringify({
+              code: err?.code || "InternalError",
+              message: err?.message || String(err),
+            }),
+          );
         }
         return;
       }
 
       // POST /a2a/tasks/:id/subscribe (SSE)
-      if (action === '/subscribe' && req.method === 'POST') {
+      if (action === "/subscribe" && req.method === "POST") {
         a2a.handleSubscribe(taskId, res);
         return;
       }
@@ -458,20 +492,20 @@ export function startServer(sim: Simulation): void {
     // ── MCP Protocol Endpoint ─────────────────────────────────────────────
 
     // GET /mcp — Streamable HTTP transport: return 405 (server-initiated streams not implemented)
-    if (path === '/mcp' && req.method === 'GET') {
+    if (path === "/mcp" && req.method === "GET") {
       res.writeHead(405, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       });
-      res.end(JSON.stringify({ error: 'Method Not Allowed. Use POST for MCP JSON-RPC requests.' }));
+      res.end(JSON.stringify({ error: "Method Not Allowed. Use POST for MCP JSON-RPC requests." }));
       return;
     }
 
     // POST /mcp — JSON-RPC 2.0
-    if (path === '/mcp' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/mcp" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const parsed = JSON.parse(body);
 
@@ -479,8 +513,8 @@ export function startServer(sim: Simulation): void {
           if (Array.isArray(parsed)) {
             const results = parsed.map((r: any) => mcp.handleRequest(r));
             res.writeHead(200, {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
             });
             res.end(JSON.stringify(results));
             return;
@@ -488,43 +522,45 @@ export function startServer(sim: Simulation): void {
 
           const result = mcp.handleRequest(parsed);
           // Emit activity event for dashboard feed
-          if (parsed.method === 'tools/call' && parsed.params?.name) {
+          if (parsed.method === "tools/call" && parsed.params?.name) {
             sim.events.push({
-              type: 'mcp_tool_call',
+              type: "mcp_tool_call",
               agentId: null as any,
               message: `🔌 MCP: Tool "${parsed.params.name}" called`,
               timestamp: Date.now(),
             });
           }
           res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           });
           res.end(JSON.stringify(result));
         } catch {
           res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           });
-          res.end(JSON.stringify({
-            jsonrpc: '2.0',
-            id: null,
-            error: { code: -32700, message: 'Parse error: invalid JSON' },
-          }));
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              id: null,
+              error: { code: -32700, message: "Parse error: invalid JSON" },
+            }),
+          );
         }
       });
       return;
     }
 
     // GraphQL-compatible endpoint (handles all dashboard queries)
-    if (path === '/graphql' && req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      req.on('end', () => {
+    if (path === "/graphql" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", () => {
         try {
           const { query, variables } = JSON.parse(body);
           const opMatch = query?.match(/(?:query|mutation)\s+(\w+)/);
-          const op = opMatch?.[1] ?? '';
+          const op = opMatch?.[1] ?? "";
           const result = handleGraphQL(op, variables ?? {}, sim);
           json(res, { data: result });
         } catch (err) {
@@ -535,17 +571,17 @@ export function startServer(sim: Simulation): void {
     }
 
     // SSE stream — real-time agent activity
-    if (path === '/api/stream') {
+    if (path === "/api/stream") {
       res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
       });
 
       // Optional filter by task or agent
-      const taskFilter = url.searchParams.get('task');
-      const agentFilter = url.searchParams.get('agent');
+      const taskFilter = url.searchParams.get("task");
+      const agentFilter = url.searchParams.get("agent");
 
       const unsub = sim.onEvent((event) => {
         // Apply filters
@@ -559,37 +595,51 @@ export function startServer(sim: Simulation): void {
           message: event.message,
           timestamp: event.timestamp,
           agentName: event.agentId
-            ? sim.agents.find(a => a.id === event.agentId)?.name
+            ? sim.agents.find((a) => a.id === event.agentId)?.name
             : undefined,
         });
         res.write(`data: ${data}\n\n`);
       });
 
       // Send initial heartbeat
-      res.write(`data: ${JSON.stringify({ type: 'connected', message: 'Stream connected' })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: "connected", message: "Stream connected" })}\n\n`);
 
-      req.on('close', () => { unsub(); });
+      req.on("close", () => {
+        unsub();
+      });
       return;
     }
 
     // Send order — inject a message from the Human Principal into COO's inbox
-    if (path === '/api/order' && req.method === 'POST') {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      req.on('end', () => {
+    if (path === "/api/order" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", () => {
         try {
           const { message } = JSON.parse(body);
-          if (!message) { json(res, { error: 'message required' }); return; }
-          
-          const coo = sim.agents.find(a => a.role === 'coo' || a.id.includes('mr-krabs') || a.id.includes('krabs') || a.level === 10);
-          if (!coo) { json(res, { error: 'COO not found' }); return; }
-          
+          if (!message) {
+            json(res, { error: "message required" });
+            return;
+          }
+
+          const coo = sim.agents.find(
+            (a) =>
+              a.role === "coo" ||
+              a.id.includes("mr-krabs") ||
+              a.id.includes("krabs") ||
+              a.level === 10,
+          );
+          if (!coo) {
+            json(res, { error: "COO not found" });
+            return;
+          }
+
           const orderMsg = {
             id: `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            type: 'delegation' as const,
-            from: 'human-principal',
+            type: "delegation" as const,
+            from: "human-principal",
             to: coo.id,
-            taskId: '',
+            taskId: "",
             body: `[PRIORITY ORDER FROM HUMAN PRINCIPAL]: ${message}`,
             timestamp: Date.now(),
           };
@@ -599,91 +649,117 @@ export function startServer(sim: Simulation): void {
 
           // Also log as event
           sim.events.push({
-            type: 'human_order',
+            type: "human_order",
             agentId: coo.id,
             message: `📢 Human Principal: ${message}`,
             timestamp: Date.now(),
           });
 
           // Deterministic mode: trigger processOrder directly
-          if ('processOrder' in sim && typeof (sim as any).processOrder === 'function') {
+          if ("processOrder" in sim && typeof (sim as any).processOrder === "function") {
             (sim as any).processOrder(message);
           }
 
           json(res, { ok: true, message: `Order delivered to ${coo.name}` });
         } catch {
-          json(res, { error: 'Invalid JSON' });
+          json(res, { error: "Invalid JSON" });
         }
       });
       return;
     }
 
     // Restart — reset simulation. ?mode=organic (default) or ?mode=full
-    if (path === '/api/restart' && req.method === 'POST') {
-      const mode = (url.searchParams.get('mode') === 'full' ? 'full' : 'organic') as 'organic' | 'full';
+    if (path === "/api/restart" && req.method === "POST") {
+      const mode = (url.searchParams.get("mode") === "full" ? "full" : "organic") as
+        | "organic"
+        | "full";
       sim.restart(mode).then(() => {
-        const msg = mode === 'full'
-          ? `Full reset with ${sim.agents.length} agents from ORG.md.`
-          : 'Reset to COO only. Org will grow organically.';
+        const msg =
+          mode === "full"
+            ? `Full reset with ${sim.agents.length} agents from ORG.md.`
+            : "Reset to COO only. Org will grow organically.";
         json(res, { ok: true, message: msg, agentCount: sim.agents.length, mode });
       });
       return;
     }
 
     // Spawn a new agent via user request
-    if (path === '/api/agents/spawn' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: Buffer | string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/api/agents/spawn" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: Buffer | string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { name, role, domain, level, avatar, avatarColor } = JSON.parse(body);
-          if (!name) { json(res, { error: 'name required' }); return; }
+          if (!name) {
+            json(res, { error: "name required" });
+            return;
+          }
 
-          const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-          if (sim.agents.find(a => a.id === id)) {
+          const id = name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "");
+          if (sim.agents.find((a) => a.id === id)) {
             json(res, { error: `Agent "${id}" already exists` });
             return;
           }
 
           // Determine parent: leads report to COO, others report to a lead in same domain or COO
-          const coo = sim.agents.find(a => a.role === 'coo' || a.level === 10);
+          const coo = sim.agents.find((a) => a.role === "coo" || a.level === 10);
           let parentId: string | undefined;
-          if (role === 'lead') {
+          if (role === "lead") {
             parentId = coo?.id;
           } else {
-            const domainLead = sim.agents.find(a => a.role === 'lead' && a.domain?.toLowerCase() === domain?.toLowerCase());
+            const domainLead = sim.agents.find(
+              (a) => a.role === "lead" && a.domain?.toLowerCase() === domain?.toLowerCase(),
+            );
             parentId = domainLead?.id ?? coo?.id;
           }
 
-          const agent = makeAgentPublic(id, name, role, level ?? 4, domain ?? 'Engineering', parentId ?? '', '');
+          const agent = makeAgentPublic(
+            id,
+            name,
+            role,
+            level ?? 4,
+            domain ?? "Engineering",
+            parentId ?? "",
+            "",
+          );
           agent.avatar = avatar;
           agent.avatarColor = avatarColor;
-          agent.status = 'active';
+          agent.status = "active";
           sim.agents.push(agent);
 
           // Emit SSE event
-          const event = { type: 'agent_spawned' as const, agentId: agent.id, message: `🐣 ${agent.name} has joined the team!`, timestamp: Date.now() };
+          const event = {
+            type: "agent_spawned" as const,
+            agentId: agent.id,
+            message: `🐣 ${agent.name} has joined the team!`,
+            timestamp: Date.now(),
+          };
           sim.events.push(event);
-          if ('onEvent' in sim && typeof (sim as any).sseListeners !== 'undefined') {
-            ((sim as any).sseListeners as Array<(e: SandboxEvent) => void>).forEach(l => l(event));
+          if ("onEvent" in sim && typeof (sim as any).sseListeners !== "undefined") {
+            ((sim as any).sseListeners as Array<(e: SandboxEvent) => void>).forEach((l) =>
+              l(event),
+            );
           }
 
           json(res, { ok: true, agent: mapAgent(agent, sim.agents) });
         } catch {
-          json(res, { error: 'Invalid JSON' });
+          json(res, { error: "Invalid JSON" });
         }
       });
       return;
     }
 
     // REST endpoints for debugging
-    if (path === '/api/state') {
+    if (path === "/api/state") {
       json(res, {
         tick: sim.tick,
         agentCount: sim.agents.length,
         taskCount: sim.tasks.length,
         eventCount: sim.events.length,
-        tasksDone: sim.tasks.filter(t => t.status === 'done').length,
+        tasksDone: sim.tasks.filter((t) => t.status === "done").length,
       });
       return;
     }
@@ -691,52 +767,63 @@ export function startServer(sim: Simulation): void {
     // ── Live Ingest API — receive real agent events ───────────────────────
     // POST /api/ingest — accepts ACP-style events from real agent systems
     // Used by the CEO agent to pipe live org activity into the dashboard
-    if (path === '/api/ingest' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
-      req.on('end', () => {
+    if (path === "/api/ingest" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: Buffer) => {
+        body += chunk.toString();
+      });
+      req.on("end", () => {
         try {
           const event = JSON.parse(body);
           const { type, from, to, task, taskId, status, timestamp, data } = event;
           const ts = timestamp ? new Date(timestamp).getTime() : Date.now();
 
-          if (type === 'agent_activate') {
+          if (type === "agent_activate") {
             // Add or activate an agent
-            const existing = sim.agents.find(a => a.id === (event.agentId || from));
+            const existing = sim.agents.find((a) => a.id === (event.agentId || from));
             if (!existing) {
               sim.agents.push({
                 id: event.agentId || from,
                 name: event.name || from,
-                role: event.role || 'worker',
+                role: event.role || "worker",
                 level: event.level ?? 4,
-                domain: event.domain || 'Engineering',
+                domain: event.domain || "Engineering",
                 avatar: event.avatar,
                 avatarColor: event.avatarColor,
                 avatarUrl: event.avatarUrl,
                 parentId: event.parentId,
-                status: 'active',
-                systemPrompt: '',
+                status: "active",
+                systemPrompt: "",
                 taskIds: [],
                 recentMessages: [],
-                trigger: 'event-driven',
+                trigger: "event-driven",
                 inbox: [],
-                stats: { tasksCompleted: 0, tasksFailed: 0, messagesSent: 0, creditsEarned: 0, creditsSpent: 0 },
+                stats: {
+                  tasksCompleted: 0,
+                  tasksFailed: 0,
+                  messagesSent: 0,
+                  creditsEarned: 0,
+                  creditsSpent: 0,
+                },
               });
             } else {
-              existing.status = 'active';
+              existing.status = "active";
             }
-            sim.events.push({ type: 'agent_activated', agentId: event.agentId || from, message: `${event.name || from} activated`, timestamp: ts });
+            sim.events.push({
+              type: "agent_activated",
+              agentId: event.agentId || from,
+              message: `${event.name || from} activated`,
+              timestamp: ts,
+            });
             sim.events.length; // SSE auto-emits via sim.onEvent through push to sim.events
-          }
-
-          else if (type === 'task_delegate') {
+          } else if (type === "task_delegate") {
             const id = taskId || `LIVE-${Date.now().toString(36)}`;
             const newTask = {
               id,
-              title: task || 'Untitled task',
-              description: event.description || task || '',
-              priority: (event.priority || 'normal') as 'low' | 'normal' | 'high' | 'critical',
-              status: 'assigned' as const,
+              title: task || "Untitled task",
+              description: event.description || task || "",
+              priority: (event.priority || "normal") as "low" | "normal" | "high" | "critical",
+              status: "assigned" as const,
               assigneeId: to,
               creatorId: from,
               createdAt: ts,
@@ -746,131 +833,191 @@ export function startServer(sim: Simulation): void {
             };
             sim.tasks.push(newTask);
             // Mark assignee as busy
-            const assignee = sim.agents.find(a => a.id === to);
-            if (assignee) { assignee.status = 'busy'; assignee.taskIds.push(id); }
-            sim.events.push({ type: 'task_delegated', agentId: from, taskId: id, message: `${from} → ${to}: ${task}`, timestamp: ts });
-            
-          }
-
-          else if (type === 'task_update') {
-            const t = sim.tasks.find(t => t.id === taskId);
+            const assignee = sim.agents.find((a) => a.id === to);
+            if (assignee) {
+              assignee.status = "busy";
+              assignee.taskIds.push(id);
+            }
+            sim.events.push({
+              type: "task_delegated",
+              agentId: from,
+              taskId: id,
+              message: `${from} → ${to}: ${task}`,
+              timestamp: ts,
+            });
+          } else if (type === "task_update") {
+            const t = sim.tasks.find((t) => t.id === taskId);
             if (t) {
               if (status) t.status = status;
               t.updatedAt = ts;
-              if (status === 'done') {
-                const agent = sim.agents.find(a => a.id === t.assigneeId);
+              if (status === "done") {
+                const agent = sim.agents.find((a) => a.id === t.assigneeId);
                 if (agent) {
                   agent.stats.tasksCompleted++;
-                  agent.taskIds = agent.taskIds.filter(id => id !== taskId);
-                  if (agent.taskIds.length === 0) agent.status = 'idle';
+                  agent.taskIds = agent.taskIds.filter((id) => id !== taskId);
+                  if (agent.taskIds.length === 0) agent.status = "idle";
                 }
               }
-              sim.events.push({ type: 'task_updated', taskId, message: `${taskId} → ${status}`, timestamp: ts });
-              
+              sim.events.push({
+                type: "task_updated",
+                taskId,
+                message: `${taskId} → ${status}`,
+                timestamp: ts,
+              });
             }
-          }
-
-          else if (type === 'message') {
-            sim.events.push({ type: 'acp_message', agentId: from, message: `${from} → ${to}: ${event.content || data?.content || ''}`, timestamp: ts });
-            
+          } else if (type === "message") {
+            sim.events.push({
+              type: "acp_message",
+              agentId: from,
+              message: `${from} → ${to}: ${event.content || data?.content || ""}`,
+              timestamp: ts,
+            });
           }
 
           json(res, { ok: true, received: type });
         } catch (e) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Invalid JSON', detail: String(e) }));
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Invalid JSON", detail: String(e) }));
         }
       });
       return;
     }
 
     // Health check
-    if (path === '/api/health') {
-      json(res, { status: 'ok', tick: (sim as any).tick ?? 0, agents: sim.agents.length, tasks: sim.tasks.length });
+    if (path === "/api/health") {
+      json(res, {
+        status: "ok",
+        tick: (sim as any).tick ?? 0,
+        agents: sim.agents.length,
+        tasks: sim.tasks.length,
+      });
       return;
     }
 
-    if (path === '/api/agents') {
-      json(res, sim.agents.map(a => mapAgent(a, sim.agents)));
+    if (path === "/api/agents") {
+      json(
+        res,
+        sim.agents.map((a) => mapAgent(a, sim.agents)),
+      );
       return;
     }
 
-    if (path === '/api/tasks') {
-      json(res, sim.tasks.map(t => mapTask(t, sim.agents)));
+    if (path === "/api/tasks") {
+      json(
+        res,
+        sim.tasks.map((t) => mapTask(t, sim.agents)),
+      );
       return;
     }
 
-    if (path === '/api/events') {
-      json(res, sim.events.slice(-100).map(e => mapEvent(e, sim.agents)));
+    if (path === "/api/events") {
+      json(
+        res,
+        sim.events.slice(-100).map((e) => mapEvent(e, sim.agents)),
+      );
       return;
     }
 
     // Task activity log (ACP messages)
-    if (path.startsWith('/api/task/') && path.endsWith('/activity')) {
-      const taskId = path.split('/')[3];
-      const task = sim.tasks.find(t => t.id === taskId);
+    if (path.startsWith("/api/task/") && path.endsWith("/activity")) {
+      const taskId = path.split("/")[3];
+      const task = sim.tasks.find((t) => t.id === taskId);
       if (task) {
-        json(res, task.activityLog.map(m => ({
-          id: m.id,
-          type: m.type,
-          from: m.from,
-          fromName: sim.agents.find(a => a.id === m.from)?.name ?? m.from,
-          to: m.to,
-          toName: sim.agents.find(a => a.id === m.to)?.name ?? m.to,
-          body: m.body,
-          reason: m.reason,
-          summary: m.summary,
-          pct: m.pct,
-          timestamp: m.timestamp,
-        })));
+        json(
+          res,
+          task.activityLog.map((m) => ({
+            id: m.id,
+            type: m.type,
+            from: m.from,
+            fromName: sim.agents.find((a) => a.id === m.from)?.name ?? m.from,
+            to: m.to,
+            toName: sim.agents.find((a) => a.id === m.to)?.name ?? m.to,
+            body: m.body,
+            reason: m.reason,
+            summary: m.summary,
+            pct: m.pct,
+            timestamp: m.timestamp,
+          })),
+        );
       } else {
         // Fallback to events
-        const taskEvents = sim.events.filter(e => e.taskId === taskId);
-        json(res, taskEvents.map(e => ({
-          agentId: e.agentId,
-          agentName: e.agentId ? sim.agents.find(a => a.id === e.agentId)?.name : null,
-          message: e.message,
-          timestamp: e.timestamp,
-        })));
+        const taskEvents = sim.events.filter((e) => e.taskId === taskId);
+        json(
+          res,
+          taskEvents.map((e) => ({
+            agentId: e.agentId,
+            agentName: e.agentId ? sim.agents.find((a) => a.id === e.agentId)?.name : null,
+            message: e.message,
+            timestamp: e.timestamp,
+          })),
+        );
       }
       return;
     }
 
     // Agent messages endpoint
-    if (path.startsWith('/api/agent/') && path.endsWith('/messages')) {
-      const agentId = path.split('/')[3];
+    if (path.startsWith("/api/agent/") && path.endsWith("/messages")) {
+      const agentId = path.split("/")[3];
       const all = collectAllMessages(sim.agents);
-      const agentMsgs = all.filter(m => m.from === agentId || m.to === agentId)
+      const agentMsgs = all
+        .filter((m) => m.from === agentId || m.to === agentId)
         .sort((a, b) => a.timestamp - b.timestamp);
       json(res, agentMsgs);
       return;
     }
 
     // Metrics time-series for sparklines / charts
-    if (path === '/api/metrics') {
+    if (path === "/api/metrics") {
       json(res, sim.metricsHistory);
       return;
     }
 
     // LLM provider info (read-only — model cannot be changed via API)
-    if (path === '/api/models') {
+    if (path === "/api/models") {
       json(res, {
         provider: getProvider(),
         providerInfo: getProviderInfo(),
         currentModel: getModelName(),
         locked: true, // Users cannot change models via the dashboard
-        availableModels: getProvider() === 'groq' ? [
-          { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant', rpm: 30, rpd: '14.4K', active: getModelName() === 'llama-3.1-8b-instant' },
-          { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', rpm: 30, rpd: '1K', active: getModelName() === 'llama-3.3-70b-versatile' },
-          { id: 'meta-llama/llama-4-scout-17b-16e-instruct', name: 'Llama 4 Scout 17B', rpm: 30, rpd: '1K', active: getModelName() === 'meta-llama/llama-4-scout-17b-16e-instruct' },
-          { id: 'qwen/qwen3-32b', name: 'Qwen3 32B', rpm: 60, rpd: '1K', active: getModelName() === 'qwen/qwen3-32b' },
-        ] : [],
+        availableModels:
+          getProvider() === "groq"
+            ? [
+                {
+                  id: "llama-3.1-8b-instant",
+                  name: "Llama 3.1 8B Instant",
+                  rpm: 30,
+                  rpd: "14.4K",
+                  active: getModelName() === "llama-3.1-8b-instant",
+                },
+                {
+                  id: "llama-3.3-70b-versatile",
+                  name: "Llama 3.3 70B",
+                  rpm: 30,
+                  rpd: "1K",
+                  active: getModelName() === "llama-3.3-70b-versatile",
+                },
+                {
+                  id: "meta-llama/llama-4-scout-17b-16e-instruct",
+                  name: "Llama 4 Scout 17B",
+                  rpm: 30,
+                  rpd: "1K",
+                  active: getModelName() === "meta-llama/llama-4-scout-17b-16e-instruct",
+                },
+                {
+                  id: "qwen/qwen3-32b",
+                  name: "Qwen3 32B",
+                  rpm: 60,
+                  rpd: "1K",
+                  active: getModelName() === "qwen/qwen3-32b",
+                },
+              ]
+            : [],
       });
       return;
     }
 
     // ACP-specific metrics (ack latency, escalation rate, delegation depth, completion rate)
-    if (path === '/api/metrics/acp') {
+    if (path === "/api/metrics/acp") {
       const allMessages = collectAllMessages(sim.agents);
       const tasks = sim.tasks;
 
@@ -887,7 +1034,7 @@ export function startServer(sim: Simulation): void {
 
       for (const msg of allMessages) {
         switch (msg.type) {
-          case 'ack':
+          case "ack":
             totalAcks++;
             {
               const key = `${msg.taskId}::${msg.from}`;
@@ -897,17 +1044,17 @@ export function startServer(sim: Simulation): void {
               }
             }
             break;
-          case 'delegation':
+          case "delegation":
             totalDelegations++;
             delegationTimestamps.set(`${msg.taskId}::${msg.to}`, msg.timestamp);
             break;
-          case 'escalation':
+          case "escalation":
             totalEscalations++;
             if (msg.reason) {
               escalationsByReason[msg.reason] = (escalationsByReason[msg.reason] || 0) + 1;
             }
             break;
-          case 'completion':
+          case "completion":
             totalCompletions++;
             break;
         }
@@ -924,31 +1071,26 @@ export function startServer(sim: Simulation): void {
       // Avg delegation depth: count delegation hops per task
       const taskDelegationCounts = new Map<string, number>();
       for (const msg of allMessages) {
-        if (msg.type === 'delegation' && msg.taskId) {
+        if (msg.type === "delegation" && msg.taskId) {
           taskDelegationCounts.set(msg.taskId, (taskDelegationCounts.get(msg.taskId) || 0) + 1);
         }
       }
       const depthValues = Array.from(taskDelegationCounts.values());
-      const avgDelegationDepth = depthValues.length > 0
-        ? depthValues.reduce((a, b) => a + b, 0) / depthValues.length
-        : 0;
+      const avgDelegationDepth =
+        depthValues.length > 0 ? depthValues.reduce((a, b) => a + b, 0) / depthValues.length : 0;
 
       // Completion rate: completed vs total non-backlog tasks
-      const nonBacklogTasks = tasks.filter(t => t.status !== 'backlog');
-      const doneTasks = tasks.filter(t => t.status === 'done');
-      const completionRate = nonBacklogTasks.length > 0
-        ? doneTasks.length / nonBacklogTasks.length
-        : 0;
+      const nonBacklogTasks = tasks.filter((t) => t.status !== "backlog");
+      const doneTasks = tasks.filter((t) => t.status === "done");
+      const completionRate =
+        nonBacklogTasks.length > 0 ? doneTasks.length / nonBacklogTasks.length : 0;
 
       // Escalation rate: escalated tasks vs total tasks
-      const escalationRate = tasks.length > 0
-        ? totalEscalations / tasks.length
-        : 0;
+      const escalationRate = tasks.length > 0 ? totalEscalations / tasks.length : 0;
 
       // Ack latency average
-      const ackLatencyMs = ackLatencies.length > 0
-        ? ackLatencies.reduce((a, b) => a + b, 0) / ackLatencies.length
-        : 0;
+      const ackLatencyMs =
+        ackLatencies.length > 0 ? ackLatencies.reduce((a, b) => a + b, 0) / ackLatencies.length : 0;
 
       json(res, {
         ackLatencyMs: Math.round(ackLatencyMs),
@@ -965,117 +1107,139 @@ export function startServer(sim: Simulation): void {
     }
 
     // PUT /api/agent/:id/trigger — change trigger mode
-    if (path.match(/^\/api\/agent\/[^/]+\/trigger$/) && req.method === 'PUT') {
-      const agentId = path.split('/')[3];
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path.match(/^\/api\/agent\/[^/]+\/trigger$/) && req.method === "PUT") {
+      const agentId = path.split("/")[3];
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { trigger, triggerOn } = JSON.parse(body);
-          const agent = sim.agents.find(a => a.id === agentId);
-          if (!agent) { json(res, { error: 'Agent not found' }); return; }
-          if (trigger !== 'polling' && trigger !== 'event-driven') {
-            json(res, { error: 'trigger must be "polling" or "event-driven"' }); return;
+          const agent = sim.agents.find((a) => a.id === agentId);
+          if (!agent) {
+            json(res, { error: "Agent not found" });
+            return;
+          }
+          if (trigger !== "polling" && trigger !== "event-driven") {
+            json(res, { error: 'trigger must be "polling" or "event-driven"' });
+            return;
           }
           agent.trigger = trigger;
           if (triggerOn) agent.triggerOn = triggerOn;
           json(res, { ok: true, trigger: agent.trigger, triggerOn: agent.triggerOn ?? null });
-        } catch { json(res, { error: 'Invalid JSON' }); }
+        } catch {
+          json(res, { error: "Invalid JSON" });
+        }
       });
       return;
     }
 
     // GET /api/agent/:id/config — get agent config from org directory
-    if (path.match(/^\/api\/agent\/[^/]+\/config$/) && req.method === 'GET') {
-      const agentId = path.split('/')[3];
+    if (path.match(/^\/api\/agent\/[^/]+\/config$/) && req.method === "GET") {
+      const agentId = path.split("/")[3];
       const config = loadAgentConfig(agentId, ORG_DIR);
       json(res, config);
       return;
     }
 
     // PUT /api/agent/:id/config — update a config file
-    if (path.match(/^\/api\/agent\/[^/]+\/config$/) && req.method === 'PUT') {
-      const agentId = path.split('/')[3];
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path.match(/^\/api\/agent\/[^/]+\/config$/) && req.method === "PUT") {
+      const agentId = path.split("/")[3];
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { file, content } = JSON.parse(body);
-          const allowedFiles = ['SOUL.md', 'AGENTS.md', 'TOOLS.md', 'IDENTITY.md'];
+          const allowedFiles = ["SOUL.md", "AGENTS.md", "TOOLS.md", "IDENTITY.md"];
           if (!allowedFiles.includes(file)) {
-            json(res, { error: `file must be one of: ${allowedFiles.join(', ')}` }); return;
+            json(res, { error: `file must be one of: ${allowedFiles.join(", ")}` });
+            return;
           }
-          const agentDir = join(ORG_DIR, 'agents', agentId);
+          const agentDir = join(ORG_DIR, "agents", agentId);
           mkdirSync(agentDir, { recursive: true });
-          writeFileSync(join(agentDir, file), content, 'utf-8');
+          writeFileSync(join(agentDir, file), content, "utf-8");
           json(res, { ok: true });
-        } catch { json(res, { error: 'Invalid JSON' }); }
+        } catch {
+          json(res, { error: "Invalid JSON" });
+        }
       });
       return;
     }
 
     // ── Model Router Endpoints ──────────────────────────────────────────────
 
-    if (path === '/api/router/config' && req.method === 'GET') {
+    if (path === "/api/router/config" && req.method === "GET") {
       json(res, { providers: router.getConfig() });
       return;
     }
 
-    if (path === '/api/router/config' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/api/router/config" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { providerId, enabled, priority } = JSON.parse(body);
-          if (!providerId) { json(res, { error: 'providerId required' }); return; }
+          if (!providerId) {
+            json(res, { error: "providerId required" });
+            return;
+          }
           const ok = router.updateProvider(providerId, { enabled, priority });
-          json(res, ok ? { ok: true } : { error: 'Provider not found' });
-        } catch { json(res, { error: 'Invalid JSON' }); }
+          json(res, ok ? { ok: true } : { error: "Provider not found" });
+        } catch {
+          json(res, { error: "Invalid JSON" });
+        }
       });
       return;
     }
 
-    if (path === '/api/router/metrics' && req.method === 'GET') {
+    if (path === "/api/router/metrics" && req.method === "GET") {
       json(res, router.getMetrics());
       return;
     }
 
-    if (path === '/api/router/route' && req.method === 'GET') {
-      const agentLevel = parseInt(url.searchParams.get('agentLevel') || '5', 10);
-      const taskType = (url.searchParams.get('taskType') || 'simple') as 'delegation' | 'coding' | 'analysis' | 'simple';
-      const preferLocal = url.searchParams.get('preferLocal') === 'true';
+    if (path === "/api/router/route" && req.method === "GET") {
+      const agentLevel = parseInt(url.searchParams.get("agentLevel") || "5", 10);
+      const taskType = (url.searchParams.get("taskType") || "simple") as
+        | "delegation"
+        | "coding"
+        | "analysis"
+        | "simple";
+      const preferLocal = url.searchParams.get("preferLocal") === "true";
       const decision = router.route({ agentLevel, taskType, preferLocal });
       json(res, decision);
       return;
     }
 
-    if (path === '/api/router/decisions' && req.method === 'GET') {
-      const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+    if (path === "/api/router/decisions" && req.method === "GET") {
+      const limit = parseInt(url.searchParams.get("limit") || "20", 10);
       json(res, router.getRecentDecisions(limit));
       return;
     }
 
     // ── Avatar static files (always available — serves /avatars/* from dashboard public) ──
-    if (path.startsWith('/avatars/')) {
-      const avatarFile = path.slice('/avatars/'.length);
+    if (path.startsWith("/avatars/")) {
+      const avatarFile = path.slice("/avatars/".length);
       // Sanitize: only allow simple filenames (no path traversal)
       if (avatarFile && /^[a-z0-9-]+\.png$/i.test(avatarFile)) {
-        const AVATAR_MIME: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
+        const AVATAR_MIME: Record<string, string> = {
+          ".png": "image/png",
+          ".jpg": "image/jpeg",
+          ".webp": "image/webp",
+        };
         // Try multiple locations: source (local dev), Nx build output (local prod), Docker layout
-        const workspaceRoot = join(__dirname, '..', '..', '..');
+        const workspaceRoot = join(__dirname, "..", "..", "..");
         const candidates = [
-          join(workspaceRoot, 'apps', 'dashboard', 'public', 'avatars', avatarFile), // local dev (source)
-          join(workspaceRoot, 'dist', 'apps', 'dashboard', 'avatars', avatarFile),   // local prod (Nx output)
-          join(__dirname, '..', 'dashboard-dist', 'avatars', avatarFile),             // Docker
+          join(workspaceRoot, "apps", "dashboard", "public", "avatars", avatarFile), // local dev (source)
+          join(workspaceRoot, "dist", "apps", "dashboard", "avatars", avatarFile), // local prod (Nx output)
+          join(__dirname, "..", "dashboard-dist", "avatars", avatarFile), // Docker
         ];
         for (const filePath of candidates) {
           if (existsSync(filePath) && statSync(filePath).isFile()) {
             const ext = extname(filePath);
             const content = readFileSync(filePath);
             res.writeHead(200, {
-              'Content-Type': AVATAR_MIME[ext] || 'application/octet-stream',
-              'Cache-Control': 'public, max-age=86400',
-              'Access-Control-Allow-Origin': '*',
+              "Content-Type": AVATAR_MIME[ext] || "application/octet-stream",
+              "Cache-Control": "public, max-age=86400",
+              "Access-Control-Allow-Origin": "*",
             });
             res.end(content);
             return;
@@ -1083,52 +1247,68 @@ export function startServer(sim: Simulation): void {
         }
       }
       res.writeHead(404);
-      res.end('Avatar not found');
+      res.end("Avatar not found");
       return;
     }
 
     // ── Static file serving (production: serve built dashboard) ──────────
-    if (process.env.SERVE_DASHBOARD === '1') {
+    if (process.env.SERVE_DASHBOARD === "1") {
       // BikiniBottom: redirect bare root to the BikiniBottom intro (landing) page
       // so visitors see "Hire the whole ocean" instead of the OpenSpawn marketing site.
-      if (path === '/' && req.method === 'GET') {
-        res.writeHead(302, { Location: '/app/intro' });
+      if (path === "/" && req.method === "GET") {
+        res.writeHead(302, { Location: "/app/intro" });
         res.end();
         return;
       }
 
       const MIME_TYPES: Record<string, string> = {
-        '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
-        '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
-        '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
-        '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
-        '.txt': 'text/plain', '.xml': 'application/xml', '.webp': 'image/webp',
+        ".html": "text/html",
+        ".js": "application/javascript",
+        ".css": "text/css",
+        ".json": "application/json",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".svg": "image/svg+xml",
+        ".ico": "image/x-icon",
+        ".woff2": "font/woff2",
+        ".woff": "font/woff",
+        ".ttf": "font/ttf",
+        ".map": "application/json",
+        ".txt": "text/plain",
+        ".xml": "application/xml",
+        ".webp": "image/webp",
       };
       // Resolve dashboard/website dirs: env var → Nx output → Docker layout
-      const workspaceRoot = join(__dirname, '..', '..', '..');
-      const dashboardDir = process.env.DASHBOARD_DIR
-        || (existsSync(join(workspaceRoot, 'dist', 'apps', 'dashboard')) ? join(workspaceRoot, 'dist', 'apps', 'dashboard') : null)
-        || join(__dirname, '..', 'dashboard-dist');
-      const websiteDir = process.env.WEBSITE_DIR
-        || (existsSync(join(workspaceRoot, 'dist', 'apps', 'website')) ? join(workspaceRoot, 'dist', 'apps', 'website') : null)
-        || join(__dirname, '..', 'website-dist');
+      const workspaceRoot = join(__dirname, "..", "..", "..");
+      const dashboardDir =
+        process.env.DASHBOARD_DIR ||
+        (existsSync(join(workspaceRoot, "dist", "apps", "dashboard"))
+          ? join(workspaceRoot, "dist", "apps", "dashboard")
+          : null) ||
+        join(__dirname, "..", "dashboard-dist");
+      const websiteDir =
+        process.env.WEBSITE_DIR ||
+        (existsSync(join(workspaceRoot, "dist", "apps", "website"))
+          ? join(workspaceRoot, "dist", "apps", "website")
+          : null) ||
+        join(__dirname, "..", "website-dist");
 
       // Dashboard: /app/* routes
-      if (path.startsWith('/app')) {
-        const subPath = path.replace(/^\/app\/?/, '') || 'index.html';
+      if (path.startsWith("/app")) {
+        const subPath = path.replace(/^\/app\/?/, "") || "index.html";
         let filePath = join(dashboardDir, subPath);
 
         // SPA fallback: non-asset paths → index.html
-        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith('index.html'))) {
-          filePath = join(dashboardDir, 'index.html');
+        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith("index.html"))) {
+          filePath = join(dashboardDir, "index.html");
         }
 
         if (existsSync(filePath) && statSync(filePath).isFile()) {
           const ext = extname(filePath);
-          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          const contentType = MIME_TYPES[ext] || "application/octet-stream";
           const content = readFileSync(filePath);
-          const cacheControl = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
-          res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
+          const cacheControl = ext === ".html" ? "no-cache" : "public, max-age=31536000, immutable";
+          res.writeHead(200, { "Content-Type": contentType, "Cache-Control": cacheControl });
           res.end(content);
           return;
         }
@@ -1136,21 +1316,28 @@ export function startServer(sim: Simulation): void {
 
       // Website: /* routes — serve from website-dist (SPA with fallback to index.html)
       // Skip API and protocol routes — those must reach handlers below
-      if (existsSync(websiteDir) && !path.startsWith('/api/') && !path.startsWith('/graphql') && !path.startsWith('/sse') && !path.startsWith('/mcp') && !path.startsWith('/.well-known/')) {
-        const subPath = path === '/' ? 'index.html' : path.slice(1);
+      if (
+        existsSync(websiteDir) &&
+        !path.startsWith("/api/") &&
+        !path.startsWith("/graphql") &&
+        !path.startsWith("/sse") &&
+        !path.startsWith("/mcp") &&
+        !path.startsWith("/.well-known/")
+      ) {
+        const subPath = path === "/" ? "index.html" : path.slice(1);
         let filePath = join(websiteDir, subPath);
 
         // SPA fallback: non-asset paths → index.html
-        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith('index.html'))) {
-          filePath = join(websiteDir, 'index.html');
+        if (!existsSync(filePath) || (!extname(filePath) && !filePath.endsWith("index.html"))) {
+          filePath = join(websiteDir, "index.html");
         }
 
         if (existsSync(filePath) && statSync(filePath).isFile()) {
           const ext = extname(filePath);
-          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          const contentType = MIME_TYPES[ext] || "application/octet-stream";
           const content = readFileSync(filePath);
-          const cacheControl = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
-          res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
+          const cacheControl = ext === ".html" ? "no-cache" : "public, max-age=31536000, immutable";
+          res.writeHead(200, { "Content-Type": contentType, "Cache-Control": cacheControl });
           res.end(content);
           return;
         }
@@ -1160,8 +1347,8 @@ export function startServer(sim: Simulation): void {
     // ── Scenario Engine Endpoints ──────────────────────────────────────
 
     // List available scenarios
-    if (path === '/api/scenarios' && req.method === 'GET') {
-      const scenarios = Object.values(SCENARIO_REGISTRY).map(s => ({
+    if (path === "/api/scenarios" && req.method === "GET") {
+      const scenarios = Object.values(SCENARIO_REGISTRY).map((s) => ({
         id: s.meta.id,
         name: s.meta.name,
         industry: s.meta.industry,
@@ -1175,14 +1362,17 @@ export function startServer(sim: Simulation): void {
     }
 
     // Start a scenario
-    if (path === '/api/scenario/start' && req.method === 'POST') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/api/scenario/start" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { scenarioId, difficulty, seed } = JSON.parse(body);
           const scenarioDef = SCENARIO_REGISTRY[scenarioId];
-          if (!scenarioDef) { json(res, { error: `Unknown scenario: ${scenarioId}` }); return; }
+          if (!scenarioDef) {
+            json(res, { error: `Unknown scenario: ${scenarioId}` });
+            return;
+          }
 
           const def = { ...scenarioDef, meta: { ...scenarioDef.meta } };
           if (difficulty) def.meta.difficulty = difficulty;
@@ -1202,7 +1392,7 @@ export function startServer(sim: Simulation): void {
     }
 
     // Scenario status
-    if (path === '/api/scenario/status' && req.method === 'GET') {
+    if (path === "/api/scenario/status" && req.method === "GET") {
       const detSim = sim as unknown as DeterministicSimulation;
       if (!detSim.scenarioEngine || !detSim.scenarioEngine.isActive) {
         json(res, { active: false });
@@ -1213,10 +1403,10 @@ export function startServer(sim: Simulation): void {
     }
 
     // Stop scenario
-    if (path === '/api/scenario/stop' && req.method === 'POST') {
+    if (path === "/api/scenario/stop" && req.method === "POST") {
       const detSim = sim as unknown as DeterministicSimulation;
       if (!detSim.scenarioEngine) {
-        json(res, { error: 'No active scenario' });
+        json(res, { error: "No active scenario" });
         return;
       }
       const scoreCard = detSim.scenarioEngine.stop();
@@ -1226,21 +1416,27 @@ export function startServer(sim: Simulation): void {
     }
 
     // Speed control
-    if (path === '/api/speed' && req.method === 'PUT') {
-      let body = '';
-      req.on('data', (chunk: string) => body += chunk);
-      req.on('end', () => {
+    if (path === "/api/speed" && req.method === "PUT") {
+      let body = "";
+      req.on("data", (chunk: string) => (body += chunk));
+      req.on("end", () => {
         try {
           const { tickIntervalMs, speed } = JSON.parse(body);
           const detSim = sim as unknown as DeterministicSimulation;
           if (tickIntervalMs) {
-            detSim.config = { ...detSim.config, tickIntervalMs: Math.max(100, Math.min(10000, tickIntervalMs)) };
+            detSim.config = {
+              ...detSim.config,
+              tickIntervalMs: Math.max(100, Math.min(10000, tickIntervalMs)),
+            };
           } else if (speed) {
             // speed multiplier: 1x = scenario default, 2x = half interval, etc.
             const baseInterval = detSim.scenarioEngine
-              ? 800  // scenario base
+              ? 800 // scenario base
               : 5000; // default base
-            detSim.config = { ...detSim.config, tickIntervalMs: Math.max(100, Math.round(baseInterval / speed)) };
+            detSim.config = {
+              ...detSim.config,
+              tickIntervalMs: Math.max(100, Math.round(baseInterval / speed)),
+            };
           }
           json(res, { ok: true, tickIntervalMs: detSim.config.tickIntervalMs });
         } catch (err) {
@@ -1251,16 +1447,16 @@ export function startServer(sim: Simulation): void {
     }
 
     // Get current speed
-    if (path === '/api/speed' && req.method === 'GET') {
+    if (path === "/api/speed" && req.method === "GET") {
       json(res, { tickIntervalMs: (sim as any).config?.tickIntervalMs ?? 5000 });
       return;
     }
 
     res.writeHead(404);
-    res.end('Not found');
+    res.end("Not found");
   });
 
-  server.listen(PORT, '0.0.0.0', () => {
+  server.listen(PORT, "0.0.0.0", () => {
     console.log(`\n🌐 Sandbox API: http://0.0.0.0:${PORT}`);
     console.log(`   Dashboard GraphQL: http://0.0.0.0:${PORT}/graphql`);
     console.log(`   Debug: http://0.0.0.0:${PORT}/api/state`);
@@ -1278,27 +1474,27 @@ function handleGraphQL(
   const events = sim.events;
 
   switch (op) {
-    case 'Agents':
-      return { agents: agents.map(a => mapAgent(a, agents)) };
+    case "Agents":
+      return { agents: agents.map((a) => mapAgent(a, agents)) };
 
-    case 'Agent': {
-      const agent = agents.find(a => a.id === variables.id);
+    case "Agent": {
+      const agent = agents.find((a) => a.id === variables.id);
       return { agent: agent ? mapAgent(agent, agents) : null };
     }
 
-    case 'Tasks':
-      return { tasks: tasks.map(t => mapTask(t, agents)) };
+    case "Tasks":
+      return { tasks: tasks.map((t) => mapTask(t, agents)) };
 
-    case 'Task': {
-      const task = tasks.find(t => t.id === variables.id);
+    case "Task": {
+      const task = tasks.find((t) => t.id === variables.id);
       return { task: task ? mapTask(task, agents) : null };
     }
 
-    case 'CreditHistory':
-    case 'Credits': {
+    case "CreditHistory":
+    case "Credits": {
       let credits = generateCredits(sim);
       const agentId = variables.agentId as string | undefined;
-      if (agentId) credits = credits.filter(c => c.agentId === agentId);
+      if (agentId) credits = credits.filter((c) => c.agentId === agentId);
       // Sort newest first, then apply offset/limit
       credits.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
       const offset = (variables.offset as number) ?? 0;
@@ -1306,25 +1502,29 @@ function handleGraphQL(
       return { creditHistory: credits.slice(offset, offset + limit) };
     }
 
-    case 'Events': {
+    case "Events": {
       const limit = (variables.limit as number) ?? 50;
-      const mapped = events.slice(-limit).reverse().map(e => mapEvent(e, agents));
+      const mapped = events
+        .slice(-limit)
+        .reverse()
+        .map((e) => mapEvent(e, agents));
       return { events: mapped };
     }
 
-    case 'Messages': {
+    case "Messages": {
       const limit = (variables.limit as number) ?? 50;
       return { messages: generateMessages(agents).slice(0, limit) };
     }
 
-    case 'AgentReputation': {
-      const agent = agents.find(a => a.id === variables.id);
+    case "AgentReputation": {
+      const agent = agents.find((a) => a.id === variables.id);
       if (!agent) return { agentReputation: null };
       const ts = Math.min(100, 30 + agent.level * 7 + agent.stats.tasksCompleted * 2);
       return {
         agentReputation: {
           trustScore: ts,
-          reputationLevel: ts >= 86 ? 'ELITE' : ts >= 71 ? 'VETERAN' : ts >= 41 ? 'TRUSTED' : 'PROBATION',
+          reputationLevel:
+            ts >= 86 ? "ELITE" : ts >= 71 ? "VETERAN" : ts >= 41 ? "TRUSTED" : "PROBATION",
           tasksCompleted: agent.stats.tasksCompleted,
           tasksSuccessful: agent.stats.tasksCompleted,
           successRate: 100,
@@ -1334,39 +1534,41 @@ function handleGraphQL(
       };
     }
 
-    case 'TrustLeaderboard': {
+    case "TrustLeaderboard": {
       const sorted = [...agents]
-        .map(a => ({ ...mapAgent(a, agents) }))
+        .map((a) => ({ ...mapAgent(a, agents) }))
         .sort((a, b) => b.trustScore - a.trustScore)
         .slice(0, 10);
       return { trustLeaderboard: sorted };
     }
 
-    case 'Conversations': {
+    case "Conversations": {
       // Build conversations from ACPMessages grouped by agent pairs
       const all = collectAllMessages(agents);
       const pairMap = new Map<string, ACPMessage[]>();
       for (const m of all) {
-        const key = [m.from, m.to].sort().join('::');
+        const key = [m.from, m.to].sort().join("::");
         if (!pairMap.has(key)) pairMap.set(key, []);
         pairMap.get(key)!.push(m);
       }
-      const conversations = Array.from(pairMap.entries()).map(([key, msgs]) => {
-        const [a, b] = key.split('::');
-        const agentA = agents.find(ag => ag.id === a);
-        const agentB = agents.find(ag => ag.id === b);
-        const last = msgs[msgs.length - 1];
-        return {
-          id: `conv-${key}`,
-          participants: [
-            agentA ? { id: agentA.id, name: agentA.name } : { id: a, name: a },
-            agentB ? { id: agentB.id, name: agentB.name } : { id: b, name: b },
-          ],
-          lastMessage: last.body || last.summary || last.type,
-          lastMessageAt: new Date(last.timestamp).toISOString(),
-          messageCount: msgs.length,
-        };
-      }).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+      const conversations = Array.from(pairMap.entries())
+        .map(([key, msgs]) => {
+          const [a, b] = key.split("::");
+          const agentA = agents.find((ag) => ag.id === a);
+          const agentB = agents.find((ag) => ag.id === b);
+          const last = msgs[msgs.length - 1];
+          return {
+            id: `conv-${key}`,
+            participants: [
+              agentA ? { id: agentA.id, name: agentA.name } : { id: a, name: a },
+              agentB ? { id: agentB.id, name: agentB.name } : { id: b, name: b },
+            ],
+            lastMessage: last.body || last.summary || last.type,
+            lastMessageAt: new Date(last.timestamp).toISOString(),
+            messageCount: msgs.length,
+          };
+        })
+        .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
       return { conversations };
     }
 

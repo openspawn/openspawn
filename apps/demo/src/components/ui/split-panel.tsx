@@ -39,7 +39,9 @@ export function SplitPanel({
     try {
       const stored = localStorage.getItem(`${STORAGE_KEY}-${storageKey}`);
       if (stored) return Number(stored);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
     return defaultLeftWidth;
   });
 
@@ -47,41 +49,46 @@ export function SplitPanel({
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_KEY}-${storageKey}`, String(leftPercent));
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, [leftPercent, storageKey]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isDragging.current = true;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      isDragging.current = true;
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const totalWidth = rect.width;
-      const x = e.clientX - rect.left;
-      const percent = (x / totalWidth) * 100;
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging.current || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const totalWidth = rect.width;
+        const x = e.clientX - rect.left;
+        const percent = (x / totalWidth) * 100;
 
-      // Enforce min widths
-      const minLeftPercent = (minLeft / totalWidth) * 100;
-      const maxLeftPercent = 100 - (minRight / totalWidth) * 100;
-      const clamped = Math.max(minLeftPercent, Math.min(maxLeftPercent, percent));
-      setLeftPercent(clamped);
-      if (collapsed) setCollapsed(false);
-    };
+        // Enforce min widths
+        const minLeftPercent = (minLeft / totalWidth) * 100;
+        const maxLeftPercent = 100 - (minRight / totalWidth) * 100;
+        const clamped = Math.max(minLeftPercent, Math.min(maxLeftPercent, percent));
+        setLeftPercent(clamped);
+        if (collapsed) setCollapsed(false);
+      };
 
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        isDragging.current = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-  }, [minLeft, minRight, collapsed]);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    },
+    [minLeft, minRight, collapsed],
+  );
 
   const handleDoubleClick = useCallback(() => {
     setCollapsed((c) => !c);
@@ -135,15 +142,13 @@ export function SplitPanel({
 
         {/* Right panel */}
         <div className="flex-1 h-full overflow-auto min-w-0">
-          {rightOpen ? (
-            right
-          ) : (
-            rightPlaceholder || (
-              <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-                Select an item to view details
-              </div>
-            )
-          )}
+          {rightOpen
+            ? right
+            : rightPlaceholder || (
+                <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+                  Select an item to view details
+                </div>
+              )}
         </div>
       </div>
 

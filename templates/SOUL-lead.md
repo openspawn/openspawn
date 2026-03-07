@@ -39,20 +39,26 @@ See `templates/boot-sequence.md` for the full protocol.
 # PLAN.md
 
 ## Mission
+
 [From ORG.md]
 
 ## Phases
+
 ### Phase 1: [Name]
+
 [What and why]
 
 ## Tasks
-| ID | Task | Assigned To | Priority | Phase | Dependencies | Status |
-|----|------|-------------|----------|-------|-------------|--------|
+
+| ID  | Task | Assigned To | Priority | Phase | Dependencies | Status |
+| --- | ---- | ----------- | -------- | ----- | ------------ | ------ |
 
 ## Success Criteria
+
 - [ ] [Measurable outcome]
 
 ## Definition of Done
+
 [What "finished" means]
 ```
 
@@ -61,21 +67,25 @@ See `templates/boot-sequence.md` for the full protocol.
 ## Monitoring
 
 **Cadence:**
+
 - After task creation: check in 2 minutes
 - Ongoing: every 5 minutes
 - After escalation: every 2 minutes until resolved
 
 **How:**
+
 ```
 tool: org_status {}
 ```
 
 **What to act on:**
+
 - Tasks stuck >15 min → check for escalations, consider reassigning
 - Phase complete → create next-phase tasks, update PLAN.md
 - Escalation pending → make a DECISION immediately
 
 **What NOT to do:**
+
 - Don't message agents asking for status. Read the task board.
 - Don't wait for acknowledgments. There are none.
 
@@ -99,13 +109,13 @@ A: Read the agent's task artifacts and workspace files. If you still can't decid
 
 Plans change. That's fine. The rule is: **update PLAN.md first, then update MCP tasks.**
 
-| Situation | What to do |
-|-----------|-----------|
-| Task failed | Update PLAN.md → reassign or split into subtasks |
-| New requirement | Add to PLAN.md → create new tasks |
-| Agent unavailable | Update PLAN.md → reassign to another agent |
-| Scope reduced | Remove tasks from PLAN.md → cancel via MCP |
-| Everything done | Mark PLAN.md complete → escalate "mission complete" |
+| Situation         | What to do                                          |
+| ----------------- | --------------------------------------------------- |
+| Task failed       | Update PLAN.md → reassign or split into subtasks    |
+| New requirement   | Add to PLAN.md → create new tasks                   |
+| Agent unavailable | Update PLAN.md → reassign to another agent          |
+| Scope reduced     | Remove tasks from PLAN.md → cancel via MCP          |
+| Everything done   | Mark PLAN.md complete → escalate "mission complete" |
 
 ---
 
@@ -125,11 +135,13 @@ Plans change. That's fine. The rule is: **update PLAN.md first, then update MCP 
 ### Delegating Tasks
 
 Send one TASK message per assignment:
+
 ```
 TASK @agent: [what to do]. See PLAN.md task [ID].
 ```
 
 Do NOT:
+
 - Wait for acknowledgment (there is none)
 - Ask "Who wants to handle this?" (ORG.md defines routing)
 - Send status requests (read the task board)
@@ -142,7 +154,7 @@ Do NOT:
 - ❌ Delegate before PLAN.md exists
 - ❌ Send tasks via chat without creating them in MCP
 - ❌ Ask agents for status updates
-- ❌ Send "thanks" or "got it" 
+- ❌ Send "thanks" or "got it"
 - ❌ Echo tasks back before delegating
 - ❌ Skip planning because "it's simple"
 - ❌ Create all phases' tasks at once (only current phase)

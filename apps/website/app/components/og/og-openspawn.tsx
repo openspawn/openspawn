@@ -126,8 +126,8 @@ export function OgOpenspawn() {
             lineHeight: 1.5,
           }}
         >
-          Orchestrate real-world AI agent orgs across phones, cameras, screens,
-          and IoT — with the structure your team actually needs.
+          Orchestrate real-world AI agent orgs across phones, cameras, screens, and IoT — with the
+          structure your team actually needs.
         </p>
 
         {/* Protocol pills */}
@@ -149,7 +149,7 @@ export function OgOpenspawn() {
               >
                 {label}
               </span>
-            )
+            ),
           )}
         </div>
       </div>
@@ -180,9 +180,33 @@ export function OgOpenspawn() {
             borderBottom: "1px solid rgba(255,255,255,0.06)",
           }}
         >
-          <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#ff5f57", display: "inline-block" }} />
-          <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#febc2e", display: "inline-block" }} />
-          <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28c840", display: "inline-block" }} />
+          <span
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: "#ff5f57",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: "#febc2e",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: "#28c840",
+              display: "inline-block",
+            }}
+          />
           <span style={{ marginLeft: 8, fontSize: 12, color: "#64748b", fontFamily: "monospace" }}>
             terminal
           </span>

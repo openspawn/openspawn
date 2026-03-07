@@ -1,14 +1,19 @@
 // ── Budget Tracking ──────────────────────────────────────────────────────────
 
-import { loadStore, saveStore } from './task-store.js';
-import type { BudgetEntry } from './types.js';
+import { loadStore, saveStore } from "./task-store.js";
+import type { BudgetEntry } from "./types.js";
 
 export function getBudget(dir: string, agentId: string): BudgetEntry | null {
   const store = loadStore(dir);
   return store.budgets[agentId] ?? null;
 }
 
-export function setBudgetLimit(dir: string, agentId: string, limit: number, currency = 'USD'): BudgetEntry {
+export function setBudgetLimit(
+  dir: string,
+  agentId: string,
+  limit: number,
+  currency = "USD",
+): BudgetEntry {
   const store = loadStore(dir);
   if (!store.budgets[agentId]) {
     store.budgets[agentId] = { limit, spent: 0, currency };
@@ -20,7 +25,12 @@ export function setBudgetLimit(dir: string, agentId: string, limit: number, curr
   return store.budgets[agentId];
 }
 
-export function spend(dir: string, agentId: string, amount: number, currency = 'USD'): { ok: boolean; remaining: number; entry: BudgetEntry } {
+export function spend(
+  dir: string,
+  agentId: string,
+  amount: number,
+  currency = "USD",
+): { ok: boolean; remaining: number; entry: BudgetEntry } {
   const store = loadStore(dir);
   if (!store.budgets[agentId]) {
     store.budgets[agentId] = { limit: 0, spent: 0, currency };

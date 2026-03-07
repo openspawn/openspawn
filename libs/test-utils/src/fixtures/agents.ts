@@ -32,8 +32,36 @@ export function createMockAgent(overrides: Partial<MockAgent> = {}): MockAgent {
  * A set of mock agents with varied statuses for testing lists/tables.
  */
 export const mockAgents: MockAgent[] = [
-  createMockAgent({ id: "agent-001", name: "Alpha", status: "active", tokensUsed: 12500, tasksCompleted: 8 }),
-  createMockAgent({ id: "agent-002", name: "Bravo", status: "idle", level: 2, tokensUsed: 8700, tasksCompleted: 5 }),
-  createMockAgent({ id: "agent-003", name: "Charlie", status: "error", level: 1, model: "claude-3.5-sonnet", tokensUsed: 3200, tasksCompleted: 2 }),
-  createMockAgent({ id: "agent-004", name: "Delta", status: "offline", level: 3, tokensUsed: 0, tasksCompleted: 0 }),
+  createMockAgent({
+    id: "agent-001",
+    name: "Alpha",
+    status: "active",
+    tokensUsed: 12500,
+    tasksCompleted: 8,
+  }),
+  createMockAgent({
+    id: "agent-002",
+    name: "Bravo",
+    status: "idle",
+    level: 2,
+    tokensUsed: 8700,
+    tasksCompleted: 5,
+  }),
+  createMockAgent({
+    id: "agent-003",
+    name: "Charlie",
+    status: "error",
+    level: 1,
+    model: "claude-3.5-sonnet",
+    tokensUsed: 3200,
+    tasksCompleted: 2,
+  }),
+  createMockAgent({
+    id: "agent-004",
+    name: "Delta",
+    status: "offline",
+    level: 3,
+    tokensUsed: 0,
+    tasksCompleted: 0,
+  }),
 ];

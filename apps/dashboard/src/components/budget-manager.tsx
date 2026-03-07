@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import {
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  ArrowRight,
-  Loader2,
-} from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Dialog, DialogPopup, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogPopup,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "./ui/dialog";
 
 interface BudgetStatus {
   agentId: string;
@@ -94,7 +95,8 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
               <CardTitle className="text-amber-500">Budget Alerts</CardTitle>
             </div>
             <CardDescription>
-              {alertBudgets.length} agent{alertBudgets.length !== 1 ? "s" : ""} approaching budget limit
+              {alertBudgets.length} agent{alertBudgets.length !== 1 ? "s" : ""} approaching budget
+              limit
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -116,7 +118,11 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
                   <div className="flex items-center gap-3">
                     <Badge
                       variant="outline"
-                      className={budget.utilizationPercent! >= 90 ? "border-red-500 text-red-500" : "border-amber-500 text-amber-500"}
+                      className={
+                        budget.utilizationPercent! >= 90
+                          ? "border-red-500 text-red-500"
+                          : "border-amber-500 text-amber-500"
+                      }
                     >
                       {budget.utilizationPercent}% used
                     </Badge>
@@ -228,7 +234,11 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
         <CardContent>
           <div className="space-y-4">
             {budgets.map((budget) => (
-              <div key={budget.agentId} className="space-y-2 p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => onAgentClick?.(budget.agentId)}>
+              <div
+                key={budget.agentId}
+                className="space-y-2 p-2 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onAgentClick?.(budget.agentId)}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{budget.agentName}</span>
@@ -236,9 +246,7 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
                       <Badge
                         variant="outline"
                         className={
-                          budget.utilizationPercent >= 80
-                            ? "border-amber-500 text-amber-500"
-                            : ""
+                          budget.utilizationPercent >= 80 ? "border-amber-500 text-amber-500" : ""
                         }
                       >
                         {budget.utilizationPercent}%
@@ -253,7 +261,8 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
                     {budget.budgetPeriodLimit && (
                       <span className="flex items-center gap-1 text-muted-foreground">
                         <TrendingDown className="h-3 w-3" />
-                        {budget.budgetPeriodSpent.toLocaleString()}/{budget.budgetPeriodLimit.toLocaleString()}
+                        {budget.budgetPeriodSpent.toLocaleString()}/
+                        {budget.budgetPeriodLimit.toLocaleString()}
                       </span>
                     )}
                   </div>

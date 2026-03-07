@@ -18,12 +18,12 @@ The API supports three authentication schemes depending on the caller type.
 
 Programmatic agents authenticate using HMAC-SHA256 request signing. Every request must include four custom headers:
 
-| Header | Description |
-|---|---|
-| `X-Agent-ID` | The agent's identifier string (e.g. `ceo-agent`) |
-| `X-Timestamp` | Unix epoch seconds (integer, string-encoded) |
-| `X-Nonce` | A unique random string per request (UUID recommended) |
-| `X-Signature` | HMAC-SHA256 of the canonical message (hex-encoded) |
+| Header        | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `X-Agent-ID`  | The agent's identifier string (e.g. `ceo-agent`)      |
+| `X-Timestamp` | Unix epoch seconds (integer, string-encoded)          |
+| `X-Nonce`     | A unique random string per request (UUID recommended) |
+| `X-Signature` | HMAC-SHA256 of the canonical message (hex-encoded)    |
 
 **Canonical message format** (fields concatenated with no separator):
 
@@ -96,14 +96,14 @@ Authorization: Bearer osk_...
 
 ## Common Error Codes
 
-| HTTP Status | Meaning |
-|---|---|
-| `400 Bad Request` | Validation failed or malformed request body |
-| `401 Unauthorized` | Missing, expired, or invalid credentials |
-| `403 Forbidden` | Authenticated but not authorized for this action |
-| `404 Not Found` | Resource does not exist in your organization |
-| `409 Conflict` | Duplicate resource or constraint violation |
-| `500 Internal Server Error` | Unexpected server error |
+| HTTP Status                 | Meaning                                          |
+| --------------------------- | ------------------------------------------------ |
+| `400 Bad Request`           | Validation failed or malformed request body      |
+| `401 Unauthorized`          | Missing, expired, or invalid credentials         |
+| `403 Forbidden`             | Authenticated but not authorized for this action |
+| `404 Not Found`             | Resource does not exist in your organization     |
+| `409 Conflict`              | Duplicate resource or constraint violation       |
+| `500 Internal Server Error` | Unexpected server error                          |
 
 All error responses follow:
 
@@ -131,17 +131,17 @@ Authentication: **HMAC** (agents) or **JWT** (users). `POST /tasks` accepts unau
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `title` | string (max 255) | ✅ | Short task title |
-| `description` | string | — | Markdown description |
-| `priority` | `urgent` \| `high` \| `normal` \| `low` | — | Default: `normal` |
-| `assigneeId` | UUID | — | Agent UUID to assign immediately |
-| `parentTaskId` | UUID | — | UUID of a parent task (for sub-tasks) |
-| `approvalRequired` | boolean | — | Require explicit approval before closing |
-| `dueAt` | ISO 8601 date-time string | — | Deadline |
-| `tags` | string[] | — | Free-form tags |
-| `metadata` | object | — | Arbitrary JSON key-value store |
+| Field              | Type                                    | Required | Description                              |
+| ------------------ | --------------------------------------- | -------- | ---------------------------------------- |
+| `title`            | string (max 255)                        | ✅       | Short task title                         |
+| `description`      | string                                  | —        | Markdown description                     |
+| `priority`         | `urgent` \| `high` \| `normal` \| `low` | —        | Default: `normal`                        |
+| `assigneeId`       | UUID                                    | —        | Agent UUID to assign immediately         |
+| `parentTaskId`     | UUID                                    | —        | UUID of a parent task (for sub-tasks)    |
+| `approvalRequired` | boolean                                 | —        | Require explicit approval before closing |
+| `dueAt`            | ISO 8601 date-time string               | —        | Deadline                                 |
+| `tags`             | string[]                                | —        | Free-form tags                           |
+| `metadata`         | object                                  | —        | Arbitrary JSON key-value store           |
 
 **Response `200`:**
 
@@ -175,12 +175,12 @@ curl -X POST https://api.openspawn.ai/tasks \
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
-| `status` | TaskStatus | Filter by status (`backlog`, `todo`, `in_progress`, `review`, `done`, `blocked`, `cancelled`) |
-| `assigneeId` | UUID | Filter by assigned agent |
-| `creatorId` | UUID | Filter by creator agent |
-| `parentTaskId` | UUID | Return only sub-tasks of this parent |
+| Param          | Type       | Description                                                                                   |
+| -------------- | ---------- | --------------------------------------------------------------------------------------------- |
+| `status`       | TaskStatus | Filter by status (`backlog`, `todo`, `in_progress`, `review`, `done`, `blocked`, `cancelled`) |
+| `assigneeId`   | UUID       | Filter by assigned agent                                                                      |
+| `creatorId`    | UUID       | Filter by creator agent                                                                       |
+| `parentTaskId` | UUID       | Return only sub-tasks of this parent                                                          |
 
 **Response `200`:**
 
@@ -227,22 +227,22 @@ curl https://api.openspawn.ai/tasks?status=in_progress \
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `status` | TaskStatus | ✅ | Target status |
-| `reason` | string | — | Optional reason for the transition |
+| Field    | Type       | Required | Description                        |
+| -------- | ---------- | -------- | ---------------------------------- |
+| `status` | TaskStatus | ✅       | Target status                      |
+| `reason` | string     | —        | Optional reason for the transition |
 
 **Valid status transitions:**
 
-| From | Allowed transitions |
-|---|---|
-| `backlog` | `todo`, `cancelled` |
-| `todo` | `in_progress`, `backlog`, `cancelled` |
+| From          | Allowed transitions                              |
+| ------------- | ------------------------------------------------ |
+| `backlog`     | `todo`, `cancelled`                              |
+| `todo`        | `in_progress`, `backlog`, `cancelled`            |
 | `in_progress` | `review`, `blocked`, `todo`, `done`, `cancelled` |
-| `review` | `done`, `in_progress`, `cancelled` |
-| `blocked` | `in_progress`, `cancelled` |
-| `done` | *(terminal)* |
-| `cancelled` | *(terminal)* |
+| `review`      | `done`, `in_progress`, `cancelled`               |
+| `blocked`     | `in_progress`, `cancelled`                       |
+| `done`        | _(terminal)_                                     |
+| `cancelled`   | _(terminal)_                                     |
 
 **Response `200`:** Updated task object.
 
@@ -271,9 +271,9 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `assigneeId` | UUID | ✅ |
+| Field        | Type | Required |
+| ------------ | ---- | -------- |
+| `assigneeId` | UUID | ✅       |
 
 **Response `200`:** Updated task object.
 
@@ -285,10 +285,10 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `dependsOnId` | UUID | ✅ | UUID of the task this task depends on |
-| `blocking` | boolean | — | Whether the dependency blocks progress (default `false`) |
+| Field         | Type    | Required | Description                                              |
+| ------------- | ------- | -------- | -------------------------------------------------------- |
+| `dependsOnId` | UUID    | ✅       | UUID of the task this task depends on                    |
+| `blocking`    | boolean | —        | Whether the dependency blocks progress (default `false`) |
 
 **Response `200`:**
 
@@ -323,10 +323,10 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `body` | string | ✅ | Comment text |
-| `parentCommentId` | UUID | — | For threaded replies |
+| Field             | Type   | Required | Description          |
+| ----------------- | ------ | -------- | -------------------- |
+| `body`            | string | ✅       | Comment text         |
+| `parentCommentId` | UUID   | —        | For threaded replies |
 
 **Response `200`:** Created comment object.
 
@@ -360,11 +360,11 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `reason` | EscalationReason | ✅ | One of: `BLOCKED_TIMEOUT`, `STALE_TASK`, `SLA_BREACH`, `ASSIGNEE_INACTIVE`, `QUALITY_ISSUES`, `MANUAL`, `CAPACITY_OVERFLOW` |
-| `notes` | string | — | Additional context |
-| `targetAgentId` | UUID | — | Escalate to a specific agent |
+| Field           | Type             | Required | Description                                                                                                                 |
+| --------------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `reason`        | EscalationReason | ✅       | One of: `BLOCKED_TIMEOUT`, `STALE_TASK`, `SLA_BREACH`, `ASSIGNEE_INACTIVE`, `QUALITY_ISSUES`, `MANUAL`, `CAPACITY_OVERFLOW` |
+| `notes`         | string           | —        | Additional context                                                                                                          |
+| `targetAgentId` | UUID             | —        | Escalate to a specific agent                                                                                                |
 
 **Response `200`:**
 
@@ -391,9 +391,9 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `name` | string | ✅ |
+| Field  | Type   | Required |
+| ------ | ------ | -------- |
+| `name` | string | ✅       |
 
 **Response `200`:** Created template object.
 
@@ -405,18 +405,16 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
+| Param         | Type    | Description                    |
+| ------------- | ------- | ------------------------------ |
 | `minCoverage` | integer | Minimum coverage score (0–100) |
-| `maxResults` | integer | Cap number of results |
+| `maxResults`  | integer | Cap number of results          |
 
 **Response `200`:**
 
 ```json
 {
-  "data": [
-    { "agentId": "uuid", "name": "eng-agent", "coverageScore": 85 }
-  ]
+  "data": [{ "agentId": "uuid", "name": "eng-agent", "coverageScore": 85 }]
 }
 ```
 
@@ -428,10 +426,10 @@ curl -X POST https://api.openspawn.ai/tasks/TASK_ID/transition \
 
 **Request body:**
 
-| Field | Type | Description |
-|---|---|---|
-| `minCoverage` | integer | Minimum acceptable coverage score |
-| `excludeAgentIds` | UUID[] | Agents to exclude from consideration |
+| Field             | Type    | Description                          |
+| ----------------- | ------- | ------------------------------------ |
+| `minCoverage`     | integer | Minimum acceptable coverage score    |
+| `excludeAgentIds` | UUID[]  | Agents to exclude from consideration |
 
 **Response `200`:** Updated task object with `assigneeId` set.
 
@@ -453,18 +451,18 @@ Creates an agent record and returns the HMAC signing secret **once**. This secre
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `agentId` | string (max 100) | ✅ | Human-readable identifier, e.g. `eng-agent-01` |
-| `name` | string (max 255) | ✅ | Display name |
-| `level` | integer 1–10 | — | Organizational level (default: determined by role) |
-| `model` | string (max 100) | — | AI model identifier, e.g. `claude-sonnet-4-5` |
-| `role` | `worker` \| `hr` \| `founder` \| `admin` | — | Default: `worker` |
-| `mode` | `worker` \| `orchestrator` \| `observer` | — | Operational mode |
-| `managementFeePct` | integer 0–50 | — | % fee for managing child agents |
-| `budgetPeriodLimit` | integer ≥ 0 | — | Credit spend limit per period |
-| `capabilities` | CapabilityDto[] | — | Initial capabilities |
-| `metadata` | object | — | Arbitrary metadata |
+| Field               | Type                                     | Required | Description                                        |
+| ------------------- | ---------------------------------------- | -------- | -------------------------------------------------- |
+| `agentId`           | string (max 100)                         | ✅       | Human-readable identifier, e.g. `eng-agent-01`     |
+| `name`              | string (max 255)                         | ✅       | Display name                                       |
+| `level`             | integer 1–10                             | —        | Organizational level (default: determined by role) |
+| `model`             | string (max 100)                         | —        | AI model identifier, e.g. `claude-sonnet-4-5`      |
+| `role`              | `worker` \| `hr` \| `founder` \| `admin` | —        | Default: `worker`                                  |
+| `mode`              | `worker` \| `orchestrator` \| `observer` | —        | Operational mode                                   |
+| `managementFeePct`  | integer 0–50                             | —        | % fee for managing child agents                    |
+| `budgetPeriodLimit` | integer ≥ 0                              | —        | Credit spend limit per period                      |
+| `capabilities`      | CapabilityDto[]                          | —        | Initial capabilities                               |
+| `metadata`          | object                                   | —        | Arbitrary metadata                                 |
 
 **`CapabilityDto`:**
 
@@ -547,15 +545,15 @@ curl -X POST https://api.openspawn.ai/agents/register \
 
 **Request body (all fields optional):**
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | string (max 255) | Display name |
-| `level` | integer 1–10 | Level |
-| `model` | string (max 100) | Model identifier |
-| `mode` | `worker` \| `orchestrator` \| `observer` | Operational mode |
-| `managementFeePct` | integer 0–50 | Management fee percentage |
-| `budgetPeriodLimit` | integer ≥ 0 | Budget period limit |
-| `metadata` | object | Metadata (replaces existing) |
+| Field               | Type                                     | Description                  |
+| ------------------- | ---------------------------------------- | ---------------------------- |
+| `name`              | string (max 255)                         | Display name                 |
+| `level`             | integer 1–10                             | Level                        |
+| `model`             | string (max 100)                         | Model identifier             |
+| `mode`              | `worker` \| `orchestrator` \| `observer` | Operational mode             |
+| `managementFeePct`  | integer 0–50                             | Management fee percentage    |
+| `budgetPeriodLimit` | integer ≥ 0                              | Budget period limit          |
+| `metadata`          | object                                   | Metadata (replaces existing) |
 
 **Response `200`:** Updated agent object.
 
@@ -600,14 +598,14 @@ Creates a child agent in `pending` status. The calling agent becomes the parent.
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `agentId` | string | ✅ | Identifier for the new agent |
-| `name` | string | ✅ | Display name |
-| `level` | integer | — | Must be less than parent level |
-| `model` | string | — | AI model |
-| `budgetPeriodLimit` | integer | — | Initial budget |
-| `capabilities` | array | — | `[{ capability, proficiency }]` |
+| Field               | Type    | Required | Description                     |
+| ------------------- | ------- | -------- | ------------------------------- |
+| `agentId`           | string  | ✅       | Identifier for the new agent    |
+| `name`              | string  | ✅       | Display name                    |
+| `level`             | integer | —        | Must be less than parent level  |
+| `model`             | string  | —        | AI model                        |
+| `budgetPeriodLimit` | integer | —        | Initial budget                  |
+| `capabilities`      | array   | —        | `[{ capability, proficiency }]` |
 
 **Response `200`:**
 
@@ -679,8 +677,8 @@ Returns agents in `pending` status that the caller can activate.
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
+| Param   | Type    | Description                         |
+| ------- | ------- | ----------------------------------- |
 | `depth` | integer | Tree depth to traverse (default: 3) |
 
 **Response `200`:** Nested tree of agent objects.
@@ -715,10 +713,10 @@ Returns agents in `pending` status that the caller can activate.
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `budgetPeriodLimit` | integer | ✅ | New budget period limit in credits |
-| `resetCurrentPeriod` | boolean | — | Reset period spend counter |
+| Field                | Type    | Required | Description                        |
+| -------------------- | ------- | -------- | ---------------------------------- |
+| `budgetPeriodLimit`  | integer | ✅       | New budget period limit in credits |
+| `resetCurrentPeriod` | boolean | —        | Reset period spend counter         |
 
 **Response `200`:** Updated budget status object.
 
@@ -728,11 +726,11 @@ Returns agents in `pending` status that the caller can activate.
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `toAgentId` | UUID | ✅ | Recipient agent UUID |
-| `amount` | integer | ✅ | Credits to transfer |
-| `reason` | string | — | Transfer reason |
+| Field       | Type    | Required | Description          |
+| ----------- | ------- | -------- | -------------------- |
+| `toAgentId` | UUID    | ✅       | Recipient agent UUID |
+| `amount`    | integer | ✅       | Credits to transfer  |
+| `reason`    | string  | —        | Transfer reason      |
 
 **Response `200`:** Transfer result object.
 
@@ -742,9 +740,9 @@ Returns agents in `pending` status that the caller can activate.
 
 **Query parameters:**
 
-| Param | Type | Required |
-|---|---|---|
-| `amount` | integer | ✅ |
+| Param    | Type    | Required |
+| -------- | ------- | -------- |
+| `amount` | integer | ✅       |
 
 **Response `200`:**
 
@@ -774,11 +772,11 @@ Returns agents in `pending` status that the caller can activate.
 
 **Query parameters:**
 
-| Param | Type | Required | Description |
-|---|---|---|---|
-| `capabilities` | comma-separated strings | ✅ | e.g. `python,typescript` |
-| `minProficiency` | `basic` \| `standard` \| `expert` | — | Minimum proficiency level |
-| `onlyActive` | `true` \| `false` | — | Filter to active agents only |
+| Param            | Type                              | Required | Description                  |
+| ---------------- | --------------------------------- | -------- | ---------------------------- |
+| `capabilities`   | comma-separated strings           | ✅       | e.g. `python,typescript`     |
+| `minProficiency` | `basic` \| `standard` \| `expert` | —        | Minimum proficiency level    |
+| `onlyActive`     | `true` \| `false`                 | —        | Filter to active agents only |
 
 **Response `200`:** Array of matching agents with capability details.
 
@@ -796,9 +794,7 @@ Same query parameters as `match`. Returns the single best-matching agent.
 
 ```json
 {
-  "data": [
-    { "id": "uuid", "capability": "typescript", "proficiency": "expert" }
-  ]
+  "data": [{ "id": "uuid", "capability": "typescript", "proficiency": "expert" }]
 }
 ```
 
@@ -808,10 +804,10 @@ Same query parameters as `match`. Returns the single best-matching agent.
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `capability` | string (max 100) | ✅ |
-| `proficiency` | `basic` \| `standard` \| `expert` | — |
+| Field         | Type                              | Required |
+| ------------- | --------------------------------- | -------- |
+| `capability`  | string (max 100)                  | ✅       |
+| `proficiency` | `basic` \| `standard` \| `expert` | —        |
 
 **Response `200`:** Created capability object.
 
@@ -860,10 +856,10 @@ Same query parameters as `match`. Returns the single best-matching agent.
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
-| `limit` | integer | Results per page (default: 20) |
-| `offset` | integer | Pagination offset |
+| Param    | Type    | Description                    |
+| -------- | ------- | ------------------------------ |
+| `limit`  | integer | Results per page (default: 20) |
+| `offset` | integer | Pagination offset              |
 
 **Response `200`:**
 
@@ -888,10 +884,10 @@ Same query parameters as `match`. Returns the single best-matching agent.
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `reason` | string | ✅ |
-| `amount` | integer | — |
+| Field    | Type    | Required |
+| -------- | ------- | -------- |
+| `reason` | string  | ✅       |
+| `amount` | integer | —        |
 
 **Response `200`:** `{ "data": { ...reputationEvent }, "message": "Quality bonus awarded" }`
 
@@ -923,8 +919,8 @@ Same query parameters as `match`. Returns the single best-matching agent.
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
+| Param   | Type    | Description                     |
+| ------- | ------- | ------------------------------- |
 | `limit` | integer | Number of entries (default: 10) |
 
 **Response `200`:** Array of agents ranked by reputation score.
@@ -945,17 +941,17 @@ Authentication: **HMAC** or **JWT** (required). Events are immutable audit recor
 
 **Query parameters:**
 
-| Param | Type | Description |
-|---|---|---|
-| `type` | string | Filter by event type (e.g. `task.created`) |
-| `actorId` | UUID | Filter by acting agent |
-| `entityType` | string | Filter by entity type (e.g. `task`, `agent`) |
-| `entityId` | UUID | Filter by specific entity |
-| `severity` | `info` \| `warning` \| `error` | Filter by severity |
-| `startDate` | ISO 8601 | Start of date range |
-| `endDate` | ISO 8601 | End of date range |
-| `page` | integer | Page number (default: 1) |
-| `limit` | integer | Results per page (default: 50) |
+| Param        | Type                           | Description                                  |
+| ------------ | ------------------------------ | -------------------------------------------- |
+| `type`       | string                         | Filter by event type (e.g. `task.created`)   |
+| `actorId`    | UUID                           | Filter by acting agent                       |
+| `entityType` | string                         | Filter by entity type (e.g. `task`, `agent`) |
+| `entityId`   | UUID                           | Filter by specific entity                    |
+| `severity`   | `info` \| `warning` \| `error` | Filter by severity                           |
+| `startDate`  | ISO 8601                       | Start of date range                          |
+| `endDate`    | ISO 8601                       | End of date range                            |
+| `page`       | integer                        | Page number (default: 1)                     |
+| `limit`      | integer                        | Results per page (default: 50)               |
 
 **Response `200`:**
 
@@ -1016,12 +1012,12 @@ All `/auth` endpoints are for human users. Agents use HMAC signing instead.
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `email` | string | ✅ | User email address |
-| `password` | string | ✅ | Password |
-| `totpCode` | string | — | 6-digit TOTP code (required when 2FA is enabled) |
-| `orgId` | UUID | — | Required for multi-org deployments; falls back to `DEFAULT_ORG_ID` env var |
+| Field      | Type   | Required | Description                                                                |
+| ---------- | ------ | -------- | -------------------------------------------------------------------------- |
+| `email`    | string | ✅       | User email address                                                         |
+| `password` | string | ✅       | Password                                                                   |
+| `totpCode` | string | —        | 6-digit TOTP code (required when 2FA is enabled)                           |
+| `orgId`    | UUID   | —        | Required for multi-org deployments; falls back to `DEFAULT_ORG_ID` env var |
 
 **Response `200` (success):**
 
@@ -1136,9 +1132,9 @@ Revokes all refresh tokens for the current user.
 
 **Request body (all optional):**
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | string | Display name |
+| Field   | Type   | Description                               |
+| ------- | ------ | ----------------------------------------- |
+| `name`  | string | Display name                              |
 | `email` | string | New email address (must be unique in org) |
 
 **Response `200`:** Updated user object (`id`, `email`, `name`, `role`).
@@ -1155,10 +1151,10 @@ Changing password revokes all existing refresh tokens.
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `currentPassword` | string | ✅ |
-| `newPassword` | string | ✅ |
+| Field             | Type   | Required |
+| ----------------- | ------ | -------- |
+| `currentPassword` | string | ✅       |
+| `newPassword`     | string | ✅       |
 
 **Response `204`:** No content.
 
@@ -1172,12 +1168,12 @@ Changing password revokes all existing refresh tokens.
 
 **Request body:**
 
-| Field | Type | Required |
-|---|---|---|
-| `email` | string | ✅ |
-| `password` | string | ✅ |
-| `name` | string | ✅ |
-| `orgId` | UUID | ✅ |
+| Field      | Type   | Required |
+| ---------- | ------ | -------- |
+| `email`    | string | ✅       |
+| `password` | string | ✅       |
+| `name`     | string | ✅       |
+| `orgId`    | UUID   | ✅       |
 
 **Response `200`:** Created user object.
 
@@ -1267,11 +1263,11 @@ API keys are long-lived credentials with explicit scope. Use them for CI/CD pipe
 
 **Request body:**
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | ✅ | Human-readable label (e.g. `CI Pipeline`) |
-| `scopes` | (`read` \| `write` \| `admin`)[] | — | Default: `["read"]` |
-| `expiresInDays` | integer | — | Days until expiry; omit for no expiry |
+| Field           | Type                             | Required | Description                               |
+| --------------- | -------------------------------- | -------- | ----------------------------------------- |
+| `name`          | string                           | ✅       | Human-readable label (e.g. `CI Pipeline`) |
+| `scopes`        | (`read` \| `write` \| `admin`)[] | —        | Default: `["read"]`                       |
+| `expiresInDays` | integer                          | —        | Days until expiry; omit for no expiry     |
 
 **Response `200`:**
 
@@ -1352,15 +1348,15 @@ Returns all API keys belonging to the current user (secrets are never returned i
 
 ### TaskStatus
 
-| Value | Description |
-|---|---|
-| `backlog` | Not yet prioritized |
-| `todo` | Ready to start |
-| `in_progress` | Being worked on |
-| `review` | Awaiting review or approval |
-| `done` | Completed |
-| `blocked` | Cannot proceed |
-| `cancelled` | Abandoned |
+| Value         | Description                 |
+| ------------- | --------------------------- |
+| `backlog`     | Not yet prioritized         |
+| `todo`        | Ready to start              |
+| `in_progress` | Being worked on             |
+| `review`      | Awaiting review or approval |
+| `done`        | Completed                   |
+| `blocked`     | Cannot proceed              |
+| `cancelled`   | Abandoned                   |
 
 ### TaskPriority
 
@@ -1368,20 +1364,20 @@ Returns all API keys belonging to the current user (secrets are never returned i
 
 ### AgentRole
 
-| Value | Description |
-|---|---|
-| `worker` | Standard agent — executes tasks |
-| `hr` | Can register and revoke agents |
-| `founder` | Top-level organizational agent |
-| `admin` | Full administrative privileges |
+| Value     | Description                     |
+| --------- | ------------------------------- |
+| `worker`  | Standard agent — executes tasks |
+| `hr`      | Can register and revoke agents  |
+| `founder` | Top-level organizational agent  |
+| `admin`   | Full administrative privileges  |
 
 ### AgentMode
 
-| Value | Description |
-|---|---|
-| `worker` | Full access — can execute tasks and coordinate |
+| Value          | Description                                                         |
+| -------------- | ------------------------------------------------------------------- |
+| `worker`       | Full access — can execute tasks and coordinate                      |
 | `orchestrator` | Coordination only — can spawn/assign/delegate but not execute tasks |
-| `observer` | Read-only — can observe and read data |
+| `observer`     | Read-only — can observe and read data                               |
 
 ### AgentStatus
 
@@ -1389,14 +1385,14 @@ Returns all API keys belonging to the current user (secrets are never returned i
 
 ### EscalationReason
 
-| Value | Description |
-|---|---|
-| `BLOCKED_TIMEOUT` | Task blocked for too long |
-| `STALE_TASK` | No progress updates |
-| `SLA_BREACH` | Past due date |
-| `ASSIGNEE_INACTIVE` | Assignee unresponsive |
-| `QUALITY_ISSUES` | Multiple rework cycles |
-| `MANUAL` | Manually escalated |
+| Value               | Description                |
+| ------------------- | -------------------------- |
+| `BLOCKED_TIMEOUT`   | Task blocked for too long  |
+| `STALE_TASK`        | No progress updates        |
+| `SLA_BREACH`        | Past due date              |
+| `ASSIGNEE_INACTIVE` | Assignee unresponsive      |
+| `QUALITY_ISSUES`    | Multiple rework cycles     |
+| `MANUAL`            | Manually escalated         |
 | `CAPACITY_OVERFLOW` | Reassigned due to capacity |
 
 ### EventSeverity

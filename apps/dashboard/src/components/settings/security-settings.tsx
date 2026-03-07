@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Shield, Smartphone, Key, Loader2, Check, X, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Shield,
+  Smartphone,
+  Key,
+  Loader2,
+  Check,
+  X,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { useAuth } from "../../contexts";
@@ -14,8 +23,14 @@ export function SecuritySettings() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordStatus, setPasswordStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [twoFaStatus, setTwoFaStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [passwordStatus, setPasswordStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+  const [twoFaStatus, setTwoFaStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -67,7 +82,11 @@ export function SecuritySettings() {
       if (user?.totpEnabled) {
         // Disable 2FA - need to show a dialog for password and code
         // For now, just show a message
-        setTwoFaStatus({ type: "error", message: "To disable 2FA, use the /auth/totp/disable endpoint with password and TOTP code" });
+        setTwoFaStatus({
+          type: "error",
+          message:
+            "To disable 2FA, use the /auth/totp/disable endpoint with password and TOTP code",
+        });
       } else {
         // Enable 2FA
         const response = await fetch(`${API_URL}/auth/totp/setup`, {
@@ -86,7 +105,10 @@ export function SecuritySettings() {
 
         const data = await response.json();
         // In a real implementation, show the QR code and recovery codes
-        setTwoFaStatus({ type: "success", message: "2FA setup initiated. Check your authenticator app." });
+        setTwoFaStatus({
+          type: "success",
+          message: "2FA setup initiated. Check your authenticator app.",
+        });
         await refreshUser?.();
       }
     } catch (error) {
@@ -124,9 +146,7 @@ export function SecuritySettings() {
             <Key className="h-5 w-5" />
             Password
           </CardTitle>
-          <CardDescription>
-            Change your password to keep your account secure
-          </CardDescription>
+          <CardDescription>Change your password to keep your account secure</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -190,14 +210,14 @@ export function SecuritySettings() {
             <Smartphone className="h-5 w-5" />
             Two-Factor Authentication
           </CardTitle>
-          <CardDescription>
-            Add an extra layer of security to your account
-          </CardDescription>
+          <CardDescription>Add an extra layer of security to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`rounded-full p-2 ${user?.totpEnabled ? 'bg-emerald-500/10' : 'bg-muted'}`}>
+              <div
+                className={`rounded-full p-2 ${user?.totpEnabled ? "bg-emerald-500/10" : "bg-muted"}`}
+              >
                 {user?.totpEnabled ? (
                   <Check className="h-5 w-5 text-emerald-500" />
                 ) : (
@@ -205,9 +225,7 @@ export function SecuritySettings() {
                 )}
               </div>
               <div>
-                <p className="font-medium">
-                  {user?.totpEnabled ? "Enabled" : "Disabled"}
-                </p>
+                <p className="font-medium">{user?.totpEnabled ? "Enabled" : "Disabled"}</p>
                 <p className="text-sm text-muted-foreground">
                   {user?.totpEnabled
                     ? "Your account is protected with 2FA"
@@ -252,28 +270,27 @@ export function SecuritySettings() {
       <Card>
         <CardHeader>
           <CardTitle>Active Sessions</CardTitle>
-          <CardDescription>
-            Manage your active login sessions
-          </CardDescription>
+          <CardDescription>Manage your active login sessions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Current Session</p>
-                <p className="text-sm text-muted-foreground">
-                  This browser · Last active now
-                </p>
+                <p className="text-sm text-muted-foreground">This browser · Last active now</p>
               </div>
               <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-500">
                 Active
               </span>
             </div>
           </div>
-          <Button variant="outline" className="mt-4" onClick={handleLogoutAll} disabled={isLoggingOutAll}>
-            {isLoggingOutAll ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : null}
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={handleLogoutAll}
+            disabled={isLoggingOutAll}
+          >
+            {isLoggingOutAll ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Sign Out All Sessions
           </Button>
         </CardContent>

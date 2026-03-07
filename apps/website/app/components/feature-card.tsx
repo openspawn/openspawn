@@ -59,8 +59,18 @@ export function FeatureCard({
       {href && (
         <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-slate-500 transition-all duration-200 group-hover:text-cyan-400 group-hover:gap-2">
           Learn more
-          <svg className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          <svg
+            className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
           </svg>
         </span>
       )}
@@ -82,8 +92,6 @@ export function FeatureCard({
   }
 
   return (
-    <div className={`${sharedClasses} hover:border-white/10 hover:bg-white/[0.04]`}>
-      {inner}
-    </div>
+    <div className={`${sharedClasses} hover:border-white/10 hover:bg-white/[0.04]`}>{inner}</div>
   );
 }

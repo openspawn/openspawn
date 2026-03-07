@@ -15,10 +15,7 @@ export function CreditsPage() {
       ) : (
         <div className="space-y-2">
           {transactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
-            >
+            <div key={tx.id} className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
               {/* Mobile: stacked; sm+: row */}
               <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <div className="space-y-0.5 min-w-0">

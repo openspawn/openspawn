@@ -36,7 +36,8 @@ describe("@openspawn/design-tokens", () => {
     };
 
     for (const [name, colors] of Object.entries(themes)) {
-      it(`${name} has valid HSL values`, () => assertHSL(colors as unknown as Record<string, string>, name));
+      it(`${name} has valid HSL values`, () =>
+        assertHSL(colors as unknown as Record<string, string>, name));
 
       it(`${name} has all required keys`, () => {
         const required = [

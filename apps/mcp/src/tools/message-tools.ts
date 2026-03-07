@@ -18,13 +18,9 @@ export function registerMessageTools(server: McpServer, client: ApiClient) {
       type: z.enum(["text", "handoff", "status_update", "request"]).default("text"),
     },
     async (params) => {
-      const result = await client.sendMessage(
-        params.channelId,
-        params.body,
-        params.type
-      );
+      const result = await client.sendMessage(params.channelId, params.body, params.type);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -37,6 +33,6 @@ export function registerMessageTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.getMessages(params.channelId, params.limit);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 }

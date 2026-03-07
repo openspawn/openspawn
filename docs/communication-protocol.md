@@ -19,19 +19,19 @@ This protocol fixes that.
 **Q: How do I know an agent received my task?**
 A: You don't need to. If they're working, they're silent. If something's wrong, they'll ESCALATE. Check their output files if you need status.
 
-**Why:** An acknowledgment message ("On it!") costs tokens and communicates zero information. The absence of an ESCALATION *is* the acknowledgment.
+**Why:** An acknowledgment message ("On it!") costs tokens and communicates zero information. The absence of an ESCALATION _is_ the acknowledgment.
 
 ### 2. Files Over Chat
 
 **Q: How should agents share status and results?**
 A: Write to shared workspace files. Never send a message when a file write will do.
 
-| Instead of... | Write to... |
-|---|---|
-| "Here's the plan" | `PLAN.md` |
-| "I'm done with X" | `RESULT.md` |
+| Instead of...        | Write to...  |
+| -------------------- | ------------ |
+| "Here's the plan"    | `PLAN.md`    |
+| "I'm done with X"    | `RESULT.md`  |
 | "Handing off to you" | `HANDOFF.md` |
-| "Here's my review" | `REVIEW.md` |
+| "Here's my review"   | `REVIEW.md`  |
 
 **Why:** Files are persistent, structured, and don't trigger response loops. Messages trigger responses. Responses trigger responses to responses.
 
@@ -65,6 +65,7 @@ Requirements in PLAN.md section 3. Deadline: end of session.
 ```
 
 **Rules:**
+
 - Must include: assignee, deliverable, location of requirements
 - Must come from someone with authority per ORG.md
 - Recipient does NOT acknowledge receipt
@@ -81,6 +82,7 @@ RESULT @lead: Rate limiter implemented. See RESULT.md for details, PR #47 for co
 ```
 
 **Rules:**
+
 - Only sent when the lead won't otherwise check the output file
 - Must reference where the actual work lives (file, PR, commit)
 - No summary of what was done — the files speak for themselves
@@ -99,6 +101,7 @@ in-memory alternative?
 ```
 
 **Rules:**
+
 - Must include: what's blocked, why, what decision or help is needed
 - Goes to the nearest authority per ORG.md
 - If unresolved in 2 turns, escalate up one level
@@ -115,6 +118,7 @@ DECISION @engineer: Use in-memory rate limiting for now. Redis is a future task.
 ```
 
 **Rules:**
+
 - Must be definitive — no "maybe" or "what do you think?"
 - Must unblock the ESCALATION it responds to
 - Recipient does NOT acknowledge the decision — they just act on it
@@ -207,14 +211,14 @@ START: I received a message
 
 Every org workspace uses these files for coordination:
 
-| File | Owner | Purpose |
-|---|---|---|
-| `PLAN.md` | Lead agent | Current sprint/session plan with assignments |
-| `HANDOFF.md` | Any agent | Queue of work ready for the next stage |
-| `RESULT.md` | Worker agents | Completed deliverables and their locations |
-| `REVIEW.md` | Reviewer agents | Review feedback, approvals, blocking issues |
-| `ESCALATION.md` | Any agent | Complex issues that need more than 3 turns |
-| `ORG.md` | Org owner | Team structure and routing rules |
+| File            | Owner           | Purpose                                      |
+| --------------- | --------------- | -------------------------------------------- |
+| `PLAN.md`       | Lead agent      | Current sprint/session plan with assignments |
+| `HANDOFF.md`    | Any agent       | Queue of work ready for the next stage       |
+| `RESULT.md`     | Worker agents   | Completed deliverables and their locations   |
+| `REVIEW.md`     | Reviewer agents | Review feedback, approvals, blocking issues  |
+| `ESCALATION.md` | Any agent       | Complex issues that need more than 3 turns   |
+| `ORG.md`        | Org owner       | Team structure and routing rules             |
 
 **Q: Who reads these files?**
 A: The agent whose workflow depends on them. Leads read RESULT.md and ESCALATION.md. Workers read PLAN.md. Reviewers read HANDOFF.md. Nobody needs to be told "go check the file" — it's part of their startup routine.
@@ -226,11 +230,13 @@ A: Whatever is most scannable. Timestamped entries work well:
 ## RESULT.md
 
 ### 2025-01-15 14:32 UTC — @engineer
+
 - Implemented rate limiter on /api/submit
 - PR #47: https://github.com/org/repo/pull/47
 - Tests passing, ready for review
 
 ### 2025-01-15 13:10 UTC — @designer
+
 - Landing page mockup complete
 - File: designs/landing-v2.fig
 - 3 variants as requested in PLAN.md section 2
@@ -241,6 +247,7 @@ A: Whatever is most scannable. Timestamped entries work well:
 ## Anti-Patterns (What NOT to Do)
 
 ### ❌ The Echo Chamber
+
 ```
 Lead: "Implement rate limiting"
 Worker: "So you want me to implement rate limiting on the API?"
@@ -248,29 +255,37 @@ Lead: "Yes, that's correct"
 Worker: "Great, I'll get started on that"
 Lead: "Sounds good"
 ```
+
 **Cost:** 5 messages, 0 work done. ~2000 tokens wasted.
 
 **✅ Correct:**
+
 ```
 Lead: "TASK @engineer: Implement rate limiting. See PLAN.md section 3."
 ```
+
 Then silence. Engineer writes code, commits, updates RESULT.md. 1 message total.
 
 ### ❌ The Courtesy Loop
+
 ```
 Worker: "RESULT: Rate limiter done, see PR #47"
 Lead: "Thanks! Great work."
 Worker: "Happy to help! Let me know if you need anything else."
 ```
+
 **Cost:** 2 wasted messages after the useful one.
 
 **✅ Correct:**
+
 ```
 Worker: "RESULT @lead: Rate limiter done. PR #47, details in RESULT.md."
 ```
+
 Then silence. Lead reads the PR. No response needed.
 
 ### ❌ The Democracy Loop
+
 ```
 Agent A: "Who should handle the database migration?"
 Agent B: "I could do it"
@@ -278,6 +293,7 @@ Agent C: "I have some experience with that too"
 Agent A: "What do you think, Agent D?"
 Agent D: "Either B or C works for me"
 ```
+
 **Cost:** 5 messages to make a routing decision.
 
 **✅ Correct:** ORG.md says database work goes to Agent B. Lead sends `TASK @agent-b`. Done.

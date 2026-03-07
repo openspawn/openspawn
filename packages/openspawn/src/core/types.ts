@@ -8,7 +8,7 @@ export interface Agent {
   domain: string;
   parentId?: string;
   model?: string;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
 }
 
 export interface ParsedOrg {
@@ -28,7 +28,7 @@ export interface ParsedOrg {
   };
 }
 
-export type TaskStatus = 'open' | 'claimed' | 'in-progress' | 'done' | 'blocked';
+export type TaskStatus = "open" | "claimed" | "in-progress" | "done" | "blocked";
 
 export interface Task {
   id: string;

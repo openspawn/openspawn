@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0a1929" />
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background: linear-gradient(135deg, #0a0a0b 0%, #0a1929 50%, #0d2847 100%);
         color: #e2e8f0;
         min-height: 100vh;
@@ -27,8 +31,13 @@
         animation: wave 3s ease-in-out infinite;
       }
       @keyframes wave {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
       }
       h1 {
         font-size: 1.5rem;
@@ -53,17 +62,16 @@
         cursor: pointer;
         transition: opacity 0.2s;
       }
-      button:hover { opacity: 0.9; }
+      button:hover {
+        opacity: 0.9;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="wave">🌊</div>
       <h1>You're Offline</h1>
-      <p>
-        OpenSpawn is temporarily offline.
-        Check your internet connection and try again.
-      </p>
+      <p>OpenSpawn is temporarily offline. Check your internet connection and try again.</p>
       <button onclick="window.location.reload()">Try Again</button>
     </div>
   </body>

@@ -9,12 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Badge } from "./ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 // Import the enum from generated types
 import { AgentMode } from "../graphql/generated/graphql";
@@ -112,7 +107,7 @@ export function AgentModeBadge({
         config.color,
         config.borderColor,
         "border",
-        sizeClasses[size]
+        sizeClasses[size],
       )}
     >
       <Icon className={iconSizes[size]} />
@@ -166,16 +161,14 @@ export function AgentModeSelector({
           currentConfig.borderColor,
           currentConfig.bgColor,
           sizeClasses[size],
-          "min-w-[140px]"
+          "min-w-[140px]",
         )}
       >
         <div className="flex items-center gap-2">
           <CurrentIcon className={cn("h-4 w-4", currentConfig.color)} />
           <span className={currentConfig.color}>{currentConfig.label}</span>
         </div>
-        <ChevronDown
-          className={cn("h-4 w-4 transition-transform", open && "rotate-180")}
-        />
+        <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-[320px] p-2">
@@ -201,7 +194,7 @@ export function AgentModeSelector({
                     "transition-all duration-200",
                     isSelected && config.bgColor,
                     isSelected && config.borderColor,
-                    isSelected && "border"
+                    isSelected && "border",
                   )}
                 >
                   <div className="flex items-center justify-between w-full">
@@ -229,9 +222,7 @@ export function AgentModeSelector({
 
                   {showDescription && (
                     <div className="mt-1 ml-9">
-                      <p className="text-xs text-muted-foreground">
-                        {config.description}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{config.description}</p>
                       <div className="flex flex-wrap gap-1 mt-2">
                         {config.allowedActions.map((action) => (
                           <Badge
@@ -258,13 +249,7 @@ export function AgentModeSelector({
 /**
  * Mode info card for detailed display
  */
-export function AgentModeCard({
-  mode,
-  className,
-}: {
-  mode: AgentMode;
-  className?: string;
-}) {
+export function AgentModeCard({ mode, className }: { mode: AgentMode; className?: string }) {
   const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
   const Icon = config.icon;
 
@@ -272,12 +257,7 @@ export function AgentModeCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "rounded-xl border p-4",
-        config.bgColor,
-        config.borderColor,
-        className
-      )}
+      className={cn("rounded-xl border p-4", config.bgColor, config.borderColor, className)}
     >
       <div className="flex items-start gap-3">
         <div className={cn("p-2 rounded-lg", config.bgColor, "border", config.borderColor)}>
@@ -290,9 +270,7 @@ export function AgentModeCard({
           <p className="text-sm text-muted-foreground mt-1">{config.description}</p>
 
           <div className="mt-3">
-            <p className="text-xs font-medium text-muted-foreground mb-2">
-              Allowed Actions:
-            </p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Allowed Actions:</p>
             <div className="flex flex-wrap gap-1.5">
               {config.allowedActions.map((action) => (
                 <Badge

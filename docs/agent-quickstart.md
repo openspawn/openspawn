@@ -3,7 +3,8 @@ purpose: Get an AI agent from zero to a running multi-agent organization
 audience: AI agents (LLMs) that need to coordinate other agents
 prerequisites: Node.js 18+, npm
 time_estimate: 10 minutes
-commands_used: [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
+commands_used:
+  [openspawn init, openspawn start, openspawn status, openspawn validate, openspawn preview]
 related: [llms.txt, mcp-reference.md, communication-protocol.md, FAQ.md, troubleshooting.md]
 ---
 
@@ -27,20 +28,24 @@ openspawn status
 That's it. You now have a running org with an Onboarding Lead, Data Migration Specialist, Integration Engineer, and Success Agent — with OpenClaw gateway configs ready to apply.
 
 > **Q: Do I need API keys?**
+>
 > - No. Demo/simulation mode works out of the box with zero configuration.
 
 > **Q: What just happened?**
+>
 > - `init` created `ORG.md` (your org definition) and `openclaw-agents.json`
 > - `start` read the agents config and generated `openclaw-patch.json` with OpenClaw gateway entries
 > - `status` displayed a table of all agents with their name, level, model, workspace, and reports-to
 
 > **Q: What is openclaw-patch.json?**
+>
 > - A ready-to-apply patch for your OpenClaw gateway's `agents.list`
 > - Each entry has: `id`, `model` (opus for L7+, sonnet for L6-), `workspace`, `tools.profile: "full"`
 > - Manager agents (L7+ with direct reports) also get `subagents.allowAgents`
 > - The highest-level agent gets `default: true`
 
 > **Q: How do I apply the patch to my gateway?**
+>
 > - Copy the entries from `openclaw-patch.json` into your OpenClaw `agents.list` configuration, then restart the gateway.
 
 ---
@@ -73,6 +78,7 @@ openspawn init my-org --template=clinical-trials
 ```
 
 > **Q: Which template should I use?**
+>
 > ```
 > What's your domain?
 > ├── Customer success / onboarding → saas-onboarding
@@ -84,9 +90,11 @@ openspawn init my-org --template=clinical-trials
 > ```
 
 > **Q: Can I combine templates?**
+>
 > - Yes. Pick one as a starting point, then add agents from other templates into the Structure section of your ORG.md.
 
 > **Q: Can I create agents not in any template?**
+>
 > - Absolutely. Templates are starting points. Add any agent to the `## Structure` section with a name, level, domain, and reporting line.
 
 ---
@@ -99,52 +107,64 @@ Your entire org lives in one file. Five sections, all optional except Structure:
 # SaaS Onboarding Org
 
 ## Identity
+
 Mission, industry context, pain solved.
 Becomes ambient context for every agent.
 
 ## Culture
+
 preset: agency
 Communication norms, escalation speed, progress frequency.
 
 ## Structure
 
 ### Onboarding Lead — Customer Onboarding Manager
+
 The quarterback. Owns customer relationships from contract to go-live.
+
 - **Level:** 7
 - **Department:** Customer Success
 - **Reports to:** Human Principal
 
 #### Data Migration Specialist — Senior Data Engineer
+
 Ingests and validates customer data from source systems.
+
 - **Level:** 5
 - **Department:** Engineering
 - **Reports to:** Onboarding Lead
 
 ## Policies
+
 Budget limits, permission guardrails, human approval thresholds.
 
 ## Playbooks
+
 Step-by-step procedures for standard scenarios and escalations.
 ```
 
 > **Q: What's the minimum viable ORG.md?**
+>
 > ```markdown
 > # My Org
 >
 > ## Structure
 >
 > ### Boss — Leader
+>
 > - **Level:** 10
 > - **Reports to:** Human Principal
 > ```
 
 > **Q: What do levels mean?**
+>
 > - L1-L5: Workers. Execute tasks.
 > - L6: Can review and approve work.
 > - L7-L9: Can create tasks and spawn agents. Department leads.
 > - L10: Executive. Top of the hierarchy.
 
 > **Q: What's "Reports to"?**
+>
 > - Defines the escalation chain. When an agent is blocked, it escalates to whoever it reports to. Never skip the chain.
 
 ---
@@ -156,6 +176,7 @@ openspawn validate ORG.md
 ```
 
 Output on success:
+
 ```
 ✅ ORG.md is valid
 
@@ -171,6 +192,7 @@ Output on success:
 ```
 
 > **Q: If I see "validation failed", what do I do?**
+>
 > - The output lists each issue. Common fixes:
 >   - "Missing Structure section" → Add `## Structure` with at least one agent
 >   - "Agent reports to unknown agent" → Check spelling of the `Reports to` value
@@ -184,23 +206,28 @@ Instead of configuring every communication parameter, use a preset:
 
 ```markdown
 ## Culture
+
 preset: agency
 ```
 
-| Preset | Best for | Escalation | Progress updates |
-|--------|----------|-----------|-----------------|
-| `startup` | Small fast teams | Immediate | Frequent |
-| `enterprise` | Large orgs with process | Batched (hourly) | On phase change |
-| `agency` | Client work with deadlines | Immediate | Every tick |
-| `research` | Exploration, long tasks | Delayed | On request |
-| `military` | Zero-ambiguity operations | Immediate | Every tick |
-| `remote-async` | Distributed, async teams | Delayed | On request |
+| Preset         | Best for                   | Escalation       | Progress updates |
+| -------------- | -------------------------- | ---------------- | ---------------- |
+| `startup`      | Small fast teams           | Immediate        | Frequent         |
+| `enterprise`   | Large orgs with process    | Batched (hourly) | On phase change  |
+| `agency`       | Client work with deadlines | Immediate        | Every tick       |
+| `research`     | Exploration, long tasks    | Delayed          | On request       |
+| `military`     | Zero-ambiguity operations  | Immediate        | Every tick       |
+| `remote-async` | Distributed, async teams   | Delayed          | On request       |
 
 > **Q: Can I override specific settings in a preset?**
+>
 > - Yes. Add overrides after the preset line:
+>
 > ```markdown
 > ## Culture
+>
 > preset: agency
+>
 > - **Escalation:** batched
 > - **Ack required:** no
 > ```
@@ -229,9 +256,11 @@ Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
 ```
 
 > **Q: How do I authenticate?**
+>
 > - HMAC authentication. Set `AGENT_ID` and `AGENT_SECRET` environment variables. The MCP client handles the rest.
 
 > **Q: What's the full tool list?**
+>
 > - See `docs/llms.txt` for every tool with all parameters.
 
 ---
@@ -241,36 +270,44 @@ Agents communicate with OpenSpawn through MCP tools at `POST /mcp`:
 The coordination tools give agents a shared task board backed by SQLite. Here's the core workflow:
 
 ### Create a task
+
 ```
 tool: task_create { title: "Migrate Acme Corp database", priority: "high", assign_to: "data-migration-specialist" }
 ```
 
 ### Claim an open task
+
 ```
 tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
 ```
+
 > **Q: Can two agents claim the same task?**
 > No. `task_claim` is atomic — only one agent wins, the other gets an error. This prevents duplicate work.
 
 ### Complete a task
+
 ```
 tool: task_complete { task_id: "abc123", result: "1.2M rows migrated, checksum verified", artifacts: ["migration-report.md"] }
 ```
 
 ### List tasks
+
 ```
 tool: task_list { status: "open", priority: "high" }
 ```
 
 ### Escalate a problem
+
 ```
 tool: escalation_create { issue: "source database connection refused", severity: "high", to_agent: "onboarding-lead" }
 ```
 
 ### Check org status
+
 ```
 tool: org_status
 ```
+
 > Returns a full overview: all agents, task counts, budget status.
 
 > **Q: How do agents coordinate work?**
@@ -284,6 +321,7 @@ tool: org_status
 ## Common workflows
 
 ### Delegate a task
+
 ```
 1. task_create { title: "...", assigneeId: "specialist-id" }
 2. Specialist receives task → auto-ACKs (👍)
@@ -293,6 +331,7 @@ tool: org_status
 ```
 
 ### Handle an escalation
+
 ```
 1. escalation_list → see pending escalations
 2. Read the reason and task details
@@ -301,6 +340,7 @@ tool: org_status
 ```
 
 ### Request consensus
+
 ```
 1. consensus_request { taskId: "...", question: "Proceed with live migration?", voterIds: ["agent-a", "agent-b"] }
 2. Each voter: consensus_vote { consensusId: "...", vote: "approve" }
@@ -311,13 +351,13 @@ tool: org_status
 
 ## Error recovery
 
-| You see | Run this |
-|---------|----------|
-| `Cannot read ORG.md` | `openspawn validate` — check the file exists and is valid markdown |
-| `Port 3333 already in use` | `lsof -i :3333` then kill the process, or set `"port": 3334` in config |
-| `Unknown template: foo` | Valid templates: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
-| `Agent reports to unknown agent` | Check the `Reports to` field matches an existing agent name exactly |
-| `HMAC authentication failed` | Verify `AGENT_ID` and `AGENT_SECRET` env vars match the API config |
+| You see                          | Run this                                                                                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Cannot read ORG.md`             | `openspawn validate` — check the file exists and is valid markdown                                                                                            |
+| `Port 3333 already in use`       | `lsof -i :3333` then kill the process, or set `"port": 3334` in config                                                                                        |
+| `Unknown template: foo`          | Valid templates: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
+| `Agent reports to unknown agent` | Check the `Reports to` field matches an existing agent name exactly                                                                                           |
+| `HMAC authentication failed`     | Verify `AGENT_ID` and `AGENT_SECRET` env vars match the API config                                                                                            |
 
 ---
 
@@ -342,6 +382,7 @@ When `openspawn start` boots your org, the lead agent doesn't just start delegat
 > Plans are cheaper than confusion. A 30-second PLAN.md prevents hours of rework, wasted tokens, and "what did you mean?" messages.
 
 > **Q: What goes in PLAN.md?**
+>
 > - Mission statement (from ORG.md)
 > - Phase breakdown (what order to build)
 > - Task table with assignments, priorities, dependencies, and status

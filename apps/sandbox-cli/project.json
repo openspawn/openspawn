@@ -10,9 +10,7 @@
       "options": {
         "command": "bash apps/sandbox-cli/build.sh"
       },
-      "outputs": [
-        "{workspaceRoot}/dist/apps/sandbox-cli"
-      ]
+      "outputs": ["{workspaceRoot}/dist/apps/sandbox-cli"]
     },
     "serve": {
       "executor": "nx:run-commands",

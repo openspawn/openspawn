@@ -18,19 +18,20 @@ Consider a COO agent running Claude Opus. Its job is strategic: receive escalati
 
 **The math is brutal:**
 
-| Scenario | Invocations/hr | Cost/hr (Opus) | Useful work |
-|----------|---------------|----------------|-------------|
-| 30s tick cycle | 120 | ~$14.40 | 3-5 actions |
-| 1min tick cycle | 60 | ~$7.20 | 3-5 actions |
-| Event-driven | 3-5 | ~$0.60 | 3-5 actions |
+| Scenario        | Invocations/hr | Cost/hr (Opus) | Useful work |
+| --------------- | -------------- | -------------- | ----------- |
+| 30s tick cycle  | 120            | ~$14.40        | 3-5 actions |
+| 1min tick cycle | 60             | ~$7.20         | 3-5 actions |
+| Event-driven    | 3-5            | ~$0.60         | 3-5 actions |
 
-Same output. 12-24x cheaper. The COO doesn't need to wake up and think "nothing to do" a hundred times an hour — it needs to wake up when something *actually needs its attention*.
+Same output. 12-24x cheaper. The COO doesn't need to wake up and think "nothing to do" a hundred times an hour — it needs to wake up when something _actually needs its attention_.
 
 ### Learning from Operating Systems
 
-This isn't a new problem. Operating systems solved it decades ago with interrupt-driven I/O. Early systems polled devices in a loop: "Any data? No? Any data? No?" Modern systems use interrupts: the device *signals* the CPU when it has data, and the CPU sleeps until then.
+This isn't a new problem. Operating systems solved it decades ago with interrupt-driven I/O. Early systems polled devices in a loop: "Any data? No? Any data? No?" Modern systems use interrupts: the device _signals_ the CPU when it has data, and the CPU sleeps until then.
 
 The analogy is exact:
+
 - **Polling** = busy-waiting. Simple, burns cycles.
 - **Event-driven** = interrupt-driven. Efficient, only runs when needed.
 
@@ -58,6 +59,7 @@ tick 5: wake → check inbox → nothing → idle ($0.12)
 ```
 
 **Characteristics:**
+
 - Fixed cost per tick, regardless of activity
 - Simple to implement — just loop
 - Good for: cheap models (Haiku, Ollama), high-activity workers who almost always have work
@@ -81,6 +83,7 @@ completion arrives → wake → process result ($0.12)
 ```
 
 **Characteristics:**
+
 - Variable cost — proportional to actual events
 - Slightly more complex — needs inbox monitoring
 - Good for: expensive models, managers, strategic roles, low-activity specialists
@@ -92,13 +95,13 @@ completion arrives → wake → process result ($0.12)
 
 The decision is straightforward:
 
-| Factor | Use Polling | Use Event-Driven |
-|--------|------------|-------------------|
-| Model cost | Cheap (<$0.01/call) | Expensive (>$0.05/call) |
-| Activity level | Busy (>50% of ticks have work) | Sparse (<20% of ticks have work) |
-| Role type | Worker (always has tasks) | Manager (waits for reports) |
-| Latency tolerance | Needs sub-second response | Can wait for next tick check |
-| Budget priority | Predictable spend | Minimized spend |
+| Factor            | Use Polling                    | Use Event-Driven                 |
+| ----------------- | ------------------------------ | -------------------------------- |
+| Model cost        | Cheap (<$0.01/call)            | Expensive (>$0.05/call)          |
+| Activity level    | Busy (>50% of ticks have work) | Sparse (<20% of ticks have work) |
+| Role type         | Worker (always has tasks)      | Manager (waits for reports)      |
+| Latency tolerance | Needs sub-second response      | Can wait for next tick check     |
+| Budget priority   | Predictable spend              | Minimized spend                  |
 
 Most orgs will use both. That's the point.
 
@@ -106,59 +109,60 @@ Most orgs will use both. That's the point.
 
 ## 2. Trigger Types
 
-Event-driven agents don't wake on *every* inbox event. They specify which event types are worth waking for. This is the `triggerOn` filter.
+Event-driven agents don't wake on _every_ inbox event. They specify which event types are worth waking for. This is the `triggerOn` filter.
 
 ### 2.1 Event Catalog
 
-| Trigger | Source | Description | Typical Consumer |
-|---------|--------|-------------|-----------------|
-| `task_assigned` | ACP delegation | New task delegated to this agent | Leads, workers |
-| `escalation_received` | ACP escalation | A report escalated a problem | Managers, COO |
-| `completion_received` | ACP completion | A report finished a task | Managers, COO |
-| `message_received` | ACP message | Direct message from another agent | Any |
-| `order_received` | Human principal | Human gave a direct order | COO, leads |
-| `timer` | Scheduler | Scheduled wake-up (cron-style) | Any (daily reviews, weekly reports) |
-| `threshold` | Metrics engine | A metric crossed a configured boundary | COO, leads |
+| Trigger               | Source          | Description                            | Typical Consumer                    |
+| --------------------- | --------------- | -------------------------------------- | ----------------------------------- |
+| `task_assigned`       | ACP delegation  | New task delegated to this agent       | Leads, workers                      |
+| `escalation_received` | ACP escalation  | A report escalated a problem           | Managers, COO                       |
+| `completion_received` | ACP completion  | A report finished a task               | Managers, COO                       |
+| `message_received`    | ACP message     | Direct message from another agent      | Any                                 |
+| `order_received`      | Human principal | Human gave a direct order              | COO, leads                          |
+| `timer`               | Scheduler       | Scheduled wake-up (cron-style)         | Any (daily reviews, weekly reports) |
+| `threshold`           | Metrics engine  | A metric crossed a configured boundary | COO, leads                          |
 
 ### 2.2 Trigger Configuration
 
 ```typescript
 interface AgentTriggerConfig {
-  mode: 'polling' | 'event-driven';
-  
+  mode: "polling" | "event-driven";
+
   // Polling mode
-  tickInterval?: number;        // Wake every N ticks (default: 1)
-  
+  tickInterval?: number; // Wake every N ticks (default: 1)
+
   // Event-driven mode
-  triggerOn?: TriggerType[];    // Which events wake the agent
-  batchWindow?: number;         // Ticks to wait before processing (batch events)
-  maxSleepTicks?: number;       // Maximum ticks to sleep (safety wake-up)
-  
+  triggerOn?: TriggerType[]; // Which events wake the agent
+  batchWindow?: number; // Ticks to wait before processing (batch events)
+  maxSleepTicks?: number; // Maximum ticks to sleep (safety wake-up)
+
   // Timer triggers
-  timers?: TimerConfig[];       // Scheduled wake-ups
-  
-  // Threshold triggers  
+  timers?: TimerConfig[]; // Scheduled wake-ups
+
+  // Threshold triggers
   thresholds?: ThresholdConfig[]; // Metric-based wake-ups
 }
 
 interface TimerConfig {
-  name: string;                 // e.g., "daily-review"
-  cron: string;                 // e.g., "0 9 * * *" (9 AM daily)
-  context?: string;             // Injected into agent prompt on wake
+  name: string; // e.g., "daily-review"
+  cron: string; // e.g., "0 9 * * *" (9 AM daily)
+  context?: string; // Injected into agent prompt on wake
 }
 
 interface ThresholdConfig {
-  metric: string;               // e.g., "team.escalation_rate"
-  operator: '>' | '<' | '>=' | '<=' | '==';
-  value: number;                // e.g., 0.30
-  cooldownTicks: number;        // Don't re-trigger for N ticks after firing
-  context?: string;             // Injected into agent prompt on wake
+  metric: string; // e.g., "team.escalation_rate"
+  operator: ">" | "<" | ">=" | "<=" | "==";
+  value: number; // e.g., 0.30
+  cooldownTicks: number; // Don't re-trigger for N ticks after firing
+  context?: string; // Injected into agent prompt on wake
 }
 ```
 
 ### 2.3 Examples
 
 **COO (strategic, expensive model):**
+
 ```typescript
 {
   mode: 'event-driven',
@@ -170,6 +174,7 @@ interface ThresholdConfig {
 ```
 
 **Engineering Lead (tactical, mid-tier model):**
+
 ```typescript
 {
   mode: 'event-driven',
@@ -179,6 +184,7 @@ interface ThresholdConfig {
 ```
 
 **Backend Worker (execution, cheap model):**
+
 ```typescript
 {
   mode: 'polling',
@@ -208,14 +214,17 @@ batch window expires (tick 13) → wake with all 3 completions
 The agent sees all pending events at once and makes one informed decision instead of three reactive ones.
 
 **When to use batch windows:**
+
 - Managers receiving many completions from a team
 - Any role where seeing multiple events together produces better decisions
 
 **When NOT to use:**
+
 - Critical escalations (you want immediate response)
 - Human orders (humans expect fast acknowledgment)
 
 **Selective batching:** Batch windows can apply per-trigger-type:
+
 ```typescript
 {
   mode: 'event-driven',
@@ -241,7 +250,7 @@ The real power emerges when you mix both modes in a single org. This creates a n
         │ $0.12/  │  ~5 events/hr = $0.60/hr
         │  call   │
         ├─────────┤
-        │ Sonnet  │  Leads: event-driven  
+        │ Sonnet  │  Leads: event-driven
         │ $0.03/  │  ~15 events/hr = $0.45/hr each
         │  call   │
         ├─────────┤
@@ -282,7 +291,9 @@ No separate event system. No message broker. No pub/sub infrastructure. The comm
 ## Structure
 
 ### COO
+
 Strategic oversight. Handles cross-department coordination and escalations.
+
 - **Model:** claude-opus
 - **Trigger:** event-driven
 - **Wake on:** escalations, completions, orders
@@ -292,18 +303,22 @@ Strategic oversight. Handles cross-department coordination and escalations.
 ### Engineering
 
 #### Engineering Lead
+
 Triages technical work. Delegates to specialists.
+
 - **Model:** claude-sonnet
 - **Trigger:** event-driven
 - **Wake on:** tasks, escalations, completions
 - **Batch window:** 3 ticks (for completions)
 
 #### Backend Workers
+
 - **Model:** claude-haiku
 - **Trigger:** polling
 - **Count:** 3
 
 #### Frontend Workers
+
 - **Model:** claude-haiku
 - **Trigger:** polling
 - **Count:** 2
@@ -311,11 +326,13 @@ Triages technical work. Delegates to specialists.
 ### Marketing
 
 #### Marketing Lead
+
 - **Model:** claude-sonnet
 - **Trigger:** event-driven
 - **Wake on:** tasks, escalations, completions
 
 #### Content Workers
+
 - **Model:** ollama/llama3
 - **Trigger:** polling
 - **Count:** 2
@@ -339,7 +356,7 @@ for (const agent of agents) {
 
 // New (hybrid)
 for (const agent of agents) {
-  if (agent.trigger.mode === 'polling') {
+  if (agent.trigger.mode === "polling") {
     if (tick % agent.trigger.tickInterval === 0) {
       await invokeAgent(agent);
     }
@@ -352,18 +369,18 @@ for (const agent of agents) {
     }
     // Safety wake-up
     if (agent.ticksSinceLastWake >= agent.trigger.maxSleepTicks) {
-      await invokeAgent(agent, { reason: 'safety_wakeup' });
+      await invokeAgent(agent, { reason: "safety_wakeup" });
     }
     // Timer check
     for (const timer of agent.trigger.timers ?? []) {
       if (timer.shouldFire(tick)) {
-        await invokeAgent(agent, { reason: 'timer', timer: timer.name, context: timer.context });
+        await invokeAgent(agent, { reason: "timer", timer: timer.name, context: timer.context });
       }
     }
     // Threshold check
     for (const threshold of agent.trigger.thresholds ?? []) {
       if (threshold.evaluate() && !threshold.inCooldown()) {
-        await invokeAgent(agent, { reason: 'threshold', metric: threshold.metric });
+        await invokeAgent(agent, { reason: "threshold", metric: threshold.metric });
         threshold.startCooldown();
       }
     }
@@ -384,20 +401,20 @@ Your inbox:
 [... ACP messages ...]
 ```
 
-This is critical — the agent needs to know *why* it's awake. A polling agent can infer "check what's new." An event-driven agent should be told "here's what triggered you."
+This is critical — the agent needs to know _why_ it's awake. A polling agent can infer "check what's new." An event-driven agent should be told "here's what triggered you."
 
 ### 5.3 Inbox Data Model
 
 ```typescript
 interface AgentInbox {
-  messages: ACPMessage[];     // All pending messages
-  
+  messages: ACPMessage[]; // All pending messages
+
   getPending(): ACPMessage[]; // Unprocessed messages
   markProcessed(msgs: ACPMessage[]): void;
-  
+
   // For batch windows
   oldestPendingTick(): number | null;
-  
+
   // Stats
   totalReceived: number;
   totalProcessed: number;
@@ -429,22 +446,24 @@ This enables dynamic cost optimization: the org adapts its execution mode based 
 
 Approximate costs per invocation (including typical context window):
 
-| Model | Cost/invocation | Notes |
-|-------|----------------|-------|
-| Claude Opus | $0.12 | ~4K input tokens + ~1K output |
-| Claude Sonnet | $0.03 | Same context |
-| Claude Haiku | $0.003 | Same context |
-| GPT-4o | $0.04 | Same context |
-| Ollama (local) | $0.00 | Electricity only |
+| Model          | Cost/invocation | Notes                         |
+| -------------- | --------------- | ----------------------------- |
+| Claude Opus    | $0.12           | ~4K input tokens + ~1K output |
+| Claude Sonnet  | $0.03           | Same context                  |
+| Claude Haiku   | $0.003          | Same context                  |
+| GPT-4o         | $0.04           | Same context                  |
+| Ollama (local) | $0.00           | Electricity only              |
 
 ### 6.2 Scenario: 25-Agent Org, 30-Second Ticks
 
 **Org composition:**
+
 - 1 COO (strategic)
 - 4 Leads (tactical)
 - 20 Workers (execution)
 
 **Activity profile (realistic):**
+
 - COO: 5 meaningful events/hour
 - Leads: 15 meaningful events/hour each
 - Workers: 80% of ticks have work (they're busy)
@@ -512,7 +531,9 @@ Event-driven configuration integrates naturally into the ORG.md structure sectio
 
 ```markdown
 ### COO
+
 Strategic oversight. Handles escalations and cross-department coordination.
+
 - **Model:** claude-opus
 - **Trigger:** event-driven
 - **Wake on:** escalations, completions, orders
@@ -523,25 +544,25 @@ Strategic oversight. Handles escalations and cross-department coordination.
 
 ### 7.2 Parsing Rules
 
-| Field | Format | Default |
-|-------|--------|---------|
-| `Trigger` | `polling` or `event-driven` | `polling` |
-| `Wake on` | Comma-separated trigger types | All types |
-| `Batch window` | Number (ticks) | `0` (no batching) |
-| `Timer` | Name + cron-like description | None |
-| `Threshold` | Metric + operator + value | None |
-| `Max sleep` | Number (ticks) | `500` |
-| `Tick interval` | Number (polling only) | `1` |
+| Field           | Format                        | Default           |
+| --------------- | ----------------------------- | ----------------- |
+| `Trigger`       | `polling` or `event-driven`   | `polling`         |
+| `Wake on`       | Comma-separated trigger types | All types         |
+| `Batch window`  | Number (ticks)                | `0` (no batching) |
+| `Timer`         | Name + cron-like description  | None              |
+| `Threshold`     | Metric + operator + value     | None              |
+| `Max sleep`     | Number (ticks)                | `500`             |
+| `Tick interval` | Number (polling only)         | `1`               |
 
 **Wake on shorthand:**
 
-| Shorthand | Expands to |
-|-----------|-----------|
+| Shorthand     | Expands to            |
+| ------------- | --------------------- |
 | `escalations` | `escalation_received` |
 | `completions` | `completion_received` |
-| `tasks` | `task_assigned` |
-| `messages` | `message_received` |
-| `orders` | `order_received` |
+| `tasks`       | `task_assigned`       |
+| `messages`    | `message_received`    |
+| `orders`      | `order_received`      |
 
 ### 7.3 Culture-Level Defaults
 
@@ -551,6 +572,7 @@ The Culture section can set org-wide defaults:
 ## Culture
 
 preset: startup
+
 - **Default trigger:** event-driven for L7+, polling for L6 and below
 - **Default max sleep:** 300 ticks
 ```
@@ -565,15 +587,15 @@ Event-driven agents create new observability needs. You need to know if an agent
 
 ### 8.1 New Metrics
 
-| Metric | Description | Healthy Range |
-|--------|-------------|---------------|
-| `wake_rate` | Invocations per hour (event-driven agents) | Depends on role |
-| `sleep_duration_avg` | Average ticks between wakes | Role-dependent |
-| `event_queue_depth` | Pending events in inbox | < 5 |
-| `batch_efficiency` | Events per invocation (batched agents) | 2-5 |
-| `safety_wake_rate` | How often maxSleepTicks triggers | Should be rare |
-| `cost_per_decision` | Total cost / meaningful actions taken | Trending down |
-| `idle_waste` | Polling invocations with no action taken | < 20% |
+| Metric               | Description                                | Healthy Range   |
+| -------------------- | ------------------------------------------ | --------------- |
+| `wake_rate`          | Invocations per hour (event-driven agents) | Depends on role |
+| `sleep_duration_avg` | Average ticks between wakes                | Role-dependent  |
+| `event_queue_depth`  | Pending events in inbox                    | < 5             |
+| `batch_efficiency`   | Events per invocation (batched agents)     | 2-5             |
+| `safety_wake_rate`   | How often maxSleepTicks triggers           | Should be rare  |
+| `cost_per_decision`  | Total cost / meaningful actions taken      | Trending down   |
+| `idle_waste`         | Polling invocations with no action taken   | < 20%           |
 
 ### 8.2 Dashboard
 
@@ -605,6 +627,7 @@ The system can recommend mode switches based on observed patterns:
 ## Recommendations
 
 ### 💰 Cost Optimization
+
 - Worker 3 is idle 55% of ticks
   → Recommendation: Switch to event-driven mode
   → Estimated savings: $0.20/hr ($4.80/day)
@@ -633,12 +656,14 @@ A COO making a decision might trigger 4 delegations, waking 4 leads, who each de
 ### 9.4 Mode Transition
 
 When switching from polling to event-driven mid-run:
+
 1. Agent finishes current tick normally
 2. Mode switches on next tick
 3. Any work-in-progress continues — the agent just won't be polled again
 4. Pending inbox messages trigger immediate wake on next engine pass
 
 When switching from event-driven to polling:
+
 1. Any pending inbox messages are processed on the first polling tick
 2. Normal tick schedule resumes
 
@@ -660,4 +685,4 @@ When switching from event-driven to polling:
 
 ---
 
-*Event-driven execution makes premium models economically viable in agent organizations. It's not about doing less work — it's about not paying to check if there's work. The best agents, like the best employees, should be available when needed and not burning budget when they're not.*
+_Event-driven execution makes premium models economically viable in agent organizations. It's not about doing less work — it's about not paying to check if there's work. The best agents, like the best employees, should be available when needed and not burning budget when they're not._

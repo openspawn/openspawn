@@ -17,10 +17,7 @@ export function NetworkPage() {
   const [view, setView] = useState<NetworkView>("network");
   const { openSidePanel, closeSidePanel } = useSidePanel();
   const openAgentDetail = (agentId: string) => {
-    openSidePanel(
-      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
-      { width: 520 }
-    );
+    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
   };
 
   const openTeamDetail = (teamId: string) => {
@@ -30,7 +27,7 @@ export function NetworkPage() {
         onAgentClick={openAgentDetail}
         onTeamClick={openTeamDetail}
       />,
-      { width: 480, title: 'Team Details' }
+      { width: 480, title: "Team Details" },
     );
   };
 
@@ -44,7 +41,9 @@ export function NetworkPage() {
               title="No agent network yet"
               description="Register agents to see their connections and hierarchy visualized here."
               ctaLabel="Register agents to get started →"
-              onCta={() => { /* noop */ }}
+              onCta={() => {
+                /* noop */
+              }}
             />
           </CardContent>
         </Card>
@@ -53,12 +52,17 @@ export function NetworkPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-theme(spacing.16))] overflow-hidden relative" data-tour="network-viz">
+    <div
+      className="h-[calc(100vh-theme(spacing.16))] overflow-hidden relative"
+      data-tour="network-viz"
+    >
       {/* Header bar with title + stats + view toggle */}
-      <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-10
+      <div
+        className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-10
         bg-card/90 backdrop-blur border border-border
         rounded-full px-4 sm:px-6 py-2 sm:py-3
-        w-auto max-w-[calc(100%-4rem)]">
+        w-auto max-w-[calc(100%-4rem)]"
+      >
         <div className="flex gap-4 sm:gap-6 items-center">
           <div className="hidden sm:block">
             <h1 className="text-sm sm:text-base font-bold text-foreground leading-tight whitespace-nowrap">
@@ -129,7 +133,11 @@ export function NetworkPage() {
       {view === "network" ? (
         <AgentNetwork className="w-full h-full" onAgentClick={openAgentDetail} />
       ) : (
-        <OrgChart className="w-full h-full" onAgentClick={openAgentDetail} onTeamClick={openTeamDetail} />
+        <OrgChart
+          className="w-full h-full"
+          onAgentClick={openAgentDetail}
+          onTeamClick={openTeamDetail}
+        />
       )}
 
       {/* Agent Detail Panel now uses global side panel */}

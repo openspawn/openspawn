@@ -9,25 +9,19 @@
  * - Primary CTA: "Watch the Agents Live", not "Get Started"
  */
 
-import { useNavigate } from '@tanstack/react-router';
-import { HeroBikiniBottom } from '../components/bb';
+import { useNavigate } from "@tanstack/react-router";
+import { HeroBikiniBottom } from "../components/bb";
 
 export function IntroPage() {
   const navigate = useNavigate();
 
   const handleWatchLive = () => {
-    navigate({ to: '/live' });
+    navigate({ to: "/live" });
   };
 
   const handleGitHub = () => {
-    window.open('https://github.com/openspawn/openspawn', '_blank', 'noopener,noreferrer');
+    window.open("https://github.com/openspawn/openspawn", "_blank", "noopener,noreferrer");
   };
 
-  return (
-    <HeroBikiniBottom
-      onWatchLive={handleWatchLive}
-      onGitHub={handleGitHub}
-      agentCount={22}
-    />
-  );
+  return <HeroBikiniBottom onWatchLive={handleWatchLive} onGitHub={handleGitHub} agentCount={22} />;
 }

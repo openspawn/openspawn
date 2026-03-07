@@ -9,7 +9,14 @@ import { AnimatePresence, motion } from "motion/react";
 import { Layout } from "./components";
 import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage, SettingsPage, MessagesPage } from "./pages";
+import {
+  TasksPage,
+  AgentsPage,
+  CreditsPage,
+  EventsPage,
+  SettingsPage,
+  MessagesPage,
+} from "./pages";
 import { KanbanPage } from "./pages/kanban";
 import { TaskBoardPage } from "./pages/task-board";
 import { RouterPage } from "./pages/router";
@@ -21,8 +28,7 @@ import { LiveViewPage } from "./pages/live-view";
 import { isBBTheme } from "./lib/dashboard-theme";
 
 const reduceMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const variants = reduceMotion
   ? { initial: {}, animate: {}, exit: {} }
@@ -41,20 +47,20 @@ function LayoutWithTransitions() {
   const location = useLocation();
   return (
     <Layout>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            variants={variants}
-            transition={transition}
-            style={{ willChange: "opacity, transform" }}
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
-      </Layout>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={variants}
+          transition={transition}
+          style={{ willChange: "opacity, transform" }}
+        >
+          <Outlet />
+        </motion.div>
+      </AnimatePresence>
+    </Layout>
   );
 }
 

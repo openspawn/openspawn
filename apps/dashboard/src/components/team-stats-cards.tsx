@@ -2,8 +2,8 @@
  * Team Stats Cards — compact overview of each top-level team.
  * Shown on the dashboard page as a "Teams" section.
  */
-import { useMemo } from 'react';
-import { motion } from 'motion/react';
+import { useMemo } from "react";
+import { motion } from "motion/react";
 import {
   Crown,
   Code2,
@@ -12,10 +12,10 @@ import {
   Users,
   Headphones,
   type LucideIcon,
-} from 'lucide-react';
-import { Card } from './ui/card';
-import { getParentTeams, getTeamColor, type Team } from '../demo/teams';
-import { useTeamStats } from '../hooks/use-teams';
+} from "lucide-react";
+import { Card } from "./ui/card";
+import { getParentTeams, getTeamColor, type Team } from "../demo/teams";
+import { useTeamStats } from "../hooks/use-teams";
 
 // ── Icon map (top-level only) ───────────────────────────────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -33,8 +33,7 @@ function getIcon(name: string): LucideIcon {
 
 // ── Health indicator ────────────────────────────────────────────────────────
 function HealthDot({ rate }: { rate: number }) {
-  const color =
-    rate >= 85 ? '#10b981' : rate >= 60 ? '#f59e0b' : '#ef4444';
+  const color = rate >= 85 ? "#10b981" : rate >= 60 ? "#f59e0b" : "#ef4444";
   return (
     <span
       className="inline-block w-2 h-2 rounded-full flex-shrink-0"
@@ -45,22 +44,13 @@ function HealthDot({ rate }: { rate: number }) {
 }
 
 // ── Single card ─────────────────────────────────────────────────────────────
-function TeamCard({
-  team,
-  onClick,
-}: {
-  team: Team;
-  onClick?: (teamId: string) => void;
-}) {
+function TeamCard({ team, onClick }: { team: Team; onClick?: (teamId: string) => void }) {
   const stats = useTeamStats(team.id);
   const color = getTeamColor(team.color);
   const Icon = getIcon(team.icon);
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
+    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Card
         className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow"
         onClick={() => onClick?.(team.id)}
@@ -88,11 +78,7 @@ function TeamCard({
 }
 
 // ── Main export ─────────────────────────────────────────────────────────────
-export function TeamStatsCards({
-  onTeamClick,
-}: {
-  onTeamClick?: (teamId: string) => void;
-}) {
+export function TeamStatsCards({ onTeamClick }: { onTeamClick?: (teamId: string) => void }) {
   const parentTeams = useMemo(() => getParentTeams(), []);
 
   return (

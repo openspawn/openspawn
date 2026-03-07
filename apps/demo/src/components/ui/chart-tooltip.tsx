@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import type { Payload } from 'recharts/types/component/DefaultTooltipContent';
+import type { ReactNode } from "react";
+import type { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 interface ChartTooltipProps {
   active?: boolean;
@@ -32,10 +32,7 @@ export function ChartTooltip({
         {payload.map((entry: Payload<number, string>, i: number) => (
           <div key={i} className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <div
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-xs text-muted-foreground capitalize">
                 {entry.name ?? String(entry.dataKey)}
               </span>
@@ -52,9 +49,9 @@ export function ChartTooltip({
 
 /** Re-usable contentStyle for inline Recharts <Tooltip> when you don't need a full custom component */
 export const oceanTooltipStyle = {
-  backgroundColor: 'hsl(var(--popover) / 0.95)',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: '0.75rem',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-  backdropFilter: 'blur(8px)',
+  backgroundColor: "hsl(var(--popover) / 0.95)",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "0.75rem",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+  backdropFilter: "blur(8px)",
 };

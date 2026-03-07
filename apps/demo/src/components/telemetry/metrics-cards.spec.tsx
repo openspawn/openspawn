@@ -42,9 +42,7 @@ describe("MetricsCards", () => {
   });
 
   it("renders single metric card", () => {
-    const single: MetricCardData[] = [
-      { label: "Test Metric", value: 42, unit: "units" },
-    ];
+    const single: MetricCardData[] = [{ label: "Test Metric", value: 42, unit: "units" }];
     render(<MetricsCards metrics={single} />);
     expect(screen.getByText("Test Metric")).toBeInTheDocument();
     expect(screen.getByText("42")).toBeInTheDocument();

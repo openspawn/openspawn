@@ -3,7 +3,7 @@
  * CSS animations only. prefers-reduced-motion: respected via media query.
  */
 
-import { Play } from 'lucide-react';
+import { Play } from "lucide-react";
 
 interface IntroCardProps {
   onStart: () => void;
@@ -80,28 +80,26 @@ export function IntroCard({ onStart }: IntroCardProps) {
     <div
       className="intro-overlay fixed inset-0 z-50 flex items-center justify-center p-6"
       style={{
-        background: 'rgba(3,14,26,0.97)',
-        backdropFilter: 'blur(12px)',
+        background: "rgba(3,14,26,0.97)",
+        backdropFilter: "blur(12px)",
       }}
     >
       <style>{INTRO_STYLES}</style>
 
       <div className="flex flex-col items-center text-center max-w-2xl w-full">
         {/* Mr. Krabs intro */}
-        <div
-          className="intro-hero flex items-center gap-3 mb-6"
-        >
+        <div className="intro-hero flex items-center gap-3 mb-6">
           <span className="text-4xl">🦀</span>
           <div className="text-left">
             <div
               className="font-black text-lg"
-              style={{ color: '#F4C542', fontFamily: '"Baloo 2", cursive' }}
+              style={{ color: "#F4C542", fontFamily: '"Baloo 2", cursive' }}
             >
               Mr. Krabs
             </div>
             <div
               className="text-xs"
-              style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}
+              style={{ color: "rgba(184,228,247,0.5)", fontFamily: "Nunito, sans-serif" }}
             >
               CEO · The Krusty Krab
             </div>
@@ -112,40 +110,53 @@ export function IntroCard({ onStart }: IntroCardProps) {
         <div
           className="intro-sub w-full max-w-lg rounded-xl mb-6 overflow-hidden"
           style={{
-            background: '#0d1117',
-            border: '1px solid rgba(74,174,217,0.3)',
+            background: "#0d1117",
+            border: "1px solid rgba(74,174,217,0.3)",
           }}
         >
           <div
             className="flex items-center gap-2 px-4 py-2"
-            style={{ background: 'rgba(74,174,217,0.08)', borderBottom: '1px solid rgba(74,174,217,0.15)' }}
+            style={{
+              background: "rgba(74,174,217,0.08)",
+              borderBottom: "1px solid rgba(74,174,217,0.15)",
+            }}
           >
-            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
-            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
-            <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28C840' }} />
-            <span className="ml-2 text-xs" style={{ color: 'rgba(184,228,247,0.3)', fontFamily: 'monospace' }}>terminal</span>
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FEBC2E" }} />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28C840" }} />
+            <span
+              className="ml-2 text-xs"
+              style={{ color: "rgba(184,228,247,0.3)", fontFamily: "monospace" }}
+            >
+              terminal
+            </span>
           </div>
-          <div className="px-4 py-4" style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace', fontSize: '13px' }}>
-            <div style={{ color: 'rgba(184,228,247,0.4)' }}>
-              <span style={{ color: '#4AE88A' }}>mr-krabs</span>
-              <span style={{ color: 'rgba(184,228,247,0.3)' }}> ~ $ </span>
+          <div
+            className="px-4 py-4"
+            style={{ fontFamily: '"Fira Code", "JetBrains Mono", monospace', fontSize: "13px" }}
+          >
+            <div style={{ color: "rgba(184,228,247,0.4)" }}>
+              <span style={{ color: "#4AE88A" }}>mr-krabs</span>
+              <span style={{ color: "rgba(184,228,247,0.3)" }}> ~ $ </span>
             </div>
-            <div className="mt-1" style={{ color: '#79c0ff' }}>
-              npx openspawn start{' '}
-              <span style={{ color: '#F4C542' }}>"Run the Krusty Krab — 10,000 patties, 5 departments, zero humans"</span>
+            <div className="mt-1" style={{ color: "#79c0ff" }}>
+              npx openspawn start{" "}
+              <span style={{ color: "#F4C542" }}>
+                "Run the Krusty Krab — 10,000 patties, 5 departments, zero humans"
+              </span>
             </div>
-            <div className="mt-3" style={{ color: 'rgba(184,228,247,0.5)' }}>
+            <div className="mt-3" style={{ color: "rgba(184,228,247,0.5)" }}>
               <div>🪸 OpenSpawn v0.1.0</div>
               <div className="mt-1">
-                <span style={{ color: '#4AE88A' }}>✓</span> Parsed ORG.md — 22 agents, 5 departments
+                <span style={{ color: "#4AE88A" }}>✓</span> Parsed ORG.md — 22 agents, 5 departments
               </div>
               <div>
-                <span style={{ color: '#4AE88A' }}>✓</span> Created agent workspaces
+                <span style={{ color: "#4AE88A" }}>✓</span> Created agent workspaces
               </div>
               <div>
-                <span style={{ color: '#4AE88A' }}>✓</span> Gateway patched — all agents online
+                <span style={{ color: "#4AE88A" }}>✓</span> Gateway patched — all agents online
               </div>
-              <div className="mt-1" style={{ color: '#4AAED9' }}>
+              <div className="mt-1" style={{ color: "#4AAED9" }}>
                 Your org is running. Dashboard: http://localhost:3333
               </div>
             </div>
@@ -157,9 +168,9 @@ export function IntroCard({ onStart }: IntroCardProps) {
           className="intro-compare font-black mb-3 leading-tight"
           style={{
             fontFamily: '"Baloo 2", cursive',
-            fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-            color: '#F4C542',
-            textShadow: '0 0 40px rgba(244,197,66,0.3)',
+            fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
+            color: "#F4C542",
+            textShadow: "0 0 40px rgba(244,197,66,0.3)",
           }}
         >
           One command. 22 agents. Zero humans.
@@ -168,31 +179,38 @@ export function IntroCard({ onStart }: IntroCardProps) {
         <p
           className="intro-compare text-sm mb-6 max-w-md"
           style={{
-            color: 'rgba(184,228,247,0.6)',
-            fontFamily: 'Nunito, sans-serif',
+            color: "rgba(184,228,247,0.6)",
+            fontFamily: "Nunito, sans-serif",
             lineHeight: 1.6,
           }}
         >
-          Mr. Krabs used{' '}
-          <span style={{ color: '#4AAED9', fontWeight: 700 }}>OpenSpawn</span>
-          {' '}to spin up an entire restaurant operation — kitchen, delivery, finance — from a single ORG.md file.
-          Watch what happens next.
+          Mr. Krabs used <span style={{ color: "#4AAED9", fontWeight: 700 }}>OpenSpawn</span> to
+          spin up an entire restaurant operation — kitchen, delivery, finance — from a single ORG.md
+          file. Watch what happens next.
         </p>
 
         {/* Divider line */}
         <div
           className="intro-line h-px mb-6"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(74,174,217,0.5), transparent)' }}
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(74,174,217,0.5), transparent)",
+          }}
         />
 
         {/* Quick comparison — compact */}
         <div
           className="intro-badge flex items-center gap-4 mb-8 text-xs"
-          style={{ color: 'rgba(184,228,247,0.5)', fontFamily: 'Nunito, sans-serif' }}
+          style={{ color: "rgba(184,228,247,0.5)", fontFamily: "Nunito, sans-serif" }}
         >
-          <span><span style={{ color: '#FF4757' }}>✗</span> Sub-agents: no persistence, no hierarchy, no peer comms</span>
-          <span style={{ color: 'rgba(74,174,217,0.3)' }}>|</span>
-          <span><span style={{ color: '#4AE88A' }}>✓</span> OpenSpawn: persistent org, hierarchy, escalation, budgets</span>
+          <span>
+            <span style={{ color: "#FF4757" }}>✗</span> Sub-agents: no persistence, no hierarchy, no
+            peer comms
+          </span>
+          <span style={{ color: "rgba(74,174,217,0.3)" }}>|</span>
+          <span>
+            <span style={{ color: "#4AE88A" }}>✓</span> OpenSpawn: persistent org, hierarchy,
+            escalation, budgets
+          </span>
         </div>
 
         {/* CTA */}
@@ -200,10 +218,10 @@ export function IntroCard({ onStart }: IntroCardProps) {
           onClick={onStart}
           className="intro-btn flex items-center gap-3 px-10 py-4 rounded-2xl font-black text-lg cursor-pointer border-none"
           style={{
-            background: 'linear-gradient(135deg, #4AAED9 0%, #1A7DB5 100%)',
-            color: '#fff',
+            background: "linear-gradient(135deg, #4AAED9 0%, #1A7DB5 100%)",
+            color: "#fff",
             fontFamily: '"Baloo 2", cursive',
-            letterSpacing: '0.02em',
+            letterSpacing: "0.02em",
           }}
         >
           <Play className="w-5 h-5" />
@@ -212,7 +230,7 @@ export function IntroCard({ onStart }: IntroCardProps) {
 
         <p
           className="text-xs mt-4"
-          style={{ color: 'rgba(184,228,247,0.2)', fontFamily: 'Nunito, sans-serif' }}
+          style={{ color: "rgba(184,228,247,0.2)", fontFamily: "Nunito, sans-serif" }}
         >
           ~75 seconds · 22 agents scale to 42 · Defined in one markdown file
         </p>

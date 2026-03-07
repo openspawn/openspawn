@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Command } from 'cmdk';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Command } from "cmdk";
+import { motion, AnimatePresence } from "motion/react";
 import {
   LayoutDashboard,
   Users,
@@ -15,33 +15,33 @@ import {
   Plus,
   Play,
   Bot,
-} from 'lucide-react';
+} from "lucide-react";
 
 const pages = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Agents', href: '/agents', icon: Users },
-  { name: 'Tasks', href: '/tasks', icon: CheckSquare },
-  { name: 'Credits', href: '/credits', icon: Coins },
-  { name: 'Events', href: '/events', icon: Activity },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Network', href: '/network', icon: Network },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Agents", href: "/agents", icon: Users },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare },
+  { name: "Credits", href: "/credits", icon: Coins },
+  { name: "Events", href: "/events", icon: Activity },
+  { name: "Messages", href: "/messages", icon: MessageSquare },
+  { name: "Network", href: "/network", icon: Network },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 const actions = [
-  { name: 'Create task', keywords: 'new add task', href: '/tasks' },
-  { name: 'Start demo', keywords: 'demo play run', href: '/?demo=true' },
+  { name: "Create task", keywords: "new add task", href: "/tasks" },
+  { name: "Start demo", keywords: "demo play run", href: "/?demo=true" },
 ];
 
 const demoAgents = [
-  { name: 'Alpha', role: 'Task Runner', id: 'alpha' },
-  { name: 'Bravo', role: 'Load Balancer', id: 'bravo' },
-  { name: 'Charlie', role: 'Code Reviewer', id: 'charlie' },
-  { name: 'Delta', role: 'Security Analyst', id: 'delta' },
-  { name: 'Echo', role: 'Cost Optimizer', id: 'echo' },
-  { name: 'Foxtrot', role: 'Data Analyst', id: 'foxtrot' },
-  { name: 'Golf', role: 'Log Monitor', id: 'golf' },
-  { name: 'Hotel', role: 'AI Assistant', id: 'hotel' },
+  { name: "Alpha", role: "Task Runner", id: "alpha" },
+  { name: "Bravo", role: "Load Balancer", id: "bravo" },
+  { name: "Charlie", role: "Code Reviewer", id: "charlie" },
+  { name: "Delta", role: "Security Analyst", id: "delta" },
+  { name: "Echo", role: "Cost Optimizer", id: "echo" },
+  { name: "Foxtrot", role: "Data Analyst", id: "foxtrot" },
+  { name: "Golf", role: "Log Monitor", id: "golf" },
+  { name: "Hotel", role: "AI Assistant", id: "hotel" },
 ];
 
 export function CommandPalette() {
@@ -50,22 +50,19 @@ export function CommandPalette() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((o) => !o);
       }
     };
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const runCommand = useCallback(
-    (command: () => void) => {
-      setOpen(false);
-      command();
-    },
-    []
-  );
+  const runCommand = useCallback((command: () => void) => {
+    setOpen(false);
+    command();
+  }, []);
 
   return (
     <AnimatePresence>
@@ -83,13 +80,13 @@ export function CommandPalette() {
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 400 }}
+            transition={{ type: "spring", damping: 25, stiffness: 400 }}
             className="fixed left-1/2 top-[20%] -translate-x-1/2 z-[101] w-full max-w-lg"
           >
             <Command
               className="rounded-xl border border-border bg-popover shadow-2xl overflow-hidden"
               onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === 'Escape') {
+                if (e.key === "Escape") {
                   setOpen(false);
                 }
               }}
@@ -137,7 +134,7 @@ export function CommandPalette() {
                       onSelect={() => runCommand(() => navigate({ to: action.href }))}
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
-                      {action.name === 'Create task' ? (
+                      {action.name === "Create task" ? (
                         <Plus className="h-4 w-4 text-muted-foreground" />
                       ) : (
                         <Play className="h-4 w-4 text-muted-foreground" />
@@ -157,14 +154,12 @@ export function CommandPalette() {
                     <Command.Item
                       key={agent.id}
                       value={`${agent.name} ${agent.role}`}
-                      onSelect={() => runCommand(() => navigate({ to: '/agents' }))}
+                      onSelect={() => runCommand(() => navigate({ to: "/agents" }))}
                       className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground/80 cursor-pointer aria-selected:bg-primary/15 aria-selected:text-primary transition-colors"
                     >
                       <Bot className="h-4 w-4 text-muted-foreground" />
                       <span>{agent.name}</span>
-                      <span className="ml-auto text-xs text-muted-foreground">
-                        {agent.role}
-                      </span>
+                      <span className="ml-auto text-xs text-muted-foreground">{agent.role}</span>
                     </Command.Item>
                   ))}
                 </Command.Group>
@@ -172,11 +167,17 @@ export function CommandPalette() {
 
               <div className="flex items-center justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">↑↓</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                    ↑↓
+                  </kbd>
                   <span>navigate</span>
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">↵</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                    ↵
+                  </kbd>
                   <span>select</span>
-                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">esc</kbd>
+                  <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                    esc
+                  </kbd>
                   <span>close</span>
                 </div>
               </div>

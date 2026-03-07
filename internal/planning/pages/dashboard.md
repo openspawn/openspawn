@@ -2,7 +2,7 @@
 
 <span class="status status-planned">Planned</span>
 
-*Updated: Feb 26, 2026*
+_Updated: Feb 26, 2026_
 
 ## Vision
 
@@ -11,6 +11,7 @@
 ## Current State
 
 The dashboard exists and works for the **BikiniBottom demo** (replay mode). It shows:
+
 - Org chart with agent status indicators
 - Live message feed
 - Stats bar (kitchen rate, queue, revenue)
@@ -21,32 +22,37 @@ The dashboard exists and works for the **BikiniBottom demo** (replay mode). It s
 ## What Needs Building
 
 ### Phase 1: Serve from CLI
+
 ```bash
 openspawn dashboard          # localhost:3333
 openspawn dashboard --port 4000
 ```
+
 - Bundle dashboard as static assets in the CLI (or `npx` fetch)
 - Serve via embedded HTTP server
 - Read org config from current directory
 
 ### Phase 2: Real Agent Data
+
 - Dashboard reads from SQLite coordination DB
 - Agent status (idle/working/busy) from real gateway state
 - Task board view — open, claimed, completed, blocked
 - Event stream via SSE for live updates
 
 ### Phase 3: Controls
-| Control | Action |
-|---------|--------|
-| Hire button | Calls `openspawn hire` → patches gateway |
-| Fire button | Calls `openspawn fire` → removes agent |
-| Promote/demote | Changes agent level |
-| Assign task | Creates task in SQLite, notifies agent |
-| Pause/resume | Suspends agent without removing |
-| Escalate | Manually push issue up hierarchy |
-| Budget adjust | Change per-agent credit limits |
+
+| Control        | Action                                   |
+| -------------- | ---------------------------------------- |
+| Hire button    | Calls `openspawn hire` → patches gateway |
+| Fire button    | Calls `openspawn fire` → removes agent   |
+| Promote/demote | Changes agent level                      |
+| Assign task    | Creates task in SQLite, notifies agent   |
+| Pause/resume   | Suspends agent without removing          |
+| Escalate       | Manually push issue up hierarchy         |
+| Budget adjust  | Change per-agent credit limits           |
 
 ### Phase 4: Monitoring
+
 - Token usage per agent (real-time)
 - Task completion rates
 - Communication overhead metrics

@@ -3,8 +3,8 @@
  * Shows: created → assigned → started → messages → completed/rejected
  * Click any node to see details. Supports drill-down into agent detail.
  */
-import { useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Plus,
   UserPlus,
@@ -17,23 +17,23 @@ import {
   ChevronDown,
   ChevronRight,
   ArrowRight,
-} from 'lucide-react';
-import { Card, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { AgentAvatar } from './agent-avatar';
-import { cn } from '../lib/utils';
-import { useAgents, useTasks, useMessages } from '../hooks';
-import type { Task } from '../hooks/use-tasks';
-import type { Message } from '../hooks/use-messages';
-import { getTaskStatusVariant } from '../lib/status-colors';
-import { TaskStatus } from '../graphql/generated/graphql';
+} from "lucide-react";
+import { Card, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { AgentAvatar } from "./agent-avatar";
+import { cn } from "../lib/utils";
+import { useAgents, useTasks, useMessages } from "../hooks";
+import type { Task } from "../hooks/use-tasks";
+import type { Message } from "../hooks/use-messages";
+import { getTaskStatusVariant } from "../lib/status-colors";
+import { TaskStatus } from "../graphql/generated/graphql";
 
 // ── Timeline event types ────────────────────────────────────────────────────
 
 interface TimelineEvent {
   id: string;
-  type: 'created' | 'assigned' | 'started' | 'message' | 'completed' | 'rejected' | 'review';
+  type: "created" | "assigned" | "started" | "message" | "completed" | "rejected" | "review";
   timestamp: string;
   label: string;
   detail?: string;
@@ -43,20 +43,24 @@ interface TimelineEvent {
   color: string;
 }
 
-function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<string, { name: string; level: number }>): TimelineEvent[] {
+function buildTimelineEvents(
+  task: Task,
+  messages: Message[],
+  agentMap: Map<string, { name: string; level: number }>,
+): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
   // Created
   events.push({
     id: `${task.id}-created`,
-    type: 'created',
+    type: "created",
     timestamp: task.createdAt,
-    label: 'Task Created',
+    label: "Task Created",
     detail: task.title,
     agentId: task.creatorId,
-    agentName: agentMap.get(task.creatorId)?.name || 'System',
+    agentName: agentMap.get(task.creatorId)?.name || "System",
     icon: Plus,
-    color: '#06b6d4',
+    color: "#06b6d4",
   });
 
   // Assigned (if has assignee and different from creator)
@@ -64,14 +68,14 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
     const assignTime = new Date(new Date(task.createdAt).getTime() + 30000).toISOString();
     events.push({
       id: `${task.id}-assigned`,
-      type: 'assigned',
+      type: "assigned",
       timestamp: assignTime,
-      label: 'Assigned',
-      detail: `to ${agentMap.get(task.assigneeId)?.name || 'agent'}`,
+      label: "Assigned",
+      detail: `to ${agentMap.get(task.assigneeId)?.name || "agent"}`,
       agentId: task.assigneeId,
       agentName: agentMap.get(task.assigneeId)?.name,
       icon: UserPlus,
-      color: '#8b5cf6',
+      color: "#8b5cf6",
     });
   }
 
@@ -80,13 +84,13 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
     const startTime = new Date(new Date(task.createdAt).getTime() + 60000).toISOString();
     events.push({
       id: `${task.id}-started`,
-      type: 'started',
+      type: "started",
       timestamp: startTime,
-      label: 'Work Started',
+      label: "Work Started",
       agentId: task.assigneeId || undefined,
       agentName: task.assigneeId ? agentMap.get(task.assigneeId)?.name : undefined,
       icon: Play,
-      color: '#10b981',
+      color: "#10b981",
     });
   }
 
@@ -98,25 +102,25 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   taskMessages.slice(0, 5).forEach((msg, i) => {
     events.push({
       id: `${task.id}-msg-${i}`,
-      type: 'message',
+      type: "message",
       timestamp: msg.createdAt,
-      label: `Message from ${agentMap.get(msg.fromAgentId)?.name || 'agent'}`,
-      detail: msg.content.slice(0, 80) + (msg.content.length > 80 ? '…' : ''),
+      label: `Message from ${agentMap.get(msg.fromAgentId)?.name || "agent"}`,
+      detail: msg.content.slice(0, 80) + (msg.content.length > 80 ? "…" : ""),
       agentId: msg.fromAgentId,
       agentName: agentMap.get(msg.fromAgentId)?.name,
       icon: MessageSquare,
-      color: '#f59e0b',
+      color: "#f59e0b",
     });
   });
 
   if (taskMessages.length > 5) {
     events.push({
       id: `${task.id}-msg-more`,
-      type: 'message',
+      type: "message",
       timestamp: taskMessages[5].createdAt,
       label: `+${taskMessages.length - 5} more messages`,
       icon: MessageSquare,
-      color: '#f59e0b',
+      color: "#f59e0b",
     });
   }
 
@@ -124,11 +128,11 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   if (task.status === TaskStatus.Review) {
     events.push({
       id: `${task.id}-review`,
-      type: 'review',
+      type: "review",
       timestamp: task.updatedAt,
-      label: 'In Review',
+      label: "In Review",
       icon: Clock,
-      color: '#f97316',
+      color: "#f97316",
     });
   }
 
@@ -136,11 +140,11 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   if (task.completedAt) {
     events.push({
       id: `${task.id}-completed`,
-      type: 'completed',
+      type: "completed",
       timestamp: task.completedAt,
-      label: 'Completed',
+      label: "Completed",
       icon: CheckCircle2,
-      color: '#10b981',
+      color: "#10b981",
     });
   }
 
@@ -148,12 +152,12 @@ function buildTimelineEvents(task: Task, messages: Message[], agentMap: Map<stri
   if (task.rejection) {
     events.push({
       id: `${task.id}-rejected`,
-      type: 'rejected',
+      type: "rejected",
       timestamp: task.updatedAt,
-      label: 'Rejected',
+      label: "Rejected",
       detail: task.rejection.feedback || undefined,
       icon: XCircle,
-      color: '#ef4444',
+      color: "#ef4444",
     });
   }
 
@@ -200,17 +204,17 @@ function TimelineNode({
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all',
+          "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
           isSelected
-            ? 'ring-2 ring-offset-2 ring-offset-background'
-            : 'hover:ring-1 hover:ring-offset-1 hover:ring-offset-background',
+            ? "ring-2 ring-offset-2 ring-offset-background"
+            : "hover:ring-1 hover:ring-offset-1 hover:ring-offset-background",
         )}
         style={{
           borderColor: event.color,
           backgroundColor: isSelected ? event.color : `${event.color}15`,
-          color: isSelected ? 'white' : event.color,
+          color: isSelected ? "white" : event.color,
           // ring color matches event
-          ...(isSelected ? { ['--tw-ring-color' as string]: event.color } : {}),
+          ...(isSelected ? { ["--tw-ring-color" as string]: event.color } : {}),
         }}
       >
         <Icon className="h-4 w-4" />
@@ -232,10 +236,10 @@ function TimelineNode({
 function formatShortTime(dateStr: string) {
   const d = new Date(dateStr);
   const diff = Date.now() - d.getTime();
-  if (diff < 60000) return 'just now';
+  if (diff < 60000) return "just now";
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-  if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  if (diff < 86400000) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
 function formatDuration(startStr: string, endStr: string) {
@@ -269,13 +273,12 @@ function TaskTimelineRow({
     [task, messages, agentMap],
   );
 
-  const duration =
-    task.completedAt
-      ? formatDuration(task.createdAt, task.completedAt)
-      : formatDuration(task.createdAt, new Date().toISOString());
+  const duration = task.completedAt
+    ? formatDuration(task.createdAt, task.completedAt)
+    : formatDuration(task.createdAt, new Date().toISOString());
 
   return (
-    <Card className={cn('transition-all', open && 'ring-1 ring-primary/20')}>
+    <Card className={cn("transition-all", open && "ring-1 ring-primary/20")}>
       {/* Header — always visible */}
       <button
         onClick={() => setOpen((v) => !v)}
@@ -299,11 +302,10 @@ function TaskTimelineRow({
           {task.assigneeId && (
             <AgentAvatar
               agentId={agentMap.get(task.assigneeId)?.name || task.assigneeId}
-              name={agentMap.get(task.assigneeId)?.name || '?'}
+              name={agentMap.get(task.assigneeId)?.name || "?"}
               level={agentMap.get(task.assigneeId)?.level || 1}
               size="sm"
               avatar={(agentMap.get(task.assigneeId) as any)?.avatar}
-
               avatarUrl={(agentMap.get(task.assigneeId) as any)?.avatarUrl}
               avatarColor={(agentMap.get(task.assigneeId) as any)?.avatarColor}
             />
@@ -316,17 +318,14 @@ function TaskTimelineRow({
         {open && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
             <div className="border-t border-border px-3 sm:px-4 py-4">
               {/* Horizontal scrollable timeline */}
-              <div
-                ref={scrollRef}
-                className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide"
-              >
+              <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
                 {events.map((event, i) => (
                   <TimelineNode
                     key={event.id}
@@ -335,9 +334,7 @@ function TaskTimelineRow({
                     isLast={i === events.length - 1}
                     isSelected={selectedEvent?.id === event.id}
                     onClick={() =>
-                      setSelectedEvent((prev) =>
-                        prev?.id === event.id ? null : event,
-                      )
+                      setSelectedEvent((prev) => (prev?.id === event.id ? null : event))
                     }
                   />
                 ))}
@@ -357,7 +354,10 @@ function TaskTimelineRow({
                     <div className="flex items-center gap-2 mb-1">
                       <div
                         className="h-6 w-6 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: `${selectedEvent.color}20`, color: selectedEvent.color }}
+                        style={{
+                          backgroundColor: `${selectedEvent.color}20`,
+                          color: selectedEvent.color,
+                        }}
                       >
                         <selectedEvent.icon className="h-3.5 w-3.5" />
                       </div>
@@ -376,7 +376,7 @@ function TaskTimelineRow({
                         onClick={() => onAgentClick(selectedEvent.agentId!)}
                         className="mt-2 pl-8 text-xs text-primary hover:underline flex items-center gap-1"
                       >
-                        View {selectedEvent.agentName || 'agent'} <ArrowRight className="h-3 w-3" />
+                        View {selectedEvent.agentName || "agent"} <ArrowRight className="h-3 w-3" />
                       </button>
                     )}
                   </motion.div>
@@ -392,15 +392,11 @@ function TaskTimelineRow({
 
 // ── Main Timeline View ──────────────────────────────────────────────────────
 
-export function TaskTimeline({
-  onAgentClick,
-}: {
-  onAgentClick?: (id: string) => void;
-}) {
+export function TaskTimeline({ onAgentClick }: { onAgentClick?: (id: string) => void }) {
   const { tasks } = useTasks();
   const { messages } = useMessages(200);
   const { agents } = useAgents();
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>("all");
   const [limit, setLimit] = useState(10);
 
   const agentMap = useMemo(() => {
@@ -412,7 +408,7 @@ export function TaskTimeline({
   // Sort tasks by most recently updated
   const sortedTasks = useMemo(() => {
     let filtered = [...tasks];
-    if (filter !== 'all') {
+    if (filter !== "all") {
       filtered = filtered.filter((t) => t.status === filter);
     }
     return filtered
@@ -432,7 +428,9 @@ export function TaskTimeline({
     return (
       <Card className="p-8 text-center">
         <AlertTriangle className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-        <p className="text-muted-foreground">No tasks to display. Start the simulation to see task timelines.</p>
+        <p className="text-muted-foreground">
+          No tasks to display. Start the simulation to see task timelines.
+        </p>
       </Card>
     );
   }
@@ -442,9 +440,9 @@ export function TaskTimeline({
       {/* Filters */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <Button
-          variant={filter === 'all' ? 'default' : 'outline'}
+          variant={filter === "all" ? "default" : "outline"}
           size="sm"
-          onClick={() => setFilter('all')}
+          onClick={() => setFilter("all")}
           className="shrink-0"
         >
           All ({tasks.length})
@@ -454,7 +452,7 @@ export function TaskTimeline({
           .map(([status, count]) => (
             <Button
               key={status}
-              variant={filter === status ? 'default' : 'outline'}
+              variant={filter === status ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter(status)}
               className="shrink-0 capitalize"

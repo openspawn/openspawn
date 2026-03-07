@@ -48,7 +48,14 @@ const PRESETS: Record<string, { label: string; description: string; widgets: str
   overview: {
     label: "Overview",
     description: "All widgets visible",
-    widgets: ["stats-overview", "teams-overview", "credit-flow-chart", "tasks-by-status", "available-agents", "recent-activity"],
+    widgets: [
+      "stats-overview",
+      "teams-overview",
+      "credit-flow-chart",
+      "tasks-by-status",
+      "available-agents",
+      "recent-activity",
+    ],
   },
   operations: {
     label: "Operations",
@@ -71,10 +78,7 @@ function loadLayout(): WidgetConfig[] {
       const saved: WidgetConfig[] = JSON.parse(raw);
       // Merge with defaults in case new widgets were added
       const savedIds = new Set(saved.map((w) => w.id));
-      const merged = [
-        ...saved,
-        ...DEFAULT_WIDGETS.filter((w) => !savedIds.has(w.id)),
-      ];
+      const merged = [...saved, ...DEFAULT_WIDGETS.filter((w) => !savedIds.has(w.id))];
       return merged;
     }
   } catch {
@@ -100,11 +104,9 @@ export function useDashboardLayout() {
 
   const toggleVisibility = useCallback(
     (id: string) => {
-      updateWidgets(
-        widgets.map((w) => (w.id === id ? { ...w, visible: !w.visible } : w))
-      );
+      updateWidgets(widgets.map((w) => (w.id === id ? { ...w, visible: !w.visible } : w)));
     },
-    [widgets, updateWidgets]
+    [widgets, updateWidgets],
   );
 
   const reorder = useCallback(
@@ -115,7 +117,7 @@ export function useDashboardLayout() {
         updateWidgets(arrayMove(widgets, oldIndex, newIndex));
       }
     },
-    [widgets, updateWidgets]
+    [widgets, updateWidgets],
   );
 
   const applyPreset = useCallback(
@@ -123,18 +125,14 @@ export function useDashboardLayout() {
       const preset = PRESETS[presetKey];
       if (!preset) return;
       const ordered = preset.widgets.map(
-        (id) =>
-          widgets.find((w) => w.id === id) || { id, label: id, visible: true }
+        (id) => widgets.find((w) => w.id === id) || { id, label: id, visible: true },
       );
       const rest = widgets
         .filter((w) => !preset.widgets.includes(w.id))
         .map((w) => ({ ...w, visible: false }));
-      updateWidgets([
-        ...ordered.map((w) => ({ ...w, visible: true })),
-        ...rest,
-      ]);
+      updateWidgets([...ordered.map((w) => ({ ...w, visible: true })), ...rest]);
     },
-    [widgets, updateWidgets]
+    [widgets, updateWidgets],
   );
 
   const resetLayout = useCallback(() => {
@@ -164,14 +162,10 @@ function SortableWidget({
   editMode: boolean;
   children: React.ReactNode;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id, disabled: !editMode });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    disabled: !editMode,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -182,12 +176,8 @@ function SortableWidget({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group ${
-        isDragging ? "z-50 opacity-50" : ""
-      } ${
-        editMode
-          ? "border-2 border-dashed border-cyan-500/30 rounded-xl p-1"
-          : ""
+      className={`relative group ${isDragging ? "z-50 opacity-50" : ""} ${
+        editMode ? "border-2 border-dashed border-cyan-500/30 rounded-xl p-1" : ""
       }`}
     >
       {editMode && (
@@ -335,13 +325,10 @@ export function DashboardGrid({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const visibleWidgets = useMemo(
-    () => widgets.filter((w) => w.visible),
-    [widgets]
-  );
+  const visibleWidgets = useMemo(() => widgets.filter((w) => w.visible), [widgets]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(String(event.active.id));
@@ -355,7 +342,7 @@ export function DashboardGrid({
         reorder(String(active.id), String(over.id));
       }
     },
-    [reorder]
+    [reorder],
   );
 
   return (
@@ -391,9 +378,7 @@ export function DashboardGrid({
 
       <DragOverlay>
         {activeId ? (
-          <div className="opacity-90 shadow-2xl rounded-xl">
-            {renderWidget(activeId)}
-          </div>
+          <div className="opacity-90 shadow-2xl rounded-xl">{renderWidget(activeId)}</div>
         ) : null}
       </DragOverlay>
     </DndContext>

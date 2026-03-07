@@ -17,7 +17,8 @@ export function createMcpServer(): McpServer {
   });
 
   // Get config from environment (support both OPENSPAWN_ and plain prefixes)
-  const baseUrl = process.env["OPENSPAWN_API_URL"] || process.env["API_URL"] || "http://localhost:3000";
+  const baseUrl =
+    process.env["OPENSPAWN_API_URL"] || process.env["API_URL"] || "http://localhost:3000";
   const apiKey = process.env["OPENSPAWN_API_KEY"];
   const agentId = process.env["OPENSPAWN_AGENT_ID"] || process.env["AGENT_ID"];
   const secret = process.env["OPENSPAWN_AGENT_SECRET"] || process.env["AGENT_SECRET"];

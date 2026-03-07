@@ -14,14 +14,19 @@ declare const __COMMIT_SHA__: string;
 declare const __BUILD_TIME__: string;
 
 // Log build info to console
-const brand = isBBTheme ? '🌊 BikiniBottom' : '⚡ OpenSpawn';
+const brand = isBBTheme ? "🌊 BikiniBottom" : "⚡ OpenSpawn";
 console.log(
   `%c${brand} %c${__COMMIT_SHA__}%c built ${__BUILD_TIME__}`,
-  'color: #06b6d4; font-weight: bold; font-size: 14px',
-  'color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace',
-  'color: #64748b'
+  "color: #06b6d4; font-weight: bold; font-size: 14px",
+  "color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace",
+  "color: #64748b",
 );
-import { OnboardingProvider, WelcomeScreen, FeatureTour, CompletionCelebration } from "../components/onboarding";
+import {
+  OnboardingProvider,
+  WelcomeScreen,
+  FeatureTour,
+  CompletionCelebration,
+} from "../components/onboarding";
 // Tour components moved inside RouterProvider (routes.tsx) — they need router context
 import { AuthProvider, SidePanelProvider } from "../contexts";
 import { router } from "../routes";
@@ -29,14 +34,14 @@ import type { ReactNode } from "react";
 
 // Check for demo/sandbox mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
-const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
-const scenarioParam = urlParams.get('scenario') || 'acmetech';
+const isDemoMode = urlParams.get("demo") === "true" || import.meta.env.VITE_DEMO_MODE === "true";
+const scenarioParam = urlParams.get("scenario") || "acmetech";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: (isDemoMode || isSandboxMode) ? 1000 * 5 : 1000 * 60,
-      gcTime: (isDemoMode || isSandboxMode) ? 1000 * 30 : 1000 * 60 * 5,
+      staleTime: isDemoMode || isSandboxMode ? 1000 * 5 : 1000 * 60,
+      gcTime: isDemoMode || isSandboxMode ? 1000 * 30 : 1000 * 60 * 5,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
       // No global refetchInterval — SSE tick_complete events drive invalidation
@@ -50,7 +55,7 @@ function DemoWrapper({ children }: { children: ReactNode }) {
   if (!isDemoMode) {
     return <>{children}</>;
   }
-  
+
   return (
     <DemoProvider scenario={scenarioParam} autoPlay={false} initialSpeed={1}>
       {children}
@@ -77,15 +82,15 @@ export function App() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <OnboardingProvider>
-            <SidePanelProvider>
-            <DemoWrapper>
-              <OfflineIndicator />
-              <WelcomeScreen />
-              <FeatureTour />
-              <CompletionCelebration />
-              <RouterProvider router={router} />
-            </DemoWrapper>
-            </SidePanelProvider>
+              <SidePanelProvider>
+                <DemoWrapper>
+                  <OfflineIndicator />
+                  <WelcomeScreen />
+                  <FeatureTour />
+                  <CompletionCelebration />
+                  <RouterProvider router={router} />
+                </DemoWrapper>
+              </SidePanelProvider>
             </OnboardingProvider>
           </NotificationProvider>
         </QueryClientProvider>

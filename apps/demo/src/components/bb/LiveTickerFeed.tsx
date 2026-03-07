@@ -4,29 +4,29 @@
  * NOTE: All animations use plain CSS — no motion/react.
  */
 
-import { useEffect, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 
 export interface TickerMessage {
   id: string;
   agentEmoji: string;
   agentName: string;
   text: string;
-  type: 'message' | 'escalation' | 'completion' | 'delegation';
+  type: "message" | "escalation" | "completion" | "delegation";
 }
 
-const TYPE_STYLE: Record<TickerMessage['type'], string> = {
-  message:    'text-[#B8E4F7]',
-  escalation: 'text-[#FF6B6B]',
-  completion: 'text-[#4AE88A]',
-  delegation: 'text-[#F4C542]',
+const TYPE_STYLE: Record<TickerMessage["type"], string> = {
+  message: "text-[#B8E4F7]",
+  escalation: "text-[#FF6B6B]",
+  completion: "text-[#4AE88A]",
+  delegation: "text-[#F4C542]",
 };
 
-const BORDER_STYLE: Record<TickerMessage['type'], string> = {
-  message:    '',
-  escalation: 'border-l-2 border-l-[#FF6B6B] !pl-3',
-  completion: 'border-l-2 border-l-[#4AE88A] !pl-3',
-  delegation: 'border-l-2 border-l-[#F4C542] !pl-3',
+const BORDER_STYLE: Record<TickerMessage["type"], string> = {
+  message: "",
+  escalation: "border-l-2 border-l-[#FF6B6B] !pl-3",
+  completion: "border-l-2 border-l-[#4AE88A] !pl-3",
+  delegation: "border-l-2 border-l-[#F4C542] !pl-3",
 };
 
 interface LiveTickerFeedProps {
@@ -70,9 +70,9 @@ export function LiveTickerFeed({ messages, onJoinWatch }: LiveTickerFeedProps) {
       <div
         ref={listRef}
         className="h-48 overflow-y-auto scrollbar-none px-0 py-1"
-        style={{ scrollBehavior: 'smooth' }}
+        style={{ scrollBehavior: "smooth" }}
       >
-        {messages.map(msg => (
+        {messages.map((msg) => (
           <div
             key={msg.id}
             className={`

@@ -2,10 +2,7 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema: "./schema.gql",
-  documents: [
-    "libs/dashboard-data/src/**/*.ts",
-    "libs/dashboard-data/src/**/*.tsx",
-  ],
+  documents: ["libs/dashboard-data/src/**/*.ts", "libs/dashboard-data/src/**/*.tsx"],
   ignoreNoDocuments: true,
   generates: {
     "libs/dashboard-data/src/graphql/generated/": {

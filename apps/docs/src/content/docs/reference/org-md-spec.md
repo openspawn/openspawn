@@ -10,13 +10,13 @@ title: ORG.md Specification
 
 The agent ecosystem already speaks markdown. `CLAUDE.md` defines one agent's behavior. `AGENTS.md` defines workspace rules. `ORG.md` defines an entire organization.
 
-Markdown has a unique advantage over YAML/JSON for this: **you can mix intent with structure.** An org definition isn't just data — it's *philosophy*. Why is the team structured this way? What communication norms matter? That context is critical when humans review changes, when agents onboard, and when the system proposes optimizations.
+Markdown has a unique advantage over YAML/JSON for this: **you can mix intent with structure.** An org definition isn't just data — it's _philosophy_. Why is the team structured this way? What communication norms matter? That context is critical when humans review changes, when agents onboard, and when the system proposes optimizations.
 
 The markdown IS the documentation. No separate wiki explaining what the config means.
 
 ```
 CLAUDE.md  → defines one agent's behavior
-AGENTS.md  → defines workspace rules  
+AGENTS.md  → defines workspace rules
 ORG.md     → defines an entire organization
 ```
 
@@ -30,10 +30,15 @@ An ORG.md file has five sections, each defined by a top-level heading. All secti
 # Organization Name
 
 ## Identity
-## Culture  
+
+## Culture
+
 ## SDLC
+
 ## Structure
+
 ## Policies
+
 ## Playbooks
 ```
 
@@ -85,14 +90,14 @@ preset: startup
 
 Available presets:
 
-| Preset | Escalation | Progress | Hierarchy | Vibe |
-|--------|-----------|----------|-----------|------|
-| `startup` | Immediate | Frequent | 2-3 levels | Fast, scrappy, everyone does everything |
-| `enterprise` | Batched (hourly) | On phase change | 5-8 levels | Process-driven, governance, separation of concerns |
-| `agency` | Immediate | Every tick | 3-4 levels | Client-facing, deadline-driven, high visibility |
-| `research` | Delayed | On request | 2-3 levels | Exploratory, high autonomy, long-running tasks |
-| `military` | Immediate | Every tick | Strict chain | Zero ambiguity, mandatory acks, full situational awareness |
-| `remote-async` | Delayed | On request | Flat | High trust, timezone-distributed, async-first |
+| Preset         | Escalation       | Progress        | Hierarchy    | Vibe                                                       |
+| -------------- | ---------------- | --------------- | ------------ | ---------------------------------------------------------- |
+| `startup`      | Immediate        | Frequent        | 2-3 levels   | Fast, scrappy, everyone does everything                    |
+| `enterprise`   | Batched (hourly) | On phase change | 5-8 levels   | Process-driven, governance, separation of concerns         |
+| `agency`       | Immediate        | Every tick      | 3-4 levels   | Client-facing, deadline-driven, high visibility            |
+| `research`     | Delayed          | On request      | 2-3 levels   | Exploratory, high autonomy, long-running tasks             |
+| `military`     | Immediate        | Every tick      | Strict chain | Zero ambiguity, mandatory acks, full situational awareness |
+| `remote-async` | Delayed          | On request      | Flat         | High trust, timezone-distributed, async-first              |
 
 Presets are starting points. Override any parameter inline:
 
@@ -100,6 +105,7 @@ Presets are starting points. Override any parameter inline:
 ## Culture
 
 preset: startup
+
 - **Escalation:** delayed — we trust our leads to figure it out
 ```
 
@@ -117,12 +123,12 @@ preset: standard
 
 **Available presets:**
 
-| Preset | Branch strategy | PRs required | Deploy verification | Orphan branches |
-|--------|----------------|--------------|--------------------|-----------------| 
-| `standard` | Trunk-based, branch off `main` | Yes, targeting `main` | Smoke test required | Forbidden |
-| `strict` | Same as standard + mandatory review, max 500 LOC per PR | Yes, with approval | Full E2E suite | Forbidden |
-| `solo` | Trunk-based, direct push allowed | Optional | Manual spot-check | Forbidden |
-| `research` | Feature branches, long-lived OK | Yes | Optional | Forbidden |
+| Preset     | Branch strategy                                         | PRs required          | Deploy verification | Orphan branches |
+| ---------- | ------------------------------------------------------- | --------------------- | ------------------- | --------------- |
+| `standard` | Trunk-based, branch off `main`                          | Yes, targeting `main` | Smoke test required | Forbidden       |
+| `strict`   | Same as standard + mandatory review, max 500 LOC per PR | Yes, with approval    | Full E2E suite      | Forbidden       |
+| `solo`     | Trunk-based, direct push allowed                        | Optional              | Manual spot-check   | Forbidden       |
+| `research` | Feature branches, long-lived OK                         | Yes                   | Optional            | Forbidden       |
 
 All presets share one invariant: **orphan branches are always forbidden.** Agents will take the path of least resistance — `git init` "works" locally but creates parallel histories that can't merge. The spec prevents this by default.
 
@@ -134,6 +140,7 @@ All presets share one invariant: **orphan branches are always forbidden.** Agent
 preset: standard
 
 ### Source Control
+
 - **Branch strategy:** trunk-based — always branch off `main`
 - **Branch naming:** `<role>/<feature>` (e.g., `web-eng/auth-flow`)
 - **Orphan branches:** forbidden — never `git init`, never create disconnected history
@@ -141,6 +148,7 @@ preset: standard
 - **Pre-work ritual:** `git fetch origin && git checkout -b <branch> origin/main`
 
 ### Pull Requests
+
 - **Required:** yes — every change, even typo fixes
 - **Target:** `main`
 - **Max size:** 500 lines (soft), 1000 lines (hard)
@@ -148,16 +156,19 @@ preset: standard
 - **Scope:** one feature per PR — don't accumulate large batches
 
 ### Quality Gates
+
 - **Pre-merge:** typecheck passes (`tsc --noEmit`), lint clean, tests pass
 - **Post-deploy:** smoke test required (Playwright or equivalent)
 - **Dependency additions:** must be checked for framework compatibility
 
 ### Deploy
+
 - **Pipeline:** PR merge → build → deploy → verify → announce
 - **Verification:** HTTP 200 on primary routes + no client-side JS errors
 - **Communication:** post to #alerts (or equivalent channel) on every deploy
 
 ### Incident Response
+
 - **Flag immediately** in the team channel — don't wait
 - **Document:** what happened, root cause, what changed
 - **Post-mortem:** update SDLC rules if a process gap caused the incident
@@ -178,18 +189,21 @@ clone: /opt/org/openspawn
 strategy: worktree-per-agent
 
 #### Worktrees
+
 - designer → /opt/org/openspawn-designer
 - web-eng → /opt/org/openspawn-web-eng
 - docs-writer → /opt/org/openspawn-docs
 ```
 
 **`worktree-per-agent`** (recommended default):
+
 - One shared `.git` directory — single object store, single fetch updates all refs
 - Each agent gets a dedicated worktree on a unique branch
 - Orphan histories are **structurally impossible** — `git worktree add` always branches from the real tree
 - The org boot sequence creates worktrees; agents never run `git init` or `git clone`
 
 **Rules enforced by the strategy:**
+
 - **One branch per worktree.** Two worktrees cannot check out the same branch.
 - **Serialize fetches.** One fetch before spawning a batch of agents — not per-agent. Prevents `.git/index.lock` contention.
 - **No `git stash`.** Stash is shared across worktrees. Agents commit or discard instead.
@@ -197,6 +211,7 @@ strategy: worktree-per-agent
 - **Cleanup on deactivation.** When an agent is removed or a sub-agent finishes, `git worktree prune` reclaims its directory.
 
 **Alternative strategies:**
+
 - `clone-per-agent` — full clone per agent. Higher disk usage but zero contention. Use for large teams or repos with submodules.
 - `shared` — all agents use the same working directory. Only viable for single-writer orgs (one agent writes, others read).
 
@@ -212,6 +227,7 @@ The org chart. Departments, roles, and hierarchy — defined as nested markdown.
 ## Structure
 
 ### COO
+
 The operational backbone. Receives orders from the human principal,
 breaks them into departmental work, ensures nothing falls through cracks.
 
@@ -220,55 +236,71 @@ breaks them into departmental work, ensures nothing falls through cracks.
 - **Reports to:** Human Principal
 
 ### Engineering
+
 Our largest team. Owns code, infrastructure, testing, and deployment.
 
 #### Engineering Lead
+
 Triages technical work. Delegates to specialists. Reviews output.
+
 - **Model:** claude-sonnet
 - **Domain:** engineering
 
 #### Backend Senior
+
 Owns API, database, and server infrastructure.
+
 - **Model:** claude-haiku
 - **Domain:** backend
 - **Count:** 2
 
 #### Frontend Workers
+
 Build and maintain the dashboard and marketing site.
+
 - **Model:** claude-haiku
 - **Domain:** frontend
 - **Count:** 3
 
 #### QA Worker
+
 Writes and runs tests. Reviews PRs for quality.
+
 - **Model:** claude-haiku
 - **Domain:** testing
 
 ### Security
+
 Small but critical. Every deploy needs their sign-off.
 
 #### Security Lead
+
 - **Model:** claude-sonnet
 - **Domain:** appsec
 
 #### Security Worker
-- **Model:** claude-haiku  
+
+- **Model:** claude-haiku
 - **Domain:** infrastructure-security
 
 ### Marketing
+
 Owns content, campaigns, and public presence.
 
 #### Marketing Lead
+
 - **Model:** claude-sonnet
 - **Domain:** content
 
 #### Content Workers
+
 - **Model:** claude-haiku
 - **Domain:** copywriting
 - **Count:** 2
 ```
 
 **How hierarchy is inferred:**
+
 - H2 (`##`) = top-level section (Structure itself)
 - H3 (`###`) = department or C-level role (L9-10)
 - H4 (`####`) = department member roles
@@ -277,14 +309,14 @@ Owns content, campaigns, and public presence.
 
 **Role keywords and levels:**
 
-| Keyword in role name | Inferred level | Can delegate? | Can spawn? |
-|---------------------|----------------|---------------|------------|
-| COO, CTO, CEO | L10 | ✅ | ✅ |
-| VP, Director, Talent | L9 | ✅ | ✅ |
-| Lead, Manager | L7 | ✅ | ✅ |
-| Senior, Principal | L6 | ✅ | ❌ |
-| Worker, Engineer, Agent | L4 | ❌ | ❌ |
-| Junior, Intern, Assistant | L1-2 | ❌ | ❌ |
+| Keyword in role name      | Inferred level | Can delegate? | Can spawn? |
+| ------------------------- | -------------- | ------------- | ---------- |
+| COO, CTO, CEO             | L10            | ✅            | ✅         |
+| VP, Director, Talent      | L9             | ✅            | ✅         |
+| Lead, Manager             | L7             | ✅            | ✅         |
+| Senior, Principal         | L6             | ✅            | ❌         |
+| Worker, Engineer, Agent   | L4             | ❌            | ❌         |
+| Junior, Intern, Assistant | L1-2           | ❌            | ❌         |
 
 **The `Count` field:** Creates multiple agents with the same role. They get auto-numbered names: "Frontend Worker 1", "Frontend Worker 2", etc. Each is an independent agent with its own task queue and trust score.
 
@@ -300,13 +332,16 @@ Rules that govern how the organization operates. Budget, routing, permissions, a
 ## Policies
 
 ### Budget
+
 - **Per-agent limit:** 1000 credits/period
 - **Alert threshold:** 80%
 - **Overage behavior:** pause and escalate — don't hard-stop
 - **Period:** weekly
 
 ### Task Routing
+
 Tasks are auto-routed to the right department by matching:
+
 1. Domain keywords in the task title/description
 2. Agent domain expertise
 3. Current workload (prefer idle agents)
@@ -315,18 +350,21 @@ Tasks are auto-routed to the right department by matching:
 If no match is found, task goes to the COO for manual delegation.
 
 ### Permissions
+
 - **L7+ can create tasks** — leads and above can break work into subtasks
 - **L7+ can spawn agents** — leads can grow their team (up to department cap)
 - **L6+ can review** — seniors and above can approve/reject work
 - **All agents can escalate** — nobody should be silently stuck
 
 ### Department Caps
+
 - Engineering: max 10 agents
-- Security: max 4 agents  
+- Security: max 4 agents
 - Marketing: max 6 agents
 - No department can exceed 15 agents without human approval
 
 ### Working Hours
+
 - **Active hours:** 08:00-22:00 (org timezone)
 - **Off-hours behavior:** queue tasks, don't process
 - **Exceptions:** critical priority tasks process 24/7
@@ -344,6 +382,7 @@ Reusable procedures for common situations. Like runbooks in ops, but for your ag
 ## Playbooks
 
 ### New Task Arrives
+
 1. COO receives task from Human Principal
 2. COO categorizes by domain and priority
 3. COO delegates to appropriate department lead
@@ -352,6 +391,7 @@ Reusable procedures for common situations. Like runbooks in ops, but for your ag
 6. Workers ack and begin — progress logged to task activity
 
 ### Escalation: BLOCKED
+
 1. Agent creates escalation message with blocker details
 2. Escalation goes to direct manager (never skip levels)
 3. Manager has 2 cycles to respond:
@@ -361,6 +401,7 @@ Reusable procedures for common situations. Like runbooks in ops, but for your ag
 4. If unresolved after 2 levels, alert Human Principal
 
 ### Escalation: OUT_OF_DOMAIN
+
 1. Agent flags task as wrong domain
 2. Manager receives escalation
 3. Manager re-delegates to correct department lead
@@ -368,6 +409,7 @@ Reusable procedures for common situations. Like runbooks in ops, but for your ag
 5. No penalty to original agent's trust score
 
 ### New Agent Onboarding
+
 1. New agent spawned by a lead
 2. First 3 tasks are LOW priority (warm-up period)
 3. Trust score starts at 30 (PROBATION)
@@ -376,6 +418,7 @@ Reusable procedures for common situations. Like runbooks in ops, but for your ag
 6. After 20 successful tasks, eligible for VETERAN
 
 ### Weekly Review (automated)
+
 1. System compiles: tasks completed, escalation rate, budget burn
 2. Generates org health score
 3. Flags anomalies: sudden escalation spikes, idle agents, budget overruns
@@ -394,6 +437,7 @@ ORG.md is designed to be readable by humans and parseable by machines. The parsi
 ### 2.1 Metadata Extraction
 
 Structured data is extracted from markdown bullet lists:
+
 ```
 - **Key:** Value
 ```
@@ -403,6 +447,7 @@ The pattern `- **Key:** Value` extracts `{ key: "value" }`. Keys are case-insens
 ### 2.2 Free Text = Context
 
 Any text that isn't structured metadata becomes context:
+
 - Department descriptions → department-level system prompt context
 - Role descriptions → agent-level system prompt context
 - Policy explanations → system enforcement rules
@@ -417,6 +462,7 @@ Any text that isn't structured metadata becomes context:
 ### 2.4 Model References
 
 Models can be specified as:
+
 - Full provider/model: `anthropic/claude-sonnet-4-5`
 - Alias: `claude-sonnet`, `claude-haiku`, `gpt-4o`
 - Relative: `same-as-lead`, `fastest`, `cheapest`
@@ -449,6 +495,7 @@ bikinibottom deploy ORG.md --dry-run
 ```
 
 On deploy:
+
 1. Parse ORG.md
 2. Create agents according to Structure
 3. Apply Culture parameters to ACP config
@@ -466,6 +513,7 @@ bikinibottom apply ORG.md
 ```
 
 The system diffs the current state against the new file:
+
 - **New roles** → spawn agents
 - **Removed roles** → gracefully wind down (finish current tasks, then deactivate)
 - **Changed policies** → apply immediately
@@ -483,16 +531,17 @@ git blame ORG.md # Who changed the escalation policy?
 ```
 
 **PR reviews for org changes:**
+
 ```
 PR #42: Add data team (2 agents)
- 
+
 + ### Data & Analytics
 + Owns data pipelines, reporting, and business intelligence.
-+ 
++
 + #### Data Lead
 + - **Model:** claude-sonnet
 + - **Domain:** data-engineering
-+ 
++
 + #### Data Worker
 + - **Model:** claude-haiku
 + - **Domain:** analytics
@@ -509,7 +558,7 @@ Running orgs can export their current state back to ORG.md:
 bikinibottom export > ORG.md
 ```
 
-This captures the *actual* org — including agents that were spawned dynamically by leads. The exported file becomes the new source of truth.
+This captures the _actual_ org — including agents that were spawned dynamically by leads. The exported file becomes the new source of truth.
 
 ---
 
@@ -519,16 +568,17 @@ This captures the *actual* org — including agents that were spawned dynamicall
 
 A single composite score (0-100) computed from ACP metrics:
 
-| Component | Weight | Healthy | Unhealthy |
-|-----------|--------|---------|-----------|
-| Ack latency | 15% | < 1 cycle | > 3 cycles |
-| Escalation rate | 20% | < 10% of tasks | > 30% of tasks |
-| Completion rate | 25% | > 90% | < 70% |
-| Budget utilization | 15% | 40-80% | < 20% or > 95% |
-| Agent idle rate | 10% | < 30% | > 60% |
-| Time-to-completion | 15% | Trending down | Trending up |
+| Component          | Weight | Healthy        | Unhealthy      |
+| ------------------ | ------ | -------------- | -------------- |
+| Ack latency        | 15%    | < 1 cycle      | > 3 cycles     |
+| Escalation rate    | 20%    | < 10% of tasks | > 30% of tasks |
+| Completion rate    | 25%    | > 90%          | < 70%          |
+| Budget utilization | 15%    | 40-80%         | < 20% or > 95% |
+| Agent idle rate    | 10%    | < 30%          | > 60%          |
+| Time-to-completion | 15%    | Trending down  | Trending up    |
 
 Score interpretation:
+
 - **90-100:** Elite org — highly efficient, minimal waste
 - **70-89:** Healthy — normal operations, minor inefficiencies
 - **50-69:** Needs attention — bottlenecks or misrouting
@@ -542,16 +592,19 @@ The system observes patterns and proposes changes:
 ## Recommendations (auto-generated)
 
 ### 🔴 Critical
+
 - Engineering escalation rate is 35% (threshold: 10%)
   → Recommendation: Add 1 senior backend agent
   → Impact: Estimated 20% reduction in escalation rate
 
-### 🟡 Warning  
+### 🟡 Warning
+
 - Marketing has 2 idle agents while Security is overloaded
   → Recommendation: Cross-train 1 marketing worker for security tasks
   → Impact: Reduce security task queue by ~30%
 
 ### 🟢 Optimization
+
 - Agent "Backend Senior 2" has 98% success rate over 50 tasks
   → Recommendation: Promote to Lead, create Backend sub-team
   → Impact: Free up Engineering Lead for higher-level planning
@@ -568,6 +621,7 @@ bikinibottom ab-test ORG-v1.md ORG-v2.md --tasks=100
 ```
 
 Both orgs process the same task set. The system reports:
+
 - Completion rate, time-to-completion, escalation rate, cost
 - Statistical significance of differences
 - Recommendation: which org structure performed better
@@ -584,25 +638,33 @@ This is how you data-drive organizational design.
 # My Dev Team
 
 ## Culture
+
 preset: startup
 
 ## Structure
 
 ### Me (Human Principal)
+
 I make the decisions. Agents do the work.
 
 ### Code Agent
+
 Writes code, runs tests, submits PRs.
+
 - **Model:** claude-sonnet
 - **Domain:** fullstack
 
-### Review Agent  
+### Review Agent
+
 Reviews PRs, checks for bugs and style issues.
+
 - **Model:** claude-haiku
 - **Domain:** code-review
 
 ### Docs Agent
+
 Keeps documentation in sync with code changes.
+
 - **Model:** claude-haiku
 - **Domain:** documentation
 ```
@@ -613,23 +675,29 @@ Keeps documentation in sync with code changes.
 # Creative Agency
 
 ## Culture
+
 preset: agency
+
 - **Progress updates:** every tick — clients expect visibility
 
 ## Structure
 
 ### Account Director
+
 Manages client relationships. Routes work to the right team.
+
 - **Model:** claude-sonnet
 - **Domain:** account-management
 
 ### Design Team
 
 #### Design Lead
+
 - **Model:** claude-sonnet
 - **Domain:** visual-design
 
 #### Designers
+
 - **Model:** claude-haiku
 - **Domain:** ui-ux
 - **Count:** 3
@@ -637,10 +705,12 @@ Manages client relationships. Routes work to the right team.
 ### Content Team
 
 #### Content Lead
+
 - **Model:** claude-sonnet
 - **Domain:** content-strategy
 
 #### Writers
+
 - **Model:** claude-haiku
 - **Domain:** copywriting
 - **Count:** 4
@@ -648,6 +718,7 @@ Manages client relationships. Routes work to the right team.
 ## Policies
 
 ### Client SLA
+
 - Critical tasks: response within 1 cycle
 - Normal tasks: completion within 10 cycles
 - All tasks: progress update every 2 cycles
@@ -659,23 +730,30 @@ Manages client relationships. Routes work to the right team.
 # AI Research Lab
 
 ## Culture
+
 preset: research
+
 - **Escalation:** delayed — let researchers explore before flagging blockers
 
 ## Structure
 
 ### Principal Investigator
+
 Sets research direction. Reviews findings. Publishes papers.
+
 - **Model:** claude-opus
 - **Domain:** ml-research
 
 ### Senior Researchers
+
 - **Model:** claude-sonnet
 - **Domain:** experimentation
 - **Count:** 2
 
 ### Research Assistants
+
 Run experiments, collect data, write up results.
+
 - **Model:** claude-haiku
 - **Domain:** data-collection
 - **Count:** 3
@@ -683,6 +761,7 @@ Run experiments, collect data, write up results.
 ## Policies
 
 ### Exploration Budget
+
 - **Per-agent limit:** 5000 credits/period — research needs room to explore
 - **No hard stops** — flag at 90%, but don't interrupt an experiment
 ```
@@ -691,13 +770,13 @@ Run experiments, collect data, write up results.
 
 ## 6. Relationship to Existing Standards
 
-| Standard | Scope | Relationship |
-|----------|-------|-------------|
-| `CLAUDE.md` | One agent's behavior | ORG.md wraps multiple agents, each with their own implicit "CLAUDE.md" (their role description) |
-| `AGENTS.md` | Workspace rules | ORG.md is the superset — workspace rules + org structure + policies |
-| ACP | Communication protocol | ORG.md's Culture section configures ACP parameters |
-| A2A | Inter-org communication | ORG.md defines one org; A2A connects multiple orgs |
-| Terraform/Pulumi | Infrastructure as code | ORG.md is the same pattern applied to agent organizations |
+| Standard         | Scope                   | Relationship                                                                                    |
+| ---------------- | ----------------------- | ----------------------------------------------------------------------------------------------- |
+| `CLAUDE.md`      | One agent's behavior    | ORG.md wraps multiple agents, each with their own implicit "CLAUDE.md" (their role description) |
+| `AGENTS.md`      | Workspace rules         | ORG.md is the superset — workspace rules + org structure + policies                             |
+| ACP              | Communication protocol  | ORG.md's Culture section configures ACP parameters                                              |
+| A2A              | Inter-org communication | ORG.md defines one org; A2A connects multiple orgs                                              |
+| Terraform/Pulumi | Infrastructure as code  | ORG.md is the same pattern applied to agent organizations                                       |
 
 ---
 
@@ -717,4 +796,4 @@ Run experiments, collect data, write up results.
 
 ---
 
-*ORG.md turns organizational design from tribal knowledge into version-controlled, reviewable, deployable code. It's the missing layer between "I have agents" and "I have an organization."*
+_ORG.md turns organizational design from tribal knowledge into version-controlled, reviewable, deployable code. It's the missing layer between "I have agents" and "I have an organization."_

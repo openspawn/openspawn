@@ -60,6 +60,7 @@ jobs:
       - name: Verify codegen is up to date
         run: |
           pnpm run codegen
+          pnpm exec oxfmt --write libs/dashboard-data/src/graphql/generated/
           if ! git diff --quiet libs/dashboard-data/src/graphql/generated/ schema.gql; then
             echo "❌ Generated files are out of date. Run 'pnpm run codegen' and commit the changes."
             git diff --stat libs/dashboard-data/src/graphql/generated/ schema.gql

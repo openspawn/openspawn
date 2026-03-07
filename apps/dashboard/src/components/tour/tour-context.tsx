@@ -1,5 +1,13 @@
-import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface TourStep {
   id: string;
@@ -12,51 +20,51 @@ export interface TourStep {
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    id: 'live-start',
-    path: '/live',
-    title: 'Live View',
-    description: 'Watch 22 agents coordinate a 10,000 order in real time',
+    id: "live-start",
+    path: "/live",
+    title: "Live View",
+    description: "Watch 22 agents coordinate a 10,000 order in real time",
   },
   {
-    id: 'agents',
-    path: '/agents',
-    title: 'Agents',
-    description: 'Every agent has a role, trust score, and real-time stats',
+    id: "agents",
+    path: "/agents",
+    title: "Agents",
+    description: "Every agent has a role, trust score, and real-time stats",
     spotlightSelector: '[data-tour="agent-list"]',
   },
   {
-    id: 'tasks',
-    path: '/tasks',
-    title: 'Tasks',
-    description: 'Tasks flow through a pipeline: backlog → assigned → in-progress → done',
+    id: "tasks",
+    path: "/tasks",
+    title: "Tasks",
+    description: "Tasks flow through a pipeline: backlog → assigned → in-progress → done",
     spotlightSelector: '[data-tour="task-list"]',
   },
   {
-    id: 'dashboard',
-    path: '/',
-    title: 'Dashboard',
-    description: 'Executive overview with live charts and org health',
+    id: "dashboard",
+    path: "/",
+    title: "Dashboard",
+    description: "Executive overview with live charts and org health",
     spotlightSelector: '[data-tour="dashboard-charts"]',
   },
   {
-    id: 'router',
-    path: '/router',
-    title: 'Model Router',
-    description: 'The Model Router picks the cheapest LLM provider for each decision',
+    id: "router",
+    path: "/router",
+    title: "Model Router",
+    description: "The Model Router picks the cheapest LLM provider for each decision",
     spotlightSelector: '[data-tour="router-cards"]',
   },
   {
-    id: 'network',
-    path: '/network',
-    title: 'Network',
-    description: 'Visualize the full org graph and communication flows',
+    id: "network",
+    path: "/network",
+    title: "Network",
+    description: "Visualize the full org graph and communication flows",
     spotlightSelector: '[data-tour="network-viz"]',
   },
   {
-    id: 'live-end',
-    path: '/live',
-    title: 'Live View',
-    description: 'Back to the action — watch the final delivery rush',
+    id: "live-end",
+    path: "/live",
+    title: "Live View",
+    description: "Back to the action — watch the final delivery rush",
   },
 ];
 
@@ -76,7 +84,7 @@ const TourContext = createContext<TourContextValue | null>(null);
 
 export function useTour() {
   const ctx = useContext(TourContext);
-  if (!ctx) throw new Error('useTour must be used within TourProvider');
+  if (!ctx) throw new Error("useTour must be used within TourProvider");
   return ctx;
 }
 
@@ -98,12 +106,15 @@ export function TourProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const navigateToStep = useCallback((stepIndex: number) => {
-    const step = TOUR_STEPS[stepIndex];
-    if (step) {
-      navigate({ to: step.path });
-    }
-  }, [navigate]);
+  const navigateToStep = useCallback(
+    (stepIndex: number) => {
+      const step = TOUR_STEPS[stepIndex];
+      if (step) {
+        navigate({ to: step.path });
+      }
+    },
+    [navigate],
+  );
 
   const start = useCallback(() => {
     setCurrentStep(0);
@@ -119,7 +130,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   const next = useCallback(() => {
     clearTimer();
-    setCurrentStep(prev => {
+    setCurrentStep((prev) => {
       const nextStep = prev + 1;
       if (nextStep >= TOUR_STEPS.length) {
         setIsActive(false);
@@ -132,7 +143,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   const prev = useCallback(() => {
     clearTimer();
-    setCurrentStep(prev => {
+    setCurrentStep((prev) => {
       const prevStep = Math.max(0, prev - 1);
       navigateToStep(prevStep);
       return prevStep;
@@ -154,7 +165,19 @@ export function TourProvider({ children }: { children: ReactNode }) {
   }, [isActive, autoAdvance, currentStep, next, clearTimer]);
 
   return (
-    <TourContext.Provider value={{ isActive, currentStep, steps: TOUR_STEPS, autoAdvance, setAutoAdvance, start, next, prev, exit }}>
+    <TourContext.Provider
+      value={{
+        isActive,
+        currentStep,
+        steps: TOUR_STEPS,
+        autoAdvance,
+        setAutoAdvance,
+        start,
+        next,
+        prev,
+        exit,
+      }}
+    >
       {children}
     </TourContext.Provider>
   );

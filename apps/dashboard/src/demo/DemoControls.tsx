@@ -1,22 +1,46 @@
-import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory } from 'lucide-react';
-import { useDemo } from './DemoProvider';
-import { Button } from '../components/ui/button';
-import { cn } from '../lib/utils';
+import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory } from "lucide-react";
+import { useDemo } from "./DemoProvider";
+import { Button } from "../components/ui/button";
+import { cn } from "../lib/utils";
 
 const SPEED_OPTIONS = [
-  { value: 1, label: '1×' },
-  { value: 2, label: '2×' },
-  { value: 5, label: '5×' },
-  { value: 10, label: '10×' },
-  { value: 50, label: '50×' },
+  { value: 1, label: "1×" },
+  { value: 2, label: "2×" },
+  { value: 5, label: "5×" },
+  { value: 10, label: "10×" },
+  { value: 50, label: "50×" },
 ];
 
 const SCENARIO_OPTIONS = [
-  { value: 'acmetech' as const, label: 'AcmeTech', icon: Factory, agents: 22, description: 'Product launch lifecycle' },
-  { value: 'startup' as const, label: 'Startup', icon: Rocket, agents: 5, description: 'Small team' },
-  { value: 'growth' as const, label: 'Growth', icon: Users, agents: 14, description: 'Scaling up' },
-  { value: 'enterprise' as const, label: 'Enterprise', icon: Building2, agents: 50, description: 'Full org' },
-  { value: 'fresh' as const, label: 'Fresh', icon: Zap, agents: 1, description: 'Start from scratch' },
+  {
+    value: "acmetech" as const,
+    label: "AcmeTech",
+    icon: Factory,
+    agents: 22,
+    description: "Product launch lifecycle",
+  },
+  {
+    value: "startup" as const,
+    label: "Startup",
+    icon: Rocket,
+    agents: 5,
+    description: "Small team",
+  },
+  { value: "growth" as const, label: "Growth", icon: Users, agents: 14, description: "Scaling up" },
+  {
+    value: "enterprise" as const,
+    label: "Enterprise",
+    icon: Building2,
+    agents: 50,
+    description: "Full org",
+  },
+  {
+    value: "fresh" as const,
+    label: "Fresh",
+    icon: Zap,
+    agents: 1,
+    description: "Start from scratch",
+  },
 ];
 
 interface DemoControlsProps {
@@ -56,10 +80,10 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
               onClick={() => setScenario(opt.value)}
               title={`${opt.label} (${opt.agents} agents)`}
               className={cn(
-                'px-1.5 py-1 rounded text-[11px] font-medium transition-colors flex items-center gap-1',
+                "px-1.5 py-1 rounded text-[11px] font-medium transition-colors flex items-center gap-1",
                 scenario === opt.value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               <opt.icon className="h-3 w-3" />
@@ -71,12 +95,7 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
         <div className="w-px h-5 bg-border" />
 
         {/* Play/Pause */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={isPlaying ? pause : play}
-          className="h-7 w-7"
-        >
+        <Button variant="ghost" size="icon" onClick={isPlaying ? pause : play} className="h-7 w-7">
           {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
         </Button>
 
@@ -87,10 +106,10 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
               key={opt.value}
               onClick={() => setSpeed(opt.value)}
               className={cn(
-                'px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors',
+                "px-1.5 py-0.5 text-[10px] font-medium rounded transition-colors",
                 speed === opt.value
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {opt.label}
@@ -116,9 +135,7 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
         </Button>
 
         {/* Demo indicator */}
-        {isPlaying && (
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-        )}
+        {isPlaying && <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
       </div>
     );
   }
@@ -143,22 +160,17 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
                 key={opt.value}
                 onClick={() => setSpeed(opt.value)}
                 className={cn(
-                  'flex-1 px-1 py-0.5 text-[10px] font-medium rounded transition-colors',
+                  "flex-1 px-1 py-0.5 text-[10px] font-medium rounded transition-colors",
                   speed === opt.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground'
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {opt.label}
               </button>
             ))}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={reset}
-            className="h-7 w-7"
-          >
+          <Button variant="ghost" size="icon" onClick={reset} className="h-7 w-7">
             <RotateCcw className="h-3 w-3" />
           </Button>
         </div>
@@ -188,17 +200,17 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
             >
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-            
+
             <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5 flex-1 justify-center">
               {SPEED_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setSpeed(opt.value)}
                   className={cn(
-                    'px-2 py-1 text-xs font-medium rounded-md transition-colors',
+                    "px-2 py-1 text-xs font-medium rounded-md transition-colors",
                     speed === opt.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground'
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground",
                   )}
                 >
                   {opt.label}
@@ -211,7 +223,7 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
               <span className="text-xs font-mono tabular-nums">{currentTick}</span>
             </div>
           </div>
-          
+
           {/* Row 2: Scenarios + Reset */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1 flex-1">
@@ -220,10 +232,10 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
                   key={opt.value}
                   onClick={() => setScenario(opt.value)}
                   className={cn(
-                    'flex-1 py-1.5 px-2 rounded-lg transition-colors flex items-center justify-center gap-1',
+                    "flex-1 py-1.5 px-2 rounded-lg transition-colors flex items-center justify-center gap-1",
                     scenario === opt.value
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground bg-muted/50'
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground bg-muted/50",
                   )}
                 >
                   <opt.icon className="h-3.5 w-3.5" />
@@ -231,12 +243,7 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
                 </button>
               ))}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={reset}
-              className="h-8 w-8"
-            >
+            <Button variant="ghost" size="icon" onClick={reset} className="h-8 w-8">
               <RotateCcw className="h-3.5 w-3.5" />
             </Button>
           </div>
@@ -259,10 +266,10 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
                 key={opt.value}
                 onClick={() => setSpeed(opt.value)}
                 className={cn(
-                  'px-2 py-1 text-xs font-medium rounded-md transition-colors',
+                  "px-2 py-1 text-xs font-medium rounded-md transition-colors",
                   speed === opt.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {opt.label}
@@ -279,10 +286,10 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
                 onClick={() => setScenario(opt.value)}
                 title={`${opt.label} (${opt.agents} agents)`}
                 className={cn(
-                  'p-2 rounded-lg transition-colors flex items-center gap-1.5',
+                  "p-2 rounded-lg transition-colors flex items-center gap-1.5",
                   scenario === opt.value
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
                 )}
               >
                 <opt.icon className="h-4 w-4" />
@@ -324,55 +331,56 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
 
 function EventLabel({ event }: { event: { type: string; payload: any } }) {
   switch (event.type) {
-    case 'agent_created':
+    case "agent_created":
       return (
         <span className="text-green-500">
           🤖 <strong>{event.payload.name}</strong> spawned
         </span>
       );
-    case 'agent_promoted':
+    case "agent_promoted":
       return (
         <span className="text-blue-500">
           ⬆️ <strong>{event.payload.agent.name}</strong> promoted to L{event.payload.newLevel}
         </span>
       );
-    case 'agent_terminated':
+    case "agent_terminated":
       return (
         <span className="text-orange-500">
           ⏸️ <strong>{event.payload.agent.name}</strong> → {event.payload.newStatus}
         </span>
       );
-    case 'task_created':
+    case "task_created":
       return (
         <span className="text-purple-500">
           📋 Task created: <strong>{event.payload.title}</strong>
         </span>
       );
-    case 'task_completed':
+    case "task_completed":
       return (
         <span className="text-emerald-500">
           ✅ Task done: <strong>{event.payload.task.title}</strong>
         </span>
       );
-    case 'credit_earned':
+    case "credit_earned":
       return (
         <span className="text-yellow-500">
           💰 <strong>{event.payload.agent.name}</strong> earned {event.payload.amount} credits
         </span>
       );
-    case 'credit_spent':
+    case "credit_spent":
       return (
         <span className="text-red-400">
           💸 <strong>{event.payload.agent.name}</strong> spent {event.payload.amount} credits
         </span>
       );
-    case 'prehook_blocked':
+    case "prehook_blocked":
       return (
         <span className="text-amber-500">
-          🛡️ <strong>{event.payload.webhookName}</strong> blocked: {event.payload.reason || event.payload.eventType}
+          🛡️ <strong>{event.payload.webhookName}</strong> blocked:{" "}
+          {event.payload.reason || event.payload.eventType}
         </span>
       );
-    case 'prehook_allowed':
+    case "prehook_allowed":
       return (
         <span className="text-green-400">
           ✓ <strong>{event.payload.webhookName}</strong> approved {event.payload.eventType}

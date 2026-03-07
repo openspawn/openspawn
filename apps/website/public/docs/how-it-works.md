@@ -130,7 +130,7 @@ Most multi-agent frameworks give you:
 
 OpenSpawn gives you: The BikiniBottom demo ( bikinibottom.ai/app ) shows this concretely: 22 SpongeBob-themed agents across 5 departments running a real company, live, right now. It's the same infrastructure you'd use for your own org — just with better character names.
 
-You have the mental model. Now put it to work: title: "Getting Started →", desc: "Scaffold your first org and send it a task in under 5 minutes", to: "/docs/getting-started", title: "Your First ORG.md", desc: "Build a real org from scratch, step by step", to: "/docs/tutorials/your-first-org-md", title: "A2A Protocol →", desc: "How OpenSpawn connects to other agents and services", to: "/docs/protocols/a2a", title: "MCP Tools →", desc: "Use your org as a tool server in Claude Desktop, Cursor, or any MCP client", to: "/docs/protocols/mcp", ].map((item) => ( key={item.to} to={item.to} href="https://bikinibottom.ai/app" target="_blank" rel="noopener"
+You have the mental model. Now put it to work: title: "Getting Started →", desc: "Scaffold your first org and send it a task in under 5 minutes", to: "/docs/getting-started", title: "Your First ORG.md", desc: "Build a real org from scratch, step by step", to: "/docs/tutorials/your-first-org-md", title: "A2A Protocol →", desc: "How OpenSpawn connects to other agents and services", to: "/docs/protocols/a2a", title: "MCP Tools →", desc: "Use your org as a tool server in Claude Desktop, Cursor, or any MCP client", to: "/docs/protocols/mcp", ].map((item) => ( key={item.to} to={item.to} href="https://bikinibottom.ai/app" target="\_blank" rel="noopener"
 
 Live Demo →
 

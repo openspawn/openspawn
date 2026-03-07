@@ -13,7 +13,7 @@
 //   LLM_RATE_LIMIT_RPM  - Max requests per minute (default: 0 = unlimited)
 //   LLM_MAX_RETRIES     - Max retries on 429/5xx (default: 3)
 
-export type LLMProvider = 'ollama' | 'anthropic' | 'openai';
+export type LLMProvider = "ollama" | "anthropic" | "openai";
 
 export interface LLMConfig {
   provider: LLMProvider;
@@ -38,15 +38,18 @@ export interface LLMResponse {
 // ── Pricing (USD per million tokens) ────────────────────────────────────────
 
 const PRICING: Record<string, { input: number; output: number }> = {
-  'claude-opus-4-0-20250514': { input: 15, output: 75 },
-  'claude-sonnet-4-5-20250514': { input: 3, output: 15 },
-  'claude-sonnet-4-0-20250514': { input: 3, output: 15 },
-  'claude-haiku-3-5-20241022': { input: 0.8, output: 4 },
+  "claude-opus-4-0-20250514": { input: 15, output: 75 },
+  "claude-sonnet-4-5-20250514": { input: 3, output: 15 },
+  "claude-sonnet-4-0-20250514": { input: 3, output: 15 },
+  "claude-haiku-3-5-20241022": { input: 0.8, output: 4 },
 };
 
 function estimateCost(model: string, inputTokens: number, outputTokens: number): number {
-  const pricing = PRICING[model] ||
-    Object.entries(PRICING).find(([k]) => model.startsWith(k.split('-').slice(0, 3).join('-')))?.[1];
+  const pricing =
+    PRICING[model] ||
+    Object.entries(PRICING).find(([k]) =>
+      model.startsWith(k.split("-").slice(0, 3).join("-")),
+    )?.[1];
   if (!pricing) return 0;
   return (inputTokens / 1_000_000) * pricing.input + (outputTokens / 1_000_000) * pricing.output;
 }
@@ -68,7 +71,7 @@ class RateLimiter {
     const elapsed = now - this.lastCallTime;
     if (elapsed < this.minIntervalMs) {
       const delay = this.minIntervalMs - elapsed;
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
     this.lastCallTime = Date.now();
   }
@@ -86,24 +89,30 @@ function getRateLimiter(config: LLMConfig): RateLimiter {
 // ── Config ──────────────────────────────────────────────────────────────────
 
 function resolveApiKey(provider: LLMProvider): string {
-  return process.env.LLM_API_KEY
-    || process.env.ANTHROPIC_API_KEY
-    || process.env.GROQ_API_KEY
-    || process.env.OPENROUTER_API_KEY
-    || '';
+  return (
+    process.env.LLM_API_KEY ||
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.GROQ_API_KEY ||
+    process.env.OPENROUTER_API_KEY ||
+    ""
+  );
 }
 
 const PROVIDER_DEFAULTS: Record<LLMProvider, { model: string; baseUrl: string; rpm: number }> = {
-  ollama: { model: 'qwen2.5:7b-instruct', baseUrl: 'http://localhost:11434', rpm: 0 },
-  anthropic: { model: 'claude-opus-4-0-20250514', baseUrl: 'https://api.anthropic.com', rpm: 0 },
-  openai: { model: 'meta-llama/llama-4-scout-17b-16e-instruct', baseUrl: 'https://api.groq.com/openai', rpm: 30 },
+  ollama: { model: "qwen2.5:7b-instruct", baseUrl: "http://localhost:11434", rpm: 0 },
+  anthropic: { model: "claude-opus-4-0-20250514", baseUrl: "https://api.anthropic.com", rpm: 0 },
+  openai: {
+    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    baseUrl: "https://api.groq.com/openai",
+    rpm: 30,
+  },
 };
 
 /** Read LLM config from environment with sensible defaults */
 export function getLLMConfig(): LLMConfig {
-  const provider = (process.env.LLM_PROVIDER || 'ollama') as LLMProvider;
+  const provider = (process.env.LLM_PROVIDER || "ollama") as LLMProvider;
   const defaults = PROVIDER_DEFAULTS[provider] || PROVIDER_DEFAULTS.ollama;
-  const isCloud = provider !== 'ollama';
+  const isCloud = provider !== "ollama";
 
   return {
     provider,
@@ -130,19 +139,24 @@ export async function generate(prompt: string, config: LLMConfig): Promise<LLMRe
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
       switch (config.provider) {
-        case 'anthropic': return await generateAnthropic(prompt, config);
-        case 'openai': return await generateOpenAI(prompt, config);
-        default: return await generateOllama(prompt, config);
+        case "anthropic":
+          return await generateAnthropic(prompt, config);
+        case "openai":
+          return await generateOpenAI(prompt, config);
+        default:
+          return await generateOllama(prompt, config);
       }
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
 
       // Check for rate limit (429) — parse retry-after and wait
-      if (lastError.message.includes('429') && attempt < config.maxRetries) {
+      if (lastError.message.includes("429") && attempt < config.maxRetries) {
         const retryAfter = parseRetryAfter(lastError.message);
         const backoffMs = retryAfter || Math.min(2000 * Math.pow(2, attempt), 60000);
-        console.log(`  ⏳ Rate limited, waiting ${(backoffMs / 1000).toFixed(1)}s (attempt ${attempt + 1}/${config.maxRetries})...`);
-        await new Promise(resolve => setTimeout(resolve, backoffMs));
+        console.log(
+          `  ⏳ Rate limited, waiting ${(backoffMs / 1000).toFixed(1)}s (attempt ${attempt + 1}/${config.maxRetries})...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
         continue;
       }
 
@@ -150,21 +164,22 @@ export async function generate(prompt: string, config: LLMConfig): Promise<LLMRe
       if (lastError.message.match(/5\d\d/) && attempt < config.maxRetries) {
         const backoffMs = 1000 * Math.pow(2, attempt);
         console.log(`  ⏳ Server error, retrying in ${(backoffMs / 1000).toFixed(1)}s...`);
-        await new Promise(resolve => setTimeout(resolve, backoffMs));
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
         continue;
       }
 
       throw lastError;
     }
   }
-  throw lastError || new Error('LLM generate failed after retries');
+  throw lastError || new Error("LLM generate failed after retries");
 }
 
 /** Parse retry-after seconds from error message or header */
 function parseRetryAfter(message: string): number | null {
   // Look for "retry-after: Xs" or "retry_after":X or "Please try again in Xs"
-  const match = message.match(/retry.?after[:\s"]*(\d+(?:\.\d+)?)/i)
-    || message.match(/try again in (\d+(?:\.\d+)?)\s*s/i);
+  const match =
+    message.match(/retry.?after[:\s"]*(\d+(?:\.\d+)?)/i) ||
+    message.match(/try again in (\d+(?:\.\d+)?)\s*s/i);
   if (match) return Math.ceil(parseFloat(match[1]) * 1000); // convert to ms
   return null;
 }
@@ -173,7 +188,7 @@ function parseRetryAfter(message: string): number | null {
 
 async function generateOpenAI(prompt: string, config: LLMConfig): Promise<LLMResponse> {
   if (!config.apiKey) {
-    throw new Error('API key not set (LLM_API_KEY, GROQ_API_KEY, or OPENROUTER_API_KEY)');
+    throw new Error("API key not set (LLM_API_KEY, GROQ_API_KEY, or OPENROUTER_API_KEY)");
   }
 
   const controller = new AbortController();
@@ -182,16 +197,16 @@ async function generateOpenAI(prompt: string, config: LLMConfig): Promise<LLMRes
 
   try {
     const res = await fetch(`${config.baseUrl}/v1/chat/completions`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify({
         model: config.model,
         max_tokens: config.maxTokens,
         temperature: config.temperature,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: "user", content: prompt }],
       }),
       signal: controller.signal,
     });
@@ -201,12 +216,12 @@ async function generateOpenAI(prompt: string, config: LLMConfig): Promise<LLMRes
       throw new Error(`OpenAI-compatible API returned ${res.status}: ${body}`);
     }
 
-    const data = await res.json() as {
+    const data = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
       usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
 
-    const text = data.choices?.[0]?.message?.content ?? '';
+    const text = data.choices?.[0]?.message?.content ?? "";
     const inputTokens = data.usage?.prompt_tokens ?? 0;
     const outputTokens = data.usage?.completion_tokens ?? 0;
     const cost = estimateCost(config.model, inputTokens, outputTokens);
@@ -227,7 +242,7 @@ async function generateOpenAI(prompt: string, config: LLMConfig): Promise<LLMRes
 
 async function generateAnthropic(prompt: string, config: LLMConfig): Promise<LLMResponse> {
   if (!config.apiKey) {
-    throw new Error('ANTHROPIC_API_KEY not set');
+    throw new Error("ANTHROPIC_API_KEY not set");
   }
 
   const controller = new AbortController();
@@ -236,17 +251,17 @@ async function generateAnthropic(prompt: string, config: LLMConfig): Promise<LLM
 
   try {
     const res = await fetch(`${config.baseUrl}/v1/messages`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': config.apiKey,
-        'anthropic-version': '2023-06-01',
+        "Content-Type": "application/json",
+        "x-api-key": config.apiKey,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
         model: config.model,
         max_tokens: config.maxTokens,
         temperature: config.temperature,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: "user", content: prompt }],
       }),
       signal: controller.signal,
     });
@@ -256,12 +271,12 @@ async function generateAnthropic(prompt: string, config: LLMConfig): Promise<LLM
       throw new Error(`Anthropic API returned ${res.status}: ${body}`);
     }
 
-    const data = await res.json() as {
+    const data = (await res.json()) as {
       content?: Array<{ type: string; text: string }>;
       usage?: { input_tokens: number; output_tokens: number };
     };
 
-    const text = data.content?.find(c => c.type === 'text')?.text ?? '';
+    const text = data.content?.find((c) => c.type === "text")?.text ?? "";
     const inputTokens = data.usage?.input_tokens ?? 0;
     const outputTokens = data.usage?.output_tokens ?? 0;
     const cost = estimateCost(config.model, inputTokens, outputTokens);
@@ -286,8 +301,8 @@ async function generateOllama(prompt: string, config: LLMConfig): Promise<LLMRes
 
   try {
     const res = await fetch(`${config.baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: config.model,
         prompt,
@@ -304,14 +319,14 @@ async function generateOllama(prompt: string, config: LLMConfig): Promise<LLMRes
       throw new Error(`Ollama returned ${res.status}: ${await res.text()}`);
     }
 
-    const data = await res.json() as {
+    const data = (await res.json()) as {
       response?: string;
       eval_count?: number;
       total_duration?: number;
     };
 
     return {
-      text: data.response ?? '',
+      text: data.response ?? "",
       tokens: data.eval_count ?? 0,
       durationMs: data.total_duration ? Math.round(data.total_duration / 1_000_000) : 0,
     };
@@ -324,7 +339,7 @@ async function generateOllama(prompt: string, config: LLMConfig): Promise<LLMRes
 
 /** Check if the configured LLM provider is reachable */
 export async function isLLMAvailable(config: LLMConfig): Promise<boolean> {
-  if (config.provider === 'anthropic' || config.provider === 'openai') {
+  if (config.provider === "anthropic" || config.provider === "openai") {
     return !!config.apiKey;
   }
 

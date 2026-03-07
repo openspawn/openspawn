@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { PartyPopper, Rocket } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { Button } from '../ui/button';
-import { useOnboarding } from './onboarding-provider';
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { PartyPopper, Rocket } from "lucide-react";
+import confetti from "canvas-confetti";
+import { Button } from "../ui/button";
+import { useOnboarding } from "./onboarding-provider";
 
 export function CompletionCelebration() {
   const { showCelebration, dismissCelebration } = useOnboarding();
@@ -20,7 +20,7 @@ export function CompletionCelebration() {
         gravity: 0.8,
         decay: 0.94,
         startVelocity: 30,
-        colors: ['#06b6d4', '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'],
+        colors: ["#06b6d4", "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"],
       };
 
       confetti({
@@ -71,7 +71,7 @@ export function CompletionCelebration() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+            transition={{ type: "spring", damping: 20, stiffness: 200 }}
             className="fixed inset-0 z-[101] flex items-center justify-center p-4"
           >
             <div className="w-full max-w-sm text-center">
@@ -79,7 +79,7 @@ export function CompletionCelebration() {
               <motion.div
                 initial={{ scale: 0, rotate: -45 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', damping: 15, stiffness: 200, delay: 0.1 }}
+                transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
                 className="mx-auto mb-6"
               >
                 <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/25">

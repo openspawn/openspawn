@@ -9,7 +9,7 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
-  } from "lucide-react";
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -26,13 +26,7 @@ import {
 } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { cn } from "../../lib/utils";
 import { useNotifications } from "../live-notifications";
 import { useDemo } from "../../demo";
@@ -173,8 +167,8 @@ export function InboundWebhooksSettings() {
               secret: `whsec_${Math.random().toString(36).slice(2, 22)}`,
               updatedAt: new Date().toISOString(),
             }
-          : k
-      )
+          : k,
+      ),
     );
     addNotification({
       type: "success",
@@ -197,7 +191,9 @@ export function InboundWebhooksSettings() {
 
   const handleToggleEnabled = (id: string, enabled: boolean) => {
     setWebhookKeys((prev) =>
-      prev.map((k) => (k.id === id ? { ...k, enabled: !enabled, updatedAt: new Date().toISOString() } : k))
+      prev.map((k) =>
+        k.id === id ? { ...k, enabled: !enabled, updatedAt: new Date().toISOString() } : k,
+      ),
     );
     addNotification({
       type: "success",
@@ -357,7 +353,7 @@ export function InboundWebhooksSettings() {
                     exit={{ opacity: 0, x: -20 }}
                     className={cn(
                       "border rounded-lg p-4 transition-colors",
-                      selectedKey === key.id && "border-primary bg-accent/50"
+                      selectedKey === key.id && "border-primary bg-accent/50",
                     )}
                   >
                     <div className="flex items-start justify-between">
@@ -374,9 +370,7 @@ export function InboundWebhooksSettings() {
                           )}
                         </div>
                         <div className="space-y-1 text-sm text-muted-foreground">
-                          {key.defaultAgentId && (
-                            <div>Default agent: {key.defaultAgentId}</div>
-                          )}
+                          {key.defaultAgentId && <div>Default agent: {key.defaultAgentId}</div>}
                           {key.defaultPriority && (
                             <div>Default priority: {key.defaultPriority}</div>
                           )}
@@ -410,8 +404,8 @@ export function InboundWebhooksSettings() {
                             <DialogHeader>
                               <DialogTitle>Rotate Webhook Key</DialogTitle>
                               <DialogDescription>
-                                This will generate a new key and secret. The old key will stop working
-                                immediately.
+                                This will generate a new key and secret. The old key will stop
+                                working immediately.
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
@@ -472,11 +466,7 @@ export function InboundWebhooksSettings() {
                           <div>
                             <Label>Webhook URL</Label>
                             <div className="flex gap-2 mt-1">
-                              <Input
-                                value={webhookUrl}
-                                readOnly
-                                className="font-mono text-sm"
-                              />
+                              <Input value={webhookUrl} readOnly className="font-mono text-sm" />
                               <Button
                                 variant="outline"
                                 size="sm"

@@ -251,8 +251,8 @@
     --radius: 0.5rem;
 
     /* Reset BB font overrides */
-    --bb-font-display: 'Inter', system-ui, sans-serif;
-    --bb-font-body: 'Inter', system-ui, sans-serif;
+    --bb-font-display: "Inter", system-ui, sans-serif;
+    --bb-font-body: "Inter", system-ui, sans-serif;
   }
 
   /* ========================================
@@ -281,12 +281,12 @@
   /* OpenSpawn theme: use Inter, override BB fonts */
   [data-theme="openspawn"] body,
   [data-theme="openspawn"] {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
   [data-theme="openspawn"] h1,
   [data-theme="openspawn"] h2,
   [data-theme="openspawn"] h3 {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
 
   /* Smooth theme transitions */
@@ -294,7 +294,11 @@
   html.theme-transitioning *,
   html.theme-transitioning *::before,
   html.theme-transitioning *::after {
-    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease !important;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease !important;
   }
 }
 
@@ -390,7 +394,8 @@
 
 /* Underwater theme animations */
 @keyframes wave-subtle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0) translateY(0);
   }
   25% {
@@ -419,7 +424,8 @@
 }
 
 @keyframes current-flow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
     opacity: 0.3;
   }
@@ -439,7 +445,8 @@
 }
 
 @keyframes bioluminescent-glow {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.5));
   }
   50% {

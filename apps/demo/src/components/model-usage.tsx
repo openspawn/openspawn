@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-import { motion } from 'motion/react';
-import { Cpu, DollarSign, TrendingUp, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { cn } from '../lib/utils';
-import { useAgents } from '../hooks/use-agents';
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import { Cpu, DollarSign, TrendingUp, Zap } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { cn } from "../lib/utils";
+import { useAgents } from "../hooks/use-agents";
 
 interface ModelUsage {
   model: string;
@@ -17,17 +17,25 @@ interface ModelUsage {
 }
 
 const MODEL_COLORS = [
-  '#d97706', '#f59e0b', '#10b981', '#34d399', '#8b5cf6',
-  '#6366f1', '#ec4899', '#f43f5e', '#14b8a6', '#0ea5e9',
+  "#d97706",
+  "#f59e0b",
+  "#10b981",
+  "#34d399",
+  "#8b5cf6",
+  "#6366f1",
+  "#ec4899",
+  "#f43f5e",
+  "#14b8a6",
+  "#0ea5e9",
 ];
 
 function inferProvider(model: string): string {
   const m = model.toLowerCase();
-  if (m.includes('claude') || m.includes('anthropic')) return 'Anthropic';
-  if (m.includes('gpt') || m.includes('openai')) return 'OpenAI';
-  if (m.includes('gemini')) return 'Google';
-  if (m.includes('llama') || m.includes('mistral')) return 'Open Source';
-  return 'Other';
+  if (m.includes("claude") || m.includes("anthropic")) return "Anthropic";
+  if (m.includes("gpt") || m.includes("openai")) return "OpenAI";
+  if (m.includes("gemini")) return "Google";
+  if (m.includes("llama") || m.includes("mistral")) return "Open Source";
+  return "Other";
 }
 
 export function ModelUsageBreakdown() {
@@ -121,7 +129,8 @@ export function ModelUsageBreakdown() {
                 const radius = 40;
                 const circumference = 2 * Math.PI * radius;
                 const strokeDasharray = circumference;
-                const strokeDashoffset = circumference * (1 - (segment.endAngle - segment.startAngle) / 360);
+                const strokeDashoffset =
+                  circumference * (1 - (segment.endAngle - segment.startAngle) / 360);
                 const rotation = segment.startAngle;
 
                 return (
@@ -135,7 +144,7 @@ export function ModelUsageBreakdown() {
                     strokeWidth="20"
                     strokeDasharray={strokeDasharray}
                     strokeDashoffset={strokeDashoffset}
-                    style={{ transform: `rotate(${rotation}deg)`, transformOrigin: '50% 50%' }}
+                    style={{ transform: `rotate(${rotation}deg)`, transformOrigin: "50% 50%" }}
                     initial={{ strokeDashoffset: circumference }}
                     animate={{ strokeDashoffset }}
                     transition={{ duration: 1, delay: index * 0.1 }}
@@ -160,10 +169,7 @@ export function ModelUsageBreakdown() {
                 transition={{ delay: index * 0.1 }}
                 className="flex items-center gap-2"
               >
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: model.color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: model.color }} />
                 <span className="text-sm truncate flex-1">{model.model}</span>
                 <span className="text-xs text-muted-foreground">
                   {totalCalls > 0 ? ((model.calls / totalCalls) * 100).toFixed(0) : 0}%
@@ -183,23 +189,22 @@ export function ModelUsageBreakdown() {
               transition={{ delay: 0.5 + index * 0.05 }}
               className="flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors"
             >
-              <div
-                className="w-1 h-8 rounded-full"
-                style={{ backgroundColor: model.color }}
-              />
+              <div className="w-1 h-8 rounded-full" style={{ backgroundColor: model.color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm">{model.model}</span>
-                  <Badge variant="outline" className="text-[10px]">{model.provider}</Badge>
+                  <Badge variant="outline" className="text-[10px]">
+                    {model.provider}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{model.calls} {model.calls === 1 ? 'agent' : 'agents'}</span>
+                  <span>
+                    {model.calls} {model.calls === 1 ? "agent" : "agents"}
+                  </span>
                 </div>
               </div>
               <div className="text-right">
-                <p className={cn(
-                  "font-semibold text-muted-foreground"
-                )}>
+                <p className={cn("font-semibold text-muted-foreground")}>
                   {((model.calls / totalCalls) * 100).toFixed(0)}%
                 </p>
               </div>

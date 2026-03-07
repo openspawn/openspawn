@@ -2,15 +2,21 @@
 // Extends DeterministicSimulation to use LLM decisions for L7+ agents.
 // Workers (L1-6) remain deterministic. Falls back to deterministic if LLM fails.
 
-import { DeterministicSimulation } from './deterministic.js';
-import { generate, isLLMAvailable, getLLMConfig, type LLMConfig } from './llm-provider.js';
-import { buildAgentPrompt, parseDecision, resolveAgentId, type AgentDecision, type SimulationState } from './markdown-decision.js';
-import { DecisionRecorder } from './recorder.js';
-import { makeAgentPublic } from './agents.js';
-import type { SandboxAgent, SandboxTask, SandboxConfig, ACPMessage } from './types.js';
-import type { ParsedOrg } from './org-parser.js';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { DeterministicSimulation } from "./deterministic.js";
+import { generate, isLLMAvailable, getLLMConfig, type LLMConfig } from "./llm-provider.js";
+import {
+  buildAgentPrompt,
+  parseDecision,
+  resolveAgentId,
+  type AgentDecision,
+  type SimulationState,
+} from "./markdown-decision.js";
+import { DecisionRecorder } from "./recorder.js";
+import { makeAgentPublic } from "./agents.js";
+import type { SandboxAgent, SandboxTask, SandboxConfig, ACPMessage } from "./types.js";
+import type { ParsedOrg } from "./org-parser.js";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -18,7 +24,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 let llmTaskCounter = 10000; // offset to avoid collisions with deterministic counter
 function nextLLMTaskId(): string {
-  return `TASK-${String(++llmTaskCounter).padStart(4, '0')}`;
+  return `TASK-${String(++llmTaskCounter).padStart(4, "0")}`;
 }
 
 function acpId(): string {
@@ -26,7 +32,7 @@ function acpId(): string {
 }
 
 function createACPMessage(
-  type: ACPMessage['type'],
+  type: ACPMessage["type"],
   from: string,
   to: string,
   taskId: string,
@@ -43,7 +49,7 @@ function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
         agent.recentMessages = agent.recentMessages.slice(-10);
       }
     }
-    if (agent.id === msg.to && agent.trigger === 'event-driven') {
+    if (agent.id === msg.to && agent.trigger === "event-driven") {
       if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
         agent.inbox.push(msg);
       }
@@ -58,7 +64,7 @@ export class LLMSimulation extends DeterministicSimulation {
   private recorder: DecisionRecorder | null = null;
   private recording: boolean;
   private llmAvailable: boolean | null = null; // null = not checked yet
-  private scenarioOrder: string = '';
+  private scenarioOrder: string = "";
   private startTime: number = Date.now();
   private totalCost: number = 0;
   private totalInputTokens: number = 0;
@@ -75,10 +81,10 @@ export class LLMSimulation extends DeterministicSimulation {
     this.llmConfig = getLLMConfig();
     this.recording = recording;
 
-    const modeLabel = recording ? 'record' : 'hybrid';
+    const modeLabel = recording ? "record" : "hybrid";
     console.log(`\n🧠 LLM Simulation (${modeLabel} mode)`);
     console.log(`   Provider: ${this.llmConfig.provider} | Model: ${this.llmConfig.model}`);
-    if (this.llmConfig.provider === 'ollama') console.log(`   Endpoint: ${this.llmConfig.baseUrl}`);
+    if (this.llmConfig.provider === "ollama") console.log(`   Endpoint: ${this.llmConfig.baseUrl}`);
     console.log(`   L7+ agents use LLM decisions, L1-6 stay deterministic`);
   }
 
@@ -96,7 +102,7 @@ export class LLMSimulation extends DeterministicSimulation {
     if (this.llmAvailable === null) {
       this.llmAvailable = await isLLMAvailable(this.llmConfig);
       if (!this.llmAvailable) {
-        console.log('⚠️  LLM not available — all agents will use deterministic logic');
+        console.log("⚠️  LLM not available — all agents will use deterministic logic");
       }
     }
 
@@ -104,15 +110,15 @@ export class LLMSimulation extends DeterministicSimulation {
     // Successfully handled agents are added to skipAgentIds so the deterministic
     // loop doesn't double-process them. Failed agents fall through to deterministic.
     if (this.llmAvailable) {
-      const llmAgents = this.agents.filter(a =>
-        a.status === 'active' && a.level >= 7
-      );
+      const llmAgents = this.agents.filter((a) => a.status === "active" && a.level >= 7);
 
       for (const agent of llmAgents) {
         try {
           await this.tickAgentLLM(agent);
         } catch (err) {
-          console.log(`  ⚠️ LLM error for ${agent.name}: ${err instanceof Error ? err.message : String(err)}`);
+          console.log(
+            `  ⚠️ LLM error for ${agent.name}: ${err instanceof Error ? err.message : String(err)}`,
+          );
           // Don't add to skipAgentIds — deterministic tick will handle this agent
         }
       }
@@ -138,15 +144,17 @@ export class LLMSimulation extends DeterministicSimulation {
     this.totalOutputTokens += response.tokens;
     if (response.cost) this.totalCost += response.cost;
 
-    const costStr = response.cost ? ` ($${response.cost.toFixed(4)})` : '';
-    const latency = response.durationMs ? ` ${(response.durationMs / 1000).toFixed(1)}s` : '';
-    console.log(`  🧠 ${agent.name}: ${decision.action} → ${decision.target} | ${decision.message.slice(0, 50)}${latency}${costStr}`);
+    const costStr = response.cost ? ` ($${response.cost.toFixed(4)})` : "";
+    const latency = response.durationMs ? ` ${(response.durationMs / 1000).toFixed(1)}s` : "";
+    console.log(
+      `  🧠 ${agent.name}: ${decision.action} → ${decision.target} | ${decision.message.slice(0, 50)}${latency}${costStr}`,
+    );
 
     // Record if in recording mode
     if (this.recording) {
       if (!this.recorder) {
         this.recorder = new DecisionRecorder(
-          this.scenarioOrder || 'LLM Simulation',
+          this.scenarioOrder || "LLM Simulation",
           this.llmConfig.model,
         );
       }
@@ -162,33 +170,35 @@ export class LLMSimulation extends DeterministicSimulation {
 
   private executeDecision(agent: SandboxAgent, decision: AgentDecision): void {
     switch (decision.action) {
-      case 'delegate': {
+      case "delegate": {
         // If agent has no active direct reports, convert to work
-        const hasReports = this.agents.some(a => a.parentId === agent.id && a.status === 'active');
+        const hasReports = this.agents.some(
+          (a) => a.parentId === agent.id && a.status === "active",
+        );
         if (!hasReports) {
           console.log(`  ⚠️ ${agent.name}: no active reports — converting delegate to work`);
-          this.executeWork(agent, { ...decision, action: 'work' });
+          this.executeWork(agent, { ...decision, action: "work" });
           break;
         }
         this.executeDelegation(agent, decision);
         break;
       }
-      case 'escalate':
+      case "escalate":
         this.executeEscalation(agent, decision);
         break;
-      case 'work':
+      case "work":
         this.executeWork(agent, decision);
         break;
-      case 'complete':
+      case "complete":
         this.executeCompletion(agent, decision);
         break;
-      case 'message':
+      case "message":
         this.executeMessage(agent, decision);
         break;
-      case 'hire':
+      case "hire":
         this.executeHire(agent, decision);
         break;
-      case 'idle':
+      case "idle":
         // Do nothing — agent explicitly chose to wait
         break;
     }
@@ -196,7 +206,7 @@ export class LLMSimulation extends DeterministicSimulation {
 
   private executeDelegation(agent: SandboxAgent, decision: AgentDecision): void {
     const targetId = resolveAgentId(decision.target, this.agents);
-    const target = targetId ? this.agents.find(a => a.id === targetId) : undefined;
+    const target = targetId ? this.agents.find((a) => a.id === targetId) : undefined;
     if (!target) {
       console.log(`  ⚠️ ${agent.name}: delegate target "${decision.target}" not found`);
       return;
@@ -204,8 +214,10 @@ export class LLMSimulation extends DeterministicSimulation {
 
     // Guard: can't delegate to your parent or someone above you — that's escalation
     if (target.id === agent.parentId || target.level > agent.level) {
-      console.log(`  ⚠️ ${agent.name}: can't delegate UP to ${target.name} (L${target.level}) — converting to escalation`);
-      this.executeEscalation(agent, { ...decision, action: 'escalate' });
+      console.log(
+        `  ⚠️ ${agent.name}: can't delegate UP to ${target.name} (L${target.level}) — converting to escalation`,
+      );
+      this.executeEscalation(agent, { ...decision, action: "escalate" });
       return;
     }
 
@@ -214,7 +226,7 @@ export class LLMSimulation extends DeterministicSimulation {
     const isSubordinate = target.level < agent.level;
     if (!isDirectReport && !isSubordinate) {
       console.log(`  ⚠️ ${agent.name}: ${target.name} is not a report — converting to message`);
-      this.executeMessage(agent, { ...decision, action: 'message' });
+      this.executeMessage(agent, { ...decision, action: "message" });
       return;
     }
 
@@ -222,16 +234,16 @@ export class LLMSimulation extends DeterministicSimulation {
     let task = this.resolveTask(decision.task, agent);
     if (!task) {
       // Create new task from "new: description"
-      const title = decision.task.replace(/^new:\s*/i, '').trim() || decision.message.slice(0, 80);
+      const title = decision.task.replace(/^new:\s*/i, "").trim() || decision.message.slice(0, 80);
       task = this.createTask(title, agent);
     }
 
     // Assign to target
     task.assigneeId = target.id;
-    task.status = 'assigned';
+    task.status = "assigned";
     if (!target.taskIds.includes(task.id)) target.taskIds.push(task.id);
 
-    const msg = createACPMessage('delegation', agent.id, target.id, task.id, {
+    const msg = createACPMessage("delegation", agent.id, target.id, task.id, {
       body: decision.message || `Delegating "${task.title}" to ${target.name}`,
     });
     pushMessage(this.agents, msg);
@@ -239,7 +251,7 @@ export class LLMSimulation extends DeterministicSimulation {
     agent.stats.messagesSent++;
 
     // Auto-ack
-    const ack = createACPMessage('ack', target.id, agent.id, task.id, {
+    const ack = createACPMessage("ack", target.id, agent.id, task.id, {
       body: `Acknowledged: "${task.title}"`,
     });
     pushMessage(this.agents, ack);
@@ -248,14 +260,14 @@ export class LLMSimulation extends DeterministicSimulation {
   }
 
   private executeEscalation(agent: SandboxAgent, decision: AgentDecision): void {
-    const parent = agent.parentId ? this.agents.find(a => a.id === agent.parentId) : undefined;
+    const parent = agent.parentId ? this.agents.find((a) => a.id === agent.parentId) : undefined;
     if (!parent) return;
 
     const task = this.resolveTask(decision.task, agent);
-    const taskId = task?.id ?? '';
+    const taskId = task?.id ?? "";
 
-    const msg = createACPMessage('escalation', agent.id, parent.id, taskId, {
-      reason: 'BLOCKED',
+    const msg = createACPMessage("escalation", agent.id, parent.id, taskId, {
+      reason: "BLOCKED",
       body: decision.message || `Escalating: ${decision.task}`,
     });
     pushMessage(this.agents, msg);
@@ -267,18 +279,20 @@ export class LLMSimulation extends DeterministicSimulation {
     let task = this.resolveTask(decision.task, agent);
     if (!task) {
       // Try to find any task assigned to this agent
-      task = this.tasks.find(t => t.assigneeId === agent.id && !['done', 'rejected'].includes(t.status));
+      task = this.tasks.find(
+        (t) => t.assigneeId === agent.id && !["done", "rejected"].includes(t.status),
+      );
     }
     if (!task) return;
 
     // Mark task as in-progress
-    if (task.status === 'assigned' || task.status === 'backlog') {
-      task.status = 'in_progress';
+    if (task.status === "assigned" || task.status === "backlog") {
+      task.status = "in_progress";
     }
     task.updatedAt = Date.now();
 
     // Log progress
-    const progressMsg = createACPMessage('progress', agent.id, agent.parentId || '', task.id, {
+    const progressMsg = createACPMessage("progress", agent.id, agent.parentId || "", task.id, {
       body: decision.message || `Working on "${task.title}"`,
     });
     pushMessage(this.agents, progressMsg);
@@ -290,29 +304,32 @@ export class LLMSimulation extends DeterministicSimulation {
     let task = this.resolveTask(decision.task, agent);
     if (!task) {
       // Try to find any in-progress task assigned to this agent
-      task = this.tasks.find(t => t.assigneeId === agent.id && t.status === 'in_progress');
+      task = this.tasks.find((t) => t.assigneeId === agent.id && t.status === "in_progress");
     }
     if (!task) return;
 
     // Guard: only complete tasks that have been worked on (in_progress or review)
-    if (task.status !== 'in_progress' && task.status !== 'review') {
-      console.log(`  ⚠️ ${agent.name}: Can't complete "${task.title}" (status: ${task.status}) — must work on it first`);
+    if (task.status !== "in_progress" && task.status !== "review") {
+      console.log(
+        `  ⚠️ ${agent.name}: Can't complete "${task.title}" (status: ${task.status}) — must work on it first`,
+      );
       // Auto-convert to work action instead
-      this.executeWork(agent, { ...decision, action: 'work' });
+      this.executeWork(agent, { ...decision, action: "work" });
       return;
     }
 
     // Guard: only the assignee or creator can complete
     if (task.assigneeId !== agent.id && task.creatorId !== agent.id) return;
 
-    task.status = 'done';
+    task.status = "done";
     task.updatedAt = Date.now();
     agent.stats.tasksCompleted++;
-    agent.stats.creditsEarned += task.priority === 'critical' ? 100 : task.priority === 'high' ? 50 : 25;
+    agent.stats.creditsEarned +=
+      task.priority === "critical" ? 100 : task.priority === "high" ? 50 : 25;
 
-    const parent = agent.parentId ? this.agents.find(a => a.id === agent.parentId) : undefined;
+    const parent = agent.parentId ? this.agents.find((a) => a.id === agent.parentId) : undefined;
     if (parent) {
-      const msg = createACPMessage('completion', agent.id, parent.id, task.id, {
+      const msg = createACPMessage("completion", agent.id, parent.id, task.id, {
         summary: decision.message || `Completed: "${task.title}"`,
         body: `Completed: "${task.title}"`,
       });
@@ -327,7 +344,7 @@ export class LLMSimulation extends DeterministicSimulation {
     if (!targetId) return;
 
     const task = this.resolveTask(decision.task, agent);
-    const msg = createACPMessage('status_request', agent.id, targetId, task?.id ?? '', {
+    const msg = createACPMessage("status_request", agent.id, targetId, task?.id ?? "", {
       body: decision.message,
     });
     pushMessage(this.agents, msg);
@@ -338,31 +355,45 @@ export class LLMSimulation extends DeterministicSimulation {
     // Try to use roster-based hiring from the parent class
     // Access parsedOrg through the inherited property
     const roster = (this as any).parsedOrg?.agents || [];
-    const notYetHired = roster.filter((r: SandboxAgent) => !this.agents.find(a => a.id === r.id));
+    const notYetHired = roster.filter((r: SandboxAgent) => !this.agents.find((a) => a.id === r.id));
 
-    const domain = decision.task.replace(/^new:\s*/i, '').trim() || agent.domain;
-    const candidate = notYetHired.find((r: SandboxAgent) =>
-      r.domain?.toLowerCase().includes(domain.toLowerCase())
-    ) || notYetHired[0];
+    const domain = decision.task.replace(/^new:\s*/i, "").trim() || agent.domain;
+    const candidate =
+      notYetHired.find((r: SandboxAgent) =>
+        r.domain?.toLowerCase().includes(domain.toLowerCase()),
+      ) || notYetHired[0];
 
     if (candidate) {
       candidate.parentId = agent.id;
-      candidate.status = 'active';
+      candidate.status = "active";
       this.agents.push(candidate);
 
-      const msg = createACPMessage('delegation', agent.id, candidate.id, '', {
+      const msg = createACPMessage("delegation", agent.id, candidate.id, "", {
         body: decision.message || `Welcome aboard, ${candidate.name}!`,
       });
       pushMessage(this.agents, msg);
       agent.stats.messagesSent++;
-      console.log(`  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`);
+      console.log(
+        `  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`,
+      );
     } else {
       // Create a generic agent
-      const name = decision.target !== 'none' ? decision.target : `${domain} Worker`;
-      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      if (!this.agents.find(a => a.id === id)) {
-        const newAgent = makeAgentPublic(id, name, 'worker', 4, domain, agent.id, `Hired by ${agent.name}`);
-        newAgent.status = 'active';
+      const name = decision.target !== "none" ? decision.target : `${domain} Worker`;
+      const id = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      if (!this.agents.find((a) => a.id === id)) {
+        const newAgent = makeAgentPublic(
+          id,
+          name,
+          "worker",
+          4,
+          domain,
+          agent.id,
+          `Hired by ${agent.name}`,
+        );
+        newAgent.status = "active";
         this.agents.push(newAgent);
         console.log(`  🐣 ${agent.name} created ${name} (L4 ${domain})`);
       }
@@ -374,12 +405,14 @@ export class LLMSimulation extends DeterministicSimulation {
   private resolveTask(taskRef: string, agent: SandboxAgent): SandboxTask | undefined {
     if (!taskRef) return undefined;
     // Direct ID match (e.g. "TASK-0001")
-    const byId = this.tasks.find(t => t.id === taskRef);
+    const byId = this.tasks.find((t) => t.id === taskRef);
     if (byId) return byId;
     // Partial match
     const upper = taskRef.toUpperCase();
-    return this.tasks.find(t => t.id === upper) ||
-      this.tasks.find(t => t.assigneeId === agent.id && !['done', 'rejected'].includes(t.status));
+    return (
+      this.tasks.find((t) => t.id === upper) ||
+      this.tasks.find((t) => t.assigneeId === agent.id && !["done", "rejected"].includes(t.status))
+    );
   }
 
   private createTask(title: string, creator: SandboxAgent): SandboxTask {
@@ -387,8 +420,8 @@ export class LLMSimulation extends DeterministicSimulation {
       id: nextLLMTaskId(),
       title,
       description: title,
-      priority: 'high',
-      status: 'backlog',
+      priority: "high",
+      status: "backlog",
       creatorId: creator.id,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -411,18 +444,18 @@ export class LLMSimulation extends DeterministicSimulation {
 
     // Attach final simulation stats
     const totalTasks = this.tasks.length;
-    const tasksDone = this.tasks.filter(t => t.status === 'done').length;
+    const tasksDone = this.tasks.filter((t) => t.status === "done").length;
     const totalMessages = this.agents.reduce((s, a) => s + a.stats.messagesSent, 0);
     this.recorder.setSummary({
       totalTasks,
       tasksDone,
       completionRate: totalTasks > 0 ? Math.round((tasksDone / totalTasks) * 100) : 0,
       totalMessages,
-      agentCount: this.agents.filter(a => a.status === 'active').length,
+      agentCount: this.agents.filter((a) => a.status === "active").length,
       durationMs: Date.now() - this.startTime,
     });
 
-    const dir = resolve(__dirname, '..', 'scenarios', 'recorded');
+    const dir = resolve(__dirname, "..", "scenarios", "recorded");
     const filepath = await this.recorder.save(dir);
     console.log(`\n📼 Recording saved: ${filepath}`);
     return filepath;
@@ -451,7 +484,7 @@ export class LLMSimulation extends DeterministicSimulation {
   }
 
   /** Override restart to save recording first */
-  async restart(mode: 'organic' | 'full' = 'organic'): Promise<void> {
+  async restart(mode: "organic" | "full" = "organic"): Promise<void> {
     if (this.recording) {
       await this.saveRecording();
       this.recorder = null;

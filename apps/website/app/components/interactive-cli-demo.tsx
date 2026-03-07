@@ -16,37 +16,83 @@ interface VisibleLine extends ScriptLine {
 }
 
 // ─── Script ───────────────────────────────────────────────────────────────────
-const CHAR_MS = 50;   // ms per character typed
-const OUT_GAP = 220;  // ms between output lines
-const CMD_GAP = 750;  // extra pause before each new command (after outputs/blank)
+const CHAR_MS = 50; // ms per character typed
+const OUT_GAP = 220; // ms between output lines
+const CMD_GAP = 750; // extra pause before each new command (after outputs/blank)
 const INIT_DELAY = 500;
 
 const SCRIPT: ScriptLine[] = [
-  { kind: "cmd",    text: "$ npx openspawn init my-startup",              color: "text-slate-200",  step: 1, charCount: 31 },
-  { kind: "output", text: "  Creating project structure...",              color: "text-slate-400",  step: 1 },
-  { kind: "output", text: "  ✓ ORG.md",                                   color: "text-emerald-400",step: 1 },
-  { kind: "output", text: "  ✓ openspawn.config.ts",                      color: "text-emerald-400",step: 1 },
-  { kind: "output", text: "  ✓ .env.example",                             color: "text-emerald-400",step: 1 },
-  { kind: "output", text: "  🚀 my-startup is ready!",                    color: "text-cyan-400",   step: 1 },
-  { kind: "blank",  text: "",                                             color: "",                step: 1 },
-  { kind: "cmd",    text: "$ openspawn org",                              color: "text-slate-200",  step: 2, charCount: 15 },
-  { kind: "output", text: "  my-startup",                                 color: "text-slate-300",  step: 2 },
-  { kind: "output", text: "  ├── 🎯 CEO (claude-opus)",                   color: "text-violet-400", step: 2 },
-  { kind: "output", text: "  │   ├── 🎨 Designer (claude-sonnet)",        color: "text-cyan-400",   step: 2 },
-  { kind: "output", text: "  │   └── 💻 Engineer (claude-sonnet)",        color: "text-cyan-400",   step: 2 },
-  { kind: "blank",  text: "",                                             color: "",                step: 2 },
-  { kind: "cmd",    text: '$ openspawn task create "Build landing page"', color: "text-slate-200",  step: 3, charCount: 45 },
-  { kind: "output", text: '  ✓ Task #42: "Build landing page"',           color: "text-emerald-400",step: 3 },
-  { kind: "output", text: "  → Status: queued · Priority: high",          color: "text-slate-400",  step: 3 },
-  { kind: "blank",  text: "",                                             color: "",                step: 3 },
-  { kind: "cmd",    text: "$ openspawn delegate --to designer --task 42", color: "text-slate-200",  step: 4, charCount: 45 },
-  { kind: "output", text: "  ✓ Delegated task #42 to Designer",          color: "text-emerald-400",step: 4 },
-  { kind: "output", text: '  💬 Designer: "Starting on landing page..."', color: "text-violet-400", step: 4 },
-  { kind: "output", text: "  ● Task #42: in-progress",                   color: "text-cyan-400",   step: 4 },
+  {
+    kind: "cmd",
+    text: "$ npx openspawn init my-startup",
+    color: "text-slate-200",
+    step: 1,
+    charCount: 31,
+  },
+  { kind: "output", text: "  Creating project structure...", color: "text-slate-400", step: 1 },
+  { kind: "output", text: "  ✓ ORG.md", color: "text-emerald-400", step: 1 },
+  { kind: "output", text: "  ✓ openspawn.config.ts", color: "text-emerald-400", step: 1 },
+  { kind: "output", text: "  ✓ .env.example", color: "text-emerald-400", step: 1 },
+  { kind: "output", text: "  🚀 my-startup is ready!", color: "text-cyan-400", step: 1 },
+  { kind: "blank", text: "", color: "", step: 1 },
+  { kind: "cmd", text: "$ openspawn org", color: "text-slate-200", step: 2, charCount: 15 },
+  { kind: "output", text: "  my-startup", color: "text-slate-300", step: 2 },
+  { kind: "output", text: "  ├── 🎯 CEO (claude-opus)", color: "text-violet-400", step: 2 },
+  {
+    kind: "output",
+    text: "  │   ├── 🎨 Designer (claude-sonnet)",
+    color: "text-cyan-400",
+    step: 2,
+  },
+  {
+    kind: "output",
+    text: "  │   └── 💻 Engineer (claude-sonnet)",
+    color: "text-cyan-400",
+    step: 2,
+  },
+  { kind: "blank", text: "", color: "", step: 2 },
+  {
+    kind: "cmd",
+    text: '$ openspawn task create "Build landing page"',
+    color: "text-slate-200",
+    step: 3,
+    charCount: 45,
+  },
+  {
+    kind: "output",
+    text: '  ✓ Task #42: "Build landing page"',
+    color: "text-emerald-400",
+    step: 3,
+  },
+  { kind: "output", text: "  → Status: queued · Priority: high", color: "text-slate-400", step: 3 },
+  { kind: "blank", text: "", color: "", step: 3 },
+  {
+    kind: "cmd",
+    text: "$ openspawn delegate --to designer --task 42",
+    color: "text-slate-200",
+    step: 4,
+    charCount: 45,
+  },
+  {
+    kind: "output",
+    text: "  ✓ Delegated task #42 to Designer",
+    color: "text-emerald-400",
+    step: 4,
+  },
+  {
+    kind: "output",
+    text: '  💬 Designer: "Starting on landing page..."',
+    color: "text-violet-400",
+    step: 4,
+  },
+  { kind: "output", text: "  ● Task #42: in-progress", color: "text-cyan-400", step: 4 },
 ];
 
 // ─── Build timing schedule ────────────────────────────────────────────────────
-interface ScheduledLine { line: ScriptLine; appearsAt: number; }
+interface ScheduledLine {
+  line: ScriptLine;
+  appearsAt: number;
+}
 
 function buildSchedule(): ScheduledLine[] {
   const schedule: ScheduledLine[] = [];
@@ -129,21 +175,21 @@ const STEPS = [
 ];
 
 const BADGE_STYLES = {
-  cyan:    { active: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",       inactive: "" },
-  violet:  { active: "bg-violet-500/10 text-violet-400 border-violet-500/20", inactive: "" },
-  amber:   { active: "bg-amber-500/10 text-amber-400 border-amber-500/20",    inactive: "" },
+  cyan: { active: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20", inactive: "" },
+  violet: { active: "bg-violet-500/10 text-violet-400 border-violet-500/20", inactive: "" },
+  amber: { active: "bg-amber-500/10 text-amber-400 border-amber-500/20", inactive: "" },
   emerald: { active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", inactive: "" },
 } as const;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function InteractiveCliDemo() {
-  const sectionRef   = useRef<HTMLDivElement>(null);
-  const terminalRef  = useRef<HTMLDivElement>(null);
-  const timersRef    = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [visibleLines, setVisibleLines] = useState<VisibleLine[]>([]);
-  const [activeStep, setActiveStep]     = useState<number>(0); // 0 = not started
-  const [isDone, setIsDone]             = useState(false);
-  const [runKey, setRunKey]             = useState(0);
+  const [activeStep, setActiveStep] = useState<number>(0); // 0 = not started
+  const [isDone, setIsDone] = useState(false);
+  const [runKey, setRunKey] = useState(0);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -197,7 +243,7 @@ export function InteractiveCliDemo() {
           }
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" },
     );
 
     observer.observe(section);
@@ -214,11 +260,7 @@ export function InteractiveCliDemo() {
   };
 
   return (
-    <section
-      ref={sectionRef}
-      aria-labelledby="cli-demo-heading"
-      className="section-py-lg"
-    >
+    <section ref={sectionRef} aria-labelledby="cli-demo-heading" className="section-py-lg">
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
         <div className="reveal text-center mb-12">
@@ -229,8 +271,7 @@ export function InteractiveCliDemo() {
             id="cli-demo-heading"
             className="text-3xl font-extrabold text-slate-100 md:text-4xl lg:text-5xl tracking-tight"
           >
-            Zero to running org in{" "}
-            <span className="gradient-text">four commands</span>
+            Zero to running org in <span className="gradient-text">four commands</span>
           </h2>
           <p className="mt-4 mx-auto max-w-xl text-slate-400 leading-relaxed">
             Watch OpenSpawn scaffold, inspect, and delegate work to a live agent organization.
@@ -239,7 +280,6 @@ export function InteractiveCliDemo() {
 
         {/* Split layout: terminal left, explanation right */}
         <div className="reveal grid gap-8 lg:grid-cols-[3fr_2fr] lg:gap-12 items-start">
-
           {/* ── Left: Terminal window ─────────────────────────────────────── */}
           <div className="terminal terminal-enhanced">
             {/* Title bar */}
@@ -347,8 +387,8 @@ export function InteractiveCliDemo() {
           <div className="flex flex-col gap-3" role="list" aria-label="Demo steps">
             {STEPS.map((exp) => {
               const isActive = activeStep === exp.step;
-              const isPast   = activeStep > exp.step;
-              const bs       = BADGE_STYLES[exp.color];
+              const isPast = activeStep > exp.step;
+              const bs = BADGE_STYLES[exp.color];
 
               return (
                 <div
@@ -359,8 +399,8 @@ export function InteractiveCliDemo() {
                     isActive
                       ? "border-cyan-500/25 bg-cyan-500/[0.05] ring-1 ring-cyan-500/10 shadow-lg shadow-cyan-500/5"
                       : isPast
-                      ? "border-white/[0.06] bg-white/[0.02] opacity-60"
-                      : "border-white/5 bg-transparent opacity-35",
+                        ? "border-white/[0.06] bg-white/[0.02] opacity-60"
+                        : "border-white/5 bg-transparent opacity-35",
                   ].join(" ")}
                   aria-current={isActive ? "step" : undefined}
                 >
@@ -372,8 +412,8 @@ export function InteractiveCliDemo() {
                         isActive
                           ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/30"
                           : isPast
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-white/5 text-slate-600",
+                            ? "bg-emerald-500/15 text-emerald-400"
+                            : "bg-white/5 text-slate-600",
                       ].join(" ")}
                     >
                       {isPast ? "✓" : exp.step}
@@ -393,9 +433,7 @@ export function InteractiveCliDemo() {
                     <span
                       className={[
                         "ml-auto inline-flex items-center rounded border px-2 py-0.5 font-mono text-xs transition-all duration-300",
-                        isActive
-                          ? bs.active
-                          : "border-white/5 bg-white/[0.02] text-slate-700",
+                        isActive ? bs.active : "border-white/5 bg-white/[0.02] text-slate-700",
                       ].join(" ")}
                     >
                       {exp.badge}
@@ -409,8 +447,8 @@ export function InteractiveCliDemo() {
                       isActive
                         ? "text-slate-400 max-h-20 opacity-100"
                         : isPast
-                        ? "text-slate-600 max-h-20 opacity-50"
-                        : "text-transparent max-h-0 opacity-0 pointer-events-none",
+                          ? "text-slate-600 max-h-20 opacity-50"
+                          : "text-transparent max-h-0 opacity-0 pointer-events-none",
                     ].join(" ")}
                   >
                     {exp.description}
@@ -423,7 +461,9 @@ export function InteractiveCliDemo() {
             <div
               className={[
                 "mt-2 transition-all duration-700",
-                isDone ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none",
+                isDone
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-3 pointer-events-none",
               ].join(" ")}
               aria-hidden={!isDone}
             >

@@ -20,7 +20,7 @@ export function registerAgentTools(server: McpServer, client: ApiClient) {
               message: "Use agent_list to see full details",
             },
             null,
-            2
+            2,
           ),
         },
       ],

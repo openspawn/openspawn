@@ -8,10 +8,10 @@
  * - Animated with framer-motion
  */
 
-import { motion } from 'motion/react';
-import { cn } from '../lib/utils';
+import { motion } from "motion/react";
+import { cn } from "../lib/utils";
 
-type RingStatus = 'active' | 'idle' | 'busy' | 'error';
+type RingStatus = "active" | "idle" | "busy" | "error";
 
 interface StatusRingProps {
   /** Task completion rate 0-1 */
@@ -21,7 +21,7 @@ interface StatusRingProps {
   /** Agent status */
   status: RingStatus;
   /** Ring size */
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   /** Avatar content */
   children: React.ReactNode;
   className?: string;
@@ -35,16 +35,16 @@ const SIZE_CONFIG = {
 
 /** Returns a semantic color based on a 0-1 value */
 function rateColor(value: number): string {
-  if (value >= 0.85) return '#f43f5e'; // rose-500
-  if (value >= 0.6) return '#f59e0b';  // amber-500
-  return '#10b981';                     // emerald-500
+  if (value >= 0.85) return "#f43f5e"; // rose-500
+  if (value >= 0.6) return "#f59e0b"; // amber-500
+  return "#10b981"; // emerald-500
 }
 
 export function StatusRing({
   completionRate,
   creditUsage,
   status,
-  size = 'md',
+  size = "md",
   children,
   className,
 }: StatusRingProps) {
@@ -64,11 +64,11 @@ export function StatusRing({
   const outerColor = rateColor(completionRate);
   const innerColor = rateColor(creditUsage);
 
-  const shouldPulse = status === 'active';
+  const shouldPulse = status === "active";
 
   return (
     <div
-      className={cn('relative inline-flex items-center justify-center', className)}
+      className={cn("relative inline-flex items-center justify-center", className)}
       style={{ width: cfg.px, height: cfg.px }}
     >
       {/* SVG rings */}
@@ -100,7 +100,7 @@ export function StatusRing({
           strokeDasharray={outerCircumference}
           initial={{ strokeDashoffset: outerCircumference }}
           animate={{ strokeDashoffset: outerOffset }}
-          transition={{ type: 'tween', duration: 0.8, ease: 'easeOut' }}
+          transition={{ type: "tween", duration: 0.8, ease: "easeOut" }}
           transform={`rotate(-90 ${center} ${center})`}
         />
 
@@ -126,7 +126,7 @@ export function StatusRing({
           strokeDasharray={innerCircumference}
           initial={{ strokeDashoffset: innerCircumference }}
           animate={{ strokeDashoffset: innerOffset }}
-          transition={{ type: 'tween', duration: 0.8, ease: 'easeOut', delay: 0.1 }}
+          transition={{ type: "tween", duration: 0.8, ease: "easeOut", delay: 0.1 }}
           transform={`rotate(-90 ${center} ${center})`}
         />
       </svg>
@@ -137,7 +137,7 @@ export function StatusRing({
           className="absolute inset-0 rounded-full"
           style={{ boxShadow: `0 0 8px ${outerColor}` }}
           animate={{ opacity: [0.4, 0.8, 0.4] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         />
       )}
 

@@ -17,11 +17,7 @@ import { cn } from "../lib/utils";
 import type { ReactNode } from "react";
 import { SidePanelShell } from "@openspawn/dashboard-ui";
 import { useSidePanel } from "@openspawn/dashboard-data";
-import {
-  GlobalSearchTrigger,
-  GlobalSearchModal,
-  useGlobalSearchShortcut,
-} from "./global-search";
+import { GlobalSearchTrigger, GlobalSearchModal, useGlobalSearchShortcut } from "./global-search";
 
 const BRAND_NAME = "OpenSpawn";
 const BRAND_SUBTITLE = "Team Dashboard";
@@ -58,7 +54,11 @@ function useSidebarCollapsed() {
   const toggle = useCallback(() => {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch { /* noop */ }
+      try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
+      } catch {
+        /* noop */
+      }
       return next;
     });
   }, []);
@@ -73,7 +73,12 @@ function SidePanelOverlay() {
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
       <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]">
-        <SidePanelShell title={title} onClose={closeSidePanel} width={width} onWidthChange={setWidth}>
+        <SidePanelShell
+          title={title}
+          onClose={closeSidePanel}
+          width={width}
+          onWidthChange={setWidth}
+        >
           {content}
         </SidePanelShell>
       </div>
@@ -131,9 +136,10 @@ export function Layout({ children }: LayoutProps) {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
           {navigation.map((item) => {
-            const active = item.href === "/"
-              ? location.pathname === "/"
-              : location.pathname.startsWith(item.href);
+            const active =
+              item.href === "/"
+                ? location.pathname === "/"
+                : location.pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}

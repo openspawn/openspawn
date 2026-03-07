@@ -2,10 +2,10 @@
  * Hook to fetch real-time metrics from the sandbox API.
  * Returns time-series data for sparklines and charts.
  */
-import { useQuery } from '@tanstack/react-query';
-import { isSandboxMode } from '../graphql/fetcher';
+import { useQuery } from "@tanstack/react-query";
+import { isSandboxMode } from "../graphql/fetcher";
 
-import { SANDBOX_URL } from '../lib/sandbox-url';
+import { SANDBOX_URL } from "../lib/sandbox-url";
 
 export interface MetricsSnapshot {
   tick: number;
@@ -28,7 +28,7 @@ async function fetchMetrics(): Promise<MetricsSnapshot[]> {
 
 export function useSandboxMetrics() {
   return useQuery({
-    queryKey: ['sandbox-metrics'],
+    queryKey: ["sandbox-metrics"],
     queryFn: fetchMetrics,
     enabled: isSandboxMode,
     // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
@@ -47,9 +47,9 @@ export function useSparklines() {
   const recent = metrics.slice(-12);
 
   return {
-    agents: recent.map(m => m.activeAgents),
-    tasks: recent.map(m => m.totalTasks),
-    completed: recent.map(m => m.tasksDone),
-    credits: recent.map(m => m.totalCreditsEarned - m.totalCreditsSpent),
+    agents: recent.map((m) => m.activeAgents),
+    tasks: recent.map((m) => m.totalTasks),
+    completed: recent.map((m) => m.tasksDone),
+    credits: recent.map((m) => m.totalCreditsEarned - m.totalCreditsSpent),
   };
 }

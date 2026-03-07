@@ -8,31 +8,31 @@
  *
  * Mount this ONCE near the app root (e.g. in App or Layout).
  */
-import { useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useSandboxSSE, type SandboxSSEEvent } from './use-sandbox-sse';
+import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSandboxSSE, type SandboxSSEEvent } from "./use-sandbox-sse";
 
 /**
  * Query keys to invalidate when a tick completes.
  * These match the keys used by useAgentsQuery, useTasksQuery, etc.
  */
 const TICK_INVALIDATION_KEYS = [
-  ['agents'],
-  ['tasks'],
-  ['creditHistory'],
-  ['sandbox-metrics'],
-  ['acp-metrics'],
-  ['messages'],
-  ['threads'],
-  ['unread'],
-  ['conversations'],
-  ['conversationMessages'],
-  ['scenario-status'],
-  ['claimableTaskCount'],
-  ['router-metrics'],
-  ['router-decisions'],
-  ['router-decisions-full'],
-  ['router-config'],
+  ["agents"],
+  ["tasks"],
+  ["creditHistory"],
+  ["sandbox-metrics"],
+  ["acp-metrics"],
+  ["messages"],
+  ["threads"],
+  ["unread"],
+  ["conversations"],
+  ["conversationMessages"],
+  ["scenario-status"],
+  ["claimableTaskCount"],
+  ["router-metrics"],
+  ["router-decisions"],
+  ["router-decisions-full"],
+  ["router-config"],
 ] as const;
 
 export function useSandboxTickInvalidation() {
@@ -41,7 +41,7 @@ export function useSandboxTickInvalidation() {
   useSandboxSSE(
     useCallback(
       (event: SandboxSSEEvent) => {
-        if (event.type === 'tick_complete') {
+        if (event.type === "tick_complete") {
           // Invalidate all data queries — TanStack Query will refetch
           // only the ones that are currently observed (mounted).
           for (const key of TICK_INVALIDATION_KEYS) {

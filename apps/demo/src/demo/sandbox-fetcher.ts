@@ -6,7 +6,7 @@
  * and exposes a GraphQL-compatible endpoint at localhost:3333/graphql
  */
 
-import { SANDBOX_URL } from '../lib/sandbox-url';
+import { SANDBOX_URL } from "../lib/sandbox-url";
 
 /**
  * TanStack Query fetcher that proxies GraphQL to the sandbox API
@@ -17,8 +17,8 @@ export function sandboxFetcher<TData, TVariables extends Record<string, unknown>
 ): () => Promise<TData> {
   return async () => {
     const response = await fetch(`${SANDBOX_URL}/graphql`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables }),
     });
 

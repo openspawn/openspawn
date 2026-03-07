@@ -3,19 +3,19 @@
  * FeedVirtualList and ComposingIndicators are internal helpers.
  * Extracted from messages.tsx to reduce file size.
  */
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { TypingIndicator } from '../components/presence';
-import { usePresence, useTeams, useAgents } from '../hooks';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import { ScrollArea } from '../components/ui/scroll-area';
-import { cn } from '../lib/utils';
-import { isSandboxMode } from '../graphql/fetcher';
-import { TeamFilterDropdown } from '../components/team-badge';
-import type { Message } from '../hooks';
-import { InlineAvatar, formatTime, typeColors, typeIcons } from './message-utils';
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { TypingIndicator } from "../components/presence";
+import { usePresence, useTeams, useAgents } from "../hooks";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { ScrollArea } from "../components/ui/scroll-area";
+import { cn } from "../lib/utils";
+import { isSandboxMode } from "../graphql/fetcher";
+import { TeamFilterDropdown } from "../components/team-badge";
+import type { Message } from "../hooks";
+import { InlineAvatar, formatTime, typeColors, typeIcons } from "./message-utils";
 
 // ─── FeedVirtualList ──────────────────────────────────────────────────────────
 
@@ -34,9 +34,9 @@ function FeedVirtualList({ filtered, onViewThread, agents }: FeedVirtualListProp
         <div className="space-y-0">
           <AnimatePresence mode="popLayout">
             {filtered.map((msg) => {
-              const sender    = msg.fromAgent;
-              const receiver  = msg.toAgent;
-              const convoKey  = [msg.fromAgentId, msg.toAgentId].sort().join('::');
+              const sender = msg.fromAgent;
+              const receiver = msg.toAgent;
+              const convoKey = [msg.fromAgentId, msg.toAgentId].sort().join("::");
               return (
                 <motion.div
                   key={msg.id}
@@ -47,39 +47,67 @@ function FeedVirtualList({ filtered, onViewThread, agents }: FeedVirtualListProp
                   className="flex gap-3 md:gap-4 pb-3 pl-8 md:pl-12 relative"
                 >
                   <div className="absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-card border-2 border-primary top-3" />
-                  <Card className={cn(
-                    "flex-1 border-l-4",
-                    isSandboxMode && (msg as any).acpType === 'delegation'  && 'border-l-blue-500',
-                    isSandboxMode && (msg as any).acpType === 'escalation'  && 'border-l-red-500 bg-red-500/5',
-                    isSandboxMode && (msg as any).acpType === 'completion'  && 'border-l-emerald-500 bg-emerald-500/5',
-                    isSandboxMode && (msg as any).acpType === 'progress'    && 'border-l-slate-400',
-                    isSandboxMode && (msg as any).acpType === 'ack'         && 'border-l-transparent',
-                    !isSandboxMode && msg.type === 'TASK'       && 'border-l-blue-500',
-                    !isSandboxMode && msg.type === 'STATUS'     && 'border-l-green-500',
-                    !isSandboxMode && msg.type === 'REPORT'     && 'border-l-purple-500',
-                    !isSandboxMode && msg.type === 'QUESTION'   && 'border-l-yellow-500',
-                    !isSandboxMode && msg.type === 'ESCALATION' && 'border-l-red-500',
-                  )}>
+                  <Card
+                    className={cn(
+                      "flex-1 border-l-4",
+                      isSandboxMode && (msg as any).acpType === "delegation" && "border-l-blue-500",
+                      isSandboxMode &&
+                        (msg as any).acpType === "escalation" &&
+                        "border-l-red-500 bg-red-500/5",
+                      isSandboxMode &&
+                        (msg as any).acpType === "completion" &&
+                        "border-l-emerald-500 bg-emerald-500/5",
+                      isSandboxMode && (msg as any).acpType === "progress" && "border-l-slate-400",
+                      isSandboxMode && (msg as any).acpType === "ack" && "border-l-transparent",
+                      !isSandboxMode && msg.type === "TASK" && "border-l-blue-500",
+                      !isSandboxMode && msg.type === "STATUS" && "border-l-green-500",
+                      !isSandboxMode && msg.type === "REPORT" && "border-l-purple-500",
+                      !isSandboxMode && msg.type === "QUESTION" && "border-l-yellow-500",
+                      !isSandboxMode && msg.type === "ESCALATION" && "border-l-red-500",
+                    )}
+                  >
                     <CardContent className="p-2 md:p-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                         <div className="flex items-center gap-1.5 md:gap-2">
-                          <InlineAvatar agentId={msg.fromAgentId} agents={agents} className="w-5 h-5 md:w-6 md:h-6" />
-                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{sender?.name || 'Unknown'}</span>
+                          <InlineAvatar
+                            agentId={msg.fromAgentId}
+                            agents={agents}
+                            className="w-5 h-5 md:w-6 md:h-6"
+                          />
+                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">
+                            {sender?.name || "Unknown"}
+                          </span>
                           <span className="text-muted-foreground text-xs">→</span>
-                          <InlineAvatar agentId={msg.toAgentId} agents={agents} className="w-5 h-5 md:w-6 md:h-6" />
-                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{receiver?.name || 'Unknown'}</span>
+                          <InlineAvatar
+                            agentId={msg.toAgentId}
+                            agents={agents}
+                            className="w-5 h-5 md:w-6 md:h-6"
+                          />
+                          <span className="font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">
+                            {receiver?.name || "Unknown"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={cn("text-[9px] md:text-[10px]", typeColors[msg.type] || typeColors.GENERAL)}>
-                            {typeIcons[msg.type] || '💬'}
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "text-[9px] md:text-[10px]",
+                              typeColors[msg.type] || typeColors.GENERAL,
+                            )}
+                          >
+                            {typeIcons[msg.type] || "💬"}
                           </Badge>
-                          <span className="text-[10px] md:text-xs text-muted-foreground">{formatTime(msg.createdAt)}</span>
+                          <span className="text-[10px] md:text-xs text-muted-foreground">
+                            {formatTime(msg.createdAt)}
+                          </span>
                         </div>
                       </div>
                       <p className="text-xs md:text-sm text-muted-foreground">{msg.content}</p>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {msg.taskRef && (
-                          <Badge variant="outline" className="text-[9px] md:text-[10px]">🔗 {msg.taskRef}</Badge>
+                          <Badge variant="outline" className="text-[9px] md:text-[10px]">
+                            🔗 {msg.taskRef}
+                          </Badge>
                         )}
                         <Button
                           variant="ghost"
@@ -126,17 +154,19 @@ interface MissionControlFeedProps {
 }
 
 export function MissionControlFeed({ messages, onViewThread }: MissionControlFeedProps) {
-  const [filter, setFilter]         = useState<string | null>(null);
-  const { teams: allTeams }         = useTeams();
-  const [teamFilter, setTeamFilter] = useState<string>('all');
-  const { agents }                  = useAgents();
+  const [filter, setFilter] = useState<string | null>(null);
+  const { teams: allTeams } = useTeams();
+  const [teamFilter, setTeamFilter] = useState<string>("all");
+  const { agents } = useAgents();
 
   const filtered = useMemo(() => {
     let result = messages;
     if (filter) result = result.filter((m) => m.type === filter);
-    if (teamFilter !== 'all') {
+    if (teamFilter !== "all") {
       const teamAgentIds = new Set(agents.filter((a) => a.teamId === teamFilter).map((a) => a.id));
-      result = result.filter((m) => teamAgentIds.has(m.fromAgentId) || teamAgentIds.has(m.toAgentId));
+      result = result.filter(
+        (m) => teamAgentIds.has(m.fromAgentId) || teamAgentIds.has(m.toAgentId),
+      );
     }
     return result;
   }, [messages, filter, teamFilter, agents]);
@@ -145,11 +175,22 @@ export function MissionControlFeed({ messages, onViewThread }: MissionControlFee
     <div className="space-y-4">
       {/* Horizontal filter bar */}
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide items-center">
-        <Button variant={filter === null ? 'default' : 'outline'} size="sm" onClick={() => setFilter(null)} className="shrink-0">
+        <Button
+          variant={filter === null ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFilter(null)}
+          className="shrink-0"
+        >
           All
         </Button>
         {Object.keys(typeColors).map((type) => (
-          <Button key={type} variant={filter === type ? 'default' : 'outline'} size="sm" onClick={() => setFilter(type)} className="shrink-0">
+          <Button
+            key={type}
+            variant={filter === type ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter(type)}
+            className="shrink-0"
+          >
             {typeIcons[type]} <span className="hidden sm:inline ml-1">{type.toLowerCase()}</span>
           </Button>
         ))}
@@ -162,7 +203,12 @@ export function MissionControlFeed({ messages, onViewThread }: MissionControlFee
         />
       </div>
 
-      <FeedVirtualList filtered={filtered} allMessages={messages} onViewThread={onViewThread} agents={agents} />
+      <FeedVirtualList
+        filtered={filtered}
+        allMessages={messages}
+        onViewThread={onViewThread}
+        agents={agents}
+      />
       <ComposingIndicators />
     </div>
   );

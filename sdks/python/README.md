@@ -113,10 +113,10 @@ def engineering_node(state):
         title="Process engineering request",
         assignee_agent_id="engineer-agent"
     )
-    
+
     # Do work
     result = do_engineering_work(state)
-    
+
     # Mark done
     client.tasks.transition(task.id, status="done")
     return result
@@ -131,6 +131,7 @@ workflow.add_node("engineer", engineering_node)
 Main client class.
 
 **Environment variables:**
+
 - `OPENSPAWN_API_KEY` — API key
 - `OPENSPAWN_ORG_ID` — Organization ID
 

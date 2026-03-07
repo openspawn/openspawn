@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetcher } from '../graphql/fetcher';
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "../graphql/fetcher";
 
 // GraphQL queries for messages
 const MESSAGES_QUERY = `
@@ -107,11 +107,8 @@ export interface Conversation {
 
 export function useMessages(limit = 50) {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['messages', limit],
-    queryFn: fetcher<{ messages: Message[] }, { limit: number }>(
-      MESSAGES_QUERY,
-      { limit }
-    ),
+    queryKey: ["messages", limit],
+    queryFn: fetcher<{ messages: Message[] }, { limit: number }>(MESSAGES_QUERY, { limit }),
     // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
 
@@ -125,10 +122,10 @@ export function useMessages(limit = 50) {
 
 export function useConversations() {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['conversations'],
+    queryKey: ["conversations"],
     queryFn: fetcher<{ conversations: Conversation[] }, Record<string, never>>(
       CONVERSATIONS_QUERY,
-      {}
+      {},
     ),
     // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
   });
@@ -143,10 +140,10 @@ export function useConversations() {
 
 export function useConversationMessages(agent1Id: string, agent2Id: string) {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['conversationMessages', agent1Id, agent2Id],
+    queryKey: ["conversationMessages", agent1Id, agent2Id],
     queryFn: fetcher<{ conversationMessages: Message[] }, { agent1Id: string; agent2Id: string }>(
       CONVERSATION_MESSAGES_QUERY,
-      { agent1Id, agent2Id }
+      { agent1Id, agent2Id },
     ),
     enabled: Boolean(agent1Id && agent2Id),
     // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)

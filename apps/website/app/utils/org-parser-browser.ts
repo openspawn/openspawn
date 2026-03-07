@@ -89,8 +89,7 @@ function phrasingToText(nodes: PhrasingContent[]): string {
 
 function nodeToText(node: Content): string {
   if (node.type === "text") return (node as Text).value;
-  if ("children" in node)
-    return (node as any).children.map((c: Content) => nodeToText(c)).join("");
+  if ("children" in node) return (node as any).children.map((c: Content) => nodeToText(c)).join("");
   return "";
 }
 
@@ -186,10 +185,7 @@ export function parseOrgMdBrowser(raw: string): OrgPreview {
   const errors: string[] = [];
 
   try {
-    const tree = unified()
-      .use(remarkParse)
-      .use(remarkFrontmatter, ["yaml"])
-      .parse(raw) as Root;
+    const tree = unified().use(remarkParse).use(remarkFrontmatter, ["yaml"]).parse(raw) as Root;
 
     const sections = buildSectionTree(tree.children as Content[]);
 
@@ -207,15 +203,11 @@ export function parseOrgMdBrowser(raw: string): OrgPreview {
 
     // Identity / description
     const identitySection = findH2("Identity") ?? findH2("Mission");
-    const description = identitySection
-      ? extractProse(identitySection.content)
-      : "";
+    const description = identitySection ? extractProse(identitySection.content) : "";
 
     // Culture
     const cultureSection = findH2("Culture");
-    const cultureMeta = cultureSection
-      ? extractMeta(cultureSection.content)
-      : {};
+    const cultureMeta = cultureSection ? extractMeta(cultureSection.content) : {};
     // Also handle simple dash list items like "- preset: move-fast"
     const cultureText = cultureSection
       ? cultureSection.content.map((n) => nodeToText(n)).join("\n")
@@ -224,10 +216,8 @@ export function parseOrgMdBrowser(raw: string): OrgPreview {
 
     const culture = {
       preset: presetMatch?.[1] ?? cultureMeta["preset"],
-      escalation:
-        cultureMeta["escalation"] ?? cultureMeta["escalation_velocity"],
-      progressUpdates:
-        cultureMeta["progress_updates"] ?? cultureMeta["progress"],
+      escalation: cultureMeta["escalation"] ?? cultureMeta["escalation_velocity"],
+      progressUpdates: cultureMeta["progress_updates"] ?? cultureMeta["progress"],
     };
 
     // Structure
@@ -247,8 +237,7 @@ export function parseOrgMdBrowser(raw: string): OrgPreview {
           const meta = extractMeta(dept.content);
           const name = nameFromHeading(dept.heading);
           const role = roleFromHeading(dept.heading);
-          const level =
-            parseInt(meta["level"] ?? "") || inferLevel(dept.heading);
+          const level = parseInt(meta["level"] ?? "") || inferLevel(dept.heading);
           const count = parseInt(meta["count"] ?? "1") || 1;
           const id = makeId(meta["id"] ?? name);
 
@@ -274,8 +263,7 @@ export function parseOrgMdBrowser(raw: string): OrgPreview {
             const meta = extractMeta(sub.content);
             const name = nameFromHeading(sub.heading);
             const role = roleFromHeading(sub.heading);
-            const level =
-              parseInt(meta["level"] ?? "") || inferLevel(sub.heading);
+            const level = parseInt(meta["level"] ?? "") || inferLevel(sub.heading);
             const count = parseInt(meta["count"] ?? "1") || 1;
             const id = makeId(meta["id"] ?? name);
             const reportsTo = meta["reports_to"];

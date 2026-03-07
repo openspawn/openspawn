@@ -35,12 +35,14 @@ openspawn hire "web-eng" --level 5 --role "frontend engineer" --worktree
 ```
 
 This runs:
+
 1. `git fetch origin`
 2. `git worktree add ../repo-worktrees/web-eng -b web-eng/task-name origin/master`
 3. Creates agent workspace inside the worktree
 4. Sets `OPENSPAWN_REPO` env var pointing to the worktree
 
 **`openspawn fire`** cleans up:
+
 1. `git worktree remove ../repo-worktrees/web-eng`
 2. Archives workspace as before
 

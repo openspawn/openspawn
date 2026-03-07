@@ -1,16 +1,16 @@
 // ── Shared Decision Executor ────────────────────────────────────────────────
 // Extracted from LLMSimulation so both LLM and Replay engines can use it.
 
-import { resolveAgentId, type AgentDecision } from './markdown-decision.js';
-import { makeAgentPublic } from './agents.js';
-import { createACPMessage, pushMessage } from './acp.js';
-import type { SandboxAgent, SandboxTask } from './types.js';
+import { resolveAgentId, type AgentDecision } from "./markdown-decision.js";
+import { makeAgentPublic } from "./agents.js";
+import { createACPMessage, pushMessage } from "./acp.js";
+import type { SandboxAgent, SandboxTask } from "./types.js";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 let executorTaskCounter = 20000;
 function nextExecutorTaskId(): string {
-  return `TASK-${String(++executorTaskCounter).padStart(4, '0')}`;
+  return `TASK-${String(++executorTaskCounter).padStart(4, "0")}`;
 }
 
 // ── Context for execution ───────────────────────────────────────────────────
@@ -29,31 +29,37 @@ export function executeDecision(
   ctx: ExecutionContext,
 ): void {
   switch (decision.action) {
-    case 'delegate':
+    case "delegate":
       executeDelegation(agent, decision, ctx);
       break;
-    case 'escalate':
+    case "escalate":
       executeEscalation(agent, decision, ctx);
       break;
-    case 'complete':
+    case "complete":
       executeCompletion(agent, decision, ctx);
       break;
-    case 'message':
+    case "message":
       executeMessage(agent, decision, ctx);
       break;
-    case 'hire':
+    case "hire":
       executeHire(agent, decision, ctx);
       break;
   }
 }
 
-function resolveTask(taskRef: string, agent: SandboxAgent, tasks: SandboxTask[]): SandboxTask | undefined {
-  if (!taskRef || taskRef === 'none') return undefined;
-  const byId = tasks.find(t => t.id === taskRef);
+function resolveTask(
+  taskRef: string,
+  agent: SandboxAgent,
+  tasks: SandboxTask[],
+): SandboxTask | undefined {
+  if (!taskRef || taskRef === "none") return undefined;
+  const byId = tasks.find((t) => t.id === taskRef);
   if (byId) return byId;
   const upper = taskRef.toUpperCase();
-  return tasks.find(t => t.id === upper) ||
-    tasks.find(t => t.assigneeId === agent.id && !['done', 'rejected'].includes(t.status));
+  return (
+    tasks.find((t) => t.id === upper) ||
+    tasks.find((t) => t.assigneeId === agent.id && !["done", "rejected"].includes(t.status))
+  );
 }
 
 function createTask(title: string, creator: SandboxAgent, tasks: SandboxTask[]): SandboxTask {
@@ -61,8 +67,8 @@ function createTask(title: string, creator: SandboxAgent, tasks: SandboxTask[]):
     id: nextExecutorTaskId(),
     title,
     description: title,
-    priority: 'high',
-    status: 'backlog',
+    priority: "high",
+    status: "backlog",
     creatorId: creator.id,
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -73,9 +79,13 @@ function createTask(title: string, creator: SandboxAgent, tasks: SandboxTask[]):
   return task;
 }
 
-function executeDelegation(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
+function executeDelegation(
+  agent: SandboxAgent,
+  decision: AgentDecision,
+  ctx: ExecutionContext,
+): void {
   const targetId = resolveAgentId(decision.target, ctx.agents);
-  const target = targetId ? ctx.agents.find(a => a.id === targetId) : undefined;
+  const target = targetId ? ctx.agents.find((a) => a.id === targetId) : undefined;
   if (!target) {
     console.log(`  ⚠️ ${agent.name}: delegate target "${decision.target}" not found`);
     return;
@@ -83,22 +93,22 @@ function executeDelegation(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
 
   let task = resolveTask(decision.task, agent, ctx.tasks);
   if (!task) {
-    const title = decision.task.replace(/^new:\s*/i, '').trim() || decision.message.slice(0, 80);
+    const title = decision.task.replace(/^new:\s*/i, "").trim() || decision.message.slice(0, 80);
     task = createTask(title, agent, ctx.tasks);
   }
 
   task.assigneeId = target.id;
-  task.status = 'assigned';
+  task.status = "assigned";
   if (!target.taskIds.includes(task.id)) target.taskIds.push(task.id);
 
-  const msg = createACPMessage('delegation', agent.id, target.id, task.id, {
+  const msg = createACPMessage("delegation", agent.id, target.id, task.id, {
     body: decision.message || `Delegating "${task.title}" to ${target.name}`,
   });
   pushMessage(ctx.agents, msg);
   task.activityLog.push(msg);
   agent.stats.messagesSent++;
 
-  const ack = createACPMessage('ack', target.id, agent.id, task.id, {
+  const ack = createACPMessage("ack", target.id, agent.id, task.id, {
     body: `Acknowledged: "${task.title}"`,
   });
   pushMessage(ctx.agents, ack);
@@ -106,15 +116,19 @@ function executeDelegation(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
   task.acked = true;
 }
 
-function executeEscalation(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
-  const parent = agent.parentId ? ctx.agents.find(a => a.id === agent.parentId) : undefined;
+function executeEscalation(
+  agent: SandboxAgent,
+  decision: AgentDecision,
+  ctx: ExecutionContext,
+): void {
+  const parent = agent.parentId ? ctx.agents.find((a) => a.id === agent.parentId) : undefined;
   if (!parent) return;
 
   const task = resolveTask(decision.task, agent, ctx.tasks);
-  const taskId = task?.id ?? '';
+  const taskId = task?.id ?? "";
 
-  const msg = createACPMessage('escalation', agent.id, parent.id, taskId, {
-    reason: 'BLOCKED',
+  const msg = createACPMessage("escalation", agent.id, parent.id, taskId, {
+    reason: "BLOCKED",
     body: decision.message || `Escalating: ${decision.task}`,
   });
   pushMessage(ctx.agents, msg);
@@ -122,18 +136,23 @@ function executeEscalation(agent: SandboxAgent, decision: AgentDecision, ctx: Ex
   agent.stats.messagesSent++;
 }
 
-function executeCompletion(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
+function executeCompletion(
+  agent: SandboxAgent,
+  decision: AgentDecision,
+  ctx: ExecutionContext,
+): void {
   const task = resolveTask(decision.task, agent, ctx.tasks);
   if (!task) return;
 
-  task.status = 'done';
+  task.status = "done";
   task.updatedAt = Date.now();
   agent.stats.tasksCompleted++;
-  agent.stats.creditsEarned += task.priority === 'critical' ? 100 : task.priority === 'high' ? 50 : 25;
+  agent.stats.creditsEarned +=
+    task.priority === "critical" ? 100 : task.priority === "high" ? 50 : 25;
 
-  const parent = agent.parentId ? ctx.agents.find(a => a.id === agent.parentId) : undefined;
+  const parent = agent.parentId ? ctx.agents.find((a) => a.id === agent.parentId) : undefined;
   if (parent) {
-    const msg = createACPMessage('completion', agent.id, parent.id, task.id, {
+    const msg = createACPMessage("completion", agent.id, parent.id, task.id, {
       summary: decision.message || `Completed: "${task.title}"`,
       body: `Completed: "${task.title}"`,
     });
@@ -148,7 +167,7 @@ function executeMessage(agent: SandboxAgent, decision: AgentDecision, ctx: Execu
   if (!targetId) return;
 
   const task = resolveTask(decision.task, agent, ctx.tasks);
-  const msg = createACPMessage('status_request', agent.id, targetId, task?.id ?? '', {
+  const msg = createACPMessage("status_request", agent.id, targetId, task?.id ?? "", {
     body: decision.message,
   });
   pushMessage(ctx.agents, msg);
@@ -157,30 +176,43 @@ function executeMessage(agent: SandboxAgent, decision: AgentDecision, ctx: Execu
 
 function executeHire(agent: SandboxAgent, decision: AgentDecision, ctx: ExecutionContext): void {
   const roster = ctx.parsedOrgAgents || [];
-  const notYetHired = roster.filter(r => !ctx.agents.find(a => a.id === r.id));
+  const notYetHired = roster.filter((r) => !ctx.agents.find((a) => a.id === r.id));
 
-  const domain = decision.task.replace(/^new:\s*/i, '').trim() || agent.domain;
-  const candidate = notYetHired.find(r =>
-    r.domain?.toLowerCase().includes(domain.toLowerCase())
-  ) || notYetHired[0];
+  const domain = decision.task.replace(/^new:\s*/i, "").trim() || agent.domain;
+  const candidate =
+    notYetHired.find((r) => r.domain?.toLowerCase().includes(domain.toLowerCase())) ||
+    notYetHired[0];
 
   if (candidate) {
     candidate.parentId = agent.id;
-    candidate.status = 'active';
+    candidate.status = "active";
     ctx.agents.push(candidate);
 
-    const msg = createACPMessage('delegation', agent.id, candidate.id, '', {
+    const msg = createACPMessage("delegation", agent.id, candidate.id, "", {
       body: decision.message || `Welcome aboard, ${candidate.name}!`,
     });
     pushMessage(ctx.agents, msg);
     agent.stats.messagesSent++;
-    console.log(`  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`);
+    console.log(
+      `  🐣 ${agent.name} hired ${candidate.name} (L${candidate.level} ${candidate.domain})`,
+    );
   } else {
-    const name = decision.target !== 'none' ? decision.target : `${domain} Worker`;
-    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    if (!ctx.agents.find(a => a.id === id)) {
-      const newAgent = makeAgentPublic(id, name, 'worker', 4, domain, agent.id, `Hired by ${agent.name}`);
-      newAgent.status = 'active';
+    const name = decision.target !== "none" ? decision.target : `${domain} Worker`;
+    const id = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    if (!ctx.agents.find((a) => a.id === id)) {
+      const newAgent = makeAgentPublic(
+        id,
+        name,
+        "worker",
+        4,
+        domain,
+        agent.id,
+        `Hired by ${agent.name}`,
+      );
+      newAgent.status = "active";
       ctx.agents.push(newAgent);
       console.log(`  🐣 ${agent.name} created ${name} (L4 ${domain})`);
     }

@@ -6,8 +6,7 @@ import { forwardRef, type ReactNode } from "react";
 import { cn } from "../lib/utils";
 
 const reduceMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ── Hover-lift card ── */
 

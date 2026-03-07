@@ -2,17 +2,24 @@
 // Builds lean markdown prompts for LLM agents and parses structured decisions
 // from free-form markdown responses.
 
-import type { SandboxAgent, SandboxTask, ACPMessage } from './types.js';
-import { loadAgentConfig, buildSystemPrompt } from './config-loader.js';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import type { SandboxAgent, SandboxTask, ACPMessage } from "./types.js";
+import { loadAgentConfig, buildSystemPrompt } from "./config-loader.js";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ORG_DIR = resolve(__dirname, '..', 'org');
+const ORG_DIR = resolve(__dirname, "..", "org");
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-export type DecisionAction = 'delegate' | 'escalate' | 'complete' | 'work' | 'message' | 'hire' | 'idle';
+export type DecisionAction =
+  | "delegate"
+  | "escalate"
+  | "complete"
+  | "work"
+  | "message"
+  | "hire"
+  | "idle";
 
 export interface AgentDecision {
   action: DecisionAction;
@@ -42,7 +49,15 @@ function getAgentSoul(agentId: string): string {
 
 // ── Prompt Builder ──────────────────────────────────────────────────────────
 
-const VALID_ACTIONS: DecisionAction[] = ['delegate', 'escalate', 'complete', 'work', 'message', 'hire', 'idle'];
+const VALID_ACTIONS: DecisionAction[] = [
+  "delegate",
+  "escalate",
+  "complete",
+  "work",
+  "message",
+  "hire",
+  "idle",
+];
 
 export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): string {
   const { agents, tasks, tick } = state;
@@ -51,85 +66,92 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
   const soul = getAgentSoul(agent.id);
 
   // Manager info
-  const parent = agent.parentId ? agents.find(a => a.id === agent.parentId) : undefined;
-  const managerLine = parent ? `**Manager:** ${parent.name} (${parent.id})` : '**Manager:** Human Principal';
+  const parent = agent.parentId ? agents.find((a) => a.id === agent.parentId) : undefined;
+  const managerLine = parent
+    ? `**Manager:** ${parent.name} (${parent.id})`
+    : "**Manager:** Human Principal";
 
   // Tasks: owned, created, or in this agent's domain that are unassigned
-  const myTasks = tasks.filter(t =>
-    t.assigneeId === agent.id ||
-    t.creatorId === agent.id
-  );
-  const activeTasks = myTasks.filter(t => !['done', 'rejected'].includes(t.status));
-  const assignedToMe = activeTasks.filter(t => t.assigneeId === agent.id);
-  const iCreated = activeTasks.filter(t => t.creatorId === agent.id && t.assigneeId !== agent.id);
+  const myTasks = tasks.filter((t) => t.assigneeId === agent.id || t.creatorId === agent.id);
+  const activeTasks = myTasks.filter((t) => !["done", "rejected"].includes(t.status));
+  const assignedToMe = activeTasks.filter((t) => t.assigneeId === agent.id);
+  const iCreated = activeTasks.filter((t) => t.creatorId === agent.id && t.assigneeId !== agent.id);
 
-  let taskSection = '';
+  let taskSection = "";
   if (assignedToMe.length > 0) {
-    taskSection += '**Assigned to you (DO THESE FIRST):**\n';
-    taskSection += assignedToMe.map(t =>
-      `- ${t.id}: "${t.title}" [${t.status}, ${t.priority}]`
-    ).join('\n');
-    taskSection += '\n';
+    taskSection += "**Assigned to you (DO THESE FIRST):**\n";
+    taskSection += assignedToMe
+      .map((t) => `- ${t.id}: "${t.title}" [${t.status}, ${t.priority}]`)
+      .join("\n");
+    taskSection += "\n";
   }
   if (iCreated.length > 0) {
-    taskSection += '**Tasks you created (track progress):**\n';
-    taskSection += iCreated.map(t => {
-      const assignee = t.assigneeId ? agents.find(a => a.id === t.assigneeId) : undefined;
-      return `- ${t.id}: "${t.title}" [${t.status}] → ${assignee?.name ?? 'unassigned'}`;
-    }).join('\n');
-    taskSection += '\n';
+    taskSection += "**Tasks you created (track progress):**\n";
+    taskSection += iCreated
+      .map((t) => {
+        const assignee = t.assigneeId ? agents.find((a) => a.id === t.assigneeId) : undefined;
+        return `- ${t.id}: "${t.title}" [${t.status}] → ${assignee?.name ?? "unassigned"}`;
+      })
+      .join("\n");
+    taskSection += "\n";
   }
 
   // Unassigned tasks in the system (for managers to delegate)
   if (agent.level >= 7) {
-    const unassigned = tasks.filter(t =>
-      !t.assigneeId && !['done', 'rejected'].includes(t.status)
+    const unassigned = tasks.filter(
+      (t) => !t.assigneeId && !["done", "rejected"].includes(t.status),
     );
     if (unassigned.length > 0) {
       taskSection += `**Unassigned tasks (${unassigned.length} — delegate these!):**\n`;
-      taskSection += unassigned.slice(0, 8).map(t =>
-        `- ${t.id}: "${t.title}" [${t.priority}]`
-      ).join('\n');
+      taskSection += unassigned
+        .slice(0, 8)
+        .map((t) => `- ${t.id}: "${t.title}" [${t.priority}]`)
+        .join("\n");
       if (unassigned.length > 8) taskSection += `\n- ... and ${unassigned.length - 8} more`;
-      taskSection += '\n';
+      taskSection += "\n";
     }
   }
 
   if (!taskSection.trim()) {
-    taskSection = '(no tasks — look for unassigned work or wait)\n';
+    taskSection = "(no tasks — look for unassigned work or wait)\n";
   }
 
   // Direct reports
-  const team = agents.filter(a => a.parentId === agent.id && a.status === 'active');
-  const teamLines = team.length > 0
-    ? team.map(a => {
-        const agentTasks = tasks.filter(t => t.assigneeId === a.id && !['done', 'rejected'].includes(t.status));
-        const label = agentTasks.length > 0 ? `working (${agentTasks.length} tasks)` : 'idle';
-        return `- ${a.name} (${a.id}, L${a.level}) — ${label}`;
-      }).join('\n')
-    : '(no direct reports — you must WORK on tasks yourself or ESCALATE)';
+  const team = agents.filter((a) => a.parentId === agent.id && a.status === "active");
+  const teamLines =
+    team.length > 0
+      ? team
+          .map((a) => {
+            const agentTasks = tasks.filter(
+              (t) => t.assigneeId === a.id && !["done", "rejected"].includes(t.status),
+            );
+            const label = agentTasks.length > 0 ? `working (${agentTasks.length} tasks)` : "idle";
+            return `- ${a.name} (${a.id}, L${a.level}) — ${label}`;
+          })
+          .join("\n")
+      : "(no direct reports — you must WORK on tasks yourself or ESCALATE)";
 
   // Pending reports (not yet spawned)
-  const pendingTeam = agents.filter(a => a.parentId === agent.id && a.status === 'pending');
-  const pendingLine = pendingTeam.length > 0
-    ? `\n*(${pendingTeam.length} more team members joining soon)*`
-    : '';
+  const pendingTeam = agents.filter((a) => a.parentId === agent.id && a.status === "pending");
+  const pendingLine =
+    pendingTeam.length > 0 ? `\n*(${pendingTeam.length} more team members joining soon)*` : "";
 
   // Inbox — recent messages TO this agent
-  const inbox = agent.recentMessages
-    .filter(m => m.to === agent.id)
-    .slice(-5);
-  const inboxLines = inbox.length > 0
-    ? inbox.map(m => {
-        const sender = agents.find(a => a.id === m.from);
-        return `- [${m.type}] ${sender?.name ?? m.from}: ${m.body || m.summary || '(no body)'}`;
-      }).join('\n')
-    : '(empty)';
+  const inbox = agent.recentMessages.filter((m) => m.to === agent.id).slice(-5);
+  const inboxLines =
+    inbox.length > 0
+      ? inbox
+          .map((m) => {
+            const sender = agents.find((a) => a.id === m.from);
+            return `- [${m.type}] ${sender?.name ?? m.from}: ${m.body || m.summary || "(no body)"}`;
+          })
+          .join("\n")
+      : "(empty)";
 
   // Global situation awareness
   const totalTasks = tasks.length;
-  const doneTasks = tasks.filter(t => t.status === 'done').length;
-  const activeTotalTasks = tasks.filter(t => !['done', 'rejected'].includes(t.status)).length;
+  const doneTasks = tasks.filter((t) => t.status === "done").length;
+  const activeTotalTasks = tasks.filter((t) => !["done", "rejected"].includes(t.status)).length;
 
   // Build the actions list based on agent level
   let actionsBlock = `**Actions (choose ONE — priority order!):**`;
@@ -165,7 +187,7 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
 **Role:** ${agent.role} | **Domain:** ${agent.domain} | **Level:** ${agent.level}
 ${managerLine}
 
-${soul ? `## Personality\n${soul}\n` : ''}## Situation
+${soul ? `## Personality\n${soul}\n` : ""}## Situation
 Tick ${tick} | ${totalTasks} total tasks | ${doneTasks} done | ${activeTotalTasks} active
 
 ## Your Tasks
@@ -202,9 +224,9 @@ export function parseDecision(response: string): AgentDecision | null {
 
   return {
     action,
-    target: targetMatch?.[1]?.trim() ?? 'none',
-    task: taskMatch?.[1]?.trim() ?? '',
-    message: messageMatch?.[1]?.trim() ?? '',
+    target: targetMatch?.[1]?.trim() ?? "none",
+    task: taskMatch?.[1]?.trim() ?? "",
+    message: messageMatch?.[1]?.trim() ?? "",
     raw: response,
   };
 }
@@ -213,32 +235,32 @@ export function parseDecision(response: string): AgentDecision | null {
 
 /** Fuzzy-match a human-readable name to an agent ID */
 export function resolveAgentId(name: string, agents: SandboxAgent[]): string | undefined {
-  if (!name || name === 'none') return undefined;
+  if (!name || name === "none") return undefined;
 
   const trimmed = name.trim();
 
   // Exact ID match
-  const byId = agents.find(a => a.id === trimmed);
+  const byId = agents.find((a) => a.id === trimmed);
   if (byId) return byId.id;
 
   // Exact name match (case-insensitive)
-  const byName = agents.find(a => a.name.toLowerCase() === trimmed.toLowerCase());
+  const byName = agents.find((a) => a.name.toLowerCase() === trimmed.toLowerCase());
   if (byName) return byName.id;
 
   // Name contains (case-insensitive)
   const lower = trimmed.toLowerCase();
-  const byContains = agents.find(a => a.name.toLowerCase().includes(lower));
+  const byContains = agents.find((a) => a.name.toLowerCase().includes(lower));
   if (byContains) return byContains.id;
 
   // First-name match
   const firstName = lower.split(/\s+/)[0];
   if (firstName.length >= 2) {
-    const byFirst = agents.find(a => a.name.toLowerCase().startsWith(firstName));
+    const byFirst = agents.find((a) => a.name.toLowerCase().startsWith(firstName));
     if (byFirst) return byFirst.id;
   }
 
   // Partial ID match
-  const byPartialId = agents.find(a => a.id.includes(lower.replace(/\s+/g, '-')));
+  const byPartialId = agents.find((a) => a.id.includes(lower.replace(/\s+/g, "-")));
   if (byPartialId) return byPartialId.id;
 
   return undefined;

@@ -42,6 +42,7 @@ Host Machine (Mac Mini / VPS)
 ```
 
 **Why Docker, not a second gateway on the host:**
+
 - Respects "one gateway per machine" — the container IS its own machine
 - True process/filesystem isolation from the host gateway
 - Self-contained and portable — move to any Docker host
@@ -80,6 +81,7 @@ services:
 ### 2.3 OpenSpawn Codebase Mount
 
 The CEO has access to the OpenSpawn codebase for two reasons:
+
 1. **To work on it** — the CEO is a developer, not just a manager
 2. **To use it** — the ORG.md spec, ACP protocol, and org-parser are reference material
 
@@ -91,6 +93,7 @@ git worktree add ~/github/openspawn/openspawn-ceo ceo-workspace
 ```
 
 This creates a separate working tree on its own branch (`ceo-workspace`). The CEO can:
+
 - Read and reference all source code
 - Make changes on its own branch
 - Commit and push without conflicting with other developers
@@ -100,12 +103,12 @@ If the worktree gets messy: `git worktree remove` and recreate.
 
 **Alternatives considered:**
 
-| Approach | Verdict |
-|----------|---------|
-| Mount repo rw directly | Risk of git conflicts with other developers |
-| Mount repo ro | CEO can't edit or commit |
-| Clone inside container | Not live, ephemeral without volume, diverges |
-| Mount build output only | CEO can't see source code |
+| Approach                | Verdict                                      |
+| ----------------------- | -------------------------------------------- |
+| Mount repo rw directly  | Risk of git conflicts with other developers  |
+| Mount repo ro           | CEO can't edit or commit                     |
+| Clone inside container  | Not live, ephemeral without volume, diverges |
+| Mount build output only | CEO can't see source code                    |
 
 ---
 
@@ -134,12 +137,14 @@ CEO presents hiring plan to Adam for approval
 The CEO executes the hiring event — a batch operation:
 
 1. **Create workspaces** for each new agent:
+
    ```bash
    mkdir -p ~/.openclaw/workspace-eng-lead
    # Write SOUL.md, AGENTS.md, TOOLS.md, USER.md
    ```
 
 2. **Update gateway config** to register the agents:
+
    ```json
    {
      "agents": {
@@ -158,8 +163,8 @@ The CEO executes the hiring event — a batch operation:
 
 4. **Onboard** each agent via `sessions_send`:
    ```
-   CEO → eng-lead: "Welcome. You are the Engineering Lead. 
-   Your first task: review the org-parser codebase and identify 
+   CEO → eng-lead: "Welcome. You are the Engineering Lead.
+   Your first task: review the org-parser codebase and identify
    areas for improvement. Report back with a plan."
    ```
 
@@ -179,15 +184,15 @@ This mirrors real orgs: you don't hire mid-sprint. You plan headcount, onboard i
 
 All agent communication uses OpenClaw's `sessions_send` tool, structured according to ACP:
 
-| Action | Tool | ACP Message Type |
-|--------|------|-----------------|
-| CEO assigns task to lead | `sessions_send` | `delegation` |
-| Lead acknowledges | `sessions_send` | `ack` |
-| Worker reports progress | `sessions_send` | `progress` |
-| Worker is blocked | `sessions_send` | `escalation` |
-| Worker finishes task | `sessions_send` | `completion` |
-| CEO checks on agent | `sessions_history` | (read-only) |
-| CEO redirects agent | `sessions_send` | `delegation` (updated) |
+| Action                   | Tool               | ACP Message Type       |
+| ------------------------ | ------------------ | ---------------------- |
+| CEO assigns task to lead | `sessions_send`    | `delegation`           |
+| Lead acknowledges        | `sessions_send`    | `ack`                  |
+| Worker reports progress  | `sessions_send`    | `progress`             |
+| Worker is blocked        | `sessions_send`    | `escalation`           |
+| Worker finishes task     | `sessions_send`    | `completion`           |
+| CEO checks on agent      | `sessions_history` | (read-only)            |
+| CEO redirects agent      | `sessions_send`    | `delegation` (updated) |
 
 The CEO's SOUL.md teaches it to use ACP message formats. Each agent's SOUL.md teaches it to respond with ACP-structured messages. The protocol is enforced by convention (agent instructions), not by code — initially.
 
@@ -200,6 +205,7 @@ sessions_send     → Send a message or redirect an agent
 ```
 
 The CEO can build a mental model of org health by periodically checking:
+
 - Which agents are active/idle
 - What each agent is working on (via history)
 - Whether any agents are stuck (no recent activity)
@@ -209,14 +215,14 @@ The CEO can build a mental model of org health by periodically checking:
 
 Full agents handle persistent, ongoing responsibilities. Sub-agents (`sessions_spawn`) handle burst work:
 
-| Use Case | Full Agent | Sub-Agent |
-|----------|-----------|-----------|
-| Engineering Lead (ongoing role) | ✅ | ❌ |
-| "Research competitor X" (one-off) | ❌ | ✅ |
-| QA Agent (ongoing testing) | ✅ | ❌ |
-| "Run 5 parallel benchmarks" (burst) | ❌ | ✅ |
-| Senior Dev (accumulates codebase knowledge) | ✅ | ❌ |
-| "Summarize this 100-page doc" (one-off) | ❌ | ✅ |
+| Use Case                                    | Full Agent | Sub-Agent |
+| ------------------------------------------- | ---------- | --------- |
+| Engineering Lead (ongoing role)             | ✅         | ❌        |
+| "Research competitor X" (one-off)           | ❌         | ✅        |
+| QA Agent (ongoing testing)                  | ✅         | ❌        |
+| "Run 5 parallel benchmarks" (burst)         | ❌         | ✅        |
+| Senior Dev (accumulates codebase knowledge) | ✅         | ❌        |
+| "Summarize this 100-page doc" (one-off)     | ❌         | ✅        |
 
 Full agents and sub-agents coexist. The CEO uses full agents for its team and sub-agents for ad-hoc work — just like a real CEO has permanent reports AND hires consultants.
 
@@ -252,6 +258,7 @@ CEO → A2A HTTP → Remote Gateway → Remote Agent
 - Independent scaling — own resources, own LLM keys
 
 **When to use Tier 2:**
+
 - Team is too large for one gateway (resource limits)
 - Want geographic distribution (agents closer to data/services)
 - Want cost isolation (separate LLM billing per team)
@@ -270,6 +277,7 @@ CEO → A2A HTTP → External Platform → External Agent
 - Discovered via public Agent Card registries or explicit URLs
 
 **When to use Tier 3:**
+
 - Specialized capability not available on OpenClaw (e.g., a vision model pipeline on a GPU platform)
 - Third-party agent services (code review, security scanning, compliance)
 - Multi-vendor strategy
@@ -284,15 +292,18 @@ The CEO's ORG.md describes agents regardless of where they run:
 ### Engineering
 
 #### Alice — Engineering Lead
+
 - **Location:** local
 - **Communication:** sessions_send (agent id: eng-lead)
 
 #### Bob — Senior Dev
+
 - **Location:** remote
 - **Communication:** A2A (https://eng-cluster.example.com)
 - **Agent Card:** /.well-known/agent.json#bob
 
 #### CodeReview Service
+
 - **Location:** external
 - **Communication:** A2A (https://codereview.ai)
 - **Agent Card:** /.well-known/agent.json
@@ -302,13 +313,13 @@ The CEO's ORG.md describes agents regardless of where they run:
 
 ### 4.5 Scaling Phases
 
-| Phase | Real Company Analogy | Agent Org |
-|-------|---------------------|-----------|
-| **Seed** | Founder alone | CEO agent, no team yet |
-| **Startup** | Everyone in one room | Single gateway, 3-5 local agents |
-| **Growth** | Multiple offices | Multiple gateways, A2A between them |
-| **Scale** | Contractors + agencies | External A2A agents from other platforms |
-| **Enterprise** | Global org + partners | Hundreds of agents across many gateways + platforms |
+| Phase          | Real Company Analogy   | Agent Org                                           |
+| -------------- | ---------------------- | --------------------------------------------------- |
+| **Seed**       | Founder alone          | CEO agent, no team yet                              |
+| **Startup**    | Everyone in one room   | Single gateway, 3-5 local agents                    |
+| **Growth**     | Multiple offices       | Multiple gateways, A2A between them                 |
+| **Scale**      | Contractors + agencies | External A2A agents from other platforms            |
+| **Enterprise** | Global org + partners  | Hundreds of agents across many gateways + platforms |
 
 The architecture doesn't change between phases — only the transport layer expands. ORG.md, ACP, and the CEO's delegation patterns stay identical.
 
@@ -327,28 +338,28 @@ The architecture doesn't change between phases — only the transport layer expa
         maxChildrenPerAgent: 5,
         maxConcurrent: 8,
         model: "sonnet",
-        thinking: "low"
-      }
+        thinking: "low",
+      },
     },
     list: [
       {
         id: "main",
         default: true,
-        tools: { profile: "full" }
+        tools: { profile: "full" },
         // CEO runs on Opus for strategic reasoning
-      }
-    ]
+      },
+    ],
   },
   channels: {
     telegram: {
       accounts: {
         default: {
           botToken: "<CEO bot token from BotFather>",
-          dmPolicy: "pairing"
-        }
-      }
-    }
-  }
+          dmPolicy: "pairing",
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -376,6 +387,7 @@ The architecture doesn't change between phases — only the transport layer expa
 ### 5.3 SOUL.md (CEO)
 
 The CEO's SOUL.md teaches it to:
+
 1. Think strategically about team composition
 2. Plan before hiring (write ORG.md first)
 3. Use ACP message formats for all communication
@@ -400,23 +412,27 @@ with real infrastructure.
 ## Culture
 
 preset: startup
+
 - **Escalation:** immediate
 - **Progress updates:** on phase change
 
 ## Structure
 
 ### CEO (main)
+
 Receives goals from Adam. Plans the org. Delegates work.
 Monitors progress. Adapts the team as needed.
 
 ## Policies
 
 ### Headcount
+
 - Current: 1 (CEO only)
 - Approved: 0 (pending first planning session)
 - Max: 10
 
 ### Hiring Process
+
 1. CEO identifies need and writes job description
 2. CEO presents hiring plan to Adam
 3. Adam approves headcount
@@ -429,24 +445,31 @@ This evolves as the CEO hires:
 ## Structure
 
 ### CEO (main) — active
+
 ...
 
 ### Engineering
 
 #### Eng Lead — active
+
 Triages engineering tasks. Delegates to devs. Reviews output.
+
 - **Level:** 7
 - **Agent ID:** eng-lead
 
 #### Senior Dev 1 — active
+
 Backend implementation. API design. Database work.
+
 - **Level:** 6
 - **Agent ID:** senior-dev-1
 
 ### Research
 
 #### Research Agent — active
+
 Market research, competitive analysis, technical exploration.
+
 - **Level:** 6
 - **Agent ID:** research-agent
 ```
@@ -490,10 +513,10 @@ Priority: **Critical** — this is the single biggest friction point.
 
 ```typescript
 // CEO just says "send to eng-lead" — router handles transport
-await orgRouter.send('eng-lead', {
-  type: 'delegation',
-  taskId: 'TASK-0042',
-  body: 'Review the org-parser tests'
+await orgRouter.send("eng-lead", {
+  type: "delegation",
+  taskId: "TASK-0042",
+  body: "Review the org-parser tests",
 });
 // Router checks: is eng-lead local? → sessions_send
 //                 is eng-lead remote? → A2A HTTP
@@ -505,6 +528,7 @@ await orgRouter.send('eng-lead', {
 **The gap:** ORG.md is a spec, not a runtime. There's no tool that reads an ORG.md and provisions real agents from it.
 
 **The feature:** `openspawn deploy ORG.md` reads the org chart and:
+
 - Creates workspaces for each agent
 - Writes SOUL.md from role descriptions
 - Updates gateway config
@@ -516,6 +540,7 @@ await orgRouter.send('eng-lead', {
 **The gap:** CEO manually checks `sessions_list` and `sessions_history`. No aggregate view.
 
 **The feature:** A dashboard showing:
+
 - Agent status (active/idle/stuck)
 - Task pipeline (queued → in progress → done)
 - Communication flow (ACP message visualization)
@@ -527,6 +552,7 @@ await orgRouter.send('eng-lead', {
 ## 7. Implementation Roadmap
 
 ### Phase 1: Docker + CEO (Week 1)
+
 - [ ] Build OpenClaw Docker image
 - [ ] Create docker-compose.yml
 - [ ] Create CEO workspace (SOUL.md, AGENTS.md, ORG.md, etc.)
@@ -535,6 +561,7 @@ await orgRouter.send('eng-lead', {
 - [ ] Test: Adam ↔ CEO conversation via Telegram
 
 ### Phase 2: First Hire (Week 1-2)
+
 - [ ] CEO plans org with Adam
 - [ ] CEO executes first hiring event (1-2 agents)
 - [ ] CEO onboards agents via sessions_send
@@ -542,24 +569,28 @@ await orgRouter.send('eng-lead', {
 - [ ] Iterate on ACP message format
 
 ### Phase 3: Working Org (Week 2-3)
+
 - [ ] Team of 3-5 agents working on real tasks (OpenSpawn improvements)
 - [ ] CEO monitors via sessions_list / sessions_history
 - [ ] Test escalation flow (agent gets stuck → CEO helps)
 - [ ] CEO uses sub-agents for ad-hoc tasks alongside full agents
 
 ### Phase 4: OpenSpawn Tooling (Week 3-4)
+
 - [ ] Build agent lifecycle CLI (`openspawn hire/fire/promote`)
 - [ ] Build unified communication router (local + A2A)
 - [ ] Prototype hot-reload agent management
 - [ ] Build org health monitoring
 
 ### Phase 5: Multi-Gateway (Future)
+
 - [ ] Spin up second gateway (VPS or another container)
 - [ ] CEO hires remote agents via A2A
 - [ ] Test cross-gateway communication
 - [ ] Validate ORG.md with mixed local/remote agents
 
 ### Phase 6: External A2A (Future)
+
 - [ ] Integrate with external A2A-compatible agent services
 - [ ] CEO discovers and hires external agents
 - [ ] Test cross-platform delegation
@@ -568,17 +599,17 @@ await orgRouter.send('eng-lead', {
 
 ## 8. Key Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Runtime | Docker container | Isolation, portability, self-contained |
-| Codebase access | Git worktree (rw) | Separate branch, no conflicts, can commit/push |
-| Agent type | Full agents (not sub-agents) | Persistent identity, memory, expertise accumulation |
-| Communication | ACP over sessions_send | Structured protocol, matches OpenSpawn spec |
-| Hiring model | Planned batches with restart | Mirrors real orgs, minimizes disruption |
-| Scaling model | Local → A2A remote → A2A external | Same interface at every scale |
-| CEO model | Opus | Strategic reasoning needs highest capability |
-| Worker model | Sonnet | Cost-effective for execution tasks |
+| Decision        | Choice                            | Rationale                                           |
+| --------------- | --------------------------------- | --------------------------------------------------- |
+| Runtime         | Docker container                  | Isolation, portability, self-contained              |
+| Codebase access | Git worktree (rw)                 | Separate branch, no conflicts, can commit/push      |
+| Agent type      | Full agents (not sub-agents)      | Persistent identity, memory, expertise accumulation |
+| Communication   | ACP over sessions_send            | Structured protocol, matches OpenSpawn spec         |
+| Hiring model    | Planned batches with restart      | Mirrors real orgs, minimizes disruption             |
+| Scaling model   | Local → A2A remote → A2A external | Same interface at every scale                       |
+| CEO model       | Opus                              | Strategic reasoning needs highest capability        |
+| Worker model    | Sonnet                            | Cost-effective for execution tasks                  |
 
 ---
 
-*The CEO Agent is not a demo. It's the first real deployment of the OpenSpawn model — and every friction point it hits becomes a feature to build.*
+_The CEO Agent is not a demo. It's the first real deployment of the OpenSpawn model — and every friction point it hits becomes a feature to build._

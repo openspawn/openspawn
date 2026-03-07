@@ -14,40 +14,52 @@ interface SidePanelShellProps {
 const MIN_WIDTH = 320;
 const MAX_WIDTH = 800;
 
-export function SidePanelShell({ children, title, onClose, width, onWidthChange }: SidePanelShellProps) {
+export function SidePanelShell({
+  children,
+  title,
+  onClose,
+  width,
+  onWidthChange,
+}: SidePanelShellProps) {
   const isDragging = useRef(false);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isDragging.current = true;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      isDragging.current = true;
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
 
-    const startX = e.clientX;
-    const startWidth = width;
+      const startX = e.clientX;
+      const startWidth = width;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      // Dragging left edge: moving left increases width
-      const delta = startX - e.clientX;
-      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + delta));
-      onWidthChange(newWidth);
-    };
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging.current) return;
+        // Dragging left edge: moving left increases width
+        const delta = startX - e.clientX;
+        const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + delta));
+        onWidthChange(newWidth);
+      };
 
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        isDragging.current = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-  }, [width, onWidthChange]);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    },
+    [width, onWidthChange],
+  );
 
   return (
-    <div data-testid="side-panel" className="h-full flex flex-col bg-background relative overflow-x-hidden w-full md:w-auto">
+    <div
+      data-testid="side-panel"
+      className="h-full flex flex-col bg-background relative overflow-x-hidden w-full md:w-auto"
+    >
       {/* Drag handle on left edge */}
       <div
         onMouseDown={handleMouseDown}
@@ -62,8 +74,10 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
 
       {/* Header — only render if title is provided (panels with their own header skip this) */}
       {title && (
-        <div className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border"
-             style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+        <div
+          className="flex-shrink-0 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border"
+          style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
+        >
           <div className="flex items-center gap-2 min-w-0">
             <Button
               variant="ghost"
@@ -89,9 +103,7 @@ export function SidePanelShell({ children, title, onClose, width, onWidthChange 
       )}
 
       {/* Content */}
-      <ScrollArea className="flex-1 overflow-x-hidden">
-        {children}
-      </ScrollArea>
+      <ScrollArea className="flex-1 overflow-x-hidden">{children}</ScrollArea>
     </div>
   );
 }

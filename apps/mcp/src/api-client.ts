@@ -16,7 +16,7 @@ interface ApiKeyAuthConfig {
 type ApiClientConfig = HmacAuthConfig | ApiKeyAuthConfig;
 
 function isApiKeyConfig(config: ApiClientConfig): config is ApiKeyAuthConfig {
-  return 'apiKey' in config;
+  return "apiKey" in config;
 }
 
 export class ApiClient {
@@ -166,16 +166,28 @@ export class ApiClient {
     return this.request("GET", `/agents/leaderboard/trust?limit=${limit}`);
   }
 
-  async applyReputationBonus(agentId: string, amount: number, reason: string): Promise<{ data: unknown }> {
+  async applyReputationBonus(
+    agentId: string,
+    amount: number,
+    reason: string,
+  ): Promise<{ data: unknown }> {
     return this.request("POST", `/agents/${agentId}/reputation/bonus`, { amount, reason });
   }
 
-  async applyReputationPenalty(agentId: string, amount: number, reason: string): Promise<{ data: unknown }> {
+  async applyReputationPenalty(
+    agentId: string,
+    amount: number,
+    reason: string,
+  ): Promise<{ data: unknown }> {
     return this.request("POST", `/agents/${agentId}/reputation/penalty`, { amount, reason });
   }
 
   // Escalation operations
-  async createEscalation(taskId: string, reason: string, targetAgentId: string): Promise<{ data: unknown }> {
+  async createEscalation(
+    taskId: string,
+    reason: string,
+    targetAgentId: string,
+  ): Promise<{ data: unknown }> {
     return this.request("POST", `/tasks/${taskId}/escalate`, { reason, targetAgentId });
   }
 
@@ -189,11 +201,19 @@ export class ApiClient {
   }
 
   // Consensus operations
-  async requestConsensus(taskId: string, question: string, voterIds: string[]): Promise<{ data: unknown }> {
+  async requestConsensus(
+    taskId: string,
+    question: string,
+    voterIds: string[],
+  ): Promise<{ data: unknown }> {
     return this.request("POST", `/tasks/${taskId}/consensus`, { question, voterIds });
   }
 
-  async submitVote(consensusId: string, vote: "approve" | "reject", reason?: string): Promise<{ data: unknown }> {
+  async submitVote(
+    consensusId: string,
+    vote: "approve" | "reject",
+    reason?: string,
+  ): Promise<{ data: unknown }> {
     return this.request("POST", `/consensus/${consensusId}/vote`, { vote, reason });
   }
 

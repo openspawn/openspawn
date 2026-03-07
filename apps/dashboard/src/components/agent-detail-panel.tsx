@@ -1,7 +1,20 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
-import { X, TrendingUp, TrendingDown, Calendar, Zap, MessageSquare, Settings, Activity, Award, Coins, Clock, Terminal } from "lucide-react";
+import {
+  X,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Zap,
+  MessageSquare,
+  Settings,
+  Activity,
+  Award,
+  Coins,
+  Clock,
+  Terminal,
+} from "lucide-react";
 import { isSandboxMode } from "../graphql/fetcher";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 import { Button } from "./ui/button";
@@ -30,7 +43,10 @@ interface AgentDetailPanelProps {
   onClose: () => void;
 }
 
-function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning" | "destructive" | "secondary"; label: string } {
+function getTaskStatusBadge(status: TaskStatus): {
+  variant: "success" | "warning" | "destructive" | "secondary";
+  label: string;
+} {
   switch (status) {
     case TaskStatus.Done:
       return { variant: "success", label: "Completed" };
@@ -50,16 +66,17 @@ function getTaskStatusBadge(status: TaskStatus): { variant: "success" | "warning
 // Overview Tab Content
 function OverviewTab({ agent }: { agent: Agent }) {
   const { agents } = useAgents();
-  const parentAgent = useMemo(() => 
-    agents.find(a => a.id === agent.parentId),
-    [agents, agent.parentId]
+  const parentAgent = useMemo(
+    () => agents.find((a) => a.id === agent.parentId),
+    [agents, agent.parentId],
   );
 
   const levelColor = getLevelColor(agent.level);
   const trustScore = agent.trustScore ?? 50;
-  const successRate = agent.tasksCompleted && agent.tasksCompleted > 0
-    ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
-    : 0;
+  const successRate =
+    agent.tasksCompleted && agent.tasksCompleted > 0
+      ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
+      : 0;
 
   return (
     <motion.div
@@ -85,7 +102,13 @@ function OverviewTab({ agent }: { agent: Agent }) {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-2xl font-bold">{agent.currentBalance.toLocaleString()}</p>
-            <Sparkline data={generateSparklineData(7, "stable")} color="#f59e0b" width={48} height={18} showDot />
+            <Sparkline
+              data={generateSparklineData(7, "stable")}
+              color="#f59e0b"
+              width={48}
+              height={18}
+              showDot
+            />
           </div>
         </div>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
@@ -103,7 +126,14 @@ function OverviewTab({ agent }: { agent: Agent }) {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-2xl font-bold">{successRate}%</p>
-            <Sparkline data={generateSparklineData(7, successRate > 70 ? "up" : "down")} color={successRate > 70 ? "#10b981" : "#f43f5e"} width={48} height={18} showDot showTrend />
+            <Sparkline
+              data={generateSparklineData(7, successRate > 70 ? "up" : "down")}
+              color={successRate > 70 ? "#10b981" : "#f43f5e"}
+              width={48}
+              height={18}
+              showDot
+              showTrend
+            />
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             {agent.tasksSuccessful ?? 0}/{agent.tasksCompleted ?? 0} tasks
@@ -153,20 +183,25 @@ function OverviewTab({ agent }: { agent: Agent }) {
 // Tasks Tab Content
 function TasksTab({ agent }: { agent: Agent }) {
   const { tasks, loading } = useTasks();
-  
-  const agentTasks = useMemo(() => 
-    tasks.filter(t => t.assigneeId === agent.id),
-    [tasks, agent.id]
+
+  const agentTasks = useMemo(
+    () => tasks.filter((t) => t.assigneeId === agent.id),
+    [tasks, agent.id],
   );
 
-  const tasksByStatus = useMemo(() => ({
-    completed: agentTasks.filter(t => t.status === TaskStatus.Done),
-    inProgress: agentTasks.filter(t => t.status === TaskStatus.InProgress),
-    pending: agentTasks.filter(t => t.status === TaskStatus.Backlog || t.status === TaskStatus.Todo),
-    failed: agentTasks.filter(t => 
-      t.status === TaskStatus.Cancelled || t.status === TaskStatus.Blocked
-    ),
-  }), [agentTasks]);
+  const tasksByStatus = useMemo(
+    () => ({
+      completed: agentTasks.filter((t) => t.status === TaskStatus.Done),
+      inProgress: agentTasks.filter((t) => t.status === TaskStatus.InProgress),
+      pending: agentTasks.filter(
+        (t) => t.status === TaskStatus.Backlog || t.status === TaskStatus.Todo,
+      ),
+      failed: agentTasks.filter(
+        (t) => t.status === TaskStatus.Cancelled || t.status === TaskStatus.Blocked,
+      ),
+    }),
+    [agentTasks],
+  );
 
   if (loading) {
     return <div className="text-center text-muted-foreground py-8">Loading tasks...</div>;
@@ -183,7 +218,9 @@ function TasksTab({ agent }: { agent: Agent }) {
       {/* Task Stats */}
       <div className="grid grid-cols-4 gap-3">
         <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-          <div className="text-2xl font-bold text-emerald-500">{tasksByStatus.completed.length}</div>
+          <div className="text-2xl font-bold text-emerald-500">
+            {tasksByStatus.completed.length}
+          </div>
           <div className="text-xs text-muted-foreground">Completed</div>
         </div>
         <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
@@ -229,9 +266,7 @@ function TasksTab({ agent }: { agent: Agent }) {
                       </p>
                     )}
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      {task.identifier && (
-                        <span className="font-mono">#{task.identifier}</span>
-                      )}
+                      {task.identifier && <span className="font-mono">#{task.identifier}</span>}
                       {task.priority && (
                         <span className="capitalize">{task.priority} priority</span>
                       )}
@@ -263,30 +298,32 @@ function CreditsTab({ agent }: { agent: Agent }) {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - (6 - i));
-      return date.toISOString().split('T')[0];
+      return date.toISOString().split("T")[0];
     });
 
-    return last7Days.map(date => {
-      const dayTransactions = creditHistory.filter(h => 
-        h.createdAt.startsWith(date)
-      );
+    return last7Days.map((date) => {
+      const dayTransactions = creditHistory.filter((h) => h.createdAt.startsWith(date));
       const earned = dayTransactions
-        .filter(h => h.amount > 0)
+        .filter((h) => h.amount > 0)
         .reduce((sum, h) => sum + h.amount, 0);
-      const spent = Math.abs(dayTransactions
-        .filter(h => h.amount < 0)
-        .reduce((sum, h) => sum + h.amount, 0));
-      
+      const spent = Math.abs(
+        dayTransactions.filter((h) => h.amount < 0).reduce((sum, h) => sum + h.amount, 0),
+      );
+
       return {
-        date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+        date: new Date(date).toLocaleDateString("en-US", { weekday: "short" }),
         earned,
         spent,
       };
     });
   }, [creditHistory]);
 
-  const totalEarned = creditHistory.filter(h => h.amount > 0).reduce((sum, h) => sum + h.amount, 0);
-  const totalSpent = Math.abs(creditHistory.filter(h => h.amount < 0).reduce((sum, h) => sum + h.amount, 0));
+  const totalEarned = creditHistory
+    .filter((h) => h.amount > 0)
+    .reduce((sum, h) => sum + h.amount, 0);
+  const totalSpent = Math.abs(
+    creditHistory.filter((h) => h.amount < 0).reduce((sum, h) => sum + h.amount, 0),
+  );
 
   return (
     <motion.div
@@ -327,13 +364,26 @@ function CreditsTab({ agent }: { agent: Agent }) {
         <h3 className="text-sm font-medium mb-4">7-Day Activity</h3>
         <div className="w-full space-y-2" style={{ height: 200 }}>
           {chartData.map((d: { date: string; earned: number; spent: number }) => {
-            const max = Math.max(...chartData.map((x: { earned: number; spent: number }) => Math.max(x.earned, x.spent)), 1);
+            const max = Math.max(
+              ...chartData.map((x: { earned: number; spent: number }) =>
+                Math.max(x.earned, x.spent),
+              ),
+              1,
+            );
             return (
               <div key={d.date} className="flex items-center gap-2 text-xs">
                 <span className="w-10 text-muted-foreground shrink-0">{d.date}</span>
                 <div className="flex-1 flex gap-1 h-5">
-                  <div className="bg-emerald-500 rounded-sm" style={{ width: `${(d.earned / max) * 50}%` }} title={`Earned: ${d.earned}`} />
-                  <div className="bg-rose-500 rounded-sm" style={{ width: `${(d.spent / max) * 50}%` }} title={`Spent: ${d.spent}`} />
+                  <div
+                    className="bg-emerald-500 rounded-sm"
+                    style={{ width: `${(d.earned / max) * 50}%` }}
+                    title={`Earned: ${d.earned}`}
+                  />
+                  <div
+                    className="bg-rose-500 rounded-sm"
+                    style={{ width: `${(d.spent / max) * 50}%` }}
+                    title={`Spent: ${d.spent}`}
+                  />
                 </div>
               </div>
             );
@@ -362,10 +412,13 @@ function CreditsTab({ agent }: { agent: Agent }) {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${
-                      transaction.amount > 0 ? 'text-emerald-500' : 'text-red-500'
-                    }`}>
-                      {transaction.amount > 0 ? '+' : ''}{transaction.amount.toLocaleString()}
+                    <span
+                      className={`text-sm font-medium ${
+                        transaction.amount > 0 ? "text-emerald-500" : "text-red-500"
+                      }`}
+                    >
+                      {transaction.amount > 0 ? "+" : ""}
+                      {transaction.amount.toLocaleString()}
                     </span>
                     <Badge variant="outline" className="text-xs">
                       {transaction.type}
@@ -392,12 +445,20 @@ function CreditsTab({ agent }: { agent: Agent }) {
 
 // ACP message type styling
 const acpTypeStyles: Record<string, { icon: string; accent: string; bg: string }> = {
-  ack: { icon: '👍', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
-  delegation: { icon: '📋', accent: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/30' },
-  progress: { icon: '📊', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
-  escalation: { icon: '⚠️', accent: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/30' },
-  completion: { icon: '✅', accent: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/30' },
-  status_request: { icon: '💬', accent: 'text-muted-foreground', bg: 'bg-muted/50 border-border' },
+  ack: { icon: "👍", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
+  delegation: { icon: "📋", accent: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/30" },
+  progress: { icon: "📊", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
+  escalation: {
+    icon: "⚠️",
+    accent: "text-orange-500",
+    bg: "bg-orange-500/10 border-orange-500/30",
+  },
+  completion: {
+    icon: "✅",
+    accent: "text-emerald-500",
+    bg: "bg-emerald-500/10 border-emerald-500/30",
+  },
+  status_request: { icon: "💬", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
 };
 
 // Messages Tab Content
@@ -409,7 +470,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
 
   // Fetch real messages from sandbox API when in sandbox mode
   const { data: sandboxMessages } = useQuery({
-    queryKey: ['sandbox-agent-messages', agent.agentId],
+    queryKey: ["sandbox-agent-messages", agent.agentId],
     queryFn: async () => {
       const res = await fetch(`${SANDBOX_URL}/api/agent/${agent.agentId}/messages`);
       return res.json();
@@ -421,35 +482,67 @@ function MessagesTab({ agent }: { agent: Agent }) {
   // Generate contextual messages based on agent properties (fallback for non-sandbox)
   const generatedMessages = useMemo(() => {
     if (isSandboxMode) return [];
-    const domain = agent.domain ?? 'operations';
-    const parentName = parent?.name ?? 'Manager';
+    const domain = agent.domain ?? "operations";
+    const parentName = parent?.name ?? "Manager";
     const reportName = firstReport?.name;
     const now = Date.now();
 
     const pool: Array<{ type: string; body: string; offset: number }> = [];
 
     if (parent) {
-      pool.push({ type: "received", body: `${agent.name}, please prioritize the ${domain} backlog items.`, offset: 1 });
+      pool.push({
+        type: "received",
+        body: `${agent.name}, please prioritize the ${domain} backlog items.`,
+        offset: 1,
+      });
       pool.push({ type: "sent", body: `Acknowledged. Working on ${domain} tasks now.`, offset: 2 });
     }
     if (agent.tasksCompleted > 0) {
-      pool.push({ type: "sent", body: `Completed ${agent.tasksCompleted} task${agent.tasksCompleted > 1 ? 's' : ''} so far. Ready for more.`, offset: 3 });
+      pool.push({
+        type: "sent",
+        body: `Completed ${agent.tasksCompleted} task${agent.tasksCompleted > 1 ? "s" : ""} so far. Ready for more.`,
+        offset: 3,
+      });
     }
     if (reportName) {
-      pool.push({ type: "sent", body: `Delegated the latest ${domain} task to ${reportName}.`, offset: 4 });
-      pool.push({ type: "received", body: `${reportName} finished the subtask. Results look good.`, offset: 5 });
+      pool.push({
+        type: "sent",
+        body: `Delegated the latest ${domain} task to ${reportName}.`,
+        offset: 4,
+      });
+      pool.push({
+        type: "received",
+        body: `${reportName} finished the subtask. Results look good.`,
+        offset: 5,
+      });
     }
-    if (domain === 'engineering' || domain === 'code') {
+    if (domain === "engineering" || domain === "code") {
       pool.push({ type: "sent", body: "PR review complete. All checks passing.", offset: 6 });
-    } else if (domain === 'security') {
-      pool.push({ type: "sent", body: "Security scan finished. No critical vulnerabilities found.", offset: 7 });
+    } else if (domain === "security") {
+      pool.push({
+        type: "sent",
+        body: "Security scan finished. No critical vulnerabilities found.",
+        offset: 7,
+      });
     } else {
-      pool.push({ type: "sent", body: `${domain.charAt(0).toUpperCase() + domain.slice(1)} tasks are on track.`, offset: 6 });
+      pool.push({
+        type: "sent",
+        body: `${domain.charAt(0).toUpperCase() + domain.slice(1)} tasks are on track.`,
+        offset: 6,
+      });
     }
     if (agent.trustScore >= 90) {
-      pool.push({ type: "received", body: `Great reliability, ${agent.name}. Keep it up.`, offset: 10 });
+      pool.push({
+        type: "received",
+        body: `Great reliability, ${agent.name}. Keep it up.`,
+        offset: 10,
+      });
     } else if (agent.trustScore < 50) {
-      pool.push({ type: "received", body: "Please improve task completion rate. Let me know if you need support.", offset: 11 });
+      pool.push({
+        type: "received",
+        body: "Please improve task completion rate. Let me know if you need support.",
+        offset: 11,
+      });
     }
 
     return pool.slice(0, 5).map((m, i) => ({
@@ -480,8 +573,8 @@ function MessagesTab({ agent }: { agent: Agent }) {
           msgs.map((msg: any, index: number) => {
             const isSent = msg.from === agent.agentId;
             const style = acpTypeStyles[msg.type] || acpTypeStyles.ack;
-            const fromAgent = allAgents.find(a => a.agentId === msg.from);
-            const toAgent = allAgents.find(a => a.agentId === msg.to);
+            const fromAgent = allAgents.find((a) => a.agentId === msg.from);
+            const toAgent = allAgents.find((a) => a.agentId === msg.to);
             return (
               <motion.div
                 key={msg.id}
@@ -493,9 +586,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
                 <div className={`max-w-[85%] p-3 rounded-lg border ${style.bg}`}>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-base">{style.icon}</span>
-                    <span className={`text-xs font-medium ${style.accent}`}>
-                      {msg.type}
-                    </span>
+                    <span className={`text-xs font-medium ${style.accent}`}>{msg.type}</span>
                     <span className="text-xs text-muted-foreground ml-auto">
                       {isSent ? `→ ${toAgent?.name || msg.to}` : `← ${fromAgent?.name || msg.from}`}
                     </span>
@@ -539,15 +630,19 @@ function MessagesTab({ agent }: { agent: Agent }) {
             transition={{ delay: index * 0.1 }}
             className={`flex ${message.type === "sent" ? "justify-end" : "justify-start"}`}
           >
-            <div className={`max-w-[80%] p-4 rounded-lg ${
-              message.type === "sent" 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted border border-border"
-            }`}>
+            <div
+              className={`max-w-[80%] p-4 rounded-lg ${
+                message.type === "sent"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted border border-border"
+              }`}
+            >
               <p className="text-sm">{message.body}</p>
-              <p className={`text-xs mt-2 ${
-                message.type === "sent" ? "text-primary-foreground/70" : "text-muted-foreground"
-              }`}>
+              <p
+                className={`text-xs mt-2 ${
+                  message.type === "sent" ? "text-primary-foreground/70" : "text-muted-foreground"
+                }`}
+              >
                 {new Date(message.createdAt).toLocaleString()}
               </p>
             </div>
@@ -561,7 +656,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
 // Prompt Tab Content
 function PromptTab({ agent }: { agent: Agent }) {
   const { data: sandboxAgents } = useQuery({
-    queryKey: ['sandbox-agents-for-prompt'],
+    queryKey: ["sandbox-agents-for-prompt"],
     queryFn: async () => {
       const res = await fetch(`${SANDBOX_URL}/api/agents`);
       return res.json();
@@ -571,7 +666,9 @@ function PromptTab({ agent }: { agent: Agent }) {
 
   const systemPrompt = useMemo(() => {
     if (!isSandboxMode || !sandboxAgents) return null;
-    const match = sandboxAgents.find((a: any) => a.agentId === agent.agentId || a.id === agent.agentId);
+    const match = sandboxAgents.find(
+      (a: any) => a.agentId === agent.agentId || a.id === agent.agentId,
+    );
     return match?.systemPrompt || null;
   }, [sandboxAgents, agent.agentId]);
 
@@ -606,10 +703,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    const changed = 
-      name !== agent.name || 
-      role !== agent.role || 
-      domain !== (agent.domain || "");
+    const changed = name !== agent.name || role !== agent.role || domain !== (agent.domain || "");
     setHasChanges(changed);
   }, [name, role, domain, agent]);
 
@@ -664,15 +758,11 @@ function SettingsTab({ agent }: { agent: Agent }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button 
-          onClick={handleSave} 
-          disabled={!hasChanges}
-          className="flex-1"
-        >
+        <Button onClick={handleSave} disabled={!hasChanges} className="flex-1">
           Save Changes
         </Button>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => {
             setName(agent.name);
             setRole(agent.role);
@@ -713,11 +803,8 @@ function SettingsTab({ agent }: { agent: Agent }) {
 export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
   const { agents } = useAgents();
   const [activeTab, setActiveTab] = useState("overview");
-  
-  const agent = useMemo(() => 
-    agents.find(a => a.id === agentId),
-    [agents, agentId]
-  );
+
+  const agent = useMemo(() => agents.find((a) => a.id === agentId), [agents, agentId]);
 
   // Escape key is handled by SidePanelProvider
 
@@ -727,136 +814,146 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
 
   const panelContent = (
     <>
-          {/* Header */}
-          <div 
-            className="flex-shrink-0 p-4 md:p-6 border-b border-border"
-            style={{ 
-              background: `linear-gradient(135deg, ${levelColor}15 0%, transparent 100%)`,
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <AgentAvatar 
-                agentId={agent.agentId} 
-                name={agent.name} 
-                level={agent.level} 
-                size="lg"
-                avatar={agent.avatar}
-
-                avatarUrl={agent.avatarUrl}
-                avatarColor={agent.avatarColor}
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h2 className="text-xl md:text-2xl font-bold truncate">{agent.name}</h2>
-                    <p className="text-sm text-muted-foreground truncate">@{agent.agentId}</p>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={onClose}
-                    className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">{agent.status}</Badge>
-                  <Badge variant="outline" className="text-[10px]">{agent.role}</Badge>
-                  <Badge className="text-[10px]" style={{ backgroundColor: `${levelColor}20`, color: levelColor, borderColor: levelColor }}>
-                    L{agent.level} • {getLevelLabel(agent.level)}
-                  </Badge>
-                  <TeamBadge teamId={agent.teamId} />
-                </div>
+      {/* Header */}
+      <div
+        className="flex-shrink-0 p-4 md:p-6 border-b border-border"
+        style={{
+          background: `linear-gradient(135deg, ${levelColor}15 0%, transparent 100%)`,
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <AgentAvatar
+            agentId={agent.agentId}
+            name={agent.name}
+            level={agent.level}
+            size="lg"
+            avatar={agent.avatar}
+            avatarUrl={agent.avatarUrl}
+            avatarColor={agent.avatarColor}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h2 className="text-xl md:text-2xl font-bold truncate">{agent.name}</h2>
+                <p className="text-sm text-muted-foreground truncate">@{agent.agentId}</p>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="hover:bg-destructive/10 hover:text-destructive flex-shrink-0 min-w-[44px] min-h-[44px]"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">
+                {agent.status}
+              </Badge>
+              <Badge variant="outline" className="text-[10px]">
+                {agent.role}
+              </Badge>
+              <Badge
+                className="text-[10px]"
+                style={{
+                  backgroundColor: `${levelColor}20`,
+                  color: levelColor,
+                  borderColor: levelColor,
+                }}
+              >
+                L{agent.level} • {getLevelLabel(agent.level)}
+              </Badge>
+              <TeamBadge teamId={agent.teamId} />
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-w-0">
-            <div className="flex-shrink-0 border-b border-border px-4 md:px-6 pt-3 overflow-x-auto scrollbar-none">
-              <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-3 md:gap-6">
-                <TabsTrigger 
-                  value="overview"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Activity className="h-4 w-4 mr-2 hidden sm:block" />
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="prompt"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Terminal className="h-4 w-4 mr-2 hidden sm:block" />
-                  Prompt
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="tasks"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Zap className="h-4 w-4 mr-2 hidden sm:block" />
-                  Tasks
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="credits"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Coins className="h-4 w-4 mr-2 hidden sm:block" />
-                  Credits
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="messages"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2 hidden sm:block" />
-                  Messages
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="timeline"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Clock className="h-4 w-4 mr-2 hidden sm:block" />
-                  Timeline
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="settings"
-                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
-                >
-                  <Settings className="h-4 w-4 mr-2 hidden sm:block" />
-                  Settings
-                </TabsTrigger>
-              </TabsList>
-            </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-w-0">
+        <div className="flex-shrink-0 border-b border-border px-4 md:px-6 pt-3 overflow-x-auto scrollbar-none">
+          <TabsList className="w-max justify-start bg-transparent h-auto p-0 gap-3 md:gap-6">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Activity className="h-4 w-4 mr-2 hidden sm:block" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="prompt"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Terminal className="h-4 w-4 mr-2 hidden sm:block" />
+              Prompt
+            </TabsTrigger>
+            <TabsTrigger
+              value="tasks"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Zap className="h-4 w-4 mr-2 hidden sm:block" />
+              Tasks
+            </TabsTrigger>
+            <TabsTrigger
+              value="credits"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Coins className="h-4 w-4 mr-2 hidden sm:block" />
+              Credits
+            </TabsTrigger>
+            <TabsTrigger
+              value="messages"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <MessageSquare className="h-4 w-4 mr-2 hidden sm:block" />
+              Messages
+            </TabsTrigger>
+            <TabsTrigger
+              value="timeline"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Clock className="h-4 w-4 mr-2 hidden sm:block" />
+              Timeline
+            </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none pb-3 px-0"
+            >
+              <Settings className="h-4 w-4 mr-2 hidden sm:block" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-            {/* Tab Content with ScrollArea */}
-            <ScrollArea className="flex-1">
-              <div className="p-4 md:p-6">
-                <AnimatePresence mode="wait">
-                  <TabsContent key="overview" value="overview" className="mt-0">
-                    <OverviewTab agent={agent} />
-                  </TabsContent>
-                  <TabsContent key="prompt" value="prompt" className="mt-0">
-                    <PromptTab agent={agent} />
-                  </TabsContent>
-                  <TabsContent key="tasks" value="tasks" className="mt-0">
-                    <TasksTab agent={agent} />
-                  </TabsContent>
-                  <TabsContent key="credits" value="credits" className="mt-0">
-                    <CreditsTab agent={agent} />
-                  </TabsContent>
-                  <TabsContent key="messages" value="messages" className="mt-0">
-                    <MessagesTab agent={agent} />
-                  </TabsContent>
-                  <TabsContent key="timeline" value="timeline" className="mt-0">
-                    <TimelineView agentId={agent.agentId} />
-                  </TabsContent>
-                  <TabsContent key="settings" value="settings" className="mt-0">
-                    <SettingsTab agent={agent} />
-                  </TabsContent>
-                </AnimatePresence>
-              </div>
-            </ScrollArea>
-          </Tabs>
+        {/* Tab Content with ScrollArea */}
+        <ScrollArea className="flex-1">
+          <div className="p-4 md:p-6">
+            <AnimatePresence mode="wait">
+              <TabsContent key="overview" value="overview" className="mt-0">
+                <OverviewTab agent={agent} />
+              </TabsContent>
+              <TabsContent key="prompt" value="prompt" className="mt-0">
+                <PromptTab agent={agent} />
+              </TabsContent>
+              <TabsContent key="tasks" value="tasks" className="mt-0">
+                <TasksTab agent={agent} />
+              </TabsContent>
+              <TabsContent key="credits" value="credits" className="mt-0">
+                <CreditsTab agent={agent} />
+              </TabsContent>
+              <TabsContent key="messages" value="messages" className="mt-0">
+                <MessagesTab agent={agent} />
+              </TabsContent>
+              <TabsContent key="timeline" value="timeline" className="mt-0">
+                <TimelineView agentId={agent.agentId} />
+              </TabsContent>
+              <TabsContent key="settings" value="settings" className="mt-0">
+                <SettingsTab agent={agent} />
+              </TabsContent>
+            </AnimatePresence>
+          </div>
+        </ScrollArea>
+      </Tabs>
     </>
   );
 

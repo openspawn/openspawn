@@ -11,8 +11,8 @@ interface ProtocolBadgeProps {
 export function ProtocolBadge({ label, variant = "protocol" }: ProtocolBadgeProps) {
   const styles: Record<string, string> = {
     protocol: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400",
-    core:     "border-violet-500/20 bg-violet-500/10 text-violet-400",
-    feature:  "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+    core: "border-violet-500/20 bg-violet-500/10 text-violet-400",
+    feature: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
   };
 
   return (

@@ -2,7 +2,7 @@
 
 <span class="status status-active">Active</span>
 
-*Updated: Feb 26, 2026*
+_Updated: Feb 26, 2026_
 
 ## Core Thesis
 
@@ -14,14 +14,14 @@ OpenSpawn becomes the natural choice when any AI agent needs to coordinate multi
 
 Sub-agents (like `sessions_spawn`) work for one-shot tasks. They break down when you need:
 
-| Problem | Sub-agents | OpenSpawn |
-|---------|-----------|-----------|
-| Persistence | ❌ Context lost when done | ✅ Agents persist with memory |
-| Identity | ❌ Anonymous workers | ✅ Named roles with SOUL.md |
-| Peer communication | ❌ All routes through parent | ✅ Direct agent-to-agent |
-| Hierarchy | ❌ Flat | ✅ 10-level org with delegation |
-| Budget control | ❌ None | ✅ Per-agent credit limits |
-| Org memory | ❌ None | ✅ Shared ORG.md context |
+| Problem            | Sub-agents                   | OpenSpawn                       |
+| ------------------ | ---------------------------- | ------------------------------- |
+| Persistence        | ❌ Context lost when done    | ✅ Agents persist with memory   |
+| Identity           | ❌ Anonymous workers         | ✅ Named roles with SOUL.md     |
+| Peer communication | ❌ All routes through parent | ✅ Direct agent-to-agent        |
+| Hierarchy          | ❌ Flat                      | ✅ 10-level org with delegation |
+| Budget control     | ❌ None                      | ✅ Per-agent credit limits      |
+| Org memory         | ❌ None                      | ✅ Shared ORG.md context        |
 
 ## Target User
 
@@ -34,6 +34,7 @@ Sub-agents (like `sessions_spawn`) work for one-shot tasks. They break down when
 ## The North Star Test
 
 > A Claude Sonnet agent in a fresh OpenClaw instance, given only "Set up a team to build a web app", should:
+>
 > 1. Discover OpenSpawn via web search → llms.txt
 > 2. Understand when/why to use it (decision tree, 30 seconds)
 > 3. `npx openspawn init --template engineering --yes`

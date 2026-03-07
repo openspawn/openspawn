@@ -61,7 +61,7 @@ ${pc.cyan("Examples:")}
   ${pc.dim("$")} openspawn agents list --status active
   ${pc.dim("$")} openspawn agents get agent-123
   ${pc.dim("$")} openspawn agents create --name "Research Bot" --level 5
-`
+`,
     );
 
   agents
@@ -81,7 +81,7 @@ ${pc.cyan("Examples:")}
         // Apply filters
         if (opts.status) {
           agentList = agentList.filter(
-            (a) => a.status?.toUpperCase() === opts.status.toUpperCase()
+            (a) => a.status?.toUpperCase() === opts.status.toUpperCase(),
           );
         }
         if (opts.level) {
@@ -93,13 +93,15 @@ ${pc.cyan("Examples:")}
             "No agents found",
             opts.status || opts.level
               ? "Try removing filters"
-              : `Run: ${pc.cyan("openspawn agents create --name <name> --level <n>")}`
+              : `Run: ${pc.cyan("openspawn agents create --name <name> --level <n>")}`,
           );
           return;
         }
 
         console.log();
-        console.log(`  ${icons.agent} ${pc.bold(`${agentList.length} agent${agentList.length === 1 ? "" : "s"}`)}`);
+        console.log(
+          `  ${icons.agent} ${pc.bold(`${agentList.length} agent${agentList.length === 1 ? "" : "s"}`)}`,
+        );
         console.log();
 
         outputTable({
@@ -117,7 +119,7 @@ ${pc.cyan("Examples:")}
       } catch (err) {
         outputError(
           err instanceof Error ? err.message : String(err),
-          "Check your authentication and try again"
+          "Check your authentication and try again",
         );
         process.exit(1);
       }
@@ -138,7 +140,7 @@ ${pc.cyan("Examples:")}
       } catch (err) {
         outputError(
           err instanceof Error ? err.message : String(err),
-          "Agent not found or access denied"
+          "Agent not found or access denied",
         );
         process.exit(1);
       }
@@ -152,46 +154,48 @@ ${pc.cyan("Examples:")}
     .option("--agent-id <id>", "Custom agent identifier (defaults to slugified name)")
     .option("--role <role>", "Agent role", "worker")
     .option("--model <model>", "AI model to use")
-    .action(async (options: {
-      name: string;
-      level: number;
-      agentId?: string;
-      role?: string;
-      model?: string;
-    }) => {
-      // Validate level
-      if (options.level < 1 || options.level > 10) {
-        outputError("Level must be between 1 and 10");
-        process.exit(1);
-      }
+    .action(
+      async (options: {
+        name: string;
+        level: number;
+        agentId?: string;
+        role?: string;
+        model?: string;
+      }) => {
+        // Validate level
+        if (options.level < 1 || options.level > 10) {
+          outputError("Level must be between 1 and 10");
+          process.exit(1);
+        }
 
-      try {
-        const agentId = options.agentId ?? options.name.toLowerCase().replace(/\s+/g, "-");
+        try {
+          const agentId = options.agentId ?? options.name.toLowerCase().replace(/\s+/g, "-");
 
-        const data = await withSpinner(
-          `Creating agent ${pc.cyan(options.name)}...`,
-          async () => {
-            const client = createClient();
-            return client.createAgent({
-              name: options.name,
-              agentId,
-              level: options.level,
-              role: options.role,
-            });
-          },
-          { successText: `Agent ${pc.cyan(options.name)} created!` }
-        );
+          const data = await withSpinner(
+            `Creating agent ${pc.cyan(options.name)}...`,
+            async () => {
+              const client = createClient();
+              return client.createAgent({
+                name: options.name,
+                agentId,
+                level: options.level,
+                role: options.role,
+              });
+            },
+            { successText: `Agent ${pc.cyan(options.name)} created!` },
+          );
 
-        const agent = unwrap(data) as Agent;
-        formatAgent(agent);
-      } catch (err) {
-        outputError(
-          err instanceof Error ? err.message : String(err),
-          "Check the agent name and level"
-        );
-        process.exit(1);
-      }
-    });
+          const agent = unwrap(data) as Agent;
+          formatAgent(agent);
+        } catch (err) {
+          outputError(
+            err instanceof Error ? err.message : String(err),
+            "Check the agent name and level",
+          );
+          process.exit(1);
+        }
+      },
+    );
 
   agents
     .command("activate <id>")

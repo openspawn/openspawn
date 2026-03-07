@@ -41,7 +41,7 @@ ${pc.dim("Examples:")}
   $ ${pc.green("openspawn init my-org")}
   $ ${pc.green("openspawn init my-agency --template agency")}
   $ ${pc.green("openspawn agents list")}
-  $ ${pc.green("openspawn tasks create --title \"Build feature\"")}
+  $ ${pc.green('openspawn tasks create --title "Build feature"')}
 
 ${pc.dim("Documentation:")}
   ${pc.cyan("https://openspawn.ai/docs/getting-started")}`)

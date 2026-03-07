@@ -15,6 +15,7 @@ cat .openspawn/tasks.json     # inspect task store state
 ```
 
 Jump to a section:
+
 - [Installation](#1-installation-issues)
 - [ORG.md parsing](#2-orgmd-parsing-errors)
 - [CLI problems](#3-cli-problems)
@@ -34,6 +35,7 @@ Jump to a section:
 **Cause:** OpenSpawn requires **Node.js 18 or later**. Older Node versions are not supported.
 
 **Fix:**
+
 ```bash
 node --version           # must be v18.0.0 or higher
 # If outdated, upgrade via nvm:
@@ -49,6 +51,7 @@ npx openspawn@latest init my-org
 **Cause:** Global npm install attempted without sufficient permissions, or the npm cache directory has wrong ownership.
 
 **Fix — use npx instead of global install:**
+
 ```bash
 # Don't do this:
 npm install -g openspawn
@@ -58,6 +61,7 @@ npx openspawn init my-org
 ```
 
 If you must install globally, fix npm's prefix instead of using `sudo`:
+
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
@@ -74,9 +78,10 @@ npm install -g openspawn
 **Fix for CLI use:** Always invoke via `npx openspawn` or the `openspawn` binary — never `require('openspawn')` in CommonJS.
 
 **Fix for programmatic use in a CJS project:**
+
 ```js
 // Use dynamic import instead:
-const { parseOrgMdContent } = await import('openspawn');
+const { parseOrgMdContent } = await import("openspawn");
 ```
 
 ---
@@ -86,6 +91,7 @@ const { parseOrgMdContent } = await import('openspawn');
 **Cause:** The workspace requires specific peer versions. Running plain `npm install` inside a sub-package instead of from the root will miss workspace links.
 
 **Fix:**
+
 ```bash
 # Always install from the repo root:
 cd /path/to/openspawn
@@ -105,10 +111,12 @@ The parser (`org-parser.ts`) uses remark to walk the markdown AST. It is forgivi
 **Cause:** The parser reads the org name from the **first H1 heading** (`# My Org`). If there is no H1, or the file starts with H2, the name defaults to `"Unnamed Org"`.
 
 **Fix:** Make sure the very first line of your ORG.md is an H1:
+
 ```markdown
-# My SaaS Org         ← must be the first heading
+# My SaaS Org ← must be the first heading
 
 ## Structure
+
 ...
 ```
 
@@ -122,18 +130,22 @@ The parser (`org-parser.ts`) uses remark to walk the markdown AST. It is forgivi
 
 ```markdown
 # Correct ✅
+
 ### Engineering
 
 #### Alice — Senior Dev
+
 - **Level:** 6
 - **Domain:** Engineering
 - **Reports to:** Bob
 
 # Wrong ❌ — uses plain list, not bold-key
+
 ### Engineering
 
 #### Alice — Senior Dev
-- Level: 6          ← not bold, ignored
+
+- Level: 6 ← not bold, ignored
 - Domain: Engineering
 ```
 
@@ -144,9 +156,11 @@ The parser (`org-parser.ts`) uses remark to walk the markdown AST. It is forgivi
 **Cause:** The `Level` key in the metadata list is missing or malformed. The parser falls back to role inference from the heading text (`ceo/coo/cto` → L10, `lead/manager` → L7, `senior/principal` → L6, `junior/intern` → L1, everything else → L4).
 
 **Fix:** Always specify level explicitly:
+
 ```markdown
 #### Jordan — Backend Developer
-- **Level:** 5       ← explicit; do not omit
+
+- **Level:** 5 ← explicit; do not omit
 - **Domain:** Engineering
 ```
 
@@ -159,12 +173,13 @@ The parser (`org-parser.ts`) uses remark to walk the markdown AST. It is forgivi
 ```markdown
 ## Culture
 
-preset: agency           ← works
+preset: agency ← works
 
 # OR:
+
 ## Culture
 
-- **Preset:** agency     ← also works
+- **Preset:** agency ← also works
 - **Escalation:** immediate
 ```
 
@@ -178,11 +193,13 @@ preset: agency           ← works
 ## Policies
 
 ### Budget
-- **Per-agent limit:** 500 credits/period   ← correct
-- **Alert threshold:** 75%                  ← correct
+
+- **Per-agent limit:** 500 credits/period ← correct
+- **Alert threshold:** 75% ← correct
 
 # Wrong:
-- Budget limit: 500      ← not bold, not a bold-key item
+
+- Budget limit: 500 ← not bold, not a bold-key item
 ```
 
 ---
@@ -193,6 +210,7 @@ preset: agency           ← works
 
 ```markdown
 ### Department Caps
+
 - Engineering: max 8 agents
 - Operations: max 3 agents
 ```
@@ -204,6 +222,7 @@ preset: agency           ← works
 **Cause:** The MCP server is looking for `ORG.md` relative to the `--dir` option (defaults to the current working directory). The file must exist at that path.
 
 **Fix:**
+
 ```bash
 # Make sure you're in the right directory:
 ls ORG.md                          # should exist
@@ -222,6 +241,7 @@ openspawn start --dir /path/to/my-org
 **Cause:** `init` is non-destructive. If `ORG.md` already exists in the target directory, it logs the message and continues (it still creates `.openspawn/tasks.json` if missing).
 
 **Fix:** This is expected behavior. If you want to reset:
+
 ```bash
 rm ORG.md                          # remove existing
 openspawn init                     # scaffold fresh from default template
@@ -238,6 +258,7 @@ openspawn init --template=incident-response
 **Symptom in logs:** `Error: listen EADDRINUSE: address already in use :::3456`
 
 **Fix:**
+
 ```bash
 # Find what's using the port:
 lsof -i :3456
@@ -258,6 +279,7 @@ openspawn start --port 3457
 **Cause:** The sandbox/dashboard server defaults to port **3333** (`SANDBOX_PORT` env var).
 
 **Fix:**
+
 ```bash
 lsof -i :3333
 kill -9 <PID>
@@ -272,6 +294,7 @@ SANDBOX_PORT=3334 openspawn start
 **Cause:** The `.openspawn/tasks.json` store is missing. This happens if you cloned/copied the `ORG.md` without running `openspawn init`, or if `.openspawn/` was deleted.
 
 **Fix:**
+
 ```bash
 # Re-initialize the state directory (non-destructive — skips if ORG.md exists):
 openspawn init
@@ -285,15 +308,18 @@ echo '{"version":1,"tasks":[],"budgets":{}}' > .openspawn/tasks.json
 
 ### Symptom: `openspawn validate` reports `"Agent reports to unknown agent"`
 
-**Cause:** The `Reports to` value must exactly match the name portion of another agent's heading (the part before ` — `). Typos, different casing, or a mismatch with an agent defined in a different section will cause this.
+**Cause:** The `Reports to` value must exactly match the name portion of another agent's heading (the part before `—`). Typos, different casing, or a mismatch with an agent defined in a different section will cause this.
 
 **Fix:**
+
 ```markdown
 ### Alice — CEO
-- **Reports to:** Human Principal     ← top of hierarchy uses this literal string
+
+- **Reports to:** Human Principal ← top of hierarchy uses this literal string
 
 #### Bob — Engineer
-- **Reports to:** Alice               ← must match exactly: "Alice" (not "alice" or "Alice — CEO")
+
+- **Reports to:** Alice ← must match exactly: "Alice" (not "alice" or "Alice — CEO")
 ```
 
 ---
@@ -303,10 +329,12 @@ echo '{"version":1,"tasks":[],"budgets":{}}' > .openspawn/tasks.json
 **Cause:** Every org needs exactly one agent whose reporting chain terminates at `Human Principal`. Without this, the hierarchy has no root.
 
 **Fix:**
+
 ```markdown
 ### CEO — Chief Executive
+
 - **Level:** 10
-- **Reports to:** Human Principal    ← exactly this string
+- **Reports to:** Human Principal ← exactly this string
 ```
 
 ---
@@ -317,10 +345,10 @@ echo '{"version":1,"tasks":[],"budgets":{}}' > .openspawn/tasks.json
 
 OpenSpawn's MCP server supports two transports:
 
-| Transport | Flag | Best for |
-|-----------|------|---------|
+| Transport             | Flag        | Best for                                     |
+| --------------------- | ----------- | -------------------------------------------- |
 | **HTTP (Streamable)** | _(default)_ | Claude.ai projects, Cursor, direct API calls |
-| **stdio** | `--stdio` | Claude Code CLI, embedded tool use |
+| **stdio**             | `--stdio`   | Claude Code CLI, embedded tool use           |
 
 ---
 
@@ -341,6 +369,7 @@ OpenSpawn's MCP server supports two transports:
 ```
 
 Verify the server starts:
+
 ```bash
 npx openspawn start --stdio --dir /path/to/my-org
 # Should silently wait for stdin (no output in stdio mode is correct)
@@ -353,12 +382,14 @@ npx openspawn start --stdio --dir /path/to/my-org
 **Fix — Cursor uses HTTP transport. Start the server first, then configure Cursor:**
 
 1. Start the server:
+
    ```bash
    openspawn start --port 3456
    # Output: OpenSpawn MCP server listening on http://localhost:3456/mcp
    ```
 
 2. In Cursor Settings → MCP → Add Server:
+
    ```json
    {
      "name": "openspawn",
@@ -380,6 +411,7 @@ npx openspawn start --stdio --dir /path/to/my-org
 **Cause:** The `--dir` argument to `openspawn start` doesn't point to a directory containing `ORG.md`.
 
 **Fix:**
+
 ```bash
 # Confirm ORG.md exists in the target directory:
 ls /path/to/my-org/ORG.md
@@ -395,6 +427,7 @@ openspawn start --dir /path/to/my-org --stdio
 **Cause:** Either (a) there are no tasks with status `open`, or (b) the specific `taskId` you requested doesn't exist or is already claimed.
 
 **Fix:**
+
 ```bash
 # Check the task store directly:
 cat .openspawn/tasks.json | jq '.tasks[] | {id, status, assignee}'
@@ -411,6 +444,7 @@ cat .openspawn/tasks.json | jq '.tasks[] | {id, status, assignee}'
 **Cause:** Delegation only flows downward. You cannot delegate to an agent with `level >= yourLevel`.
 
 **Fix:** Check the org hierarchy and ensure you're delegating to a lower-level agent. Use `org_read` to see agent levels:
+
 ```
 tool: org_read
 # Look at agents[].level in the response
@@ -427,27 +461,30 @@ The REST API (`api.openspawn.ai` or your self-hosted instance) supports three au
 ### HMAC Signature Authentication (agent-to-API)
 
 Agents authenticate using four request headers:
+
 - `x-agent-id` — the agent's ID
 - `x-timestamp` — Unix timestamp in seconds
 - `x-nonce` — random unique string per request
 - `x-signature` — HMAC-SHA256 of `METHOD + PATH + TIMESTAMP + NONCE + BODY`
 
 **Signature message format (exact):**
+
 ```
 {METHOD}{PATH}{TIMESTAMP}{NONCE}{BODY}
 # Example:
 POSTlists/tasks17096835001a2b3c{"title":"test"}
 ```
 
-| Error message | Cause | Fix |
-|---------------|-------|-----|
-| `"Missing authentication headers: x-agent-id, x-timestamp, x-nonce, and x-signature are all required"` | One or more HMAC headers are missing | Include all four headers in every request |
-| `"Request timestamp outside valid window"` | Clock skew > ±5 minutes | Sync your system clock: `ntpdate -u pool.ntp.org` |
-| `"Invalid credentials"` | Agent ID not found, or signature mismatch | Verify `AGENT_ID` matches the registered agent; recompute signature |
-| `"Agent is not active"` | The agent's status is not `ACTIVE` in the database | Check agent status via dashboard or API |
-| `"Nonce already used"` | The nonce was replayed within a 10-minute window | Generate a fresh random nonce for every request |
+| Error message                                                                                          | Cause                                              | Fix                                                                 |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------- |
+| `"Missing authentication headers: x-agent-id, x-timestamp, x-nonce, and x-signature are all required"` | One or more HMAC headers are missing               | Include all four headers in every request                           |
+| `"Request timestamp outside valid window"`                                                             | Clock skew > ±5 minutes                            | Sync your system clock: `ntpdate -u pool.ntp.org`                   |
+| `"Invalid credentials"`                                                                                | Agent ID not found, or signature mismatch          | Verify `AGENT_ID` matches the registered agent; recompute signature |
+| `"Agent is not active"`                                                                                | The agent's status is not `ACTIVE` in the database | Check agent status via dashboard or API                             |
+| `"Nonce already used"`                                                                                 | The nonce was replayed within a 10-minute window   | Generate a fresh random nonce for every request                     |
 
 **Example: correct HMAC headers (Node.js)**
+
 ```js
 import crypto from 'crypto';
 
@@ -479,36 +516,36 @@ headers: {
 
 ### API Key Authentication (Bearer `osp_...`)
 
-| Error message | Cause | Fix |
-|---------------|-------|-----|
-| `"Missing authorization header"` | No `Authorization` header sent | Add `Authorization: Bearer osp_your_key` |
-| `"Invalid authorization format"` | Header present but malformed (wrong scheme/no space) | Use exactly `Bearer osp_...` or `ApiKey osp_...` |
-| `"Invalid API key format"` | Token doesn't start with `osp_` | Use a key generated via the dashboard API Keys page |
-| `"Invalid or expired API key"` | Key revoked, expired, or wrong environment | Generate a new key in the dashboard |
-| `"API key missing required scope: {scope}"` | Key exists but lacks the permission for this endpoint | Regenerate key with the required scope checked |
+| Error message                               | Cause                                                 | Fix                                                 |
+| ------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------- |
+| `"Missing authorization header"`            | No `Authorization` header sent                        | Add `Authorization: Bearer osp_your_key`            |
+| `"Invalid authorization format"`            | Header present but malformed (wrong scheme/no space)  | Use exactly `Bearer osp_...` or `ApiKey osp_...`    |
+| `"Invalid API key format"`                  | Token doesn't start with `osp_`                       | Use a key generated via the dashboard API Keys page |
+| `"Invalid or expired API key"`              | Key revoked, expired, or wrong environment            | Generate a new key in the dashboard                 |
+| `"API key missing required scope: {scope}"` | Key exists but lacks the permission for this endpoint | Regenerate key with the required scope checked      |
 
 ---
 
 ### JWT Authentication (dashboard users)
 
-| Error message | Cause | Fix |
-|---------------|-------|-----|
-| `"Invalid or expired JWT token"` | Access token has expired (default 15-minute lifetime) | Re-authenticate; the client should auto-refresh using the refresh token |
-| `"User not found"` | Account was deleted after the token was issued | Log out and log back in |
-| `"Authentication required. Provide either a valid JWT Bearer token, API key (Bearer osp_...), or agent HMAC signature headers."` | No auth header at all | Add the appropriate `Authorization` header |
+| Error message                                                                                                                    | Cause                                                 | Fix                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| `"Invalid or expired JWT token"`                                                                                                 | Access token has expired (default 15-minute lifetime) | Re-authenticate; the client should auto-refresh using the refresh token |
+| `"User not found"`                                                                                                               | Account was deleted after the token was issued        | Log out and log back in                                                 |
+| `"Authentication required. Provide either a valid JWT Bearer token, API key (Bearer osp_...), or agent HMAC signature headers."` | No auth header at all                                 | Add the appropriate `Authorization` header                              |
 
 ---
 
 ### HTTP Status Quick Reference
 
-| Status | Typical meaning in OpenSpawn |
-|--------|------------------------------|
-| `400` | Malformed request body (Zod validation failed) — check required fields |
-| `401` | Auth failure — see error message for specific reason |
-| `403` | Authenticated but not authorized — wrong org, wrong role, or pre-hook block |
-| `404` | Resource not found — wrong ID, or resource belongs to a different org |
-| `409` | Conflict — e.g., task already claimed by another agent |
-| `422` | Invalid state transition (see [Task State Machine](#7-task-state-machine)) |
+| Status | Typical meaning in OpenSpawn                                                |
+| ------ | --------------------------------------------------------------------------- |
+| `400`  | Malformed request body (Zod validation failed) — check required fields      |
+| `401`  | Auth failure — see error message for specific reason                        |
+| `403`  | Authenticated but not authorized — wrong org, wrong role, or pre-hook block |
+| `404`  | Resource not found — wrong ID, or resource belongs to a different org       |
+| `409`  | Conflict — e.g., task already claimed by another agent                      |
+| `422`  | Invalid state transition (see [Task State Machine](#7-task-state-machine))  |
 
 ---
 
@@ -519,6 +556,7 @@ headers: {
 **Cause A:** The sandbox server isn't running or the dashboard can't reach it.
 
 **Fix:**
+
 ```bash
 # Check if the sandbox server is up:
 curl http://localhost:3333/health
@@ -537,6 +575,7 @@ openspawn start
 **Cause:** SSE connections time out after periods of inactivity. Some reverse proxies (nginx, Caddy) have a default timeout that kills idle SSE streams.
 
 **Fix for nginx:**
+
 ```nginx
 location /events {
     proxy_pass http://localhost:3333;
@@ -550,6 +589,7 @@ location /events {
 ```
 
 **Fix for Caddy** (in your `Caddyfile`):
+
 ```caddyfile
 reverse_proxy /events localhost:3333 {
     flush_interval -1
@@ -565,6 +605,7 @@ The client-side dashboard reconnects automatically — this is cosmetic in most 
 **Cause:** The JWT access token lifetime is 15 minutes by default. The dashboard should automatically use the refresh token to obtain a new access token, but if the refresh fails, you'll be logged out.
 
 **Fix:**
+
 - Check if `REFRESH_TOKEN_TTL` is configured in your API environment (default: 7 days)
 - Ensure cookies are not being blocked — the refresh token is stored as an `HttpOnly` cookie
 - If self-hosting, make sure the API and dashboard share the same domain so the cookie is sent with requests
@@ -596,15 +637,15 @@ BACKLOG ──→ TODO ──→ IN_PROGRESS ──→ REVIEW ──→ DONE (te
 
 Full transition table:
 
-| From | Allowed `to` values |
-|------|---------------------|
-| `BACKLOG` | `TODO`, `CANCELLED` |
-| `TODO` | `IN_PROGRESS`, `BLOCKED`, `CANCELLED` |
-| `IN_PROGRESS` | `REVIEW`, `BLOCKED`, `CANCELLED` |
-| `REVIEW` | `DONE`, `IN_PROGRESS`, `CANCELLED` |
-| `BLOCKED` | `TODO`, `IN_PROGRESS`, `CANCELLED` |
-| `DONE` | _(none — terminal)_ |
-| `CANCELLED` | _(none — terminal)_ |
+| From          | Allowed `to` values                   |
+| ------------- | ------------------------------------- |
+| `BACKLOG`     | `TODO`, `CANCELLED`                   |
+| `TODO`        | `IN_PROGRESS`, `BLOCKED`, `CANCELLED` |
+| `IN_PROGRESS` | `REVIEW`, `BLOCKED`, `CANCELLED`      |
+| `REVIEW`      | `DONE`, `IN_PROGRESS`, `CANCELLED`    |
+| `BLOCKED`     | `TODO`, `IN_PROGRESS`, `CANCELLED`    |
+| `DONE`        | _(none — terminal)_                   |
+| `CANCELLED`   | _(none — terminal)_                   |
 
 ---
 
@@ -614,13 +655,13 @@ Full transition table:
 
 **Common invalid transitions and fixes:**
 
-| You tried | Error | Fix |
-|-----------|-------|-----|
-| `BACKLOG → IN_PROGRESS` | Invalid | Move to `TODO` first, then `IN_PROGRESS` |
-| `DONE → IN_PROGRESS` | Invalid — `DONE` is terminal | Create a new task instead |
-| `CANCELLED → TODO` | Invalid — `CANCELLED` is terminal | Create a new task instead |
-| `IN_PROGRESS → DONE` | Invalid | Move to `REVIEW` first (or `BLOCKED`) |
-| `TODO → DONE` | Invalid | Must pass through `IN_PROGRESS` and `REVIEW` |
+| You tried               | Error                             | Fix                                          |
+| ----------------------- | --------------------------------- | -------------------------------------------- |
+| `BACKLOG → IN_PROGRESS` | Invalid                           | Move to `TODO` first, then `IN_PROGRESS`     |
+| `DONE → IN_PROGRESS`    | Invalid — `DONE` is terminal      | Create a new task instead                    |
+| `CANCELLED → TODO`      | Invalid — `CANCELLED` is terminal | Create a new task instead                    |
+| `IN_PROGRESS → DONE`    | Invalid                           | Move to `REVIEW` first (or `BLOCKED`)        |
+| `TODO → DONE`           | Invalid                           | Must pass through `IN_PROGRESS` and `REVIEW` |
 
 ---
 
@@ -629,6 +670,7 @@ Full transition table:
 **Cause:** A blocked task requires an agent to explicitly transition it back to `TODO` or `IN_PROGRESS` after resolving the blocker.
 
 **Fix:**
+
 1. Check the task's escalation — the escalating agent's manager should have received it
 2. Resolve the blocker:
    ```
@@ -646,6 +688,7 @@ Full transition table:
 **Cause:** No agent with `level >= 6` has claimed the review, or the review assignee is busy/inactive.
 
 **Fix:** Explicitly assign and escalate:
+
 ```
 tool: task_update { taskId: "task-007", assignee: "senior-reviewer-id" }
 # If urgent, escalate to the lead:
@@ -661,15 +704,18 @@ tool: escalate { taskId: "task-007", reason: "Review overdue", agentId: "my-agen
 **Cause:** No budget limit has been configured for this agent. The budget system is opt-in — agents without a configured budget can spend freely.
 
 **Fix — set a budget limit via MCP tool:**
+
 ```
 tool: budget_spend is blocked until a limit is set via setBudgetLimit
 # Use the API or dashboard to configure a per-agent limit,
 # or add it to ORG.md:
 ```
+
 ```markdown
 ## Policies
 
 ### Budget
+
 - **Per-agent limit:** 50
 ```
 
@@ -680,6 +726,7 @@ tool: budget_spend is blocked until a limit is set via setBudgetLimit
 **Cause:** The requested spend exceeds the agent's remaining budget. Spending is blocked when `amount > (limit - spent)` and the limit is greater than 0.
 
 **Fix:**
+
 1. Check remaining balance: `tool: budget_check { "agentId": "my-agent" }`
 2. If you need more budget, update the limit via the dashboard or API
 3. In ORG.md, increase `Per-agent limit`:
@@ -695,15 +742,18 @@ tool: budget_spend is blocked until a limit is set via setBudgetLimit
 **Cause:** The `departmentCaps` policy in ORG.md limits how many agents can exist in a department.
 
 **Fix:**
+
 ```markdown
 ## Policies
 
 ### Department Caps
-- Engineering: max 12 agents   ← increase this number
+
+- Engineering: max 12 agents ← increase this number
 - Operations: max 5 agents
 ```
 
 Or fire an inactive agent first:
+
 ```
 tool: fire { "name": "Inactive Agent Name" }
 ```
@@ -715,16 +765,17 @@ tool: fire { "name": "Inactive Agent Name" }
 ### Symptom: Container exits immediately — `docker compose up` shows exit code 1
 
 **Diagnosis:**
+
 ```bash
 docker compose logs sandbox
 ```
 
 **Common causes:**
 
-| Log message | Fix |
-|-------------|-----|
-| `Cannot find module ...` | Image build is stale — rebuild: `docker compose build --no-cache` |
-| `ENCRYPTION_KEY not configured` | Add `ENCRYPTION_KEY` to your `.env` file |
+| Log message                        | Fix                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| `Cannot find module ...`           | Image build is stale — rebuild: `docker compose build --no-cache`                  |
+| `ENCRYPTION_KEY not configured`    | Add `ENCRYPTION_KEY` to your `.env` file                                           |
 | `Error: listen EADDRINUSE :::3333` | Host port 3333 is already in use — change the port mapping in `docker-compose.yml` |
 
 ---
@@ -736,12 +787,13 @@ docker compose logs sandbox
 **Symptom in logs:** `Connection refused` or `ECONNREFUSED` to the database port.
 
 **Fix — check your `docker-compose.yml` has a proper `depends_on` with healthcheck:**
+
 ```yaml
 services:
   api:
     depends_on:
       db:
-        condition: service_healthy   # wait for DB health check, not just start
+        condition: service_healthy # wait for DB health check, not just start
 
   db:
     image: postgres:16-alpine
@@ -753,6 +805,7 @@ services:
 ```
 
 **Check `DATABASE_URL` format:**
+
 ```
 # Correct for Docker Compose (use service name as host):
 DATABASE_URL=postgresql://postgres:password@db:5432/openspawn
@@ -766,6 +819,7 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/openspawn
 ### Symptom: Database migrations fail on first start
 
 **Fix:**
+
 ```bash
 # Run migrations manually:
 docker compose exec api pnpm nx run api:migrate
@@ -782,6 +836,7 @@ docker compose up -d
 **Cause:** The container runs as a non-root user but the host-mounted volume is owned by root.
 
 **Fix:**
+
 ```bash
 # Option 1: Fix ownership on the host:
 sudo chown -R 1000:1000 ./data
@@ -799,13 +854,14 @@ services:
 **Cause:** When using `SANDBOX_READONLY=1`, the server serves a fixed snapshot and ignores file changes. Without `READONLY`, the file is read on each request but only if it's mounted correctly.
 
 **Fix — verify the volume mount:**
+
 ```yaml
 services:
   sandbox:
     volumes:
-      - ./my-org:/app/org:ro    # mounts your local org/ directory
+      - ./my-org:/app/org:ro # mounts your local org/ directory
     environment:
-      - SANDBOX_READONLY=0      # allow live reloading
+      - SANDBOX_READONLY=0 # allow live reloading
 ```
 
 ---

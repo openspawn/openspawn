@@ -1,29 +1,21 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import { getApiKey, getApiUrl, setApiKey, setApiUrl } from "../lib/config.js";
-import {
-  outputSuccess,
-  outputError,
-  formatStatus,
-  formatKeyValue,
-  icons,
-  } from "../lib/output.js";
+import { outputSuccess, outputError, formatStatus, formatKeyValue, icons } from "../lib/output.js";
 import { withSpinner } from "../lib/spinner.js";
 import { OpenSpawnClient } from "../lib/api.js";
 
 export function createAuthCommand(): Command {
-  const auth = new Command("auth")
-    .description("Authenticate with the OpenSpawn API")
-    .addHelpText(
-      "after",
-      `
+  const auth = new Command("auth").description("Authenticate with the OpenSpawn API").addHelpText(
+    "after",
+    `
 ${pc.cyan("Examples:")}
   ${pc.dim("$")} openspawn auth login --api-key osp_abc123
   ${pc.dim("$")} openspawn auth login --api-key osp_abc123 --api-url https://api.example.com
   ${pc.dim("$")} openspawn auth whoami
   ${pc.dim("$")} openspawn auth logout
-`
-    );
+`,
+  );
 
   auth
     .command("login")
@@ -33,10 +25,7 @@ ${pc.cyan("Examples:")}
     .action(async (options: { apiKey: string; apiUrl?: string }) => {
       // Validate API key format
       if (!options.apiKey.startsWith("osp_")) {
-        outputError(
-          "Invalid API key format",
-          "API keys must start with 'osp_'"
-        );
+        outputError("Invalid API key format", "API keys must start with 'osp_'");
         process.exit(1);
       }
 
@@ -58,15 +47,14 @@ ${pc.cyan("Examples:")}
         console.log();
         outputSuccess("Authentication configured successfully!");
         console.log();
-        console.log(`  ${icons.key} API Key: ${pc.dim(options.apiKey.slice(0, 12))}${pc.dim("...")}`);
+        console.log(
+          `  ${icons.key} API Key: ${pc.dim(options.apiKey.slice(0, 12))}${pc.dim("...")}`,
+        );
         console.log(`  ${icons.arrow} Endpoint: ${pc.underline(apiUrl)}`);
         console.log(`  ${icons.check} Saved to: ${pc.dim("~/.openspawn/config.json")}`);
         console.log();
       } catch (error) {
-        outputError(
-          "Failed to verify credentials",
-          "Check your API key and try again"
-        );
+        outputError("Failed to verify credentials", "Check your API key and try again");
         // Still save the credentials, but warn
         outputSuccess("Credentials saved (unverified)");
         process.exit(1);
@@ -94,22 +82,21 @@ ${pc.cyan("Examples:")}
         console.log();
         console.log(`  ${icons.success} ${pc.green("Authenticated")}`);
         console.log();
-        
+
         formatKeyValue({
           "API URL": pc.underline(apiUrl),
           "API Key": `${apiKey.slice(0, 12)}...`,
-          "Status": pc.green("Active"),
+          Status: pc.green("Active"),
         });
-
       } catch (error) {
         console.log();
         console.log(`  ${icons.error} ${pc.red("Authentication failed")}`);
         console.log();
-        
+
         formatKeyValue({
           "API URL": pc.underline(apiUrl),
           "API Key": `${apiKey.slice(0, 12)}...`,
-          "Status": pc.red("Invalid"),
+          Status: pc.red("Invalid"),
         });
 
         console.log(`  ${pc.dim("Run:")} ${pc.cyan("openspawn auth login --api-key <key>")}`);

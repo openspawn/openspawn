@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -12,7 +12,7 @@ export function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
         setSize((prev) =>
           prev.width === Math.round(width) && prev.height === Math.round(height)
             ? prev
-            : { width: Math.round(width), height: Math.round(height) }
+            : { width: Math.round(width), height: Math.round(height) },
         );
       }
     });

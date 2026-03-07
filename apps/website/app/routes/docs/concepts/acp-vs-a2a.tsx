@@ -8,8 +8,8 @@ export function AcpVsA2A() {
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">ACP vs A2A</h1>
       <p className="mb-8 text-lg text-slate-400">
-        When to use OpenSpawn's Agent Communication Protocol versus Google's Agent-to-Agent protocol — and how they
-        work together.
+        When to use OpenSpawn's Agent Communication Protocol versus Google's Agent-to-Agent protocol
+        — and how they work together.
       </p>
 
       <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
@@ -17,9 +17,10 @@ export function AcpVsA2A() {
       </div>
 
       <p className="mb-8 text-slate-400">
-        If you've read about multi-agent systems, you've probably encountered Google's A2A (Agent-to-Agent) protocol.
-        OpenSpawn uses a different protocol internally — ACP (Agent Communication Protocol). They're not competitors.
-        They're designed for different problems and work together.
+        If you've read about multi-agent systems, you've probably encountered Google's A2A
+        (Agent-to-Agent) protocol. OpenSpawn uses a different protocol internally — ACP (Agent
+        Communication Protocol). They're not competitors. They're designed for different problems
+        and work together.
       </p>
 
       <hr className="my-8 border-white/10" />
@@ -57,12 +58,15 @@ export function AcpVsA2A() {
       <hr className="my-8 border-white/10" />
 
       {/* ACP */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">ACP: Communication Inside Your Org</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        ACP: Communication Inside Your Org
+      </h2>
       <p className="mb-4 text-slate-400">
-        ACP governs how agents within a single OpenSpawn org communicate with each other. It's built around a core
-        insight: <strong className="text-slate-200">agents in the same org already know each other</strong>, share
-        context, and exist in a trust hierarchy. You shouldn't need to treat your own backend worker like an opaque
-        third-party service.
+        ACP governs how agents within a single OpenSpawn org communicate with each other. It's built
+        around a core insight:{" "}
+        <strong className="text-slate-200">agents in the same org already know each other</strong>,
+        share context, and exist in a trust hierarchy. You shouldn't need to treat your own backend
+        worker like an opaque third-party service.
       </p>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">What ACP Defines</h3>
@@ -73,14 +77,16 @@ export function AcpVsA2A() {
       <p className="mb-2 text-slate-300 font-semibold">1. Acknowledgment (ACK)</p>
       <CodeBlock title="typescript">{`{ type: "ack", from: "agent-backend-1", to: "agent-lead-eng", taskId: "task-42", timestamp }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Immediate reaction (no LLM required) when an agent receives a task. Tells the delegator "I got it."
+        Immediate reaction (no LLM required) when an agent receives a task. Tells the delegator "I
+        got it."
       </p>
 
       <p className="mb-2 text-slate-300 font-semibold">2. Progress</p>
       <CodeBlock title="typescript">{`{ type: "progress", from: "agent-backend-1", taskId: "task-42", 
   body: "Bug reproduced. Root cause: UTC vs server time. Fixing.", pct: 60, timestamp }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Pull-based log entry written to the task as work progresses. The manager checks when they want to.
+        Pull-based log entry written to the task as work progresses. The manager checks when they
+        want to.
       </p>
 
       <p className="mb-2 text-slate-300 font-semibold">3. Escalation</p>
@@ -99,20 +105,30 @@ export function AcpVsA2A() {
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Why This Matters</h3>
       <p className="mb-4 text-slate-400">
-        Most multi-agent frameworks have no communication model at all — tasks go in, results come out, and the
-        delegator just waits. ACP gives you:
+        Most multi-agent frameworks have no communication model at all — tasks go in, results come
+        out, and the delegator just waits. ACP gives you:
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
-        <li><strong className="text-slate-200">Visibility without noise</strong> — progress is pull-based; completions and escalations are push</li>
-        <li><strong className="text-slate-200">Automatic accountability</strong> — the 👍 ack confirms delivery instantly</li>
-        <li><strong className="text-slate-200">Organizational metrics</strong> — escalation rates, ack latency, completion rates emerge from the protocol</li>
-        <li><strong className="text-slate-200">Debugging information</strong> — every decision an agent makes is logged with context</li>
+        <li>
+          <strong className="text-slate-200">Visibility without noise</strong> — progress is
+          pull-based; completions and escalations are push
+        </li>
+        <li>
+          <strong className="text-slate-200">Automatic accountability</strong> — the 👍 ack confirms
+          delivery instantly
+        </li>
+        <li>
+          <strong className="text-slate-200">Organizational metrics</strong> — escalation rates, ack
+          latency, completion rates emerge from the protocol
+        </li>
+        <li>
+          <strong className="text-slate-200">Debugging information</strong> — every decision an
+          agent makes is logged with context
+        </li>
       </ul>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">What ACP Doesn't Do</h3>
-      <p className="mb-4 text-slate-400">
-        ACP is not for talking to external systems. It assumes:
-      </p>
+      <p className="mb-4 text-slate-400">ACP is not for talking to external systems. It assumes:</p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
         <li>Both agents are in your org</li>
         <li>You have trust information about each agent (level, history, trust score)</li>
@@ -120,18 +136,20 @@ export function AcpVsA2A() {
         <li>Agents share context (task details, org policies, playbooks)</li>
       </ul>
       <p className="mb-4 text-slate-400">
-        When you need to communicate <em>outside</em> your org — to another company's agent, a third-party AI
-        service, or an external agent built on a different framework — you need A2A.
+        When you need to communicate <em>outside</em> your org — to another company's agent, a
+        third-party AI service, or an external agent built on a different framework — you need A2A.
       </p>
 
       <hr className="my-8 border-white/10" />
 
       {/* A2A */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">A2A: Communication Between Orgs</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        A2A: Communication Between Orgs
+      </h2>
       <p className="mb-4 text-slate-400">
-        Google's A2A protocol is an open standard for inter-agent communication across organizational and vendor
-        boundaries. It answers the question: "How does my LangGraph agent talk to your CrewAI agent, when we can't
-        assume shared infrastructure?"
+        Google's A2A protocol is an open standard for inter-agent communication across
+        organizational and vendor boundaries. It answers the question: "How does my LangGraph agent
+        talk to your CrewAI agent, when we can't assume shared infrastructure?"
       </p>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">What A2A Defines</h3>
@@ -152,17 +170,23 @@ export function AcpVsA2A() {
   ]
 }`}</CodeBlock>
 
-      <p className="mb-2 text-slate-300 font-semibold">Tasks — stateful work units with a lifecycle:</p>
+      <p className="mb-2 text-slate-300 font-semibold">
+        Tasks — stateful work units with a lifecycle:
+      </p>
       <CodeBlock title="">{`submitted → working → completed | canceled | failed
                      ↓
                (streaming updates via SSE)`}</CodeBlock>
 
       <p className="mb-2 text-slate-400">
-        <strong className="text-slate-300">Transport</strong> — JSON-RPC 2.0 over HTTPS, with optional gRPC and SSE for streaming.
+        <strong className="text-slate-300">Transport</strong> — JSON-RPC 2.0 over HTTPS, with
+        optional gRPC and SSE for streaming.
       </p>
 
       <p className="mb-2 text-slate-300 font-semibold">Message format</p>
-      <p className="mb-2 text-slate-400">Generic <code className="inline-code">Message</code> objects containing typed <code className="inline-code">Parts</code>:</p>
+      <p className="mb-2 text-slate-400">
+        Generic <code className="inline-code">Message</code> objects containing typed{" "}
+        <code className="inline-code">Parts</code>:
+      </p>
       <CodeBlock title="message.json">{`{
   "role": "agent",
   "parts": [
@@ -173,14 +197,15 @@ export function AcpVsA2A() {
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">What A2A Doesn't Do</h3>
       <p className="mb-4 text-slate-400">
-        A2A is deliberately <strong className="text-slate-200">opaque</strong> — it doesn't assume you know anything
-        about the internal structure of the agent you're talking to. There's no concept of trust scores, hierarchy,
-        delegation depth, or escalation chains. Two agents can exchange tasks over A2A without either knowing whether
-        the other is a single model, a multi-agent team, or a human pretending to be a bot.
+        A2A is deliberately <strong className="text-slate-200">opaque</strong> — it doesn't assume
+        you know anything about the internal structure of the agent you're talking to. There's no
+        concept of trust scores, hierarchy, delegation depth, or escalation chains. Two agents can
+        exchange tasks over A2A without either knowing whether the other is a single model, a
+        multi-agent team, or a human pretending to be a bot.
       </p>
       <p className="mb-4 text-slate-400">
-        This opacity is a feature, not a limitation. You don't want to expose your internal org structure to a
-        third-party service.
+        This opacity is a feature, not a limitation. You don't want to expose your internal org
+        structure to a third-party service.
       </p>
 
       <hr className="my-8 border-white/10" />
@@ -204,9 +229,17 @@ export function AcpVsA2A() {
               ["Transport", "Internal events, SSE", "JSON-RPC 2.0, gRPC, REST"],
               ["Task lifecycle", "Stateful (same as A2A)", "Stateful"],
               ["Streaming", "SSE", "SSE (similar)"],
-              ["Message types", "Typed: ack, progress, escalation, completion", "Generic: Message with Parts"],
+              [
+                "Message types",
+                "Typed: ack, progress, escalation, completion",
+                "Generic: Message with Parts",
+              ],
               ["Hierarchy", "First-class (parent, level, chain of command)", "Flat (peer-to-peer)"],
-              ["Organizational metrics", "Built-in (escalation rate, ack latency, etc.)", "Not defined"],
+              [
+                "Organizational metrics",
+                "Built-in (escalation rate, ack latency, etc.)",
+                "Not defined",
+              ],
               ["Delegation chain", "Tracked and surfaced", "Not defined"],
             ].map(([dim, acp, a2a]) => (
               <tr key={dim}>
@@ -219,29 +252,31 @@ export function AcpVsA2A() {
         </table>
       </div>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">The Key Philosophical Difference</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        The Key Philosophical Difference
+      </h3>
       <div className="mb-6 space-y-4">
         <div className="rounded-lg border border-cyan-500/10 bg-cyan-500/5 px-5 py-4">
           <p className="mb-1 text-sm font-semibold text-cyan-400">ACP assumes transparency.</p>
           <p className="text-sm text-slate-400">
-            Within your org, shared context improves outcomes. Your backend worker should know the org is a startup
-            that moves fast. Your engineering lead should know which workers have the highest trust scores for hard
-            tasks. Opacity <em>within</em> your own org creates the same dysfunctions as opacity in human
-            organizations.
+            Within your org, shared context improves outcomes. Your backend worker should know the
+            org is a startup that moves fast. Your engineering lead should know which workers have
+            the highest trust scores for hard tasks. Opacity <em>within</em> your own org creates
+            the same dysfunctions as opacity in human organizations.
           </p>
         </div>
         <div className="rounded-lg border border-purple-500/10 bg-purple-500/5 px-5 py-4">
           <p className="mb-1 text-sm font-semibold text-purple-400">A2A assumes opacity.</p>
           <p className="text-sm text-slate-400">
-            Across org boundaries, you don't want to expose your internal state, and you can't trust the other
-            party's trust model. Two agents that have never met need a common protocol that doesn't require shared
-            infrastructure.
+            Across org boundaries, you don't want to expose your internal state, and you can't trust
+            the other party's trust model. Two agents that have never met need a common protocol
+            that doesn't require shared infrastructure.
           </p>
         </div>
       </div>
       <p className="mb-4 text-slate-400">
-        <strong className="text-slate-200">Together they cover the full spectrum:</strong> transparent internally
-        (ACP), opaque externally (A2A).
+        <strong className="text-slate-200">Together they cover the full spectrum:</strong>{" "}
+        transparent internally (ACP), opaque externally (A2A).
       </p>
 
       <hr className="my-8 border-white/10" />
@@ -270,9 +305,7 @@ export function AcpVsA2A() {
       </div>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">In Practice: Both at Once</h3>
-      <p className="mb-4 text-slate-400">
-        Most real OpenSpawn deployments use both:
-      </p>
+      <p className="mb-4 text-slate-400">Most real OpenSpawn deployments use both:</p>
       <CodeBlock title="architecture">{`┌──────────────────────────────────────────────┐
 │              Your OpenSpawn Org              │
 │                                              │
@@ -300,17 +333,18 @@ export function AcpVsA2A() {
       </p>
       <ul className="mb-8 list-disc pl-6 text-slate-400 space-y-2">
         <li>
-          <strong className="text-slate-200">Inbound (A2A → ACP):</strong> External agent sends an A2A task →
-          Gateway creates an internal ACP delegation to the right agent based on skill/domain matching.
+          <strong className="text-slate-200">Inbound (A2A → ACP):</strong> External agent sends an
+          A2A task → Gateway creates an internal ACP delegation to the right agent based on
+          skill/domain matching.
         </li>
         <li>
-          <strong className="text-slate-200">Outbound (ACP → A2A):</strong> Internal agent escalates with{" "}
-          <code className="inline-code">OUT_OF_DOMAIN</code> → Gateway discovers external agents via Agent Cards and
-          sends an A2A request.
+          <strong className="text-slate-200">Outbound (ACP → A2A):</strong> Internal agent escalates
+          with <code className="inline-code">OUT_OF_DOMAIN</code> → Gateway discovers external
+          agents via Agent Cards and sends an A2A request.
         </li>
         <li>
-          <strong className="text-slate-200">Status mapping:</strong> ACP completion/escalation → A2A task status
-          updates.
+          <strong className="text-slate-200">Status mapping:</strong> ACP completion/escalation →
+          A2A task status updates.
         </li>
       </ul>
 
@@ -319,7 +353,9 @@ export function AcpVsA2A() {
       {/* Code Examples */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Code Examples</h2>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">ACP: Handling an Escalation</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        ACP: Handling an Escalation
+      </h3>
       <p className="mb-4 text-slate-400">
         When an agent in your org escalates, you see this in the ACP message stream:
       </p>
@@ -341,7 +377,9 @@ const escalation: AgentMessage = {
 // - Escalate further up the chain
 // - Cancel the task`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">A2A: Sending a Task to an External Agent</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        A2A: Sending a Task to an External Agent
+      </h3>
       <p className="mb-4 text-slate-400">
         When your org delegates to an external service, it goes via A2A:
       </p>
@@ -384,7 +422,9 @@ const response = await fetch("https://analyst-agent.example.com/", {
 // { id, status: "working", ... }
 // Updates come via SSE streaming`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">A2A + ACP: A Task That Crosses the Boundary</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        A2A + ACP: A Task That Crosses the Boundary
+      </h3>
       <CodeBlock title="typescript">{`// Step 1: Internal agent (COO) creates a task that needs external analysis
 // ACP delegation: COO → Data Lead → Data Worker (internal, via ACP)
 
@@ -407,10 +447,12 @@ const response = await fetch("https://analyst-agent.example.com/", {
       <hr className="my-8 border-white/10" />
 
       {/* How They Complement */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">How They Complement Each Other</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        How They Complement Each Other
+      </h2>
       <p className="mb-4 text-slate-400">
-        ACP and A2A are designed to be used together, and they share some structural similarities that make
-        integration natural:
+        ACP and A2A are designed to be used together, and they share some structural similarities
+        that make integration natural:
       </p>
       <div className="mb-6 overflow-x-auto">
         <table className="w-full text-sm text-slate-400 border-collapse">
@@ -437,14 +479,17 @@ const response = await fetch("https://analyst-agent.example.com/", {
         </table>
       </div>
       <p className="mb-4 text-slate-400">
-        The main difference is in the communication model: ACP is typed and hierarchical; A2A is generic and flat.
+        The main difference is in the communication model: ACP is typed and hierarchical; A2A is
+        generic and flat.
       </p>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Future: ACP as an A2A Extension</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        Future: ACP as an A2A Extension
+      </h3>
       <p className="mb-4 text-slate-400">
-        A2A supports an extension mechanism for additional capabilities. ACP message semantics — typed acks,
-        escalations, and completions — could be formalized as an A2A extension, allowing A2A-compatible agents to
-        opt into richer intra-org communication:
+        A2A supports an extension mechanism for additional capabilities. ACP message semantics —
+        typed acks, escalations, and completions — could be formalized as an A2A extension, allowing
+        A2A-compatible agents to opt into richer intra-org communication:
       </p>
       <CodeBlock title="agent-card.json (with ACP extension)">{`{
   "name": "openspawn-org-agent",
@@ -462,8 +507,8 @@ const response = await fetch("https://analyst-agent.example.com/", {
   ]
 }`}</CodeBlock>
       <p className="mb-8 text-slate-400">
-        This would let any A2A-compatible framework gradually adopt ACP semantics — getting richer organizational
-        communication without abandoning A2A compatibility.
+        This would let any A2A-compatible framework gradually adopt ACP semantics — getting richer
+        organizational communication without abandoning A2A compatibility.
       </p>
 
       <hr className="my-8 border-white/10" />
@@ -475,18 +520,19 @@ const response = await fetch("https://analyst-agent.example.com/", {
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-2">
         <li>
-          <strong className="text-slate-200">ACP</strong> makes your org's internal communication structured,
-          visible, and debuggable. It's the reason you can look at an escalation rate dashboard and know your
-          engineering team is struggling.
+          <strong className="text-slate-200">ACP</strong> makes your org's internal communication
+          structured, visible, and debuggable. It's the reason you can look at an escalation rate
+          dashboard and know your engineering team is struggling.
         </li>
         <li>
-          <strong className="text-slate-200">A2A</strong> makes your org interoperable with the broader agent
-          ecosystem. It's the reason your OpenSpawn org can call a LangGraph agent or accept tasks from a CrewAI
-          pipeline without either side knowing the other's internals.
+          <strong className="text-slate-200">A2A</strong> makes your org interoperable with the
+          broader agent ecosystem. It's the reason your OpenSpawn org can call a LangGraph agent or
+          accept tasks from a CrewAI pipeline without either side knowing the other's internals.
         </li>
       </ul>
       <div className="mb-8 rounded-lg border border-white/5 bg-white/[0.02] px-5 py-4 text-sm text-slate-300">
-        Think of it this way: <strong>ACP is how your team works. A2A is how your team works with everyone else.</strong>
+        Think of it this way:{" "}
+        <strong>ACP is how your team works. A2A is how your team works with everyone else.</strong>
       </div>
 
       <hr className="my-8 border-white/10" />

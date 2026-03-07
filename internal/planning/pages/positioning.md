@@ -2,7 +2,7 @@
 
 <span class="status status-active">Active</span>
 
-*Updated: Feb 26, 2026*
+_Updated: Feb 26, 2026_
 
 ## One-liner
 
@@ -10,13 +10,13 @@
 
 ## Competitive Landscape
 
-| Framework | What it does | Our relationship |
-|-----------|-------------|-----------------|
-| **CrewAI** | Role-based task crews (Python) | Complementary — we orchestrate CrewAI crews |
-| **LangGraph** | Stateful agent graphs (Python) | Complementary — we wrap LangGraph pipelines |
-| **AutoGen** | Free-form group chat | Cautionary tale — 40-60% coordination overhead |
-| **MetaGPT** | SOP pipeline + pub/sub | Good ideas, we borrow the structured artifact approach |
-| **Sub-agents** (OpenClaw, Claude Code) | Spawn-and-forget workers | Our direct predecessor — we're the upgrade path |
+| Framework                              | What it does                   | Our relationship                                       |
+| -------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+| **CrewAI**                             | Role-based task crews (Python) | Complementary — we orchestrate CrewAI crews            |
+| **LangGraph**                          | Stateful agent graphs (Python) | Complementary — we wrap LangGraph pipelines            |
+| **AutoGen**                            | Free-form group chat           | Cautionary tale — 40-60% coordination overhead         |
+| **MetaGPT**                            | SOP pipeline + pub/sub         | Good ideas, we borrow the structured artifact approach |
+| **Sub-agents** (OpenClaw, Claude Code) | Spawn-and-forget workers       | Our direct predecessor — we're the upgrade path        |
 
 ## Key Differentiators
 

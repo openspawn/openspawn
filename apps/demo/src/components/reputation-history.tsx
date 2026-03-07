@@ -75,13 +75,8 @@ export function ReputationHistory({
         <ScrollArea className="h-[300px] pr-4">
           <div className="space-y-3">
             {events.map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start gap-3 p-2 rounded-lg bg-muted/50"
-              >
-                <div className="text-xl mt-0.5">
-                  {EVENT_ICONS[event.type] || "❓"}
-                </div>
+              <div key={event.id} className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                <div className="text-xl mt-0.5">{EVENT_ICONS[event.type] || "❓"}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="font-medium text-sm">
@@ -97,9 +92,7 @@ export function ReputationHistory({
                     </div>
                   </div>
                   {event.reason && (
-                    <div className="text-xs text-muted-foreground truncate">
-                      {event.reason}
-                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{event.reason}</div>
                   )}
                   <div className="text-xs text-muted-foreground mt-1">
                     {event.previousScore} → {event.newScore} · {formatTimeAgo(event.createdAt)}
@@ -108,9 +101,7 @@ export function ReputationHistory({
               </div>
             ))}
             {events.length === 0 && (
-              <div className="text-center text-muted-foreground py-4">
-                No reputation events yet
-              </div>
+              <div className="text-center text-muted-foreground py-4">No reputation events yet</div>
             )}
           </div>
         </ScrollArea>

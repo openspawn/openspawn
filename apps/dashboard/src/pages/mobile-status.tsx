@@ -11,7 +11,16 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { RefreshCw, ChevronDown, Coins, Zap, Clock, Activity, CheckCircle, Bot } from "lucide-react";
+import {
+  RefreshCw,
+  ChevronDown,
+  Coins,
+  Zap,
+  Clock,
+  Activity,
+  CheckCircle,
+  Bot,
+} from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAgents, usePresence, useAgentHealth, useTasks } from "../hooks";
 import type { PresenceStatus } from "../hooks";
@@ -62,12 +71,19 @@ interface StatPillProps {
 
 function StatPill({ label, value, color, icon }: StatPillProps) {
   return (
-    <div className={cn("flex flex-col items-center gap-1 rounded-xl border px-3 py-2.5 flex-1 min-w-0", color)}>
+    <div
+      className={cn(
+        "flex flex-col items-center gap-1 rounded-xl border px-3 py-2.5 flex-1 min-w-0",
+        color,
+      )}
+    >
       <div className="flex items-center gap-1.5">
         {icon}
         <span className="text-lg font-bold tabular-nums leading-none">{value}</span>
       </div>
-      <span className="text-[10px] font-medium uppercase tracking-wider opacity-70 leading-none">{label}</span>
+      <span className="text-[10px] font-medium uppercase tracking-wider opacity-70 leading-none">
+        {label}
+      </span>
     </div>
   );
 }
@@ -88,14 +104,17 @@ interface AgentRowProps {
 function AgentRow({ agent, presence, currentTask, health, expanded, onToggle }: AgentRowProps) {
   // Deterministic sparkline data based on agent status
   const sparkData = useMemo(
-    () => generateSparklineData(8, presence === "active" ? "up" : presence === "error" ? "down" : "stable"),
-    [agent.id, presence]
+    () =>
+      generateSparklineData(
+        8,
+        presence === "active" ? "up" : presence === "error" ? "down" : "stable",
+      ),
+    [agent.id, presence],
   );
 
   const levelColor = getLevelColor(agent.level);
-  const successRate = agent.tasksCompleted > 0
-    ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100)
-    : 0;
+  const successRate =
+    agent.tasksCompleted > 0 ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100) : 0;
 
   return (
     <div className="border-b border-border/50 last:border-b-0">
@@ -111,7 +130,6 @@ function AgentRow({ agent, presence, currentTask, health, expanded, onToggle }: 
           level={agent.level}
           size="sm"
           avatar={agent.avatar}
-
           avatarUrl={agent.avatarUrl}
           avatarColor={agent.avatarColor}
           presenceStatus={presence}
@@ -211,9 +229,17 @@ function AgentRow({ agent, presence, currentTask, health, expanded, onToggle }: 
 
               {/* Agent details */}
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span>Model: <span className="text-foreground">{agent.model}</span></span>
-                <span>Balance: <span className="text-foreground">{agent.currentBalance.toLocaleString()}</span></span>
-                <span>Lifetime: <span className="text-foreground">{agent.lifetimeEarnings.toLocaleString()}</span></span>
+                <span>
+                  Model: <span className="text-foreground">{agent.model}</span>
+                </span>
+                <span>
+                  Balance:{" "}
+                  <span className="text-foreground">{agent.currentBalance.toLocaleString()}</span>
+                </span>
+                <span>
+                  Lifetime:{" "}
+                  <span className="text-foreground">{agent.lifetimeEarnings.toLocaleString()}</span>
+                </span>
               </div>
 
               {/* Current task (if expanded and has task) */}
@@ -312,13 +338,15 @@ export function MobileStatusPage() {
 
   // Compute summary stats
   const inProgressTasks = useMemo(
-    () => (tasks ?? []).filter((t: any) => t.status === "in_progress" || t.status === "assigned").length,
-    [tasks]
+    () =>
+      (tasks ?? []).filter((t: any) => t.status === "in_progress" || t.status === "assigned")
+        .length,
+    [tasks],
   );
 
   const totalCredits = useMemo(
     () => agents.reduce((sum, a) => sum + a.currentBalance, 0),
-    [agents]
+    [agents],
   );
 
   const formatCredits = (n: number) => {
@@ -356,9 +384,7 @@ export function MobileStatusPage() {
           disabled={refreshing}
           className="h-10 w-10"
         >
-          <RefreshCw
-            className={cn("h-4 w-4", refreshing && "animate-spin")}
-          />
+          <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
         </Button>
       </div>
 

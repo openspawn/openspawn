@@ -5,7 +5,7 @@
 services:
   sandbox:
     image: ghcr.io/openspawn/openspawn:latest
-    build: .  # Used for local dev; production pulls from GHCR
+    build: . # Used for local dev; production pulls from GHCR
     restart: unless-stopped
     env_file: .env.production
     environment:

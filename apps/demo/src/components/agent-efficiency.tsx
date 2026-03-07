@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
-import { motion } from 'motion/react';
-import { Trophy, TrendingUp, Zap, Star, Medal } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { cn } from '../lib/utils';
-import { useAgents } from '../hooks/use-agents';
-import { useTasks } from '../hooks/use-tasks';
-import { useSidePanel } from '../contexts';
-import { AgentAvatar } from './agent-avatar';
-import { AgentDetailPanel } from './agent-detail-panel';
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import { Trophy, TrendingUp, Zap, Star, Medal } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Progress } from "./ui/progress";
+import { cn } from "../lib/utils";
+import { useAgents } from "../hooks/use-agents";
+import { useTasks } from "../hooks/use-tasks";
+import { useSidePanel } from "../contexts";
+import { AgentAvatar } from "./agent-avatar";
+import { AgentDetailPanel } from "./agent-detail-panel";
 
 interface ComputedEfficiency {
   id: string;
@@ -25,12 +25,12 @@ interface ComputedEfficiency {
 }
 
 const rankIcons = [
-  { icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-500/20' },
-  { icon: Medal, color: 'text-muted-foreground', bg: 'bg-muted' },
-  { icon: Medal, color: 'text-amber-600', bg: 'bg-amber-600/20' },
+  { icon: Trophy, color: "text-amber-400", bg: "bg-amber-500/20" },
+  { icon: Medal, color: "text-muted-foreground", bg: "bg-muted" },
+  { icon: Medal, color: "text-amber-600", bg: "bg-amber-600/20" },
 ];
 
-const RANK_EMOJI = ['🥇', '🥈', '🥉'];
+const RANK_EMOJI = ["🥇", "🥈", "🥉"];
 
 export function AgentEfficiencyLeaderboard() {
   const { agents, loading: agentsLoading } = useAgents();
@@ -46,7 +46,7 @@ export function AgentEfficiencyLeaderboard() {
       if (!task.assigneeId) continue;
       const entry = tasksByAgent.get(task.assigneeId) ?? { completed: 0, total: 0 };
       entry.total++;
-      if (task.status === 'DONE') entry.completed++;
+      if (task.status === "DONE") entry.completed++;
       tasksByAgent.set(task.assigneeId, entry);
     }
 
@@ -62,8 +62,8 @@ export function AgentEfficiencyLeaderboard() {
         id: agent.id,
         name: agent.name,
         level: agent.level,
-        avatar: agent.avatar ?? '',
-        avatarColor: agent.avatarColor ?? '',
+        avatar: agent.avatar ?? "",
+        avatarColor: agent.avatarColor ?? "",
         avatarUrl: agent.avatarUrl,
         tasksCompleted,
         totalAssigned,
@@ -89,10 +89,7 @@ export function AgentEfficiencyLeaderboard() {
   }, [efficiencyData]);
 
   const handleRowClick = (agentId: string) => {
-    openSidePanel(
-      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
-      { width: 520 }
-    );
+    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
   };
 
   const loading = agentsLoading || tasksLoading;
@@ -148,12 +145,16 @@ export function AgentEfficiencyLeaderboard() {
       </CardHeader>
       <CardContent className="space-y-3">
         {efficiencyData.map((agent, index) => {
-          const rankConfig = rankIcons[index] || { icon: Star, color: 'text-muted-foreground/70', bg: 'bg-muted/50' };
+          const rankConfig = rankIcons[index] || {
+            icon: Star,
+            color: "text-muted-foreground/70",
+            bg: "bg-muted/50",
+          };
           const RankIcon = rankConfig.icon;
-          const efficiencyPercent = agent.efficiency !== null ? (agent.efficiency / maxEfficiency) * 100 : 0;
-          const progressPercent = agent.totalAssigned > 0
-            ? (agent.tasksCompleted / agent.totalAssigned) * 100
-            : 0;
+          const efficiencyPercent =
+            agent.efficiency !== null ? (agent.efficiency / maxEfficiency) * 100 : 0;
+          const progressPercent =
+            agent.totalAssigned > 0 ? (agent.tasksCompleted / agent.totalAssigned) * 100 : 0;
 
           return (
             <motion.div
@@ -163,15 +164,20 @@ export function AgentEfficiencyLeaderboard() {
               transition={{ delay: index * 0.1 }}
               onClick={() => handleRowClick(agent.id)}
               className={cn(
-                'flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors',
-                index === 0 && 'bg-amber-500/10 border border-yellow-500/30',
-                index === 1 && 'bg-muted border border-border',
-                index === 2 && 'bg-amber-600/10 border border-amber-600/30',
-                index > 2 && 'bg-muted/30'
+                "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors",
+                index === 0 && "bg-amber-500/10 border border-yellow-500/30",
+                index === 1 && "bg-muted border border-border",
+                index === 2 && "bg-amber-600/10 border border-amber-600/30",
+                index > 2 && "bg-muted/30",
               )}
             >
               {/* Rank */}
-              <div className={cn('w-8 h-8 rounded-full flex items-center justify-center', rankConfig.bg)}>
+              <div
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center",
+                  rankConfig.bg,
+                )}
+              >
                 {index < 3 ? (
                   <span className="text-base">{RANK_EMOJI[index]}</span>
                 ) : (
@@ -186,7 +192,6 @@ export function AgentEfficiencyLeaderboard() {
                 level={agent.level}
                 size="sm"
                 avatar={agent.avatar}
-
                 avatarUrl={agent.avatarUrl}
                 avatarColor={agent.avatarColor}
                 showRing={false}
@@ -196,7 +201,9 @@ export function AgentEfficiencyLeaderboard() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium truncate">{agent.name}</span>
-                  <Badge variant="outline" className="text-[10px]">L{agent.level}</Badge>
+                  <Badge variant="outline" className="text-[10px]">
+                    L{agent.level}
+                  </Badge>
                   {agent.tasksCompleted > 0 && (
                     <Badge className="text-[10px] bg-orange-500/20 text-orange-400 border-orange-500/30">
                       ✅ {agent.tasksCompleted} done
@@ -215,11 +222,9 @@ export function AgentEfficiencyLeaderboard() {
               <div className="text-right">
                 <div className="flex items-center gap-1">
                   <span className="text-lg font-bold">
-                    {agent.efficiency !== null ? agent.efficiency.toFixed(2) : 'N/A'}
+                    {agent.efficiency !== null ? agent.efficiency.toFixed(2) : "N/A"}
                   </span>
-                  {agent.efficiency !== null && (
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  )}
+                  {agent.efficiency !== null && <TrendingUp className="w-4 h-4 text-emerald-400" />}
                 </div>
                 <p className="text-[10px] text-muted-foreground/70">
                   {agent.creditsSpent.toLocaleString()} credits
@@ -234,13 +239,19 @@ export function AgentEfficiencyLeaderboard() {
 }
 
 // Compact efficiency score for agent cards
-export function AgentEfficiencyBadge({ efficiency, trend }: { efficiency: number; trend: 'up' | 'down' | 'stable' }) {
+export function AgentEfficiencyBadge({
+  efficiency,
+  trend,
+}: {
+  efficiency: number;
+  trend: "up" | "down" | "stable";
+}) {
   return (
     <div className="flex items-center gap-1">
       <Zap className="w-3 h-3 text-amber-400" />
       <span className="text-xs font-medium">{efficiency.toFixed(2)}</span>
-      {trend === 'up' && <TrendingUp className="w-3 h-3 text-emerald-400" />}
-      {trend === 'down' && <TrendingUp className="w-3 h-3 text-red-400 rotate-180" />}
+      {trend === "up" && <TrendingUp className="w-3 h-3 text-emerald-400" />}
+      {trend === "down" && <TrendingUp className="w-3 h-3 text-red-400 rotate-180" />}
     </div>
   );
 }

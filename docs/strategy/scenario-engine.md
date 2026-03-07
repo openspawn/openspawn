@@ -44,7 +44,7 @@ It's a straight line. Real organizations are a tangle. We need to model that tan
 
 ### The Vision
 
-BikiniBottom is SimCity for agent organizations. SimCity isn't fun because a single house gets built. It's fun because *a thousand things happen simultaneously* — traffic jams, power outages, budget crises, zoning disputes — and you watch the city respond. The Scenario Engine is what generates that emergent complexity.
+BikiniBottom is SimCity for agent organizations. SimCity isn't fun because a single house gets built. It's fun because _a thousand things happen simultaneously_ — traffic jams, power outages, budget crises, zoning disputes — and you watch the city respond. The Scenario Engine is what generates that emergent complexity.
 
 A scenario should feel like watching a real organization work. Not every decision is dramatic — most are routine. But routines compound into patterns, patterns create bottlenecks, bottlenecks force hard choices, and hard choices are where the drama lives.
 
@@ -54,7 +54,7 @@ A scenario should feel like watching a real organization work. Not every decisio
 
 2. **Deterministic core, stochastic texture.** The engine is a state machine. Random events use seeded PRNGs — same seed, same run. Replay is sacred.
 
-3. **Friction is the feature.** Dependencies, contention, review loops, interrupts — these aren't bugs. They're what makes organizations interesting. The engine should generate *realistic* friction, not artificial delays.
+3. **Friction is the feature.** Dependencies, contention, review loops, interrupts — these aren't bugs. They're what makes organizations interesting. The engine should generate _realistic_ friction, not artificial delays.
 
 4. **Visual density matters.** Every decision should produce visible activity on the dashboard: a node lights up, a message flies across the org chart, a task moves on the board, a metric ticks. Dead air is death.
 
@@ -107,21 +107,21 @@ A scenario should feel like watching a real organization work. Not every decisio
 
 ### Key Components
 
-| Component | Responsibility |
-|-----------|---------------|
-| **Phase Manager** | Tracks scenario phase, evaluates phase transitions, unlocks new work |
-| **Task Generator** | Expands epic templates into concrete tasks/subtasks on-demand |
-| **Event Scheduler** | Fires random and scripted events at appropriate times |
-| **DAG Resolver** | Tracks dependencies between tasks, blocks/unblocks as predecessors complete |
-| **Resource Allocator** | Models agent availability, handles contention, forces prioritization |
+| Component              | Responsibility                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| **Phase Manager**      | Tracks scenario phase, evaluates phase transitions, unlocks new work                       |
+| **Task Generator**     | Expands epic templates into concrete tasks/subtasks on-demand                              |
+| **Event Scheduler**    | Fires random and scripted events at appropriate times                                      |
+| **DAG Resolver**       | Tracks dependencies between tasks, blocks/unblocks as predecessors complete                |
+| **Resource Allocator** | Models agent availability, handles contention, forces prioritization                       |
 | **Decision Evaluator** | Applies weighted random outcomes to decision points (reviews, approvals, resource choices) |
-| **Narrative Engine** | Generates flavor text, tracks branching story arcs, names events for dashboard display |
+| **Narrative Engine**   | Generates flavor text, tracks branching story arcs, names events for dashboard display     |
 
 ---
 
 ## 3. SCENARIO.md File Format
 
-A SCENARIO.md defines a reusable scenario template. Combined with an ORG.md (which defines *who works here*), it defines *what work they do*.
+A SCENARIO.md defines a reusable scenario template. Combined with an ORG.md (which defines _who works here_), it defines _what work they do_.
 
 ### 3.1 Top-Level Structure
 
@@ -129,10 +129,15 @@ A SCENARIO.md defines a reusable scenario template. Combined with an ORG.md (whi
 # Scenario Name
 
 ## Meta
+
 ## Phases
+
 ## Epics
-## Events  
+
+## Events
+
 ## Resources
+
 ## Scoring
 ```
 
@@ -154,24 +159,24 @@ Scenario identity and configuration parameters.
   to burn out the team.
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `Industry` | string | Category tag for filtering/grouping |
-| `Duration` | duration | Target wall-clock runtime (engine adjusts tick pacing) |
-| `Target decisions` | number | Approximate decision count (engine calibrates generation) |
-| `Tick interval` | duration | Base time between ticks (can be overridden by phase) |
-| `Seed` | number \| "random" | PRNG seed for reproducibility |
-| `Difficulty` | easy \| normal \| hard \| chaos | Adjusts event frequency, review rejection rates, resource scarcity |
-| `Description` | text | Shown on scenario select screen |
+| Field              | Type                            | Description                                                        |
+| ------------------ | ------------------------------- | ------------------------------------------------------------------ |
+| `Industry`         | string                          | Category tag for filtering/grouping                                |
+| `Duration`         | duration                        | Target wall-clock runtime (engine adjusts tick pacing)             |
+| `Target decisions` | number                          | Approximate decision count (engine calibrates generation)          |
+| `Tick interval`    | duration                        | Base time between ticks (can be overridden by phase)               |
+| `Seed`             | number \| "random"              | PRNG seed for reproducibility                                      |
+| `Difficulty`       | easy \| normal \| hard \| chaos | Adjusts event frequency, review rejection rates, resource scarcity |
+| `Description`      | text                            | Shown on scenario select screen                                    |
 
 **Difficulty presets:**
 
 | Difficulty | Event frequency | Review rejection % | Resource scarcity | Block chance |
-|------------|----------------|-------------------|-------------------|-------------|
-| easy | 1 per 30 ticks | 5% | none | 5% |
-| normal | 1 per 15 ticks | 15% | light | 10% |
-| hard | 1 per 8 ticks | 25% | heavy | 20% |
-| chaos | 1 per 4 ticks | 35% | extreme | 30% |
+| ---------- | --------------- | ------------------ | ----------------- | ------------ |
+| easy       | 1 per 30 ticks  | 5%                 | none              | 5%           |
+| normal     | 1 per 15 ticks  | 15%                | light             | 10%          |
+| hard       | 1 per 8 ticks   | 25%                | heavy             | 20%          |
+| chaos      | 1 per 4 ticks   | 35%                | extreme           | 30%          |
 
 ### 3.3 Phases
 
@@ -181,6 +186,7 @@ Phases are the macro-structure of a scenario. Each phase unlocks new epics, chan
 ## Phases
 
 ### Phase 1: Setup (ticks 1–50)
+
 The team assembles. Leads are hired, initial tasks assigned.
 Client kickoff meetings happen. Requirements are gathered.
 
@@ -191,6 +197,7 @@ Client kickoff meetings happen. Requirements are gathered.
 - **Transition:** all "Setup" epics at 80%+ completion
 
 ### Phase 2: Sprint 1 (ticks 51–200)
+
 First real work sprint. Multiple workstreams running in parallel.
 Dependencies start to bite. First blockers emerge.
 
@@ -200,15 +207,17 @@ Dependencies start to bite. First blockers emerge.
 - **Transition:** 3+ epics at "done" status
 
 ### Phase 3: Crunch (ticks 201–350)
+
 Deadline approaching. Resource contention peaks. Hard trade-offs.
 
-- **Tick range:** 201–350  
+- **Tick range:** 201–350
 - **Unlocks epics:** Launch Prep, Performance Optimization, Documentation
 - **Events enabled:** all
 - **Difficulty modifier:** +1 (events fire 50% more often)
 - **Transition:** "Launch Prep" epic at 100% OR tick 350
 
 ### Phase 4: Launch (ticks 351–400)
+
 Ship it. Final reviews, deploy, monitor, celebrate (or patch).
 
 - **Tick range:** 351–400
@@ -218,6 +227,7 @@ Ship it. Final reviews, deploy, monitor, celebrate (or patch).
 ```
 
 **Phase transitions** can be:
+
 - **Tick-based:** phase starts at tick N regardless
 - **Completion-based:** phase starts when conditions are met (e.g., "3 epics done")
 - **Event-based:** phase starts when a specific event fires (e.g., "battle-begins" event triggers Phase 3)
@@ -231,6 +241,7 @@ Epics are templates for large bodies of work. Each epic expands into tasks and s
 ## Epics
 
 ### Client Onboarding
+
 - **Phase:** Setup
 - **Domain:** operations, engineering
 - **Priority:** critical
@@ -240,21 +251,19 @@ Epics are templates for large bodies of work. Each epic expands into tasks and s
   requirements doc, kickoff meeting, access setup.
 
 #### Task Templates
+
 1. **Contract Review** [finance]
    - Review terms → Negotiate changes → Final sign-off
    - Duration: 4–6 ticks per subtask
    - Review required: yes (L7+)
-   
 2. **Environment Provisioning** [engineering]
    - Create repos → Set up CI/CD → Configure staging
    - Duration: 3–5 ticks per subtask
    - Dependencies: Contract Review (approved)
-   
 3. **Requirements Document** [engineering]
    - Draft requirements → Client review → Revisions → Sign-off
    - Duration: 5–8 ticks per subtask
    - Review loop: 1–3 iterations (weighted: 60% pass first time, 30% one revision, 10% two revisions)
-   
 4. **Kickoff Meeting** [operations]
    - Prepare agenda → Schedule → Run meeting → Distribute notes
    - Duration: 2–3 ticks per subtask
@@ -268,26 +277,26 @@ Epics are templates for large bodies of work. Each epic expands into tasks and s
 
 **Epic template fields:**
 
-| Field | Description |
-|-------|-------------|
-| `Phase` | Which phase unlocks this epic |
-| `Domain` | Which department(s) own this work |
-| `Priority` | Base priority (can be elevated by events) |
-| `Generates` | Task/subtask count ranges (randomized within range) |
-| `Dependencies` | Other epics or tasks that must complete first |
-| `Description` | Context for flavor text generation |
+| Field          | Description                                         |
+| -------------- | --------------------------------------------------- |
+| `Phase`        | Which phase unlocks this epic                       |
+| `Domain`       | Which department(s) own this work                   |
+| `Priority`     | Base priority (can be elevated by events)           |
+| `Generates`    | Task/subtask count ranges (randomized within range) |
+| `Dependencies` | Other epics or tasks that must complete first       |
+| `Description`  | Context for flavor text generation                  |
 
 **Task template fields:**
 
-| Field | Description |
-|-------|-------------|
-| `[domain]` | Domain tag in brackets — routes to correct department |
-| Subtask list | Named subtasks in order |
-| `Duration` | Tick range per subtask (randomized) |
-| `Review required` | Whether this task needs review before "done" |
-| `Review loop` | How many iterations of review are expected (weighted distribution) |
-| `Dependencies` | Tasks that must complete before this one starts |
-| `Cross-dept trigger` | Events to fire on completion |
+| Field                | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| `[domain]`           | Domain tag in brackets — routes to correct department              |
+| Subtask list         | Named subtasks in order                                            |
+| `Duration`           | Tick range per subtask (randomized)                                |
+| `Review required`    | Whether this task needs review before "done"                       |
+| `Review loop`        | How many iterations of review are expected (weighted distribution) |
+| `Dependencies`       | Tasks that must complete before this one starts                    |
+| `Cross-dept trigger` | Events to fire on completion                                       |
 
 ### 3.5 Events
 
@@ -297,6 +306,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 ## Events
 
 ### p0-bug
+
 - **Type:** interrupt
 - **Probability:** 0.08 per tick (during enabled phases)
 - **Cooldown:** 20 ticks (can't fire again within)
@@ -311,6 +321,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 - **Narrative:** "[Agent] discovered a critical bug in [system]. All hands on deck."
 
 ### client-escalation
+
 - **Type:** interrupt
 - **Probability:** 0.05 per tick
 - **Cooldown:** 30 ticks
@@ -322,6 +333,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 - **Narrative:** "Client [name] is unhappy with progress on [task]. Emergency meeting called."
 
 ### team-sick
+
 - **Type:** disruption
 - **Probability:** 0.03 per tick
 - **Cooldown:** 40 ticks
@@ -334,6 +346,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 - **Narrative:** "[Agent] is out sick. [Manager] is redistributing their workload."
 
 ### scope-creep
+
 - **Type:** expansion
 - **Probability:** 0.04 per tick
 - **Cooldown:** 25 ticks
@@ -344,6 +357,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 - **Narrative:** "New requirements just came in: [generated requirement]. Adding to the backlog."
 
 ### deadline-pressure
+
 - **Type:** modifier
 - **Probability:** 0.0 (triggered by other events or phase transitions)
 - **Effect:**
@@ -354,6 +368,7 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 - **Narrative:** "Two weeks until launch. [COO] is cutting scope."
 
 ### surprise-opportunity
+
 - **Type:** expansion
 - **Probability:** 0.02 per tick
 - **Cooldown:** 60 ticks
@@ -367,14 +382,14 @@ Events inject chaos, drama, and realism. They interrupt normal flow and force th
 
 **Event types:**
 
-| Type | Description | Dashboard effect |
-|------|-------------|-----------------|
-| `interrupt` | Demands immediate attention, preempts current work | 🚨 Flash alert, red highlights |
-| `disruption` | Removes or modifies resources | ⚠️ Agent goes grey, tasks redistribute |
-| `expansion` | Adds new work to the scenario | 📋 New tasks appear on board |
-| `modifier` | Changes simulation parameters | 🔧 Metric shifts visible |
-| `narrative` | Pure story beat, no mechanical effect | 💬 Story event in timeline |
-| `opportunity` | Optional beneficial event, but costs resources | ✨ Gold highlight, optional accept |
+| Type          | Description                                        | Dashboard effect                       |
+| ------------- | -------------------------------------------------- | -------------------------------------- |
+| `interrupt`   | Demands immediate attention, preempts current work | 🚨 Flash alert, red highlights         |
+| `disruption`  | Removes or modifies resources                      | ⚠️ Agent goes grey, tasks redistribute |
+| `expansion`   | Adds new work to the scenario                      | 📋 New tasks appear on board           |
+| `modifier`    | Changes simulation parameters                      | 🔧 Metric shifts visible               |
+| `narrative`   | Pure story beat, no mechanical effect              | 💬 Story event in timeline             |
+| `opportunity` | Optional beneficial event, but costs resources     | ✨ Gold highlight, optional accept     |
 
 ### 3.6 Resources
 
@@ -384,22 +399,26 @@ Resources model scarcity and contention — things agents need but can't always 
 ## Resources
 
 ### Senior Engineering Time
+
 - **Type:** agent-hours
 - **Pool:** 2 agents × 1 task-slot each = 2 concurrent
 - **Contention rule:** FIFO with priority override (critical tasks preempt)
 - **Starvation alert:** if any task waits > 10 ticks for this resource
 
 ### QA Capacity
+
 - **Type:** agent-hours
 - **Pool:** 1 agent × 2 task-slots = 2 concurrent reviews
 - **Bottleneck effect:** when queue > 4, review duration increases 50%
 
 ### Client Meeting Slots
+
 - **Type:** calendar
 - **Pool:** 2 per phase (client only meets twice per phase)
 - **Effect:** tasks requiring client sign-off must wait for a slot
 
 ### Budget
+
 - **Type:** credits
 - **Pool:** 5000 credits for scenario
 - **Burn rate:** ~15 credits/tick during active work
@@ -424,9 +443,11 @@ How well did the organization perform?
 - **Deadline:** % of deadline-sensitive tasks completed on time
 
 ### Overall Score
+
 weighted_average(velocity=20, quality=25, efficiency=15, resilience=20, morale=10, deadline=10)
 
 ### Grades
+
 - **S:** 90–100 — "Legendary org. Screenshot this."
 - **A:** 80–89 — "Well-oiled machine."
 - **B:** 70–79 — "Solid. Room to optimize."
@@ -462,19 +483,19 @@ Epic: "Build Payment System"                    [1 decision: create + delegate t
 
 **Decision accounting per subtask:**
 
-| Step | Decisions | Messages Generated |
-|------|-----------|-------------------|
-| Lead creates subtask | 1 | — |
-| Lead assigns to worker | 1 | delegation ACP |
-| Worker acknowledges | 1 | ack ACP |
-| Worker progresses (1–3 updates) | 1–3 | progress ACP(s) |
-| Worker submits for review | 1 | progress ACP (pct=80) |
-| Reviewer evaluates | 1 | — |
-| If revision needed: feedback + rework + resubmit | 3 | escalation ACP + progress ACP |
-| Reviewer approves | 1 | completion ACP |
-| Worker marks complete | 1 | completion ACP |
-| Cross-dept trigger fires (if applicable) | 1 | delegation ACP |
-| **Total per subtask** | **8–12** | **5–8 messages** |
+| Step                                             | Decisions | Messages Generated            |
+| ------------------------------------------------ | --------- | ----------------------------- |
+| Lead creates subtask                             | 1         | —                             |
+| Lead assigns to worker                           | 1         | delegation ACP                |
+| Worker acknowledges                              | 1         | ack ACP                       |
+| Worker progresses (1–3 updates)                  | 1–3       | progress ACP(s)               |
+| Worker submits for review                        | 1         | progress ACP (pct=80)         |
+| Reviewer evaluates                               | 1         | —                             |
+| If revision needed: feedback + rework + resubmit | 3         | escalation ACP + progress ACP |
+| Reviewer approves                                | 1         | completion ACP                |
+| Worker marks complete                            | 1         | completion ACP                |
+| Cross-dept trigger fires (if applicable)         | 1         | delegation ACP                |
+| **Total per subtask**                            | **8–12**  | **5–8 messages**              |
 
 ### 4.2 Dependencies (DAG)
 
@@ -522,12 +543,13 @@ Tasks form a directed acyclic graph. Dependencies create realistic workflow fric
 
 ```typescript
 interface TaskDependency {
-  taskId: string;           // the dependent task
-  dependsOn: string[];      // predecessor task IDs
-  type: 'finish-to-start'   // predecessor must be done
-       | 'start-to-start'   // predecessor must have started
-       | 'partial';         // predecessor at 50%+ triggers start
-  blockedSince?: number;    // tick when this dependency started blocking
+  taskId: string; // the dependent task
+  dependsOn: string[]; // predecessor task IDs
+  type:
+    | "finish-to-start" // predecessor must be done
+    | "start-to-start" // predecessor must have started
+    | "partial"; // predecessor at 50%+ triggers start
+  blockedSince?: number; // tick when this dependency started blocking
 }
 ```
 
@@ -539,18 +561,21 @@ Not all reviews pass. Not all plans survive contact with reality.
 
 ```markdown
 ### Decision: Code Review
+
 - **Approve (pass):** 70% — task advances to done
 - **Request changes (minor):** 20% — task returns to in_progress, 2–3 tick rework
 - **Reject (major issues):** 8% — task returns to in_progress, 5–8 tick rework
 - **Escalate (out of scope):** 2% — task escalated to manager, possible reassignment
 
 ### Decision: Client Sign-Off
+
 - **Approve:** 60%
 - **Approve with conditions:** 25% — creates 1–2 new subtasks
 - **Request major revisions:** 12% — epic adds 1 new task
 - **Reject direction:** 3% — epic resets current phase, 30% work lost
 
 ### Decision: Resource Contention
+
 - **First-come-first-served:** 50% — whoever asked first gets the resource
 - **Priority override:** 30% — higher priority task preempts
 - **Manager intervention:** 15% — manager manually assigns
@@ -559,12 +584,12 @@ Not all reviews pass. Not all plans survive contact with reality.
 
 **Difficulty scaling:**
 
-| Decision | Easy | Normal | Hard | Chaos |
-|----------|------|--------|------|-------|
-| Review pass rate | 85% | 70% | 55% | 40% |
-| Client approval | 80% | 60% | 40% | 25% |
-| Block chance | 5% | 10% | 20% | 30% |
-| Event frequency | low | medium | high | extreme |
+| Decision         | Easy | Normal | Hard | Chaos   |
+| ---------------- | ---- | ------ | ---- | ------- |
+| Review pass rate | 85%  | 70%    | 55%  | 40%     |
+| Client approval  | 80%  | 60%    | 40%  | 25%     |
+| Block chance     | 5%   | 10%    | 20%  | 30%     |
+| Event frequency  | low  | medium | high | extreme |
 
 ### 4.4 Cross-Department Triggers
 
@@ -594,7 +619,7 @@ triggers:
     message: "Client is onboarded! Sprint 1 begins."
 ```
 
-**The multiplier effect:** A single task completion can cascade into 3–5 new tasks across departments. This is how scenarios naturally generate 1000+ decisions — not by having 1000 pre-defined tasks, but by having ~50 tasks that *generate* more tasks through triggers.
+**The multiplier effect:** A single task completion can cascade into 3–5 new tasks across departments. This is how scenarios naturally generate 1000+ decisions — not by having 1000 pre-defined tasks, but by having ~50 tasks that _generate_ more tasks through triggers.
 
 ### 4.5 Resource Contention
 
@@ -647,11 +672,13 @@ Deadlines aren't just numbers — they create organizational pressure that chang
 ### Deadline: Client Demo (Tick 250)
 
 **Required completions:**
+
 - API endpoints (all critical paths)
 - Frontend demo flow (happy path)
 - Sample data loaded
 
 **As deadline approaches:**
+
 - Tick 200 (50 remaining): status check, scope assessment
 - Tick 220 (30 remaining): if behind, trigger "scope-cut" event
   - COO must choose which features to drop
@@ -675,21 +702,21 @@ Phases give scenarios a narrative arc — a beginning, middle, and climax.
 interface ScenarioPhase {
   id: string;
   name: string;
-  tickRange: [number, number];     // [start, end] — flexible boundaries
-  tickInterval?: number;            // override base tick speed
-  unlocksEpics: string[];          // epic IDs that become available
-  enabledEvents: string[];          // event IDs active during this phase
-  difficultyMod: number;           // multiplier on event probability (1.0 = normal)
-  transition: PhaseTransition;     // when does this phase end?
-  narrative: string;               // displayed on phase start
-  ambientMessages: string[];       // random chatter during this phase
+  tickRange: [number, number]; // [start, end] — flexible boundaries
+  tickInterval?: number; // override base tick speed
+  unlocksEpics: string[]; // epic IDs that become available
+  enabledEvents: string[]; // event IDs active during this phase
+  difficultyMod: number; // multiplier on event probability (1.0 = normal)
+  transition: PhaseTransition; // when does this phase end?
+  narrative: string; // displayed on phase start
+  ambientMessages: string[]; // random chatter during this phase
 }
 
 type PhaseTransition =
-  | { type: 'tick'; tick: number }
-  | { type: 'completion'; condition: string } // e.g., "3 epics done"
-  | { type: 'event'; eventId: string }
-  | { type: 'hybrid'; tick: number; condition: string }; // whichever comes first
+  | { type: "tick"; tick: number }
+  | { type: "completion"; condition: string } // e.g., "3 epics done"
+  | { type: "event"; eventId: string }
+  | { type: "hybrid"; tick: number; condition: string }; // whichever comes first
 ```
 
 ### 4.9 Branching Narratives
@@ -716,6 +743,7 @@ If declined:
 
 ```markdown
 ### Event: Competitor Wins Client
+
 - **Condition:** storyState["opportunity-declined"] == true
 - **Probability:** 0.4 (fires once)
 - **Effect:** narrative only — "Meanwhile, [Competitor] landed the [Opportunity] deal."
@@ -728,15 +756,15 @@ Real-time metrics visible on the dashboard, final score on scenario completion.
 
 **Per-tick metrics:**
 
-| Metric | Computation | Dashboard widget |
-|--------|-------------|-----------------|
-| Active tasks | count(status ∈ {assigned, in_progress, review}) | Number badge |
-| Throughput | completed tasks in last 20 ticks | Sparkline chart |
-| Message rate | ACP messages in last 10 ticks | Pulse indicator |
-| Block rate | blocked / total active | Color indicator (green → red) |
-| Budget burn | credits spent / credits total | Progress bar |
-| Agent utilization | busy agents / total agents | Percentage gauge |
-| Escalation rate | escalations / total decisions in last 20 ticks | Warning indicator |
+| Metric            | Computation                                     | Dashboard widget              |
+| ----------------- | ----------------------------------------------- | ----------------------------- |
+| Active tasks      | count(status ∈ {assigned, in_progress, review}) | Number badge                  |
+| Throughput        | completed tasks in last 20 ticks                | Sparkline chart               |
+| Message rate      | ACP messages in last 10 ticks                   | Pulse indicator               |
+| Block rate        | blocked / total active                          | Color indicator (green → red) |
+| Budget burn       | credits spent / credits total                   | Progress bar                  |
+| Agent utilization | busy agents / total agents                      | Percentage gauge              |
+| Escalation rate   | escalations / total decisions in last 20 ticks  | Warning indicator             |
 
 **Final score card:**
 
@@ -794,28 +822,28 @@ Rich:         4 × 5 × 5 × 4 × 12 = 4,800
 
 Additional decisions from organizational friction:
 
-| Source | Decisions per occurrence | Occurrences per scenario | Total |
-|--------|------------------------|-------------------------|-------|
-| Dependency blocks/unblocks | 3 (block + reassess + unblock) | 20–40 | 60–120 |
-| Review rejections + rework | 5 (reject + feedback + rework + resubmit + re-review) | 15–30 | 75–150 |
-| Resource contention | 4 (conflict + escalation + resolution + reassign) | 10–20 | 40–80 |
-| Cross-dept triggers | 6 (trigger + create + assign + ack + notify + log) | 15–25 | 90–150 |
-| Hiring/onboarding | 4 (decide + hire + assign mentor + first task) | 5–15 | 20–60 |
-| Escalation chains | 6 (escalate + manager review + resolution × levels) | 10–20 | 60–120 |
-| **Friction total** | | | **345–680** |
+| Source                     | Decisions per occurrence                              | Occurrences per scenario | Total       |
+| -------------------------- | ----------------------------------------------------- | ------------------------ | ----------- |
+| Dependency blocks/unblocks | 3 (block + reassess + unblock)                        | 20–40                    | 60–120      |
+| Review rejections + rework | 5 (reject + feedback + rework + resubmit + re-review) | 15–30                    | 75–150      |
+| Resource contention        | 4 (conflict + escalation + resolution + reassign)     | 10–20                    | 40–80       |
+| Cross-dept triggers        | 6 (trigger + create + assign + ack + notify + log)    | 15–25                    | 90–150      |
+| Hiring/onboarding          | 4 (decide + hire + assign mentor + first task)        | 5–15                     | 20–60       |
+| Escalation chains          | 6 (escalate + manager review + resolution × levels)   | 10–20                    | 60–120      |
+| **Friction total**         |                                                       |                          | **345–680** |
 
 ### 5.3 Event Decisions
 
 Each random event generates its own decision tree:
 
-| Event type | Decisions generated | Frequency (normal) | Total |
-|-----------|-------------------|-------------------|-------|
-| P0 bug | 20–30 (investigate + fix + test + deploy + postmortem) | 2–4 per scenario | 40–120 |
-| Client escalation | 10–15 (meeting + reprioritize + communicate) | 3–5 per scenario | 30–75 |
-| Team sick | 8–12 (reassign + redistribute + backfill) | 2–4 per scenario | 16–48 |
-| Scope creep | 15–20 (new tasks + replan + negotiate) | 2–3 per scenario | 30–60 |
-| Opportunity | 25–35 (evaluate + accept/decline + execute) | 1–2 per scenario | 25–70 |
-| **Event total** | | | **141–373** |
+| Event type        | Decisions generated                                    | Frequency (normal) | Total       |
+| ----------------- | ------------------------------------------------------ | ------------------ | ----------- |
+| P0 bug            | 20–30 (investigate + fix + test + deploy + postmortem) | 2–4 per scenario   | 40–120      |
+| Client escalation | 10–15 (meeting + reprioritize + communicate)           | 3–5 per scenario   | 30–75       |
+| Team sick         | 8–12 (reassign + redistribute + backfill)              | 2–4 per scenario   | 16–48       |
+| Scope creep       | 15–20 (new tasks + replan + negotiate)                 | 2–3 per scenario   | 30–60       |
+| Opportunity       | 25–35 (evaluate + accept/decline + execute)            | 1–2 per scenario   | 25–70       |
+| **Event total**   |                                                        |                    | **141–373** |
 
 ### 5.4 Total Decision Budget
 
@@ -850,7 +878,7 @@ Rich scenario (hard, 30 min):
 
 ### 6.1 AI Dev Agency 🤖
 
-*The meta-demo. OpenClaw showing off what OpenClaw can do.*
+_The meta-demo. OpenClaw showing off what OpenClaw can do._
 
 **ORG.md:** The existing BikiniBottom org (Mr. Krabs, Sandy, SpongeBob, etc.)
 
@@ -858,6 +886,7 @@ Rich scenario (hard, 30 min):
 # AI Dev Agency Sprint
 
 ## Meta
+
 - **Industry:** AI Dev Agency
 - **Duration:** 20 minutes
 - **Target decisions:** 1800
@@ -868,28 +897,36 @@ Rich scenario (hard, 30 min):
 ## Phases
 
 ### Phase 1: Client Intake (ticks 1–40)
+
 New quarter, new clients. Mr. Krabs smells money.
+
 - **Unlocks epics:** Client Alpha Onboarding, Client Beta Onboarding, Internal: Platform Upgrade
 - **Events enabled:** requirement-change
 - **Tick interval:** 500ms
 - **Transition:** both onboarding epics at 60%+
 
 ### Phase 2: Parallel Sprints (ticks 41–200)
+
 Three workstreams, one engineering team. The fun begins.
+
 - **Unlocks epics:** Alpha: Model Evaluation Pipeline, Beta: Prompt Engineering Suite,
   Internal: CI/CD Overhaul, Marketing: Case Study
 - **Events enabled:** all
 - **Transition:** 4+ epics done
 
 ### Phase 3: Demo Day Prep (ticks 201–320)
+
 Client Alpha wants a demo. Client Beta wants a different demo. Both next week.
+
 - **Unlocks epics:** Alpha: Demo Environment, Beta: Demo Environment, Cross-Client: Shared Infra
 - **Events enabled:** all
 - **Difficulty modifier:** 1.5
 - **Transition:** both demo epics complete OR tick 320
 
 ### Phase 4: Ship & Celebrate (ticks 321–400)
+
 Deploy to production, send invoices, write postmortem.
+
 - **Unlocks epics:** Deployment, Billing, Retrospective
 - **Events enabled:** deploy-failure, production-bug, client-feedback
 - **Transition:** scenario complete
@@ -897,11 +934,13 @@ Deploy to production, send invoices, write postmortem.
 ## Epics
 
 ### Client Alpha Onboarding
+
 - **Phase:** Client Intake
 - **Domain:** operations, engineering
 - **Priority:** high
 
 #### Task Templates
+
 1. **Scope Definition** [operations]
    - Review RFP → Draft SOW → Client review → Revisions → Sign-off
    - Review loop: 1–2 iterations
@@ -916,11 +955,13 @@ Deploy to production, send invoices, write postmortem.
    - Duration: 4–7 ticks per subtask
 
 ### Alpha: Model Evaluation Pipeline
+
 - **Phase:** Parallel Sprints
 - **Domain:** engineering
 - **Priority:** critical
 
 #### Task Templates
+
 1. **Eval Framework** [backend]
    - Design eval metrics → Implement scoring → Build comparison UI → Backtest
    - Cross-dept: on completion → create "Write Eval Methodology" in marketing
@@ -941,11 +982,13 @@ Deploy to production, send invoices, write postmortem.
    - Duration: 2–3 ticks per eval run
 
 ### Internal: Platform Upgrade
+
 - **Phase:** Parallel Sprints
 - **Domain:** engineering, security
 - **Priority:** normal (but competes for resources with client work)
 
 #### Task Templates
+
 1. **Dependency Audit** [security]
    - Scan packages → Flag CVEs → Prioritize fixes → Document exceptions
 2. **Upgrade Core** [backend]
@@ -956,6 +999,7 @@ Deploy to production, send invoices, write postmortem.
 ## Events
 
 ### model-api-outage
+
 - **Type:** interrupt
 - **Probability:** 0.06 per tick
 - **Cooldown:** 30 ticks
@@ -966,6 +1010,7 @@ Deploy to production, send invoices, write postmortem.
 - **Narrative:** "🔥 OpenAI API is down. Eval pipeline halted. Sandy is wiring up local fallbacks."
 
 ### billing-dispute
+
 - **Type:** interrupt
 - **Probability:** 0.03 per tick
 - **Effect:**
@@ -975,6 +1020,7 @@ Deploy to production, send invoices, write postmortem.
 - **Narrative:** "Client Beta is disputing last month's GPU charges. Mr. Krabs is NOT happy."
 
 ### intern-breaks-prod
+
 - **Type:** interrupt
 - **Probability:** 0.04 per tick (only once per scenario)
 - **Effect:**
@@ -987,15 +1033,18 @@ Deploy to production, send invoices, write postmortem.
 ## Resources
 
 ### Senior Engineering Time
+
 - **Pool:** SpongeBob + Patrick = 2 concurrent critical tasks
 - **Contention:** Client Alpha vs Client Beta vs Internal
 - **Starvation:** if any critical path waits > 8 ticks
 
 ### QA Capacity
+
 - **Pool:** Gary = 1 agent, 2 task slots
 - **Bottleneck:** Gary is the only QA. Everything funnels through Gary. 🐌
 
 ### GPU Budget
+
 - **Pool:** 500 compute credits
 - **Burn:** eval runs cost 5 credits each, training costs 20
 - **Depleted:** eval work pauses, must negotiate with Mr. Krabs for more budget
@@ -1005,9 +1054,10 @@ Deploy to production, send invoices, write postmortem.
 
 ### 6.2 Ocean Reef War 🐠⚔️
 
-*THE viral scenario. Two rival reef civilizations in an all-out underwater war for territorial dominance. This is BikiniBottom's brand moment.*
+_THE viral scenario. Two rival reef civilizations in an all-out underwater war for territorial dominance. This is BikiniBottom's brand moment._
 
 **Why this scenario goes viral:**
+
 - The org chart IS the military command structure — watching generals coordinate is inherently dramatic
 - Messages between scouts and commanders feel like intercepted military communications
 - The fog of war mechanic means decisions are made with incomplete information
@@ -1021,6 +1071,7 @@ Deploy to production, send invoices, write postmortem.
 # Coral Reef Alliance
 
 ## Identity
+
 The Coral Reef Alliance — defenders of the Great Reef.
 A militaristic organization fighting to protect their territory
 from the Kelp Forest Dominion's expansion.
@@ -1030,7 +1081,9 @@ from the Kelp Forest Dominion's expansion.
 - **Values:** Defend the reef, protect civilians, strategic superiority
 
 ## Culture
+
 preset: military
+
 - **Escalation:** immediate — lives are at stake
 - **Progress updates:** every tick — full situational awareness
 - **Ack required:** yes — no order goes unconfirmed
@@ -1038,118 +1091,158 @@ preset: military
 ## Structure
 
 ### Admiral Nautilus — Commander-in-Chief 🐚
+
 Supreme military commander of the Coral Reef Alliance.
 Receives intelligence, makes strategic decisions, allocates forces.
 Old, wise, cautious. Prefers siege warfare over direct assault.
+
 - **Avatar:** 🐚
 - **Domain:** Command
 - **Reports to:** The Reef Council (Human Principal)
 
 ### Intelligence Division
+
 Eyes and ears of the Alliance. Scouts, spies, signal interceptors.
 
 #### Commander Eel — Intelligence Lead 🐍
+
 Runs the spy network. Processes raw intel into actionable briefings.
+
 - **Avatar:** 🐍
 - **Domain:** Intelligence
 
 #### Scout Fish Alpha — Field Scout 🐟
+
 Fast, expendable, observant. Maps enemy positions.
+
 - **Avatar:** 🐟
 - **Domain:** Reconnaissance
 - **Count:** 3
 
 #### Octopus Agent — Spy 🐙
+
 Deep cover agent in enemy territory. High-value, high-risk.
+
 - **Avatar:** 🐙
 - **Domain:** Espionage
 
 ### Battle Division
+
 The fighting force. Organized in strike groups.
 
 #### General Mantis Shrimp — Battle Commander 🦐
+
 Hits harder than anything in the ocean. Commands all combat operations.
 Aggressive, decisive, impatient with cautious strategies.
+
 - **Avatar:** 🦐
 - **Domain:** Combat
 
 #### Captain Barracuda — Strike Group Alpha Lead 🐡
+
 Fast assault specialist. Commands the primary attack force.
+
 - **Avatar:** 🐡
 - **Domain:** Assault
 
 #### Warrior Crab — Heavy Infantry 🦀
+
 Armored frontline fighters. Slow but nearly indestructible.
+
 - **Avatar:** 🦀
 - **Domain:** Infantry
 - **Count:** 4
 
 #### Jellyfish Swarm — Area Denial 🪼
+
 Deploys stinging formations to control chokepoints.
+
 - **Avatar:** 🪼
 - **Domain:** Area Control
 - **Count:** 2
 
 ### Engineering Corps
+
 Builders and defenders. Coral fortifications, traps, supply routes.
 
 #### Chief Engineer Turtle — Engineering Lead 🐢
+
 Slow and steady. Builds the reef's defenses. Every wall is a masterpiece.
+
 - **Avatar:** 🐢
 - **Domain:** Fortification
 
 #### Coral Builder — Construction Worker 🪸
+
 Grows and shapes coral into defensive walls, watchtowers, and bunkers.
+
 - **Avatar:** 🪸
 - **Domain:** Construction
 - **Count:** 3
 
 #### Trap Specialist Pufferfish — Combat Engineer 🐡
+
 Designs and deploys underwater mines, net traps, and ink clouds.
+
 - **Avatar:** 🐡
 - **Domain:** Traps
 
 ### Supply Corps
+
 Keeps the army fed, armed, and moving.
 
 #### Quartermaster Whale — Supply Lead 🐋
+
 Manages logistics. Moves massive quantities of kelp rations
 and shell ammunition across the reef.
+
 - **Avatar:** 🐋
 - **Domain:** Logistics
 
 #### Supply Runner — Transport 🐠
+
 Fast swimmers carrying supplies to front lines.
+
 - **Avatar:** 🐠
 - **Domain:** Transport
 - **Count:** 3
 
 ### Diplomatic Corps
+
 War isn't just fought with claws. Alliances, treaties, intelligence sharing.
 
 #### Ambassador Dolphin — Diplomatic Lead 🐬
+
 Charming, intelligent, and politically savvy. Negotiates alliances
 with neutral reefs. Manages propaganda and morale.
+
 - **Avatar:** 🐬
 - **Domain:** Diplomacy
 
 #### Messenger Seahorse — Diplomatic Courier 🐴
+
 Carries sealed messages between allied reefs. Small, fast, discreet.
+
 - **Avatar:** 🐴
 - **Domain:** Communications
 - **Count:** 2
 
 ### Medical Corps
+
 Keeps fighters in the fight. Triage, recovery, morale.
 
 #### Dr. Anemone — Chief Medical Officer 🌺
+
 Field hospital commander. Pragmatic healer. "I can't fix stupid,
 but I can fix the damage stupid causes."
+
 - **Avatar:** 🌺
 - **Domain:** Medical
 
 #### Medic Cleaner Fish — Field Medic 🐟
+
 Front-line medical support. Quick treatment under fire.
+
 - **Avatar:** 🐟
 - **Domain:** Field Medicine
 - **Count:** 2
@@ -1161,6 +1254,7 @@ Front-line medical support. Quick treatment under fire.
 # Ocean Reef War: The Battle for the Abyssal Trench
 
 ## Meta
+
 - **Industry:** Ocean Reef War
 - **Duration:** 30 minutes
 - **Target decisions:** 2500
@@ -1177,13 +1271,15 @@ Front-line medical support. Quick treatment under fire.
 
 ### Territory Map (6×6 grid)
 ```
-  A  B  C  D  E  F
+
+A B C D E F
 1 [🪸][🪸][🪸][ ? ][ ? ][ ? ]
 2 [🪸][🪸][ ? ][ ? ][ ? ][ ? ]
 3 [🪸][ ? ][ ? ][ ? ][ ? ][🌿]
 4 [ ? ][ ? ][ ? ][ ? ][🌿][🌿]
 5 [ ? ][ ? ][ ? ][🌿][🌿][🌿]
 6 [ ? ][ ? ][🌿][🌿][🌿][🌿]
+
 ```
 
 - 🪸 = Coral Reef Alliance territory (known)
@@ -1263,26 +1359,28 @@ Each skirmish generates tactical decisions and cascading consequences.
 Each skirmish is a mini-scenario within the scenario:
 
 ```
-1. Detection (scout reports enemy movement)              [3 decisions]
-2. Intel Assessment (Commander Eel evaluates threat)      [2 decisions]
-3. Admiral Decision: engage / defend / retreat            [1 decision, branching]
-4. Force Allocation (General assigns units)               [4 decisions]
-5. Supply Check (Quartermaster confirms ammo/rations)     [2 decisions]
-6. Engagement (3–8 ticks of combat, decisions per tick)   [15–40 decisions]
+
+1. Detection (scout reports enemy movement) [3 decisions]
+2. Intel Assessment (Commander Eel evaluates threat) [2 decisions]
+3. Admiral Decision: engage / defend / retreat [1 decision, branching]
+4. Force Allocation (General assigns units) [4 decisions]
+5. Supply Check (Quartermaster confirms ammo/rations) [2 decisions]
+6. Engagement (3–8 ticks of combat, decisions per tick) [15–40 decisions]
    - Each tick: advance/hold/retreat per unit
    - Flanking opportunities (spend reserves?)
    - Casualty reports → medical dispatch
    - Ammo depletion → resupply request
    - Morale checks (hold or break?)
-7. Aftermath                                               [8 decisions]
+7. Aftermath [8 decisions]
    - Casualty triage (medics)
    - Territory assessment (gained/lost/held)
    - Intel from captured enemies
    - Report to Admiral
    - Propaganda (spin the story for morale)
-   
+
 Total per skirmish: 35–60 decisions
 × 4–6 skirmishes in Phase 3 = 140–360 decisions
+
 ```
 
 ### Phase 4: The Battle of the Abyssal Trench (ticks 221–340)
@@ -1529,23 +1627,26 @@ The battle is decided. Now comes the aftermath.
 ### Twitter Card
 On completion, generate a shareable summary card:
 ```
+
 🐠⚔️ OCEAN REEF WAR — BATTLE COMPLETE
 
 🪸 Coral Reef Alliance: VICTORY
 
 Territory: ████████░░ 82%
-Forces:    ██████░░░░ 64%
-Morale:    █████████░ 87%
+Forces: ██████░░░░ 64%
+Morale: █████████░ 87%
 
 Grade: A (86/100)
 Achievements: 🕵️🤝
 
 "The Sonic Coral Cannon fired once.
- That was enough."
+That was enough."
 
 Decisions: 2,847 | Agents: 42
 #BikiniBottom #OceanReefWar
+
 ```
+
 ```
 
 **The second ORG (enemy) — Kelp Forest Dominion** is auto-generated by mirroring the Coral Reef org with different names, flavors, and slight tactical biases (more aggressive, fewer diplomats, more combat units). The engine runs both orgs simultaneously, with decisions from one affecting the other through the shared territory map.
@@ -1554,12 +1655,13 @@ Decisions: 2,847 | Agents: 42
 
 ### 6.3 Legal Tech Firm ⚖️
 
-*Every case is a branching tree. Perfect for the dependency engine.*
+_Every case is a branching tree. Perfect for the dependency engine._
 
 ```markdown
 # Legal Tech Firm: Quarterly Docket
 
 ## Meta
+
 - **Industry:** Legal Tech
 - **Duration:** 25 minutes
 - **Target decisions:** 2000
@@ -1572,22 +1674,28 @@ Decisions: 2,847 | Agents: 42
 ## Phases
 
 ### Phase 1: Case Intake (ticks 1–50)
+
 New cases arrive. Conflict checks, engagement letters, initial research.
+
 - **Unlocks epics:** Case Alpha: Patent Infringement, Case Beta: Data Breach Class Action,
   Case Gamma: Regulatory Compliance Audit, Case Delta: Contract Dispute
 - **Events enabled:** conflict-of-interest, rush-filing, new-evidence
 - **Transition:** all intake tasks complete
 
 ### Phase 2: Discovery & Research (ticks 51–180)
+
 The deep work. Document review, depositions, expert analysis.
 Discovery is where the decisions multiply — every document reviewed is a decision.
+
 - **Unlocks epics:** Alpha Discovery, Beta Discovery, Gamma Compliance Matrix, Delta Mediation Prep
 - **Events enabled:** all
 - **Transition:** 60%+ discovery complete across all cases
 
 ### Phase 3: Filing & Motions (ticks 181–300)
+
 Court deadlines. Motions to file. Opposing counsel's responses.
 Every filing can be contested, amended, or rejected.
+
 - **Unlocks epics:** Alpha Motion for Summary Judgment, Beta Class Certification,
   Gamma Regulatory Submission, Delta Settlement Negotiation
 - **Events enabled:** all + court-ruling, judge-order, opposing-motion
@@ -1595,18 +1703,22 @@ Every filing can be contested, amended, or rejected.
 - **Transition:** all cases resolved or at trial stage
 
 ### Phase 4: Resolution (ticks 301–400)
+
 Cases settle, go to trial, or get dismissed.
+
 - **Unlocks epics:** case-specific resolution epics based on branching
 - **Transition:** scenario complete
 
 ## Epics
 
 ### Case Alpha: Patent Infringement — Discovery
+
 - **Phase:** Discovery & Research
 - **Domain:** litigation, research
 - **Priority:** high
 
 #### Task Templates
+
 1. **Document Collection** [research]
    - Identify custodians → Issue hold notices → Collect documents → Process for review
    - Generates: 200+ document-review subtasks (batch of 10 per task)
@@ -1631,6 +1743,7 @@ Cases settle, go to trial, or get dismissed.
 ## Events
 
 ### court-ruling
+
 - **Type:** narrative + interrupt
 - **Probability:** 0.04 per tick (Phase 3+)
 - **Effect:**
@@ -1643,6 +1756,7 @@ Cases settle, go to trial, or get dismissed.
   Production deadline moved up 2 weeks."
 
 ### new-evidence
+
 - **Type:** expansion
 - **Probability:** 0.05 per tick
 - **Effect:**
@@ -1654,6 +1768,7 @@ Cases settle, go to trial, or get dismissed.
   Compliance team is scrambling."
 
 ### billing-audit
+
 - **Type:** disruption
 - **Probability:** 0.03 per tick
 - **Effect:**
@@ -1668,12 +1783,13 @@ Cases settle, go to trial, or get dismissed.
 
 ### 6.4 Fintech Startup 💳
 
-*Compliance creates review loops. KYC is a dependency nightmare.*
+_Compliance creates review loops. KYC is a dependency nightmare._
 
 ```markdown
 # Fintech Startup: Series B Quarter
 
 ## Meta
+
 - **Industry:** Fintech
 - **Duration:** 20 minutes
 - **Target decisions:** 1600
@@ -1681,6 +1797,7 @@ Cases settle, go to trial, or get dismissed.
   navigating regulatory mazes, audit prep, and the ever-present fraud pipeline.
 
 ## Key Mechanics
+
 - **KYC Pipeline:** Every new customer triggers: identity verify → document check →
   risk scoring → compliance review → approve/deny/escalate.
   At scale, 50+ KYC applications per scenario phase.
@@ -1698,6 +1815,7 @@ Cases settle, go to trial, or get dismissed.
 # Game Studio: Ship the RPG
 
 ## Meta
+
 - **Industry:** Game Studio
 - **Duration:** 25 minutes
 - **Target decisions:** 1800
@@ -1705,6 +1823,7 @@ Cases settle, go to trial, or get dismissed.
   sprint cycles, QA hell, and the dreaded launch day.
 
 ## Key Mechanics
+
 - **Art Pipeline:** Concept → Model → Texture → Rig → Animate → Review.
   Each asset is 6 subtasks × 50+ assets = 300+ art subtasks.
 - **Sprint Cycles:** 2-week sprints within the scenario. Sprint planning,
@@ -1721,6 +1840,7 @@ Cases settle, go to trial, or get dismissed.
 # Open Source Project: v2.0 Release
 
 ## Meta
+
 - **Industry:** Open Source
 - **Duration:** 15 minutes
 - **Target decisions:** 1200
@@ -1728,6 +1848,7 @@ Cases settle, go to trial, or get dismissed.
   Community PRs, breaking changes, documentation, governance.
 
 ## Key Mechanics
+
 - **PR Triage:** Community PRs arrive as events. Each: review → test →
   merge/reject/request-changes. 40+ PRs per scenario.
 - **Breaking Change Process:** RFC → Discussion → Vote → Implementation → Migration guide.
@@ -1748,8 +1869,8 @@ The Scenario Engine wraps the existing `DeterministicSimulation` class. No rewri
 ```typescript
 // New file: tools/sandbox/src/scenario-engine.ts
 
-import { DeterministicSimulation } from './deterministic.js';
-import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from './types.js';
+import { DeterministicSimulation } from "./deterministic.js";
+import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from "./types.js";
 
 interface ScenarioDefinition {
   meta: ScenarioMeta;
@@ -1796,7 +1917,7 @@ class ScenarioEngine {
       this.sim.tick,
       this.currentPhase,
       this.scenario.phases[this.currentPhase],
-      this.storyState
+      this.storyState,
     );
     for (const event of events) {
       this.fireEvent(event);
@@ -1842,43 +1963,45 @@ interface SandboxEpic {
   title: string;
   phase: string;
   domain: string[];
-  priority: SandboxTask['priority'];
-  status: 'locked' | 'active' | 'done';
+  priority: SandboxTask["priority"];
+  status: "locked" | "active" | "done";
   taskIds: string[];
   completionPct: number;
-  unlockedAt?: number;    // tick when epic became active
-  completedAt?: number;   // tick when epic finished
+  unlockedAt?: number; // tick when epic became active
+  completedAt?: number; // tick when epic finished
 }
 
 // Extended task with dependency info
 interface SandboxTaskV2 extends SandboxTask {
-  epicId?: string;           // parent epic
-  parentTaskId?: string;     // parent task (for subtasks)
-  dependsOn?: string[];      // task IDs that must complete first
-  triggers?: TaskTrigger[];  // what happens when this task completes
+  epicId?: string; // parent epic
+  parentTaskId?: string; // parent task (for subtasks)
+  dependsOn?: string[]; // task IDs that must complete first
+  triggers?: TaskTrigger[]; // what happens when this task completes
   resourceCost?: Record<string, number>; // resources consumed
-  reviewLoop?: {             // review iteration tracking
+  reviewLoop?: {
+    // review iteration tracking
     maxIterations: number;
     currentIteration: number;
-    weights: number[];       // probability distribution for pass/revise/reject
+    weights: number[]; // probability distribution for pass/revise/reject
   };
 }
 
 // New ACP message types
-type ACPMessageTypeV2 = ACPMessage['type']
-  | 'intel_report'    // reef war: scout reports
-  | 'resource_alert'  // resource pool running low
-  | 'event_alert'     // random event notification
-  | 'phase_change'    // scenario phase transition
-  | 'decision_request' // requires manager decision
-  | 'battle_report';  // reef war: combat results
+type ACPMessageTypeV2 =
+  | ACPMessage["type"]
+  | "intel_report" // reef war: scout reports
+  | "resource_alert" // resource pool running low
+  | "event_alert" // random event notification
+  | "phase_change" // scenario phase transition
+  | "decision_request" // requires manager decision
+  | "battle_report"; // reef war: combat results
 
 // Extended event with scenario metadata
 interface SandboxEventV2 extends SandboxEvent {
-  scenarioEvent?: string;  // which scenario event template triggered this
-  phaseId?: string;        // which phase we're in
-  epicId?: string;         // which epic this relates to
-  visualEffect?: string;   // hint to dashboard for special rendering
+  scenarioEvent?: string; // which scenario event template triggered this
+  phaseId?: string; // which phase we're in
+  epicId?: string; // which epic this relates to
+  visualEffect?: string; // hint to dashboard for special rendering
 }
 ```
 
@@ -1937,21 +2060,21 @@ class DependencyGraph {
 
   /** Check all blocked tasks. Unblock any whose dependencies are met. */
   resolve(tasks: SandboxTask[]): string[] {
-    const taskMap = new Map(tasks.map(t => [t.id, t]));
+    const taskMap = new Map(tasks.map((t) => [t.id, t]));
     const unblocked: string[] = [];
 
     for (const [taskId, deps] of this.edges) {
       const task = taskMap.get(taskId);
-      if (!task || task.status !== 'blocked') continue;
-      if (task.blockedReason !== 'Dependency not ready') continue;
+      if (!task || task.status !== "blocked") continue;
+      if (task.blockedReason !== "Dependency not ready") continue;
 
-      const allMet = deps.every(depId => {
+      const allMet = deps.every((depId) => {
         const dep = taskMap.get(depId);
-        return dep && dep.status === 'done';
+        return dep && dep.status === "done";
       });
 
       if (allMet) {
-        task.status = 'assigned';
+        task.status = "assigned";
         task.blockedReason = undefined;
         unblocked.push(taskId);
       }
@@ -2069,12 +2192,14 @@ The org chart becomes the primary visual for scenarios:
 **Normal state:** Agents are nodes, connections show reporting lines. Idle agents are dim, busy agents glow.
 
 **During active work:**
+
 - Messages fly along connection lines as animated particles
 - Agents pulse when making decisions (brighter = more critical)
 - Blocked agents show a red border with a pulsing lock icon
 - Cross-department messages arc across the chart in distinct colors
 
 **During Reef War:**
+
 - Split screen: two org charts side by side
 - Territory map in the center
 - Attack messages show as red arrows between the two orgs
@@ -2083,6 +2208,7 @@ The org chart becomes the primary visual for scenarios:
 - When a battle is won, victor's section glows gold
 
 **Ambient animations:**
+
 - Scouts have a radar-sweep animation on their nodes
 - Supply runners have tiny package icons traveling along their connections
 - Engineers have a building animation (tiny coral growing)
@@ -2110,6 +2236,7 @@ Legend:
 ```
 
 Tiles animate on state change:
+
 - Fog clears with a dissolve effect when scouted
 - Battles show explosion particles
 - Fortifications build up brick-by-brick
@@ -2174,6 +2301,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** Scenario Engine can load SCENARIO.md and feed work into the existing simulation.
 
 **Deliverables:**
+
 - [ ] SCENARIO.md parser (markdown → ScenarioDefinition)
 - [ ] ScenarioEngine class with preTick/postTick hooks
 - [ ] Phase Manager (tick-based transitions only)
@@ -2182,6 +2310,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 - [ ] One working scenario: "AI Dev Agency — Simple Sprint" (500+ decisions)
 
 **Key files:**
+
 - `tools/sandbox/src/scenario-engine.ts` — core engine
 - `tools/sandbox/src/scenario-parser.ts` — SCENARIO.md parser
 - `tools/sandbox/scenarios/ai-dev-agency-simple.md` — first scenario
@@ -2191,6 +2320,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** Dependencies, events, and resource contention working.
 
 **Deliverables:**
+
 - [ ] DependencyGraph (DAG resolver with topological sort)
 - [ ] EventScheduler (seeded PRNG, cooldowns, chaining)
 - [ ] ResourceManager (pools, burn rates, alerts)
@@ -2201,6 +2331,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 - [ ] Upgraded scenario: "AI Dev Agency — Full Sprint" (1500+ decisions)
 
 **Key files:**
+
 - `tools/sandbox/src/dag.ts` — dependency graph
 - `tools/sandbox/src/events.ts` — event scheduler
 - `tools/sandbox/src/resources.ts` — resource management
@@ -2211,6 +2342,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** Scenarios are visually compelling on the dashboard.
 
 **Deliverables:**
+
 - [ ] Phase banner component
 - [ ] Enhanced org chart animations (message particles, glow states)
 - [ ] Event timeline component
@@ -2224,6 +2356,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** The Ocean Reef War scenario runs with two competing orgs.
 
 **Deliverables:**
+
 - [ ] AdversarialScenarioEngine (dual simulation runner)
 - [ ] WorldState (shared territory map)
 - [ ] Combat resolution system
@@ -2238,6 +2371,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** All six scenarios playable. Polish and sharing.
 
 **Deliverables:**
+
 - [ ] Legal Tech scenario
 - [ ] Fintech Startup scenario
 - [ ] Game Studio scenario
@@ -2253,6 +2387,7 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 **Goal:** Users create and share their own scenarios.
 
 **Deliverables:**
+
 - [ ] Scenario editor (web UI for building SCENARIO.md)
 - [ ] Scenario gallery (community-shared scenarios)
 - [ ] Scenario validation (lint + dry-run to catch errors)
@@ -2263,18 +2398,18 @@ Each decision is a row with: number, agent avatar, action verb, and details. Col
 
 ## Appendix A: Glossary
 
-| Term | Definition |
-|------|-----------|
-| **Epic** | Large body of work containing multiple tasks. Tied to a phase. |
-| **Phase** | Major stage of a scenario with its own pacing, events, and epics. |
-| **DAG** | Directed Acyclic Graph — the dependency structure between tasks. |
-| **Decision** | Any action taken by an agent: assign, ack, progress, review, complete, escalate, etc. |
-| **Tick** | One simulation cycle. ~600–1000ms of wall-clock time. |
-| **Seed** | PRNG seed for reproducible runs. Same seed + same scenario = same outcome. |
-| **Friction** | Organizational overhead: dependencies, reviews, contention, events. |
-| **Fog of War** | Information asymmetry — agents make decisions with incomplete information. |
-| **Story State** | Key-value map tracking narrative branch decisions for conditional content. |
-| **Adversarial Mode** | Two simulations running against each other with a shared world state. |
+| Term                 | Definition                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| **Epic**             | Large body of work containing multiple tasks. Tied to a phase.                        |
+| **Phase**            | Major stage of a scenario with its own pacing, events, and epics.                     |
+| **DAG**              | Directed Acyclic Graph — the dependency structure between tasks.                      |
+| **Decision**         | Any action taken by an agent: assign, ack, progress, review, complete, escalate, etc. |
+| **Tick**             | One simulation cycle. ~600–1000ms of wall-clock time.                                 |
+| **Seed**             | PRNG seed for reproducible runs. Same seed + same scenario = same outcome.            |
+| **Friction**         | Organizational overhead: dependencies, reviews, contention, events.                   |
+| **Fog of War**       | Information asymmetry — agents make decisions with incomplete information.            |
+| **Story State**      | Key-value map tracking narrative branch decisions for conditional content.            |
+| **Adversarial Mode** | Two simulations running against each other with a shared world state.                 |
 
 ## Appendix B: SCENARIO.md Complete Grammar
 
@@ -2316,19 +2451,19 @@ scoring       := "## Scoring" newline prose
 
 Every decision in the simulation falls into one of these categories:
 
-| Category | Examples | Avg per occurrence | Visual signal |
-|----------|----------|-------------------|---------------|
-| **Command** | Delegate task, approve plan, allocate resources | 1 | Blue pulse |
-| **Execution** | Start work, make progress, submit deliverable | 1–3 | Green pulse |
-| **Review** | Approve, reject, request changes | 1 | Yellow pulse |
-| **Communication** | Ack, progress report, escalation | 1 | Message particle |
-| **Hiring** | Spawn agent, assign mentor, first task | 3–4 | New node animation |
-| **Contention** | Resource conflict, priority override, deadlock | 2–4 | Red/orange pulse |
-| **Event Response** | Triage interrupt, reassign, emergency task | 5–15 | Alert animation |
-| **Strategic** | Phase transition, scope cut, strategy choice | 1–3 | Phase banner |
-| **Diplomatic** | Negotiate, offer tribute, form alliance | 3–6 | Handshake animation |
-| **Combat** | Engage, retreat, flank, resupply (Reef War only) | 2–4 | Sword animation |
+| Category           | Examples                                         | Avg per occurrence | Visual signal       |
+| ------------------ | ------------------------------------------------ | ------------------ | ------------------- |
+| **Command**        | Delegate task, approve plan, allocate resources  | 1                  | Blue pulse          |
+| **Execution**      | Start work, make progress, submit deliverable    | 1–3                | Green pulse         |
+| **Review**         | Approve, reject, request changes                 | 1                  | Yellow pulse        |
+| **Communication**  | Ack, progress report, escalation                 | 1                  | Message particle    |
+| **Hiring**         | Spawn agent, assign mentor, first task           | 3–4                | New node animation  |
+| **Contention**     | Resource conflict, priority override, deadlock   | 2–4                | Red/orange pulse    |
+| **Event Response** | Triage interrupt, reassign, emergency task       | 5–15               | Alert animation     |
+| **Strategic**      | Phase transition, scope cut, strategy choice     | 1–3                | Phase banner        |
+| **Diplomatic**     | Negotiate, offer tribute, form alliance          | 3–6                | Handshake animation |
+| **Combat**         | Engage, retreat, flank, resupply (Reef War only) | 2–4                | Sword animation     |
 
 ---
 
-*The Scenario Engine transforms BikiniBottom from a toy demo into something people actually want to watch. It's the difference between a sandbox with three blocks and SimCity. Build the engine, and the scenarios write themselves.*
+_The Scenario Engine transforms BikiniBottom from a toy demo into something people actually want to watch. It's the difference between a sandbox with three blocks and SimCity. Build the engine, and the scenarios write themselves._

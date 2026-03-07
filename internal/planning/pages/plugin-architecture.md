@@ -47,12 +47,13 @@ Agent ──MCP──▶ Plugin ──API──▶ External Service
 **Examples:** An agent calls `github.create_issue(title, body)` — the MCP plugin handles auth, API calls, and returns structured results.
 
 **Interface:**
+
 ```typescript
 interface McpPlugin {
   type: "mcp";
-  tools: ToolDefinition[];       // MCP tool schemas
+  tools: ToolDefinition[]; // MCP tool schemas
   resources?: ResourceDefinition[]; // MCP resources (optional)
-  prompts?: PromptDefinition[];    // MCP prompt templates (optional)
+  prompts?: PromptDefinition[]; // MCP prompt templates (optional)
 }
 ```
 
@@ -67,12 +68,13 @@ External Service ◀──sync──▶ Bridge Plugin ◀──read/write──�
 **Examples:** Linear issues sync to SQLite `tasks` table. When an agent completes a task in SQLite, the bridge updates Linear.
 
 **Interface:**
+
 ```typescript
 interface BridgePlugin {
   type: "bridge";
   direction: "inbound" | "outbound" | "bidirectional";
-  syncInterval?: number;          // ms, or event-driven if omitted
-  tables: string[];               // SQLite tables this bridge touches
+  syncInterval?: number; // ms, or event-driven if omitted
+  tables: string[]; // SQLite tables this bridge touches
   onExternalChange(event: ExternalEvent): Promise<SqliteOp[]>;
   onInternalChange(event: SqliteChangeEvent): Promise<ExternalOp[]>;
 }
@@ -87,12 +89,13 @@ SQLite ──read──▶ Dashboard Plugin ──render──▶ Browser
 ```
 
 **Interface:**
+
 ```typescript
 interface DashboardPlugin {
   type: "dashboard";
-  panels: PanelDefinition[];      // Named UI panels
-  routes?: RouteDefinition[];     // Optional dedicated pages
-  refreshInterval?: number;       // Auto-refresh rate in ms
+  panels: PanelDefinition[]; // Named UI panels
+  routes?: RouteDefinition[]; // Optional dedicated pages
+  refreshInterval?: number; // Auto-refresh rate in ms
 }
 ```
 
@@ -101,11 +104,13 @@ interface DashboardPlugin {
 The most powerful pattern. A single plugin package combines MCP tools, bridge sync, and dashboard visualization.
 
 **Example — GitHub Composite Plugin:**
+
 - **MCP**: `github.create_pr`, `github.review`, `github.merge`
 - **Bridge**: Syncs issues, PRs, and reviews to SQLite
 - **Dashboard**: PR status board, review queue, merge activity
 
 **Interface:**
+
 ```typescript
 interface CompositePlugin {
   type: "composite";
@@ -161,16 +166,16 @@ function register(): PluginManifest {
 
 Plugins can subscribe to organizational lifecycle events:
 
-| Hook | Trigger | Use Case |
-|------|---------|----------|
-| `onOrgBoot` | Organization starts up | Initialize sync, validate config |
-| `onAgentHire(agent)` | New agent added to org | Grant tool access, create accounts |
-| `onAgentFire(agent)` | Agent removed from org | Revoke access, archive data |
-| `onTaskCreate(task)` | Task created in SQLite | Sync to external PM tool |
-| `onTaskComplete(task)` | Task marked complete | Update external tool, trigger deploy |
-| `onEscalation(escalation)` | Issue escalated to human | Send notification via comms plugin |
-| `onMessage(message)` | Inter-agent or human message | Log, analyze, route |
-| `onBudgetExceeded(agent, budget)` | Agent exceeds token/cost budget | Alert, throttle, pause agent |
+| Hook                              | Trigger                         | Use Case                             |
+| --------------------------------- | ------------------------------- | ------------------------------------ |
+| `onOrgBoot`                       | Organization starts up          | Initialize sync, validate config     |
+| `onAgentHire(agent)`              | New agent added to org          | Grant tool access, create accounts   |
+| `onAgentFire(agent)`              | Agent removed from org          | Revoke access, archive data          |
+| `onTaskCreate(task)`              | Task created in SQLite          | Sync to external PM tool             |
+| `onTaskComplete(task)`            | Task marked complete            | Update external tool, trigger deploy |
+| `onEscalation(escalation)`        | Issue escalated to human        | Send notification via comms plugin   |
+| `onMessage(message)`              | Inter-agent or human message    | Log, analyze, route                  |
+| `onBudgetExceeded(agent, budget)` | Agent exceeds token/cost budget | Alert, throttle, pause agent         |
 
 ```typescript
 interface PluginHooks {
@@ -190,14 +195,17 @@ interface PluginHooks {
 Plugins are configured through two mechanisms:
 
 **ORG.md** (human-readable, checked into repo):
+
 ```markdown
 ## Plugins
+
 - github: repo=openspawn/openspawn, branch=main
 - linear: team=SPAWN, project=Core
 - slack: channel=#agents
 ```
 
 **openspawn.config.yaml** (machine-readable, full control):
+
 ```yaml
 plugins:
   github:
@@ -357,7 +365,7 @@ stateDiagram-v2
   INITIALIZED --> RUNNING: hooks active
   RUNNING --> STOPPED: cleanup
   STOPPED --> [*]: uninstall
-  
+
   REGISTERED --> ERROR: config invalid
   CONFIGURED --> ERROR: boot failed
   INITIALIZED --> ERROR: runtime error
@@ -455,6 +463,7 @@ SQLite change notifications drive the system:
 3. **Dashboard polls SQLite** → Renders current state (or uses SSE for live updates)
 
 The `events` table serves as an append-only audit log. Every meaningful action is recorded. This enables:
+
 - Full audit trail for compliance
 - Replay/debugging of organization history
 - Dashboard activity feeds
@@ -466,131 +475,131 @@ The `events` table serves as an append-only audit log. Every meaningful action i
 
 ### 6.1 Knowledge Management
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Obsidian** | Composite | Official | Vault sync, markdown-native. Bridge syncs vault ↔ SQLite. MCP tools: `obsidian.search`, `obsidian.create_note`, `obsidian.link`. Best for developer-focused orgs. |
-| **Outline** | Composite | Official | Team wiki with rich API. MCP tools: `outline.search`, `outline.create_doc`, `outline.update`. Bridge syncs collections. API-rich, great for agent authoring. |
-| **Notion** | Composite | Community | Database-oriented. MCP tools: `notion.query_db`, `notion.create_page`. Bridge syncs databases. Complex API but powerful. |
-| **Confluence** | Bridge+MCP | Community | Enterprise wiki. Heavier API, JIRA integration synergy. |
-| **BookStack** | Bridge+MCP | Experimental | Open-source, self-hosted wiki. Simple API. |
-| **WikiJS** | Bridge+MCP | Experimental | Open-source, Git-backed wiki. Good for technical docs. |
+| Plugin         | Type       | Status       | Notes                                                                                                                                                             |
+| -------------- | ---------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Obsidian**   | Composite  | Official     | Vault sync, markdown-native. Bridge syncs vault ↔ SQLite. MCP tools: `obsidian.search`, `obsidian.create_note`, `obsidian.link`. Best for developer-focused orgs. |
+| **Outline**    | Composite  | Official     | Team wiki with rich API. MCP tools: `outline.search`, `outline.create_doc`, `outline.update`. Bridge syncs collections. API-rich, great for agent authoring.      |
+| **Notion**     | Composite  | Community    | Database-oriented. MCP tools: `notion.query_db`, `notion.create_page`. Bridge syncs databases. Complex API but powerful.                                          |
+| **Confluence** | Bridge+MCP | Community    | Enterprise wiki. Heavier API, JIRA integration synergy.                                                                                                           |
+| **BookStack**  | Bridge+MCP | Experimental | Open-source, self-hosted wiki. Simple API.                                                                                                                        |
+| **WikiJS**     | Bridge+MCP | Experimental | Open-source, Git-backed wiki. Good for technical docs.                                                                                                            |
 
 **Recommended default:** Obsidian (for solo/small orgs) or Outline (for team orgs).
 
 ### 6.2 Project Management
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Linear** | Composite | Official | Best-in-class API. MCP tools: `linear.create_issue`, `linear.update_status`, `linear.list_cycles`. Bridge: bidirectional issue sync. Dashboard: sprint board. |
-| **GitHub Issues** | Composite | Official | Bundled with GitHub plugin. Zero additional config for code-centric teams. |
-| **Jira** | Bridge+MCP | Community | Enterprise. Complex but ubiquitous. |
-| **Plane** | Composite | Community | Open-source Linear alternative. Self-hosted. |
-| **Taiga** | Bridge+MCP | Experimental | Open-source, agile-focused. |
+| Plugin            | Type       | Status       | Notes                                                                                                                                                         |
+| ----------------- | ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Linear**        | Composite  | Official     | Best-in-class API. MCP tools: `linear.create_issue`, `linear.update_status`, `linear.list_cycles`. Bridge: bidirectional issue sync. Dashboard: sprint board. |
+| **GitHub Issues** | Composite  | Official     | Bundled with GitHub plugin. Zero additional config for code-centric teams.                                                                                    |
+| **Jira**          | Bridge+MCP | Community    | Enterprise. Complex but ubiquitous.                                                                                                                           |
+| **Plane**         | Composite  | Community    | Open-source Linear alternative. Self-hosted.                                                                                                                  |
+| **Taiga**         | Bridge+MCP | Experimental | Open-source, agile-focused.                                                                                                                                   |
 
 **Recommended default:** Linear (SaaS) or Plane (self-hosted).
 
 ### 6.3 Kanban
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Planka** | Bridge+Dashboard | Community | Self-hosted Trello clone. Clean API. |
-| **WeKan** | Bridge+Dashboard | Community | Open-source, mature. |
-| **Vikunja** | Bridge+Dashboard | Experimental | Modern, API-first. |
-| **Built-in Kanban** | Dashboard | Official | Pure dashboard plugin reading from SQLite `tasks` table. Zero config. Renders task status as columns. |
+| Plugin              | Type             | Status       | Notes                                                                                                 |
+| ------------------- | ---------------- | ------------ | ----------------------------------------------------------------------------------------------------- |
+| **Planka**          | Bridge+Dashboard | Community    | Self-hosted Trello clone. Clean API.                                                                  |
+| **WeKan**           | Bridge+Dashboard | Community    | Open-source, mature.                                                                                  |
+| **Vikunja**         | Bridge+Dashboard | Experimental | Modern, API-first.                                                                                    |
+| **Built-in Kanban** | Dashboard        | Official     | Pure dashboard plugin reading from SQLite `tasks` table. Zero config. Renders task status as columns. |
 
 **Recommended default:** Built-in Kanban (ships with OpenSpawn).
 
 ### 6.4 Code
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **GitHub** | Composite | Official | Full integration: repos, PRs, issues, actions, code search. MCP tools: `github.create_pr`, `github.review_pr`, `github.merge`, `github.search_code`, `github.create_issue`. Bridge: PR/issue sync. Dashboard: PR board, CI status. |
-| **GitLab** | Composite | Community | Similar scope to GitHub. MCP tools mirror GitHub's. |
-| **Gitea** | Composite | Community | Self-hosted, lightweight. Good for private orgs. |
-| **Bitbucket** | Bridge+MCP | Experimental | Atlassian ecosystem. |
+| Plugin        | Type       | Status       | Notes                                                                                                                                                                                                                              |
+| ------------- | ---------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GitHub**    | Composite  | Official     | Full integration: repos, PRs, issues, actions, code search. MCP tools: `github.create_pr`, `github.review_pr`, `github.merge`, `github.search_code`, `github.create_issue`. Bridge: PR/issue sync. Dashboard: PR board, CI status. |
+| **GitLab**    | Composite  | Community    | Similar scope to GitHub. MCP tools mirror GitHub's.                                                                                                                                                                                |
+| **Gitea**     | Composite  | Community    | Self-hosted, lightweight. Good for private orgs.                                                                                                                                                                                   |
+| **Bitbucket** | Bridge+MCP | Experimental | Atlassian ecosystem.                                                                                                                                                                                                               |
 
 **Recommended default:** GitHub.
 
 ### 6.5 Communication
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Discord** | Composite | Official | Native OpenClaw integration. MCP tools: `discord.send`, `discord.read_channel`, `discord.create_thread`. Bridge: message log sync. Dashboard: activity feed. |
-| **Slack** | Composite | Official | Enterprise standard. MCP tools: `slack.send`, `slack.search`, `slack.create_channel`. Bridge: message sync. |
-| **Matrix** | Bridge+MCP | Community | Open protocol, self-hosted. Good for privacy-focused orgs. |
-| **Email** | MCP | Community | SMTP/IMAP. MCP tools: `email.send`, `email.search`. |
-| **Telegram** | Bridge+MCP | Community | Bot API. Good for notifications and mobile access. |
-| **Teams** | Bridge+MCP | Experimental | Microsoft ecosystem. |
+| Plugin       | Type       | Status       | Notes                                                                                                                                                        |
+| ------------ | ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Discord**  | Composite  | Official     | Native OpenClaw integration. MCP tools: `discord.send`, `discord.read_channel`, `discord.create_thread`. Bridge: message log sync. Dashboard: activity feed. |
+| **Slack**    | Composite  | Official     | Enterprise standard. MCP tools: `slack.send`, `slack.search`, `slack.create_channel`. Bridge: message sync.                                                  |
+| **Matrix**   | Bridge+MCP | Community    | Open protocol, self-hosted. Good for privacy-focused orgs.                                                                                                   |
+| **Email**    | MCP        | Community    | SMTP/IMAP. MCP tools: `email.send`, `email.search`.                                                                                                          |
+| **Telegram** | Bridge+MCP | Community    | Bot API. Good for notifications and mobile access.                                                                                                           |
+| **Teams**    | Bridge+MCP | Experimental | Microsoft ecosystem.                                                                                                                                         |
 
 **Recommended default:** Discord (for indie/startup) or Slack (for enterprise).
 
 ### 6.6 Deployment
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Vercel** | MCP+Dashboard | Official | MCP tools: `vercel.deploy`, `vercel.rollback`, `vercel.logs`. Dashboard: deploy status. |
-| **Fly.io** | MCP+Dashboard | Official | MCP tools: `fly.deploy`, `fly.scale`, `fly.logs`. |
-| **Railway** | MCP | Community | Simple deploy-from-repo. |
-| **Coolify** | MCP+Bridge | Community | Self-hosted PaaS. Good for cost control. |
-| **Dokku** | MCP | Experimental | Self-hosted Heroku. SSH-based. |
+| Plugin      | Type          | Status       | Notes                                                                                   |
+| ----------- | ------------- | ------------ | --------------------------------------------------------------------------------------- |
+| **Vercel**  | MCP+Dashboard | Official     | MCP tools: `vercel.deploy`, `vercel.rollback`, `vercel.logs`. Dashboard: deploy status. |
+| **Fly.io**  | MCP+Dashboard | Official     | MCP tools: `fly.deploy`, `fly.scale`, `fly.logs`.                                       |
+| **Railway** | MCP           | Community    | Simple deploy-from-repo.                                                                |
+| **Coolify** | MCP+Bridge    | Community    | Self-hosted PaaS. Good for cost control.                                                |
+| **Dokku**   | MCP           | Experimental | Self-hosted Heroku. SSH-based.                                                          |
 
 **Recommended default:** Vercel (frontend) + Fly.io (backend).
 
 ### 6.7 Storage
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **SQLite** | Built-in | Official | The coordination bus itself. Always available. |
-| **S3/R2** | MCP | Official | Object storage. MCP tools: `s3.upload`, `s3.download`, `s3.list`. R2 for zero-egress. |
-| **PostgreSQL** | Bridge+MCP | Community | For orgs needing relational data beyond SQLite. Bridge syncs key tables. |
-| **MongoDB** | MCP | Experimental | Document store. |
+| Plugin         | Type       | Status       | Notes                                                                                 |
+| -------------- | ---------- | ------------ | ------------------------------------------------------------------------------------- |
+| **SQLite**     | Built-in   | Official     | The coordination bus itself. Always available.                                        |
+| **S3/R2**      | MCP        | Official     | Object storage. MCP tools: `s3.upload`, `s3.download`, `s3.list`. R2 for zero-egress. |
+| **PostgreSQL** | Bridge+MCP | Community    | For orgs needing relational data beyond SQLite. Bridge syncs key tables.              |
+| **MongoDB**    | MCP        | Experimental | Document store.                                                                       |
 
 **Recommended default:** SQLite (built-in) + S3/R2 (for files).
 
 ### 6.8 Memory & RAG
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Qdrant** | MCP | Official | Open-source vector DB. Self-hostable. MCP tools: `qdrant.search`, `qdrant.upsert`. Best balance of features and simplicity. |
-| **Chroma** | MCP | Official | Embedded vector DB. Zero-config for small orgs. |
-| **Pinecone** | MCP | Community | Managed vector DB. Scales well. |
-| **Weaviate** | MCP | Community | Hybrid search (vector + keyword). |
+| Plugin       | Type | Status    | Notes                                                                                                                       |
+| ------------ | ---- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Qdrant**   | MCP  | Official  | Open-source vector DB. Self-hostable. MCP tools: `qdrant.search`, `qdrant.upsert`. Best balance of features and simplicity. |
+| **Chroma**   | MCP  | Official  | Embedded vector DB. Zero-config for small orgs.                                                                             |
+| **Pinecone** | MCP  | Community | Managed vector DB. Scales well.                                                                                             |
+| **Weaviate** | MCP  | Community | Hybrid search (vector + keyword).                                                                                           |
 
 **Recommended default:** Chroma (embedded, small orgs) or Qdrant (production).
 
 ### 6.9 Design
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Figma** | MCP+Bridge | Community | MCP tools: `figma.get_file`, `figma.get_components`, `figma.export_frame`. Bridge: design token sync. |
-| **Penpot** | MCP+Bridge | Experimental | Open-source Figma alternative. Self-hosted. |
+| Plugin     | Type       | Status       | Notes                                                                                                 |
+| ---------- | ---------- | ------------ | ----------------------------------------------------------------------------------------------------- |
+| **Figma**  | MCP+Bridge | Community    | MCP tools: `figma.get_file`, `figma.get_components`, `figma.export_frame`. Bridge: design token sync. |
+| **Penpot** | MCP+Bridge | Experimental | Open-source Figma alternative. Self-hosted.                                                           |
 
 ### 6.10 Documentation
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Docusaurus** | MCP | Community | React-based docs. MCP tools: `docs.build`, `docs.create_page`. |
-| **Starlight** | MCP | Community | Astro-based. Fast, modern. |
-| **MkDocs** | MCP | Community | Python-based, Material theme. |
-| **Mintlify** | MCP | Experimental | API docs focused. Managed hosting. |
+| Plugin         | Type | Status       | Notes                                                          |
+| -------------- | ---- | ------------ | -------------------------------------------------------------- |
+| **Docusaurus** | MCP  | Community    | React-based docs. MCP tools: `docs.build`, `docs.create_page`. |
+| **Starlight**  | MCP  | Community    | Astro-based. Fast, modern.                                     |
+| **MkDocs**     | MCP  | Community    | Python-based, Material theme.                                  |
+| **Mintlify**   | MCP  | Experimental | API docs focused. Managed hosting.                             |
 
 ### 6.11 Monitoring
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Grafana** | Bridge+Dashboard | Community | Metrics visualization. Bridge exports org metrics. |
-| **PostHog** | MCP+Bridge | Community | Product analytics. Track agent actions as events. |
-| **Sentry** | MCP+Bridge | Community | Error tracking. MCP tools: `sentry.list_issues`, `sentry.resolve`. Bridge syncs errors to tasks. |
+| Plugin      | Type             | Status    | Notes                                                                                            |
+| ----------- | ---------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| **Grafana** | Bridge+Dashboard | Community | Metrics visualization. Bridge exports org metrics.                                               |
+| **PostHog** | MCP+Bridge       | Community | Product analytics. Track agent actions as events.                                                |
+| **Sentry**  | MCP+Bridge       | Community | Error tracking. MCP tools: `sentry.list_issues`, `sentry.resolve`. Bridge syncs errors to tasks. |
 
 ### 6.12 Models
 
-| Plugin | Type | Status | Notes |
-|--------|------|--------|-------|
-| **Anthropic** | MCP | Official | Claude models. Native to OpenClaw/OpenSpawn. |
-| **OpenAI** | MCP | Official | GPT models. |
-| **Google** | MCP | Community | Gemini models. |
-| **OpenRouter** | MCP | Official | Multi-provider gateway. Single API key, all models. |
-| **Ollama** | MCP | Community | Local models. Zero cost, full privacy. |
+| Plugin         | Type | Status    | Notes                                               |
+| -------------- | ---- | --------- | --------------------------------------------------- |
+| **Anthropic**  | MCP  | Official  | Claude models. Native to OpenClaw/OpenSpawn.        |
+| **OpenAI**     | MCP  | Official  | GPT models.                                         |
+| **Google**     | MCP  | Community | Gemini models.                                      |
+| **OpenRouter** | MCP  | Official  | Multi-provider gateway. Single API key, all models. |
+| **Ollama**     | MCP  | Community | Local models. Zero cost, full privacy.              |
 
 ---
 
@@ -620,16 +629,19 @@ In the `## Team` section, specify which plugins each agent can use:
 ## Team
 
 ### Devon (Senior Engineer)
+
 - Role: Full-stack development
 - Plugins: github, linear, vercel, slack
 - Skills: code, deploy
 
 ### Riley (Research Analyst)
+
 - Role: Research and analysis
 - Plugins: obsidian, qdrant, slack
 - Skills: research, write
 
 ### Casey (Project Manager)
+
 - Role: Coordination and planning
 - Plugins: linear, github(read-only), slack, discord
 - Skills: plan, communicate
@@ -669,6 +681,7 @@ Each plugin runs in an isolated context:
 ```
 
 **Sandboxing rules:**
+
 - **Network**: Plugins can only reach domains declared in their manifest (`permissions: ["network:api.github.com"]`).
 - **SQLite**: Plugins can only read/write tables they declare (`permissions: ["sqlite:write:tasks"]`).
 - **Filesystem**: No filesystem access except explicitly mounted paths (e.g., Obsidian vault).
@@ -696,8 +709,8 @@ Each plugin runs in an isolated context:
 
 Permissions are three-layered:
 
-1. **Plugin-level**: What the plugin *can* do (declared in manifest)
-2. **Org-level**: What the org *allows* the plugin to do (config can restrict below manifest)
+1. **Plugin-level**: What the plugin _can_ do (declared in manifest)
+2. **Org-level**: What the org _allows_ the plugin to do (config can restrict below manifest)
 3. **Agent-level**: Which agents can use which plugins and tools (ORG.md Team section)
 
 ```typescript
@@ -717,6 +730,7 @@ VALUES ('github', 'devon', 'pr.create', '{"number": 42, "title": "..."}');
 ```
 
 The audit log is:
+
 - **Append-only**: Events cannot be modified or deleted by plugins
 - **Queryable**: Dashboard and MCP tools can search/filter events
 - **Exportable**: `openspawn audit export --from 2026-01-01 --format json`
@@ -772,11 +786,11 @@ openspawn plugin publish <name>     # Publish to SpawnHub
 
 ### 9.3 Quality Tiers
 
-| Tier | Badge | Requirements |
-|------|-------|-------------|
-| **Official** | ✅ | Maintained by OpenSpawn core team. Security-audited. SLA on updates. |
-| **Community** | 🟢 | Published by verified authors. Passes automated security scan. Has tests. |
-| **Experimental** | 🟡 | Anyone can publish. No guarantees. May break. Use at own risk. |
+| Tier             | Badge | Requirements                                                              |
+| ---------------- | ----- | ------------------------------------------------------------------------- |
+| **Official**     | ✅    | Maintained by OpenSpawn core team. Security-audited. SLA on updates.      |
+| **Community**    | 🟢    | Published by verified authors. Passes automated security scan. Has tests. |
+| **Experimental** | 🟡    | Anyone can publish. No guarantees. May break. Use at own risk.            |
 
 ### 9.4 Plugin Package Format
 
@@ -885,10 +899,10 @@ export const hooks = {
     // If task originated internally, create matching GitHub issue
     if (task.source !== "github") {
       const issue = await createGithubIssue(ctx, task);
-      await ctx.db.run(
-        "UPDATE tasks SET external_id = ? WHERE id = ?",
-        [issue.number.toString(), task.id]
-      );
+      await ctx.db.run("UPDATE tasks SET external_id = ? WHERE id = ?", [
+        issue.number.toString(),
+        task.id,
+      ]);
     }
   },
 
@@ -903,15 +917,15 @@ export const hooks = {
 
 ### 10.2 Glossary
 
-| Term | Definition |
-|------|-----------|
-| **MCP** | Model Context Protocol — the standard protocol for AI tool calling |
-| **Bridge** | A plugin component that syncs state between external services and SQLite |
-| **Coordination Bus** | SQLite acting as the central event and state store |
-| **SpawnHub** | The OpenSpawn plugin marketplace |
-| **Composite Plugin** | A plugin combining MCP tools, bridge sync, and dashboard panels |
-| **Manifest** | The metadata object returned by a plugin's `register()` function |
-| **Sandbox** | The isolated execution context for each plugin |
+| Term                 | Definition                                                               |
+| -------------------- | ------------------------------------------------------------------------ |
+| **MCP**              | Model Context Protocol — the standard protocol for AI tool calling       |
+| **Bridge**           | A plugin component that syncs state between external services and SQLite |
+| **Coordination Bus** | SQLite acting as the central event and state store                       |
+| **SpawnHub**         | The OpenSpawn plugin marketplace                                         |
+| **Composite Plugin** | A plugin combining MCP tools, bridge sync, and dashboard panels          |
+| **Manifest**         | The metadata object returned by a plugin's `register()` function         |
+| **Sandbox**          | The isolated execution context for each plugin                           |
 
 ### 10.3 Future Considerations
 
@@ -924,4 +938,4 @@ export const hooks = {
 
 ---
 
-*This specification is a living document. Submit changes via PR to `openspawn/openspawn`.*
+_This specification is a living document. Submit changes via PR to `openspawn/openspawn`._

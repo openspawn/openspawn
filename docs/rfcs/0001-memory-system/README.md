@@ -16,35 +16,35 @@ Add shared long-term memory to OpenSpawn so agents can store, search, and build 
 
 ## 2. Decisions Made
 
-| Decision | Choice | Reasoning |
-|----------|--------|-----------|
-| Backend framework | FastAPI + SQLAlchemy (async) | Python-native AI ecosystem, Cognee direct import, less boilerplate |
-| Package manager | uv | Current Python standard, replaces pip/virtualenv/pip-tools |
-| Memory engine | Cognee (direct import) | Production-proven (1M+ pipelines/mo), handles compression, dedup, embedding, knowledge graph |
-| Embedding provider | Voyage 3.5 (cloud, 1024d) / BGE-M3 via Ollama (self-hosted, 1024d) | Best retrieval quality at pgvector-friendly dimensions |
-| Embedding dimensions | 1024 | Sweet spot: pgvector perf + quality. Voyage and BGE-M3 both output 1024 natively |
-| Vector storage | Postgres + pgvector | Already using Postgres, no new infra |
-| API protocol | REST-only with OpenAPI | Eliminates GraphQL security surface (introspection, depth attacks, batching), FastAPI auto-generates OpenAPI spec |
-| Frontend types | openapi-typescript codegen | Replaces GraphQL codegen, same DX |
-| Memory table | Single table with type enum | Simpler queries, single vector index, type-specific data in metadata jsonb |
-| Memory scoping | Org + agent + visibility (SHARED/PRIVATE/TARGETED) | Default SHARED, fine-grained when needed |
-| Search | Hybrid: pgvector cosine + tsvector BM25 + Reciprocal Rank Fusion | Validated by OpenClaw (189K stars) in production. ~84% precision vs ~62% vector-only |
-| Dedup strategy | SHA-256 hash (instant) -> vector similarity 0.90 -> LLM ADD/UPDATE/NOOP/CONFLICT | Layered: free instant dedup, then semantic dedup, then LLM decision |
-| Content handling | LLM compression to atomic facts on ingest via instructor + litellm, raw preserved | Inspired by SimpleMem Stage 1. Better embeddings from normalized content |
-| Rate limiting | 10/min burst, 1000/day/agent, 100K/org (configurable per org) | Prevents memory explosion without blocking productive agents |
-| Architecture approach | Thin memory module in API, clean boundary, documented extraction path | Build as module, extract to service when signals warrant |
-| Real-time | SSE / WebSocket (FastAPI native) | Replaces GraphQL subscriptions |
-| LLM structured output | instructor + litellm | Pydantic-native structured outputs, provider-agnostic LLM calls |
-| MCP server | fastmcp standalone v3.1.0 | Ahead of bundled mcp SDK with OTel, auth, versioning |
-| Task queue | arq (Redis-backed async) | Lighter than Celery, async-native |
-| Retries | tenacity | Higher LLM training coverage for agent-written retry logic |
-| Observability | OpenTelemetry + structlog + logfire + langfuse | FastAPI/Pydantic tracing (logfire) + LLM-specific spans (langfuse) |
-| Migrations | Alembic | Industry standard for SQLAlchemy |
-| Rate limiting lib | limits (Redis-backed) | Production-grade, configurable |
-| Caching | cashews (Redis-backed async) | Better async API than aiocache |
-| Auth | authlib + passlib + bcrypt | More actively maintained than python-jose |
-| Testing | pytest + pytest-asyncio + respx + factory-boy + hypothesis | Comprehensive: async, mocking, fixtures, property-based |
-| Datetime handling | pendulum | Better timezone support than stdlib |
+| Decision              | Choice                                                                            | Reasoning                                                                                                         |
+| --------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Backend framework     | FastAPI + SQLAlchemy (async)                                                      | Python-native AI ecosystem, Cognee direct import, less boilerplate                                                |
+| Package manager       | uv                                                                                | Current Python standard, replaces pip/virtualenv/pip-tools                                                        |
+| Memory engine         | Cognee (direct import)                                                            | Production-proven (1M+ pipelines/mo), handles compression, dedup, embedding, knowledge graph                      |
+| Embedding provider    | Voyage 3.5 (cloud, 1024d) / BGE-M3 via Ollama (self-hosted, 1024d)                | Best retrieval quality at pgvector-friendly dimensions                                                            |
+| Embedding dimensions  | 1024                                                                              | Sweet spot: pgvector perf + quality. Voyage and BGE-M3 both output 1024 natively                                  |
+| Vector storage        | Postgres + pgvector                                                               | Already using Postgres, no new infra                                                                              |
+| API protocol          | REST-only with OpenAPI                                                            | Eliminates GraphQL security surface (introspection, depth attacks, batching), FastAPI auto-generates OpenAPI spec |
+| Frontend types        | openapi-typescript codegen                                                        | Replaces GraphQL codegen, same DX                                                                                 |
+| Memory table          | Single table with type enum                                                       | Simpler queries, single vector index, type-specific data in metadata jsonb                                        |
+| Memory scoping        | Org + agent + visibility (SHARED/PRIVATE/TARGETED)                                | Default SHARED, fine-grained when needed                                                                          |
+| Search                | Hybrid: pgvector cosine + tsvector BM25 + Reciprocal Rank Fusion                  | Validated by OpenClaw (189K stars) in production. ~84% precision vs ~62% vector-only                              |
+| Dedup strategy        | SHA-256 hash (instant) -> vector similarity 0.90 -> LLM ADD/UPDATE/NOOP/CONFLICT  | Layered: free instant dedup, then semantic dedup, then LLM decision                                               |
+| Content handling      | LLM compression to atomic facts on ingest via instructor + litellm, raw preserved | Inspired by SimpleMem Stage 1. Better embeddings from normalized content                                          |
+| Rate limiting         | 10/min burst, 1000/day/agent, 100K/org (configurable per org)                     | Prevents memory explosion without blocking productive agents                                                      |
+| Architecture approach | Thin memory module in API, clean boundary, documented extraction path             | Build as module, extract to service when signals warrant                                                          |
+| Real-time             | SSE / WebSocket (FastAPI native)                                                  | Replaces GraphQL subscriptions                                                                                    |
+| LLM structured output | instructor + litellm                                                              | Pydantic-native structured outputs, provider-agnostic LLM calls                                                   |
+| MCP server            | fastmcp standalone v3.1.0                                                         | Ahead of bundled mcp SDK with OTel, auth, versioning                                                              |
+| Task queue            | arq (Redis-backed async)                                                          | Lighter than Celery, async-native                                                                                 |
+| Retries               | tenacity                                                                          | Higher LLM training coverage for agent-written retry logic                                                        |
+| Observability         | OpenTelemetry + structlog + logfire + langfuse                                    | FastAPI/Pydantic tracing (logfire) + LLM-specific spans (langfuse)                                                |
+| Migrations            | Alembic                                                                           | Industry standard for SQLAlchemy                                                                                  |
+| Rate limiting lib     | limits (Redis-backed)                                                             | Production-grade, configurable                                                                                    |
+| Caching               | cashews (Redis-backed async)                                                      | Better async API than aiocache                                                                                    |
+| Auth                  | authlib + passlib + bcrypt                                                        | More actively maintained than python-jose                                                                         |
+| Testing               | pytest + pytest-asyncio + respx + factory-boy + hypothesis                        | Comprehensive: async, mocking, fixtures, property-based                                                           |
+| Datetime handling     | pendulum                                                                          | Better timezone support than stdlib                                                                               |
 
 ### Deliberate omissions
 
@@ -211,33 +211,33 @@ Background enrichment (Phase 2):
 
 ### Memory entity
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| org_id | uuid FK | Org-scoped |
-| agent_id | uuid FK | Which agent wrote this |
-| type | enum (EPISODIC, SEMANTIC, GRAPH) | Discriminator |
-| content | text | Compressed atomic fact |
-| raw_content | text | Original input, up to 8K chars |
-| summary | text, nullable | LLM-generated summary |
-| embedding | vector(1024) | pgvector, nullable until async embed completes |
-| content_tsv | tsvector | Full-text search column |
-| content_hash | varchar(64) | SHA-256 of compressed content, unique per agent |
-| visibility | enum (SHARED, PRIVATE, TARGETED) | Default SHARED |
-| target_agent_ids | uuid[] | Only when visibility = TARGETED |
-| confidence | smallint | 0-100, source-based default |
-| strength | smallint, default 50 | Co-retrieval boosting (memify Phase 2) |
-| source | varchar | e.g. task_completion, code_change, observation |
-| access_count | int, default 0 | Incremented on retrieval |
-| helpful_count | int, default 0 | Feedback tracking |
-| unhelpful_count | int, default 0 | Feedback tracking |
-| occurred_at | timestamptz | When the event happened (bi-temporal) |
-| expires_at | timestamptz, nullable | Time-bound memories |
-| last_accessed_at | timestamptz, nullable | Recency signal |
-| retrieval_context | jsonb, nullable | What query triggered last retrieval (future optimization data) |
-| metadata | jsonb | Type-specific fields, max 8KB |
-| created_at | timestamptz | When stored (bi-temporal) |
-| updated_at | timestamptz | |
+| Column            | Type                             | Notes                                                          |
+| ----------------- | -------------------------------- | -------------------------------------------------------------- |
+| id                | uuid PK                          |                                                                |
+| org_id            | uuid FK                          | Org-scoped                                                     |
+| agent_id          | uuid FK                          | Which agent wrote this                                         |
+| type              | enum (EPISODIC, SEMANTIC, GRAPH) | Discriminator                                                  |
+| content           | text                             | Compressed atomic fact                                         |
+| raw_content       | text                             | Original input, up to 8K chars                                 |
+| summary           | text, nullable                   | LLM-generated summary                                          |
+| embedding         | vector(1024)                     | pgvector, nullable until async embed completes                 |
+| content_tsv       | tsvector                         | Full-text search column                                        |
+| content_hash      | varchar(64)                      | SHA-256 of compressed content, unique per agent                |
+| visibility        | enum (SHARED, PRIVATE, TARGETED) | Default SHARED                                                 |
+| target_agent_ids  | uuid[]                           | Only when visibility = TARGETED                                |
+| confidence        | smallint                         | 0-100, source-based default                                    |
+| strength          | smallint, default 50             | Co-retrieval boosting (memify Phase 2)                         |
+| source            | varchar                          | e.g. task_completion, code_change, observation                 |
+| access_count      | int, default 0                   | Incremented on retrieval                                       |
+| helpful_count     | int, default 0                   | Feedback tracking                                              |
+| unhelpful_count   | int, default 0                   | Feedback tracking                                              |
+| occurred_at       | timestamptz                      | When the event happened (bi-temporal)                          |
+| expires_at        | timestamptz, nullable            | Time-bound memories                                            |
+| last_accessed_at  | timestamptz, nullable            | Recency signal                                                 |
+| retrieval_context | jsonb, nullable                  | What query triggered last retrieval (future optimization data) |
+| metadata          | jsonb                            | Type-specific fields, max 8KB                                  |
+| created_at        | timestamptz                      | When stored (bi-temporal)                                      |
+| updated_at        | timestamptz                      |                                                                |
 
 ### Indexes
 
@@ -250,13 +250,13 @@ Background enrichment (Phase 2):
 
 ### Confidence tiers (source-based defaults)
 
-| Source | Base Confidence |
-|--------|----------------|
-| task_completion | 90 |
-| code_change | 85 |
-| observation | 60 |
-| inference | 40 |
-| unknown | 50 |
+| Source          | Base Confidence |
+| --------------- | --------------- |
+| task_completion | 90              |
+| code_change     | 85              |
+| observation     | 60              |
+| inference       | 40              |
+| unknown         | 50              |
 
 ---
 
@@ -318,21 +318,21 @@ score = (0.6 * cosine_similarity) + (0.25 * recency_decay) + (0.15 * access_freq
 
 ### Memory
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| POST | /memory | Store a memory |
-| GET | /memory/search | Semantic + keyword hybrid search |
-| GET | /memory | List memories with filters |
-| GET | /memory/{id} | Get single memory |
-| POST | /memory/{id}/feedback | Submit helpful/unhelpful feedback |
+| Method | Path                  | Purpose                           |
+| ------ | --------------------- | --------------------------------- |
+| POST   | /memory               | Store a memory                    |
+| GET    | /memory/search        | Semantic + keyword hybrid search  |
+| GET    | /memory               | List memories with filters        |
+| GET    | /memory/{id}          | Get single memory                 |
+| POST   | /memory/{id}/feedback | Submit helpful/unhelpful feedback |
 
 ### MCP Tools (fastmcp)
 
-| Tool | Maps to |
-|------|---------|
-| memory_store | POST /memory |
-| memory_search | GET /memory/search |
-| memory_list | GET /memory |
+| Tool            | Maps to                    |
+| --------------- | -------------------------- |
+| memory_store    | POST /memory               |
+| memory_search   | GET /memory/search         |
+| memory_list     | GET /memory                |
 | memory_feedback | POST /memory/{id}/feedback |
 
 ---
@@ -463,11 +463,11 @@ libs/shared-types/            # Keep for frontend enum sharing
 
 ### Signals to extract
 
-| Signal | Action |
-|--------|--------|
-| Memory writes >10x task writes | Independent scaling needed |
-| Cognee pipeline becomes bottleneck | Dedicated worker process |
-| Multiple external consumers | Separate auth/routing |
+| Signal                             | Action                     |
+| ---------------------------------- | -------------------------- |
+| Memory writes >10x task writes     | Independent scaling needed |
+| Cognee pipeline becomes bottleneck | Dedicated worker process   |
+| Multiple external consumers        | Separate auth/routing      |
 
 ### How to extract (mechanical)
 
@@ -513,6 +513,7 @@ Estimated effort: 1-2 days.
 ### Phase 1: Foundation (Issues #525-#543)
 
 Track A — API Rewrite:
+
 - #525 FastAPI scaffold + tooling (uv, ruff, pyright, pytest)
 - #526 SQLAlchemy models (all 25+ entities)
 - #527 Alembic setup (stamp existing schema as baseline)
@@ -526,6 +527,7 @@ Track A — API Rewrite:
 - #535 Frontend: replace GraphQL with REST + TanStack Query
 
 Track B — Memory System (parallel after #526):
+
 - #536 Cognee spike (validate assumptions — START EARLY)
 - #537 Memory entity + pgvector + Alembic migration
 - #538 Cognee integration + embedding providers
@@ -552,15 +554,15 @@ Track B — Memory System (parallel after #526):
 
 ## 17. Risks & Mitigations
 
-| Risk | Mitigation |
-|------|-----------|
-| Memory explosion | Rate limiting (limits) + hash/vector dedup + Phase 2 pruning |
-| Hallucination poisoning | Confidence scoring + corroboration boost + contradiction tracking |
-| Cognee dependency | Clean adapter boundary, fallback to instructor + litellm + pgvector custom pipeline |
-| FastAPI migration breaks clients | Same REST routes + response shapes, integration tests comparing NestJS vs FastAPI |
-| Embedding provider outage | Two-tier write (store raw immediately via fast path, embed async via arq) |
-| pgvector perf at scale | 1024d optimized, HNSW index, separate Postgres option documented |
-| LLM call failures (dedup/compression) | tenacity retries, graceful degradation (store uncompressed) |
+| Risk                                  | Mitigation                                                                          |
+| ------------------------------------- | ----------------------------------------------------------------------------------- |
+| Memory explosion                      | Rate limiting (limits) + hash/vector dedup + Phase 2 pruning                        |
+| Hallucination poisoning               | Confidence scoring + corroboration boost + contradiction tracking                   |
+| Cognee dependency                     | Clean adapter boundary, fallback to instructor + litellm + pgvector custom pipeline |
+| FastAPI migration breaks clients      | Same REST routes + response shapes, integration tests comparing NestJS vs FastAPI   |
+| Embedding provider outage             | Two-tier write (store raw immediately via fast path, embed async via arq)           |
+| pgvector perf at scale                | 1024d optimized, HNSW index, separate Postgres option documented                    |
+| LLM call failures (dedup/compression) | tenacity retries, graceful degradation (store uncompressed)                         |
 
 ---
 

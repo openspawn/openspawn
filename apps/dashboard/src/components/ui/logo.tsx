@@ -13,7 +13,7 @@ interface LogoProps {
   style?: React.CSSProperties;
 }
 
-export function Logo({ size = 'md', className = '', style }: LogoProps) {
+export function Logo({ size = "md", className = "", style }: LogoProps) {
   const px = sizes[size];
   return (
     <span

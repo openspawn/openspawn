@@ -1,6 +1,6 @@
-export { DemoProvider, useDemo, type ScenarioName } from './DemoProvider';
-export { DemoControls } from './DemoControls';
-export { DemoWelcome } from './DemoWelcome';
+export { DemoProvider, useDemo, type ScenarioName } from "./DemoProvider";
+export { DemoControls } from "./DemoControls";
+export { DemoWelcome } from "./DemoWelcome";
 export {
   teams,
   type Team,
@@ -10,4 +10,4 @@ export {
   getParentTeams,
   getSubTeams,
   getTeamColor,
-} from './teams';
+} from "./teams";

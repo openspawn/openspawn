@@ -1,9 +1,4 @@
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-} from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
 import { Layout } from "./components/layout";
 import { DashboardPage } from "./pages/dashboard";
 import { AgentsPage } from "./pages/agents";
@@ -35,14 +30,46 @@ const indexRoute = createRoute({
   component: DashboardPage,
 });
 
-const agentsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/agents", component: AgentsPage });
-const tasksRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/tasks", component: TasksPage });
-const eventsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/events", component: EventsPage });
-const messagesRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/messages", component: MessagesPage });
-const settingsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/settings", component: SettingsPage });
-const creditsRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/credits", component: CreditsPage });
-const taskBoardRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/task-board", component: TaskBoardPage });
-const networkRoute = createRoute({ getParentRoute: () => layoutRoute, path: "/network", component: NetworkPage });
+const agentsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/agents",
+  component: AgentsPage,
+});
+const tasksRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/tasks",
+  component: TasksPage,
+});
+const eventsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/events",
+  component: EventsPage,
+});
+const messagesRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/messages",
+  component: MessagesPage,
+});
+const settingsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/settings",
+  component: SettingsPage,
+});
+const creditsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/credits",
+  component: CreditsPage,
+});
+const taskBoardRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/task-board",
+  component: TaskBoardPage,
+});
+const networkRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/network",
+  component: NetworkPage,
+});
 
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
@@ -61,5 +88,7 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({ routeTree, basepath: "/app" });
 
 declare module "@tanstack/react-router" {
-  interface Register { router: typeof router; }
+  interface Register {
+    router: typeof router;
+  }
 }

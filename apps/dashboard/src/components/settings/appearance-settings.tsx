@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Check, Palette, Paintbrush } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { 
-  AVATAR_STYLES, 
+import {
+  AVATAR_STYLES,
   BACKGROUND_COLORS,
   BACKGROUND_TYPES,
   type AvatarStyleKey,
   type BackgroundColorKey,
   type BackgroundTypeKey,
-  getAvatarSettings, 
+  getAvatarSettings,
   setAvatarStyle,
   setBackgroundColor,
   setBackgroundType,
@@ -25,8 +25,8 @@ export function AppearanceSettings() {
     const handleChange = () => {
       setSettings(getAvatarSettings());
     };
-    window.addEventListener('avatar-style-changed', handleChange as EventListener);
-    return () => window.removeEventListener('avatar-style-changed', handleChange as EventListener);
+    window.addEventListener("avatar-style-changed", handleChange as EventListener);
+    return () => window.removeEventListener("avatar-style-changed", handleChange as EventListener);
   }, []);
 
   function handleStyleSelect(style: AvatarStyleKey) {
@@ -45,10 +45,19 @@ export function AppearanceSettings() {
   const styleCategories = {
     "Robots & Tech": ["bottts", "botttsNeutral", "glass", "shapes", "rings", "identicon", "icons"],
     "Pixel Art": ["pixelArt", "pixelArtNeutral", "miniavs"],
-    "Illustrated": ["lorelei", "loreleiNeutral", "notionists", "notionistsNeutral", "openPeeps", "personas", "dylan", "micah"],
+    Illustrated: [
+      "lorelei",
+      "loreleiNeutral",
+      "notionists",
+      "notionistsNeutral",
+      "openPeeps",
+      "personas",
+      "dylan",
+      "micah",
+    ],
     "Fun & Playful": ["funEmoji", "thumbs", "bigSmile", "croodles", "croodlesNeutral"],
-    "Characters": ["adventurer", "adventurerNeutral", "bigEars", "bigEarsNeutral"],
-    "Simple": ["initials"],
+    Characters: ["adventurer", "adventurerNeutral", "bigEars", "bigEarsNeutral"],
+    Simple: ["initials"],
   } as const;
 
   return (
@@ -61,20 +70,23 @@ export function AppearanceSettings() {
             Avatar Style
           </CardTitle>
           <CardDescription>
-            Choose a consistent avatar style for all agents. Each agent will still have a unique avatar based on their ID.
+            Choose a consistent avatar style for all agents. Each agent will still have a unique
+            avatar based on their ID.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Current selection preview */}
           <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-            <img 
-              src={generateStylePreview(settings.style, previewSeed)} 
+            <img
+              src={generateStylePreview(settings.style, previewSeed)}
               alt="Current style preview"
               className="w-16 h-16 rounded-full"
             />
             <div>
               <p className="font-medium">{AVATAR_STYLES[settings.style].name}</p>
-              <p className="text-sm text-muted-foreground">{AVATAR_STYLES[settings.style].description}</p>
+              <p className="text-sm text-muted-foreground">
+                {AVATAR_STYLES[settings.style].description}
+              </p>
             </div>
           </div>
 
@@ -87,14 +99,14 @@ export function AppearanceSettings() {
                   const styleInfo = AVATAR_STYLES[styleKey as AvatarStyleKey];
                   if (!styleInfo) return null;
                   const isSelected = settings.style === styleKey;
-                  
+
                   return (
                     <button
                       key={styleKey}
                       onClick={() => handleStyleSelect(styleKey as AvatarStyleKey)}
                       className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:bg-accent/50 ${
-                        isSelected 
-                          ? "border-primary bg-primary/10" 
+                        isSelected
+                          ? "border-primary bg-primary/10"
                           : "border-transparent bg-muted/30 hover:border-muted-foreground/20"
                       }`}
                       title={styleInfo.description}
@@ -104,8 +116,8 @@ export function AppearanceSettings() {
                           <Check className="w-3 h-3 text-primary-foreground" />
                         </div>
                       )}
-                      <img 
-                        src={generateStylePreview(styleKey as AvatarStyleKey, previewSeed)} 
+                      <img
+                        src={generateStylePreview(styleKey as AvatarStyleKey, previewSeed)}
                         alt={styleInfo.name}
                         className="w-12 h-12 rounded-full"
                       />
@@ -129,7 +141,8 @@ export function AppearanceSettings() {
             Background Style
           </CardTitle>
           <CardDescription>
-            Customize avatar background colors. "Level-Based" uses different colors for each agent level (L10=pink, L9=purple, etc.)
+            Customize avatar background colors. "Level-Based" uses different colors for each agent
+            level (L10=pink, L9=purple, etc.)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -144,8 +157,8 @@ export function AppearanceSettings() {
                     key={key}
                     onClick={() => handleBgTypeSelect(key as BackgroundTypeKey)}
                     className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
-                      isSelected 
-                        ? "border-primary bg-primary/10 text-primary" 
+                      isSelected
+                        ? "border-primary bg-primary/10 text-primary"
                         : "border-muted bg-muted/30 hover:border-muted-foreground/30"
                     }`}
                   >
@@ -163,14 +176,14 @@ export function AppearanceSettings() {
               {Object.entries(BACKGROUND_COLORS).map(([key, info]) => {
                 const isSelected = settings.bgColor === key;
                 const bgColorKey = key as BackgroundColorKey;
-                
+
                 return (
                   <button
                     key={key}
                     onClick={() => handleBgColorSelect(bgColorKey)}
                     className={`relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:bg-accent/50 ${
-                      isSelected 
-                        ? "border-primary bg-primary/10" 
+                      isSelected
+                        ? "border-primary bg-primary/10"
                         : "border-transparent bg-muted/30 hover:border-muted-foreground/20"
                     }`}
                     title={info.description}
@@ -180,8 +193,8 @@ export function AppearanceSettings() {
                         <Check className="w-3 h-3 text-primary-foreground" />
                       </div>
                     )}
-                    <img 
-                      src={generateBackgroundPreview(bgColorKey, settings.bgType, previewSeed)} 
+                    <img
+                      src={generateBackgroundPreview(bgColorKey, settings.bgType, previewSeed)}
                       alt={info.name}
                       className="w-12 h-12 rounded-full"
                     />
@@ -207,8 +220,8 @@ export function AppearanceSettings() {
                 { seed: "new-intern", level: 2, label: "L2 Prob" },
               ].map(({ seed, level, label }) => (
                 <div key={seed} className="flex flex-col items-center gap-1 shrink-0">
-                  <img 
-                    src={generateStylePreview(settings.style, seed, 64, level)} 
+                  <img
+                    src={generateStylePreview(settings.style, seed, 64, level)}
                     alt={seed}
                     className="w-10 h-10 rounded-full"
                   />
@@ -216,9 +229,10 @@ export function AppearanceSettings() {
                 </div>
               ))}
             </div>
-            {settings.bgColor === 'levelBased' && (
+            {settings.bgColor === "levelBased" && (
               <p className="text-xs text-muted-foreground mt-2">
-                💡 With "Level-Based" colors, each level has a distinct color for quick visual hierarchy.
+                💡 With "Level-Based" colors, each level has a distinct color for quick visual
+                hierarchy.
               </p>
             )}
           </div>

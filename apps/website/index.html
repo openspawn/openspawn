@@ -1,10 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenSpawn — Coordination Layer for AI Agent Organizations</title>
-    <meta name="description" content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native, self-hosted." />
+    <meta
+      name="description"
+      content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native, self-hosted."
+    />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href="https://openspawn.ai/" />
@@ -14,7 +17,10 @@
     <meta property="og:url" content="https://openspawn.ai/" />
     <meta property="og:site_name" content="OpenSpawn" />
     <meta property="og:title" content="OpenSpawn — Coordination Layer for AI Agent Organizations" />
-    <meta property="og:description" content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native, self-hosted." />
+    <meta
+      property="og:description"
+      content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native, self-hosted."
+    />
     <meta property="og:image" content="https://openspawn.ai/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -22,8 +28,14 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@openspawn" />
-    <meta name="twitter:title" content="OpenSpawn — Coordination Layer for AI Agent Organizations" />
-    <meta name="twitter:description" content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native." />
+    <meta
+      name="twitter:title"
+      content="OpenSpawn — Coordination Layer for AI Agent Organizations"
+    />
+    <meta
+      name="twitter:description"
+      content="Open-source coordination layer for AI agent organizations. Define your entire agent org in a single ORG.md file. Framework-agnostic, MCP-native."
+    />
     <meta name="twitter:image" content="https://openspawn.ai/og-image.jpg" />
   </head>
   <body>
@@ -31,33 +43,62 @@
     <noscript>
       <article>
         <h1>OpenSpawn — Coordination Layer for AI Agent Organizations</h1>
-        <p>OpenSpawn is an open-source coordination layer that lets you define and run organizations of AI agents. One markdown file (ORG.md) defines your entire agent org — roles, hierarchy, culture, policies, and playbooks.</p>
+        <p>
+          OpenSpawn is an open-source coordination layer that lets you define and run organizations
+          of AI agents. One markdown file (ORG.md) defines your entire agent org — roles, hierarchy,
+          culture, policies, and playbooks.
+        </p>
 
         <h2>What is OpenSpawn?</h2>
-        <p>OpenSpawn is infrastructure, not a framework. It coordinates agents built with CrewAI, LangGraph, AutoGen, OpenClaw, or any other agent framework. Think of it as the org chart and HR department for your AI workforce.</p>
+        <p>
+          OpenSpawn is infrastructure, not a framework. It coordinates agents built with CrewAI,
+          LangGraph, AutoGen, OpenClaw, or any other agent framework. Think of it as the org chart
+          and HR department for your AI workforce.
+        </p>
 
         <h2>Key Features</h2>
         <ul>
-          <li><strong>ORG.md</strong> — Your entire agent organization defined in a single markdown file.</li>
-          <li><strong>Framework-Agnostic</strong> — Works with any agent framework. OpenSpawn coordinates, frameworks execute.</li>
-          <li><strong>MCP-Native</strong> — Built-in Model Context Protocol server with 7 tools.</li>
+          <li>
+            <strong>ORG.md</strong> — Your entire agent organization defined in a single markdown
+            file.
+          </li>
+          <li>
+            <strong>Framework-Agnostic</strong> — Works with any agent framework. OpenSpawn
+            coordinates, frameworks execute.
+          </li>
+          <li>
+            <strong>MCP-Native</strong> — Built-in Model Context Protocol server with 7 tools.
+          </li>
           <li><strong>A2A Protocol</strong> — Agent-to-Agent communication via Google A2A v0.3.</li>
-          <li><strong>Economic Layer</strong> — Budget management, trust scores, performance tracking.</li>
-          <li><strong>Self-Hosted</strong> — Run on your own infrastructure. Zero external dependencies.</li>
-          <li><strong>Simulation Modes</strong> — Deterministic ($0), hybrid (LLM), record, and replay.</li>
+          <li>
+            <strong>Economic Layer</strong> — Budget management, trust scores, performance tracking.
+          </li>
+          <li>
+            <strong>Self-Hosted</strong> — Run on your own infrastructure. Zero external
+            dependencies.
+          </li>
+          <li>
+            <strong>Simulation Modes</strong> — Deterministic ($0), hybrid (LLM), record, and
+            replay.
+          </li>
         </ul>
 
         <h2>Quick Start</h2>
         <pre><code>npx openspawn init my-org</code></pre>
 
         <h2>Live Demo</h2>
-        <p>Visit <a href="https://bikinibottom.ai">bikinibottom.ai</a> to see 22 agents coordinate to deliver 10,000 Krabby Patties.</p>
+        <p>
+          Visit <a href="https://bikinibottom.ai">bikinibottom.ai</a> to see 22 agents coordinate to
+          deliver 10,000 Krabby Patties.
+        </p>
 
         <h2>Documentation</h2>
         <ul>
           <li><a href="https://openspawn.ai/docs/getting-started">Getting Started</a></li>
           <li><a href="https://openspawn.ai/docs/how-it-works">How It Works</a></li>
-          <li><a href="https://openspawn.ai/docs/reference/org-md-reference">ORG.md Reference</a></li>
+          <li>
+            <a href="https://openspawn.ai/docs/reference/org-md-reference">ORG.md Reference</a>
+          </li>
           <li><a href="https://openspawn.ai/docs/protocols/mcp">MCP Integration</a></li>
           <li><a href="https://openspawn.ai/llms.txt">llms.txt</a></li>
         </ul>
@@ -70,10 +111,13 @@
       // Kill any stale service workers at root scope.
       // Dashboard PWA was previously registered at / before moving to /app/.
       // Register a self-destroying SW that replaces the old one and nukes caches.
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .then(function(reg) { reg.update(); })
-          .catch(function() {});
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js", { scope: "/" })
+          .then(function (reg) {
+            reg.update();
+          })
+          .catch(function () {});
       }
     </script>
     <script type="module" src="/app/main.tsx"></script>

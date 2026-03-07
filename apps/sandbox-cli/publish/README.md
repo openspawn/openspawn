@@ -38,34 +38,45 @@ Everything starts with a single markdown file:
 # My Company
 
 ## Identity
+
 We build developer tools.
 
 ## Culture
+
 preset: startup
 
 ## Structure
 
 ### COO
+
 Operational lead. Delegates to department heads.
+
 - **Level:** 9
 - **Domain:** operations
 
 #### Engineering Lead
+
 Triages technical work.
+
 - **Level:** 7
 - **Domain:** engineering
 
 ##### Workers
+
 Write code, run tests, build APIs.
+
 - **Level:** 5
 - **Pool:** 3
 
 ## Policies
+
 - Budget approval required above 1000 credits
 - Escalation required for cross-department dependencies
 
 ## Playbooks
+
 ### New Feature Request
+
 1. Research Lead evaluates feasibility
 2. Engineering Lead creates task breakdown
 3. Workers implement and test
@@ -94,28 +105,35 @@ openspawn tasks list --demo
 ## Key Features
 
 ### Organizational Structure
+
 Define roles, hierarchy, and reporting chains in markdown. Agents know who they report to, who reports to them, and what decisions they can make.
 
 ### Task Coordination
+
 Built-in task routing with atomic claiming, delegation up/down the hierarchy, and automatic escalation when agents are stuck or over budget.
 
 ### Protocol Native
+
 - **MCP** (Model Context Protocol) — 30+ coordination tools via Streamable HTTP
 - **A2A** (Agent-to-Agent) — Google's A2A v0.3 for cross-system agent communication
 
 ### Economic Layer
+
 Budget management, trust scores, and performance tracking per agent. Agents earn trust by completing tasks successfully.
 
 ### Real-Time Dashboard
+
 See your entire agent organization in real time — who's working on what, task throughput, escalations, and bottlenecks.
 
 ### Simulation Modes
+
 - **Deterministic** — $0 cost, reproducible coordination patterns
 - **Hybrid** — Real LLM decisions for L7+ agents
 - **Record** — Capture a live run for replay
 - **Replay** — Play back recorded scenarios (great for demos)
 
 ### Framework Agnostic
+
 OpenSpawn coordinates. Your agents execute. Works with CrewAI, LangGraph, AutoGen, Semantic Kernel, OpenClaw, or raw API calls.
 
 ## Architecture
@@ -135,13 +153,13 @@ ORG.md  ──▶  Coordinator  ──▶  Dashboard
 
 ## Agent Levels
 
-| Level | Role | Capabilities |
-|-------|------|-------------|
-| L1-L3 | Intern/Junior | Execute assigned tasks, poll for work |
-| L4-L6 | Mid-level | Claim tasks, basic delegation |
-| L7-L8 | Senior/Lead | Event-driven, spawn sub-agents, manage teams |
-| L9 | Director/VP | Cross-department coordination, budget authority |
-| L10 | CEO | Full organizational authority |
+| Level | Role          | Capabilities                                    |
+| ----- | ------------- | ----------------------------------------------- |
+| L1-L3 | Intern/Junior | Execute assigned tasks, poll for work           |
+| L4-L6 | Mid-level     | Claim tasks, basic delegation                   |
+| L7-L8 | Senior/Lead   | Event-driven, spawn sub-agents, manage teams    |
+| L9    | Director/VP   | Cross-department coordination, budget authority |
+| L10   | CEO           | Full organizational authority                   |
 
 ## Live Demo
 

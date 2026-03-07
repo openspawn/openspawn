@@ -11,11 +11,7 @@ function Expandable({ children }: { children: React.ReactNode }) {
         onClick={() => setOpen(!open)}
         className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-300 transition hover:text-cyan-400"
       >
-        <span
-          className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}
-        >
-          ▸
-        </span>
+        <span className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>▸</span>
         What just happened?
       </button>
       {open && (
@@ -28,13 +24,7 @@ function Expandable({ children }: { children: React.ReactNode }) {
 }
 
 /* ── Terminal-style code block ────────────────────────────────────────────── */
-function Terminal({
-  title,
-  children,
-}: {
-  title?: string;
-  children: string;
-}) {
+function Terminal({ title, children }: { title?: string; children: string }) {
   return (
     <div className="my-4 overflow-hidden rounded-lg border border-white/10 bg-[#0d1117] font-mono text-sm">
       {title && (
@@ -85,9 +75,7 @@ function Progress({ active }: { active: number }) {
           <span className="hidden text-xs text-slate-500 sm:inline">{s.label}</span>
           {i < STEPS.length - 1 && (
             <div
-              className={`h-px w-4 sm:w-8 ${
-                s.num < active ? "bg-cyan-500/40" : "bg-white/10"
-              }`}
+              className={`h-px w-4 sm:w-8 ${s.num < active ? "bg-cyan-500/40" : "bg-white/10"}`}
             />
           )}
         </div>
@@ -136,11 +124,11 @@ export function GettingStartedPage() {
         {/* Step 1: Install */}
         <StepSection num={1} title="Install" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            Install OpenSpawn globally, or use <code className="inline-code">npx</code> to
-            run without installing. Requires Node.js 18+.
+            Install OpenSpawn globally, or use <code className="inline-code">npx</code> to run
+            without installing. Requires Node.js 18+.
           </p>
           <Terminal title="terminal">
-{`$ npm install -g openspawn
+            {`$ npm install -g openspawn
 
 added 1 package in 3s
 
@@ -148,14 +136,14 @@ $ openspawn --version
 openspawn v0.3.0`}
           </Terminal>
           <p className="text-sm text-slate-500">
-            Or skip the global install:{" "}
-            <code className="inline-code">npx openspawn</code> works everywhere.
+            Or skip the global install: <code className="inline-code">npx openspawn</code> works
+            everywhere.
           </p>
           <Expandable>
             <p>
-              OpenSpawn is a single npm package that includes the CLI, the org parser,
-              the agent runtime, and the dashboard. It connects to OpenClaw for agent
-              execution — your agents run in sandboxed containers, not on your machine.
+              OpenSpawn is a single npm package that includes the CLI, the org parser, the agent
+              runtime, and the dashboard. It connects to OpenClaw for agent execution — your agents
+              run in sandboxed containers, not on your machine.
             </p>
           </Expandable>
         </StepSection>
@@ -163,11 +151,11 @@ openspawn v0.3.0`}
         {/* Step 2: Init */}
         <StepSection num={2} title="Init" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            Scaffold a new org. The interactive wizard asks a few questions and picks
-            a template that matches your use case.
+            Scaffold a new org. The interactive wizard asks a few questions and picks a template
+            that matches your use case.
           </p>
           <Terminal title="terminal">
-{`$ openspawn init my-org
+            {`$ openspawn init my-org
 
 🪸 OpenSpawn — Create a new org
 
@@ -191,9 +179,11 @@ openspawn v0.3.0`}
           <Expandable>
             <p>
               <code className="inline-code">openspawn init</code> creates two files:
-              <strong className="text-slate-200"> ORG.md</strong> (your org definition — agents, hierarchy, 
-              culture, policies) and <strong className="text-slate-200">openspawn.config.json</strong> (server 
-              settings, API keys, port). The template pre-fills sensible defaults — you can edit everything later.
+              <strong className="text-slate-200"> ORG.md</strong> (your org definition — agents,
+              hierarchy, culture, policies) and{" "}
+              <strong className="text-slate-200">openspawn.config.json</strong> (server settings,
+              API keys, port). The template pre-fills sensible defaults — you can edit everything
+              later.
             </p>
           </Expandable>
           <div className="mt-3">
@@ -209,11 +199,11 @@ openspawn v0.3.0`}
         {/* Step 3: Configure */}
         <StepSection num={3} title="Configure" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            Open the generated ORG.md. This single file defines your entire agent
-            organization — hierarchy, roles, models, and policies.
+            Open the generated ORG.md. This single file defines your entire agent organization —
+            hierarchy, roles, models, and policies.
           </p>
           <Terminal title="my-org/ORG.md">
-{`# customer-onboarding
+            {`# customer-onboarding
 > Mission: Onboard new enterprise customers end-to-end
 
 ## Identity
@@ -259,18 +249,18 @@ Schedules check-ins, collects health scores, flags churn risk early.
 - **Period:** daily`}
           </Terminal>
           <p className="text-sm text-slate-400">
-            Heading levels define the hierarchy. Prose descriptions become agent system
-            prompts. <code className="inline-code">Count: 2</code> spawns multiple workers
-            with the same role.
+            Heading levels define the hierarchy. Prose descriptions become agent system prompts.{" "}
+            <code className="inline-code">Count: 2</code> spawns multiple workers with the same
+            role.
           </p>
           <Expandable>
             <p>
-              ORG.md is infrastructure-as-code for agent organizations. The parser reads
-              markdown headings to build a hierarchy tree — H3 roles are top-level, H4
-              roles report to the H3 above. Each agent's description, model, domain, and
-              constraints are extracted and injected into their runtime context.
-              Culture presets (like <code className="inline-code">startup</code>) configure
-              communication defaults: escalation thresholds, update frequency, and routing rules.
+              ORG.md is infrastructure-as-code for agent organizations. The parser reads markdown
+              headings to build a hierarchy tree — H3 roles are top-level, H4 roles report to the H3
+              above. Each agent's description, model, domain, and constraints are extracted and
+              injected into their runtime context. Culture presets (like{" "}
+              <code className="inline-code">startup</code>) configure communication defaults:
+              escalation thresholds, update frequency, and routing rules.
             </p>
           </Expandable>
           <div className="mt-3">
@@ -286,11 +276,11 @@ Schedules check-ins, collects health scores, flags churn risk early.
         {/* Step 4: Start */}
         <StepSection num={4} title="Start" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            Boot your org on OpenClaw. Agents spawn in sandboxed containers and start
-            listening for tasks immediately.
+            Boot your org on OpenClaw. Agents spawn in sandboxed containers and start listening for
+            tasks immediately.
           </p>
           <Terminal title="terminal">
-{`$ cd my-org
+            {`$ cd my-org
 $ openspawn start
 
 🚀 OpenSpawn starting...
@@ -310,12 +300,11 @@ $ openspawn start
           </Terminal>
           <Expandable>
             <p>
-              <code className="inline-code">openspawn start</code> does three things:
-              (1) parses ORG.md into an agent graph, (2) connects to OpenClaw and spawns
-              each agent in its own sandboxed container with the right model and context,
-              (3) starts a local server with the dashboard, A2A endpoint, and MCP tool server.
-              Agents immediately begin a tick-based execution loop — checking their inbox,
-              deciding what to do, and acting.
+              <code className="inline-code">openspawn start</code> does three things: (1) parses
+              ORG.md into an agent graph, (2) connects to OpenClaw and spawns each agent in its own
+              sandboxed container with the right model and context, (3) starts a local server with
+              the dashboard, A2A endpoint, and MCP tool server. Agents immediately begin a
+              tick-based execution loop — checking their inbox, deciding what to do, and acting.
             </p>
           </Expandable>
           <div className="mt-3">
@@ -331,11 +320,11 @@ $ openspawn start
         {/* Step 5: Monitor */}
         <StepSection num={5} title="Monitor" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            Check on your org from the CLI or open the real-time dashboard to see
-            agents working, tasks flowing, and escalations happening.
+            Check on your org from the CLI or open the real-time dashboard to see agents working,
+            tasks flowing, and escalations happening.
           </p>
           <Terminal title="terminal">
-{`$ openspawn status
+            {`$ openspawn status
 
 ┌──────────────────────────────┬──────────┬───────┬──────────┐
 │ Agent                        │ Status   │ Trust │ Tasks    │
@@ -352,18 +341,17 @@ $ openspawn dashboard
 Opening http://localhost:3333/app/ ...`}
           </Terminal>
           <p className="text-sm text-slate-400">
-            The dashboard shows a live network graph, task timeline, trust scores,
-            and budget usage — all updating in real time via SSE.
+            The dashboard shows a live network graph, task timeline, trust scores, and budget usage
+            — all updating in real time via SSE.
           </p>
           <Expandable>
             <p>
-              <code className="inline-code">openspawn status</code> gives you a snapshot
-              of every agent's state, trust score, and task count.
-              <code className="inline-code"> openspawn dashboard</code> opens the web UI
-              where you can watch the org graph animate as tasks flow through the hierarchy.
-              Trust scores start at 30 (PROBATION) and rise with successful completions.
-              The health score is a composite of ack latency, escalation rate, completion
-              rate, and budget utilization.
+              <code className="inline-code">openspawn status</code> gives you a snapshot of every
+              agent's state, trust score, and task count.
+              <code className="inline-code"> openspawn dashboard</code> opens the web UI where you
+              can watch the org graph animate as tasks flow through the hierarchy. Trust scores
+              start at 30 (PROBATION) and rise with successful completions. The health score is a
+              composite of ack latency, escalation rate, completion rate, and budget utilization.
             </p>
           </Expandable>
           <div className="mt-3">
@@ -379,11 +367,11 @@ Opening http://localhost:3333/app/ ...`}
         {/* Step 6: Ship */}
         <StepSection num={6} title="Ship" onVisible={setActive}>
           <p className="mb-2 text-slate-400">
-            When you're done, archive the org. Results are collected, agents wind
-            down gracefully, and you get a summary of everything that happened.
+            When you're done, archive the org. Results are collected, agents wind down gracefully,
+            and you get a summary of everything that happened.
           </p>
           <Terminal title="terminal">
-{`$ openspawn done
+            {`$ openspawn done
 
 🏁 Winding down org "my-org"...
    Waiting for 2 in-flight tasks to complete...
@@ -403,10 +391,10 @@ Done. Results are in ./output/`}
           <Expandable>
             <p>
               <code className="inline-code">openspawn done</code> initiates a graceful shutdown.
-              In-flight tasks are given time to complete (configurable timeout). The system
-              collects all artifacts, task results, and communication logs into an archive.
-              Agent containers on OpenClaw are cleaned up. The archive includes everything
-              needed to reproduce or audit the run.
+              In-flight tasks are given time to complete (configurable timeout). The system collects
+              all artifacts, task results, and communication logs into an archive. Agent containers
+              on OpenClaw are cleaned up. The archive includes everything needed to reproduce or
+              audit the run.
             </p>
           </Expandable>
         </StepSection>
@@ -417,13 +405,12 @@ Done. Results are in ./output/`}
             Ready to graduate from sub-agents?
           </h2>
           <p className="mx-auto mb-6 max-w-lg text-slate-400">
-            Sub-agents are great for simple tasks. But when you need a full team —
-            with hierarchy, delegation, escalation, and accountability — you need
-            an org.
+            Sub-agents are great for simple tasks. But when you need a full team — with hierarchy,
+            delegation, escalation, and accountability — you need an org.
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Terminal title="terminal">
-{`$ npx openspawn init my-org --template saas-onboarding`}
+              {`$ npx openspawn init my-org --template saas-onboarding`}
             </Terminal>
           </div>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
@@ -480,10 +467,7 @@ function StepSection({
 /* ── Intersection observer hook ───────────────────────────────────────────── */
 import { useEffect, useRef } from "react";
 
-function useIntersectionStep(
-  num: number,
-  onVisible: (n: number) => void,
-) {
+function useIntersectionStep(num: number, onVisible: (n: number) => void) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {

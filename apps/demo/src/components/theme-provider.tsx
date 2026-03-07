@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 
 import { DASHBOARD_THEME, isOpenSpawnTheme } from "../lib/dashboard-theme";
 
@@ -127,30 +120,23 @@ export function ThemeProvider({
     return stored === "compact" ? "compact" : "comfortable";
   });
 
-  const resolvedTheme =
-    THEMES.find((t) => t.id === theme)?.isDark === false ? "light" : "dark";
+  const resolvedTheme = THEMES.find((t) => t.id === theme)?.isDark === false ? "light" : "dark";
 
-  const setTheme = useCallback(
-    (newTheme: OceanTheme) => {
-      // Trigger transition class
-      const root = document.documentElement;
-      root.classList.add("theme-transitioning");
+  const setTheme = useCallback((newTheme: OceanTheme) => {
+    // Trigger transition class
+    const root = document.documentElement;
+    root.classList.add("theme-transitioning");
 
-      setThemeState(newTheme);
-      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    setThemeState(newTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
 
-      // Legacy compat
-      const def = THEMES.find((t) => t.id === newTheme);
-      localStorage.setItem(
-        LEGACY_STORAGE_KEY,
-        def?.isDark === false ? "light" : "dark"
-      );
+    // Legacy compat
+    const def = THEMES.find((t) => t.id === newTheme);
+    localStorage.setItem(LEGACY_STORAGE_KEY, def?.isDark === false ? "light" : "dark");
 
-      // Remove transition class after animation
-      setTimeout(() => root.classList.remove("theme-transitioning"), 250);
-    },
-    []
-  );
+    // Remove transition class after animation
+    setTimeout(() => root.classList.remove("theme-transitioning"), 250);
+  }, []);
 
   const setDensity = useCallback((newDensity: Density) => {
     setDensityState(newDensity);

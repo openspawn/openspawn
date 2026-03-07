@@ -1,5 +1,5 @@
-
 # OpenSpawn: Shared Long‑Term Memory & Multi‑Agent Orchestration
+
 ## Product Requirements Document (PRD) & Implementation Plan
 
 ---
@@ -17,7 +17,7 @@ This document describes:
 • Data model  
 • Dashboard integration  
 • Testing strategy  
-• Rollout phases  
+• Rollout phases
 
 ---
 
@@ -41,7 +41,7 @@ The following are explicitly **out of scope for v1**:
 • Training custom LLMs  
 • Replacing OpenClaw plugins  
 • Large‑scale enterprise RBAC  
-• Offline mobile clients  
+• Offline mobile clients
 
 ---
 
@@ -96,7 +96,7 @@ All interactions become memory events.
 
 NestJS (existing OpenSpawn API)  
 Node / Bun runtime  
-GraphQL + REST APIs  
+GraphQL + REST APIs
 
 ## Event Bus
 
@@ -106,12 +106,12 @@ Reasons:
 
 • lightweight  
 • reliable for self‑hosted installs  
-• horizontally scalable  
+• horizontally scalable
 
 Future compatibility:
 
 • Kafka  
-• Redis Streams  
+• Redis Streams
 
 ## Databases
 
@@ -192,7 +192,7 @@ Agents supported initially:
 
 Claude  
 Codex  
-OpenClaw  
+OpenClaw
 
 Agents interact with OpenSpawn via:
 
@@ -224,7 +224,7 @@ pending
 assigned  
 running  
 completed  
-failed  
+failed
 
 Agents claim tasks via:
 
@@ -239,21 +239,21 @@ The dashboard must show:
 Agent swarm map  
 Task timeline  
 Memory growth  
-Event stream  
+Event stream
 
 Built using:
 
 Tailwind v4  
 shadcn/ui components  
 TanStack Table  
-Framer Motion animations  
+Framer Motion animations
 
 Pages:
 
 Agents  
 Tasks  
 Memory  
-Events  
+Events
 
 ---
 
@@ -320,7 +320,7 @@ Cloud‑native first.
 Default stack:
 
 Docker  
-Kubernetes optional  
+Kubernetes optional
 
 Services:
 
@@ -362,7 +362,7 @@ Memory growth rate
 User metrics:
 
 Agent task completion rate  
-Memory retrieval accuracy  
+Memory retrieval accuracy
 
 ---
 

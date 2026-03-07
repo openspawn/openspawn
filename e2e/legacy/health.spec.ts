@@ -12,10 +12,10 @@ test.describe("API Health", () => {
 test.describe("Dashboard", () => {
   test("Dashboard loads and shows navigation", async ({ page }) => {
     await page.goto("/");
-    
+
     // Should show dashboard page
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-    
+
     // Should show navigation
     await expect(page.getByText("OpenSpawn").first()).toBeVisible();
     await expect(page.getByText("Tasks").first()).toBeVisible();

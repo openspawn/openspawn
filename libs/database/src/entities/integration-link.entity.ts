@@ -10,9 +10,9 @@ import {
 } from "typeorm";
 import { Organization } from "./organization.entity.js";
 
-export type IntegrationSourceType = 
-  | "github_issue" 
-  | "github_pr" 
+export type IntegrationSourceType =
+  | "github_issue"
+  | "github_pr"
   | "github_comment"
   | "linear_issue"
   | "linear_comment";

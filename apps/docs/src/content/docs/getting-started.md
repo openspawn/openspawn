@@ -10,7 +10,7 @@ title: Getting Started
 
 ## What is OpenSpawn?
 
-OpenSpawn is a **coordination layer for AI agents**. It is not an agent framework — you keep using whatever you're using (OpenClaw, LangGraph, Claude Code, raw API calls). OpenSpawn adds the layer most multi-agent systems are missing: *structure*.
+OpenSpawn is a **coordination layer for AI agents**. It is not an agent framework — you keep using whatever you're using (OpenClaw, LangGraph, Claude Code, raw API calls). OpenSpawn adds the layer most multi-agent systems are missing: _structure_.
 
 ```
 ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything
@@ -19,9 +19,11 @@ ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hie
 **The key idea:** One file — `ORG.md` — defines your entire agent organization. Roles, hierarchy, culture, budget policies, and operating procedures all live in one readable, version-controlled markdown file.
 
 > **Q: How is this different from CrewAI / LangGraph / AutoGen?**
+>
 > - Those are agent frameworks (they build agents). OpenSpawn is a coordination layer (it organizes agents). Use them together.
 
 > **Q: Do I need to rewrite my agents?**
+>
 > - No. OpenSpawn coordinates your existing agents via standard protocols (MCP, A2A).
 
 ---
@@ -42,14 +44,17 @@ Do you have multiple agents that need to work together?
 ## Prerequisites
 
 **Required:**
+
 - Node.js 18+ (`node --version` to check)
 
 **Optional (for real model inference):**
+
 - [Ollama](https://ollama.ai) — free local models (workers use `qwen2.5` at zero cost)
 - [Groq](https://groq.com) API key — fast inference for mid-tier agents
 - [OpenRouter](https://openrouter.ai) API key — Claude/GPT-4o for executives
 
 > **Q: Do I need API keys to try it?**
+>
 > - No. Demo/simulation mode works without any API keys. You see the full coordination flow.
 
 ---
@@ -64,45 +69,59 @@ Here's a real ORG.md for a SaaS customer onboarding team — the scenario we'll 
 # Customer Onboarding Org
 
 ## Identity
+
 - **Mission:** Onboard new enterprise customers end-to-end in under 48 hours
 - **Industry:** SaaS / Enterprise Software
 
 ## Culture
+
 preset: agency
 
 ## Structure
 
 ### Onboarding Lead — Customer Onboarding Manager
+
 The quarterback. Owns the customer relationship from signed contract to go-live.
+
 - **Level:** 7
 - **Department:** Customer Success
 - **Reports to:** Human Principal
 
 #### Data Migration Specialist — Senior Data Engineer
+
 Ingests customer data, validates schema compatibility, verifies migration.
+
 - **Level:** 5
 - **Department:** Engineering
 - **Reports to:** Onboarding Lead
 
 #### Integration Engineer — Platform Integration Specialist
+
 Connects customer's existing tools (CRM, ERP, SSO) to the platform.
+
 - **Level:** 5
 - **Department:** Engineering
 - **Reports to:** Onboarding Lead
 
 #### Success Agent — Customer Success Representative
+
 Conducts go-live check-in, validates first successful workflow.
+
 - **Level:** 4
 - **Department:** Customer Success
 - **Reports to:** Onboarding Lead
 
 ## Policies
+
 ### Budget
+
 - **Per-agent limit:** 800 credits/customer
 - **Overage behavior:** pause and escalate
 
 ## Playbooks
+
 ### 48-Hour Onboarding Track
+
 1. Onboarding Lead creates PLAN.md and assigns tasks
 2. Migration and Integration work in parallel (hours 2–24)
 3. Success Agent conducts go-live validation (hours 40–48)
@@ -111,6 +130,7 @@ Conducts go-live check-in, validates first successful workflow.
 This one file defines the entire onboarding team. OpenSpawn parses it, generates OpenClaw configs, and routes tasks through the hierarchy automatically.
 
 > **Q: What if I just want to start fast without writing ORG.md from scratch?**
+>
 > - Use a template: `openspawn init my-org --template=saas-onboarding`
 
 ---
@@ -132,6 +152,7 @@ my-org/
 ```
 
 > **Q: Can I skip the wizard?**
+>
 > ```bash
 > openspawn init my-org --template=saas-onboarding --non-interactive
 > ```
@@ -153,32 +174,36 @@ my-org/
 
 Open `ORG.md`. You'll see five sections:
 
-| Section | Purpose | Required? |
-|---------|---------|-----------|
-| `## Identity` | Name, mission, values | No |
-| `## Culture` | Communication norms, preset | No |
-| `## Structure` | Agent roles and hierarchy | **Yes** |
-| `## Policies` | Budgets, caps, permissions | No |
-| `## Playbooks` | Step-by-step procedures | No |
+| Section        | Purpose                     | Required? |
+| -------------- | --------------------------- | --------- |
+| `## Identity`  | Name, mission, values       | No        |
+| `## Culture`   | Communication norms, preset | No        |
+| `## Structure` | Agent roles and hierarchy   | **Yes**   |
+| `## Policies`  | Budgets, caps, permissions  | No        |
+| `## Playbooks` | Step-by-step procedures     | No        |
 
 Each agent in Structure looks like:
 
 ```markdown
 ### Onboarding Lead — Customer Onboarding Manager
+
 The coordinator. Receives new customer intake, creates the onboarding plan,
 assigns work to specialists, and tracks progress to go-live.
+
 - **Level:** 7
 - **Department:** Customer Success
 - **Reports to:** Human Principal
 ```
 
 > **Q: What do levels mean?**
+>
 > - L1-L5: Workers
 > - L6: Can review/approve
 > - L7-L9: Can create tasks and spawn agents
 > - L10: Executive
 
 > **Q: What's "Reports to"?**
+>
 > - The escalation chain. Blocked agents escalate to their manager. Never skip levels.
 
 ---
@@ -190,6 +215,7 @@ openspawn validate
 ```
 
 Expected output:
+
 ```
 ✅ ORG.md is valid
 
@@ -200,12 +226,12 @@ Expected output:
 
 ### Error recovery
 
-| Error | Fix |
-|-------|-----|
-| `Cannot read ORG.md` | Make sure you're in the right directory: `ls ORG.md` |
-| `Missing Structure section` | Add `## Structure` with at least one agent |
+| Error                            | Fix                                                               |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `Cannot read ORG.md`             | Make sure you're in the right directory: `ls ORG.md`              |
+| `Missing Structure section`      | Add `## Structure` with at least one agent                        |
 | `Agent reports to unknown agent` | Check spelling in `Reports to` — must match an agent name exactly |
-| `No top-level agent` | One agent needs `Reports to: Human Principal` |
+| `No top-level agent`             | One agent needs `Reports to: Human Principal`                     |
 
 ---
 
@@ -232,9 +258,11 @@ Success Agent               L4     sonnet  workspace-success-agent          Onbo
 ```
 
 > **Q: What happens after init?**
+>
 > - Run `openspawn start` to generate OpenClaw configs, then apply the patch to your gateway. The `openclaw-patch.json` file contains `agents.list` entries with id, model, workspace, and subagents config.
 
 > **Q: Can I output status as JSON?**
+>
 > ```bash
 > openspawn status --json
 > ```
@@ -248,12 +276,14 @@ npx openspawn preview
 ```
 
 Opens the dashboard at http://localhost:3333. You'll see:
+
 - Network graph of your agent hierarchy
 - Task timeline (onboarding tasks flowing through the team)
 - Agent details and credit balances
 - Real-time SSE event stream
 
 > **Q: Port 3333 is in use?**
+>
 > ```bash
 > # Option 1: Kill the existing process
 > lsof -i :3333
@@ -271,17 +301,18 @@ Opens the dashboard at http://localhost:3333. You'll see:
 
 ```markdown
 ## Culture
+
 preset: enterprise
 ```
 
-| Preset | Escalation | Progress | Hierarchy depth |
-|--------|-----------|----------|-----------------|
-| `startup` | Immediate | Frequent | 2-3 levels |
-| `enterprise` | Batched | On phase change | 5-8 levels |
-| `agency` | Immediate | Every tick | 3-4 levels |
-| `research` | Delayed | On request | 2-3 levels |
-| `military` | Immediate | Every tick | Strict chain |
-| `remote-async` | Delayed | On request | Flat |
+| Preset         | Escalation | Progress        | Hierarchy depth |
+| -------------- | ---------- | --------------- | --------------- |
+| `startup`      | Immediate  | Frequent        | 2-3 levels      |
+| `enterprise`   | Batched    | On phase change | 5-8 levels      |
+| `agency`       | Immediate  | Every tick      | 3-4 levels      |
+| `research`     | Delayed    | On request      | 2-3 levels      |
+| `military`     | Immediate  | Every tick      | Strict chain    |
+| `remote-async` | Delayed    | On request      | Flat            |
 
 ### Add an agent
 
@@ -289,7 +320,9 @@ Add under `## Structure`:
 
 ```markdown
 #### QA Validator — Onboarding Quality Analyst
+
 Reviews completed onboarding configurations for errors before go-live.
+
 - **Level:** 4
 - **Department:** Engineering
 - **Reports to:** Onboarding Lead
@@ -301,6 +334,7 @@ Reviews completed onboarding configurations for errors before go-live.
 ## Policies
 
 ### Budget
+
 - **Per-agent limit:** 800 credits/customer
 - **Alert threshold:** 80%
 - **Overage behavior:** pause and escalate
@@ -312,6 +346,7 @@ Reviews completed onboarding configurations for errors before go-live.
 ## Playbooks
 
 ### Escalation: Blocked Migration
+
 1. Data Migration Specialist writes blocker to ESCALATION.md
 2. Escalates to Onboarding Lead via escalation_create
 3. Onboarding Lead engages engineering support within 1 hour
@@ -337,6 +372,7 @@ Edit `openspawn.config.json`:
 ```
 
 > **Q: Which model for which agent?**
+>
 > - L1-L5 workers: Ollama (`qwen2.5`) — free, local
 > - L6-L8 leads: Groq — fast, cheap
 > - L9-L10 executives: OpenRouter (Claude/GPT-4o) — best reasoning

@@ -189,4 +189,4 @@ How agents coordinate inside an org to="/docs/getting-started"
 
 Getting Started →
 
-Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="_blank" rel="noopener" GitHub repo for the latest.
+Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="\_blank" rel="noopener" GitHub repo for the latest.

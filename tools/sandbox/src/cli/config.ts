@@ -1,8 +1,8 @@
 // ── openclaw.json config reader/writer ───────────────────────────────────────
 
-import { readFileSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 export interface AgentEntry {
   id: string;
@@ -22,19 +22,19 @@ export interface OpenClawConfig {
   [key: string]: unknown;
 }
 
-const CONFIG_PATH = join(homedir(), '.openclaw', 'openclaw.json');
+const CONFIG_PATH = join(homedir(), ".openclaw", "openclaw.json");
 
 export function getConfigPath(): string {
   return CONFIG_PATH;
 }
 
 export function readConfig(): OpenClawConfig {
-  const raw = readFileSync(CONFIG_PATH, 'utf-8');
+  const raw = readFileSync(CONFIG_PATH, "utf-8");
   return JSON.parse(raw) as OpenClawConfig;
 }
 
 export function writeConfig(config: OpenClawConfig): void {
-  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 4) + '\n', 'utf-8');
+  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 4) + "\n", "utf-8");
 }
 
 export function findAgent(config: OpenClawConfig, agentId: string): AgentEntry | undefined {

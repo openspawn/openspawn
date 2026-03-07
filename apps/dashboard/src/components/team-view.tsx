@@ -2,8 +2,8 @@
  * Team View — collapsible team sections with agent cards.
  * Used on the Agents page as an alternative view to grid/list.
  */
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronRight,
   Crown,
@@ -26,25 +26,20 @@ import {
   Wrench,
   Headphones,
   type LucideIcon,
-} from 'lucide-react';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
-import { AgentAvatar } from './agent-avatar';
-import { AgentModeBadge } from './agent-mode-selector';
-import { getStatusVariant } from '../lib/status-colors';
-import { cn } from '../lib/utils';
-import {
-  type Team,
-  getParentTeams,
-  getSubTeams,
-  getTeamColor,
-  } from '../demo/teams';
-import { useAgents } from '../hooks/use-agents';
-import { useTeamStats } from '../hooks/use-teams';
-import { usePresence } from '../hooks/use-presence';
-import { useAgentHealth } from '../hooks/use-agent-health';
-import { AgentMode } from '../graphql/generated/graphql';
-import type { AgentFieldsFragment } from '../graphql/generated/graphql';
+} from "lucide-react";
+import { Card, CardContent } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { AgentAvatar } from "./agent-avatar";
+import { AgentModeBadge } from "./agent-mode-selector";
+import { getStatusVariant } from "../lib/status-colors";
+import { cn } from "../lib/utils";
+import { type Team, getParentTeams, getSubTeams, getTeamColor } from "../demo/teams";
+import { useAgents } from "../hooks/use-agents";
+import { useTeamStats } from "../hooks/use-teams";
+import { usePresence } from "../hooks/use-presence";
+import { useAgentHealth } from "../hooks/use-agent-health";
+import { AgentMode } from "../graphql/generated/graphql";
+import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 
 type Agent = AgentFieldsFragment;
 
@@ -93,8 +88,8 @@ function TeamAgentCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       className={cn(
-        'flex items-center gap-3 rounded-lg border border-border p-3 hover:bg-accent/40 transition-colors cursor-pointer',
-        isLead && 'ring-1 ring-amber-500/40 bg-amber-500/5',
+        "flex items-center gap-3 rounded-lg border border-border p-3 hover:bg-accent/40 transition-colors cursor-pointer",
+        isLead && "ring-1 ring-amber-500/40 bg-amber-500/5",
       )}
       onClick={() => onClick?.(agent.id)}
     >
@@ -104,7 +99,6 @@ function TeamAgentCard({
         level={agent.level}
         size="md"
         avatar={agent.avatar}
-
         avatarUrl={agent.avatarUrl}
         avatarColor={agent.avatarColor}
         presenceStatus={presenceMap.get(agent.id)?.status}
@@ -114,9 +108,7 @@ function TeamAgentCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm truncate">{agent.name}</span>
-          {isLead && (
-            <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-          )}
+          {isLead && <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />}
         </div>
         <div className="text-xs text-muted-foreground truncate">
           L{agent.level} · @{agent.agentId}
@@ -149,9 +141,7 @@ function TeamStatsPill({ teamId }: { teamId: string }) {
         <Coins className="h-3 w-3 text-amber-500" />
         {stats.totalCredits.toLocaleString()}
       </span>
-      <span className="hidden sm:flex items-center gap-1">
-        {stats.taskCompletionRate}% success
-      </span>
+      <span className="hidden sm:flex items-center gap-1">{stats.taskCompletionRate}% success</span>
     </div>
   );
 }
@@ -178,20 +168,16 @@ function TeamSection({
   const Icon = getTeamIcon(team.icon);
 
   // Agents directly assigned to this team (not sub-teams)
-  const directAgents = useMemo(
-    () =>
-      agents.filter((a) => a.teamId === team.id),
-    [agents, team.id],
-  );
+  const directAgents = useMemo(() => agents.filter((a) => a.teamId === team.id), [agents, team.id]);
 
   return (
-    <div className={cn(depth > 0 && 'ml-4 sm:ml-6')}>
+    <div className={cn(depth > 0 && "ml-4 sm:ml-6")}>
       {/* Team header */}
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'w-full flex items-center gap-3 rounded-lg px-4 py-3 text-left',
-          'hover:bg-accent/40 transition-colors group',
+          "w-full flex items-center gap-3 rounded-lg px-4 py-3 text-left",
+          "hover:bg-accent/40 transition-colors group",
         )}
       >
         <div
@@ -220,10 +206,7 @@ function TeamSection({
           </p>
         </div>
 
-        <motion.div
-          animate={{ rotate: open ? 90 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.2 }}>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </motion.div>
       </button>
@@ -234,9 +217,9 @@ function TeamSection({
           <motion.div
             key="content"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
             <div className="space-y-1 px-2 pb-2">

@@ -1,12 +1,7 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import { createClient, unwrap } from "../lib/api.js";
-import {
-  outputError,
-  outputTable,
-  formatEmpty,
-  icons,
-  } from "../lib/output.js";
+import { outputError, outputTable, formatEmpty, icons } from "../lib/output.js";
 import { withSpinner } from "../lib/spinner.js";
 
 interface Message {
@@ -34,7 +29,7 @@ function formatTime(dateStr: string): string {
   if (diffMins < 1) return pc.dim("now");
   if (diffMins < 60) return pc.dim(`${diffMins}m`);
   if (diffHours < 24) return pc.dim(`${diffHours}h`);
-  
+
   return pc.dim(date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }));
 }
 
@@ -63,7 +58,7 @@ ${pc.cyan("Examples:")}
   ${pc.dim("$")} openspawn messages list --channel ch_abc123
   ${pc.dim("$")} openspawn messages channels
   ${pc.dim("$")} openspawn msg send --to agent-456 --content "Quick update"
-`
+`,
     );
 
   messages
@@ -84,7 +79,7 @@ ${pc.cyan("Examples:")}
             const client = createClient();
             return client.sendMessage(opts.to, opts.content);
           },
-          { successText: "Message sent!" }
+          { successText: "Message sent!" },
         );
 
         console.log();
@@ -94,7 +89,7 @@ ${pc.cyan("Examples:")}
       } catch (err) {
         outputError(
           err instanceof Error ? err.message : String(err),
-          "Check the recipient ID and try again"
+          "Check the recipient ID and try again",
         );
         process.exit(1);
       }
@@ -112,7 +107,7 @@ ${pc.cyan("Examples:")}
           async () => {
             const client = createClient();
             return client.listMessages(opts.channel);
-          }
+          },
         );
 
         const messageList = (unwrap(data) as Message[]) || [];
@@ -130,7 +125,7 @@ ${pc.cyan("Examples:")}
         for (const msg of messageList.slice(0, parseInt(opts.limit)).reverse()) {
           const senderName = msg.sender?.name || msg.senderId;
           const time = formatTime(msg.createdAt);
-          
+
           console.log(`  ${pc.cyan(pc.bold(senderName))} ${time}`);
           console.log(`  ${msg.body}`);
           console.log();
@@ -159,16 +154,14 @@ ${pc.cyan("Examples:")}
         }
 
         console.log();
-        console.log(`  💬 ${pc.bold(`${channels.length} channel${channels.length === 1 ? "" : "s"}`)}`);
+        console.log(
+          `  💬 ${pc.bold(`${channels.length} channel${channels.length === 1 ? "" : "s"}`)}`,
+        );
         console.log();
 
         outputTable({
           headers: ["Name", "Type", "ID"],
-          rows: channels.map((c) => [
-            pc.bold(c.name),
-            formatChannelType(c.type),
-            pc.dim(c.id),
-          ]),
+          rows: channels.map((c) => [pc.bold(c.name), formatChannelType(c.type), pc.dim(c.id)]),
         });
         console.log();
       } catch (err) {

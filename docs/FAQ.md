@@ -35,6 +35,7 @@ They're designed to work together, not replace each other.
 ### Q3: Do I need to rewrite my agents to use OpenSpawn?
 
 **No.** OpenSpawn connects to your existing agents via standard protocols:
+
 - **MCP** (Model Context Protocol) — for tool calls
 - **A2A** (Agent-to-Agent) — for inter-org communication
 - **REST** — for direct API calls
@@ -103,6 +104,7 @@ All templates are starting points — edit the generated `ORG.md` freely.
 ### Q9: What is `openclaw-patch.json` and what do I do with it?
 
 `openclaw-patch.json` is a ready-to-apply patch for your OpenClaw gateway's `agents.list`. It contains entries with:
+
 - `id` — agent identifier (lowercase hyphenated name)
 - `model` — `opus` for L7+ agents, `sonnet` for L6 and below
 - `workspace` — agent workspace path
@@ -124,12 +126,12 @@ Checks: valid markdown structure, required sections, agent role definitions, hie
 
 **Common errors and fixes:**
 
-| Error | Fix |
-|-------|-----|
-| `Missing Structure section` | Add `## Structure` with at least one agent |
-| `Agent reports to unknown agent` | Check `Reports to` matches an agent name exactly |
-| `No top-level agent` | One agent must have `Reports to: Human Principal` |
-| `Circular reporting chain` | No agent can report to itself or create a loop |
+| Error                            | Fix                                               |
+| -------------------------------- | ------------------------------------------------- |
+| `Missing Structure section`      | Add `## Structure` with at least one agent        |
+| `Agent reports to unknown agent` | Check `Reports to` matches an agent name exactly  |
+| `No top-level agent`             | One agent must have `Reports to: Human Principal` |
+| `Circular reporting chain`       | No agent can report to itself or create a loop    |
 
 ---
 
@@ -143,6 +145,7 @@ Checks: valid markdown structure, required sections, agent role definitions, hie
 ## Structure
 
 ### Boss — Leader
+
 - **Level:** 10
 - **Reports to:** Human Principal
 ```
@@ -151,22 +154,22 @@ That's it. One heading, one agent, one level, one reporting line.
 
 ### Q12: What do agent levels mean?
 
-| Level | Role type | Permissions |
-|-------|-----------|-------------|
-| L1-L5 | Workers | Execute tasks |
-| L6 | Seniors | Review and approve work |
-| L7-L9 | Leads | Create tasks, spawn agents, manage teams |
-| L10 | Executives | Top of hierarchy |
+| Level | Role type  | Permissions                              |
+| ----- | ---------- | ---------------------------------------- |
+| L1-L5 | Workers    | Execute tasks                            |
+| L6    | Seniors    | Review and approve work                  |
+| L7-L9 | Leads      | Create tasks, spawn agents, manage teams |
+| L10   | Executives | Top of hierarchy                         |
 
 ### Q13: What are the five ORG.md sections?
 
-| Section | Purpose | Required? |
-|---------|---------|-----------|
-| `## Identity` | Name, mission, values — ambient context for all agents | No |
-| `## Culture` | Communication norms, escalation speed, preset | No |
-| `## Structure` | Agent roles and hierarchy | **Yes** |
-| `## Policies` | Budget limits, caps, permissions | No |
-| `## Playbooks` | Step-by-step procedures for common scenarios | No |
+| Section        | Purpose                                                | Required? |
+| -------------- | ------------------------------------------------------ | --------- |
+| `## Identity`  | Name, mission, values — ambient context for all agents | No        |
+| `## Culture`   | Communication norms, escalation speed, preset          | No        |
+| `## Structure` | Agent roles and hierarchy                              | **Yes**   |
+| `## Policies`  | Budget limits, caps, permissions                       | No        |
+| `## Playbooks` | Step-by-step procedures for common scenarios           | No        |
 
 ### Q14: What are culture presets?
 
@@ -174,17 +177,18 @@ Presets are shorthand for configuring communication norms. Use one line:
 
 ```markdown
 ## Culture
+
 preset: agency
 ```
 
-| Preset | Escalation | Progress | Best for |
-|--------|-----------|----------|---------|
-| `startup` | Immediate | Frequent | Small fast teams |
-| `enterprise` | Batched (hourly) | On phase change | Large orgs with process |
-| `agency` | Immediate | Every tick | Client work with deadlines |
-| `research` | Delayed | On request | Exploration, long tasks |
-| `military` | Immediate | Every tick | Zero-ambiguity operations |
-| `remote-async` | Delayed | On request | Distributed async teams |
+| Preset         | Escalation       | Progress        | Best for                   |
+| -------------- | ---------------- | --------------- | -------------------------- |
+| `startup`      | Immediate        | Frequent        | Small fast teams           |
+| `enterprise`   | Batched (hourly) | On phase change | Large orgs with process    |
+| `agency`       | Immediate        | Every tick      | Client work with deadlines |
+| `research`     | Delayed          | On request      | Exploration, long tasks    |
+| `military`     | Immediate        | Every tick      | Zero-ambiguity operations  |
+| `remote-async` | Delayed          | On request      | Distributed async teams    |
 
 ---
 
@@ -231,12 +235,12 @@ tool: task_claim { task_id: "abc123", agent_id: "data-migration-specialist" }
 
 The [Agent Communication Protocol](./communication-protocol.md) defines 4 message types — **no ACKs, no courtesy messages**:
 
-| Type | Direction | When |
-|------|-----------|------|
-| `TASK` | Lead → Worker | Work assignment |
-| `RESULT` | Worker → Lead | Deliverable notification |
-| `ESCALATION` | Worker → Lead | Blocker requiring help |
-| `DECISION` | Lead → Worker | Resolves an escalation |
+| Type         | Direction     | When                     |
+| ------------ | ------------- | ------------------------ |
+| `TASK`       | Lead → Worker | Work assignment          |
+| `RESULT`     | Worker → Lead | Deliverable notification |
+| `ESCALATION` | Worker → Lead | Blocker requiring help   |
+| `DECISION`   | Lead → Worker | Resolves an escalation   |
 
 **Core rule:** Silence = success. If an agent is working, it stays silent. Only message when blocked, assigning, delivering, or resolving.
 
@@ -244,13 +248,13 @@ The [Agent Communication Protocol](./communication-protocol.md) defines 4 messag
 
 Instead of sending messages, agents write to shared workspace files:
 
-| File | Owner | Purpose |
-|------|-------|---------|
-| `PLAN.md` | Lead agent | Current sprint plan with task assignments |
-| `RESULT.md` | Workers | Completed deliverables |
-| `HANDOFF.md` | Any agent | Work ready for next stage |
-| `REVIEW.md` | Reviewers | Feedback and approvals |
-| `ESCALATION.md` | Any agent | Complex issues needing >3 turns |
+| File            | Owner      | Purpose                                   |
+| --------------- | ---------- | ----------------------------------------- |
+| `PLAN.md`       | Lead agent | Current sprint plan with task assignments |
+| `RESULT.md`     | Workers    | Completed deliverables                    |
+| `HANDOFF.md`    | Any agent  | Work ready for next stage                 |
+| `REVIEW.md`     | Reviewers  | Feedback and approvals                    |
+| `ESCALATION.md` | Any agent  | Complex issues needing >3 turns           |
 
 ---
 
@@ -259,6 +263,7 @@ Instead of sending messages, agents write to shared workspace files:
 ### Q20: Can I use OpenSpawn for compliance monitoring?
 
 **Yes.** The `compliance-monitoring` template is purpose-built for fintech compliance teams. It models:
+
 - Transaction ingestion and normalization (Transaction Analyst)
 - AML/BSA rule application and OFAC screening (Rule Engine Agent)
 - SAR/CTR filing and regulatory reporting (Report Generator)
@@ -273,6 +278,7 @@ openspawn init my-compliance-org --template=compliance-monitoring
 ### Q21: How would I set up a contract review pipeline?
 
 Use the `contract-review` template. The pipeline flows:
+
 1. **Clause Extractor** reads the contract and categorizes all key clauses (liability, indemnification, IP, etc.)
 2. **Risk Analyst** compares each clause against your negotiation playbook and flags deviations
 3. **Summary Writer** produces an attorney-ready package with risk register and recommended redlines
@@ -293,6 +299,7 @@ The template is designed so each customer's onboarding is repeatable, documented
 ### Q23: How would I handle a production incident with OpenSpawn?
 
 Use the `incident-response` template. When an alert fires:
+
 1. Incident Commander activates and assigns Diagnostics and Comms agents simultaneously
 2. Diagnostics Agent pulls metrics, traces, and logs to identify root cause
 3. Remediation Agent executes fix with explicit Commander go-ahead
@@ -303,6 +310,7 @@ The template uses the `military` culture preset — mandatory acks, every-5-minu
 ### Q24: Can I use OpenSpawn for a gaming live ops team?
 
 **Yes.** The `game-live-ops` template covers:
+
 - 24/7 economy metric monitoring with guardrails (max 15% parameter change without approval)
 - Automated content generation on the weekly calendar
 - Player sentiment monitoring across app stores and social
@@ -315,6 +323,7 @@ openspawn init my-game-org --template=game-live-ops
 ### Q25: How does OpenSpawn handle regulatory compliance requirements like audit trails?
 
 For regulated industries (fintech, healthcare, legal), the ORG.md Policies section can specify:
+
 - Audit trail requirements (every agent action logged with source reference and agent ID)
 - Human approval gates for specific action types
 - Data handling restrictions (what agents can read vs. write)

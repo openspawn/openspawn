@@ -1,11 +1,11 @@
-import type { DemoScenario } from '../types';
-import { agents, AGENT_IDS } from '../fixtures/agents';
-import { tasks } from '../fixtures/tasks';
-import { creditTransactions } from '../fixtures/credits';
-import { events } from '../fixtures/events';
-import { generateInitialMessages } from '../fixtures/messages';
-import { demoWebhooks } from '../fixtures/webhooks';
-import { demoGitHubConnections, demoIntegrationLinks } from '../fixtures/github';
+import type { DemoScenario } from "../types";
+import { agents, AGENT_IDS } from "../fixtures/agents";
+import { tasks } from "../fixtures/tasks";
+import { creditTransactions } from "../fixtures/credits";
+import { events } from "../fixtures/events";
+import { generateInitialMessages } from "../fixtures/messages";
+import { demoWebhooks } from "../fixtures/webhooks";
+import { demoGitHubConnections, demoIntegrationLinks } from "../fixtures/github";
 
 /**
  * Startup Scenario: Small team, early stage
@@ -14,40 +14,56 @@ import { demoGitHubConnections, demoIntegrationLinks } from '../fixtures/github'
  * - Limited credit activity
  */
 export const startupScenario: DemoScenario = {
-  name: 'startup',
-  description: 'Small team, early stage - 5 agents, 10 tasks',
-  
+  name: "startup",
+  description: "Small team, early stage - 5 agents, 10 tasks",
+
   agents: [
     // Keep only core agents
-    agents.find(a => a.id === AGENT_IDS.agentDennis)!,
-    agents.find(a => a.id === AGENT_IDS.techTalent)!,
-    agents.find(a => a.id === AGENT_IDS.marketingTalent)!,
-    agents.find(a => a.id === AGENT_IDS.codeReviewer)!,
-    agents.find(a => a.id === AGENT_IDS.copywriter)!,
+    agents.find((a) => a.id === AGENT_IDS.agentDennis)!,
+    agents.find((a) => a.id === AGENT_IDS.techTalent)!,
+    agents.find((a) => a.id === AGENT_IDS.marketingTalent)!,
+    agents.find((a) => a.id === AGENT_IDS.codeReviewer)!,
+    agents.find((a) => a.id === AGENT_IDS.copywriter)!,
   ],
-  
+
   tasks: tasks.slice(0, 10),
-  
-  credits: creditTransactions.filter(t => 
-    [AGENT_IDS.agentDennis, AGENT_IDS.techTalent, AGENT_IDS.marketingTalent, 
-     AGENT_IDS.codeReviewer, AGENT_IDS.copywriter].includes(t.agentId as any)
+
+  credits: creditTransactions.filter((t) =>
+    [
+      AGENT_IDS.agentDennis,
+      AGENT_IDS.techTalent,
+      AGENT_IDS.marketingTalent,
+      AGENT_IDS.codeReviewer,
+      AGENT_IDS.copywriter,
+    ].includes(t.agentId as any),
   ),
-  
-  events: events.filter(e => 
-    !e.agentId || 
-    [AGENT_IDS.agentDennis, AGENT_IDS.techTalent, AGENT_IDS.marketingTalent,
-     AGENT_IDS.codeReviewer, AGENT_IDS.copywriter].includes(e.agentId as any)
+
+  events: events.filter(
+    (e) =>
+      !e.agentId ||
+      [
+        AGENT_IDS.agentDennis,
+        AGENT_IDS.techTalent,
+        AGENT_IDS.marketingTalent,
+        AGENT_IDS.codeReviewer,
+        AGENT_IDS.copywriter,
+      ].includes(e.agentId as any),
   ),
-  
+
   messages: generateInitialMessages(
-    [AGENT_IDS.agentDennis, AGENT_IDS.techTalent, AGENT_IDS.marketingTalent,
-     AGENT_IDS.codeReviewer, AGENT_IDS.copywriter],
-    tasks.slice(0, 10).map(t => t.identifier)
+    [
+      AGENT_IDS.agentDennis,
+      AGENT_IDS.techTalent,
+      AGENT_IDS.marketingTalent,
+      AGENT_IDS.codeReviewer,
+      AGENT_IDS.copywriter,
+    ],
+    tasks.slice(0, 10).map((t) => t.identifier),
   ),
-  
+
   // Include demo webhooks for startup scenario
   webhooks: demoWebhooks.slice(0, 3),
-  
+
   // GitHub integration demo data
   githubConnections: demoGitHubConnections.slice(0, 1),
   integrationLinks: demoIntegrationLinks.slice(0, 2),

@@ -11,7 +11,11 @@ const lines = [
   { text: "🔀 Router: 3 providers configured", color: "text-emerald-400", delay: 3700 },
   { text: "📊 Dashboard: http://localhost:3333", color: "text-cyan-400", delay: 4100 },
   { text: "", color: "", delay: 4600 },
-  { text: "✨ 22 agents ready. Visit http://localhost:3333", color: "text-cyan-300 font-semibold", delay: 5200 },
+  {
+    text: "✨ 22 agents ready. Visit http://localhost:3333",
+    color: "text-cyan-300 font-semibold",
+    delay: 5200,
+  },
 ];
 
 export function TerminalDemo() {
@@ -25,7 +29,7 @@ export function TerminalDemo() {
 
   useEffect(() => {
     const timers = lines.map((line, i) =>
-      setTimeout(() => setVisibleLines(i + 1), line.delay + Math.random() * 80)
+      setTimeout(() => setVisibleLines(i + 1), line.delay + Math.random() * 80),
     );
     return () => timers.forEach(clearTimeout);
   }, [key]);
@@ -57,8 +61,18 @@ export function TerminalDemo() {
               className="flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-slate-500 transition-all duration-150 hover:bg-white/10 hover:text-cyan-400"
               aria-label="Replay terminal animation"
             >
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              <svg
+                className="h-3 w-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                />
               </svg>
               Replay
             </button>

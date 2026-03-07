@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useTourSafe } from './tour-context';
-import { ChevronLeft, ChevronRight, X, Timer, TimerOff } from 'lucide-react';
+import { motion, AnimatePresence } from "motion/react";
+import { useTourSafe } from "./tour-context";
+import { ChevronLeft, ChevronRight, X, Timer, TimerOff } from "lucide-react";
 
 export function TourBar() {
   const tour = useTourSafe();
@@ -15,7 +15,7 @@ export function TourBar() {
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
         className="fixed bottom-0 left-0 right-0 z-[9999] pointer-events-none"
       >
         <div className="pointer-events-auto mx-auto max-w-3xl mb-4 px-4">
@@ -25,7 +25,7 @@ export function TourBar() {
               <motion.div
                 className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400"
                 animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               />
             </div>
 
@@ -49,10 +49,10 @@ export function TourBar() {
                     key={i}
                     className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                       i === currentStep
-                        ? 'bg-cyan-400 scale-125'
+                        ? "bg-cyan-400 scale-125"
                         : i < currentStep
-                          ? 'bg-cyan-400/40'
-                          : 'bg-white/10'
+                          ? "bg-cyan-400/40"
+                          : "bg-white/10"
                     }`}
                   />
                 ))}
@@ -64,12 +64,16 @@ export function TourBar() {
                   onClick={() => setAutoAdvance(!autoAdvance)}
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                     autoAdvance
-                      ? 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'
-                      : 'text-white/30 hover:text-white/50 hover:bg-white/5'
+                      ? "text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20"
+                      : "text-white/30 hover:text-white/50 hover:bg-white/5"
                   }`}
-                  title={autoAdvance ? 'Auto-advance ON' : 'Auto-advance OFF'}
+                  title={autoAdvance ? "Auto-advance ON" : "Auto-advance OFF"}
                 >
-                  {autoAdvance ? <Timer className="w-3.5 h-3.5" /> : <TimerOff className="w-3.5 h-3.5" />}
+                  {autoAdvance ? (
+                    <Timer className="w-3.5 h-3.5" />
+                  ) : (
+                    <TimerOff className="w-3.5 h-3.5" />
+                  )}
                 </button>
 
                 <button
@@ -84,7 +88,7 @@ export function TourBar() {
                   onClick={next}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/30 transition-all cursor-pointer"
                 >
-                  {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
 

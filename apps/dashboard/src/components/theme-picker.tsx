@@ -28,19 +28,13 @@ function ThemeSwatch({
         dim,
         isActive
           ? "border-primary ring-2 ring-primary/30"
-          : "border-border hover:border-muted-foreground/50"
+          : "border-border hover:border-muted-foreground/50",
       )}
     >
       {/* Background takes full circle */}
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: swatches[0] }}
-      />
+      <div className="absolute inset-0" style={{ backgroundColor: swatches[0] }} />
       {/* Primary takes right half */}
-      <div
-        className="absolute inset-y-0 right-0 w-1/2"
-        style={{ backgroundColor: swatches[1] }}
-      />
+      <div className="absolute inset-y-0 right-0 w-1/2" style={{ backgroundColor: swatches[1] }} />
       {/* Accent takes bottom-right quarter */}
       <div
         className="absolute bottom-0 right-0 w-1/2 h-1/2"
@@ -88,21 +82,13 @@ export function ThemePicker() {
                 "flex items-center gap-3 w-full rounded-md px-2 py-2 text-left transition-colors",
                 theme === t.id
                   ? "bg-secondary text-foreground"
-                  : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                  : "hover:bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
-              <ThemeSwatch
-                swatches={t.swatches}
-                isActive={theme === t.id}
-                size="md"
-              />
+              <ThemeSwatch swatches={t.swatches} isActive={theme === t.id} size="md" />
               <div className="flex flex-col min-w-0">
-                <span className="text-sm font-medium truncate">
-                  {t.label}
-                </span>
-                <span className="text-xs text-muted-foreground truncate">
-                  {t.description}
-                </span>
+                <span className="text-sm font-medium truncate">{t.label}</span>
+                <span className="text-xs text-muted-foreground truncate">{t.description}</span>
               </div>
             </button>
           ))}
@@ -120,7 +106,7 @@ export function ThemePicker() {
               "flex items-center gap-2 flex-1 rounded-md px-3 py-2 text-sm transition-colors",
               density === "comfortable"
                 ? "bg-secondary text-foreground"
-                : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                : "hover:bg-muted text-muted-foreground hover:text-foreground",
             )}
           >
             <Maximize2 className="h-3.5 w-3.5" />
@@ -132,7 +118,7 @@ export function ThemePicker() {
               "flex items-center gap-2 flex-1 rounded-md px-3 py-2 text-sm transition-colors",
               density === "compact"
                 ? "bg-secondary text-foreground"
-                : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                : "hover:bg-muted text-muted-foreground hover:text-foreground",
             )}
           >
             <Minimize2 className="h-3.5 w-3.5" />

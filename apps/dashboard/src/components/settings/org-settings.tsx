@@ -78,9 +78,7 @@ export function OrgSettings() {
             <Building2 className="h-5 w-5" />
             Organization
           </CardTitle>
-          <CardDescription>
-            Manage your organization settings
-          </CardDescription>
+          <CardDescription>Manage your organization settings</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -124,11 +122,7 @@ export function OrgSettings() {
               {members.length} member{members.length !== 1 ? "s" : ""} in your organization
             </CardDescription>
           </div>
-          {isAdmin && (
-            <Button variant="outline">
-              Invite Member
-            </Button>
-          )}
+          {isAdmin && <Button variant="outline">Invite Member</Button>}
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -144,9 +138,7 @@ export function OrgSettings() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{member.name}</p>
-                      <Badge variant={getRoleBadgeVariant(member.role)}>
-                        {member.role}
-                      </Badge>
+                      <Badge variant={getRoleBadgeVariant(member.role)}>{member.role}</Badge>
                       {member.id === user?.id && (
                         <Badge variant="outline" className="text-xs">
                           You
@@ -182,9 +174,7 @@ export function OrgSettings() {
                   Permanently delete this organization and all its data
                 </p>
               </div>
-              <Button variant="destructive">
-                Delete Organization
-              </Button>
+              <Button variant="destructive">Delete Organization</Button>
             </div>
           </CardContent>
         </Card>

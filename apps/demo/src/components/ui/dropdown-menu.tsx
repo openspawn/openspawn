@@ -11,13 +11,7 @@ const DropdownMenuTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof Menu.Trigger> & { asChild?: boolean }
 >(({ asChild, children, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <Menu.Trigger
-        ref={ref}
-        render={children}
-        {...props}
-      />
-    );
+    return <Menu.Trigger ref={ref} render={children} {...props} />;
   }
   return (
     <Menu.Trigger ref={ref} {...props}>
@@ -46,7 +40,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[popup-open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
-      className
+      className,
     )}
     {...props}
   >
@@ -66,7 +60,7 @@ const DropdownMenuSubContent = React.forwardRef<
         ref={ref}
         className={cn(
           "z-[60] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className
+          className,
         )}
         {...props}
       />
@@ -79,18 +73,22 @@ const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof Menu.Popup> & {
     sideOffset?: number;
-    align?: 'start' | 'center' | 'end';
-    side?: 'top' | 'bottom' | 'left' | 'right';
+    align?: "start" | "center" | "end";
+    side?: "top" | "bottom" | "left" | "right";
   }
 >(({ className, sideOffset = 4, align, side, ...props }, ref) => (
   <Menu.Portal>
-    <Menu.Positioner sideOffset={sideOffset} align={align === 'end' ? 'end' : align === 'start' ? 'start' : 'center'} side={side}>
+    <Menu.Positioner
+      sideOffset={sideOffset}
+      align={align === "end" ? "end" : align === "start" ? "start" : "center"}
+      side={side}
+    >
       <Menu.Popup
         ref={ref}
         className={cn(
           "z-[60] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className
+          className,
         )}
         {...props}
       />
@@ -114,7 +112,7 @@ const DropdownMenuItem = React.forwardRef<
         className={cn(
           "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
           inset && "pl-8",
-          className
+          className,
         )}
         {...props}
       />
@@ -126,7 +124,7 @@ const DropdownMenuItem = React.forwardRef<
       className={cn(
         "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
         inset && "pl-8",
-        className
+        className,
       )}
       {...props}
     >
@@ -144,7 +142,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -166,7 +164,7 @@ const DropdownMenuRadioItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
+      className,
     )}
     {...props}
   >
@@ -188,11 +186,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "px-2 py-1.5 text-sm font-semibold",
-      inset && "pl-8",
-      className
-    )}
+    className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
     {...props}
   />
 ));
@@ -202,23 +196,13 @@ const DropdownMenuSeparator = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof Menu.Separator>
 >(({ className, ...props }, ref) => (
-  <Menu.Separator
-    ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
-    {...props}
-  />
+  <Menu.Separator ref={ref} className={cn("-mx-1 my-1 h-px bg-muted", className)} {...props} />
 ));
 DropdownMenuSeparator.displayName = "DropdownMenuSeparator";
 
-const DropdownMenuShortcut = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => {
+const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
-    <span
-      className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
-      {...props}
-    />
+    <span className={cn("ml-auto text-xs tracking-widest opacity-60", className)} {...props} />
   );
 };
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut";

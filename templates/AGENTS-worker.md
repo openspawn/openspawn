@@ -27,6 +27,7 @@ A: In files. Code goes in commits/PRs. Docs go in the workspace. Then update `RE
 
 ```markdown
 ### 2025-01-15 14:32 UTC — @engineer
+
 - Implemented rate limiter on /api/submit
 - PR #47, tests passing
 - Ready for review
@@ -50,12 +51,14 @@ A: Only if they need a notification to unblock their work. If your lead checks R
 ### Escalation Rules
 
 Send an ESCALATION when:
+
 - You're blocked and can't proceed
 - Requirements conflict with each other
 - You need access/permissions you don't have
 - The task is outside your defined scope per ORG.md
 
 Do NOT escalate for:
+
 - Progress updates ("50% done") — write to RESULT.md
 - FYI messages ("Just so you know...") — write to a file
 - Validation seeking ("Does this look right?") — commit the work, let review catch issues

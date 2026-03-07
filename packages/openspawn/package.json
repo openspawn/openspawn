@@ -2,10 +2,30 @@
   "name": "openspawn",
   "version": "2026.3.3",
   "description": "Standalone MCP server and CLI for OpenSpawn multi-agent organizations",
-  "type": "module",
+  "keywords": [
+    "a2a",
+    "agent",
+    "cli",
+    "mcp",
+    "multi-agent",
+    "orchestration",
+    "org"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openspawn/openspawn.git",
+    "directory": "packages/openspawn"
+  },
   "bin": {
     "openspawn": "dist/cli/index.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -24,25 +44,5 @@
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^3.0.0"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/openspawn/openspawn.git",
-    "directory": "packages/openspawn"
-  },
-  "keywords": [
-    "multi-agent",
-    "agent",
-    "mcp",
-    "cli",
-    "org",
-    "orchestration",
-    "a2a"
-  ],
-  "files": [
-    "dist/",
-    "README.md",
-    "LICENSE"
-  ]
+  }
 }

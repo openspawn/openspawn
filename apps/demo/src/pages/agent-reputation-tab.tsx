@@ -18,19 +18,19 @@ type Agent = AgentFieldsFragment;
 // ─── Shared reputation constants ──────────────────────────────────────────────
 
 export const REPUTATION_COLORS: Record<string, string> = {
-  NEW:       "bg-gray-500",
+  NEW: "bg-gray-500",
   PROBATION: "bg-orange-500",
-  TRUSTED:   "bg-cyan-500",
-  VETERAN:   "bg-violet-500",
-  ELITE:     "bg-amber-500",
+  TRUSTED: "bg-cyan-500",
+  VETERAN: "bg-violet-500",
+  ELITE: "bg-amber-500",
 };
 
 export const REPUTATION_EMOJI: Record<string, string> = {
-  NEW:       "🆕",
+  NEW: "🆕",
   PROBATION: "⚠️",
-  TRUSTED:   "✅",
-  VETERAN:   "🏆",
-  ELITE:     "👑",
+  TRUSTED: "✅",
+  VETERAN: "🏆",
+  ELITE: "👑",
 };
 
 // ─── ReputationTab ────────────────────────────────────────────────────────────
@@ -56,16 +56,22 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
         name: a.name,
         level: a.level,
         trustScore: a.trustScore ?? 50,
-        reputationLevel: a.reputationLevel || 'TRUSTED',
+        reputationLevel: a.reputationLevel || "TRUSTED",
         tasksCompleted: a.tasksCompleted ?? 0,
       }));
   }, [agents]);
 
   // Reputation distribution by level
   const distribution = useMemo(() => {
-    const counts: Record<string, number> = { NEW: 0, PROBATION: 0, TRUSTED: 0, VETERAN: 0, ELITE: 0 };
+    const counts: Record<string, number> = {
+      NEW: 0,
+      PROBATION: 0,
+      TRUSTED: 0,
+      VETERAN: 0,
+      ELITE: 0,
+    };
     agents.forEach((a) => {
-      const level = a.reputationLevel || 'TRUSTED';
+      const level = a.reputationLevel || "TRUSTED";
       if (counts[level] !== undefined) counts[level]++;
     });
     return counts;
@@ -87,7 +93,9 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg Trust Score</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Avg Trust Score
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{avgTrustScore}/100</div>
@@ -96,7 +104,9 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Elite Agents</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Elite Agents
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-500">👑 {distribution.ELITE}</div>
@@ -104,7 +114,9 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Veteran Agents</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Veteran Agents
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-violet-500">🏆 {distribution.VETERAN}</div>
@@ -112,7 +124,9 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Tasks Done</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Tasks Done
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalTasks.toLocaleString()}</div>
@@ -123,7 +137,9 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
       {/* Distribution + Leaderboard */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Reputation Distribution</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Reputation Distribution</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             {Object.entries(distribution).map(([level, count]) => (
               <div key={level} className="space-y-1">
@@ -147,17 +163,20 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
 
       {/* All Agents Trust Overview */}
       <Card>
-        <CardHeader><CardTitle>All Agents Trust Overview</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>All Agents Trust Overview</CardTitle>
+        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[...agents]
               .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
               .map((agent) => {
-                const trustScore   = agent.trustScore ?? 50;
-                const repLevel     = agent.reputationLevel || 'TRUSTED';
-                const successRate  = agent.tasksCompleted && agent.tasksCompleted > 0
-                  ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
-                  : 0;
+                const trustScore = agent.trustScore ?? 50;
+                const repLevel = agent.reputationLevel || "TRUSTED";
+                const successRate =
+                  agent.tasksCompleted && agent.tasksCompleted > 0
+                    ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
+                    : 0;
 
                 return (
                   <motion.div
@@ -184,7 +203,8 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
                       <div>
                         <div className="font-medium">{agent.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          L{agent.level} · {agent.tasksCompleted ?? 0} tasks · {successRate}% success
+                          L{agent.level} · {agent.tasksCompleted ?? 0} tasks · {successRate}%
+                          success
                         </div>
                       </div>
                     </div>

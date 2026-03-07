@@ -2,15 +2,15 @@
  * ThreadView — displays a conversation thread between two agents
  * with a visual timeline showing message flow direction.
  */
-import { useMemo } from 'react';
-import { motion } from 'motion/react';
-import { X, MessageSquare } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { cn } from '../lib/utils';
-import { darkenForBackground } from '../lib/avatar-utils';
-import { resolveAvatarUrl } from '../lib/resolve-avatar-url';
-import { useAgents, type Message } from '../hooks';
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import { X, MessageSquare } from "lucide-react";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { cn } from "../lib/utils";
+import { darkenForBackground } from "../lib/avatar-utils";
+import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
+import { useAgents, type Message } from "../hooks";
 
 interface ThreadViewProps {
   /** All messages in this conversation (between two agents) */
@@ -20,37 +20,59 @@ interface ThreadViewProps {
 }
 
 // ACP message type styling
-const acpStyles: Record<string, { icon: string; label: string; className: string; compact?: boolean }> = {
-  ack: { icon: '👍', label: 'Acknowledged', className: 'bg-muted/60 text-muted-foreground', compact: true },
-  delegation: { icon: '📋', label: 'Delegated', className: 'border-l-4 border-l-blue-500 bg-blue-500/5' },
-  progress: { icon: '📊', label: 'Progress', className: 'bg-muted/40' },
-  escalation: { icon: '⚠️', label: 'Escalated', className: 'bg-red-500/10 border border-red-500/20' },
-  completion: { icon: '✅', label: 'Completed', className: 'bg-emerald-500/10 border border-emerald-500/20' },
+const acpStyles: Record<
+  string,
+  { icon: string; label: string; className: string; compact?: boolean }
+> = {
+  ack: {
+    icon: "👍",
+    label: "Acknowledged",
+    className: "bg-muted/60 text-muted-foreground",
+    compact: true,
+  },
+  delegation: {
+    icon: "📋",
+    label: "Delegated",
+    className: "border-l-4 border-l-blue-500 bg-blue-500/5",
+  },
+  progress: { icon: "📊", label: "Progress", className: "bg-muted/40" },
+  escalation: {
+    icon: "⚠️",
+    label: "Escalated",
+    className: "bg-red-500/10 border border-red-500/20",
+  },
+  completion: {
+    icon: "✅",
+    label: "Completed",
+    className: "bg-emerald-500/10 border border-emerald-500/20",
+  },
 };
 
 const typeColors: Record<string, string> = {
-  TASK: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-  STATUS: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  REPORT: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
-  QUESTION: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  ESCALATION: 'bg-red-500/20 text-red-400 border-red-500/30',
-  GENERAL: 'bg-secondary text-muted-foreground border-border',
+  TASK: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+  STATUS: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  REPORT: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+  QUESTION: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  ESCALATION: "bg-red-500/20 text-red-400 border-red-500/30",
+  GENERAL: "bg-secondary text-muted-foreground border-border",
 };
 
 const typeIcons: Record<string, string> = {
-  TASK: '📋',
-  STATUS: '✅',
-  REPORT: '📊',
-  QUESTION: '❓',
-  ESCALATION: '🚨',
-  GENERAL: '💬',
+  TASK: "📋",
+  STATUS: "✅",
+  REPORT: "📊",
+  QUESTION: "❓",
+  ESCALATION: "🚨",
+  GENERAL: "💬",
 };
 
 function formatThreadTime(dateStr: string) {
   const date = new Date(dateStr);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
-    ' · ' +
-    date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  return (
+    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
+    " · " +
+    date.toLocaleDateString([], { month: "short", day: "numeric" })
+  );
 }
 
 export function ThreadView({ messages, onClose }: ThreadViewProps) {
@@ -83,7 +105,9 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
         agentMap.set(m.toAgentId, m.toAgent);
       }
     });
-    return Array.from(ids).map((id) => agentMap.get(id)).filter(Boolean) as {
+    return Array.from(ids)
+      .map((id) => agentMap.get(id))
+      .filter(Boolean) as {
       id: string;
       name: string;
       level: number;
@@ -102,10 +126,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
       <motion.div
@@ -119,10 +140,10 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
             <MessageSquare className="h-5 w-5 text-primary" />
             <div>
               <h3 className="font-semibold text-sm">
-                {participants.map((p) => p.name).join(' ↔ ') || 'Thread'}
+                {participants.map((p) => p.name).join(" ↔ ") || "Thread"}
               </h3>
               <p className="text-xs text-muted-foreground">
-                {sorted.length} message{sorted.length !== 1 ? 's' : ''}
+                {sorted.length} message{sorted.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
@@ -137,8 +158,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
             {sorted.map((msg, idx) => {
               const isLeft = msg.fromAgentId === leftId;
               const sender = msg.fromAgent;
-              const showAvatar =
-                idx === 0 || sorted[idx - 1].fromAgentId !== msg.fromAgentId;
+              const showAvatar = idx === 0 || sorted[idx - 1].fromAgentId !== msg.fromAgentId;
 
               const acpType = (msg as any).acpType as string | undefined;
               const acpStyle = acpType ? acpStyles[acpType] : undefined;
@@ -166,73 +186,77 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                   initial={{ opacity: 0, x: isLeft ? -10 : 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.03 }}
-                  className={cn('flex gap-2', isLeft ? 'flex-row' : 'flex-row-reverse')}
+                  className={cn("flex gap-2", isLeft ? "flex-row" : "flex-row-reverse")}
                 >
                   {/* Avatar (only when sender changes) */}
                   <div className="w-7 shrink-0">
-                    {showAvatar && sender && (() => {
-                      const agentData = agentMap.get(msg.fromAgentId);
-                      const emoji = agentData?.avatar || '🤖';
-                      const color = agentData?.avatarColor || '#71717a';
-                      const imgUrl = resolveAvatarUrl(agentData?.avatarUrl);
-                      return imgUrl ? (
-                        <img src={imgUrl} alt={sender?.name} className="w-7 h-7 rounded-full object-cover" />
-                      ) : (
-                        <span
-                          className="w-7 h-7 rounded-full inline-flex items-center justify-center text-sm"
-                          style={{ backgroundColor: darkenForBackground(color) }}
-                        >
-                          {emoji}
-                        </span>
-                      );
-                    })()}
+                    {showAvatar &&
+                      sender &&
+                      (() => {
+                        const agentData = agentMap.get(msg.fromAgentId);
+                        const emoji = agentData?.avatar || "🤖";
+                        const color = agentData?.avatarColor || "#71717a";
+                        const imgUrl = resolveAvatarUrl(agentData?.avatarUrl);
+                        return imgUrl ? (
+                          <img
+                            src={imgUrl}
+                            alt={sender?.name}
+                            className="w-7 h-7 rounded-full object-cover"
+                          />
+                        ) : (
+                          <span
+                            className="w-7 h-7 rounded-full inline-flex items-center justify-center text-sm"
+                            style={{ backgroundColor: darkenForBackground(color) }}
+                          >
+                            {emoji}
+                          </span>
+                        );
+                      })()}
                   </div>
 
                   {/* Bubble — ACP-styled or default */}
                   <div
                     className={cn(
-                      'max-w-[75%] rounded-xl px-3 py-2',
+                      "max-w-[75%] rounded-xl px-3 py-2",
                       acpStyle
                         ? acpStyle.className
                         : isLeft
-                          ? 'bg-muted rounded-tl-sm'
-                          : 'bg-primary/10 rounded-tr-sm',
+                          ? "bg-muted rounded-tl-sm"
+                          : "bg-primary/10 rounded-tr-sm",
                     )}
                   >
                     {showAvatar && (
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="text-[11px] font-semibold">
-                          {sender?.name || 'Unknown'}
+                          {sender?.name || "Unknown"}
                         </span>
                         <Badge
                           variant="outline"
                           className={cn(
-                            'text-[8px] px-1 py-0 h-3.5',
+                            "text-[8px] px-1 py-0 h-3.5",
                             typeColors[msg.type] || typeColors.GENERAL,
                           )}
                         >
-                          {typeIcons[msg.type] || '💬'}
+                          {typeIcons[msg.type] || "💬"}
                         </Badge>
                       </div>
                     )}
-                    {acpType === 'delegation' && (
+                    {acpType === "delegation" && (
                       <p className="text-xs font-medium text-blue-400 mb-0.5">
-                        📋 Delegated: {msg.taskRef || 'task'}
+                        📋 Delegated: {msg.taskRef || "task"}
                       </p>
                     )}
-                    {acpType === 'escalation' && (
+                    {acpType === "escalation" && (
                       <p className="text-xs font-medium text-red-400 mb-0.5">
-                        ⚠️ Escalated: {(msg as any).reason || 'unknown'}
+                        ⚠️ Escalated: {(msg as any).reason || "unknown"}
                       </p>
                     )}
-                    {acpType === 'completion' && (
-                      <p className="text-xs font-medium text-emerald-400 mb-0.5">
-                        ✅ Completed
-                      </p>
+                    {acpType === "completion" && (
+                      <p className="text-xs font-medium text-emerald-400 mb-0.5">✅ Completed</p>
                     )}
-                    {acpType === 'progress' && (
+                    {acpType === "progress" && (
                       <p className="text-xs font-medium text-muted-foreground mb-0.5">
-                        📊 Progress{(msg as any).pct != null ? ` (${(msg as any).pct}%)` : ''}
+                        📊 Progress{(msg as any).pct != null ? ` (${(msg as any).pct}%)` : ""}
                       </p>
                     )}
                     <p className="text-xs md:text-sm text-foreground/90 leading-relaxed">

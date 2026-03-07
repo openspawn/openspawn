@@ -96,14 +96,14 @@ export function createInitCommand(): Command {
 
       console.log("");
       console.log(
-        `${icons.rocket} ${pc.bold("Creating OpenSpawn organization:")} ${pc.cyan(name)}`
+        `${icons.rocket} ${pc.bold("Creating OpenSpawn organization:")} ${pc.cyan(name)}`,
       );
       console.log("");
 
       // Check if directory exists
       if (existsSync(targetDir) && !opts.force) {
         console.log(
-          `${icons.error} Directory ${pc.bold(name)} already exists. Use ${pc.dim("--force")} to overwrite.`
+          `${icons.error} Directory ${pc.bold(name)} already exists. Use ${pc.dim("--force")} to overwrite.`,
         );
         process.exit(1);
       }
@@ -126,13 +126,9 @@ export function createInitCommand(): Command {
       console.log(`  ${pc.dim("Next steps:")}`);
       console.log(`  ${pc.cyan(`cd ${name}`)}`);
       console.log(`  ${pc.cyan("npx openspawn preview")}  ${pc.dim("# launch the sandbox")}`);
-      console.log(
-        `  ${pc.dim("Edit ORG.md to customize your organization")}`
-      );
+      console.log(`  ${pc.dim("Edit ORG.md to customize your organization")}`);
       console.log("");
-      console.log(
-        `  ${pc.dim("Docs:")} ${pc.cyan("https://openspawn.ai/docs/getting-started")}`
-      );
+      console.log(`  ${pc.dim("Docs:")} ${pc.cyan("https://openspawn.ai/docs/getting-started")}`);
       console.log("");
     });
 
@@ -247,7 +243,7 @@ Manages vulnerability scanning, access control, and compliance.
   }
 
   console.log(
-    `${icons.warning} Unknown template "${template}". Available: startup, agency, devops`
+    `${icons.warning} Unknown template "${template}". Available: startup, agency, devops`,
   );
   console.log(`  Using default (startup) template.`);
   return STARTER_ORG;

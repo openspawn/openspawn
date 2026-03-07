@@ -16,6 +16,7 @@ search_exclude: true
 This document analyzes 15+ viral open-source projects across multiple domains (backend, frontend, tooling, infrastructure) to extract actionable branding and launch strategies for **BikiniBottom**.
 
 **Key Findings:**
+
 - **Positioning over features**: The most viral projects lead with a simple, bold positioning statement
 - **Visual identity matters**: Mascots, unique color schemes, and memorable names create instant recognition
 - **"Not X, but Y" positioning**: Many successful projects defined themselves against incumbents
@@ -34,6 +35,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Hero tagline:** "The Postgres development platform. We're building the features of Firebase using enterprise-grade open source tools."
 - Immediate clarity: developers know exactly what it does and why it matters
 - Feature list with docs links right in the README
@@ -42,6 +44,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - **Badges strategy:** Light/dark mode logos, "Made with Supabase" badges for users
 
 **GitHub Repo Design:**
+
 - Clean, organized monorepo structure
 - Translations in 40+ languages (i18n folder signals global ambition)
 - "Watch releases" animated GIF teaching people to follow
@@ -49,16 +52,19 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Architecture transparency: full diagram of components
 
 **Branding Elements:**
+
 - Green color scheme (distinct from Firebase's yellow/orange)
 - Professional, enterprise-grade visual identity
 - "Made with Supabase" badge system for social proof
 
 **Community Building:**
+
 - Multiple support channels clearly defined (Forum, GitHub Issues, Email, Discord)
 - "Best for:" explanations for each channel
 - Community spotlight section
 
 **What We Can Steal:**
+
 - **Bold positioning statement** that references a known alternative
 - Architecture transparency builds trust
 - Multiple badge variants for community adoption
@@ -75,27 +81,32 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "A set of beautifully designed components that you can customize, extend, and build on. Start here then make it your own. Open Source. Open Code."
 - **Revolutionary positioning:** Not installing packages, you own the code
 - Beautiful opengraph image for social shares
 - Minimal README (confidence move - the product speaks for itself)
 
 **GitHub Repo Design:**
+
 - Extremely clean, minimal structure
 - Documentation site is the real star: ui.shadcn.com
 - `.claude` and `.cursor/rules` folders (AI-native development signals)
 
 **Branding Elements:**
+
 - Black and white aesthetic (sophisticated, designer-focused)
 - "Open Code" as a philosophy, not just "open source"
 - No logo needed - the aesthetic IS the brand
 
 **Social Strategy:**
+
 - Twitter/X community went wild with showcases
 - Developers building themes and sharing
 - "Copy/paste components" messaging resonated
 
 **What We Can Steal:**
+
 - **Challenge conventions** ("not a library, a collection")
 - Minimalist branding can be powerful
 - Make developers feel like they're building, not consuming
@@ -112,6 +123,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "Virtual whiteboard for sketching hand-drawn like diagrams"
 - Immediate visual differentiation - you know what it looks like
 - Feature list with emojis (friendly, approachable)
@@ -119,29 +131,34 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - End-to-end encryption messaging (privacy-first)
 
 **GitHub Repo Design:**
+
 - Clean feature list with emoji bullets
 - PWA support highlighted (works offline)
 - Free & open source emphasize
 - Links to Excalidraw+ (business model clarity)
 
 **Branding Elements:**
+
 - Hand-drawn aesthetic is instantly recognizable
 - Playful, creative vibe
 - Purple/pink color scheme
 - Visual identity that matches product experience
 
 **Community Building:**
+
 - Discord, Twitter presence
 - Excalidraw+ for sustainable business model
 - VSCode extension, npm package (everywhere strategy)
 - Translation guide (community contribution)
 
 **Launch Strategy:**
+
 - Product screenshot IS the marketing
 - Integrations create network effects
 - Free tier with premium offering
 
 **What We Can Steal:**
+
 - **Visual aesthetic as differentiator**
 - Emoji-friendly, approachable docs
 - "Who's using" section for social proof
@@ -158,24 +175,28 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "very good whiteboard infinite canvas SDK" (hilariously confident)
 - Immediate focus: it's a library, not just an app
 - Simple install + usage example
 - Clear licensing with watermark removal option
 
 **Branding Elements:**
+
 - Lowercase branding (tldraw, not TlDraw)
 - Casual, developer-friendly tone
 - "very good" = understated confidence
 - Pricing transparency (free with watermark, business license to remove)
 
 **Developer Experience:**
+
 - One-line install
 - Immediate code example
 - Local dev setup is clear
 - "Made with tldraw" watermark as marketing
 
 **What We Can Steal:**
+
 - **Understated confidence** ("very good")
 - Watermark as viral marketing
 - Free tier with clear upgrade path
@@ -192,6 +213,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "A modern runtime for JavaScript and TypeScript"
 - Created by Ryan Dahl (Node.js creator) - instant credibility
 - **Dinosaur logo/name** - memorable, fun, distinct
@@ -199,24 +221,28 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Security-first messaging ("secure defaults")
 
 **GitHub Repo Design:**
+
 - Clean, organized structure
 - Installation options for every platform
 - "Your first Deno program" - onboarding in README
 - Built on "V8, Rust, and Tokio" - tech stack as credibility
 
 **Branding Elements:**
+
 - Dinosaur mascot (playful, approachable)
 - Green color scheme
 - Twitter: @deno_land, Discord presence
 - "dee-no" pronunciation (brand consistency)
 
 **Launch Strategy:**
+
 - Ryan Dahl's talk "10 Things I Regret About Node.js" went viral
 - Positioned as "fixing Node's mistakes"
 - Security-first messaging
 - Modern, no legacy baggage
 
 **What We Can Steal:**
+
 - **Mascot/character branding** (dinosaur = instant recognition)
 - Founder credibility (who's behind it matters)
 - "Modern" positioning against legacy
@@ -234,6 +260,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "Incredibly fast JavaScript runtime, bundler, test runner, and package manager – all in one"
 - Speed benchmarks everywhere (20x-90x faster claims)
 - Cute bun logo (food-based mascot)
@@ -241,6 +268,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - "all-in-one" positioning vs fragmented tools
 
 **GitHub Repo Design:**
+
 - Extensive documentation links (guides for everything)
 - "Quick links" section (organized, scannable)
 - Upgrade path clearly shown
@@ -248,6 +276,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - AGENTS.md, CLAUDE.md (AI-native development)
 
 **Branding Elements:**
+
 - Bun logo (cute, memorable, food = approachable)
 - Orange/brown color scheme
 - "bun" = single syllable, easy to say
@@ -255,18 +284,21 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Discord presence
 
 **Developer Experience:**
+
 - Zero config
 - "Just works" philosophy
 - Drop-in Node.js replacement
 - All-in-one tool (no tool fatigue)
 
 **Launch Strategy:**
+
 - Jarred Sumner's Twitter threads on performance
 - Benchmark comparisons (competitive positioning)
 - "Fast" as the core message
 - Community showcases
 
 **What We Can Steal:**
+
 - **Food-based mascot** (approachable, memorable)
 - Single-word, simple name
 - All-in-one positioning (reduce complexity)
@@ -284,28 +316,33 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "High-performance build system for JavaScript and TypeScript codebases, written in Rust"
 - Clean, minimal README
 - Immediate link to turborepo.dev
 - Vercel branding (acquisition credibility)
 
 **Branding Elements:**
+
 - Vercel-aligned visual identity
 - "Turbo" = speed messaging
 - Written in Rust (performance credibility)
 
 **Community Strategy:**
+
 - GitHub Discussions for community
 - Vercel Community tag
 - Twitter: @turborepo
 - Showcase page (social proof)
 
 **Launch Strategy:**
+
 - Vercel acquisition announcement (instant credibility)
 - "Build systems suck" positioning
 - Showcase of who's using it
 
 **What We Can Steal:**
+
 - **Minimal, confident README**
 - Backing/acquisition as credibility
 - Showcase page for social proof
@@ -322,6 +359,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "Open Source realtime backend in 1 file"
 - Single binary simplicity
 - Go-based (performance, single executable)
@@ -329,30 +367,35 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Admin dashboard UI included
 
 **GitHub Repo Design:**
+
 - Warning about v1.0 stability (transparency)
 - SDK clients for multiple languages
 - Framework vs standalone app options
 - Go framework integration guide
 
 **Branding Elements:**
+
 - Simplicity as brand
 - "1 file" messaging
 - Developer-friendly purple theme
 - "Pocket" = small, portable
 
 **Developer Experience:**
+
 - Download, extract, run - done
 - No configuration hell
 - Self-contained
 - Go framework for extensions
 
 **Launch Strategy:**
+
 - HN "Show HN" post
 - "No configuration" messaging
 - Single binary = easy to try
 - Developer community advocacy
 
 **What We Can Steal:**
+
 - **Simplicity as core brand** ("1 file")
 - Zero-config philosophy
 - Self-contained = easy adoption
@@ -370,6 +413,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "Hono - means flame🔥 in Japanese - is a small, simple, and ultrafast web framework"
 - Multi-runtime support (Cloudflare Workers, Deno, Bun, Node.js, etc.)
 - Speed-focused ("ultrafast")
@@ -377,6 +421,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - TypeScript-first
 
 **GitHub Repo Design:**
+
 - Clean feature list
 - "Fast, but not only fast" (feature-rich too)
 - Quick start with npm create
@@ -384,24 +429,28 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Discord + Twitter presence
 
 **Branding Elements:**
+
 - Fire emoji 🔥 everywhere
 - "Hono" = flame (Japanese)
 - Red/orange color scheme
 - Speed + heat metaphor
 
 **Developer Experience:**
+
 - Works everywhere (multi-runtime)
 - Zero dependencies
 - First-class TypeScript
 - "Delightful DX" as feature
 
 **Launch Strategy:**
+
 - Multi-runtime support = wider audience
 - Japanese origin (unique positioning)
 - Benchmark comparisons
 - Framework-agnostic guides
 
 **What We Can Steal:**
+
 - **Emoji + name meaning** (brand storytelling)
 - Multi-platform/runtime strategy
 - "Small, simple, ultrafast" trinity
@@ -419,6 +468,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **README/Landing Page:**
+
 - **Tagline:** "Build production-ready applications in TypeScript"
 - Monorepo structure showcasing ecosystem
 - Professional, enterprise positioning
@@ -426,6 +476,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - "Fully-fledged functional effect system"
 
 **GitHub Repo Design:**
+
 - Extensive monorepo structure
 - Clear package descriptions
 - Documentation site + API reference
@@ -433,24 +484,28 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Discord community link
 
 **Branding Elements:**
+
 - Professional, enterprise feel
 - "Effect" = functional programming concept
 - Purple/blue color scheme
 - Comprehensive ecosystem
 
 **Developer Experience:**
+
 - Type-safe everything
 - Functional programming patterns
 - Extensive documentation
 - Active Discord community
 
 **Community Strategy:**
+
 - Discord server for community
 - YouTube content
 - Comprehensive contribution guide
 - Changeset documentation workflow
 
 **What We Can Steal:**
+
 - **Monorepo ecosystem showcase**
 - Video introduction (YouTube)
 - Professional/enterprise positioning
@@ -467,6 +522,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### What Made It Viral
 
 **Launch Strategy:**
+
 - Twitter/X threads on AI coding
 - YouTube demos of AI features
 - Word-of-mouth in developer community
@@ -474,11 +530,13 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Clean, VSCode-like interface (familiar)
 
 **Branding:**
+
 - Simple, minimal name
 - Blue/purple gradient branding
 - Professional, focused aesthetic
 
 **What We Can Steal:**
+
 - **AI-first vs AI-added messaging**
 - Video demos for launch
 - Twitter thread marketing
@@ -490,12 +548,14 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 ### 12. Other Notable Viral Projects
 
 **Zed** (high-performance editor):
+
 - "Code at the speed of thought" tagline
 - Multiplayer coding angle
 - Created by Atom/Tree-sitter team (credibility)
 - Performance-first messaging
 
 **Tauri** (desktop apps):
+
 - "Smaller, faster, more secure" trinity
 - Rust-based (performance credibility)
 - Cross-platform (Windows, macOS, Linux, iOS, Android)
@@ -519,12 +579,14 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 ### 2. **Branding Elements**
 
 ✅ **Memorable mascots/logos:**
+
 - Deno (dinosaur)
 - Bun (bun/bread)
 - Supabase (stylized logo)
 - Hono (fire emoji)
 
 ✅ **Distinct color schemes:**
+
 - Supabase (green)
 - Bun (orange/brown)
 - Hono (red/orange fire)
@@ -532,11 +594,13 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Shadcn/ui (black/white)
 
 ✅ **Simple, pronounceable names:**
+
 - Bun, Deno, Hono, Zed
 - Single syllable or easy to say
 - Often lowercase (modern, casual)
 
 ✅ **Visual identity matching product:**
+
 - Excalidraw (hand-drawn)
 - Shadcn/ui (minimal, sophisticated)
 - Tldraw (infinite canvas vibes)
@@ -565,12 +629,14 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 ### 5. **Social Media Launch Strategies**
 
 **Hacker News:**
+
 - "Show HN" posts
 - Solving real problems
 - Open source gets upvoted
 - Thoughtful comments = engagement
 
 **Twitter/X:**
+
 - Founder threads
 - Demo videos/GIFs
 - Performance benchmarks
@@ -578,17 +644,20 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - Retweets from influencers
 
 **Reddit:**
+
 - r/programming, r/webdev, r/rust, etc.
 - Authentic, not promotional
 - Engage with comments
 
 **Discord:**
+
 - Community-first, not marketing
 - Real-time support
 - Showcase channel for users
 - Early adopter gathering place
 
 **YouTube:**
+
 - Intro videos
 - Tutorial series
 - Conference talks
@@ -633,6 +702,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### 1.1 Brand Identity
 
 **The "Underwater" Theme:**
+
 - **Mascot:** SpongeBob-inspired character (avoid copyright - make it uniquely ours)
   - Option: Cartoon jellyfish agent
   - Option: Coral/anemone character
@@ -646,6 +716,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 - **Emoji Strategy:** 🌊 🐠 🪸 💧 ⚡ (ocean + speed metaphors)
 
 **Name Positioning:**
+
 - **BikiniBottom** = playful, memorable, nostalgic
 - **Tagline options:**
   - "Agent orchestration, underwater fast 🌊"
@@ -655,6 +726,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
   - "Multi-agent orchestration. No pants required."
 
 **Domain Strategy:**
+
 - bikinibottom.dev (primary docs)
 - bikinibottom.ai (alternative)
 - GitHub: github.com/openspawn/openspawn (but brand as BikiniBottom)
@@ -662,6 +734,7 @@ This document analyzes 15+ viral open-source projects across multiple domains (b
 #### 1.2 Repository Setup
 
 **README.md Structure:**
+
 ```markdown
 # 🌊 BikiniBottom
 
@@ -682,7 +755,9 @@ BikiniBottom is a [clear positioning]. Unlike [competitor], BikiniBottom [unique
 
 \`\`\`bash
 npm install bikinibottom
+
 # or
+
 bun add bikinibottom
 \`\`\`
 
@@ -716,6 +791,7 @@ MIT License - see [LICENSE](LICENSE)
 ```
 
 **GitHub Repo Features:**
+
 - ✅ Animated GIF demo (agents spawning, communicating)
 - ✅ Architecture diagram (transparent, visual)
 - ✅ Badges (CI status, npm version, Discord invite, license)
@@ -768,6 +844,7 @@ Blog
 ```
 
 **Design Principles:**
+
 - Ocean theme (blues, waves, underwater illustrations)
 - Fast search (Algolia or similar)
 - Dark mode default (developer-friendly)
@@ -775,6 +852,7 @@ Blog
 - Mobile-responsive
 
 **Tech Stack for Docs:**
+
 - VitePress, Docusaurus, or Astro
 - Tailwind CSS for styling
 - Ocean-themed illustrations (custom or Undraw-style)
@@ -784,6 +862,7 @@ Blog
 #### 1.4 GitHub Pages Setup
 
 **Landing Page Features:**
+
 - Hero section with animated ocean background
 - 30-second explainer video (optional)
 - "Try in Browser" interactive demo
@@ -794,6 +873,7 @@ Blog
 - Community links
 
 **Design:**
+
 - Single-page application (SPA)
 - Ocean wave animations (subtle, performant)
 - Jellyfish/fish animations on scroll
@@ -802,6 +882,7 @@ Blog
 - Underwater photography (blurred backgrounds)
 
 **Tech Stack:**
+
 - Static site (fast load times)
 - Astro, Next.js, or Vite
 - Tailwind CSS + custom ocean theme
@@ -813,12 +894,14 @@ Blog
 #### 2.1 Origin Story
 
 **Blog Post: "Why We Built BikiniBottom"**
+
 - The problem with current agent frameworks
 - Our journey (authentic, personal)
 - Design decisions (technical depth)
 - What's next (roadmap teaser)
 
 **Format:**
+
 - Long-form blog post (1500-2000 words)
 - Technical diagrams
 - Code examples
@@ -828,12 +911,14 @@ Blog
 #### 2.2 Technical Deep Dive
 
 **Series of Posts:**
+
 1. "Architecture: How BikiniBottom Spawns Agents"
 2. "Performance: Benchmarking Agent Runtimes"
 3. "Design Patterns: Multi-Agent Communication"
 4. "Under the Hood: Memory Management in BikiniBottom"
 
 **Distribution:**
+
 - Dev.to
 - Medium
 - Personal blog
@@ -842,6 +927,7 @@ Blog
 #### 2.3 Teaser Content
 
 **Twitter/X Strategy:**
+
 - **4 weeks before launch:**
   - "Building something under the sea... 🌊"
   - Code snippet teasers
@@ -859,6 +945,7 @@ Blog
   - Influencer sneak peeks
 
 **Visual Content:**
+
 - GIF demos (agents spawning, communicating)
 - Architecture diagrams (beautiful, shareable)
 - Code examples (syntax-highlighted screenshots)
@@ -933,6 +1020,7 @@ Blog
 **Launch Blog Post: "Introducing BikiniBottom"**
 
 Outline:
+
 1. **Hook:** "We built an agent runtime that spawns faster than SpongeBob flips burgers 🍔"
 2. **Problem:** Current agent frameworks are slow, complex, or don't scale
 3. **Solution:** BikiniBottom's approach (lightweight, composable, fast)
@@ -945,6 +1033,7 @@ Outline:
 10. **Join Us:** Community links (Discord, GitHub, Twitter)
 
 **Demo Video (60-90 seconds):**
+
 - Voiceover or text overlays
 - Code editor → install command → first agent
 - Spawn multiple agents → communication
@@ -954,18 +1043,21 @@ Outline:
 #### 3.3 Influencer Strategy
 
 **Pre-Launch Outreach:**
+
 - Identify 10-15 developer influencers (Twitter, YouTube)
 - Personalized emails/DMs
 - Offer early access
 - No payment, just authentic interest
 
 **Launch Day:**
+
 - Notify influencers (it's live!)
 - Ask for honest feedback
 - Retweet their posts
 - Don't beg for promotion
 
 **Target Influencers:**
+
 - AI/ML content creators
 - DevTools reviewers
 - Open source advocates
@@ -976,6 +1068,7 @@ Outline:
 #### 4.1 Community Seeding
 
 **Discord Strategy:**
+
 - **Day 1-3:** Founders very active, answering every question
 - **Week 1:** Daily "office hours" (live Q&A)
 - **Week 2:** Community highlights (showcase channel)
@@ -983,6 +1076,7 @@ Outline:
 - **Week 4:** First community call/webinar
 
 **GitHub Strategy:**
+
 - **Issues:** Respond within 24 hours
 - **PRs:** Review within 48 hours
 - **Discussions:** Seed with interesting topics
@@ -992,26 +1086,31 @@ Outline:
 #### 4.2 Content Marketing
 
 **Week 1: Basics**
+
 - "Getting Started with BikiniBottom" tutorial
 - "5 Agent Patterns You Need to Know" listicle
 - "BikiniBottom vs [Competitor]: Performance Comparison"
 
 **Week 2: Advanced**
+
 - "Building a Multi-Agent Chatbot with BikiniBottom"
 - "Production Deployment Guide"
 - "Memory Management Deep Dive"
 
 **Week 3: Community**
+
 - "Community Showcase: Top 5 BikiniBottom Projects"
 - "How We Built BikiniBottom: Behind the Scenes"
 - "Contributor Spotlight: [First major contributor]"
 
 **Week 4: Roadmap**
+
 - "What's Next for BikiniBottom: Roadmap 2026"
 - "Community Feedback Round-Up"
 - "v1.1 Preview: New Features Coming Soon"
 
 **Distribution Channels:**
+
 - bikinibottom.dev/blog
 - Dev.to (cross-post)
 - Medium (cross-post)
@@ -1022,6 +1121,7 @@ Outline:
 #### 4.3 Social Media Cadence
 
 **Twitter/X (Daily):**
+
 - Tips & tricks
 - Code snippets
 - Community highlights
@@ -1030,6 +1130,7 @@ Outline:
 - Retweets of user projects
 
 **Discord (Always On):**
+
 - Support questions → answered quickly
 - Showcase new projects
 - Weekly community calls
@@ -1037,6 +1138,7 @@ Outline:
 - Feature discussions
 
 **GitHub (Daily Check-ins):**
+
 - Issue triage
 - PR reviews
 - Release notes
@@ -1045,6 +1147,7 @@ Outline:
 #### 4.4 Partnerships & Integrations
 
 **Target Integrations:**
+
 - Vercel / Netlify deployment guides
 - Docker official image
 - VSCode extension (syntax highlighting, snippets)
@@ -1054,6 +1157,7 @@ Outline:
 - Railway deployment guide
 
 **Partnership Outreach:**
+
 - Contact DevTools companies
 - Offer integration examples
 - Co-marketing opportunities
@@ -1062,6 +1166,7 @@ Outline:
 #### 4.5 Metrics & Iteration
 
 **Track:**
+
 - GitHub stars (growth rate)
 - Discord members (engagement)
 - npm downloads (adoption)
@@ -1070,6 +1175,7 @@ Outline:
 - Social media reach
 
 **Weekly Review:**
+
 - What's working? (double down)
 - What's not? (pivot or drop)
 - Community feedback themes
@@ -1077,6 +1183,7 @@ Outline:
 - Bug reports (fix immediately)
 
 **Iterate:**
+
 - Quick wins (merge small PRs fast)
 - Community-requested features
 - Documentation gaps (fill them)
@@ -1089,14 +1196,17 @@ Outline:
 ### 1. Positioning Statement
 
 **Primary:**
+
 > "BikiniBottom: Multi-agent orchestration that's faster than SpongeBob flips burgers 🍔🌊"
 
 **Alternatives:**
+
 - "The agent runtime that scales like an ocean"
 - "Spawn AI agents. Build agent systems. No pants required."
 - "Where AI agents live, work, and play together"
 
 **Comparative:**
+
 - "Like Docker for AI agents, but faster"
 - "Multi-agent systems without the complexity"
 - "The Kubernetes of agent orchestration (but simpler)"
@@ -1104,32 +1214,37 @@ Outline:
 ### 2. GitHub README Must-Haves
 
 ✅ **Animated GIF demo** (15-30 seconds)
+
 - Show agent spawning
 - Show communication
 - Show scaling
 
 ✅ **One-liner install:**
+
 ```bash
 npm install bikinibottom
 ```
 
 ✅ **5-line code example:**
+
 ```typescript
-import { spawn } from 'bikinibottom'
+import { spawn } from "bikinibottom";
 
-const agent = await spawn('researcher', {
-  task: 'Find viral open source projects'
-})
+const agent = await spawn("researcher", {
+  task: "Find viral open source projects",
+});
 
-await agent.communicate('What did you find?')
+await agent.communicate("What did you find?");
 ```
 
 ✅ **Architecture diagram** (ocean-themed)
+
 - Visual representation of agent spawning
 - Communication flows
 - Scaling topology
 
 ✅ **Badges:**
+
 - CI/CD status
 - npm version
 - License
@@ -1138,11 +1253,13 @@ await agent.communicate('What did you find?')
 - Downloads
 
 ✅ **"Who's Using This"** section
+
 - Add projects as they come in
 - Screenshots/logos
 - Testimonials
 
 ✅ **Feature comparison table** (vs competitors)
+
 - Honest, factual
 - Highlight unique features
 - Don't bash competitors
@@ -1150,12 +1267,14 @@ await agent.communicate('What did you find?')
 ### 3. Visual Identity Checklist
 
 ✅ **Logo/Mascot:**
+
 - Create cartoon underwater character
 - Friendly, approachable, memorable
 - Works in monochrome (GitHub favicons)
 - Works at small sizes (16x16px)
 
 ✅ **Color Palette:**
+
 - Ocean blue (#0077BE)
 - Coral orange (#FF7F50)
 - Seafoam green (#20B2AA)
@@ -1163,17 +1282,20 @@ await agent.communicate('What did you find?')
 - Bubble white (#F0F8FF)
 
 ✅ **Typography:**
+
 - Headings: Inter, Outfit, or Manrope (modern, friendly)
 - Code: JetBrains Mono, Fira Code (ligatures)
 - Body: System fonts (performance)
 
 ✅ **Illustration Style:**
+
 - Flat, modern illustrations
 - Ocean/underwater themes
 - Consistent style across docs
 - Custom or licensed (not generic stock)
 
 ✅ **Favicon/Social:**
+
 - Favicon.ico (ocean icon)
 - Opengraph image (1200x630px, ocean scene + logo)
 - Twitter card image (same as opengraph)
@@ -1181,6 +1303,7 @@ await agent.communicate('What did you find?')
 ### 4. Documentation Strategy
 
 **Docs Site Structure:**
+
 ```
 bikinibottom.dev/
 ├── / (landing)
@@ -1197,6 +1320,7 @@ bikinibottom.dev/
 ```
 
 **Must-Have Docs:**
+
 1. **Introduction**
    - What is BikiniBottom?
    - Why BikiniBottom?
@@ -1235,6 +1359,7 @@ bikinibottom.dev/
    - Real-world case studies
 
 **Interactive Elements:**
+
 - Embedded code playgrounds (StackBlitz, CodeSandbox)
 - Interactive diagrams (agent flows)
 - Video walkthroughs (screencasts)
@@ -1243,6 +1368,7 @@ bikinibottom.dev/
 ### 5. Community Building Tactics
 
 **Discord Server Structure:**
+
 ```
 📢 Announcements
 ├── #announcements (read-only)
@@ -1267,6 +1393,7 @@ bikinibottom.dev/
 ```
 
 **Community Programs:**
+
 - **Contributors Club:** Recognition for PRs
 - **Showcase Fridays:** Weekly project highlights
 - **Office Hours:** Weekly live Q&A
@@ -1274,6 +1401,7 @@ bikinibottom.dev/
 - **Swag:** Stickers, t-shirts for contributors
 
 **Recognition:**
+
 - Contributor wall on website
 - Shoutouts on Twitter
 - "Contributor of the Month"
@@ -1282,9 +1410,10 @@ bikinibottom.dev/
 
 ### 6. Social Media Strategy
 
-**Twitter/X (@bikinibottom_ or @bikinibottomdev):**
+**Twitter/X (@bikinibottom\_ or @bikinibottomdev):**
 
 **Content Mix (Weekly):**
+
 - 3x Tips/tricks (how-to threads)
 - 2x Community highlights (retweets, showcases)
 - 2x Memes/humor (SpongeBob + coding)
@@ -1293,18 +1422,21 @@ bikinibottom.dev/
 - 1x Engagement (polls, questions)
 
 **Posting Schedule:**
+
 - Daily posts (1-2 per day)
 - Engage with replies (always)
 - Retweet user content (generously)
 - Quote tweet with commentary
 
 **Thread Templates:**
+
 - "🧵 5 ways to optimize BikiniBottom agents"
 - "🌊 How BikiniBottom handles [X] under the hood"
 - "🐠 Building [project] with BikiniBottom: A thread"
 - "⚡ Performance tip: [specific optimization]"
 
 **Reddit Strategy:**
+
 - Don't spam
 - Participate authentically
 - Share when genuinely relevant
@@ -1312,6 +1444,7 @@ bikinibottom.dev/
 - Post in relevant subreddits only
 
 **YouTube (Optional but powerful):**
+
 - Intro video (2-3 minutes)
 - Tutorial series (10-15 minutes each)
 - Live coding sessions
@@ -1321,6 +1454,7 @@ bikinibottom.dev/
 ### 7. Launch Checklist
 
 **2 Weeks Before:**
+
 - [ ] GitHub repo public (cleaned up)
 - [ ] Documentation site live
 - [ ] npm package published (or ready)
@@ -1333,6 +1467,7 @@ bikinibottom.dev/
 - [ ] Influencer outreach complete
 
 **1 Week Before:**
+
 - [ ] Final testing (everything works)
 - [ ] Launch day plan (timeline)
 - [ ] HN post drafted
@@ -1343,6 +1478,7 @@ bikinibottom.dev/
 - [ ] Support channels ready
 
 **Launch Day:**
+
 - [ ] 9 AM: GitHub release published
 - [ ] 9 AM: npm package live
 - [ ] 9 AM: Docs site confirmed working
@@ -1355,6 +1491,7 @@ bikinibottom.dev/
 - [ ] All day: Discord active (founders present)
 
 **Week After:**
+
 - [ ] Daily: Respond to GitHub issues
 - [ ] Daily: Active in Discord
 - [ ] Daily: Social media engagement
@@ -1369,23 +1506,27 @@ bikinibottom.dev/
 ### Mascot/Character Options
 
 **Option 1: Agent Jellyfish**
+
 - Jellyfish = distributed, networked (tentacles)
 - Glowing, bioluminescent (tech vibes)
 - Multiple jellyfish = multi-agent swarms
 - Cute, non-threatening
 
 **Option 2: Coral Agent**
+
 - Coral = ecosystem, interconnected
 - Colorful, vibrant
 - Growth metaphor (scaling agents)
 - Less character, more abstract
 
 **Option 3: Octopus Orchestrator**
+
 - Octopus = intelligent, multi-armed (multi-tasking)
 - Each arm = different agent
 - Problem: might be complex to illustrate
 
 **Recommendation: Agent Jellyfish**
+
 - Most visual potential
 - Swarm behavior fits multi-agent metaphor
 - Cute, approachable, memorable
@@ -1403,6 +1544,7 @@ bikinibottom.dev/
 ### Naming Conventions (Inside BikiniBottom)
 
 **API/Functions:**
+
 - `spawn()` ← launch agent
 - `swarm()` ← multi-agent group
 - `current()` ← message stream
@@ -1412,6 +1554,7 @@ bikinibottom.dev/
 - `reef()` ← agent cluster
 
 **Agent Types:**
+
 - Jellyfish (standard agent)
 - Eel (fast, specialized)
 - Crab (stateful agent)
@@ -1419,6 +1562,7 @@ bikinibottom.dev/
 - Whale (large model agent)
 
 **Ocean Puns (Use sparingly):**
+
 - "No pressure" (ocean depth pun)
 - "Making waves in agent orchestration"
 - "Dive deep into multi-agent systems"
@@ -1428,6 +1572,7 @@ bikinibottom.dev/
 ### Illustration Style Guide
 
 **Style:**
+
 - Flat, modern (not realistic)
 - 2-3 color palette per illustration
 - Consistent line weight
@@ -1435,6 +1580,7 @@ bikinibottom.dev/
 - Underwater gradients (light to dark)
 
 **Elements:**
+
 - Jellyfish agents (primary)
 - Bubbles (communication, events)
 - Waves (data streams)
@@ -1443,6 +1589,7 @@ bikinibottom.dev/
 - Light rays (performance)
 
 **Tools:**
+
 - Figma for design
 - Illustrations by designer or:
   - Undraw.co (customize colors)
@@ -1452,6 +1599,7 @@ bikinibottom.dev/
 ### Website Design Direction
 
 **Homepage Hero:**
+
 - Animated ocean scene (CSS/SVG)
 - Jellyfish floating across screen
 - Bubbles rising
@@ -1459,17 +1607,20 @@ bikinibottom.dev/
 - CTA: "Dive In" (ocean pun)
 
 **Color Gradients:**
+
 - Header: Deep blue → lighter blue (top to bottom)
 - Sections: Alternating ocean shades
 - Buttons: Coral orange (high contrast)
 - Code blocks: Dark mode (deep sea theme)
 
 **Typography:**
+
 - Headers: Bold, modern (Inter, Outfit)
 - Code: Monospace with ligatures (JetBrains Mono)
 - Body: Readable sans-serif (system fonts)
 
 **Animations:**
+
 - Parallax scrolling (ocean depth)
 - Floating elements (jellyfish, bubbles)
 - Hover effects (glow, ripple)
@@ -1480,28 +1631,31 @@ bikinibottom.dev/
 
 ## Competitive Positioning Matrix
 
-| Feature | BikiniBottom | LangGraph | AutoGen | CrewAI |
-|---------|--------------|-----------|---------|--------|
-| **Speed** | ⚡ Fastest | Medium | Medium | Slow |
-| **Simplicity** | 🌊 Simple API | Complex | Medium | Complex |
-| **Scalability** | 🐠 Built-in | Manual | Manual | Limited |
-| **DX** | 😊 Delightful | Technical | Academic | Opinionated |
-| **Open Source** | ✅ MIT | ✅ | ✅ | ✅ |
-| **Underwater Branding** | 🪸 Yes | ❌ | ❌ | ❌ |
+| Feature                 | BikiniBottom  | LangGraph | AutoGen  | CrewAI      |
+| ----------------------- | ------------- | --------- | -------- | ----------- |
+| **Speed**               | ⚡ Fastest    | Medium    | Medium   | Slow        |
+| **Simplicity**          | 🌊 Simple API | Complex   | Medium   | Complex     |
+| **Scalability**         | 🐠 Built-in   | Manual    | Manual   | Limited     |
+| **DX**                  | 😊 Delightful | Technical | Academic | Opinionated |
+| **Open Source**         | ✅ MIT        | ✅        | ✅       | ✅          |
+| **Underwater Branding** | 🪸 Yes        | ❌        | ❌       | ❌          |
 
 **How to position against each:**
 
 **vs LangGraph:**
+
 - "BikiniBottom is to LangGraph what Bun is to Node.js: faster, simpler, modern"
 - Focus on DX (developer experience)
 - Simpler API for common patterns
 
 **vs AutoGen:**
+
 - "BikiniBottom is production-ready, not research-focused"
 - Easier onboarding
 - Better documentation
 
 **vs CrewAI:**
+
 - "BikiniBottom is unopinionated - bring your own models, prompts, workflows"
 - More flexible architecture
 - Faster performance
@@ -1513,6 +1667,7 @@ bikinibottom.dev/
 ### 9:00 AM PT - GitHub Release
 
 **Actions:**
+
 1. Tag final commit: `git tag -a v1.0.0 -m "Initial release"`
 2. Push to GitHub: `git push origin v1.0.0`
 3. Create GitHub Release:
@@ -1526,27 +1681,30 @@ bikinibottom.dev/
 ### 12:00 PM PT - Hacker News Launch
 
 **Show HN Post:**
+
 - Title: "Show HN: BikiniBottom – Multi-agent orchestration runtime"
 - Text:
+
   ```
   Hey HN!
-  
+
   I built BikiniBottom, an agent orchestration runtime for building multi-agent AI systems.
-  
+
   After struggling with [problem], I wanted a tool that's:
   - Fast (spawns agents in milliseconds)
   - Simple (5 lines to get started)
   - Scalable (built-in horizontal scaling)
-  
+
   It's open source (MIT) and production-ready.
-  
+
   Try it: https://bikinibottom.dev
   GitHub: https://github.com/openspawn/openspawn
-  
+
   Would love your feedback!
   ```
 
 **Monitor:**
+
 - Refresh HN every 5-10 minutes
 - Respond to every comment (within 30 minutes)
 - Be helpful, not defensive
@@ -1556,6 +1714,7 @@ bikinibottom.dev/
 ### 12:30 PM PT - Twitter Thread Launch
 
 **Thread Structure:**
+
 ```
 1/ 🌊 Launching BikiniBottom today!
 
@@ -1629,6 +1788,7 @@ Try it out and let me know what you think! 🌊
 ```
 
 **Engage:**
+
 - Like and reply to every comment
 - Retweet positive feedback
 - Answer questions
@@ -1637,21 +1797,25 @@ Try it out and let me know what you think! 🌊
 ### 1:00 PM PT - Reddit Launch
 
 **r/programming:**
+
 - Title: "BikiniBottom: Multi-agent orchestration runtime (open source)"
 - Link to GitHub
 - Comment with context (not promotional)
 
 **r/MachineLearning:**
+
 - Title: "Built a runtime for multi-agent AI systems"
 - Link to docs
 - Comment: technical details, use cases
 
 **r/Python (if Python support):**
+
 - Title: "BikiniBottom: Agent orchestration for Python"
 - Link to getting started
 - Comment: Python-specific examples
 
 **Engage:**
+
 - Reply to every comment
 - Answer questions thoroughly
 - Don't be defensive
@@ -1660,6 +1824,7 @@ Try it out and let me know what you think! 🌊
 ### 2:00 PM PT - Product Hunt (Optional)
 
 **Listing:**
+
 - Name: BikiniBottom
 - Tagline: "Multi-agent orchestration that scales like an ocean"
 - Description: [150 words, compelling]
@@ -1667,6 +1832,7 @@ Try it out and let me know what you think! 🌊
 - Topics: Developer Tools, Open Source, AI
 
 **Engage:**
+
 - Reply to every comment
 - Upvote thoughtful feedback
 - Don't beg for upvotes
@@ -1677,6 +1843,7 @@ Try it out and let me know what you think! 🌊
 **Post: "Introducing BikiniBottom: Multi-Agent Orchestration Made Simple"**
 
 Outline:
+
 1. Hook (problem statement)
 2. Solution overview
 3. How it works
@@ -1687,6 +1854,7 @@ Outline:
 8. Community links
 
 Cross-post to:
+
 - Dev.to (canonical URL)
 - Medium (import from Dev.to)
 - Personal blog
@@ -1696,6 +1864,7 @@ Cross-post to:
 **Subject:** "🌊 BikiniBottom is live!"
 
 **Body:**
+
 - Announcement
 - Key features
 - Quick start
@@ -1705,18 +1874,21 @@ Cross-post to:
 ### Evening - Community Engagement
 
 **Discord:**
+
 - Welcome message pinned
 - Founders active (answering questions)
 - Showcase channel seeded with examples
 - Community vibe set (friendly, helpful)
 
 **GitHub:**
+
 - Monitor issues
 - Respond to PRs
 - Engage with discussions
 - Thank contributors
 
 **Twitter:**
+
 - Retweet mentions
 - Reply to comments
 - Share user experiments
@@ -1727,36 +1899,43 @@ Cross-post to:
 ## Week 1 Content Calendar
 
 ### Day 1 (Launch Day)
+
 - ✅ Launch announcement (all channels)
 - ✅ Active engagement (comments, Discord)
 - ✅ Monitor metrics
 
 ### Day 2
+
 - 📝 Blog: "How BikiniBottom Spawns Agents (Architecture Deep Dive)"
 - 🐦 Twitter: "Tips for optimizing agent performance"
 - 💬 Discord: First office hours (live Q&A)
 
 ### Day 3
+
 - 📝 Tutorial: "Build Your First Multi-Agent System in 15 Minutes"
 - 🐦 Twitter: Community showcase (first user projects)
 - 📊 Metrics review (GitHub stars, npm downloads)
 
 ### Day 4
+
 - 📝 Blog: "BikiniBottom vs [Competitor]: Performance Benchmark"
 - 🐦 Twitter: Behind-the-scenes (development story)
 - 💬 Discord: Contributor onboarding (how to contribute)
 
 ### Day 5
+
 - 📝 Tutorial: "5 Agent Patterns Every Developer Should Know"
 - 🐦 Twitter: Code snippet thread (useful patterns)
 - 🎥 Video: Quick start walkthrough (YouTube)
 
 ### Day 6
+
 - 📝 Blog: "Community Showcase: Top 3 BikiniBottom Projects This Week"
 - 🐦 Twitter: Weekend project ideas
 - 💬 Discord: Weekend hackathon (optional)
 
 ### Day 7
+
 - 📝 Recap: "Week 1: What We Learned"
 - 🐦 Twitter: Thank you thread (community appreciation)
 - 📊 Metrics review (full week analysis)
@@ -1766,6 +1945,7 @@ Cross-post to:
 ## Success Metrics (First Month)
 
 ### GitHub
+
 - **Stars:** 1,000+ (week 1), 5,000+ (month 1)
 - **Forks:** 100+ (week 1), 500+ (month 1)
 - **Issues:** 20+ (week 1), 100+ (month 1) [engagement, not bugs]
@@ -1773,20 +1953,24 @@ Cross-post to:
 - **Contributors:** 10+ (month 1)
 
 ### npm
+
 - **Downloads:** 500+ (week 1), 5,000+ (month 1)
 - **Dependents:** 5+ (month 1)
 
 ### Community
+
 - **Discord:** 100+ members (week 1), 500+ (month 1)
 - **Twitter:** 200+ followers (week 1), 1,000+ (month 1)
 - **Documentation:** 1,000+ unique visitors (week 1), 10,000+ (month 1)
 
 ### Content
+
 - **Blog posts:** 5+ published (month 1)
 - **Tutorials:** 3+ comprehensive guides (month 1)
 - **Videos:** 2+ YouTube videos (month 1)
 
 ### Quality
+
 - **Response time:** <24 hours (GitHub issues, Discord)
 - **PR review time:** <48 hours
 - **Documentation accuracy:** 100% (no broken links/examples)
@@ -1797,6 +1981,7 @@ Cross-post to:
 ## Red Flags to Avoid
 
 ❌ **Don't:**
+
 - Over-promise features (ship what works)
 - Ignore negative feedback (engage constructively)
 - Spam communities (be authentic)
@@ -1809,6 +1994,7 @@ Cross-post to:
 - Overcomplicate branding (keep it simple)
 
 ✅ **Do:**
+
 - Ship working code (quality > features)
 - Engage with critics (learn from them)
 - Add value to communities (help others)
@@ -1825,6 +2011,7 @@ Cross-post to:
 ## Final Checklist: Pre-Launch
 
 ### Brand
+
 - [ ] Name finalized (BikiniBottom)
 - [ ] Tagline written (ocean-themed)
 - [ ] Logo/mascot designed (jellyfish)
@@ -1833,6 +2020,7 @@ Cross-post to:
 - [ ] Domain registered (bikinibottom.dev)
 
 ### Repository
+
 - [ ] Code cleaned up (no TODOs)
 - [ ] README comprehensive (demo, install, features)
 - [ ] LICENSE added (MIT)
@@ -1845,6 +2033,7 @@ Cross-post to:
 - [ ] Badges added (CI, npm, Discord, etc.)
 
 ### Documentation Site
+
 - [ ] Domain set up (bikinibottom.dev)
 - [ ] Site deployed (fast, responsive)
 - [ ] Introduction page complete
@@ -1857,6 +2046,7 @@ Cross-post to:
 - [ ] Analytics set up (privacy-friendly)
 
 ### Package
+
 - [ ] npm package ready (or PyPI)
 - [ ] Package name reserved
 - [ ] Version 1.0.0 tagged
@@ -1865,6 +2055,7 @@ Cross-post to:
 - [ ] Bundle size optimized
 
 ### Community
+
 - [ ] Discord server created
 - [ ] Channels organized (welcome, support, showcase)
 - [ ] Invite link generated
@@ -1874,6 +2065,7 @@ Cross-post to:
 - [ ] Email/contact set up
 
 ### Content
+
 - [ ] Launch blog post written (1500+ words)
 - [ ] Demo video recorded (60-90 sec)
 - [ ] HN post drafted
@@ -1882,12 +2074,14 @@ Cross-post to:
 - [ ] Press kit prepared (logos, screenshots, copy)
 
 ### Outreach
+
 - [ ] Influencer list created (10-15 people)
 - [ ] Early access invites sent
 - [ ] Friendly developers notified
 - [ ] Potential partners identified
 
 ### Monitoring
+
 - [ ] Analytics set up (docs, website)
 - [ ] GitHub notifications configured
 - [ ] Discord mobile app installed
@@ -1895,6 +2089,7 @@ Cross-post to:
 - [ ] Error tracking set up (Sentry, etc.)
 
 ### Legal/Admin
+
 - [ ] License verified (MIT)
 - [ ] Copyright notices added
 - [ ] Privacy policy (if collecting data)
@@ -1906,6 +2101,7 @@ Cross-post to:
 ## Conclusion
 
 **The BikiniBottom launch playbook combines:**
+
 1. **Strong positioning** ("Multi-agent orchestration that scales like an ocean")
 2. **Memorable branding** (ocean theme, jellyfish mascot, playful yet professional)
 3. **Excellent DX** (simple API, great docs, quick start)
@@ -1913,14 +2109,17 @@ Cross-post to:
 5. **Sustained effort** (weekly content, engagement, updates)
 
 **Key Insight from Viral Projects:**
+
 > "The best developer tools market themselves through great developer experience. Make something developers love, and they'll tell everyone."
 
 **Launch Success Formula:**
+
 ```
 Viral Launch = (Great Product × Clear Positioning × Memorable Brand) + (Community × Sustained Effort)
 ```
 
 **The BikiniBottom Advantage:**
+
 - 🌊 Unique, memorable branding (ocean theme)
 - 🐠 Differentiated positioning (vs LangGraph, AutoGen, CrewAI)
 - ⚡ Performance-focused (benchmarks matter)

@@ -61,10 +61,10 @@ async function getLayoutedElements(
 ): Promise<{ nodes: Node[]; edges: Edge[] }> {
   if (nodes.length === 0) return { nodes: [], edges: [] };
 
-  const nodeWidth         = options.compact ? 90  : 160;
-  const nodeHeight        = options.compact ? 64  : 96;
-  const horizontalSpacing = options.compact ? 40  : 70;
-  const verticalSpacing   = options.compact ? 100 : 150;
+  const nodeWidth = options.compact ? 90 : 160;
+  const nodeHeight = options.compact ? 64 : 96;
+  const horizontalSpacing = options.compact ? 40 : 70;
+  const verticalSpacing = options.compact ? 100 : 150;
 
   const elkGraph = {
     id: "root",
@@ -79,7 +79,7 @@ async function getLayoutedElements(
       "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
     },
     children: nodes.map((node) => ({ id: node.id, width: nodeWidth, height: nodeHeight })),
-    edges:    edges.map((edge) => ({ id: edge.id, sources: [edge.source], targets: [edge.target] })),
+    edges: edges.map((edge) => ({ id: edge.id, sources: [edge.source], targets: [edge.target] })),
   };
 
   const layoutedGraph = await elk.layout(elkGraph);
@@ -104,24 +104,25 @@ function calculateAgentActivity(
 
   const taskCounts = new Map<string, number>();
   tasks.forEach((task) => {
-    if (task.assignedToId) taskCounts.set(task.assignedToId, (taskCounts.get(task.assignedToId) || 0) + 1);
+    if (task.assignedToId)
+      taskCounts.set(task.assignedToId, (taskCounts.get(task.assignedToId) || 0) + 1);
   });
 
   const messageCounts = new Map<string, number>();
   messages.forEach((msg) => {
-    if (msg.fromAgentId) messageCounts.set(msg.fromAgentId, (messageCounts.get(msg.fromAgentId) || 0) + 1);
-    if (msg.toAgentId)   messageCounts.set(msg.toAgentId,   (messageCounts.get(msg.toAgentId)   || 0) + 1);
+    if (msg.fromAgentId)
+      messageCounts.set(msg.fromAgentId, (messageCounts.get(msg.fromAgentId) || 0) + 1);
+    if (msg.toAgentId)
+      messageCounts.set(msg.toAgentId, (messageCounts.get(msg.toAgentId) || 0) + 1);
   });
 
   agents.forEach((agent) => {
-    const taskCount    = taskCounts.get(agent.id)    || 0;
+    const taskCount = taskCounts.get(agent.id) || 0;
     const messageCount = messageCounts.get(agent.id) || 0;
-    const total        = taskCount * 2 + messageCount;
+    const total = taskCount * 2 + messageCount;
 
-    const activityLevel: AgentActivity['activityLevel'] =
-      total === 0   ? 'idle' :
-      total >= 20   ? 'hot'  :
-      total >= 10   ? 'warm' : 'cool';
+    const activityLevel: AgentActivity["activityLevel"] =
+      total === 0 ? "idle" : total >= 20 ? "hot" : total >= 10 ? "warm" : "cool";
 
     activityMap.set(agent.id, { taskCount, messageCount, activityLevel });
   });
@@ -140,16 +141,20 @@ function calculateEdgeMessages(
 
   messages.forEach((msg) => {
     if (msg.fromAgentId && msg.toAgentId) {
-      const key      = `${msg.fromAgentId}-${msg.toAgentId}`;
+      const key = `${msg.fromAgentId}-${msg.toAgentId}`;
       const existing = edgeMap.get(key) || { count: 0 };
-      edgeMap.set(key, { count: existing.count + 1, lastMessage: msg.content, lastMessageTime: msg.createdAt });
+      edgeMap.set(key, {
+        count: existing.count + 1,
+        lastMessage: msg.content,
+        lastMessageTime: msg.createdAt,
+      });
     }
   });
 
   conversations.forEach((conv) => {
     if (conv.agents && conv.agents.length === 2) {
       const [agent1, agent2] = conv.agents;
-      const key      = `${agent1.id}-${agent2.id}`;
+      const key = `${agent1.id}-${agent2.id}`;
       const existing = edgeMap.get(key) || { count: 0 };
       if (conv.messageCount > existing.count) {
         edgeMap.set(key, {
@@ -199,20 +204,20 @@ function buildNodesAndEdges(
       type: "agent",
       position: { x: 0, y: 0 },
       data: {
-        label:    agent.name,
-        agentId:  agent.agentId || agent.id,
-        role:     agent.role,
-        level:    agent.level,
-        status:   agent.status as unknown as "active" | "pending" | "paused" | "suspended",
-        credits:  agent.currentBalance,
-        domain:      agent.domain      || undefined,
-        avatar:      agent.avatar      || undefined,
+        label: agent.name,
+        agentId: agent.agentId || agent.id,
+        role: agent.role,
+        level: agent.level,
+        status: agent.status as unknown as "active" | "pending" | "paused" | "suspended",
+        credits: agent.currentBalance,
+        domain: agent.domain || undefined,
+        avatar: agent.avatar || undefined,
         avatarColor: agent.avatarColor || undefined,
-        avatarUrl:   resolveAvatarUrl(agent.avatarUrl) || undefined,
+        avatarUrl: resolveAvatarUrl(agent.avatarUrl) || undefined,
         tasksCompleted: 0,
         compact,
         activityLevel: activity?.activityLevel,
-        taskCount:     activity?.taskCount,
+        taskCount: activity?.taskCount,
       },
     });
 
@@ -221,10 +226,17 @@ function buildNodesAndEdges(
       let color = levelColors[agent.level] || "#6366f1";
       if (activity) {
         switch (activity.activityLevel) {
-          case 'hot':  color = heatColors.hot;  break;
-          case 'warm': color = heatColors.warm; break;
-          case 'cool': color = heatColors.cool; break;
-          default:     color = heatColors.idle;
+          case "hot":
+            color = heatColors.hot;
+            break;
+          case "warm":
+            color = heatColors.warm;
+            break;
+          case "cool":
+            color = heatColors.cool;
+            break;
+          default:
+            color = heatColors.idle;
         }
       }
       edges.push({
@@ -290,26 +302,29 @@ interface AgentNetworkProps {
 
 function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const demo = useDemo();
-  const { agents, loading: agentsLoading }  = useAgents();
-  const { tasks, loading: tasksLoading }    = useTasks();
-  const { messages }                         = useMessages(100);
-  const { conversations }                    = useConversations();
-  const { fitView, zoomIn, setCenter }      = useReactFlow();
-  const { isMobileOrTouch, isMobile }       = useTouchDevice();
+  const { agents, loading: agentsLoading } = useAgents();
+  const { tasks, loading: tasksLoading } = useTasks();
+  const { messages } = useMessages(100);
+  const { conversations } = useConversations();
+  const { fitView, zoomIn, setCenter } = useReactFlow();
+  const { isMobileOrTouch, isMobile } = useTouchDevice();
 
   const [selectedEdge, setSelectedEdge] = useState<{
-    source: string; target: string; sourceLabel: string; targetLabel: string;
+    source: string;
+    target: string;
+    sourceLabel: string;
+    targetLabel: string;
   } | null>(null);
   const [activeDelegations, setActiveDelegations] = useState<TaskDelegation[]>([]);
-  const [compact,    setCompact]    = useState(false);
-  const [dimIdle,    setDimIdle]    = useState(false);
+  const [compact, setCompact] = useState(false);
+  const [dimIdle, setDimIdle] = useState(false);
   const [isLayouted, setIsLayouted] = useState(false);
 
-  const agentHealth         = useAgentHealth();
-  const prevAgentCountRef   = useRef(0);
-  const lastTapRef          = useRef<{ time: number; nodeId: string | null }>({ time: 0, nodeId: null });
-  const longPressTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longPressNodeRef    = useRef<string | null>(null);
+  const agentHealth = useAgentHealth();
+  const prevAgentCountRef = useRef(0);
+  const lastTapRef = useRef<{ time: number; nodeId: string | null }>({ time: 0, nodeId: null });
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressNodeRef = useRef<string | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
@@ -331,7 +346,11 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   );
 
   const agentIds = useMemo(
-    () => agents.map((a) => a.id).sort().join(','),
+    () =>
+      agents
+        .map((a) => a.id)
+        .sort()
+        .join(","),
     [agents],
   );
 
@@ -354,37 +373,53 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   edgesRef.current = edges;
 
   // Sandbox mode: real delegation animations from SSE
-  useSandboxSSE(useCallback((event: SandboxSSEEvent) => {
-    if (!isSandboxMode) return;
-    if (!event.message?.includes('Delegated') && event.type !== 'agent_action') return;
-    if (!event.agentId) return;
+  useSandboxSSE(
+    useCallback((event: SandboxSSEEvent) => {
+      if (!isSandboxMode) return;
+      if (!event.message?.includes("Delegated") && event.type !== "agent_action") return;
+      if (!event.agentId) return;
 
-    const edge = edgesRef.current.find((e) => e.source === event.agentId || e.target === event.agentId);
-    if (!edge) return;
+      const edge = edgesRef.current.find(
+        (e) => e.source === event.agentId || e.target === event.agentId,
+      );
+      if (!edge) return;
 
-    const delegation: TaskDelegation = {
-      id: `del-${Date.now()}-${Math.random()}`,
-      fromId: edge.source,
-      toId: edge.target,
-      taskTitle: event.message || 'Task delegation',
-      startTime: Date.now(),
-    };
-    setActiveDelegations((prev) => [...prev, delegation]);
-    setTimeout(() => setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id)), 1200);
-  }, []));
+      const delegation: TaskDelegation = {
+        id: `del-${Date.now()}-${Math.random()}`,
+        fromId: edge.source,
+        toId: edge.target,
+        taskTitle: event.message || "Task delegation",
+        startTime: Date.now(),
+      };
+      setActiveDelegations((prev) => [...prev, delegation]);
+      setTimeout(
+        () => setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id)),
+        1200,
+      );
+    }, []),
+  );
 
   // Demo mode: random delegation animation
   useEffect(() => {
     if (isSandboxMode) return;
     if (!demo.isPlaying || nodes.length === 0) return;
 
-    const taskTitles = ["Review PR #42", "Deploy v2.1", "Fix auth bug", "Update docs", "Run tests", "Code review", "Setup CI/CD", "Refactor API"];
+    const taskTitles = [
+      "Review PR #42",
+      "Deploy v2.1",
+      "Fix auth bug",
+      "Update docs",
+      "Run tests",
+      "Code review",
+      "Setup CI/CD",
+      "Refactor API",
+    ];
 
     const interval = setInterval(() => {
       const currentEdges = edgesRef.current;
       if (currentEdges.length === 0) return;
-      const randomEdge  = currentEdges[Math.floor(Math.random() * currentEdges.length)];
-      const taskTitle   = taskTitles[Math.floor(Math.random() * taskTitles.length)];
+      const randomEdge = currentEdges[Math.floor(Math.random() * currentEdges.length)];
+      const taskTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)];
       const delegation: TaskDelegation = {
         id: `del-${Date.now()}-${Math.random()}`,
         fromId: randomEdge.source,
@@ -394,14 +429,17 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
       };
       setActiveDelegations((prev) => [...prev, delegation]);
       const animDuration = 1200 / Math.sqrt(demo.speed);
-      setTimeout(() => setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id)), animDuration);
+      setTimeout(
+        () => setActiveDelegations((prev) => prev.filter((d) => d.id !== delegation.id)),
+        animDuration,
+      );
     }, 800 / demo.speed);
 
     return () => clearInterval(interval);
   }, [demo.isPlaying, demo.speed, nodes.length]);
 
   function handleNodeClick(_event: React.MouseEvent, node: Node) {
-    const now     = Date.now();
+    const now = Date.now();
     const lastTap = lastTapRef.current;
 
     // Double-tap: zoom to node on mobile
@@ -426,7 +464,10 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   }
 
   function handleNodeMouseUp() {
-    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
     longPressNodeRef.current = null;
   }
 
@@ -443,15 +484,26 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     }
   }
 
-  const contextValue = useMemo(() => ({
-    delegations: activeDelegations,
-    speed: demo.speed,
-    agentActivity,
-    edgeMessages,
-    agentHealth,
-    isMobileOrTouch,
-    dimIdle,
-  }), [activeDelegations, demo.speed, agentActivity, edgeMessages, agentHealth, isMobileOrTouch, dimIdle]);
+  const contextValue = useMemo(
+    () => ({
+      delegations: activeDelegations,
+      speed: demo.speed,
+      agentActivity,
+      edgeMessages,
+      agentHealth,
+      isMobileOrTouch,
+      dimIdle,
+    }),
+    [
+      activeDelegations,
+      demo.speed,
+      agentActivity,
+      edgeMessages,
+      agentHealth,
+      isMobileOrTouch,
+      dimIdle,
+    ],
+  );
 
   if (loading) {
     return (
@@ -495,7 +547,12 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
           onNodeDragStart={handleNodeMouseDown as any}
           onNodeDragStop={handleNodeMouseUp as any}
         >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="hsl(var(--border))" />
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={20}
+            size={1}
+            color="hsl(var(--border))"
+          />
           {!isMobileOrTouch && (
             <Controls className="!bg-card !border-border !rounded-lg [&>button]:!bg-card [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-accent" />
           )}
@@ -504,20 +561,22 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
         {isMobileOrTouch && <MobileZoomControls onFitView={handleFitView} />}
 
         {/* Activity legend */}
-        <div className={`absolute top-4 left-4 bg-card/90 backdrop-blur border border-border rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? 'hidden sm:block' : ''}`}>
+        <div
+          className={`absolute top-4 left-4 bg-card/90 backdrop-blur border border-border rounded-lg p-2 sm:p-4 text-sm max-w-[140px] sm:max-w-none landscape:hidden lg:landscape:block ${isMobile ? "hidden sm:block" : ""}`}
+        >
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-foreground text-xs sm:text-sm">Activity</span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setDimIdle(!dimIdle)}
-                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${dimIdle ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-muted text-muted-foreground border border-border hover:bg-accent'}`}
+                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${dimIdle ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30" : "bg-muted text-muted-foreground border border-border hover:bg-accent"}`}
                 title={dimIdle ? "Show all nodes" : "Dim idle nodes"}
               >
                 {dimIdle ? "◐" : "◑"}
               </button>
               <button
                 onClick={() => setCompact(!compact)}
-                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${compact ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' : 'bg-muted text-muted-foreground border border-border hover:bg-accent'}`}
+                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${compact ? "bg-violet-500/20 text-violet-400 border border-violet-500/30" : "bg-muted text-muted-foreground border border-border hover:bg-accent"}`}
                 title={compact ? "Expand nodes" : "Compact nodes"}
               >
                 {compact ? "▪" : "▫"}
@@ -526,15 +585,20 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
           </div>
           <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs">
             {[
-              { label: "Hot",  color: heatColors.hot,  desc: "Very busy" },
+              { label: "Hot", color: heatColors.hot, desc: "Very busy" },
               { label: "Warm", color: heatColors.warm, desc: "Busy" },
               { label: "Cool", color: heatColors.cool, desc: "Light" },
               { label: "Idle", color: heatColors.idle, desc: "Inactive" },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-1 sm:gap-2">
-                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                <div
+                  className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: item.color }}
+                />
                 <span className="text-muted-foreground">{item.label}</span>
-                <span className="text-muted-foreground/70 hidden sm:inline text-[10px]">{item.desc}</span>
+                <span className="text-muted-foreground/70 hidden sm:inline text-[10px]">
+                  {item.desc}
+                </span>
               </div>
             ))}
           </div>
@@ -553,7 +617,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
             <AnimatePresence mode="popLayout">
               {activeDelegations.slice(-5).map((del, idx) => {
                 const fromNode = nodes.find((n) => n.id === del.fromId);
-                const toNode   = nodes.find((n) => n.id === del.toId);
+                const toNode = nodes.find((n) => n.id === del.toId);
                 return (
                   <motion.div
                     key={del.id}
@@ -562,12 +626,16 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
                     exit={{ opacity: 0, x: 30, scale: 0.8 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     className="bg-zinc-900/95 backdrop-blur border border-emerald-500/30 rounded-lg px-3 py-1.5 mb-1 text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/10"
-                    style={{ position: idx === 0 ? 'relative' : 'absolute', bottom: 0 }}
+                    style={{ position: idx === 0 ? "relative" : "absolute", bottom: 0 }}
                   >
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                    <span className="text-zinc-400 truncate max-w-[60px]">{String(fromNode?.data?.label || "") || del.fromId}</span>
+                    <span className="text-zinc-400 truncate max-w-[60px]">
+                      {String(fromNode?.data?.label || "") || del.fromId}
+                    </span>
                     <span className="text-emerald-500">→</span>
-                    <span className="text-zinc-400 truncate max-w-[60px]">{String(toNode?.data?.label || "") || del.toId}</span>
+                    <span className="text-zinc-400 truncate max-w-[60px]">
+                      {String(toNode?.data?.label || "") || del.toId}
+                    </span>
                   </motion.div>
                 );
               })}

@@ -46,9 +46,9 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       const w = entries[0].contentRect.width;
-      if (w < 500)      setColCount(1);
+      if (w < 500) setColCount(1);
       else if (w < 800) setColCount(2);
-      else              setColCount(3);
+      else setColCount(3);
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -83,7 +83,7 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                 left: 0,
                 width: "100%",
                 transform: `translateY(${virtualRow.start}px)`,
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+                gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
               }}
               className="grid gap-3 sm:gap-4 pb-4"
             >
@@ -104,7 +104,10 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                         className="relative overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
                         onClick={() => onCardClick(agent.id)}
                       >
-                        <div className="absolute left-0 top-0 h-1 w-full" style={{ backgroundColor: levelColor }} />
+                        <div
+                          className="absolute left-0 top-0 h-1 w-full"
+                          style={{ backgroundColor: levelColor }}
+                        />
                         <div
                           className="absolute top-3 right-12 px-2 py-0.5 rounded-full text-xs font-bold text-foreground"
                           style={{ backgroundColor: levelColor }}
@@ -185,7 +188,10 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                             <div>
                               <p className="text-muted-foreground">Activity</p>
                               <Sparkline
-                                data={generateSparklineData(7, agent.status === AgentStatus.Active ? "up" : "stable")}
+                                data={generateSparklineData(
+                                  7,
+                                  agent.status === AgentStatus.Active ? "up" : "stable",
+                                )}
                                 width={56}
                                 height={18}
                                 color={levelColor}

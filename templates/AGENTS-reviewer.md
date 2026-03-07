@@ -30,12 +30,14 @@ All review feedback goes in `REVIEW.md`:
 **Status:** APPROVED / CHANGES REQUESTED / BLOCKED
 
 **Findings:**
+
 - ✅ Rate limiting logic correct
 - ✅ Tests cover edge cases
 - ⚠️ Missing rate limit headers in response (non-blocking)
 - ❌ No Redis connection pooling — will leak connections under load (blocking)
 
 **Required before merge:**
+
 - Add connection pooling (see finding #4)
 ```
 

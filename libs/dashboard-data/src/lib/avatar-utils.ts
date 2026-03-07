@@ -10,5 +10,5 @@ export function darkenForBackground(hex: string): string {
   const dr = Math.round(r * factor);
   const dg = Math.round(g * factor);
   const db = Math.round(b * factor);
-  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+  return `#${dr.toString(16).padStart(2, "0")}${dg.toString(16).padStart(2, "0")}${db.toString(16).padStart(2, "0")}`;
 }

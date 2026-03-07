@@ -29,21 +29,24 @@ export function SidePanelProvider({ children }: { children: ReactNode }) {
     title: undefined,
   });
 
-  const openSidePanel = useCallback((content: ReactNode, options?: { width?: number; title?: string }) => {
-    setState({
-      isOpen: true,
-      content,
-      width: options?.width ?? DEFAULT_WIDTH,
-      title: options?.title,
-    });
-  }, []);
+  const openSidePanel = useCallback(
+    (content: ReactNode, options?: { width?: number; title?: string }) => {
+      setState({
+        isOpen: true,
+        content,
+        width: options?.width ?? DEFAULT_WIDTH,
+        title: options?.title,
+      });
+    },
+    [],
+  );
 
   const closeSidePanel = useCallback(() => {
-    setState(prev => ({ ...prev, isOpen: false, content: null, title: undefined }));
+    setState((prev) => ({ ...prev, isOpen: false, content: null, title: undefined }));
   }, []);
 
   const setWidth = useCallback((width: number) => {
-    setState(prev => ({ ...prev, width }));
+    setState((prev) => ({ ...prev, width }));
   }, []);
 
   // Close on Escape
@@ -58,15 +61,17 @@ export function SidePanelProvider({ children }: { children: ReactNode }) {
   }, [state.isOpen, closeSidePanel]);
 
   return (
-    <SidePanelContext.Provider value={{
-      openSidePanel,
-      closeSidePanel,
-      isOpen: state.isOpen,
-      content: state.content,
-      width: state.width,
-      title: state.title,
-      setWidth,
-    }}>
+    <SidePanelContext.Provider
+      value={{
+        openSidePanel,
+        closeSidePanel,
+        isOpen: state.isOpen,
+        content: state.content,
+        width: state.width,
+        title: state.title,
+        setWidth,
+      }}
+    >
       {children}
     </SidePanelContext.Provider>
   );

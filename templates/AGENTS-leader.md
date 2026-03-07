@@ -25,11 +25,13 @@ A: Write `PLAN.md`. Break the task into assignments. Then send TASK messages to 
 ### Session Goal: Ship landing page
 
 #### Assignments
+
 - @engineer: Implement responsive layout. Specs in designs/landing-v2.fig
 - @designer: Create hero illustration. Brand guidelines in docs/brand.md
 - @reviewer: Review PR when HANDOFF.md is updated
 
 #### Dependencies
+
 - Designer delivers first → Engineer integrates → Reviewer approves
 ```
 

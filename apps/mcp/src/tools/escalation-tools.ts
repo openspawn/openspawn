@@ -10,13 +10,15 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     "Escalate a task to a higher-level agent",
     {
       taskId: z.string().describe("The task ID to escalate"),
-      reason: z.string().describe("Reason for escalation (e.g., 'blocked', 'needs_approval', 'out_of_scope')"),
+      reason: z
+        .string()
+        .describe("Reason for escalation (e.g., 'blocked', 'needs_approval', 'out_of_scope')"),
       targetAgentId: z.string().describe("Agent ID to escalate to (must be higher level)"),
     },
     async ({ taskId, reason, targetAgentId }) => {
       const result = await client.createEscalation(taskId, reason, targetAgentId);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // List escalations
@@ -29,7 +31,7 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     async ({ taskId }) => {
       const result = await client.getEscalations(taskId);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Resolve escalation
@@ -43,7 +45,7 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     async ({ escalationId, resolution }) => {
       const result = await client.resolveEscalation(escalationId, resolution);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Request consensus
@@ -58,7 +60,7 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     async ({ taskId, question, voterIds }) => {
       const result = await client.requestConsensus(taskId, question, voterIds);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Submit vote
@@ -73,7 +75,7 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     async ({ consensusId, vote, reason }) => {
       const result = await client.submitVote(consensusId, vote, reason);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Get consensus status
@@ -86,6 +88,6 @@ export function registerEscalationTools(server: McpServer, client: ApiClient) {
     async ({ consensusId }) => {
       const result = await client.getConsensusStatus(consensusId);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 }

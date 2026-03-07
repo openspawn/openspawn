@@ -2,7 +2,7 @@
 
 <span class="status status-active">In Design</span>
 
-*Updated: Feb 26, 2026*
+_Updated: Feb 26, 2026_
 
 ## The Problem
 
@@ -10,12 +10,12 @@ Agent-to-agent communication wastes tokens. Dennis + CEO burned hundreds of mess
 
 ## Decision: SQLite + MCP Tools
 
-| Approach | Verdict |
-|----------|---------|
-| File-based (HANDOFF.md, PLAN.md) | ❌ Mutex/race conditions |
-| Free-form chat (Discord, group) | ❌ Token waste, ping-pong |
-| SQLite + MCP tools | ✅ Transactional, agent-native, dashboard-friendly |
-| Redis/Postgres | ❌ Overkill, infrastructure dependency |
+| Approach                         | Verdict                                            |
+| -------------------------------- | -------------------------------------------------- |
+| File-based (HANDOFF.md, PLAN.md) | ❌ Mutex/race conditions                           |
+| Free-form chat (Discord, group)  | ❌ Token waste, ping-pong                          |
+| SQLite + MCP tools               | ✅ Transactional, agent-native, dashboard-friendly |
+| Redis/Postgres                   | ❌ Overkill, infrastructure dependency             |
 
 ## Architecture
 
@@ -31,14 +31,14 @@ Agent → MCP Tool Call → SQLite (WAL mode) → Dashboard
 
 ## MCP Tools (Task Board)
 
-| Tool | Description |
-|------|-------------|
-| `task_create` | Create a task with assignee, priority, dependencies |
-| `task_claim` | Atomically claim an open task (no double-assignment) |
-| `task_complete` | Mark done with result artifact |
-| `task_list` | Query tasks by status, assignee, priority |
-| `escalate` | Push issue up the chain of command |
-| `org_status` | Current org state, agent statuses, budget usage |
+| Tool            | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| `task_create`   | Create a task with assignee, priority, dependencies  |
+| `task_claim`    | Atomically claim an open task (no double-assignment) |
+| `task_complete` | Mark done with result artifact                       |
+| `task_list`     | Query tasks by status, assignee, priority            |
+| `escalate`      | Push issue up the chain of command                   |
+| `org_status`    | Current org state, agent statuses, budget usage      |
 
 ## Communication Rules (baked into SOUL.md)
 

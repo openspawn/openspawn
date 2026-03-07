@@ -22,21 +22,21 @@ Dashboard connects to `http://localhost:3333` — same port, same API.
 
 All endpoints are 1:1 compatible with the TypeScript sandbox:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/graphql` | GraphQL-compatible (dashboard queries) |
-| GET | `/api/stream` | SSE real-time events |
-| GET | `/api/state` | Simulation summary |
-| GET | `/api/agents` | All agents |
-| GET | `/api/tasks` | All tasks |
-| GET | `/api/events` | Recent events |
-| GET | `/api/metrics` | Time-series metrics |
-| GET | `/api/metrics/acp` | ACP protocol metrics |
-| POST | `/api/order` | Send order to COO |
-| POST | `/api/restart` | Reset simulation |
-| POST | `/api/agents/spawn` | Spawn new agent |
-| GET/PUT | `/api/speed` | Tick interval control |
-| GET | `/api/models` | LLM provider info |
+| Method  | Path                | Description                            |
+| ------- | ------------------- | -------------------------------------- |
+| POST    | `/graphql`          | GraphQL-compatible (dashboard queries) |
+| GET     | `/api/stream`       | SSE real-time events                   |
+| GET     | `/api/state`        | Simulation summary                     |
+| GET     | `/api/agents`       | All agents                             |
+| GET     | `/api/tasks`        | All tasks                              |
+| GET     | `/api/events`       | Recent events                          |
+| GET     | `/api/metrics`      | Time-series metrics                    |
+| GET     | `/api/metrics/acp`  | ACP protocol metrics                   |
+| POST    | `/api/order`        | Send order to COO                      |
+| POST    | `/api/restart`      | Reset simulation                       |
+| POST    | `/api/agents/spawn` | Spawn new agent                        |
+| GET/PUT | `/api/speed`        | Tick interval control                  |
+| GET     | `/api/models`       | LLM provider info                      |
 
 ## Docker
 
