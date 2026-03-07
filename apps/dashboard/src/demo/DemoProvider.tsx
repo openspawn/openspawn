@@ -1,5 +1,13 @@
-import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   SimulationEngine,
   createSimulation,
@@ -11,12 +19,12 @@ import {
   PROJECT_PHASES,
   type SimulationEvent,
   type DemoScenario,
-} from '@openspawn/demo-data';
-import { setDemoEngine } from './mock-fetcher';
-import { celebrateLevelUp, celebrateElite } from '../lib/confetti';
-import { debug } from '../lib/debug';
+} from "@openspawn/demo-data";
+import { setDemoEngine } from "./mock-fetcher";
+import { celebrateLevelUp, celebrateElite } from "../lib/confetti";
+import { debug } from "../lib/debug";
 
-export type ScenarioName = 'acmetech' | 'fresh' | 'startup' | 'growth' | 'enterprise' | 'sandbox';
+export type ScenarioName = "acmetech" | "fresh" | "startup" | "growth" | "enterprise" | "sandbox";
 
 // Re-export phase info for UI components
 export { PROJECT_PHASES };
@@ -50,14 +58,26 @@ export function useDemo(): DemoContextValue {
       isPlaying: false,
       speed: 1,
       currentTick: 0,
-      scenario: 'fresh',
+      scenario: "fresh",
       recentEvents: [],
-      play: () => { /* noop */ },
-      pause: () => { /* noop */ },
-      setIsPlaying: () => { /* noop */ },
-      setSpeed: () => { /* noop */ },
-      setScenario: () => { /* noop */ },
-      reset: () => { /* noop */ },
+      play: () => {
+        /* noop */
+      },
+      pause: () => {
+        /* noop */
+      },
+      setIsPlaying: () => {
+        /* noop */
+      },
+      setSpeed: () => {
+        /* noop */
+      },
+      setScenario: () => {
+        /* noop */
+      },
+      reset: () => {
+        /* noop */
+      },
       engine: null,
     };
   }
@@ -65,7 +85,7 @@ export function useDemo(): DemoContextValue {
 }
 
 const SCENARIOS: Record<ScenarioName, DemoScenario> = {
-  acmetech: acmetechScenario,  // Default: Realistic product launch
+  acmetech: acmetechScenario, // Default: Realistic product launch
   fresh: freshScenario,
   startup: startupScenario,
   growth: growthScenario,
@@ -74,8 +94,16 @@ const SCENARIOS: Record<ScenarioName, DemoScenario> = {
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (s === 'acmetech' || s === 'fresh' || s === 'startup' || s === 'growth' || s === 'enterprise' || s === 'sandbox') return s;
-  return 'acmetech'; // Default to AcmeTech product launch
+  if (
+    s === "acmetech" ||
+    s === "fresh" ||
+    s === "startup" ||
+    s === "growth" ||
+    s === "enterprise" ||
+    s === "sandbox"
+  )
+    return s;
+  return "acmetech"; // Default to AcmeTech product launch
 }
 
 interface DemoProviderProps {
@@ -85,8 +113,8 @@ interface DemoProviderProps {
   initialSpeed?: number;
 }
 
-export function DemoProvider({ 
-  children, 
+export function DemoProvider({
+  children,
   scenario: initialScenarioName,
   autoPlay = false,
   initialSpeed = 1,
@@ -98,14 +126,14 @@ export function DemoProvider({
   const [currentTick, setCurrentTick] = useState(0);
   const [scenario, setScenarioState] = useState<ScenarioName>(parseScenario(initialScenarioName));
   const [recentEvents, setRecentEvents] = useState<SimulationEvent[]>([]);
-  
+
   // Ref for stable access
   const engineRef = useRef<SimulationEngine | null>(null);
 
   // Initialize simulation (no MSW needed!)
   useEffect(() => {
-    debug.demo('Initializing simulation...');
-    
+    debug.demo("Initializing simulation...");
+
     // Create simulation engine
     const initialScenario = SCENARIOS[scenario];
     const sim = createSimulation(initialScenario);
@@ -113,8 +141,8 @@ export function DemoProvider({
 
     // Connect engine to mock fetcher (this is the key!)
     setDemoEngine(() => engineRef.current);
-    
-    debug.demo('Ready with scenario:', scenario);
+
+    debug.demo("Ready with scenario:", scenario);
     setIsReady(true);
 
     return () => {
@@ -142,14 +170,14 @@ export function DemoProvider({
     }
 
     // Only celebrate promotions (rare, meaningful events)
-    if (event.type === 'agent_promoted') {
+    if (event.type === "agent_promoted") {
       lastConfettiRef.current = now;
       celebrateLevelUp();
     }
-    
+
     // Special celebration for elite + 100 trust (very rare)
     const payload = event.payload as { agent?: { reputationLevel?: string; trustScore?: number } };
-    if (payload?.agent?.reputationLevel === 'ELITE' && payload?.agent?.trustScore === 100) {
+    if (payload?.agent?.reputationLevel === "ELITE" && payload?.agent?.trustScore === 100) {
       lastConfettiRef.current = now;
       celebrateElite();
     }
@@ -170,12 +198,12 @@ export function DemoProvider({
 
     // Refetch queries once per tick
     const unsubscribeTick = engine.onTick((events, tick) => {
-      debug.demo('Tick', tick, '→', events.length, 'events');
+      debug.demo("Tick", tick, "→", events.length, "events");
       setCurrentTick(tick);
-      
+
       // Force refetch all active queries (they'll hit mock fetcher)
       if (events.length > 0) {
-        queryClient.refetchQueries({ type: 'active' });
+        queryClient.refetchQueries({ type: "active" });
       }
     });
 
@@ -208,35 +236,38 @@ export function DemoProvider({
     setSpeedState(newSpeed);
   }, []);
 
-  const setScenario = useCallback((name: ScenarioName, autoPlay = false) => {
-    pause();
-    
-    // Create new engine with new scenario
-    const newScenario = SCENARIOS[name];
-    const newEngine = createSimulation(newScenario);
-    engineRef.current = newEngine;
-    
-    // Update mock fetcher reference
-    setDemoEngine(() => engineRef.current);
-    
-    setScenarioState(name);
-    setCurrentTick(0);
-    setRecentEvents([]);
-    
-    // Refetch all queries with new scenario data
-    queryClient.refetchQueries();
-    
-    // Auto-play if requested (useful for initial demo start)
-    if (autoPlay) {
-      // Small delay to ensure engine is ready
-      setTimeout(() => {
-        engineRef.current?.play();
-        setIsPlaying(true);
-      }, 50);
-    }
-    
-    debug.demo('Switched to scenario:', name, autoPlay ? '(auto-playing)' : '');
-  }, [pause, queryClient]);
+  const setScenario = useCallback(
+    (name: ScenarioName, autoPlay = false) => {
+      pause();
+
+      // Create new engine with new scenario
+      const newScenario = SCENARIOS[name];
+      const newEngine = createSimulation(newScenario);
+      engineRef.current = newEngine;
+
+      // Update mock fetcher reference
+      setDemoEngine(() => engineRef.current);
+
+      setScenarioState(name);
+      setCurrentTick(0);
+      setRecentEvents([]);
+
+      // Refetch all queries with new scenario data
+      queryClient.refetchQueries();
+
+      // Auto-play if requested (useful for initial demo start)
+      if (autoPlay) {
+        // Small delay to ensure engine is ready
+        setTimeout(() => {
+          engineRef.current?.play();
+          setIsPlaying(true);
+        }, 50);
+      }
+
+      debug.demo("Switched to scenario:", name, autoPlay ? "(auto-playing)" : "");
+    },
+    [pause, queryClient],
+  );
 
   const reset = useCallback(() => {
     setScenario(scenario);
@@ -252,7 +283,7 @@ export function DemoProvider({
     recentEvents,
     play,
     pause,
-    setIsPlaying: (playing: boolean) => playing ? play() : pause(),
+    setIsPlaying: (playing: boolean) => (playing ? play() : pause()),
     setSpeed,
     setScenario,
     reset,
@@ -270,9 +301,5 @@ export function DemoProvider({
     );
   }
 
-  return (
-    <DemoContext.Provider value={value}>
-      {children}
-    </DemoContext.Provider>
-  );
+  return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;
 }

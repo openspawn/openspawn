@@ -2,11 +2,21 @@ import { GraphQLClient } from "graphql-request";
 
 // Check if we're in demo mode or sandbox mode
 // Check both search params and full URL (HashRouter can move params around)
-const _href = typeof window !== 'undefined' ? (window.location.href ?? '') : '';
-const urlParams = typeof window !== 'undefined' && window.location.search ? new URLSearchParams(window.location.search) : null;
-const _env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
-export const isDemoMode = urlParams?.get('demo') === 'true' || _href.includes('demo=true') || _env.VITE_DEMO_MODE === 'true';
-export const isSandboxMode = urlParams?.get('sandbox') === 'true' || _href.includes('sandbox=true') || _env.VITE_SANDBOX_MODE === 'true' || _href.includes('bikinibottom.ai');
+const _href = typeof window !== "undefined" ? (window.location.href ?? "") : "";
+const urlParams =
+  typeof window !== "undefined" && window.location.search
+    ? new URLSearchParams(window.location.search)
+    : null;
+const _env = (typeof import.meta !== "undefined" && import.meta.env) || {};
+export const isDemoMode =
+  urlParams?.get("demo") === "true" ||
+  _href.includes("demo=true") ||
+  _env.VITE_DEMO_MODE === "true";
+export const isSandboxMode =
+  urlParams?.get("sandbox") === "true" ||
+  _href.includes("sandbox=true") ||
+  _env.VITE_SANDBOX_MODE === "true" ||
+  _href.includes("bikinibottom.ai");
 
 if (isDemoMode) {
   console.log("[GraphQL] Demo mode enabled - using mock fetcher (no network requests)");
@@ -25,9 +35,13 @@ let _demoFetcher: FetcherFn | null = null;
 let _sandboxFetcher: FetcherFn | null = null;
 
 /** Register a demo-mode fetcher (called by app at startup). */
-export function setDemoFetcher(fn: FetcherFn) { _demoFetcher = fn; }
+export function setDemoFetcher(fn: FetcherFn) {
+  _demoFetcher = fn;
+}
 /** Register a sandbox-mode fetcher (called by app at startup). */
-export function setSandboxFetcher(fn: FetcherFn) { _sandboxFetcher = fn; }
+export function setSandboxFetcher(fn: FetcherFn) {
+  _sandboxFetcher = fn;
+}
 
 // Use the same host as the dashboard, but port 3000 for the API
 // This allows LAN access without hardcoding IPs
@@ -67,7 +81,7 @@ function getClient(): GraphQLClient {
 export function fetcher<TData, TVariables extends Record<string, unknown>>(
   query: string,
   variables?: TVariables,
-  _options?: RequestInit['headers']
+  _options?: RequestInit["headers"],
 ): () => Promise<TData> {
   // Use sandbox fetcher (real LLM agents via Ollama)
   if (isSandboxMode && _sandboxFetcher) {
@@ -78,7 +92,7 @@ export function fetcher<TData, TVariables extends Record<string, unknown>>(
   if (isDemoMode && _demoFetcher) {
     return _demoFetcher<TData, TVariables>(query, variables);
   }
-  
+
   // Real API request
   return async () => {
     return getClient().request<TData>(query, variables);
@@ -87,6 +101,6 @@ export function fetcher<TData, TVariables extends Record<string, unknown>>(
 
 // For direct access if needed
 export const graphqlClient = {
-  request: <TData>(query: string, variables?: Record<string, unknown>) => 
+  request: <TData>(query: string, variables?: Record<string, unknown>) =>
     getClient().request<TData>(query, variables),
 };

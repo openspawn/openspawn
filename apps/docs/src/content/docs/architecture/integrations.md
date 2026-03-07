@@ -33,13 +33,14 @@ What we don't have yet: **integrations with the outside world**. BikiniBottom is
 
 ### The Insight
 
-Every agent framework solves *execution* — how a single agent reasons and acts. Very few solve *coordination* — how multiple agents organize, communicate, govern, and account for their work.
+Every agent framework solves _execution_ — how a single agent reasons and acts. Very few solve _coordination_ — how multiple agents organize, communicate, govern, and account for their work.
 
 **BikiniBottom is infrastructure, not a framework.** We don't compete with LangGraph, CrewAI, or Claude Code. We complement them. Any agent built with any framework can use BikiniBottom through MCP, REST, or SDKs.
 
 ### The Analogy
 
 Think of it like this:
+
 - **Agent frameworks** = individual employees (their skills, how they work)
 - **BikiniBottom** = the company (org chart, task management, payroll, communications, HR)
 
@@ -120,18 +121,21 @@ Similar pattern — SDK + framework-specific adapter. Prioritize based on adopti
 This is the most natural integration for developer teams:
 
 **Inbound (GitHub → BikiniBottom):**
+
 - Issue labeled `agent-work` → creates BikiniBottom task with metadata
 - Issue assigned to bot user → routes to specific agent
 - PR review requested → creates review task
 - CI failure → creates fix task with error context
 
 **Outbound (BikiniBottom → GitHub):**
+
 - Task completed → closes linked issue with summary comment
 - Agent opens PR → task moves to `review` state
 - Pre-hook on deploy → requires issue approval before merge
 - Credit spend → commented on issue as cost tracking
 
 **Bidirectional:**
+
 - Status sync: GitHub project board ↔ BikiniBottom task board
 - Comment threads: GitHub comments appear as BikiniBottom messages and vice versa
 
@@ -204,13 +208,14 @@ Beyond dashboards, people need alerts:
 
 #### SDKs
 
-| SDK | Language | Priority | Notes |
-|-----|----------|----------|-------|
-| `@openspawn/sdk` | TypeScript | High | Wraps REST API, type-safe, tree-shakeable |
-| `openspawn-py` | Python | High | Async + sync clients, Pydantic models |
-| `openspawn-go` | Go | Low | For infrastructure teams |
+| SDK              | Language   | Priority | Notes                                     |
+| ---------------- | ---------- | -------- | ----------------------------------------- |
+| `@openspawn/sdk` | TypeScript | High     | Wraps REST API, type-safe, tree-shakeable |
+| `openspawn-py`   | Python     | High     | Async + sync clients, Pydantic models     |
+| `openspawn-go`   | Go         | Low      | For infrastructure teams                  |
 
 Each SDK should provide:
+
 - Authentication helpers (HMAC signing, API key)
 - Typed methods for all API operations
 - Event streaming (WebSocket/SSE)
@@ -255,6 +260,7 @@ Same pattern as Slack. Particularly relevant for open-source communities running
 #### Email
 
 Agents that can send/receive email through BikiniBottom:
+
 - Task notifications to stakeholders
 - Status reports on schedule
 - Human replies create messages in BikiniBottom
@@ -296,46 +302,46 @@ This is the long game:
 
 ### Phase A: Foundation (Weeks 1-4)
 
-| Item | Effort | Impact | Notes |
-|------|--------|--------|-------|
-| TypeScript SDK (`@openspawn/sdk`) | Medium | High | Extract from MCP server, formalize |
-| Python SDK (`openspawn-py`) | Medium | High | Opens entire Python ecosystem |
-| Outbound webhooks | Low | High | Event-driven, covers 80% of notification needs |
-| Inbound webhook (task creation) | Low | Medium | Simple POST → task |
+| Item                              | Effort | Impact | Notes                                          |
+| --------------------------------- | ------ | ------ | ---------------------------------------------- |
+| TypeScript SDK (`@openspawn/sdk`) | Medium | High   | Extract from MCP server, formalize             |
+| Python SDK (`openspawn-py`)       | Medium | High   | Opens entire Python ecosystem                  |
+| Outbound webhooks                 | Low    | High   | Event-driven, covers 80% of notification needs |
+| Inbound webhook (task creation)   | Low    | Medium | Simple POST → task                             |
 
 **Why first:** SDKs are prerequisites for everything else. Webhooks are low-effort, high-impact.
 
 ### Phase B: GitHub + Observability (Weeks 5-8)
 
-| Item | Effort | Impact | Notes |
-|------|--------|--------|-------|
-| GitHub App (issues ↔ tasks) | Medium | High | The killer integration for dev teams |
-| OpenTelemetry traces | Medium | Medium | Plugs into existing monitoring |
-| OpenClaw skill | Low | High | Seamless for our core users |
-| LLM cost sync (LiteLLM) | Low | Medium | Makes credits meaningful |
+| Item                        | Effort | Impact | Notes                                |
+| --------------------------- | ------ | ------ | ------------------------------------ |
+| GitHub App (issues ↔ tasks) | Medium | High   | The killer integration for dev teams |
+| OpenTelemetry traces        | Medium | Medium | Plugs into existing monitoring       |
+| OpenClaw skill              | Low    | High   | Seamless for our core users          |
+| LLM cost sync (LiteLLM)     | Low    | Medium | Makes credits meaningful             |
 
 **Why second:** GitHub is the highest-value single integration. OTEL gives instant credibility. OpenClaw skill serves our base.
 
 ### Phase C: Ecosystem (Weeks 9-12)
 
-| Item | Effort | Impact | Notes |
-|------|--------|--------|-------|
-| LangGraph adapter (Python) | Medium | High | Largest framework community |
-| Linear integration | Medium | Medium | Developer-friendly PM tool |
-| Langfuse integration | Low | Medium | Popular observability |
-| Slack notifications | Low | Medium | Where teams already are |
+| Item                       | Effort | Impact | Notes                       |
+| -------------------------- | ------ | ------ | --------------------------- |
+| LangGraph adapter (Python) | Medium | High   | Largest framework community |
+| Linear integration         | Medium | Medium | Developer-friendly PM tool  |
+| Langfuse integration       | Low    | Medium | Popular observability       |
+| Slack notifications        | Low    | Medium | Where teams already are     |
 
 **Why third:** By now we have SDKs and GitHub. Framework adapters expand the market. Linear and Slack are nice-to-haves.
 
 ### Phase D: Advanced (Weeks 13+)
 
-| Item | Effort | Impact | Notes |
-|------|--------|--------|-------|
-| CrewAI adapter | Medium | Medium | Second-largest framework |
-| Helm chart | Medium | Medium | Enterprise/K8s users |
-| 1-click deploys (Railway, Fly) | Low | Medium | Lowers adoption barrier |
-| Email notifications | Low | Low | Enterprise checkbox |
-| Agent marketplace prototype | High | High (long-term) | The endgame |
+| Item                           | Effort | Impact           | Notes                    |
+| ------------------------------ | ------ | ---------------- | ------------------------ |
+| CrewAI adapter                 | Medium | Medium           | Second-largest framework |
+| Helm chart                     | Medium | Medium           | Enterprise/K8s users     |
+| 1-click deploys (Railway, Fly) | Low    | Medium           | Lowers adoption barrier  |
+| Email notifications            | Low    | Low              | Enterprise checkbox      |
+| Agent marketplace prototype    | High   | High (long-term) | The endgame              |
 
 ---
 
@@ -365,6 +371,7 @@ This is the long game:
 ```
 
 New providers plug in without touching core business logic. Each provider:
+
 - Registers webhook endpoints (inbound)
 - Subscribes to BikiniBottom events (outbound)
 - Handles auth/credentials for the external service
@@ -435,14 +442,14 @@ openspawn-py (Python)
 
 ### What Exists Today
 
-| Platform | Focus | vs. BikiniBottom |
-|----------|-------|---------------|
-| **CrewAI** | Agent execution framework | Execution, not governance. No credits, no approval gates. |
-| **LangGraph** | Agent graph orchestration | Powerful execution, no organizational layer. |
-| **AutoGen** | Multi-agent conversation | Research-oriented, no production governance. |
-| **Fixie / Letta** | Agent hosting | Hosted, not self-hosted. Limited coordination. |
-| **Relevance AI** | Agent workforce | SaaS, not self-hosted. No economic layer. |
-| **Crew.ai Enterprise** | Managed agent teams | Closest competitor, but SaaS and locked to CrewAI. |
+| Platform               | Focus                     | vs. BikiniBottom                                          |
+| ---------------------- | ------------------------- | --------------------------------------------------------- |
+| **CrewAI**             | Agent execution framework | Execution, not governance. No credits, no approval gates. |
+| **LangGraph**          | Agent graph orchestration | Powerful execution, no organizational layer.              |
+| **AutoGen**            | Multi-agent conversation  | Research-oriented, no production governance.              |
+| **Fixie / Letta**      | Agent hosting             | Hosted, not self-hosted. Limited coordination.            |
+| **Relevance AI**       | Agent workforce           | SaaS, not self-hosted. No economic layer.                 |
+| **Crew.ai Enterprise** | Managed agent teams       | Closest competitor, but SaaS and locked to CrewAI.        |
 
 ### Our Differentiation
 
@@ -472,6 +479,7 @@ openspawn-py (Python)
 ### Pricing (When the Time Comes)
 
 BikiniBottom core stays MIT open source. Revenue options:
+
 - **BikiniBottom Cloud** — hosted version for teams who don't want to self-host
 - **Enterprise features** — SSO, RBAC, SLA, audit compliance, support
 - **Marketplace fees** — percentage of cross-org agent transactions
@@ -501,4 +509,4 @@ The architecture should be **provider-based** so integrations are modular. The b
 
 ---
 
-*This is a living document. Update as the market evolves and we learn from users.*
+_This is a living document. Update as the market evolves and we learn from users._

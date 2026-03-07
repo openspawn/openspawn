@@ -45,17 +45,21 @@ claim task → do the work → complete task → claim next
 ```
 
 ### Claiming
+
 ```
 tool: task_claim { task_id: "abc123", agent_id: "[your_id]" }
 ```
+
 Claims are atomic — if another agent already claimed it, you'll get an error. Pick another task.
 
 ### Working
+
 - Do the actual work (write code, create content, analyze data, etc.)
 - Write outputs to files in your workspace
 - Don't message the lead with progress updates — your task status IS the update
 
 ### Completing
+
 ```
 tool: task_complete {
   task_id: "abc123",
@@ -65,13 +69,16 @@ tool: task_complete {
 ```
 
 Always include:
+
 - A one-line summary of what you did
 - File paths to your deliverables
 
 ### Getting the next task
+
 ```
 tool: task_list { assigned_to: "[your_id]", status: "open" }
 ```
+
 Claim the highest-priority available task. Respect dependencies — don't claim tasks whose blockers aren't resolved.
 
 ---
@@ -89,12 +96,14 @@ tool: escalation_create {
 ```
 
 **What counts as stuck:**
+
 - Missing information not in PLAN.md or your workspace
 - Dependency on another agent's unfinished work
 - Technical blocker you can't resolve
 - Ambiguous requirements after re-reading PLAN.md
 
 **What does NOT count as stuck:**
+
 - Hard problem you haven't tried solving yet (try first)
 - Something you could look up or figure out (do that)
 - Wanting confirmation before proceeding (just proceed per PLAN.md)
@@ -120,6 +129,7 @@ A: Wait 5 minutes, then escalate again with increased severity. If still no resp
 ### Receiving Tasks
 
 When you receive a TASK message:
+
 - Do NOT acknowledge it ("On it!", "Got it!")
 - Read the referenced PLAN.md section
 - Claim the task via MCP
@@ -128,6 +138,7 @@ When you receive a TASK message:
 ### Delivering Results
 
 When work is complete:
+
 - Complete the task via MCP (with result + artifacts)
 - If the lead needs to know something non-obvious, send ONE message:
   ```

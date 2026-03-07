@@ -1,13 +1,7 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import { createClient, unwrap } from "../lib/api.js";
-import {
-  outputError,
-  outputTable,
-  formatEmpty,
-  icons,
-  colors,
-} from "../lib/output.js";
+import { outputError, outputTable, formatEmpty, icons, colors } from "../lib/output.js";
 import { withSpinner, progressBar } from "../lib/spinner.js";
 
 interface Balance {
@@ -68,24 +62,22 @@ function formatTime(dateStr: string): string {
   if (diffMins < 60) return pc.dim(`${diffMins}m ago`);
   if (diffHours < 24) return pc.dim(`${diffHours}h ago`);
   if (diffDays < 7) return pc.dim(`${diffDays}d ago`);
-  
+
   return pc.dim(date.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
 }
 
 export function createCreditsCommand(): Command {
-  const credits = new Command("credits")
-    .description("View and manage credits")
-    .addHelpText(
-      "after",
-      `
+  const credits = new Command("credits").description("View and manage credits").addHelpText(
+    "after",
+    `
 ${pc.cyan("Examples:")}
   ${pc.dim("$")} openspawn credits balance
   ${pc.dim("$")} openspawn credits balance agent-123
   ${pc.dim("$")} openspawn credits history --limit 20
   ${pc.dim("$")} openspawn credits transfer --from agent-a --to agent-b --amount 100
   ${pc.dim("$")} openspawn credits grant --to agent-123 --amount 500 --reason "Bonus"
-`
-    );
+`,
+  );
 
   credits
     .command("balance [agentId]")
@@ -97,7 +89,7 @@ ${pc.cyan("Examples:")}
           async () => {
             const client = createClient();
             return client.getBalance(agentId);
-          }
+          },
         );
 
         const balance = unwrap(data) as Balance;
@@ -105,19 +97,27 @@ ${pc.cyan("Examples:")}
         console.log();
         console.log(`  ${icons.credit} ${pc.bold("Credit Balance")}`);
         console.log();
-        console.log(`  ${pc.dim("Current:")}     ${colors.credit(pc.bold(balance.currentBalance.toLocaleString()))} credits`);
+        console.log(
+          `  ${pc.dim("Current:")}     ${colors.credit(pc.bold(balance.currentBalance.toLocaleString()))} credits`,
+        );
 
         if (balance.budgetPeriodLimit) {
           const spent = balance.budgetPeriodSpent || 0;
           const pct = (spent / balance.budgetPeriodLimit) * 100;
           console.log();
-          console.log(`  ${pc.dim("Budget:")}      ${spent.toLocaleString()} / ${balance.budgetPeriodLimit.toLocaleString()}`);
-          console.log(`  ${pc.dim("Usage:")}       ${progressBar(spent, balance.budgetPeriodLimit, 20)}`);
+          console.log(
+            `  ${pc.dim("Budget:")}      ${spent.toLocaleString()} / ${balance.budgetPeriodLimit.toLocaleString()}`,
+          );
+          console.log(
+            `  ${pc.dim("Usage:")}       ${progressBar(spent, balance.budgetPeriodLimit, 20)}`,
+          );
         }
 
         if (balance.lifetimeEarnings) {
           console.log();
-          console.log(`  ${pc.dim("Lifetime:")}    ${balance.lifetimeEarnings.toLocaleString()} earned`);
+          console.log(
+            `  ${pc.dim("Lifetime:")}    ${balance.lifetimeEarnings.toLocaleString()} earned`,
+          );
         }
 
         console.log();
@@ -157,13 +157,19 @@ ${pc.cyan("Examples:")}
 
         outputTable({
           headers: ["Type", "Amount", "Balance", "Reason", "Time"],
-          rows: transactions.slice(0, parseInt(opts.limit)).map((t) => [
-            formatType(t.type),
-            formatAmount(t.amount, t.type),
-            t.balanceAfter.toLocaleString(),
-            t.reason ? (t.reason.length > 25 ? t.reason.slice(0, 22) + "..." : t.reason) : pc.dim("—"),
-            formatTime(t.createdAt),
-          ]),
+          rows: transactions
+            .slice(0, parseInt(opts.limit))
+            .map((t) => [
+              formatType(t.type),
+              formatAmount(t.amount, t.type),
+              t.balanceAfter.toLocaleString(),
+              t.reason
+                ? t.reason.length > 25
+                  ? t.reason.slice(0, 22) + "..."
+                  : t.reason
+                : pc.dim("—"),
+              formatTime(t.createdAt),
+            ]),
         });
         console.log();
       } catch (err) {
@@ -199,13 +205,15 @@ ${pc.cyan("Examples:")}
           },
           {
             successText: `Transferred ${opts.amount.toLocaleString()} credits: ${opts.from} → ${opts.to}`,
-          }
+          },
         );
 
         console.log();
         console.log(`  ${pc.dim("From:")}   ${opts.from}`);
         console.log(`  ${pc.dim("To:")}     ${opts.to}`);
-        console.log(`  ${pc.dim("Amount:")} ${colors.credit(opts.amount.toLocaleString())} credits`);
+        console.log(
+          `  ${pc.dim("Amount:")} ${colors.credit(opts.amount.toLocaleString())} credits`,
+        );
         if (opts.reason) {
           console.log(`  ${pc.dim("Reason:")} ${opts.reason}`);
         }
@@ -240,12 +248,14 @@ ${pc.cyan("Examples:")}
             void client; // suppress unused-var warning until wired
             await new Promise((r) => setTimeout(r, 500));
           },
-          { successText: `Granted ${opts.amount.toLocaleString()} credits to ${opts.to}` }
+          { successText: `Granted ${opts.amount.toLocaleString()} credits to ${opts.to}` },
         );
 
         console.log();
         console.log(`  ${pc.dim("To:")}     ${opts.to}`);
-        console.log(`  ${pc.dim("Amount:")} ${colors.credit(`+${opts.amount.toLocaleString()}`)} credits`);
+        console.log(
+          `  ${pc.dim("Amount:")} ${colors.credit(`+${opts.amount.toLocaleString()}`)} credits`,
+        );
         if (opts.reason) {
           console.log(`  ${pc.dim("Reason:")} ${opts.reason}`);
         }

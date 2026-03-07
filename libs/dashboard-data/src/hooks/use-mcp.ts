@@ -3,8 +3,8 @@
  * Returns { data, error, connected }.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { orgStatus, McpError } from '../services/mcp-client';
+import { useState, useEffect, useCallback } from "react";
+import { orgStatus, McpError } from "../services/mcp-client";
 
 export interface McpOrgData {
   agents?: unknown[];
@@ -25,7 +25,7 @@ export function useMcpOrgStatus(intervalMs = 5000) {
       setError(null);
     } catch (err) {
       setConnected(false);
-      setError(err instanceof McpError ? err.message : 'Unknown error');
+      setError(err instanceof McpError ? err.message : "Unknown error");
     }
   }, []);
 

@@ -48,9 +48,7 @@ export function ProfileSettings() {
     <Card>
       <CardHeader>
         <CardTitle>Profile</CardTitle>
-        <CardDescription>
-          Update your personal information
-        </CardDescription>
+        <CardDescription>Update your personal information</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

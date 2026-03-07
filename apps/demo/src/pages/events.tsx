@@ -1,12 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import {
-  Activity,
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  Filter,
-} from "lucide-react";
+import { Activity, AlertCircle, AlertTriangle, CheckCircle, Info, Filter } from "lucide-react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -67,7 +60,11 @@ function formatTime(dateString: string) {
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeof useEvents>["events"] }) {
+function EventVirtualList({
+  filteredEvents,
+}: {
+  filteredEvents: ReturnType<typeof useEvents>["events"];
+}) {
   const parentRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: filteredEvents.length,
@@ -82,7 +79,11 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
       <EmptyState
         variant="events"
         title="No events recorded"
-        description={isSandboxMode ? "Waiting for agent activity..." : "Events appear as agents work. Start a simulation or assign tasks to generate activity."}
+        description={
+          isSandboxMode
+            ? "Waiting for agent activity..."
+            : "Events appear as agents work. Start a simulation or assign tasks to generate activity."
+        }
         compact
       />
     );
@@ -115,9 +116,7 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
                 }}
                 className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-accent/50 transition-colors border-b border-border min-h-[44px]"
               >
-                <div className="mt-0.5 shrink-0">
-                  {getSeverityIcon(event.severity)}
-                </div>
+                <div className="mt-0.5 shrink-0">{getSeverityIcon(event.severity)}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <Badge variant={getSeverityVariant(event.severity)} className="text-xs">
@@ -128,8 +127,7 @@ function EventVirtualList({ filteredEvents }: { filteredEvents: ReturnType<typeo
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm">
-                    <span className="font-medium">{event.actor?.name || "System"}</span>
-                    {" "}
+                    <span className="font-medium">{event.actor?.name || "System"}</span>{" "}
                     <span className="text-muted-foreground">
                       {event.entityType} → {event.entityId.slice(0, 8)}...
                     </span>

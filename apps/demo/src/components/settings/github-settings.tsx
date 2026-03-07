@@ -10,7 +10,7 @@ import {
   Link2,
   GitPullRequest,
   AlertCircle,
-  } from "lucide-react";
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -125,7 +125,11 @@ const MOCK_LINKS: IntegrationLinkData[] = [
     sourceId: "42",
     targetType: "task",
     targetId: "task-abc-123",
-    metadata: { title: "Fix authentication bug", url: "https://github.com/openspawn/core/issues/42", repo: "openspawn/core" },
+    metadata: {
+      title: "Fix authentication bug",
+      url: "https://github.com/openspawn/core/issues/42",
+      repo: "openspawn/core",
+    },
     createdAt: new Date(Date.now() - 3600000).toISOString(),
   },
   {
@@ -135,7 +139,11 @@ const MOCK_LINKS: IntegrationLinkData[] = [
     sourceId: "87",
     targetType: "task",
     targetId: "task-def-456",
-    metadata: { title: "Add rate limiting middleware", url: "https://github.com/openspawn/core/pull/87", repo: "openspawn/core" },
+    metadata: {
+      title: "Add rate limiting middleware",
+      url: "https://github.com/openspawn/core/pull/87",
+      repo: "openspawn/core",
+    },
     createdAt: new Date(Date.now() - 7200000).toISOString(),
   },
   {
@@ -145,7 +153,11 @@ const MOCK_LINKS: IntegrationLinkData[] = [
     sourceId: "55",
     targetType: "task",
     targetId: "task-ghi-789",
-    metadata: { title: "Upgrade TypeORM to v0.4", url: "https://github.com/openspawn/core/issues/55", repo: "openspawn/core" },
+    metadata: {
+      title: "Upgrade TypeORM to v0.4",
+      url: "https://github.com/openspawn/core/issues/55",
+      repo: "openspawn/core",
+    },
     createdAt: new Date(Date.now() - 86400000).toISOString(),
   },
 ];
@@ -212,9 +224,7 @@ export function GitHubSettings() {
   };
 
   const handleToggle = (id: string) => {
-    setConnections((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, enabled: !c.enabled } : c)),
-    );
+    setConnections((prev) => prev.map((c) => (c.id === id ? { ...c, enabled: !c.enabled } : c)));
   };
 
   const copyToClipboard = (text: string, id: string) => {
@@ -310,7 +320,10 @@ export function GitHubSettings() {
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
                   <DialogClose asChild>
-                    <Button onClick={handleCreate} disabled={isCreating || !newName || !newInstallationId}>
+                    <Button
+                      onClick={handleCreate}
+                      disabled={isCreating || !newName || !newInstallationId}
+                    >
                       {isCreating ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
                       Create Connection
                     </Button>
@@ -362,9 +375,7 @@ export function GitHubSettings() {
                         </>
                       )}
                     </div>
-                    {conn.lastError && (
-                      <p className="text-xs text-destructive">{conn.lastError}</p>
-                    )}
+                    {conn.lastError && <p className="text-xs text-destructive">{conn.lastError}</p>}
 
                     {/* Sync config badges */}
                     <div className="flex flex-wrap gap-1.5 pt-1">
@@ -392,19 +403,13 @@ export function GitHubSettings() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleToggle(conn.id)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => handleToggle(conn.id)}>
                       {conn.enabled ? "Disable" : "Enable"}
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() =>
-                        copyToClipboard(conn.webhookSecret, `secret-${conn.id}`)
-                      }
+                      onClick={() => copyToClipboard(conn.webhookSecret, `secret-${conn.id}`)}
                     >
                       {copiedId === `secret-${conn.id}` ? (
                         <Check className="h-4 w-4" />
@@ -430,10 +435,7 @@ export function GitHubSettings() {
                             <Button variant="outline">Cancel</Button>
                           </DialogClose>
                           <DialogClose asChild>
-                            <Button
-                              variant="destructive"
-                              onClick={() => handleDelete(conn.id)}
-                            >
+                            <Button variant="destructive" onClick={() => handleDelete(conn.id)}>
                               Delete
                             </Button>
                           </DialogClose>
@@ -468,9 +470,7 @@ export function GitHubSettings() {
               <Link2 className="h-5 w-5" />
               Linked Items
             </CardTitle>
-            <CardDescription>
-              Active links between GitHub and OpenSpawn
-            </CardDescription>
+            <CardDescription>Active links between GitHub and OpenSpawn</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -503,7 +503,7 @@ export function GitHubSettings() {
                       <Badge variant="outline" className="text-xs">
                         {(link.metadata.repo as string) || "unknown"}
                       </Badge>
-                      {typeof link.metadata.url === 'string' && (
+                      {typeof link.metadata.url === "string" && (
                         <a
                           href={link.metadata.url as string}
                           target="_blank"

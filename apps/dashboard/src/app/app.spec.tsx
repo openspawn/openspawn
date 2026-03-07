@@ -71,9 +71,7 @@ describe("Pages (isolated)", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
-    return render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-    );
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
   }
 
   it("IntroPage renders pineapple and CTA", async () => {

@@ -3,18 +3,26 @@
 // random events, resource pools, and scoring.
 // The engine hooks into preTick/postTick of the simulation.
 
-import type { DeterministicSimulation } from './deterministic.js';
-import type { SandboxTask, SandboxEvent, SandboxAgent } from './types.js';
+import type { DeterministicSimulation } from "./deterministic.js";
+import type { SandboxTask, SandboxEvent, SandboxAgent } from "./types.js";
 import type {
-  ScenarioDefinition, ScenarioPhase, EpicTemplate, EpicInstance,
-  EventTemplate, EventEffect, ResourcePool, ScoreCard, TaskTemplate,
-  CompletionCondition, CrossDeptTrigger,
-} from './scenario-types.js';
-import { SeededRandom, DIFFICULTY_PRESETS } from './scenario-types.js';
+  ScenarioDefinition,
+  ScenarioPhase,
+  EpicTemplate,
+  EpicInstance,
+  EventTemplate,
+  EventEffect,
+  ResourcePool,
+  ScoreCard,
+  TaskTemplate,
+  CompletionCondition,
+  CrossDeptTrigger,
+} from "./scenario-types.js";
+import { SeededRandom, DIFFICULTY_PRESETS } from "./scenario-types.js";
 
 let scenarioTaskCounter = 1000;
 function nextScenarioTaskId(): string {
-  return `TASK-${String(++scenarioTaskCounter).padStart(4, '0')}`;
+  return `TASK-${String(++scenarioTaskCounter).padStart(4, "0")}`;
 }
 
 // ── Scenario Engine ──────────────────────────────────────────────────────────
@@ -24,7 +32,7 @@ export class ScenarioEngine {
   private scenario: ScenarioDefinition;
   private currentPhaseIndex = 0;
   private epics: EpicInstance[] = [];
-  private dag: Map<string, string[]> = new Map();  // taskId → dependsOn[]
+  private dag: Map<string, string[]> = new Map(); // taskId → dependsOn[]
   private prng: SeededRandom;
   private decisionCount = 0;
   private lastDecisionSnapshot = 0;
@@ -46,9 +54,9 @@ export class ScenarioEngine {
 
   constructor(scenario: ScenarioDefinition) {
     this.scenario = scenario;
-    const seed = scenario.meta.seed === 'random' ? Date.now() : scenario.meta.seed;
+    const seed = scenario.meta.seed === "random" ? Date.now() : scenario.meta.seed;
     this.prng = new SeededRandom(seed);
-    this.resources = scenario.resources.map(r => ({ ...r, current: r.initial }));
+    this.resources = scenario.resources.map((r) => ({ ...r, current: r.initial }));
   }
 
   /** Attach to a simulation instance */
@@ -66,29 +74,38 @@ export class ScenarioEngine {
 
     // Start Phase 0
     this.enterPhase(0);
-    this.log(`🎬 Scenario "${this.scenario.meta.name}" started (${this.scenario.meta.difficulty} difficulty)`);
+    this.log(
+      `🎬 Scenario "${this.scenario.meta.name}" started (${this.scenario.meta.difficulty} difficulty)`,
+    );
   }
 
-  get isActive(): boolean { return this.active; }
-  get scenarioId(): string { return this.scenario.meta.id; }
+  get isActive(): boolean {
+    return this.active;
+  }
+  get scenarioId(): string {
+    return this.scenario.meta.id;
+  }
 
   getStatus() {
     const phase = this.scenario.phases[this.currentPhaseIndex];
     return {
       scenarioId: this.scenario.meta.id,
       scenarioName: this.scenario.meta.name,
-      currentPhase: phase?.name ?? 'N/A',
+      currentPhase: phase?.name ?? "N/A",
       currentPhaseIndex: this.currentPhaseIndex,
       tick: this.sim?.tick ?? 0,
       decisionCount: this.decisionCount,
-      resources: this.resources.map(r => ({
-        id: r.id, name: r.name,
+      resources: this.resources.map((r) => ({
+        id: r.id,
+        name: r.name,
         current: r.current ?? r.initial,
         initial: r.initial,
         pct: Math.round(((r.current ?? r.initial) / r.initial) * 100),
       })),
-      epics: this.epics.map(e => ({
-        id: e.id, title: e.title, status: e.status,
+      epics: this.epics.map((e) => ({
+        id: e.id,
+        title: e.title,
+        status: e.status,
         completionPct: Math.round(e.completionPct),
       })),
       scores: this.computeScores(),
@@ -155,7 +172,7 @@ export class ScenarioEngine {
 
     // Check scenario end
     if (this.currentPhaseIndex >= this.scenario.phases.length) {
-      this.log('🏁 Scenario complete!');
+      this.log("🏁 Scenario complete!");
       this.active = false;
     }
   }
@@ -174,16 +191,16 @@ export class ScenarioEngine {
 
     // Emit phase change event
     this.emitEvent({
-      type: 'phase_change',
+      type: "phase_change",
       message: `Phase ${index + 1}: ${phase.name} — ${phase.narrative}`,
       timestamp: Date.now(),
     });
 
     // Mark epics for this phase as ready to expand
     for (const epicId of phase.unlocksEpics) {
-      const existing = this.epics.find(e => e.templateId === epicId);
+      const existing = this.epics.find((e) => e.templateId === epicId);
       if (!existing) {
-        const template = this.scenario.epics.find(e => e.id === epicId);
+        const template = this.scenario.epics.find((e) => e.id === epicId);
         if (template) {
           this.epics.push({
             id: `epic-${epicId}-${this.sim.tick}`,
@@ -192,7 +209,7 @@ export class ScenarioEngine {
             phase: template.phase,
             domains: template.domains,
             priority: template.priority,
-            status: 'active',
+            status: "active",
             taskIds: [],
             completionPct: 0,
             unlockedAtTick: this.sim.tick,
@@ -211,13 +228,13 @@ export class ScenarioEngine {
     let shouldTransition = false;
 
     switch (transition.type) {
-      case 'tick':
+      case "tick":
         shouldTransition = tick >= transition.tick;
         break;
-      case 'completion':
+      case "completion":
         shouldTransition = this.checkCompletion(transition.condition);
         break;
-      case 'hybrid':
+      case "hybrid":
         shouldTransition = tick >= transition.tick || this.checkCompletion(transition.condition);
         break;
     }
@@ -233,21 +250,21 @@ export class ScenarioEngine {
   }
 
   private checkCompletion(condition: CompletionCondition): boolean {
-    const activeEpics = this.epics.filter(e => e.status !== 'locked');
+    const activeEpics = this.epics.filter((e) => e.status !== "locked");
 
     if (condition.epicsDone !== undefined) {
-      const doneCount = activeEpics.filter(e => e.status === 'done').length;
+      const doneCount = activeEpics.filter((e) => e.status === "done").length;
       return doneCount >= condition.epicsDone;
     }
 
     if (condition.epicCompletionPct !== undefined) {
-      return activeEpics.every(e => e.completionPct >= condition.epicCompletionPct!);
+      return activeEpics.every((e) => e.completionPct >= condition.epicCompletionPct!);
     }
 
     if (condition.specificEpics) {
-      return condition.specificEpics.every(id => {
-        const epic = this.epics.find(e => e.templateId === id);
-        return epic && (epic.status === 'done' || epic.completionPct >= 100);
+      return condition.specificEpics.every((id) => {
+        const epic = this.epics.find((e) => e.templateId === id);
+        return epic && (epic.status === "done" || epic.completionPct >= 100);
       });
     }
 
@@ -258,14 +275,14 @@ export class ScenarioEngine {
 
   private expandUnlockedEpics(): void {
     for (const epic of this.epics) {
-      if (epic.status !== 'active' || epic.taskIds.length > 0) continue;
+      if (epic.status !== "active" || epic.taskIds.length > 0) continue;
 
       // Check epic-level dependencies
-      const template = this.scenario.epics.find(e => e.id === epic.templateId);
+      const template = this.scenario.epics.find((e) => e.id === epic.templateId);
       if (template?.dependsOnEpics) {
-        const allDone = template.dependsOnEpics.every(depId => {
-          const dep = this.epics.find(e => e.templateId === depId);
-          return dep && dep.status === 'done';
+        const allDone = template.dependsOnEpics.every((depId) => {
+          const dep = this.epics.find((e) => e.templateId === depId);
+          return dep && dep.status === "done";
         });
         if (!allDone) continue;
       }
@@ -289,8 +306,8 @@ export class ScenarioEngine {
         title: taskTpl.title,
         description: `[${epic.title}] ${taskTpl.title}`,
         priority: template.priority,
-        status: 'backlog',
-        creatorId: this.findLeadForDomain(taskTpl.domain)?.id ?? 'scenario-engine',
+        status: "backlog",
+        creatorId: this.findLeadForDomain(taskTpl.domain)?.id ?? "scenario-engine",
         createdAt: Date.now(),
         updatedAt: Date.now(),
         activityLog: [],
@@ -307,8 +324,8 @@ export class ScenarioEngine {
         }
         if (deps.length > 0) {
           (task as any).dependsOn = deps;
-          task.status = 'blocked';
-          task.blockedReason = 'Dependency not ready';
+          task.status = "blocked";
+          task.blockedReason = "Dependency not ready";
           this.dag.set(taskId, deps);
         }
       }
@@ -325,7 +342,7 @@ export class ScenarioEngine {
           title: subtaskTpl.title,
           description: `Subtask of "${taskTpl.title}": ${subtaskTpl.title}`,
           priority: template.priority,
-          status: 'backlog',
+          status: "backlog",
           creatorId: task.creatorId,
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -363,7 +380,7 @@ export class ScenarioEngine {
   private assignBacklogTasks(): void {
     // Pass 1: Assign parent tasks to leads first
     for (const task of this.sim.tasks) {
-      if (task.status !== 'backlog' || task.assigneeId) continue;
+      if (task.status !== "backlog" || task.assigneeId) continue;
       if ((task as any).parentTaskId) continue; // skip subtasks in pass 1
 
       const epicId = (task as any).epicId;
@@ -374,7 +391,7 @@ export class ScenarioEngine {
       if (lead) {
         task.assigneeId = lead.id;
         const hasSubtasks = (task as any).subtaskIds && (task as any).subtaskIds.length > 0;
-        task.status = hasSubtasks ? 'in_progress' : 'assigned';
+        task.status = hasSubtasks ? "in_progress" : "assigned";
         lead.taskIds.push(task.id);
         this.decisionCount++;
       }
@@ -382,17 +399,20 @@ export class ScenarioEngine {
 
     // Pass 2: Assign subtasks to the lead who owns the parent
     for (const task of this.sim.tasks) {
-      if (task.status !== 'backlog' || task.assigneeId) continue;
+      if (task.status !== "backlog" || task.assigneeId) continue;
       if (!(task as any).parentTaskId) continue; // only subtasks in pass 2
 
-      const parent = this.sim.tasks.find(t => t.id === (task as any).parentTaskId);
+      const parent = this.sim.tasks.find((t) => t.id === (task as any).parentTaskId);
       let lead: SandboxAgent | undefined;
 
       if (parent?.assigneeId) {
-        const parentAssignee = this.sim.agents.find(a => a.id === parent.assigneeId);
-        lead = parentAssignee && (parentAssignee.role === 'lead' || parentAssignee.level >= 7)
-          ? parentAssignee
-          : this.sim.agents.find(a => a.id === parentAssignee?.parentId && (a.role === 'lead' || a.level >= 7));
+        const parentAssignee = this.sim.agents.find((a) => a.id === parent.assigneeId);
+        lead =
+          parentAssignee && (parentAssignee.role === "lead" || parentAssignee.level >= 7)
+            ? parentAssignee
+            : this.sim.agents.find(
+                (a) => a.id === parentAssignee?.parentId && (a.role === "lead" || a.level >= 7),
+              );
       }
 
       // Fallback: find lead by domain from the task description
@@ -403,7 +423,7 @@ export class ScenarioEngine {
 
       if (lead) {
         task.assigneeId = lead.id;
-        task.status = 'assigned';
+        task.status = "assigned";
         lead.taskIds.push(task.id);
         this.decisionCount++;
       }
@@ -413,16 +433,15 @@ export class ScenarioEngine {
   private getDomainFromTask(task: SandboxTask): string {
     // Try to extract domain from description brackets
     const match = task.description.match(/\[([^\]]+)\]/);
-    return match ? match[1].toLowerCase() : 'engineering';
+    return match ? match[1].toLowerCase() : "engineering";
   }
 
   private findLeadForDomain(domain: string): SandboxAgent | undefined {
     const d = domain.toLowerCase();
-    return this.sim.agents.find(a =>
-      (a.role === 'lead' || a.level >= 7) &&
-      a.domain.toLowerCase().includes(d)
-    ) || this.sim.agents.find(a =>
-      a.role === 'lead'
+    return (
+      this.sim.agents.find(
+        (a) => (a.role === "lead" || a.level >= 7) && a.domain.toLowerCase().includes(d),
+      ) || this.sim.agents.find((a) => a.role === "lead")
     );
   }
 
@@ -430,17 +449,17 @@ export class ScenarioEngine {
 
   private resolveDAG(): void {
     for (const [taskId, deps] of this.dag.entries()) {
-      const task = this.sim.tasks.find(t => t.id === taskId);
-      if (!task || task.status !== 'blocked') continue;
-      if (task.blockedReason !== 'Dependency not ready') continue;
+      const task = this.sim.tasks.find((t) => t.id === taskId);
+      if (!task || task.status !== "blocked") continue;
+      if (task.blockedReason !== "Dependency not ready") continue;
 
-      const allMet = deps.every(depId => {
-        const dep = this.sim.tasks.find(t => t.id === depId);
-        return dep && dep.status === 'done';
+      const allMet = deps.every((depId) => {
+        const dep = this.sim.tasks.find((t) => t.id === depId);
+        return dep && dep.status === "done";
       });
 
       if (allMet) {
-        task.status = 'backlog';
+        task.status = "backlog";
         task.blockedReason = undefined;
         (task as any).dependsOn = undefined;
         this.dag.delete(taskId);
@@ -460,7 +479,7 @@ export class ScenarioEngine {
     const difficultyPreset = DIFFICULTY_PRESETS[this.scenario.meta.difficulty];
 
     for (const eventId of phase.enabledEvents) {
-      const template = this.scenario.events.find(e => e.id === eventId);
+      const template = this.scenario.events.find((e) => e.id === eventId);
       if (!template) continue;
 
       // Check cooldown
@@ -472,10 +491,11 @@ export class ScenarioEngine {
       if (template.maxOccurrences !== undefined && occurrences >= template.maxOccurrences) continue;
 
       // Roll probability
-      const adjustedProb = template.probability
-        * phase.difficultyMod
-        * difficultyPreset.eventFrequencyMod
-        * this.eventFrequencyMod;
+      const adjustedProb =
+        template.probability *
+        phase.difficultyMod *
+        difficultyPreset.eventFrequencyMod *
+        this.eventFrequencyMod;
 
       if (this.prng.chance(adjustedProb)) {
         this.executeEvent(template);
@@ -491,7 +511,7 @@ export class ScenarioEngine {
     this.log(`   ${template.narrative}`);
 
     this.emitEvent({
-      type: 'scenario_event',
+      type: "scenario_event",
       message: `${template.narrative}`,
       data: { eventId: template.id, eventType: template.type },
       timestamp: Date.now(),
@@ -508,8 +528,8 @@ export class ScenarioEngine {
           title: taskDef.title,
           description: `[Event: ${template.name}] ${taskDef.title}`,
           priority: taskDef.priority,
-          status: 'backlog',
-          creatorId: 'scenario-engine',
+          status: "backlog",
+          creatorId: "scenario-engine",
           createdAt: Date.now(),
           updatedAt: Date.now(),
           activityLog: [],
@@ -525,8 +545,8 @@ export class ScenarioEngine {
             title: `${taskDef.title} — step ${i + 1}`,
             description: `Subtask ${i + 1} of event task "${taskDef.title}"`,
             priority: taskDef.priority,
-            status: 'backlog',
-            creatorId: 'scenario-engine',
+            status: "backlog",
+            creatorId: "scenario-engine",
             createdAt: Date.now(),
             updatedAt: Date.now(),
             activityLog: [],
@@ -544,19 +564,23 @@ export class ScenarioEngine {
 
     // Block agents
     if (effect.blockAgents) {
-      const candidates = this.sim.agents.filter(a => {
-        if (effect.blockAgents!.domain && !a.domain.toLowerCase().includes(effect.blockAgents!.domain)) return false;
+      const candidates = this.sim.agents.filter((a) => {
+        if (
+          effect.blockAgents!.domain &&
+          !a.domain.toLowerCase().includes(effect.blockAgents!.domain)
+        )
+          return false;
         if (effect.blockAgents!.role && a.role !== effect.blockAgents!.role) return false;
-        return a.role !== 'coo';
+        return a.role !== "coo";
       });
       const count = effect.blockAgents.count ?? 1;
       for (let i = 0; i < Math.min(count, candidates.length); i++) {
         const agent = this.prng.pick(candidates);
         // Block their current tasks
         for (const taskId of agent.taskIds) {
-          const task = this.sim.tasks.find(t => t.id === taskId);
-          if (task && !['done', 'rejected'].includes(task.status)) {
-            task.status = 'blocked';
+          const task = this.sim.tasks.find((t) => t.id === taskId);
+          if (task && !["done", "rejected"].includes(task.status)) {
+            task.status = "blocked";
             task.blockedReason = `Agent ${agent.name} unavailable (${template.name})`;
           }
         }
@@ -567,7 +591,7 @@ export class ScenarioEngine {
     // Resource effects
     if (effect.resourceEffect) {
       for (const [resId, amount] of Object.entries(effect.resourceEffect)) {
-        const pool = this.resources.find(r => r.id === resId);
+        const pool = this.resources.find((r) => r.id === resId);
         if (pool) {
           pool.current = (pool.current ?? pool.initial) + amount;
           if (pool.current < 0) pool.current = 0;
@@ -577,17 +601,17 @@ export class ScenarioEngine {
 
     // Elevate priorities
     if (effect.elevatePriority) {
-      const inProgress = this.sim.tasks.filter(t => t.status === 'in_progress');
+      const inProgress = this.sim.tasks.filter((t) => t.status === "in_progress");
       for (let i = 0; i < Math.min(effect.elevatePriority, inProgress.length); i++) {
         const task = this.prng.pick(inProgress);
-        task.priority = 'critical';
+        task.priority = "critical";
         this.log(`   ⬆️ "${task.title}" elevated to critical`);
       }
     }
 
     // Expand epic
     if (effect.expandEpic) {
-      const activeEpics = this.epics.filter(e => e.status === 'active');
+      const activeEpics = this.epics.filter((e) => e.status === "active");
       if (activeEpics.length > 0) {
         const epic = this.prng.pick(activeEpics);
         for (let i = 0; i < effect.expandEpic.taskCount; i++) {
@@ -597,8 +621,8 @@ export class ScenarioEngine {
             title: `Scope addition ${i + 1} for ${epic.title}`,
             description: `Added by ${template.name}`,
             priority: effect.expandEpic.priority,
-            status: 'backlog',
-            creatorId: 'scenario-engine',
+            status: "backlog",
+            creatorId: "scenario-engine",
             createdAt: Date.now(),
             updatedAt: Date.now(),
             activityLog: [],
@@ -616,8 +640,8 @@ export class ScenarioEngine {
   // ── Resource Management ────────────────────────────────────────────────
 
   private updateResources(): void {
-    const activeTasks = this.sim.tasks.filter(t =>
-      ['in_progress', 'assigned', 'review'].includes(t.status)
+    const activeTasks = this.sim.tasks.filter((t) =>
+      ["in_progress", "assigned", "review"].includes(t.status),
     ).length;
 
     for (const pool of this.resources) {
@@ -635,10 +659,14 @@ export class ScenarioEngine {
       }
 
       // Handle depletion
-      if (pool.current !== undefined && pool.current <= 0 && pool.depletedEffect === 'pause-non-critical') {
+      if (
+        pool.current !== undefined &&
+        pool.current <= 0 &&
+        pool.depletedEffect === "pause-non-critical"
+      ) {
         for (const task of this.sim.tasks) {
-          if (task.priority !== 'critical' && task.status === 'in_progress') {
-            task.status = 'blocked';
+          if (task.priority !== "critical" && task.status === "in_progress") {
+            task.status = "blocked";
             task.blockedReason = `Resource depleted: ${pool.name}`;
           }
         }
@@ -656,9 +684,9 @@ export class ScenarioEngine {
     this.lastDecisionSnapshot = totalMessages;
 
     // Also count task state changes
-    const completedNow = this.sim.tasks.filter(t => t.status === 'done').length;
+    const completedNow = this.sim.tasks.filter((t) => t.status === "done").length;
     if (completedNow > this.tasksCompletedCount) {
-      this.decisionCount += (completedNow - this.tasksCompletedCount);
+      this.decisionCount += completedNow - this.tasksCompletedCount;
       this.tasksCompletedCount = completedNow;
     }
   }
@@ -681,19 +709,19 @@ export class ScenarioEngine {
 
   private processTriggers(): void {
     for (const task of this.sim.tasks) {
-      if (task.status !== 'done') continue;
+      if (task.status !== "done") continue;
       const triggers = (task as any)._crossDeptTriggers as CrossDeptTrigger[] | undefined;
       if (!triggers || (task as any)._triggersProcessed) continue;
 
       for (const trigger of triggers) {
-        if (trigger.action === 'create_task') {
+        if (trigger.action === "create_task") {
           const taskId = nextScenarioTaskId();
           const newTask: SandboxTask = {
             id: taskId,
             title: trigger.target,
             description: `Triggered by completion of "${task.title}"`,
-            priority: trigger.priority ?? 'high',
-            status: 'backlog',
+            priority: trigger.priority ?? "high",
+            status: "backlog",
             creatorId: task.creatorId,
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -703,10 +731,10 @@ export class ScenarioEngine {
           this.sim.tasks.push(newTask);
           this.log(`   🔗 Trigger: created "${trigger.target}" (from "${task.title}")`);
           this.decisionCount += 2;
-        } else if (trigger.action === 'unlock_epic') {
-          const epic = this.epics.find(e => e.templateId === trigger.target);
-          if (epic && epic.status === 'locked') {
-            epic.status = 'active';
+        } else if (trigger.action === "unlock_epic") {
+          const epic = this.epics.find((e) => e.templateId === trigger.target);
+          if (epic && epic.status === "locked") {
+            epic.status = "active";
             epic.unlockedAtTick = this.sim.tick;
             this.log(`   🔓 Trigger: unlocked epic "${epic.title}"`);
           }
@@ -720,15 +748,17 @@ export class ScenarioEngine {
 
   private updateEpicCompletion(): void {
     for (const epic of this.epics) {
-      if (epic.status !== 'active') continue;
+      if (epic.status !== "active") continue;
       if (epic.taskIds.length === 0) continue;
 
-      const tasks = epic.taskIds.map(id => this.sim.tasks.find(t => t.id === id)).filter(Boolean) as SandboxTask[];
-      const done = tasks.filter(t => t.status === 'done').length;
+      const tasks = epic.taskIds
+        .map((id) => this.sim.tasks.find((t) => t.id === id))
+        .filter(Boolean) as SandboxTask[];
+      const done = tasks.filter((t) => t.status === "done").length;
       epic.completionPct = (done / tasks.length) * 100;
 
       if (epic.completionPct >= 100) {
-        epic.status = 'done';
+        epic.status = "done";
         epic.completedAtTick = this.sim.tick;
         this.log(`🎉 Epic complete: ${epic.title}`);
         this.decisionCount += 3; // epic completion decisions
@@ -741,9 +771,9 @@ export class ScenarioEngine {
   private computeScores(): Record<string, number> {
     const tick = this.sim?.tick ?? 1;
     const tasks = this.sim?.tasks ?? [];
-    const doneTasks = tasks.filter(t => t.status === 'done').length;
+    const doneTasks = tasks.filter((t) => t.status === "done").length;
     const totalTasks = Math.max(1, tasks.length);
-    const blockedTasks = tasks.filter(t => t.status === 'blocked').length;
+    const blockedTasks = tasks.filter((t) => t.status === "blocked").length;
 
     // Velocity: tasks completed per tick, normalized to 0-100
     const velocity = Math.min(100, (doneTasks / Math.max(1, tick)) * 200);
@@ -752,16 +782,19 @@ export class ScenarioEngine {
     const quality = Math.max(0, 100 - (blockedTasks / totalTasks) * 200);
 
     // Efficiency: resource remaining ratio
-    const totalResourcePct = this.resources.reduce((sum, r) => {
-      return sum + ((r.current ?? r.initial) / r.initial);
-    }, 0) / Math.max(1, this.resources.length);
+    const totalResourcePct =
+      this.resources.reduce((sum, r) => {
+        return sum + (r.current ?? r.initial) / r.initial;
+      }, 0) / Math.max(1, this.resources.length);
     const efficiency = Math.round(totalResourcePct * 100);
 
     // Resilience: how quickly events were recovered from (approximation)
     const resilience = Math.max(0, 100 - this.eventsFired * 5);
 
     // Morale: based on block time and agent utilization
-    const busyAgents = (this.sim?.agents ?? []).filter(a => a.status === 'busy' || a.taskIds.length > 0).length;
+    const busyAgents = (this.sim?.agents ?? []).filter(
+      (a) => a.status === "busy" || a.taskIds.length > 0,
+    ).length;
     const totalAgents = Math.max(1, (this.sim?.agents ?? []).length);
     const morale = Math.min(100, (busyAgents / totalAgents) * 100 + 20);
 
@@ -786,13 +819,13 @@ export class ScenarioEngine {
     for (const g of this.scenario.scoring.grades) {
       if (overall >= g.minScore) return { grade: g.grade, label: g.label };
     }
-    return { grade: 'F', label: 'Total organizational collapse.' };
+    return { grade: "F", label: "Total organizational collapse." };
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────
 
   private log(msg: string): void {
-    const event: SandboxEvent = { type: 'system', message: msg, timestamp: Date.now() };
+    const event: SandboxEvent = { type: "system", message: msg, timestamp: Date.now() };
     if (this.sim) {
       this.sim.events.push(event);
     }

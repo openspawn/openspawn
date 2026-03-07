@@ -9,6 +9,7 @@ Try BikiniBottom right now — no install needed:
 ## SDKs
 
 ### TypeScript
+
 ```bash
 npm install @openspawn/sdk
 ```
@@ -16,6 +17,7 @@ npm install @openspawn/sdk
 See [`libs/sdk/`](../libs/sdk/) for full documentation.
 
 ### Python
+
 ```bash
 pip install openspawn
 ```

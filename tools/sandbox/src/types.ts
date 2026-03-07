@@ -1,10 +1,16 @@
 // ── Sandbox Agent Types ──────────────────────────────────────────────────────
 
-export type EscalationReason = 'BLOCKED' | 'OUT_OF_DOMAIN' | 'OVER_BUDGET' | 'LOW_CONFIDENCE' | 'TIMEOUT' | 'DEPENDENCY';
+export type EscalationReason =
+  | "BLOCKED"
+  | "OUT_OF_DOMAIN"
+  | "OVER_BUDGET"
+  | "LOW_CONFIDENCE"
+  | "TIMEOUT"
+  | "DEPENDENCY";
 
 export interface ACPMessage {
   id: string;
-  type: 'ack' | 'progress' | 'escalation' | 'completion' | 'delegation' | 'status_request';
+  type: "ack" | "progress" | "escalation" | "completion" | "delegation" | "status_request";
   from: string;
   to: string;
   taskId: string;
@@ -18,23 +24,23 @@ export interface ACPMessage {
 export interface SandboxAgent {
   id: string;
   name: string;
-  role: 'coo' | 'talent' | 'lead' | 'senior' | 'worker' | 'intern';
+  role: "coo" | "talent" | "lead" | "senior" | "worker" | "intern";
   level: number;
   domain: string;
   avatar?: string;
   avatarColor?: string;
   avatarUrl?: string;
   parentId?: string;
-  status: 'active' | 'idle' | 'busy' | 'pending';
+  status: "active" | "idle" | "busy" | "pending";
   systemPrompt: string;
   /** Current tasks assigned to this agent */
   taskIds: string[];
   /** Message history (kept short for context window) */
   recentMessages: ACPMessage[];
   /** Execution mode — polling agents wake every N ticks, event-driven agents wake on inbox messages */
-  trigger: 'polling' | 'event-driven';
+  trigger: "polling" | "event-driven";
   /** Which ACP message types wake this agent (only for event-driven) */
-  triggerOn?: ACPMessage['type'][];
+  triggerOn?: ACPMessage["type"][];
   /** Inbox queue — pending ACP messages that haven't been processed */
   inbox: ACPMessage[];
   /** Tick number when this agent last took an LLM action */
@@ -53,8 +59,16 @@ export interface SandboxTask {
   id: string;
   title: string;
   description: string;
-  priority: 'low' | 'normal' | 'high' | 'critical';
-  status: 'backlog' | 'pending' | 'assigned' | 'in_progress' | 'review' | 'done' | 'rejected' | 'blocked';
+  priority: "low" | "normal" | "high" | "critical";
+  status:
+    | "backlog"
+    | "pending"
+    | "assigned"
+    | "in_progress"
+    | "review"
+    | "done"
+    | "rejected"
+    | "blocked";
   assigneeId?: string;
   creatorId: string;
   createdAt: number;
@@ -87,14 +101,28 @@ export interface ToolCall {
 
 // Actions an agent can take
 export type AgentAction =
-  | { action: 'delegate'; taskId: string; targetAgentId: string; reason: string; description?: string }
-  | { action: 'work'; taskId: string; result: string }
-  | { action: 'message'; to: string; content: string }
-  | { action: 'escalate'; taskId: string; reason: EscalationReason; body: string }
-  | { action: 'create_task'; title: string; description: string; priority: string; name?: string; task?: string; desc?: string }
-  | { action: 'review'; taskId: string; verdict: 'approve' | 'reject'; feedback: string }
-  | { action: 'spawn_agent'; name: string; domain: string; role: string; reason: string }
-  | { action: 'idle' };
+  | {
+      action: "delegate";
+      taskId: string;
+      targetAgentId: string;
+      reason: string;
+      description?: string;
+    }
+  | { action: "work"; taskId: string; result: string }
+  | { action: "message"; to: string; content: string }
+  | { action: "escalate"; taskId: string; reason: EscalationReason; body: string }
+  | {
+      action: "create_task";
+      title: string;
+      description: string;
+      priority: string;
+      name?: string;
+      task?: string;
+      desc?: string;
+    }
+  | { action: "review"; taskId: string; verdict: "approve" | "reject"; feedback: string }
+  | { action: "spawn_agent"; name: string; domain: string; role: string; reason: string }
+  | { action: "idle" };
 
 // ── Simulation config ────────────────────────────────────────────────────────
 
@@ -106,5 +134,5 @@ export interface SandboxConfig {
   contextWindowTokens: number;
   verbose: boolean;
   /** Default trigger mode for agents */
-  defaultTrigger: 'polling' | 'event-driven';
+  defaultTrigger: "polling" | "event-driven";
 }

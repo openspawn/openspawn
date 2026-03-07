@@ -2,7 +2,7 @@
 // TypeScript interfaces for the BikiniBottom Scenario Engine.
 // Scenarios are defined as typed TS objects, NOT parsed from markdown.
 
-import type { SandboxTask } from './types.js';
+import type { SandboxTask } from "./types.js";
 
 // ── Seeded PRNG (Mulberry32) ─────────────────────────────────────────────────
 
@@ -65,26 +65,34 @@ export interface ScenarioMeta {
   name: string;
   industry: string;
   description: string;
-  duration: string;            // e.g. "20 minutes"
+  duration: string; // e.g. "20 minutes"
   targetDecisions: number;
   tickIntervalMs: number;
-  seed: number | 'random';
+  seed: number | "random";
   difficulty: Difficulty;
-  totalTicks: number;          // estimated total ticks for the scenario
+  totalTicks: number; // estimated total ticks for the scenario
 }
 
-export type Difficulty = 'easy' | 'normal' | 'hard' | 'chaos';
+export type Difficulty = "easy" | "normal" | "hard" | "chaos";
 
-export const DIFFICULTY_PRESETS: Record<Difficulty, {
-  eventFrequencyMod: number;
-  reviewRejectPct: number;
-  resourceScarcity: number;   // 0 = none, 1 = extreme
-  blockChance: number;
-}> = {
-  easy:   { eventFrequencyMod: 0.5,  reviewRejectPct: 0.05, resourceScarcity: 0,   blockChance: 0.05 },
-  normal: { eventFrequencyMod: 1.0,  reviewRejectPct: 0.15, resourceScarcity: 0.2, blockChance: 0.10 },
-  hard:   { eventFrequencyMod: 1.5,  reviewRejectPct: 0.25, resourceScarcity: 0.5, blockChance: 0.20 },
-  chaos:  { eventFrequencyMod: 2.5,  reviewRejectPct: 0.35, resourceScarcity: 0.8, blockChance: 0.30 },
+export const DIFFICULTY_PRESETS: Record<
+  Difficulty,
+  {
+    eventFrequencyMod: number;
+    reviewRejectPct: number;
+    resourceScarcity: number; // 0 = none, 1 = extreme
+    blockChance: number;
+  }
+> = {
+  easy: { eventFrequencyMod: 0.5, reviewRejectPct: 0.05, resourceScarcity: 0, blockChance: 0.05 },
+  normal: {
+    eventFrequencyMod: 1.0,
+    reviewRejectPct: 0.15,
+    resourceScarcity: 0.2,
+    blockChance: 0.1,
+  },
+  hard: { eventFrequencyMod: 1.5, reviewRejectPct: 0.25, resourceScarcity: 0.5, blockChance: 0.2 },
+  chaos: { eventFrequencyMod: 2.5, reviewRejectPct: 0.35, resourceScarcity: 0.8, blockChance: 0.3 },
 };
 
 // ── Phases ───────────────────────────────────────────────────────────────────
@@ -94,23 +102,23 @@ export interface ScenarioPhase {
   name: string;
   tickRange: [number, number];
   tickIntervalMs?: number;
-  unlocksEpics: string[];       // epic IDs to unlock when phase starts
-  enabledEvents: string[];      // event IDs active during this phase
-  difficultyMod: number;        // multiplier on event probability (1.0 = normal)
+  unlocksEpics: string[]; // epic IDs to unlock when phase starts
+  enabledEvents: string[]; // event IDs active during this phase
+  difficultyMod: number; // multiplier on event probability (1.0 = normal)
   transition: PhaseTransition;
-  narrative: string;            // displayed on phase start
+  narrative: string; // displayed on phase start
 }
 
 export type PhaseTransition =
-  | { type: 'tick'; tick: number }
-  | { type: 'completion'; condition: CompletionCondition }
-  | { type: 'hybrid'; tick: number; condition: CompletionCondition };
+  | { type: "tick"; tick: number }
+  | { type: "completion"; condition: CompletionCondition }
+  | { type: "hybrid"; tick: number; condition: CompletionCondition };
 
 export interface CompletionCondition {
   /** e.g. "epicsDone >= 3" or "epicCompletion >= 0.6" */
   epicsDone?: number;
-  epicCompletionPct?: number;   // all unlocked epics at this % or higher
-  specificEpics?: string[];     // these specific epics must be done/at threshold
+  epicCompletionPct?: number; // all unlocked epics at this % or higher
+  specificEpics?: string[]; // these specific epics must be done/at threshold
 }
 
 // ── Epics ────────────────────────────────────────────────────────────────────
@@ -118,12 +126,12 @@ export interface CompletionCondition {
 export interface EpicTemplate {
   id: string;
   title: string;
-  phase: string;               // phase ID that unlocks this epic
+  phase: string; // phase ID that unlocks this epic
   domains: string[];
-  priority: SandboxTask['priority'];
+  priority: SandboxTask["priority"];
   description: string;
   taskTemplates: TaskTemplate[];
-  dependsOnEpics?: string[];   // other epic IDs that must be done first
+  dependsOnEpics?: string[]; // other epic IDs that must be done first
 }
 
 export interface TaskTemplate {
@@ -131,13 +139,13 @@ export interface TaskTemplate {
   title: string;
   domain: string;
   subtasks: SubtaskTemplate[];
-  durationRange: [number, number];  // ticks per subtask [min, max]
+  durationRange: [number, number]; // ticks per subtask [min, max]
   reviewRequired: boolean;
   reviewLoop?: {
     maxIterations: number;
-    weights: number[];             // [pass, minor-revise, major-revise, escalate]
+    weights: number[]; // [pass, minor-revise, major-revise, escalate]
   };
-  dependsOnTasks?: string[];      // task template IDs within the same epic
+  dependsOnTasks?: string[]; // task template IDs within the same epic
   crossDeptTriggers?: CrossDeptTrigger[];
   resourceCost?: Record<string, number>;
 }
@@ -148,24 +156,30 @@ export interface SubtaskTemplate {
 }
 
 export interface CrossDeptTrigger {
-  action: 'create_task' | 'unlock_epic' | 'notify';
-  target: string;               // task title, epic ID, or agent role
+  action: "create_task" | "unlock_epic" | "notify";
+  target: string; // task title, epic ID, or agent role
   domain?: string;
-  priority?: SandboxTask['priority'];
+  priority?: SandboxTask["priority"];
 }
 
 // ── Events ───────────────────────────────────────────────────────────────────
 
-export type EventType = 'interrupt' | 'disruption' | 'expansion' | 'modifier' | 'narrative' | 'opportunity';
+export type EventType =
+  | "interrupt"
+  | "disruption"
+  | "expansion"
+  | "modifier"
+  | "narrative"
+  | "opportunity";
 
 export interface EventTemplate {
   id: string;
   name: string;
   type: EventType;
-  probability: number;          // per-tick probability when enabled
+  probability: number; // per-tick probability when enabled
   cooldownTicks: number;
-  maxOccurrences?: number;      // limit total fires (e.g. 1 = fires once)
-  durationTicks?: number;       // how long the event effect lasts
+  maxOccurrences?: number; // limit total fires (e.g. 1 = fires once)
+  durationTicks?: number; // how long the event effect lasts
   narrative: string;
   effect: EventEffect;
 }
@@ -175,7 +189,7 @@ export interface EventEffect {
   createTasks?: Array<{
     title: string;
     domain: string;
-    priority: SandboxTask['priority'];
+    priority: SandboxTask["priority"];
     subtaskCount: number;
     durationRange: [number, number];
   }>;
@@ -187,30 +201,30 @@ export interface EventEffect {
     durationTicks: number;
   };
   /** Modify resource pools */
-  resourceEffect?: Record<string, number>;  // positive = add, negative = subtract
+  resourceEffect?: Record<string, number>; // positive = add, negative = subtract
   /** Elevate priority of random in-progress tasks */
-  elevatePriority?: number;     // number of tasks to elevate
+  elevatePriority?: number; // number of tasks to elevate
   /** Add tasks to a random in-progress epic */
   expandEpic?: {
     taskCount: number;
     domain: string;
-    priority: SandboxTask['priority'];
+    priority: SandboxTask["priority"];
   };
 }
 
 // ── Resources ────────────────────────────────────────────────────────────────
 
-export type ResourceType = 'agent-hours' | 'calendar' | 'credits' | 'compute';
+export type ResourceType = "agent-hours" | "calendar" | "credits" | "compute";
 
 export interface ResourcePool {
   id: string;
   name: string;
   type: ResourceType;
   initial: number;
-  current?: number;            // runtime state
-  burnRate: number;            // per-tick consumption during active work
-  alertThresholdPct: number;   // fire alert event when below this %
-  depletedEffect: 'pause-non-critical' | 'pause-all' | 'none';
+  current?: number; // runtime state
+  burnRate: number; // per-tick consumption during active work
+  alertThresholdPct: number; // fire alert event when below this %
+  depletedEffect: "pause-non-critical" | "pause-all" | "none";
 }
 
 // ── Scoring ──────────────────────────────────────────────────────────────────
@@ -234,7 +248,7 @@ export interface GradeThreshold {
 }
 
 export interface ScoreCard {
-  dimensions: Record<string, number>;   // dimension id → score 0-100
+  dimensions: Record<string, number>; // dimension id → score 0-100
   overall: number;
   grade: string;
   gradeLabel: string;
@@ -248,14 +262,14 @@ export interface ScoreCard {
 // ── Decision Types ───────────────────────────────────────────────────────────
 
 export type DecisionType =
-  | 'command'         // delegate, approve plan, allocate
-  | 'execution'       // start work, progress, submit
-  | 'review'          // approve, reject, request changes
-  | 'communication'   // ack, progress report, escalation
-  | 'hiring'          // spawn agent, assign, first task
-  | 'contention'      // resource conflict, priority override
-  | 'event_response'  // triage, reassign, emergency
-  | 'strategic';      // phase transition, scope cut
+  | "command" // delegate, approve plan, allocate
+  | "execution" // start work, progress, submit
+  | "review" // approve, reject, request changes
+  | "communication" // ack, progress report, escalation
+  | "hiring" // spawn agent, assign, first task
+  | "contention" // resource conflict, priority override
+  | "event_response" // triage, reassign, emergency
+  | "strategic"; // phase transition, scope cut
 
 // ── Runtime State ────────────────────────────────────────────────────────────
 
@@ -265,8 +279,8 @@ export interface EpicInstance {
   title: string;
   phase: string;
   domains: string[];
-  priority: SandboxTask['priority'];
-  status: 'locked' | 'active' | 'done';
+  priority: SandboxTask["priority"];
+  status: "locked" | "active" | "done";
   taskIds: string[];
   completionPct: number;
   unlockedAtTick?: number;

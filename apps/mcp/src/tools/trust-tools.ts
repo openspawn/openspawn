@@ -14,7 +14,7 @@ export function registerTrustTools(server: McpServer, client: ApiClient) {
     async ({ agentId }) => {
       const result = await client.getAgentReputation(agentId);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Get reputation history
@@ -28,7 +28,7 @@ export function registerTrustTools(server: McpServer, client: ApiClient) {
     async ({ agentId, limit }) => {
       const result = await client.getReputationHistory(agentId, limit);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Get trust leaderboard
@@ -41,7 +41,7 @@ export function registerTrustTools(server: McpServer, client: ApiClient) {
     async ({ limit }) => {
       const result = await client.getTrustLeaderboard(limit);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Apply reputation bonus (requires HR role)
@@ -56,7 +56,7 @@ export function registerTrustTools(server: McpServer, client: ApiClient) {
     async ({ agentId, amount, reason }) => {
       const result = await client.applyReputationBonus(agentId, amount, reason);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   // Apply reputation penalty (requires HR role)
@@ -71,6 +71,6 @@ export function registerTrustTools(server: McpServer, client: ApiClient) {
     async ({ agentId, amount, reason }) => {
       const result = await client.applyReputationPenalty(agentId, amount, reason);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 }

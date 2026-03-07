@@ -9,16 +9,19 @@ The OpenSpawn Agent Skill bridges OpenClaw and BikiniBottom/OpenSpawn, enabling 
 ## Why You Need It
 
 ### For Solo OpenClaw Users
+
 - **Scale beyond one agent**: Spin up specialized agents on-demand for different tasks
 - **Automate agent coordination**: Let your OpenClaw agent manage task distribution across your OpenSpawn instance
 - **Monitor at a glance**: Quick metrics on all your agents and tasks
 
 ### For Teams
+
 - **Central orchestration**: One OpenClaw agent managing multiple OpenSpawn agents across different domains
 - **Task delegation**: Automatically route tasks to the best-suited agent
 - **Inter-agent messaging**: Facilitate communication between specialized agents
 
 ### For Multi-Agent Workflows
+
 - **Research pipelines**: Coordinate data gathering, analysis, and reporting agents
 - **Content creation**: Manage writer, editor, and publisher agents
 - **Development workflows**: Coordinate planning, coding, testing, and deployment agents
@@ -51,21 +54,25 @@ export OPENSPAWN_API_KEY="your-api-key"
 ## What Can You Do?
 
 ### 🤖 Agent Management
+
 - List all agents in your OpenSpawn instance
 - Create new specialized agents programmatically
 - Monitor agent status and performance
 
 ### ✅ Task Orchestration
+
 - Create and assign tasks across your agent fleet
 - Filter tasks by status, assignee, priority
 - Auto-complete tasks when goals are met
 
 ### 💬 Inter-Agent Communication
+
 - Send messages between agents
 - Build agent collaboration workflows
 - Enable peer-to-peer agent coordination
 
 ### 📊 System Monitoring
+
 - Track agent count and activity
 - Monitor task completion rates
 - View credit usage and balances
@@ -113,6 +120,7 @@ Add to your OpenClaw `HEARTBEAT.md`:
 Run: `./skills/openclaw/scripts/openspawn-cli.sh metrics`
 
 Alert me if:
+
 - Pending tasks > 20
 - Any agent status = error
 - Credit balance < 100

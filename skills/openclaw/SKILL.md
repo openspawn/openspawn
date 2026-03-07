@@ -34,6 +34,7 @@ All commands are available through the `openspawn-cli.sh` script.
 ### Agent Management
 
 #### List All Agents
+
 ```bash
 ./scripts/openspawn-cli.sh agents list
 ```
@@ -41,6 +42,7 @@ All commands are available through the `openspawn-cli.sh` script.
 Returns a JSON array of all agents with their IDs, names, roles, and status.
 
 #### Get Agent Details
+
 ```bash
 ./scripts/openspawn-cli.sh agents get <agent-id>
 ```
@@ -48,11 +50,13 @@ Returns a JSON array of all agents with their IDs, names, roles, and status.
 Returns detailed information about a specific agent.
 
 #### Create a New Agent
+
 ```bash
 ./scripts/openspawn-cli.sh agents create
 ```
 
 Interactive prompt to create a new agent. You'll be asked for:
+
 - Name
 - Role/persona
 - Model preference
@@ -61,6 +65,7 @@ Interactive prompt to create a new agent. You'll be asked for:
 ### Task Management
 
 #### List Tasks
+
 ```bash
 # List all tasks
 ./scripts/openspawn-cli.sh tasks list
@@ -73,6 +78,7 @@ Interactive prompt to create a new agent. You'll be asked for:
 ```
 
 #### Create a Task
+
 ```bash
 ./scripts/openspawn-cli.sh tasks create
 ```
@@ -80,6 +86,7 @@ Interactive prompt to create a new agent. You'll be asked for:
 Interactive prompt to create a new task with title, description, and priority.
 
 #### Assign a Task
+
 ```bash
 ./scripts/openspawn-cli.sh tasks assign <task-id> <agent-id>
 ```
@@ -87,6 +94,7 @@ Interactive prompt to create a new task with title, description, and priority.
 Assigns a task to a specific agent.
 
 #### Complete a Task
+
 ```bash
 ./scripts/openspawn-cli.sh tasks complete <task-id>
 ```
@@ -96,6 +104,7 @@ Marks a task as completed.
 ### Communication
 
 #### Send Peer Message
+
 ```bash
 ./scripts/openspawn-cli.sh messages send <from-agent-id> <to-agent-id> "Message content"
 ```
@@ -105,11 +114,13 @@ Sends a message from one agent to another within the OpenSpawn network.
 ### Metrics & Monitoring
 
 #### Get Dashboard Metrics
+
 ```bash
 ./scripts/openspawn-cli.sh metrics
 ```
 
 Returns system-wide metrics including:
+
 - Total agent count
 - Active agents
 - Task statistics (pending, in-progress, completed)
@@ -194,11 +205,13 @@ This skill wraps the following OpenSpawn REST API endpoints:
 - **jq** - For JSON parsing and formatting
 
 Install on macOS:
+
 ```bash
 brew install jq
 ```
 
 Install on Linux:
+
 ```bash
 sudo apt-get install jq
 ```
@@ -206,16 +219,19 @@ sudo apt-get install jq
 ## Troubleshooting
 
 ### "Authentication failed"
+
 - Verify `OPENSPAWN_API_KEY` is set correctly
 - Check that your API key hasn't expired
 - Ensure your IP is not blocked
 
 ### "Connection refused"
+
 - Verify `OPENSPAWN_URL` is correct
 - Check that your OpenSpawn instance is running
 - Test with: `curl -I $OPENSPAWN_URL/health`
 
 ### "jq: command not found"
+
 - Install jq using the commands above
 
 ## Security Notes

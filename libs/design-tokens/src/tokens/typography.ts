@@ -6,7 +6,7 @@ export const fontFamilies = {
   /** Display/heading font — used for hero text, agent names */
   display: '"Baloo 2", "Fredoka One", cursive',
   /** Body text — reads well at all sizes */
-  body: "Nunito, \"DM Sans\", system-ui, sans-serif",
+  body: 'Nunito, "DM Sans", system-ui, sans-serif',
   /** Monospace — code, logs, IDs */
   mono: '"JetBrains Mono", "Fira Code", monospace',
 } as const;

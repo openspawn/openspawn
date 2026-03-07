@@ -161,9 +161,7 @@ export function WebhooksSettings() {
   };
 
   const handleToggleEnabled = async (id: string) => {
-    setWebhooks(
-      webhooks.map((w) => (w.id === id ? { ...w, enabled: !w.enabled } : w))
-    );
+    setWebhooks(webhooks.map((w) => (w.id === id ? { ...w, enabled: !w.enabled } : w)));
   };
 
   const handleTestWebhook = async (webhook: WebhookData) => {
@@ -272,10 +270,15 @@ export function WebhooksSettings() {
                       "flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all",
                       formData.hookType === "post"
                         ? "border-primary bg-primary/5"
-                        : "border-border hover:border-muted-foreground/50"
+                        : "border-border hover:border-muted-foreground/50",
                     )}
                   >
-                    <Zap className={cn("h-6 w-6", formData.hookType === "post" ? "text-primary" : "text-muted-foreground")} />
+                    <Zap
+                      className={cn(
+                        "h-6 w-6",
+                        formData.hookType === "post" ? "text-primary" : "text-muted-foreground",
+                      )}
+                    />
                     <div className="text-center">
                       <p className="font-medium">Post-Hook</p>
                       <p className="text-xs text-muted-foreground">Fires after action</p>
@@ -287,10 +290,15 @@ export function WebhooksSettings() {
                       "flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all",
                       formData.hookType === "pre"
                         ? "border-amber-500 bg-amber-500/5"
-                        : "border-border hover:border-muted-foreground/50"
+                        : "border-border hover:border-muted-foreground/50",
                     )}
                   >
-                    <Shield className={cn("h-6 w-6", formData.hookType === "pre" ? "text-amber-500" : "text-muted-foreground")} />
+                    <Shield
+                      className={cn(
+                        "h-6 w-6",
+                        formData.hookType === "pre" ? "text-amber-500" : "text-muted-foreground",
+                      )}
+                    />
                     <div className="text-center">
                       <p className="font-medium">Pre-Hook</p>
                       <p className="text-xs text-muted-foreground">Fires before, can block</p>
@@ -315,13 +323,13 @@ export function WebhooksSettings() {
                     onClick={() => setFormData({ ...formData, canBlock: !formData.canBlock })}
                     className={cn(
                       "relative h-6 w-11 rounded-full transition-colors",
-                      formData.canBlock ? "bg-amber-500" : "bg-muted"
+                      formData.canBlock ? "bg-amber-500" : "bg-muted",
                     )}
                   >
                     <span
                       className={cn(
                         "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
-                        formData.canBlock ? "translate-x-5" : "translate-x-0.5"
+                        formData.canBlock ? "translate-x-5" : "translate-x-0.5",
                       )}
                     />
                   </button>
@@ -365,7 +373,7 @@ export function WebhooksSettings() {
                         "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
                         formData.events.includes(event.value)
                           ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80",
                       )}
                     >
                       {event.label}
@@ -410,7 +418,9 @@ export function WebhooksSettings() {
               </Button>
               <Button
                 onClick={handleCreateWebhook}
-                disabled={!formData.name || !formData.url || formData.events.length === 0 || isCreating}
+                disabled={
+                  !formData.name || !formData.url || formData.events.length === 0 || isCreating
+                }
               >
                 {isCreating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -444,7 +454,7 @@ export function WebhooksSettings() {
                     ? webhook.hookType === "pre"
                       ? "border-amber-500/30 bg-amber-500/5"
                       : "border-border"
-                    : "border-border bg-muted/30 opacity-60"
+                    : "border-border bg-muted/30 opacity-60",
                 )}
               >
                 {/* Header */}
@@ -458,13 +468,13 @@ export function WebhooksSettings() {
                           ? webhook.hookType === "pre"
                             ? "bg-amber-500"
                             : "bg-primary"
-                          : "bg-muted"
+                          : "bg-muted",
                       )}
                     >
                       <span
                         className={cn(
                           "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform",
-                          webhook.enabled ? "translate-x-4" : "translate-x-0.5"
+                          webhook.enabled ? "translate-x-4" : "translate-x-0.5",
                         )}
                       />
                     </button>
@@ -476,7 +486,7 @@ export function WebhooksSettings() {
                           variant={webhook.hookType === "pre" ? "default" : "secondary"}
                           className={cn(
                             "text-xs",
-                            webhook.hookType === "pre" && "bg-amber-500 hover:bg-amber-600"
+                            webhook.hookType === "pre" && "bg-amber-500 hover:bg-amber-600",
                           )}
                         >
                           {webhook.hookType === "pre" ? (
@@ -489,7 +499,10 @@ export function WebhooksSettings() {
                           )}
                         </Badge>
                         {webhook.hookType === "pre" && webhook.canBlock && (
-                          <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600">
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-amber-500/50 text-amber-600"
+                          >
                             Blocking
                           </Badge>
                         )}
@@ -526,9 +539,7 @@ export function WebhooksSettings() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        setExpandedId(expandedId === webhook.id ? null : webhook.id)
-                      }
+                      onClick={() => setExpandedId(expandedId === webhook.id ? null : webhook.id)}
                     >
                       {expandedId === webhook.id ? (
                         <ChevronUp className="h-4 w-4" />
@@ -598,13 +609,14 @@ export function WebhooksSettings() {
           <div className="flex items-start gap-3">
             <Shield className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-amber-700 dark:text-amber-400">
-                About Pre-Hooks
-              </p>
+              <p className="font-medium text-amber-700 dark:text-amber-400">About Pre-Hooks</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Pre-hooks fire <strong>before</strong> an action occurs. If configured as blocking,
-                they can prevent the action by returning <code className="px-1 py-0.5 rounded bg-muted font-mono text-xs">{"{ allow: false, reason: '...' }"}</code>.
-                This is useful for compliance checks, budget approvals, or custom business rules.
+                they can prevent the action by returning{" "}
+                <code className="px-1 py-0.5 rounded bg-muted font-mono text-xs">
+                  {"{ allow: false, reason: '...' }"}
+                </code>
+                . This is useful for compliance checks, budget approvals, or custom business rules.
               </p>
             </div>
           </div>

@@ -1,11 +1,11 @@
 /**
  * First-Visit Context Overlay — shows once per session for 10 seconds.
  */
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { isSandboxMode } from '../graphql/fetcher';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { isSandboxMode } from "../graphql/fetcher";
 
-const STORAGE_KEY = 'openspawn-first-visit-shown';
+const STORAGE_KEY = "openspawn-first-visit-shown";
 
 export function FirstVisitOverlay() {
   const [visible, setVisible] = useState(false);
@@ -14,7 +14,7 @@ export function FirstVisitOverlay() {
     if (!isSandboxMode) return;
     if (sessionStorage.getItem(STORAGE_KEY)) return;
 
-    sessionStorage.setItem(STORAGE_KEY, '1');
+    sessionStorage.setItem(STORAGE_KEY, "1");
     setVisible(true);
     const timer = setTimeout(() => setVisible(false), 10000);
     return () => clearTimeout(timer);

@@ -1,5 +1,5 @@
-import { cn } from '../lib/utils';
-import type { PhaseInfo } from './phase-progress';
+import { cn } from "../lib/utils";
+import type { PhaseInfo } from "./phase-progress";
 
 interface PhaseChipProps {
   phase: PhaseInfo;
@@ -17,7 +17,7 @@ export function PhaseChip({ phase, className }: PhaseChipProps) {
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
         "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
         "transition-colors hover:bg-cyan-500/15",
-        className
+        className,
       )}
       title={`${phase.name}: ${phase.description}`}
     >

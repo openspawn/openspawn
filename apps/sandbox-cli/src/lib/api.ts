@@ -22,17 +22,11 @@ export class OpenSpawnClient {
     this.apiKey = apiKey ?? getApiKey() ?? "";
 
     if (!this.apiKey) {
-      throw new Error(
-        "No API key configured. Run: openspawn auth login --api-key <key>",
-      );
+      throw new Error("No API key configured. Run: openspawn auth login --api-key <key>");
     }
   }
 
-  private async request<T>(
-    method: string,
-    path: string,
-    body?: unknown,
-  ): Promise<T> {
+  private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const url = `${this.baseUrl}${path}`;
 
     const headers: Record<string, string> = {
@@ -112,11 +106,7 @@ export class OpenSpawnClient {
     return this.request("GET", "/credits/balance");
   }
 
-  async transferCredits(
-    fromId: string,
-    toId: string,
-    amount: number,
-  ): Promise<ApiResponse> {
+  async transferCredits(fromId: string, toId: string, amount: number): Promise<ApiResponse> {
     return this.request("POST", "/agents/credits/transfer", {
       fromAgentId: fromId,
       toAgentId: toId,
@@ -128,10 +118,7 @@ export class OpenSpawnClient {
     return this.request("GET", `/messages?channelId=${channelId}`);
   }
 
-  async sendMessage(
-    recipientId: string,
-    content: string,
-  ): Promise<ApiResponse> {
+  async sendMessage(recipientId: string, content: string): Promise<ApiResponse> {
     return this.request("POST", "/dm", {
       recipientId,
       body: content,

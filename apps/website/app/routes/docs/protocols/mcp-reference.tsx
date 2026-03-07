@@ -42,14 +42,20 @@ export function MCPReference() {
         MCP replaces a fragmented landscape of proprietary plugin systems with one standard:
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
-        <li><strong className="text-slate-200">Tools</strong> — functions the agent can call</li>
-        <li><strong className="text-slate-200">Resources</strong> — data sources the agent can read</li>
-        <li><strong className="text-slate-200">Prompts</strong> — reusable prompt templates</li>
+        <li>
+          <strong className="text-slate-200">Tools</strong> — functions the agent can call
+        </li>
+        <li>
+          <strong className="text-slate-200">Resources</strong> — data sources the agent can read
+        </li>
+        <li>
+          <strong className="text-slate-200">Prompts</strong> — reusable prompt templates
+        </li>
       </ul>
       <p className="mb-6 text-slate-400">
-        OpenSpawn implements the <strong className="text-slate-200">Tools</strong> capability.
-        Your entire org — its agents, tasks, messages, and statistics — is accessible as structured
-        tool calls over a single HTTP endpoint.
+        OpenSpawn implements the <strong className="text-slate-200">Tools</strong> capability. Your
+        entire org — its agents, tasks, messages, and statistics — is accessible as structured tool
+        calls over a single HTTP endpoint.
       </p>
 
       <CalloutBlock variant="info" className="mb-8">
@@ -62,7 +68,9 @@ export function MCPReference() {
       {/* ── Quick Start ───────────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Quick Start</h2>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">1. Start Your OpenSpawn Instance</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        1. Start Your OpenSpawn Instance
+      </h3>
       <CodeBlock title="bash">{`git clone https://github.com/openspawn/openspawn.git
 cd openspawn && pnpm install
 pnpm exec nx serve sandbox
@@ -98,7 +106,9 @@ curl -X POST https://bikinibottom.ai/mcp \\
     "params": {}
   }'`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">3. Connect Claude Desktop or Cursor</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        3. Connect Claude Desktop or Cursor
+      </h3>
       <CodeBlock title="mcp_config.json">{`{
   "mcpServers": {
     "openspawn": {
@@ -142,7 +152,9 @@ curl -X POST https://bikinibottom.ai/mcp \\
               ["get_org_stats", "Get organization-wide statistics", "—"],
             ].map(([tool, desc, params]) => (
               <tr key={tool} className="border-b border-white/5">
-                <td className="py-2 pr-4"><code className="inline-code">{tool}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{tool}</code>
+                </td>
                 <td className="py-2 pr-4 text-slate-400">{desc}</td>
                 <td className="py-2 text-slate-500">{params}</td>
               </tr>
@@ -171,16 +183,24 @@ curl -X POST https://bikinibottom.ai/mcp \\
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">task</code></td>
+              <td className="py-2 pr-4">
+                <code className="inline-code">task</code>
+              </td>
               <td className="py-2 pr-4">string</td>
               <td className="py-2 pr-4 text-emerald-400">✅</td>
               <td className="py-2">Task description in natural language</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">priority</code></td>
-              <td className="py-2 pr-4 text-xs"><code className="inline-code">"low" | "medium" | "high" | "critical"</code></td>
+              <td className="py-2 pr-4">
+                <code className="inline-code">priority</code>
+              </td>
+              <td className="py-2 pr-4 text-xs">
+                <code className="inline-code">"low" | "medium" | "high" | "critical"</code>
+              </td>
               <td className="py-2 pr-4 text-slate-500">❌</td>
-              <td className="py-2">Task priority (default: <code className="inline-code">"medium"</code>)</td>
+              <td className="py-2">
+                Task priority (default: <code className="inline-code">"medium"</code>)
+              </td>
             </tr>
           </tbody>
         </table>
@@ -278,11 +298,9 @@ curl -X POST https://bikinibottom.ai/mcp \\
   }
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
-        Valid status values:{" "}
-        <code className="inline-code">todo</code>,{" "}
+        Valid status values: <code className="inline-code">todo</code>,{" "}
         <code className="inline-code">in_progress</code>,{" "}
-        <code className="inline-code">review</code>,{" "}
-        <code className="inline-code">done</code>,{" "}
+        <code className="inline-code">review</code>, <code className="inline-code">done</code>,{" "}
         <code className="inline-code">blocked</code>
       </p>
 
@@ -313,8 +331,8 @@ curl -X POST https://bikinibottom.ai/mcp \\
         <code className="inline-code text-xl">send_message</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Send an ACP (Agent Communication Protocol) message directly to a specific agent. The
-        message appears in the agent's inbox on the next tick.
+        Send an ACP (Agent Communication Protocol) message directly to a specific agent. The message
+        appears in the agent's inbox on the next tick.
       </p>
       <CodeBlock title="Example — send a priority update">{`{
   "jsonrpc": "2.0",
@@ -330,7 +348,9 @@ curl -X POST https://bikinibottom.ai/mcp \\
 }`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         <strong className="text-slate-200">Response:</strong>{" "}
-        <code className="inline-code">{"{ \"sent\": true, \"to\": \"Engineering Lead\", \"messageId\": \"acp-...\" }"}</code>
+        <code className="inline-code">
+          {'{ "sent": true, "to": "Engineering Lead", "messageId": "acp-..." }'}
+        </code>
       </p>
 
       {/* get_org_stats */}
@@ -338,8 +358,8 @@ curl -X POST https://bikinibottom.ai/mcp \\
         <code className="inline-code text-xl">get_org_stats</code>
       </h3>
       <p className="mb-4 text-slate-400">
-        Get a summary of organization-wide statistics: total agents, active agents, total tasks,
-        and completion rates. No parameters required.
+        Get a summary of organization-wide statistics: total agents, active agents, total tasks, and
+        completion rates. No parameters required.
       </p>
       <CodeBlock title="Response">{`{
   "content": [{
@@ -354,7 +374,9 @@ curl -X POST https://bikinibottom.ai/mcp \\
       {/* ── Connecting Agent Frameworks ───────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Connecting Agent Frameworks</h2>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Claude Desktop &amp; Cursor</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        Claude Desktop &amp; Cursor
+      </h3>
       <p className="mb-6 text-slate-400">
         After adding OpenSpawn to your config and restarting, you'll see OpenSpawn tools in the
         tools panel. Claude can now delegate tasks, check blocked tasks, get task status, and send
@@ -516,13 +538,19 @@ console.log(\`Task \${task.taskId} created, assigned to \${task.assigneeId}\`);`
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["-32600", "Invalid Request", "jsonrpc field is not \"2.0\""],
+              ["-32600", "Invalid Request", 'jsonrpc field is not "2.0"'],
               ["-32601", "Method not found", "Unknown method"],
               ["-32602", "Invalid params", "Missing required parameter, or wrong type"],
-              ["Tool error", "Returned in content with isError: true", "Agent not found, task not found, etc."],
+              [
+                "Tool error",
+                "Returned in content with isError: true",
+                "Agent not found, task not found, etc.",
+              ],
             ].map(([code, msg, cause]) => (
               <tr key={code}>
-                <td className="py-2 pr-4"><code className="inline-code">{code}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{code}</code>
+                </td>
                 <td className="py-2 pr-4">{msg}</td>
                 <td className="py-2">{cause}</td>
               </tr>
@@ -568,8 +596,8 @@ console.log(\`Task \${task.taskId} created, assigned to \${task.assigneeId}\`);`
   "protocolVersion": "2025-03-26"
 }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        <code className="inline-code">listChanged: false</code> means the tool list is static —
-        no need to re-fetch tools after initialization.
+        <code className="inline-code">listChanged: false</code> means the tool list is static — no
+        need to re-fetch tools after initialization.
       </p>
 
       <hr className="my-8 border-white/10" />
@@ -580,12 +608,29 @@ console.log(\`Task \${task.taskId} created, assigned to \${task.assigneeId}\`);`
         OpenSpawn's MCP server is actively expanding. Planned additions:
       </p>
       <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-1">
-        <li><code className="inline-code">approve_task</code> — Approve a task through a pre-hook gate</li>
-        <li><code className="inline-code">get_org_health</code> — Retrieve the org health score and recommendations</li>
-        <li><code className="inline-code">list_escalations</code> — See all active escalations and their chains</li>
-        <li><code className="inline-code">spawn_agent</code> — Dynamically create a new agent in the org</li>
-        <li><strong className="text-slate-200">Resource support</strong> — Expose org state as MCP Resources</li>
-        <li><strong className="text-slate-200">Authentication</strong> — API key support for multi-tenant deployments</li>
+        <li>
+          <code className="inline-code">approve_task</code> — Approve a task through a pre-hook gate
+        </li>
+        <li>
+          <code className="inline-code">get_org_health</code> — Retrieve the org health score and
+          recommendations
+        </li>
+        <li>
+          <code className="inline-code">list_escalations</code> — See all active escalations and
+          their chains
+        </li>
+        <li>
+          <code className="inline-code">spawn_agent</code> — Dynamically create a new agent in the
+          org
+        </li>
+        <li>
+          <strong className="text-slate-200">Resource support</strong> — Expose org state as MCP
+          Resources
+        </li>
+        <li>
+          <strong className="text-slate-200">Authentication</strong> — API key support for
+          multi-tenant deployments
+        </li>
       </ul>
 
       <hr className="my-8 border-white/10" />

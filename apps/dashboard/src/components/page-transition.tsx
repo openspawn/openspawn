@@ -2,8 +2,7 @@ import { useLocation, Outlet } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 
 const reduceMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const variants = reduceMotion
   ? { initial: {}, animate: {}, exit: {} }

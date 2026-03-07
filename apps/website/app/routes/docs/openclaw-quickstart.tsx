@@ -13,7 +13,8 @@ export function OpenClawQuickstart() {
       </p>
 
       <Callout className="mb-8">
-        🦞 Already running OpenClaw with multiple agents? This guide shows you how to add organizational structure without changing your existing setup.
+        🦞 Already running OpenClaw with multiple agents? This guide shows you how to add
+        organizational structure without changing your existing setup.
       </Callout>
 
       {/* Section 1 */}
@@ -38,13 +39,16 @@ export function OpenClawQuickstart() {
   }
 }`}</CodeBlock>
       <p className="text-slate-400">
-        This gives you isolated agents that can message each other. But they don't know who's in charge, what team they're on, or how to coordinate.
+        This gives you isolated agents that can message each other. But they don't know who's in
+        charge, what team they're on, or how to coordinate.
       </p>
 
       {/* Section 2 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What OpenSpawn adds</h2>
       <p className="mb-4 text-slate-400">
-        <code className="inline-code">ORG.md</code> defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies.
+        <code className="inline-code">ORG.md</code> defines the structure that sits on top of your
+        OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and
+        policies.
       </p>
       <CodeBlock title="ORG.md">{`# 🍍 BikiniBottom Inc.
 > Mission: Ship fast, stay weird, protect the reef.
@@ -71,14 +75,20 @@ export function OpenClawQuickstart() {
       {/* Section 3 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step by step</h2>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">1. Add ORG.md to each agent's workspace</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        1. Add ORG.md to each agent's workspace
+      </h3>
       <CodeBlock title="bash">{`# Copy ORG.md to each agent workspace
 cp ORG.md ~/.openclaw/workspace-sandy/
 cp ORG.md ~/.openclaw/workspace-spongebob/
 cp ORG.md ~/.openclaw/workspace-squidward/`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">2. Tell agents to read ORG.md</h3>
-      <p className="mb-4 text-slate-400">Add to each agent's <code className="inline-code">AGENTS.md</code>:</p>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        2. Tell agents to read ORG.md
+      </h3>
+      <p className="mb-4 text-slate-400">
+        Add to each agent's <code className="inline-code">AGENTS.md</code>:
+      </p>
       <CodeBlock title="AGENTS.md">{`## Organization
 Read \`ORG.md\` at the start of every session. It defines:
 - Your role and level in the org
@@ -88,35 +98,85 @@ Read \`ORG.md\` at the start of every session. It defines:
 
 Treat ORG.md as authoritative for organizational decisions.`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">3. Launch the OpenSpawn dashboard (optional)</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        3. Launch the OpenSpawn dashboard (optional)
+      </h3>
       <CodeBlock title="bash">{`npx openspawn start
 # Opens dashboard at http://localhost:3333/app/`}</CodeBlock>
       <p className="text-slate-400">
-        The dashboard gives you real-time visibility into your agent org — network graph, task flow, credit usage, escalation chains.
+        The dashboard gives you real-time visibility into your agent org — network graph, task flow,
+        credit usage, escalation chains.
       </p>
 
       {/* Section 4 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What changes for your agents</h2>
       <ul className="space-y-3 text-slate-400">
-        <li><strong className="text-slate-200">Sandy</strong> now knows she's L9 Science lead — she delegates research to Patrick, not SpongeBob</li>
-        <li><strong className="text-slate-200">SpongeBob</strong> knows to escalate architecture questions to Sandy, not try to solve them himself</li>
-        <li><strong className="text-slate-200">Squidward</strong> knows his role is code quality — he reviews, not builds</li>
-        <li><strong className="text-slate-200">All agents</strong> follow the same policies — peer review, escalation timelines, communication protocols</li>
-        <li><strong className="text-slate-200">Credits</strong> are tracked per-department, so you know which team is burning through budget</li>
+        <li>
+          <strong className="text-slate-200">Sandy</strong> now knows she's L9 Science lead — she
+          delegates research to Patrick, not SpongeBob
+        </li>
+        <li>
+          <strong className="text-slate-200">SpongeBob</strong> knows to escalate architecture
+          questions to Sandy, not try to solve them himself
+        </li>
+        <li>
+          <strong className="text-slate-200">Squidward</strong> knows his role is code quality — he
+          reviews, not builds
+        </li>
+        <li>
+          <strong className="text-slate-200">All agents</strong> follow the same policies — peer
+          review, escalation timelines, communication protocols
+        </li>
+        <li>
+          <strong className="text-slate-200">Credits</strong> are tracked per-department, so you
+          know which team is burning through budget
+        </li>
       </ul>
 
       {/* Section 5 */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Going further</h2>
       <ul className="space-y-2 text-slate-400">
-        <li><Link to="/org-md" className="text-cyan-400 hover:underline">Organization as Code</Link> — Deep dive into ORG.md</li>
-        <li><Link to="/docs/features/dashboard" className="text-cyan-400 hover:underline">Dashboard</Link> — Real-time agent visualization</li>
-        <li><Link to="/docs/protocols/a2a" className="text-cyan-400 hover:underline">A2A Protocol</Link> — External agent discovery</li>
-        <li><Link to="/docs/protocols/mcp" className="text-cyan-400 hover:underline">MCP Tools</Link> — Connect to other platforms</li>
-        <li><a href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">OpenClaw Documentation</a> — OpenClaw docs & guides</li>
+        <li>
+          <Link to="/org-md" className="text-cyan-400 hover:underline">
+            Organization as Code
+          </Link>{" "}
+          — Deep dive into ORG.md
+        </li>
+        <li>
+          <Link to="/docs/features/dashboard" className="text-cyan-400 hover:underline">
+            Dashboard
+          </Link>{" "}
+          — Real-time agent visualization
+        </li>
+        <li>
+          <Link to="/docs/protocols/a2a" className="text-cyan-400 hover:underline">
+            A2A Protocol
+          </Link>{" "}
+          — External agent discovery
+        </li>
+        <li>
+          <Link to="/docs/protocols/mcp" className="text-cyan-400 hover:underline">
+            MCP Tools
+          </Link>{" "}
+          — Connect to other platforms
+        </li>
+        <li>
+          <a
+            href="https://openclaw.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:underline"
+          >
+            OpenClaw Documentation
+          </a>{" "}
+          — OpenClaw docs & guides
+        </li>
       </ul>
 
       <Callout className="mt-10">
-        OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. OpenSpawn adds the organizational layer that makes multi-agent coordination actually work.
+        OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and
+        communication. OpenSpawn adds the organizational layer that makes multi-agent coordination
+        actually work.
       </Callout>
     </DocsLayout>
   );

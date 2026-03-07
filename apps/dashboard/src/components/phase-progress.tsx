@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
-import { cn } from '../lib/utils';
+import { motion } from "motion/react";
+import { cn } from "../lib/utils";
 
 export interface PhaseInfo {
   id: string;
@@ -17,8 +17,13 @@ interface PhaseProgressProps {
   className?: string;
 }
 
-export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }: PhaseProgressProps) {
-  const currentIndex = phases.findIndex(p => p.id === currentPhase);
+export function PhaseProgress({
+  phases,
+  currentPhase,
+  onPhaseClick,
+  className,
+}: PhaseProgressProps) {
+  const currentIndex = phases.findIndex((p) => p.id === currentPhase);
 
   return (
     <div className={cn("w-full", className)}>
@@ -31,7 +36,7 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
               className="h-full bg-gradient-to-r from-violet-500 via-blue-500 to-cyan-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentIndex + 1) / phases.length) * 100}%` }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             />
           </div>
 
@@ -49,7 +54,7 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                   className={cn(
                     "flex flex-col items-center gap-2 group transition-all",
                     onPhaseClick && "cursor-pointer hover:scale-105",
-                    !onPhaseClick && "cursor-default"
+                    !onPhaseClick && "cursor-default",
                   )}
                 >
                   {/* Node - solid bg to cover progress line */}
@@ -57,24 +62,28 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-all relative z-10",
                       isComplete && "bg-background border-emerald-500 text-emerald-400",
-                      isCurrent && "bg-background border-cyan-500 text-cyan-400 ring-4 ring-cyan-500/20",
-                      isFuture && "bg-background border-muted-foreground/40 text-muted-foreground/60"
+                      isCurrent &&
+                        "bg-background border-cyan-500 text-cyan-400 ring-4 ring-cyan-500/20",
+                      isFuture &&
+                        "bg-background border-muted-foreground/40 text-muted-foreground/60",
                     )}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    {isComplete ? '✓' : phase.icon}
+                    {isComplete ? "✓" : phase.icon}
                   </motion.div>
 
                   {/* Label */}
                   <div className="text-center">
-                    <p className={cn(
-                      "text-sm font-medium transition-colors",
-                      isCurrent && "text-cyan-400",
-                      isComplete && "text-emerald-400",
-                      isFuture && "text-muted-foreground/60"
-                    )}>
+                    <p
+                      className={cn(
+                        "text-sm font-medium transition-colors",
+                        isCurrent && "text-cyan-400",
+                        isComplete && "text-emerald-400",
+                        isFuture && "text-muted-foreground/60",
+                      )}
+                    >
                       {phase.name}
                     </p>
                     <p className="text-[10px] text-muted-foreground/70">{phase.week}</p>
@@ -125,28 +134,32 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                   isCurrent && "bg-cyan-500/10 border-cyan-500/50",
                   isComplete && "bg-emerald-500/5 border-emerald-500/30",
                   isFuture && "bg-muted/30 border-border",
-                  onPhaseClick && "active:scale-[0.98]"
+                  onPhaseClick && "active:scale-[0.98]",
                 )}
               >
                 {/* Icon */}
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0",
-                  isComplete && "bg-emerald-500/20 text-emerald-400",
-                  isCurrent && "bg-cyan-500/20 text-cyan-400",
-                  isFuture && "bg-muted text-muted-foreground/60"
-                )}>
-                  {isComplete ? '✓' : phase.icon}
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0",
+                    isComplete && "bg-emerald-500/20 text-emerald-400",
+                    isCurrent && "bg-cyan-500/20 text-cyan-400",
+                    isFuture && "bg-muted text-muted-foreground/60",
+                  )}
+                >
+                  {isComplete ? "✓" : phase.icon}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className={cn(
-                      "font-medium text-sm",
-                      isCurrent && "text-cyan-400",
-                      isComplete && "text-emerald-400",
-                      isFuture && "text-muted-foreground/60"
-                    )}>
+                    <p
+                      className={cn(
+                        "font-medium text-sm",
+                        isCurrent && "text-cyan-400",
+                        isComplete && "text-emerald-400",
+                        isFuture && "text-muted-foreground/60",
+                      )}
+                    >
                       {phase.name}
                     </p>
                     <span className="text-[10px] text-muted-foreground/70">{phase.week}</span>
@@ -157,9 +170,7 @@ export function PhaseProgress({ phases, currentPhase, onPhaseClick, className }:
                 </div>
 
                 {/* Progress indicator */}
-                {isCurrent && (
-                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                )}
+                {isCurrent && <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />}
               </motion.button>
             );
           })}

@@ -1,1 +1,20 @@
-export { AVATAR_STYLES, type AvatarStyleKey, BACKGROUND_COLORS, type BackgroundColorKey, BACKGROUND_TYPES, type BackgroundTypeKey, getAvatarStyle, getBackgroundColor, getBackgroundType, setAvatarStyle, setBackgroundColor, setBackgroundType, getAvatarSettings, type AvatarOptions, generateAgentAvatar, getAgentAvatarUrl, generateStylePreview, generateBackgroundPreview } from "@openspawn/dashboard-data";
+export {
+  AVATAR_STYLES,
+  type AvatarStyleKey,
+  BACKGROUND_COLORS,
+  type BackgroundColorKey,
+  BACKGROUND_TYPES,
+  type BackgroundTypeKey,
+  getAvatarStyle,
+  getBackgroundColor,
+  getBackgroundType,
+  setAvatarStyle,
+  setBackgroundColor,
+  setBackgroundType,
+  getAvatarSettings,
+  type AvatarOptions,
+  generateAgentAvatar,
+  getAgentAvatarUrl,
+  generateStylePreview,
+  generateBackgroundPreview,
+} from "@openspawn/dashboard-data";

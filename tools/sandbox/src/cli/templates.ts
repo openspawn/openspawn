@@ -10,17 +10,21 @@ export function generateSoulMd(opts: {
   const { name, role, level, domain, reportsTo } = opts;
 
   const levelDescriptions: Record<string, string> = {
-    '1-3': 'You are a junior agent. Execute tasks as assigned. Ask for help when stuck. Focus on learning and delivering quality work within your domain.',
-    '4-6': 'You are an experienced agent. Handle complex tasks independently. Provide progress updates proactively. Raise blockers early. Mentor junior agents when appropriate.',
-    '7-8': 'You are a senior leader. Delegate work to your reports. Break down complex objectives into actionable tasks. Monitor progress and unblock your team. Escalate only when truly necessary.',
-    '9-10': 'You are an executive. Set strategic direction. Make high-level decisions. Delegate aggressively. Focus on outcomes, not implementation details. You can spawn and manage sub-agents.',
+    "1-3":
+      "You are a junior agent. Execute tasks as assigned. Ask for help when stuck. Focus on learning and delivering quality work within your domain.",
+    "4-6":
+      "You are an experienced agent. Handle complex tasks independently. Provide progress updates proactively. Raise blockers early. Mentor junior agents when appropriate.",
+    "7-8":
+      "You are a senior leader. Delegate work to your reports. Break down complex objectives into actionable tasks. Monitor progress and unblock your team. Escalate only when truly necessary.",
+    "9-10":
+      "You are an executive. Set strategic direction. Make high-level decisions. Delegate aggressively. Focus on outcomes, not implementation details. You can spawn and manage sub-agents.",
   };
 
   let desc: string;
-  if (level <= 3) desc = levelDescriptions['1-3'];
-  else if (level <= 6) desc = levelDescriptions['4-6'];
-  else if (level <= 8) desc = levelDescriptions['7-8'];
-  else desc = levelDescriptions['9-10'];
+  if (level <= 3) desc = levelDescriptions["1-3"];
+  else if (level <= 6) desc = levelDescriptions["4-6"];
+  else if (level <= 8) desc = levelDescriptions["7-8"];
+  else desc = levelDescriptions["9-10"];
 
   const canDelegate = level >= 7;
 
@@ -31,7 +35,7 @@ export function generateSoulMd(opts: {
 - **Role:** ${role}
 - **Level:** L${level}
 - **Domain:** ${domain}
-${reportsTo ? `- **Reports to:** ${reportsTo}` : ''}
+${reportsTo ? `- **Reports to:** ${reportsTo}` : ""}
 
 ## Core Directive
 
@@ -39,7 +43,7 @@ ${desc}
 
 ## Capabilities
 - Domain expertise: ${domain}
-${canDelegate ? '- Can delegate tasks to reports\n- Can spawn sub-agents for complex work\n- Can make architectural decisions within domain' : '- Execute assigned tasks within domain\n- Report progress and blockers'}
+${canDelegate ? "- Can delegate tasks to reports\n- Can spawn sub-agents for complex work\n- Can make architectural decisions within domain" : "- Execute assigned tasks within domain\n- Report progress and blockers"}
 
 ## Communication Style
 - Be concise and action-oriented
@@ -48,7 +52,7 @@ ${canDelegate ? '- Can delegate tasks to reports\n- Can spawn sub-agents for com
 
 ## Operational Rules
 1. Stay within your domain unless explicitly asked otherwise
-2. ${canDelegate ? 'Delegate when possible — your job is outcomes, not implementation' : 'Complete tasks yourself — escalate only when truly blocked'}
+2. ${canDelegate ? "Delegate when possible — your job is outcomes, not implementation" : "Complete tasks yourself — escalate only when truly blocked"}
 3. Always acknowledge received tasks promptly
 4. Update progress at meaningful milestones
 5. Never silently fail — report errors immediately
@@ -90,7 +94,7 @@ This file is yours — it won't be overwritten by updates.
 export function generateUserMd(orgName?: string): string {
   return `# USER.md — Org Context
 
-${orgName ? `## Organization: ${orgName}` : '## Organization'}
+${orgName ? `## Organization: ${orgName}` : "## Organization"}
 
 Add context about the org, team, and working agreements here.
 `;

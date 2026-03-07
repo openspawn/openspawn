@@ -18,19 +18,107 @@ interface Plugin {
 }
 
 const plugins: Plugin[] = [
-  { name: "Coordinator", slug: "coordinator", emoji: "📋", category: "Coordination", tagline: "SQLite task board + MCP tools", description: "Atomic task claiming, budget tracking, event audit trail.", status: "available" },
-  { name: "Dashboard", slug: "dashboard", emoji: "📊", category: "Monitoring", tagline: "Real-time org visualization", description: "Kanban board, org chart, agent controls.", status: "available" },
-  { name: "Identity", slug: "identity", emoji: "🔑", category: "Identity", tagline: "Ed25519 agent keypairs", description: "Sign messages, verify identity, cross-org federation.", status: "available" },
-  { name: "Budget Guard", slug: "budget-guard", emoji: "💰", category: "Monitoring", tagline: "Token/cost enforcement", description: "Set per-agent limits, auto-pause on overspend.", status: "coming-soon" },
-  { name: "Git Sync", slug: "git-sync", emoji: "🔄", category: "DevOps", tagline: "Automatic git operations", description: "Branch per agent, auto-commit, PR creation.", status: "coming-soon" },
-  { name: "Slack Bridge", slug: "slack-bridge", emoji: "💬", category: "Communication", tagline: "Agent ↔ Slack integration", description: "Human-in-the-loop via Slack channels.", status: "coming-soon" },
-  { name: "S3 Artifacts", slug: "s3-artifacts", emoji: "☁️", category: "Storage", tagline: "Cloud artifact storage", description: "Upload results, share across orgs.", status: "coming-soon" },
-  { name: "Prometheus Exporter", slug: "prometheus-exporter", emoji: "📈", category: "Monitoring", tagline: "Metrics export", description: "Grafana dashboards for agent performance.", status: "coming-soon" },
-  { name: "Review Gate", slug: "review-gate", emoji: "✅", category: "DevOps", tagline: "Automated code review", description: "PR quality checks before merge.", status: "coming-soon" },
-  { name: "Webhook Router", slug: "webhook-router", emoji: "🔗", category: "Communication", tagline: "External event triggers", description: "GitHub webhooks, CI notifications.", status: "coming-soon" },
+  {
+    name: "Coordinator",
+    slug: "coordinator",
+    emoji: "📋",
+    category: "Coordination",
+    tagline: "SQLite task board + MCP tools",
+    description: "Atomic task claiming, budget tracking, event audit trail.",
+    status: "available",
+  },
+  {
+    name: "Dashboard",
+    slug: "dashboard",
+    emoji: "📊",
+    category: "Monitoring",
+    tagline: "Real-time org visualization",
+    description: "Kanban board, org chart, agent controls.",
+    status: "available",
+  },
+  {
+    name: "Identity",
+    slug: "identity",
+    emoji: "🔑",
+    category: "Identity",
+    tagline: "Ed25519 agent keypairs",
+    description: "Sign messages, verify identity, cross-org federation.",
+    status: "available",
+  },
+  {
+    name: "Budget Guard",
+    slug: "budget-guard",
+    emoji: "💰",
+    category: "Monitoring",
+    tagline: "Token/cost enforcement",
+    description: "Set per-agent limits, auto-pause on overspend.",
+    status: "coming-soon",
+  },
+  {
+    name: "Git Sync",
+    slug: "git-sync",
+    emoji: "🔄",
+    category: "DevOps",
+    tagline: "Automatic git operations",
+    description: "Branch per agent, auto-commit, PR creation.",
+    status: "coming-soon",
+  },
+  {
+    name: "Slack Bridge",
+    slug: "slack-bridge",
+    emoji: "💬",
+    category: "Communication",
+    tagline: "Agent ↔ Slack integration",
+    description: "Human-in-the-loop via Slack channels.",
+    status: "coming-soon",
+  },
+  {
+    name: "S3 Artifacts",
+    slug: "s3-artifacts",
+    emoji: "☁️",
+    category: "Storage",
+    tagline: "Cloud artifact storage",
+    description: "Upload results, share across orgs.",
+    status: "coming-soon",
+  },
+  {
+    name: "Prometheus Exporter",
+    slug: "prometheus-exporter",
+    emoji: "📈",
+    category: "Monitoring",
+    tagline: "Metrics export",
+    description: "Grafana dashboards for agent performance.",
+    status: "coming-soon",
+  },
+  {
+    name: "Review Gate",
+    slug: "review-gate",
+    emoji: "✅",
+    category: "DevOps",
+    tagline: "Automated code review",
+    description: "PR quality checks before merge.",
+    status: "coming-soon",
+  },
+  {
+    name: "Webhook Router",
+    slug: "webhook-router",
+    emoji: "🔗",
+    category: "Communication",
+    tagline: "External event triggers",
+    description: "GitHub webhooks, CI notifications.",
+    status: "coming-soon",
+  },
 ];
 
-const categories: Array<"All" | Category> = ["All", "Coordination", "Identity", "Communication", "Monitoring", "Storage", "DevOps"];
+const categories: Array<"All" | Category> = [
+  "All",
+  "Coordination",
+  "Identity",
+  "Communication",
+  "Monitoring",
+  "Storage",
+  "DevOps",
+];
 
 /* ─── Components ───────────────────────────────────────────────────────────── */
 
@@ -63,10 +151,13 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
   const [copied, setCopied] = useState(false);
 
   const handleInstall = () => {
-    navigator.clipboard.writeText(`openspawn plugin add ${plugin.slug}`).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    navigator.clipboard
+      .writeText(`openspawn plugin add ${plugin.slug}`)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {});
   };
 
   return (
@@ -116,7 +207,14 @@ export function PluginsPage() {
     const q = search.toLowerCase();
     return plugins.filter((p) => {
       if (activeCategory !== "All" && p.category !== activeCategory) return false;
-      if (q && !p.name.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q) && !p.description.toLowerCase().includes(q) && !p.tagline.toLowerCase().includes(q)) return false;
+      if (
+        q &&
+        !p.name.toLowerCase().includes(q) &&
+        !p.category.toLowerCase().includes(q) &&
+        !p.description.toLowerCase().includes(q) &&
+        !p.tagline.toLowerCase().includes(q)
+      )
+        return false;
       return true;
     });
   }, [search, activeCategory]);
@@ -134,12 +232,23 @@ export function PluginsPage() {
             <span className="text-slate-300"> — Plugins for Agent Organizations</span>
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-slate-400">
-            Browse and install plugins to extend your agent org with task coordination, monitoring, identity, DevOps integrations, and more.
+            Browse and install plugins to extend your agent org with task coordination, monitoring,
+            identity, DevOps integrations, and more.
           </p>
           <div className="mx-auto max-w-xl">
             <div className="relative">
-              <svg className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              <svg
+                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
               </svg>
               <input
                 type="text"
@@ -175,9 +284,7 @@ export function PluginsPage() {
 
         {/* Plugin Grid */}
         {filtered.length === 0 ? (
-          <div className="py-20 text-center text-slate-500">
-            No plugins match your search.
-          </div>
+          <div className="py-20 text-center text-slate-500">No plugins match your search.</div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
@@ -189,7 +296,9 @@ export function PluginsPage() {
         {/* Stats */}
         <div className="mt-16 text-center">
           <p className="text-sm text-slate-500">
-            {plugins.filter((p) => p.status === "available").length} available · {plugins.filter((p) => p.status === "coming-soon").length} coming soon · More plugins shipping every week
+            {plugins.filter((p) => p.status === "available").length} available ·{" "}
+            {plugins.filter((p) => p.status === "coming-soon").length} coming soon · More plugins
+            shipping every week
           </p>
         </div>
       </section>

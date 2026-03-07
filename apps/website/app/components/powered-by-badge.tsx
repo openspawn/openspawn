@@ -135,14 +135,14 @@ const themes: Record<Theme, ThemeTokens> = {
       "transition-all duration-200 ease-out " +
       "hover:border-cyan-500/30 hover:bg-cyan-500/[0.06] " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950",
-    inlineLink:  "text-cyan-400 underline-offset-2 hover:underline",
-    inlineText:  "text-slate-400",
+    inlineLink: "text-cyan-400 underline-offset-2 hover:underline",
+    inlineText: "text-slate-400",
 
     // ── Banner ──────────────────────────────────────────────────────────────
     bannerWrap:
       "w-full border-y border-white/5 bg-navy-900 " +
       "transition-colors duration-200 hover:bg-navy-800",
-    bannerText:    "text-slate-300",
+    bannerText: "text-slate-300",
     bannerLink:
       "font-semibold text-cyan-400 underline-offset-2 hover:underline " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:rounded",
@@ -155,8 +155,8 @@ const themes: Record<Theme, ThemeTokens> = {
       "shadow-[0_1px_3px_rgba(0,0,0,0.4),0_1px_2px_rgba(0,0,0,0.3)] " +
       "transition-all duration-200 ease-out " +
       "hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.10)]",
-    cardTitle:   "text-slate-100 font-semibold",
-    cardBody:    "text-slate-400",
+    cardTitle: "text-slate-100 font-semibold",
+    cardBody: "text-slate-400",
     cardLink:
       "text-cyan-400 underline-offset-2 hover:underline " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:rounded",
@@ -167,7 +167,7 @@ const themes: Record<Theme, ThemeTokens> = {
       "hover:bg-cyan-400 hover:shadow-[0_0_10px_rgba(6,182,212,0.25)] " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950",
     cardBtnHover: "",
-    cardFooter:   "text-slate-500 text-xs",
+    cardFooter: "text-slate-500 text-xs",
   },
 
   light: {
@@ -178,14 +178,14 @@ const themes: Record<Theme, ThemeTokens> = {
       "transition-all duration-200 ease-out " +
       "hover:border-cyan-500/40 hover:bg-cyan-50 " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2",
-    inlineLink:  "text-cyan-600 underline-offset-2 hover:underline",
-    inlineText:  "text-slate-500",
+    inlineLink: "text-cyan-600 underline-offset-2 hover:underline",
+    inlineText: "text-slate-500",
 
     // ── Banner ──────────────────────────────────────────────────────────────
     bannerWrap:
       "w-full border-y border-slate-200 bg-slate-50 " +
       "transition-colors duration-200 hover:bg-slate-100",
-    bannerText:    "text-slate-600",
+    bannerText: "text-slate-600",
     bannerLink:
       "font-semibold text-cyan-600 underline-offset-2 hover:underline " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:rounded",
@@ -198,8 +198,8 @@ const themes: Record<Theme, ThemeTokens> = {
       "shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.05)] " +
       "transition-all duration-200 ease-out " +
       "hover:border-cyan-500/40 hover:shadow-[0_4px_16px_rgba(6,182,212,0.12)]",
-    cardTitle:   "text-slate-800 font-semibold",
-    cardBody:    "text-slate-500",
+    cardTitle: "text-slate-800 font-semibold",
+    cardBody: "text-slate-500",
     cardLink:
       "text-cyan-600 underline-offset-2 hover:underline " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:rounded",
@@ -210,7 +210,7 @@ const themes: Record<Theme, ThemeTokens> = {
       "hover:bg-cyan-500 hover:shadow-[0_0_10px_rgba(6,182,212,0.25)] " +
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 focus-visible:ring-offset-2",
     cardBtnHover: "",
-    cardFooter:   "text-slate-400 text-xs",
+    cardFooter: "text-slate-400 text-xs",
   },
 };
 
@@ -228,8 +228,7 @@ function InlineBadge({ t, className }: { t: ThemeTokens; className: string }) {
     >
       <CoralIcon className="h-4 w-4 flex-shrink-0" />
       <span className={`text-xs font-medium ${t.inlineText}`}>
-        Powered by{" "}
-        <span className={`${t.inlineLink} font-semibold`}>OpenSpawn</span>
+        Powered by <span className={`${t.inlineLink} font-semibold`}>OpenSpawn</span>
       </span>
     </a>
   );
@@ -319,8 +318,8 @@ function CardBadge({
 
       {/* Body copy */}
       <p className={`mb-5 text-sm leading-relaxed ${t.cardBody}`}>
-        This deployment runs on OpenSpawn — the open-source platform for
-        multi-agent organizations. Protocol-native, real-world ready.
+        This deployment runs on OpenSpawn — the open-source platform for multi-agent organizations.
+        Protocol-native, real-world ready.
       </p>
 
       {/* CTA button */}

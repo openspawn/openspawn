@@ -9,9 +9,7 @@ const sidebar = [
   { label: "OpenClaw Integration", to: "/docs/openclaw" },
   {
     label: "Tutorials",
-    children: [
-      { label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" },
-    ],
+    children: [{ label: "Your First ORG.md", to: "/docs/tutorials/your-first-org-md" }],
   },
   {
     label: "Guides",
@@ -22,9 +20,7 @@ const sidebar = [
   },
   {
     label: "Concepts",
-    children: [
-      { label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" },
-    ],
+    children: [{ label: "ACP vs A2A", to: "/docs/concepts/acp-vs-a2a" }],
   },
   {
     label: "Protocols",
@@ -51,9 +47,7 @@ const sidebar = [
   },
   {
     label: "Reference",
-    children: [
-      { label: "ORG.md Reference", to: "/docs/reference/org-md-reference" },
-    ],
+    children: [{ label: "ORG.md Reference", to: "/docs/reference/org-md-reference" }],
   },
   { label: "Comparison", to: "/docs/comparison" },
 ];
@@ -87,7 +81,8 @@ export function DocsLayout({ children }: { children: ReactNode }) {
 
   const currentIdx = flatPages.findIndex((p) => p.to === currentPath);
   const prevPage = currentIdx > 0 ? flatPages[currentIdx - 1] : null;
-  const nextPage = currentIdx < flatPages.length - 1 && currentIdx >= 0 ? flatPages[currentIdx + 1] : null;
+  const nextPage =
+    currentIdx < flatPages.length - 1 && currentIdx >= 0 ? flatPages[currentIdx + 1] : null;
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -126,7 +121,7 @@ export function DocsLayout({ children }: { children: ReactNode }) {
                 >
                   {item.label}
                 </Link>
-              )
+              ),
             )}
           </nav>
         </aside>
@@ -142,18 +137,26 @@ export function DocsLayout({ children }: { children: ReactNode }) {
                   className="group flex flex-col items-start rounded-xl border border-white/5 bg-white/[0.02] px-5 py-4 text-sm transition hover:border-white/10 hover:bg-white/[0.04] no-underline min-w-0"
                 >
                   <span className="text-xs text-slate-500 mb-1">← Previous</span>
-                  <span className="font-medium text-slate-300 group-hover:text-cyan-400 truncate">{prevPage.label}</span>
+                  <span className="font-medium text-slate-300 group-hover:text-cyan-400 truncate">
+                    {prevPage.label}
+                  </span>
                 </Link>
-              ) : <div />}
+              ) : (
+                <div />
+              )}
               {nextPage ? (
                 <Link
                   to={nextPage.to}
                   className="group flex flex-col items-end rounded-xl border border-white/5 bg-white/[0.02] px-5 py-4 text-sm transition hover:border-white/10 hover:bg-white/[0.04] no-underline min-w-0 ml-auto"
                 >
                   <span className="text-xs text-slate-500 mb-1">Next →</span>
-                  <span className="font-medium text-slate-300 group-hover:text-cyan-400 truncate">{nextPage.label}</span>
+                  <span className="font-medium text-slate-300 group-hover:text-cyan-400 truncate">
+                    {nextPage.label}
+                  </span>
                 </Link>
-              ) : <div />}
+              ) : (
+                <div />
+              )}
             </nav>
           )}
         </div>

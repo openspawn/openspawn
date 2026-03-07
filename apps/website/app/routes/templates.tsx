@@ -413,11 +413,16 @@ function OrgPreviewPanel({ preview }: { preview: OrgPreview }) {
   }
 
   const levelBadge = (level: number) => {
-    if (level >= 10) return { label: "CEO", color: "text-amber-400 bg-amber-400/10 ring-amber-400/20" };
-    if (level >= 9) return { label: "Director", color: "text-violet-400 bg-violet-400/10 ring-violet-400/20" };
-    if (level >= 7) return { label: "Lead", color: "text-cyan-400 bg-cyan-400/10 ring-cyan-400/20" };
-    if (level >= 6) return { label: "Senior", color: "text-emerald-400 bg-emerald-400/10 ring-emerald-400/20" };
-    if (level <= 2) return { label: "Intern", color: "text-slate-400 bg-slate-400/10 ring-slate-400/20" };
+    if (level >= 10)
+      return { label: "CEO", color: "text-amber-400 bg-amber-400/10 ring-amber-400/20" };
+    if (level >= 9)
+      return { label: "Director", color: "text-violet-400 bg-violet-400/10 ring-violet-400/20" };
+    if (level >= 7)
+      return { label: "Lead", color: "text-cyan-400 bg-cyan-400/10 ring-cyan-400/20" };
+    if (level >= 6)
+      return { label: "Senior", color: "text-emerald-400 bg-emerald-400/10 ring-emerald-400/20" };
+    if (level <= 2)
+      return { label: "Intern", color: "text-slate-400 bg-slate-400/10 ring-slate-400/20" };
     return { label: "Agent", color: "text-slate-300 bg-slate-300/10 ring-slate-300/20" };
   };
 
@@ -428,7 +433,9 @@ function OrgPreviewPanel({ preview }: { preview: OrgPreview }) {
         <div>
           <h3 className="text-lg font-bold text-slate-100 leading-tight">{preview.name}</h3>
           {preview.description && (
-            <p className="mt-1 text-xs text-slate-500 leading-relaxed line-clamp-2">{preview.description}</p>
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed line-clamp-2">
+              {preview.description}
+            </p>
           )}
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
@@ -472,7 +479,9 @@ function OrgPreviewPanel({ preview }: { preview: OrgPreview }) {
                     <span className="text-base leading-none">
                       {agent.level >= 10 ? "👑" : agent.level >= 7 ? "🎯" : "🤖"}
                     </span>
-                    <span className={`text-sm font-medium ${isLead ? "text-slate-200" : "text-slate-400"}`}>
+                    <span
+                      className={`text-sm font-medium ${isLead ? "text-slate-200" : "text-slate-400"}`}
+                    >
                       {agent.name}
                     </span>
                     {agent.role && (
@@ -494,7 +503,9 @@ function OrgPreviewPanel({ preview }: { preview: OrgPreview }) {
       {preview.errors.length > 0 && (
         <div className="space-y-1">
           {preview.errors.map((e, i) => (
-            <p key={i} className="text-xs text-amber-400/70">⚠ {e}</p>
+            <p key={i} className="text-xs text-amber-400/70">
+              ⚠ {e}
+            </p>
           ))}
         </div>
       )}
@@ -515,10 +526,7 @@ function TemplateCard({ template }: { template: Template }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const preview = useMemo(
-    () => parseOrgMdBrowser(template.orgMd),
-    [template.orgMd],
-  );
+  const preview = useMemo(() => parseOrgMdBrowser(template.orgMd), [template.orgMd]);
 
   // Show just the first 8 lines as a teaser
   const teaserLines = template.orgMd.split("\n").slice(0, 8).join("\n");
@@ -539,17 +547,11 @@ function TemplateCard({ template }: { template: Template }) {
                 {template.badgeLabel}
               </Badge>
             </div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-1">
-              {template.name}
-            </h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              {template.description}
-            </p>
+            <h3 className="text-lg font-semibold text-slate-100 mb-1">{template.name}</h3>
+            <p className="text-sm text-slate-400 leading-relaxed">{template.description}</p>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
-            <span className="text-3xl font-bold text-slate-100">
-              {template.agentCount}
-            </span>
+            <span className="text-3xl font-bold text-slate-100">{template.agentCount}</span>
             <span className="text-xs text-slate-500">agents</span>
           </div>
         </div>
@@ -574,14 +576,22 @@ function TemplateCard({ template }: { template: Template }) {
             <>
               <span>Collapse</span>
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clipRule="evenodd"/>
+                <path
+                  fillRule="evenodd"
+                  d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832 6.29 12.77a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z"
+                  clipRule="evenodd"
+                />
               </svg>
             </>
           ) : (
             <>
               <span>View full ORG.md</span>
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd"/>
+                <path
+                  fillRule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clipRule="evenodd"
+                />
               </svg>
             </>
           )}
@@ -607,15 +617,19 @@ function TemplateCard({ template }: { template: Template }) {
                 {copied ? (
                   <>
                     <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     Copied!
                   </>
                 ) : (
                   <>
                     <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
                     </svg>
                     Copy
                   </>
@@ -648,13 +662,10 @@ function InteractivePlayground() {
 
   const preview = useMemo(() => parseOrgMdBrowser(input), [input]);
 
-  const loadTemplate = useCallback(
-    (t: Template) => {
-      setInput(t.orgMd);
-      setActiveTemplate(t.id);
-    },
-    [],
-  );
+  const loadTemplate = useCallback((t: Template) => {
+    setInput(t.orgMd);
+    setActiveTemplate(t.id);
+  }, []);
 
   return (
     <div className="rounded-2xl border border-white/8 bg-white/[0.015] overflow-hidden">
@@ -667,7 +678,9 @@ function InteractivePlayground() {
             interactive
           </span>
         </div>
-        <span className="text-xs text-slate-500 hidden sm:block">Edit the markdown → see your org update live</span>
+        <span className="text-xs text-slate-500 hidden sm:block">
+          Edit the markdown → see your org update live
+        </span>
       </div>
 
       {/* Quick-load template pills */}
@@ -724,7 +737,8 @@ function InteractivePlayground() {
             ) : (
               <div className="flex h-full items-center justify-center">
                 <p className="text-sm text-slate-600 text-center leading-relaxed">
-                  Start typing your ORG.md<br />
+                  Start typing your ORG.md
+                  <br />
                   to see the live preview →
                 </p>
               </div>
@@ -735,13 +749,11 @@ function InteractivePlayground() {
 
       {/* Footer hint */}
       <div className="px-5 py-3 border-t border-white/5 bg-black/10 text-xs text-slate-600">
-        💡 Tip: Use{" "}
-        <code className="font-mono text-slate-500">## Structure</code> with{" "}
+        💡 Tip: Use <code className="font-mono text-slate-500">## Structure</code> with{" "}
         <code className="font-mono text-slate-500">### Department</code> and{" "}
-        <code className="font-mono text-slate-500">#### Agent — Role</code>{" "}
-        headers. Add{" "}
-        <code className="font-mono text-slate-500">- **Count:** 3</code> to
-        spawn multiple identical agents.
+        <code className="font-mono text-slate-500">#### Agent — Role</code> headers. Add{" "}
+        <code className="font-mono text-slate-500">- **Count:** 3</code> to spawn multiple identical
+        agents.
       </div>
     </div>
   );
@@ -769,9 +781,9 @@ export function TemplatesPage() {
             <span className="gradient-text">Starter Orgs</span>
           </h1>
           <p className="mx-auto max-w-xl text-lg text-slate-400 leading-relaxed md:text-xl">
-            Seven industry-ready ORG.md templates. SaaS onboarding, incident response, legal
-            review, compliance, live ops, e-commerce, and clinical trials — pick one and
-            have agents running in minutes.
+            Seven industry-ready ORG.md templates. SaaS onboarding, incident response, legal review,
+            compliance, live ops, e-commerce, and clinical trials — pick one and have agents running
+            in minutes.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
@@ -794,13 +806,9 @@ export function TemplatesPage() {
       <section className="py-8 pb-16">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center gap-4">
-            <h2 className="text-2xl font-bold text-slate-100">
-              Template Gallery
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-100">Template Gallery</h2>
             <div className="h-px flex-1 bg-white/5" />
-            <span className="text-sm text-slate-500">
-              {TEMPLATES.length} industry templates
-            </span>
+            <span className="text-sm text-slate-500">{TEMPLATES.length} industry templates</span>
           </div>
 
           <div className="space-y-4">
@@ -819,12 +827,11 @@ export function TemplatesPage() {
               interactive preview
             </p>
             <h2 className="mb-4 text-3xl font-bold text-slate-100 md:text-4xl">
-              See your org{" "}
-              <span className="gradient-text">come to life</span>
+              See your org <span className="gradient-text">come to life</span>
             </h2>
             <p className="mx-auto max-w-lg text-slate-400 leading-relaxed">
-              Paste any ORG.md and watch the parsed structure appear instantly.
-              This is exactly what OpenSpawn reads when you run{" "}
+              Paste any ORG.md and watch the parsed structure appear instantly. This is exactly what
+              OpenSpawn reads when you run{" "}
               <code className="font-mono text-cyan-400">openspawn start</code>.
             </p>
           </div>

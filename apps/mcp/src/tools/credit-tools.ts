@@ -19,7 +19,7 @@ export function registerCreditTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.spendCredits(params.amount, params.reason);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -32,6 +32,6 @@ export function registerCreditTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.getCreditHistory(params.limit, params.offset);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 }

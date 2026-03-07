@@ -46,7 +46,8 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: "px-8 py-3.5 text-lg rounded-xl",
 };
 
-const baseStyles = "inline-flex items-center justify-center gap-2 transition-all duration-150 no-underline";
+const baseStyles =
+  "inline-flex items-center justify-center gap-2 transition-all duration-150 no-underline";
 
 function classes(variant: ButtonVariant, size: ButtonSize, extra: string) {
   return `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${extra}`;
@@ -64,7 +65,14 @@ export function Button(props: Props) {
   const { variant = "primary", size = "md", children, className = "", as: tag } = props;
 
   if (tag === "a") {
-    const { as: _as, variant: _v, size: _s, children: _c, className: _cl, ...rest } = props as AnchorProps;
+    const {
+      as: _as,
+      variant: _v,
+      size: _s,
+      children: _c,
+      className: _cl,
+      ...rest
+    } = props as AnchorProps;
     return (
       <a className={classes(variant, size, className)} {...rest}>
         {children}
@@ -72,7 +80,14 @@ export function Button(props: Props) {
     );
   }
 
-  const { as: _as, variant: _v, size: _s, children: _c, className: _cl, ...rest } = props as ButtonProps;
+  const {
+    as: _as,
+    variant: _v,
+    size: _s,
+    children: _c,
+    className: _cl,
+    ...rest
+  } = props as ButtonProps;
   return (
     <button type="button" className={classes(variant, size, className)} {...rest}>
       {children}

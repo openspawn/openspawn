@@ -3,7 +3,15 @@ import { Key, Plus, Trash2, Copy, Loader2, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { Dialog, DialogPopup, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import {
+  Dialog,
+  DialogPopup,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 interface ApiKey {
   id: string;
@@ -53,10 +61,10 @@ export function ApiKeySettings() {
     //   const { secret, key } = await apiClient.createApiKey({ name, scopes })
     // The server should return the actual secret (shown once) and key metadata.
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     const mockSecret = `osp_${Math.random().toString(36).substring(2)}${Math.random().toString(36).substring(2)}`;
     setNewKeySecret(mockSecret);
-    
+
     const newKey: ApiKey = {
       id: Math.random().toString(),
       name: newKeyName,
@@ -66,7 +74,7 @@ export function ApiKeySettings() {
       expiresAt: null,
       createdAt: new Date().toISOString(),
     };
-    
+
     setApiKeys([newKey, ...apiKeys]);
     setIsCreating(false);
   };
@@ -108,9 +116,7 @@ export function ApiKeySettings() {
             <Key className="h-5 w-5" />
             API Keys
           </CardTitle>
-          <CardDescription>
-            Manage API keys for programmatic access
-          </CardDescription>
+          <CardDescription>Manage API keys for programmatic access</CardDescription>
         </div>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
@@ -131,11 +137,7 @@ export function ApiKeySettings() {
                 <div className="my-4 rounded-lg bg-muted p-4">
                   <div className="flex items-center justify-between gap-2">
                     <code className="text-sm break-all">{newKeySecret}</code>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCopyKey(newKeySecret)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => handleCopyKey(newKeySecret)}>
                       {copiedKey === newKeySecret ? (
                         <Check className="h-4 w-4 text-emerald-500" />
                       ) : (
@@ -246,13 +248,9 @@ export function ApiKeySettings() {
                   <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="font-mono">{key.keyPrefix}...</span>
                     <span>Created {formatDate(key.createdAt)}</span>
-                    {key.lastUsedAt && (
-                      <span>Last used {formatDate(key.lastUsedAt)}</span>
-                    )}
+                    {key.lastUsedAt && <span>Last used {formatDate(key.lastUsedAt)}</span>}
                     {key.expiresAt && (
-                      <span className="text-amber-500">
-                        Expires {formatDate(key.expiresAt)}
-                      </span>
+                      <span className="text-amber-500">Expires {formatDate(key.expiresAt)}</span>
                     )}
                   </div>
                 </div>

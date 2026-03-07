@@ -32,7 +32,13 @@ function SpongeBobIcon({ size = 64 }: { size?: number }) {
       {/* Nose */}
       <ellipse cx="32" cy="35" rx="3" ry="2" fill="#e8a020" />
       {/* Smile */}
-      <path d="M24 40 Q32 46 40 40" stroke="#1a1a0e" strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path
+        d="M24 40 Q32 46 40 40"
+        stroke="#1a1a0e"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
       {/* Teeth */}
       <rect x="28" y="40" width="4" height="4" rx="1" fill="white" />
       <rect x="33" y="40" width="4" height="4" rx="1" fill="white" />
@@ -133,7 +139,7 @@ export function OgBikiniBottom() {
           key={i}
           style={{
             position: "absolute",
-            left: `${((i * 41) % 100)}%`,
+            left: `${(i * 41) % 100}%`,
             top: `${20 + ((i * 37) % 30)}%`,
             width: 3,
             height: 3,
@@ -213,8 +219,8 @@ export function OgBikiniBottom() {
             22 SpongeBob agents running a real company
           </p>
           <p style={{ fontSize: 17, color: "rgba(26,26,14,0.55)", margin: 0 }}>
-            Powered by{" "}
-            <strong style={{ color: "#1a1a0e" }}>OpenSpawn</strong> · 5 departments · Real-time
+            Powered by <strong style={{ color: "#1a1a0e" }}>OpenSpawn</strong> · 5 departments ·
+            Real-time
           </p>
         </div>
 

@@ -16,25 +16,86 @@ export function DeviceOrchestrationIllustration({ className = "" }: { className?
       {/* Hub glow */}
       <circle cx="50" cy="50" r="14" fill="rgba(6,182,212,0.12)" />
       {/* Hub ring */}
-      <circle cx="50" cy="50" r="10" stroke="#22d3ee" strokeWidth="1.5" fill="rgba(6,182,212,0.08)" />
+      <circle
+        cx="50"
+        cy="50"
+        r="10"
+        stroke="#22d3ee"
+        strokeWidth="1.5"
+        fill="rgba(6,182,212,0.08)"
+      />
       {/* Hub dot */}
       <circle cx="50" cy="50" r="4" fill="#22d3ee" />
 
       {/* ── Connection lines (spokes) ────────────────────────────────────── */}
       {/* To phone top-left */}
-      <line x1="43" y1="43" x2="26" y2="26" stroke="#22d3ee" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" />
+      <line
+        x1="43"
+        y1="43"
+        x2="26"
+        y2="26"
+        stroke="#22d3ee"
+        strokeWidth="1"
+        strokeDasharray="2,2"
+        opacity="0.5"
+      />
       {/* To camera top-right */}
-      <line x1="57" y1="43" x2="74" y2="26" stroke="#06b6d4" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" />
+      <line
+        x1="57"
+        y1="43"
+        x2="74"
+        y2="26"
+        stroke="#06b6d4"
+        strokeWidth="1"
+        strokeDasharray="2,2"
+        opacity="0.5"
+      />
       {/* To IoT bottom-left */}
-      <line x1="43" y1="57" x2="24" y2="72" stroke="#22d3ee" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" />
+      <line
+        x1="43"
+        y1="57"
+        x2="24"
+        y2="72"
+        stroke="#22d3ee"
+        strokeWidth="1"
+        strokeDasharray="2,2"
+        opacity="0.5"
+      />
       {/* To screen bottom-right */}
-      <line x1="57" y1="57" x2="76" y2="72" stroke="#06b6d4" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" />
+      <line
+        x1="57"
+        y1="57"
+        x2="76"
+        y2="72"
+        stroke="#06b6d4"
+        strokeWidth="1"
+        strokeDasharray="2,2"
+        opacity="0.5"
+      />
       {/* To phone bottom-center */}
-      <line x1="50" y1="60" x2="50" y2="76" stroke="#22d3ee" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" />
+      <line
+        x1="50"
+        y1="60"
+        x2="50"
+        y2="76"
+        stroke="#22d3ee"
+        strokeWidth="1"
+        strokeDasharray="2,2"
+        opacity="0.5"
+      />
 
       {/* ── Phone (top-left) ────────────────────────────────────────────── */}
       <g transform="translate(14, 14)">
-        <rect x="0" y="0" width="14" height="22" rx="2.5" fill="rgba(34,211,238,0.10)" stroke="#22d3ee" strokeWidth="1.2" />
+        <rect
+          x="0"
+          y="0"
+          width="14"
+          height="22"
+          rx="2.5"
+          fill="rgba(34,211,238,0.10)"
+          stroke="#22d3ee"
+          strokeWidth="1.2"
+        />
         {/* Screen */}
         <rect x="1.5" y="3" width="11" height="14" rx="1" fill="rgba(34,211,238,0.15)" />
         {/* Home button */}
@@ -47,20 +108,54 @@ export function DeviceOrchestrationIllustration({ className = "" }: { className?
       {/* ── Camera (top-right) ──────────────────────────────────────────── */}
       <g transform="translate(68, 12)">
         {/* Camera body */}
-        <rect x="0" y="4" width="20" height="14" rx="2.5" fill="rgba(6,182,212,0.10)" stroke="#06b6d4" strokeWidth="1.2" />
+        <rect
+          x="0"
+          y="4"
+          width="20"
+          height="14"
+          rx="2.5"
+          fill="rgba(6,182,212,0.10)"
+          stroke="#06b6d4"
+          strokeWidth="1.2"
+        />
         {/* Lens */}
-        <circle cx="10" cy="11" r="4.5" fill="rgba(6,182,212,0.08)" stroke="#06b6d4" strokeWidth="1" />
+        <circle
+          cx="10"
+          cy="11"
+          r="4.5"
+          fill="rgba(6,182,212,0.08)"
+          stroke="#06b6d4"
+          strokeWidth="1"
+        />
         <circle cx="10" cy="11" r="2.5" fill="rgba(6,182,212,0.20)" />
         {/* Flash */}
         <rect x="14.5" y="6" width="3" height="2" rx="0.5" fill="rgba(6,182,212,0.35)" />
         {/* Bump/mode dial */}
-        <rect x="3" y="2" width="6" height="3" rx="1" fill="rgba(6,182,212,0.10)" stroke="#06b6d4" strokeWidth="0.8" />
+        <rect
+          x="3"
+          y="2"
+          width="6"
+          height="3"
+          rx="1"
+          fill="rgba(6,182,212,0.10)"
+          stroke="#06b6d4"
+          strokeWidth="0.8"
+        />
       </g>
 
       {/* ── IoT Sensor (bottom-left) ────────────────────────────────────── */}
       <g transform="translate(14, 66)">
         {/* Sensor body */}
-        <rect x="0" y="0" width="18" height="18" rx="3" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" strokeWidth="1.2" />
+        <rect
+          x="0"
+          y="0"
+          width="18"
+          height="18"
+          rx="3"
+          fill="rgba(34,211,238,0.08)"
+          stroke="#22d3ee"
+          strokeWidth="1.2"
+        />
         {/* Signal waves */}
         <path d="M4 14 Q9 8 14 14" stroke="#22d3ee" strokeWidth="1" fill="none" opacity="0.4" />
         <path d="M2 16 Q9 6 16 16" stroke="#22d3ee" strokeWidth="1" fill="none" opacity="0.25" />
@@ -74,7 +169,16 @@ export function DeviceOrchestrationIllustration({ className = "" }: { className?
       {/* ── Screen/Desktop (bottom-right) ───────────────────────────────── */}
       <g transform="translate(66, 66)">
         {/* Monitor */}
-        <rect x="0" y="0" width="22" height="15" rx="2" fill="rgba(6,182,212,0.10)" stroke="#06b6d4" strokeWidth="1.2" />
+        <rect
+          x="0"
+          y="0"
+          width="22"
+          height="15"
+          rx="2"
+          fill="rgba(6,182,212,0.10)"
+          stroke="#06b6d4"
+          strokeWidth="1.2"
+        />
         {/* Screen content */}
         <rect x="1.5" y="1.5" width="19" height="12" rx="1" fill="rgba(6,182,212,0.08)" />
         {/* Screen bars */}
@@ -87,7 +191,16 @@ export function DeviceOrchestrationIllustration({ className = "" }: { className?
 
       {/* ── Phone (bottom-center) ───────────────────────────────────────── */}
       <g transform="translate(43.5, 76)">
-        <rect x="0" y="0" width="13" height="20" rx="2" fill="rgba(34,211,238,0.10)" stroke="#22d3ee" strokeWidth="1.2" />
+        <rect
+          x="0"
+          y="0"
+          width="13"
+          height="20"
+          rx="2"
+          fill="rgba(34,211,238,0.10)"
+          stroke="#22d3ee"
+          strokeWidth="1.2"
+        />
         <rect x="1.5" y="2.5" width="10" height="12" rx="0.8" fill="rgba(34,211,238,0.12)" />
         <circle cx="6.5" cy="17.5" r="1.2" fill="rgba(34,211,238,0.35)" />
       </g>

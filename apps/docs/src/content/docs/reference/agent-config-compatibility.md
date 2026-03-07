@@ -87,13 +87,13 @@ org/
 
 ### 1.2 What Each Directory Does
 
-| Path | Purpose | Who creates it |
-|------|---------|---------------|
-| `ORG.md` | Org structure, culture, policies | Human (org designer) |
-| `agents/_defaults/` | Shared config inherited by all agents | Human or COO |
-| `agents/<name>/` | Per-agent configuration overrides | Human, manager, or self |
-| `playbooks/` | Shared procedures referenced by agents | Human or COO |
-| `snapshots/` | Point-in-time captures for rollback | System (on command) |
+| Path                | Purpose                                | Who creates it          |
+| ------------------- | -------------------------------------- | ----------------------- |
+| `ORG.md`            | Org structure, culture, policies       | Human (org designer)    |
+| `agents/_defaults/` | Shared config inherited by all agents  | Human or COO            |
+| `agents/<name>/`    | Per-agent configuration overrides      | Human, manager, or self |
+| `playbooks/`        | Shared procedures referenced by agents | Human or COO            |
+| `snapshots/`        | Point-in-time captures for rollback    | System (on command)     |
 
 ### 1.3 Minimal Viable Org
 
@@ -127,12 +127,12 @@ When the system loads config for agent `dennis`:
 
 This applies to every config file independently:
 
-| File | Dennis has it? | _defaults has it? | Result |
-|------|:-:|:-:|--------|
-| SOUL.md | ✅ | ✅ | Dennis's SOUL.md (override) |
-| AGENTS.md | ❌ | ✅ | _defaults AGENTS.md (inherited) |
-| TOOLS.md | ❌ | ❌ | No TOOLS.md (absent) |
-| MEMORY.md | ✅ | ❌ | Dennis's MEMORY.md (unique) |
+| File      | Dennis has it? | \_defaults has it? | Result                           |
+| --------- | :------------: | :----------------: | -------------------------------- |
+| SOUL.md   |       ✅       |         ✅         | Dennis's SOUL.md (override)      |
+| AGENTS.md |       ❌       |         ✅         | \_defaults AGENTS.md (inherited) |
+| TOOLS.md  |       ❌       |         ❌         | No TOOLS.md (absent)             |
+| MEMORY.md |       ✅       |         ❌         | Dennis's MEMORY.md (unique)      |
 
 ### 2.2 Override, Not Merge
 
@@ -163,19 +163,19 @@ Every OpenClaw config file has a defined role. BikiniBottom uses them identicall
 
 ### 3.1 File Mapping
 
-| OpenClaw File | Purpose | BikiniBottom Role | Who Edits |
-|---------------|---------|-------------------|-----------|
-| `SOUL.md` | Personality, voice, communication style, strengths | Agent identity — how it thinks, speaks, and approaches work | Human, manager (approved) |
-| `AGENTS.md` | Workspace rules, conventions, safety constraints | Operational rules — what the agent can/can't do, how it behaves in the workspace | Human, manager |
-| `TOOLS.md` | Tool-specific notes (camera names, SSH hosts) | Environment config — local details that tools need | Agent (self), human |
-| `MEMORY.md` | Long-term curated memory | Persistent knowledge — lessons learned, key decisions, important context | Agent (self) |
-| `memory/*.md` | Daily operational notes | Session logs — raw notes from each day's work | Agent (self, auto) |
-| `HEARTBEAT.md` | Periodic check tasks | Heartbeat checklist — what to do on scheduled wake-ups | Agent (self), manager |
-| `IDENTITY.md` | Name, role, emoji, avatar | Agent metadata — used for display and routing | Human, manager |
+| OpenClaw File  | Purpose                                            | BikiniBottom Role                                                                | Who Edits                 |
+| -------------- | -------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------- |
+| `SOUL.md`      | Personality, voice, communication style, strengths | Agent identity — how it thinks, speaks, and approaches work                      | Human, manager (approved) |
+| `AGENTS.md`    | Workspace rules, conventions, safety constraints   | Operational rules — what the agent can/can't do, how it behaves in the workspace | Human, manager            |
+| `TOOLS.md`     | Tool-specific notes (camera names, SSH hosts)      | Environment config — local details that tools need                               | Agent (self), human       |
+| `MEMORY.md`    | Long-term curated memory                           | Persistent knowledge — lessons learned, key decisions, important context         | Agent (self)              |
+| `memory/*.md`  | Daily operational notes                            | Session logs — raw notes from each day's work                                    | Agent (self, auto)        |
+| `HEARTBEAT.md` | Periodic check tasks                               | Heartbeat checklist — what to do on scheduled wake-ups                           | Agent (self), manager     |
+| `IDENTITY.md`  | Name, role, emoji, avatar                          | Agent metadata — used for display and routing                                    | Human, manager            |
 
 ### 3.2 SOUL.md — The Critical File
 
-SOUL.md is the most important config file. It defines how the agent *thinks* — its reasoning style, communication preferences, and domain expertise.
+SOUL.md is the most important config file. It defines how the agent _thinks_ — its reasoning style, communication preferences, and domain expertise.
 
 **Example for a COO agent:**
 
@@ -183,26 +183,31 @@ SOUL.md is the most important config file. It defines how the agent *thinks* —
 # Dennis — Chief Operating Officer
 
 ## Who You Are
-You are the operational backbone of the organization. You translate the human 
+
+You are the operational backbone of the organization. You translate the human
 principal's intent into structured work, delegate to department leads, and ensure
 nothing falls through the cracks.
 
 ## How You Think
+
 - Strategic first: always consider the org-wide impact before acting
 - Data-driven: cite metrics when making delegation decisions
 - Decisive: when you have enough information, act. Don't over-deliberate.
 
 ## How You Communicate
+
 - Direct and clear. No fluff.
 - Use structured formats (bullet lists, numbered steps) for delegations
 - When escalating to the human: lead with the decision needed, then context
 
 ## Your Strengths
+
 - Cross-department coordination
 - Priority triage
 - Resource allocation
 
 ## Your Boundaries
+
 - You don't do the work yourself — you delegate
 - You don't skip levels — work through your leads
 - You escalate to the human for: budget overruns, org structure changes, policy decisions
@@ -216,16 +221,19 @@ nothing falls through the cracks.
 # Workspace Rules
 
 ## Safety
+
 - Never commit directly to main — always use branches
 - Don't delete data without explicit confirmation
 - Escalate if unsure about a destructive action
 
 ## Conventions
+
 - Use ISO 8601 for dates
 - Write memory notes in markdown
 - Keep daily notes concise — bullet points, not essays
 
 ## ACP Behavior
+
 - Always acknowledge delegated tasks immediately
 - Progress updates on phase changes only
 - Escalate blockers within 2 ticks — don't spin
@@ -256,19 +264,19 @@ Agents in an org should be able to evolve their own configuration — but not wi
 
 ### 4.1 Permission Ladder
 
-| Action | Required Level | Approval | Rationale |
-|--------|:-:|--------|-----------|
-| Edit own `memory/*.md` | Any | Auto | It's their memory — daily notes are personal |
-| Edit own `MEMORY.md` | Any | Auto | Long-term memory is self-curated |
-| Edit own `TOOLS.md` | Any | Auto | Local environment notes are agent-specific |
-| Edit own `HEARTBEAT.md` | Any | Auto | Agents manage their own check routines |
-| Propose `SOUL.md` change | Any | Manager approves | Identity changes need oversight |
-| Edit own `SOUL.md` | L6+ | Auto, logged | Seniors trusted to self-modify, with audit trail |
-| Propose `AGENTS.md` change | Any | Manager approves | Rule changes need oversight |
-| Propose model upgrade | Any | Manager + budget check | Cost implications need approval |
-| Request new tool/permission | Any | Manager approves | Security implications need review |
-| Modify team config | L9+ | Human approves | Org-level changes are human decisions |
-| Modify `ORG.md` | Nobody | Human only | The org structure is the human's domain |
+| Action                      | Required Level | Approval               | Rationale                                        |
+| --------------------------- | :------------: | ---------------------- | ------------------------------------------------ |
+| Edit own `memory/*.md`      |      Any       | Auto                   | It's their memory — daily notes are personal     |
+| Edit own `MEMORY.md`        |      Any       | Auto                   | Long-term memory is self-curated                 |
+| Edit own `TOOLS.md`         |      Any       | Auto                   | Local environment notes are agent-specific       |
+| Edit own `HEARTBEAT.md`     |      Any       | Auto                   | Agents manage their own check routines           |
+| Propose `SOUL.md` change    |      Any       | Manager approves       | Identity changes need oversight                  |
+| Edit own `SOUL.md`          |      L6+       | Auto, logged           | Seniors trusted to self-modify, with audit trail |
+| Propose `AGENTS.md` change  |      Any       | Manager approves       | Rule changes need oversight                      |
+| Propose model upgrade       |      Any       | Manager + budget check | Cost implications need approval                  |
+| Request new tool/permission |      Any       | Manager approves       | Security implications need review                |
+| Modify team config          |      L9+       | Human approves         | Org-level changes are human decisions            |
+| Modify `ORG.md`             |     Nobody     | Human only             | The org structure is the human's domain          |
 
 ### 4.2 Config Request Protocol
 
@@ -276,23 +284,23 @@ A new ACP message type for configuration changes:
 
 ```typescript
 interface ConfigRequest {
-  type: 'config_request';
-  from: string;           // agentId requesting the change
-  to: string;             // managerId who approves
-  file: string;           // Which file to modify
-  action: 'create' | 'update' | 'delete';
-  proposed: string;       // New content (for create/update)
-  reason: string;         // Why the change is needed
+  type: "config_request";
+  from: string; // agentId requesting the change
+  to: string; // managerId who approves
+  file: string; // Which file to modify
+  action: "create" | "update" | "delete";
+  proposed: string; // New content (for create/update)
+  reason: string; // Why the change is needed
   timestamp: number;
 }
 
 interface ConfigResponse {
-  type: 'config_response';
-  from: string;           // managerId
-  to: string;             // agentId who requested
-  requestId: string;      // Links to original request
+  type: "config_response";
+  from: string; // managerId
+  to: string; // agentId who requested
+  requestId: string; // Links to original request
   approved: boolean;
-  feedback?: string;      // Why rejected, or notes on approval
+  feedback?: string; // Why rejected, or notes on approval
   timestamp: number;
 }
 ```
@@ -307,10 +315,10 @@ Backend Worker 1 → Engineering Lead:
   to: 'engineering-lead',
   file: 'SOUL.md',
   action: 'update',
-  proposed: '# Backend Specialist\n\n## Who You Are\nYou specialize in API design 
+  proposed: '# Backend Specialist\n\n## Who You Are\nYou specialize in API design
     and database optimization. You also handle data pipeline tasks when needed.\n...',
-  reason: 'I keep receiving data pipeline tasks but my SOUL.md only mentions API 
-    and database work. Adding data pipelines to my identity would improve my 
+  reason: 'I keep receiving data pipeline tasks but my SOUL.md only mentions API
+    and database work. Adding data pipelines to my identity would improve my
     task handling.',
   timestamp: 1707609600
 }
@@ -380,6 +388,7 @@ snapshots/2026-02-11T00-14-00/
 ```
 
 `meta.json`:
+
 ```json
 {
   "timestamp": "2026-02-11T00:14:00Z",
@@ -415,6 +424,7 @@ bikinibottom rollback 2026-02-10T18-00-00 --dry-run
 ```
 
 Rollback applies the snapshot's config state to the running org:
+
 - Agents added since the snapshot are gracefully wound down
 - Agents removed since the snapshot are respawned
 - Config changes are reverted
@@ -467,6 +477,7 @@ bikinibottom import-agent ~/my-standalone-agent/ --name "new-analyst" --role "Da
 ```
 
 The import tool:
+
 1. Copies the agent's config files to `org/agents/new-analyst/`
 2. Resolves file naming differences (see 6.3)
 3. Adds the agent to ORG.md under the specified manager
@@ -474,13 +485,13 @@ The import tool:
 
 ### 6.3 File Naming Compatibility
 
-| OpenClaw Standard | Claude Agent Teams | BikiniBottom | Import Behavior |
-|---|----|---|---|
-| `SOUL.md` | — | `SOUL.md` | Direct copy |
-| `AGENTS.md` | `CLAUDE.md` | `AGENTS.md` | Rename `CLAUDE.md` → `AGENTS.md` |
-| `TOOLS.md` | — | `TOOLS.md` | Direct copy |
-| `MEMORY.md` | — | `MEMORY.md` | Direct copy |
-| `memory/*.md` | — | `memory/*.md` | Direct copy |
+| OpenClaw Standard | Claude Agent Teams | BikiniBottom  | Import Behavior                  |
+| ----------------- | ------------------ | ------------- | -------------------------------- |
+| `SOUL.md`         | —                  | `SOUL.md`     | Direct copy                      |
+| `AGENTS.md`       | `CLAUDE.md`        | `AGENTS.md`   | Rename `CLAUDE.md` → `AGENTS.md` |
+| `TOOLS.md`        | —                  | `TOOLS.md`    | Direct copy                      |
+| `MEMORY.md`       | —                  | `MEMORY.md`   | Direct copy                      |
+| `memory/*.md`     | —                  | `memory/*.md` | Direct copy                      |
 
 The key rename: Claude Agent Teams uses `CLAUDE.md` for workspace rules. OpenClaw and BikiniBottom use `AGENTS.md`. Same purpose, different name. The import tool handles this automatically.
 
@@ -524,22 +535,27 @@ Playbooks are markdown files that describe procedures any agent can reference. T
 
 ```markdown
 <!-- playbooks/escalation.md -->
+
 # Escalation Procedure
 
 ## When to Escalate
+
 - You're blocked and can't make progress
 - The task is outside your domain expertise
 - You'd exceed your credit budget to complete it
 - You have low confidence in your output
 
 ## How to Escalate
+
 1. Set task status to BLOCKED
 2. Send escalation message to your direct manager
 3. Include: what you tried, why it failed, what you need
 4. Do NOT skip levels — always go to your direct manager first
 
 ## What Happens Next
+
 Your manager will either:
+
 - Provide what you need and unblock you
 - Reassign the task to someone better suited
 - Escalate further up the chain
@@ -549,6 +565,7 @@ Your manager will either:
 ### 7.2 Playbook Injection
 
 Playbooks are injected into agent context when relevant:
+
 - `escalation.md` → injected when agent encounters a blocker
 - `onboarding.md` → injected for newly spawned agents
 - `weekly-review.md` → injected during scheduled reviews
@@ -575,4 +592,4 @@ The injection is context-aware — agents don't carry all playbooks at all times
 
 ---
 
-*Agent configuration should be boring. Not because it doesn't matter — because the format should be so obvious and standard that you spend zero time thinking about it and all your time thinking about what the agents actually do. OpenClaw got this right. BikiniBottom builds on it.*
+_Agent configuration should be boring. Not because it doesn't matter — because the format should be so obvious and standard that you spend zero time thinking about it and all your time thinking about what the agents actually do. OpenClaw got this right. BikiniBottom builds on it._

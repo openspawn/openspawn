@@ -2,9 +2,9 @@
  * TeamBadge — small colored pill showing team name.
  * Uses the team color from demo/teams.ts.
  */
-import { useMemo } from 'react';
-import { getTeamById, getTeamColor, type Team } from '../demo/teams';
-import { cn } from '../lib/utils';
+import { useMemo } from "react";
+import { getTeamById, getTeamColor, type Team } from "../demo/teams";
+import { cn } from "../lib/utils";
 
 interface TeamBadgeProps {
   teamId: string | undefined | null;
@@ -23,8 +23,8 @@ export function TeamBadge({ teamId, className, compact }: TeamBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] md:text-xs font-medium border whitespace-nowrap',
-        compact && 'px-1.5',
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] md:text-xs font-medium border whitespace-nowrap",
+        compact && "px-1.5",
         className,
       )}
       style={{
@@ -52,18 +52,13 @@ interface TeamFilterDropdownProps {
   className?: string;
 }
 
-export function TeamFilterDropdown({
-  value,
-  onChange,
-  teams,
-  className,
-}: TeamFilterDropdownProps) {
+export function TeamFilterDropdown({ value, onChange, teams, className }: TeamFilterDropdownProps) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        'px-3 pr-8 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0',
+        "px-3 pr-8 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0",
         className,
       )}
     >

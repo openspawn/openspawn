@@ -76,19 +76,20 @@ interface LayoutProps {
 /** Routes that should span full width with no max-width or padding constraints */
 const fullBleedRoutes = new Set(["/network", "/messages"]);
 
-const navigation: { name: string; href: string; icon: typeof LayoutDashboard; tourId?: string }[] = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard" },
-  { name: "Network", href: "/network", icon: Network, tourId: "network" },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks" },
-  { name: "Kanban", href: "/kanban", icon: Layers },
-  { name: "Task Board", href: "/task-board", icon: ClipboardList },
-  { name: "Agents", href: "/agents", icon: Users, tourId: "agents" },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
-  { name: "Model Router", href: "/router", icon: GitBranch },
-  { name: "Credits", href: "/credits", icon: Coins },
-  { name: "Events", href: "/events", icon: Activity },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
+const navigation: { name: string; href: string; icon: typeof LayoutDashboard; tourId?: string }[] =
+  [
+    { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard" },
+    { name: "Network", href: "/network", icon: Network, tourId: "network" },
+    { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks" },
+    { name: "Kanban", href: "/kanban", icon: Layers },
+    { name: "Task Board", href: "/task-board", icon: ClipboardList },
+    { name: "Agents", href: "/agents", icon: Users, tourId: "agents" },
+    { name: "Messages", href: "/messages", icon: MessageSquare },
+    { name: "Model Router", href: "/router", icon: GitBranch },
+    { name: "Credits", href: "/credits", icon: Coins },
+    { name: "Events", href: "/events", icon: Activity },
+    { name: "Settings", href: "/settings", icon: Settings },
+  ];
 
 // Bottom nav items for mobile (subset of main nav)
 const bottomNavItems: { name: string; href: string; icon: typeof LayoutDashboard }[] = [
@@ -115,7 +116,11 @@ function useSidebarCollapsed() {
   const toggle = useCallback(() => {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next)); } catch { /* noop */ }
+      try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
+      } catch {
+        /* noop */
+      }
       return next;
     });
   }, []);
@@ -202,7 +207,7 @@ export function Layout({ children }: LayoutProps) {
         {isBBTheme && (
           <div
             className="fixed inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: 'url(/app/bikini-bottom-bg.jpg)', opacity: 0.06 }}
+            style={{ backgroundImage: "url(/app/bikini-bottom-bg.jpg)", opacity: 0.06 }}
             aria-hidden="true"
           />
         )}
@@ -213,9 +218,17 @@ export function Layout({ children }: LayoutProps) {
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
         >
           {/* Logo */}
-          <div className={cn("flex h-16 items-center gap-2 border-b border-border relative overflow-hidden", sidebarCollapsed ? "justify-center px-2" : "px-4")}>
+          <div
+            className={cn(
+              "flex h-16 items-center gap-2 border-b border-border relative overflow-hidden",
+              sidebarCollapsed ? "justify-center px-2" : "px-4",
+            )}
+          >
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
-            <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
+            <Logo
+              size="sm"
+              style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined}
+            />
             {!sidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
@@ -245,7 +258,13 @@ export function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 const linkContent = (
-                  <Link key={item.name} to={item.href} className="relative block" data-testid={`nav-link-${item.name.toLowerCase()}`} {...(item.tourId ? { 'data-tour': item.tourId } : {})}>
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="relative block"
+                    data-testid={`nav-link-${item.name.toLowerCase()}`}
+                    {...(item.tourId ? { "data-tour": item.tourId } : {})}
+                  >
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active"
@@ -258,7 +277,7 @@ export function Layout({ children }: LayoutProps) {
                       className={cn(
                         "w-full relative z-10",
                         sidebarCollapsed ? "justify-center px-0" : "justify-start gap-3",
-                        isActive && "text-primary hover:bg-transparent"
+                        isActive && "text-primary hover:bg-transparent",
                       )}
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -293,51 +312,52 @@ export function Layout({ children }: LayoutProps) {
           </ScrollArea>
 
           {/* Demo Toggle — hidden in sandbox mode (bikinibottom.ai) */}
-          {!isSandboxMode && (!sidebarCollapsed ? (
-            <div className="border-t border-border p-3">
-              <Button
-                onClick={handleToggleDemo}
-                variant={isDemo ? "default" : "outline"}
-                size="sm"
-                className="w-full gap-2"
-              >
-                {isDemo ? (
-                  <>
-                    <Square className="h-3 w-3" />
-                    Exit Demo
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-3 w-3" />
-                    Demo Mode
-                  </>
+          {!isSandboxMode &&
+            (!sidebarCollapsed ? (
+              <div className="border-t border-border p-3">
+                <Button
+                  onClick={handleToggleDemo}
+                  variant={isDemo ? "default" : "outline"}
+                  size="sm"
+                  className="w-full gap-2"
+                >
+                  {isDemo ? (
+                    <>
+                      <Square className="h-3 w-3" />
+                      Exit Demo
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-3 w-3" />
+                      Demo Mode
+                    </>
+                  )}
+                </Button>
+                {isDemo && (
+                  <div className="mt-2">
+                    <DemoControls compact />
+                  </div>
                 )}
-              </Button>
-              {isDemo && (
-                <div className="mt-2">
-                  <DemoControls compact />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="border-t border-border p-2 flex justify-center">
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleToggleDemo}
-                    variant={isDemo ? "default" : "outline"}
-                    size="icon"
-                    className="h-8 w-8"
-                  >
-                    {isDemo ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>
-                  {isDemo ? "Exit Demo" : "Demo Mode"}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          ))}
+              </div>
+            ) : (
+              <div className="border-t border-border p-2 flex justify-center">
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleToggleDemo}
+                      variant={isDemo ? "default" : "outline"}
+                      size="icon"
+                      className="h-8 w-8"
+                    >
+                      {isDemo ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={8}>
+                    {isDemo ? "Exit Demo" : "Demo Mode"}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            ))}
 
           {/* Help Links */}
           {!sidebarCollapsed ? (
@@ -387,7 +407,9 @@ export function Layout({ children }: LayoutProps) {
                     <BookOpen className="h-4 w-4" />
                   </a>
                 </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>Documentation</TooltipContent>
+                <TooltipContent side="right" sideOffset={8}>
+                  Documentation
+                </TooltipContent>
               </Tooltip>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -400,14 +422,16 @@ export function Layout({ children }: LayoutProps) {
                     <Github className="h-4 w-4" />
                   </a>
                 </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>GitHub</TooltipContent>
+                <TooltipContent side="right" sideOffset={8}>
+                  GitHub
+                </TooltipContent>
               </Tooltip>
             </div>
           )}
 
           {/* Protocol Status */}
-          {isSandboxMode && (
-            !sidebarCollapsed ? (
+          {isSandboxMode &&
+            (!sidebarCollapsed ? (
               <div className="border-t border-border px-3 py-2 space-y-2">
                 <ProtocolStatus />
                 <ProtocolActivity />
@@ -416,8 +440,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="border-t border-border py-2 flex flex-col items-center gap-1">
                 <ProtocolStatus compact />
               </div>
-            )
-          )}
+            ))}
 
           {/* User & Footer */}
           {!sidebarCollapsed ? (
@@ -433,7 +456,9 @@ export function Layout({ children }: LayoutProps) {
                       </Avatar>
                       <div className="flex flex-col items-start text-left overflow-hidden">
                         <span className="text-sm font-medium truncate">{user.name}</span>
-                        <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {user.role}
+                        </span>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -441,7 +466,9 @@ export function Layout({ children }: LayoutProps) {
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
                         <span>{user.name}</span>
-                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {user.email}
+                        </span>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
@@ -458,7 +485,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (!isDemo && !isSandboxMode) ? (
+              ) : !isDemo && !isSandboxMode ? (
                 <Link to="/login">
                   <Button variant="outline" size="sm" className="w-full">
                     Sign in
@@ -487,7 +514,9 @@ export function Layout({ children }: LayoutProps) {
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
                         <span>{user.name}</span>
-                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {user.email}
+                        </span>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
@@ -504,7 +533,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (!isDemo && !isSandboxMode) ? (
+              ) : !isDemo && !isSandboxMode ? (
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                     <Link to="/login">
@@ -513,13 +542,14 @@ export function Layout({ children }: LayoutProps) {
                       </Button>
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent side="right" sideOffset={8}>Sign in</TooltipContent>
+                  <TooltipContent side="right" sideOffset={8}>
+                    Sign in
+                  </TooltipContent>
                 </Tooltip>
               ) : null}
               <ThemeToggle />
             </div>
           )}
-
         </motion.aside>
 
         {/* Mobile drawer overlay */}
@@ -534,28 +564,27 @@ export function Layout({ children }: LayoutProps) {
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-50 w-72 bg-background border-r border-border transform transition-transform duration-200 ease-in-out lg:hidden",
-            mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+            mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           {/* Drawer header */}
           <div className="flex h-16 items-center justify-between border-b border-border px-4 relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <div className="flex items-center gap-2">
-              <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
+              <Logo
+                size="sm"
+                style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined}
+              />
               <div className="flex flex-col">
-              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                {BRAND_NAME}
-              </span>
-              <span className="text-[9px] text-muted-foreground tracking-wide">
-                {BRAND_SUBTITLE}
-              </span>
+                <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  {BRAND_NAME}
+                </span>
+                <span className="text-[9px] text-muted-foreground tracking-wide">
+                  {BRAND_SUBTITLE}
+                </span>
+              </div>
             </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setMobileMenuOpen(false)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -571,7 +600,7 @@ export function Layout({ children }: LayoutProps) {
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
                         "w-full justify-start gap-3 min-h-[44px]",
-                        isActive && "bg-secondary text-primary"
+                        isActive && "bg-secondary text-primary",
                       )}
                     >
                       <item.icon className="h-5 w-5" />
@@ -585,31 +614,31 @@ export function Layout({ children }: LayoutProps) {
 
           {/* Drawer demo toggle — hidden in sandbox mode */}
           {!isSandboxMode && (
-          <div className="border-t border-border p-3">
-            <Button
-              onClick={handleToggleDemo}
-              variant={isDemo ? "default" : "outline"}
-              size="sm"
-              className="w-full gap-2"
-            >
-              {isDemo ? (
-                <>
-                  <Square className="h-3 w-3" />
-                  Exit Demo
-                </>
-              ) : (
-                <>
-                  <Play className="h-3 w-3" />
-                  Demo Mode
-                </>
+            <div className="border-t border-border p-3">
+              <Button
+                onClick={handleToggleDemo}
+                variant={isDemo ? "default" : "outline"}
+                size="sm"
+                className="w-full gap-2"
+              >
+                {isDemo ? (
+                  <>
+                    <Square className="h-3 w-3" />
+                    Exit Demo
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-3 w-3" />
+                    Demo Mode
+                  </>
+                )}
+              </Button>
+              {isDemo && (
+                <div className="mt-2">
+                  <DemoControls compact />
+                </div>
               )}
-            </Button>
-            {isDemo && (
-              <div className="mt-2">
-                <DemoControls compact />
-              </div>
-            )}
-          </div>
+            </div>
           )}
 
           {/* Drawer help links */}
@@ -661,10 +690,12 @@ export function Layout({ children }: LayoutProps) {
 
         {/* Mobile header */}
         <div className="flex flex-1 flex-col min-w-0">
-          <header className={cn(
-            "flex h-14 sm:h-16 items-center justify-between border-b border-border px-4 lg:hidden relative overflow-hidden sticky top-0 z-30 bg-background transition-transform duration-300",
-            !headerVisible && "-translate-y-full"
-          )}>
+          <header
+            className={cn(
+              "flex h-14 sm:h-16 items-center justify-between border-b border-border px-4 lg:hidden relative overflow-hidden sticky top-0 z-30 bg-background transition-transform duration-300",
+              !headerVisible && "-translate-y-full",
+            )}
+          >
             <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-cyan-500 to-blue-600 pointer-events-none" />
             <Button
               variant="ghost"
@@ -675,20 +706,21 @@ export function Layout({ children }: LayoutProps) {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Logo size="sm" style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined} />
+              <Logo
+                size="sm"
+                style={isBBTheme ? { animation: "wave-subtle 6s ease-in-out infinite" } : undefined}
+              />
               <div className="flex flex-col">
-              <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                {BRAND_NAME}
-              </span>
-              <span className="text-[9px] text-muted-foreground tracking-wide">
-                {BRAND_SUBTITLE}
-              </span>
-            </div>
+                <span className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  {BRAND_NAME}
+                </span>
+                <span className="text-[9px] text-muted-foreground tracking-wide">
+                  {BRAND_SUBTITLE}
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              {isDemo && activeCount > 0 && (
-                <ActiveAgentsBadge count={activeCount} />
-              )}
+              {isDemo && activeCount > 0 && <ActiveAgentsBadge count={activeCount} />}
               {isDemo && (
                 <Button
                   variant="ghost"
@@ -696,11 +728,7 @@ export function Layout({ children }: LayoutProps) {
                   onClick={() => demo.setIsPlaying(!demo.isPlaying)}
                   className="relative"
                 >
-                  {demo.isPlaying ? (
-                    <Square className="h-4 w-4" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )}
+                  {demo.isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                   {demo.isPlaying && (
                     <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   )}
@@ -727,19 +755,22 @@ export function Layout({ children }: LayoutProps) {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {sidebarCollapsed ? "Expand" : "Collapse"} sidebar <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
+                {sidebarCollapsed ? "Expand" : "Collapse"} sidebar{" "}
+                <kbd className="ml-1 text-[10px] opacity-60">⌘[</kbd>
               </TooltipContent>
             </Tooltip>
             <button
               data-tour="cmdk"
               onClick={() => {
-                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+                window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
               }}
               className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted transition-colors mr-auto"
             >
               <Search className="h-3 w-3" />
               <span>Search…</span>
-              <kbd className="ml-2 px-1.5 py-0.5 text-[10px] bg-background border border-border rounded font-mono">⌘K</kbd>
+              <kbd className="ml-2 px-1.5 py-0.5 text-[10px] bg-background border border-border rounded font-mono">
+                ⌘K
+              </kbd>
             </button>
             {/* Demo controls inline in header */}
             {isDemo && <DemoControls header />}
@@ -765,7 +796,11 @@ export function Layout({ children }: LayoutProps) {
           {/* Main content + side panel */}
           <div className="flex flex-1 min-h-0">
             <main ref={mainContentRef} className="flex-1 overflow-y-auto overflow-x-hidden min-w-0">
-              <div className={`${fullBleedRoutes.has(location.pathname) ? 'h-full' : 'mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl w-full'} ${scenarioStatus ? 'pt-12' : ''} pb-16 sm:pb-6`}>{children}</div>
+              <div
+                className={`${fullBleedRoutes.has(location.pathname) ? "h-full" : "mx-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 max-w-7xl w-full"} ${scenarioStatus ? "pt-12" : ""} pb-16 sm:pb-6`}
+              >
+                {children}
+              </div>
             </main>
 
             {/* Global Side Panel - desktop: inline, mobile: full-screen overlay */}
@@ -826,7 +861,7 @@ export function Layout({ children }: LayoutProps) {
                     to={item.href}
                     className={cn(
                       "flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-[44px] min-h-[44px] transition-colors",
-                      isActive ? "text-primary" : "text-muted-foreground"
+                      isActive ? "text-primary" : "text-muted-foreground",
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -854,9 +889,9 @@ export function Layout({ children }: LayoutProps) {
         position="bottom-right"
         toastOptions={{
           style: {
-            background: 'rgb(15, 23, 42)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'rgb(203, 213, 225)',
+            background: "rgb(15, 23, 42)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: "rgb(203, 213, 225)",
           },
         }}
       />

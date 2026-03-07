@@ -13,17 +13,43 @@ import { Button } from "./ui/button";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 
 const OCEAN_NAMES = [
-  "Coral Reef", "Tide Walker", "Deep Current", "Shell Diver", "Wave Runner",
-  "Kelp Dancer", "Sand Dollar", "Starfish", "Moon Jellyfish", "Pearl Fisher",
+  "Coral Reef",
+  "Tide Walker",
+  "Deep Current",
+  "Shell Diver",
+  "Wave Runner",
+  "Kelp Dancer",
+  "Sand Dollar",
+  "Starfish",
+  "Moon Jellyfish",
+  "Pearl Fisher",
 ];
 
 const ROLES = ["lead", "senior", "worker", "intern"] as const;
 const DOMAINS = [
-  "Engineering", "Finance", "Marketing", "Sales", "Support",
-  "HR", "AppSec", "Content Strategy", "Frontend", "Backend", "Infrastructure",
+  "Engineering",
+  "Finance",
+  "Marketing",
+  "Sales",
+  "Support",
+  "HR",
+  "AppSec",
+  "Content Strategy",
+  "Frontend",
+  "Backend",
+  "Infrastructure",
 ];
 const EMOJIS = ["🐡", "🦈", "🐬", "🐢", "🦑", "🐠", "🪸", "🦞", "🐚", "🦭"];
-const COLORS = ["#dc2626", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#6366f1", "#a78bfa", "#ec4899"];
+const COLORS = [
+  "#dc2626",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#06b6d4",
+  "#6366f1",
+  "#a78bfa",
+  "#ec4899",
+];
 
 const ROLE_LEVEL_DEFAULTS: Record<string, number> = { lead: 7, senior: 6, worker: 4, intern: 2 };
 
@@ -94,7 +120,9 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
       <DialogPopup className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>🐣 Spawn Agent</DialogTitle>
-          <DialogDescription>Create a new agent and inject it into the simulation.</DialogDescription>
+          <DialogDescription>
+            Create a new agent and inject it into the simulation.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -104,7 +132,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder={placeholder}
               className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-cyan-500"
             />
@@ -116,20 +144,28 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
               <label className="text-sm font-medium text-foreground">Role</label>
               <select
                 value={role}
-                onChange={e => setRole(e.target.value)}
+                onChange={(e) => setRole(e.target.value)}
                 className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-cyan-500"
               >
-                {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Domain</label>
               <select
                 value={domain}
-                onChange={e => setDomain(e.target.value)}
+                onChange={(e) => setDomain(e.target.value)}
                 className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-cyan-500"
               >
-                {DOMAINS.map(d => <option key={d} value={d}>{d}</option>)}
+                {DOMAINS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -142,7 +178,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
               min={1}
               max={10}
               value={level}
-              onChange={e => setLevel(Number(e.target.value))}
+              onChange={(e) => setLevel(Number(e.target.value))}
               className="w-full accent-cyan-500"
             />
           </div>
@@ -152,7 +188,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Emoji Avatar</label>
               <div className="flex flex-wrap gap-1">
-                {EMOJIS.map(e => (
+                {EMOJIS.map((e) => (
                   <button
                     key={e}
                     type="button"
@@ -167,7 +203,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Color</label>
               <div className="flex flex-wrap gap-1">
-                {COLORS.map(c => (
+                {COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"

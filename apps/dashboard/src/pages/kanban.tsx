@@ -1,5 +1,5 @@
-import { PageHeader } from '../components/ui/page-header';
-import { KanbanBoard } from '../components/kanban/KanbanBoard';
+import { PageHeader } from "../components/ui/page-header";
+import { KanbanBoard } from "../components/kanban/KanbanBoard";
 
 export function KanbanPage() {
   return (

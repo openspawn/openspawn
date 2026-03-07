@@ -3,13 +3,13 @@
  * Seed the CEO agent's organization in the OpenSpawn API
  */
 
-const GRAPHQL_ENDPOINT = process.env.API_URL || 'https://api.openspawn.ai/graphql';
-const ORG_ID = 'f3a3fc0c-29e6-4d0d-b489-3c065d9230b6';
+const GRAPHQL_ENDPOINT = process.env.API_URL || "https://api.openspawn.ai/graphql";
+const ORG_ID = "f3a3fc0c-29e6-4d0d-b489-3c065d9230b6";
 
 async function graphql(query: string, variables = {}) {
   const resp = await fetch(GRAPHQL_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
   });
   const data = await resp.json();
@@ -18,7 +18,7 @@ async function graphql(query: string, variables = {}) {
 }
 
 async function seed() {
-  console.log('🌱 Seeding CEO organization...\n');
+  console.log("🌱 Seeding CEO organization...\n");
 
   // Create CEO agent
   try {
@@ -36,9 +36,9 @@ async function seed() {
         }
       }
     `);
-    console.log('✅ CEO agent registered');
+    console.log("✅ CEO agent registered");
   } catch (e) {
-    console.log('⚠️  CEO agent:', e.message);
+    console.log("⚠️  CEO agent:", e.message);
   }
 
   // Create Dennis
@@ -55,17 +55,22 @@ async function seed() {
         }) { id }
       }
     `);
-    console.log('✅ Dennis registered');
+    console.log("✅ Dennis registered");
   } catch (e) {
-    console.log('⚠️  Dennis:', e.message);
+    console.log("⚠️  Dennis:", e.message);
   }
 
   // Create tasks
   const tasks = [
-    { title: 'Python SDK', status: 'done', priority: 'high', assignee: 'dennis' },
-    { title: 'npm CLI polish', status: 'done', priority: 'high', assignee: 'dennis' },
-    { title: 'External review fixes', status: 'done', priority: 'critical', assignee: 'dennis' },
-    { title: 'Team dashboard live', status: 'in_progress', priority: 'critical', assignee: 'dennis' },
+    { title: "Python SDK", status: "done", priority: "high", assignee: "dennis" },
+    { title: "npm CLI polish", status: "done", priority: "high", assignee: "dennis" },
+    { title: "External review fixes", status: "done", priority: "critical", assignee: "dennis" },
+    {
+      title: "Team dashboard live",
+      status: "in_progress",
+      priority: "critical",
+      assignee: "dennis",
+    },
   ];
 
   for (const t of tasks) {
@@ -87,7 +92,7 @@ async function seed() {
     }
   }
 
-  console.log('\n✅ Seed complete! View at https://team.openspawn.ai');
+  console.log("\n✅ Seed complete! View at https://team.openspawn.ai");
 }
 
 seed().catch(console.error);

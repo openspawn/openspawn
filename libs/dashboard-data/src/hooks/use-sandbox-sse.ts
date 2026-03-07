@@ -2,9 +2,9 @@
  * Shared hook for connecting to the sandbox SSE stream.
  * Only connects when isSandboxMode is true.
  */
-import { useEffect, useRef } from 'react';
-import { isSandboxMode } from '../graphql/fetcher';
-import { SANDBOX_URL } from '../lib/sandbox-url';
+import { useEffect, useRef } from "react";
+import { isSandboxMode } from "../graphql/fetcher";
+import { SANDBOX_URL } from "../lib/sandbox-url";
 
 export interface SandboxSSEEvent {
   type: string;

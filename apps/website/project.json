@@ -11,13 +11,8 @@
         "cwd": "apps/website"
       },
       "cache": true,
-      "inputs": [
-        "default",
-        "^default"
-      ],
-      "outputs": [
-        "{workspaceRoot}/dist/apps/website"
-      ]
+      "inputs": ["default", "^default"],
+      "outputs": ["{workspaceRoot}/dist/apps/website"]
     },
     "serve": {
       "command": "vite serve",
@@ -37,12 +32,8 @@
         "cwd": "apps/website"
       },
       "cache": true,
-      "inputs": [
-        "default"
-      ],
-      "outputs": [
-        "{projectRoot}/public/docs"
-      ]
+      "inputs": ["default"],
+      "outputs": ["{projectRoot}/public/docs"]
     }
   }
 }

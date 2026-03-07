@@ -8,7 +8,15 @@ interface ProviderConfig {
   id: string;
   name: string;
   baseUrl: string;
-  models: { id: string; name: string; costPer1kInput: number; costPer1kOutput: number; contextWindow: number; capabilities: string[]; maxTokens: number }[];
+  models: {
+    id: string;
+    name: string;
+    costPer1kInput: number;
+    costPer1kOutput: number;
+    contextWindow: number;
+    capabilities: string[];
+    maxTokens: number;
+  }[];
   rateLimit?: { rpm: number; tpm: number };
   enabled: boolean;
   priority: number;
@@ -38,12 +46,45 @@ interface RouteDecision {
   taskType: string;
 }
 
-const PROVIDER_COLORS: Record<string, { text: string; bg: string; border: string; bar: string; dot: string }> = {
-  ollama: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", bar: "bg-emerald-500", dot: "bg-emerald-400" },
-  groq: { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", bar: "bg-amber-500", dot: "bg-amber-400" },
-  openrouter: { text: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20", bar: "bg-violet-500", dot: "bg-violet-400" },
-  openai: { text: "text-slate-300", bg: "bg-slate-500/10", border: "border-slate-500/20", bar: "bg-slate-500", dot: "bg-slate-400" },
-  anthropic: { text: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20", bar: "bg-orange-500", dot: "bg-orange-400" },
+const PROVIDER_COLORS: Record<
+  string,
+  { text: string; bg: string; border: string; bar: string; dot: string }
+> = {
+  ollama: {
+    text: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    bar: "bg-emerald-500",
+    dot: "bg-emerald-400",
+  },
+  groq: {
+    text: "text-amber-400",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+    bar: "bg-amber-500",
+    dot: "bg-amber-400",
+  },
+  openrouter: {
+    text: "text-violet-400",
+    bg: "bg-violet-500/10",
+    border: "border-violet-500/20",
+    bar: "bg-violet-500",
+    dot: "bg-violet-400",
+  },
+  openai: {
+    text: "text-slate-300",
+    bg: "bg-slate-500/10",
+    border: "border-slate-500/20",
+    bar: "bg-slate-500",
+    dot: "bg-slate-400",
+  },
+  anthropic: {
+    text: "text-orange-400",
+    bg: "bg-orange-500/10",
+    border: "border-orange-500/20",
+    bar: "bg-orange-500",
+    dot: "bg-orange-400",
+  },
 };
 
 function getColors(id: string) {
@@ -68,24 +109,30 @@ export function RouterPage() {
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
 
   const { data: configData } = useQuery({
-    queryKey: ['router-config'],
-    queryFn: () => fetch(`${SANDBOX_URL}/api/router/config`).then(r => r.json()),
+    queryKey: ["router-config"],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/config`).then((r) => r.json()),
     enabled: isSandboxMode,
   });
   const { data: metricsData } = useQuery({
-    queryKey: ['router-metrics'],
-    queryFn: () => fetch(`${SANDBOX_URL}/api/router/metrics`).then(r => r.json()),
+    queryKey: ["router-metrics"],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/metrics`).then((r) => r.json()),
     enabled: isSandboxMode,
   });
   const { data: decisionsData } = useQuery({
-    queryKey: ['router-decisions-full'],
-    queryFn: () => fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then(r => r.json()),
+    queryKey: ["router-decisions-full"],
+    queryFn: () => fetch(`${SANDBOX_URL}/api/router/decisions?limit=30`).then((r) => r.json()),
     enabled: isSandboxMode,
   });
 
-  useEffect(() => { if (configData) setProviders(configData.providers || []); }, [configData]);
-  useEffect(() => { if (metricsData) setMetrics(metricsData); }, [metricsData]);
-  useEffect(() => { if (decisionsData) setDecisions(decisionsData); }, [decisionsData]);
+  useEffect(() => {
+    if (configData) setProviders(configData.providers || []);
+  }, [configData]);
+  useEffect(() => {
+    if (metricsData) setMetrics(metricsData);
+  }, [metricsData]);
+  useEffect(() => {
+    if (decisionsData) setDecisions(decisionsData);
+  }, [decisionsData]);
 
   if (!isSandboxMode) {
     return <div className="p-8 text-white/50">Model Router is only available in sandbox mode.</div>;
@@ -93,14 +140,16 @@ export function RouterPage() {
 
   const total = metrics?.totalRequests || 1;
   const localPct = metrics ? Math.round((metrics.localRoutedCount / total) * 100) : 0;
-  const saved = metrics ? (metrics.cloudOnlyCostEstimate - metrics.totalCost) : 0;
+  const saved = metrics ? metrics.cloudOnlyCostEstimate - metrics.totalCost : 0;
 
   return (
     <div className="space-y-6 p-4 md:p-6 max-w-7xl mx-auto" data-tour="router-cards">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Model Router</h1>
-          <p className="text-sm text-white/50 mt-1">Intelligent LLM routing with provider fallback chains and cost tracking</p>
+          <p className="text-sm text-white/50 mt-1">
+            Intelligent LLM routing with provider fallback chains and cost tracking
+          </p>
         </div>
         <span className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
           ⚡ Simulated
@@ -111,11 +160,16 @@ export function RouterPage() {
       {metrics && metrics.totalRequests > 0 && (
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div>
-            <span className="text-emerald-400 font-semibold">{localPct}% of requests routed locally ($0)</span>
-            <span className="text-white/40 text-sm ml-2">— saved {formatCost(saved).text} vs cloud-only</span>
+            <span className="text-emerald-400 font-semibold">
+              {localPct}% of requests routed locally ($0)
+            </span>
+            <span className="text-white/40 text-sm ml-2">
+              — saved {formatCost(saved).text} vs cloud-only
+            </span>
           </div>
           <div className="text-sm text-white/40">
-            {metrics.totalRequests} total requests · {metrics.fallbacksTriggered} fallbacks triggered
+            {metrics.totalRequests} total requests · {metrics.fallbacksTriggered} fallbacks
+            triggered
           </div>
         </div>
       )}
@@ -125,13 +179,27 @@ export function RouterPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: "Total Requests", value: String(metrics.totalRequests) },
-            { label: "Total Cost", value: formatCost(metrics.totalCost).text, color: formatCost(metrics.totalCost).color },
-            { label: "Local Routes", value: String(metrics.localRoutedCount), color: "text-emerald-400" },
-            { label: "Fallbacks", value: String(metrics.fallbacksTriggered), color: metrics.fallbacksTriggered > 0 ? "text-amber-400" : undefined },
+            {
+              label: "Total Cost",
+              value: formatCost(metrics.totalCost).text,
+              color: formatCost(metrics.totalCost).color,
+            },
+            {
+              label: "Local Routes",
+              value: String(metrics.localRoutedCount),
+              color: "text-emerald-400",
+            },
+            {
+              label: "Fallbacks",
+              value: String(metrics.fallbacksTriggered),
+              color: metrics.fallbacksTriggered > 0 ? "text-amber-400" : undefined,
+            },
           ].map((item, i) => (
             <div key={i} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
               <div className="text-xs text-white/40">{item.label}</div>
-              <div className={cn("text-xl font-bold mt-1", item.color || "text-white")}>{item.value}</div>
+              <div className={cn("text-xl font-bold mt-1", item.color || "text-white")}>
+                {item.value}
+              </div>
             </div>
           ))}
         </div>
@@ -141,7 +209,7 @@ export function RouterPage() {
       <div>
         <h2 className="text-lg font-semibold text-white mb-3">Providers</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {providers.map(p => {
+          {providers.map((p) => {
             const c = getColors(p.id);
             const requests = metrics?.requestsByProvider[p.id] || 0;
             const cost = metrics?.costByProvider[p.id] || 0;
@@ -153,7 +221,9 @@ export function RouterPage() {
               <div key={p.id} className={cn("rounded-xl border p-4 space-y-3", c.border, c.bg)}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={cn("w-2.5 h-2.5 rounded-full", p.enabled ? c.dot : "bg-gray-600")} />
+                    <div
+                      className={cn("w-2.5 h-2.5 rounded-full", p.enabled ? c.dot : "bg-gray-600")}
+                    />
                     <span className={cn("font-semibold", c.text)}>{p.name}</span>
                   </div>
                   <span className="text-xs text-white/30">P{p.priority}</span>
@@ -163,10 +233,12 @@ export function RouterPage() {
 
                 {/* Models */}
                 <div className="space-y-1">
-                  {p.models.map(m => (
+                  {p.models.map((m) => (
                     <div key={m.id} className="flex items-center justify-between text-xs">
                       <span className="text-white/60 truncate mr-2">{m.name}</span>
-                      <span className={m.costPer1kInput === 0 ? "text-emerald-400" : "text-white/40"}>
+                      <span
+                        className={m.costPer1kInput === 0 ? "text-emerald-400" : "text-white/40"}
+                      >
                         {m.costPer1kInput === 0 ? "Free" : `$${m.costPer1kInput}/1k`}
                       </span>
                     </div>
@@ -217,23 +289,30 @@ export function RouterPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {decisions.slice().reverse().map((d, i) => {
-                    const c = getColors(d.provider);
-                    const cost = formatCost(d.estimatedCost);
-                    const lat = formatLatency(d.latencyEstimate);
-                    return (
-                      <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
-                        <td className="p-3 text-white/30 font-mono">{new Date(d.timestamp).toLocaleTimeString()}</td>
-                        <td className="p-3 text-white/60">{d.agentId || "—"}</td>
-                        <td className="p-3 text-white/40">{d.taskType}</td>
-                        <td className={cn("p-3 font-medium", c.text)}>{d.provider}</td>
-                        <td className="p-3 text-white/50 font-mono">{d.model.split('/').pop()}</td>
-                        <td className="p-3 text-white/40 max-w-[200px] truncate">{d.reason}</td>
-                        <td className={cn("p-3 text-right", cost.color)}>{cost.text}</td>
-                        <td className={cn("p-3 text-right", lat.color)}>{lat.text}</td>
-                      </tr>
-                    );
-                  })}
+                  {decisions
+                    .slice()
+                    .reverse()
+                    .map((d, i) => {
+                      const c = getColors(d.provider);
+                      const cost = formatCost(d.estimatedCost);
+                      const lat = formatLatency(d.latencyEstimate);
+                      return (
+                        <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
+                          <td className="p-3 text-white/30 font-mono">
+                            {new Date(d.timestamp).toLocaleTimeString()}
+                          </td>
+                          <td className="p-3 text-white/60">{d.agentId || "—"}</td>
+                          <td className="p-3 text-white/40">{d.taskType}</td>
+                          <td className={cn("p-3 font-medium", c.text)}>{d.provider}</td>
+                          <td className="p-3 text-white/50 font-mono">
+                            {d.model.split("/").pop()}
+                          </td>
+                          <td className="p-3 text-white/40 max-w-[200px] truncate">{d.reason}</td>
+                          <td className={cn("p-3 text-right", cost.color)}>{cost.text}</td>
+                          <td className={cn("p-3 text-right", lat.color)}>{lat.text}</td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>

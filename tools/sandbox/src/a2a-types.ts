@@ -30,7 +30,14 @@ export interface AgentSkill {
 
 // ── Task lifecycle ───────────────────────────────────────────────────────────
 
-export type TaskState = 'submitted' | 'working' | 'input-required' | 'completed' | 'failed' | 'canceled' | 'rejected';
+export type TaskState =
+  | "submitted"
+  | "working"
+  | "input-required"
+  | "completed"
+  | "failed"
+  | "canceled"
+  | "rejected";
 
 export interface TaskStatus {
   state: TaskState;
@@ -49,7 +56,7 @@ export interface Task {
 
 // ── Messages & Parts ─────────────────────────────────────────────────────────
 
-export type MessageRole = 'user' | 'agent';
+export type MessageRole = "user" | "agent";
 
 export interface Message {
   role: MessageRole;
@@ -64,12 +71,12 @@ export interface Message {
 export type Part = TextPart | FilePart | DataPart;
 
 export interface TextPart {
-  kind: 'text';
+  kind: "text";
   text: string;
 }
 
 export interface FilePart {
-  kind: 'file';
+  kind: "file";
   file: FileContent;
 }
 
@@ -81,7 +88,7 @@ export interface FileContent {
 }
 
 export interface DataPart {
-  kind: 'data';
+  kind: "data";
   data: Record<string, unknown>;
 }
 
@@ -98,7 +105,7 @@ export interface Artifact {
 // ── Streaming Events ─────────────────────────────────────────────────────────
 
 export interface TaskStatusUpdateEvent {
-  kind: 'status-update';
+  kind: "status-update";
   taskId: string;
   contextId: string;
   status: TaskStatus;
@@ -106,7 +113,7 @@ export interface TaskStatusUpdateEvent {
 }
 
 export interface TaskArtifactUpdateEvent {
-  kind: 'artifact-update';
+  kind: "artifact-update";
   taskId: string;
   contextId: string;
   artifact: Artifact;

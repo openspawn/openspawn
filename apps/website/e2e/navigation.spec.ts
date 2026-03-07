@@ -28,13 +28,8 @@ test.describe("Route tree — every route renders", () => {
       await page.waitForSelector("h1, h2");
 
       // Page must have meaningful content
-      const bodyText = await page.evaluate(
-        () => document.body.innerText.trim()
-      );
-      expect(
-        bodyText.length,
-        `${route.path} appears blank`
-      ).toBeGreaterThan(50);
+      const bodyText = await page.evaluate(() => document.body.innerText.trim());
+      expect(bodyText.length, `${route.path} appears blank`).toBeGreaterThan(50);
 
       // Nav should always render (it's in RootLayout)
       await expect(page.locator("nav").first()).toBeVisible();
@@ -43,9 +38,7 @@ test.describe("Route tree — every route renders", () => {
       await expect(page.locator("footer")).toBeVisible();
 
       // Expected heading should be visible
-      await expect(
-        page.getByRole("heading", { name: route.expectedHeading })
-      ).toBeVisible();
+      await expect(page.getByRole("heading", { name: route.expectedHeading })).toBeVisible();
     });
   }
 });
@@ -59,9 +52,7 @@ test.describe("404 — unknown routes", () => {
     await expect(page.getByText("404 — Page Not Found")).toBeVisible();
 
     // And the main headline
-    await expect(
-      page.getByRole("heading", { name: /lost in the deep end/i })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /lost in the deep end/i })).toBeVisible();
   });
 
   test("nested unknown route also shows 404", async ({ page }) => {
@@ -74,7 +65,10 @@ test.describe("404 — unknown routes", () => {
     // (root notFoundComponent applies to top-level mismatches, nested ones
     // show TanStack Router's default "Not Found" message within the layout)
     const hasNotFoundText =
-      (await page.getByText("Not Found").isVisible().catch(() => false)) ||
+      (await page
+        .getByText("Not Found")
+        .isVisible()
+        .catch(() => false)) ||
       (await page
         .getByText("404 — Page Not Found")
         .isVisible()
@@ -136,12 +130,8 @@ test.describe("Mobile nav toggle", () => {
     await expect(mobileMenu).toBeVisible();
 
     // Nav links should be visible
-    await expect(
-      mobileMenu.getByRole("link", { name: "ORG.md" })
-    ).toBeVisible();
-    await expect(
-      mobileMenu.getByRole("link", { name: "Docs" })
-    ).toBeVisible();
+    await expect(mobileMenu.getByRole("link", { name: "ORG.md" })).toBeVisible();
+    await expect(mobileMenu.getByRole("link", { name: "Docs" })).toBeVisible();
   });
 
   test("clicking hamburger again closes mobile nav menu", async ({ page }) => {

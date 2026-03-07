@@ -606,7 +606,12 @@ const gettingStartedTopRoute = createRoute({
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "OpenSpawn", item: BASE_URL },
-          { "@type": "ListItem", position: 2, name: "Getting Started", item: `${BASE_URL}/getting-started` },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Getting Started",
+            item: `${BASE_URL}/getting-started`,
+          },
         ],
       },
     }),
@@ -625,4 +630,11 @@ const pluginsRoute = createRoute({
     }),
 });
 
-export const routeTree = rootRoute.addChildren([indexRoute, orgMdRoute, templatesRoute, gettingStartedTopRoute, pluginsRoute, docsRouteTree]);
+export const routeTree = rootRoute.addChildren([
+  indexRoute,
+  orgMdRoute,
+  templatesRoute,
+  gettingStartedTopRoute,
+  pluginsRoute,
+  docsRouteTree,
+]);

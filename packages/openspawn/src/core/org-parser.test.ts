@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { parseOrgMdContent, generateOrgMd } from './org-parser.js';
+import { describe, it, expect } from "vitest";
+import { parseOrgMdContent, generateOrgMd } from "./org-parser.js";
 
 const SAMPLE_ORG = `# Acme Corp
 
@@ -36,41 +36,41 @@ const SAMPLE_ORG = `# Acme Corp
 - **Count:** 2
 `;
 
-describe('org-parser', () => {
-  it('parses org name', () => {
+describe("org-parser", () => {
+  it("parses org name", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
-    expect(org.name).toBe('Acme Corp');
+    expect(org.name).toBe("Acme Corp");
   });
 
-  it('parses culture', () => {
+  it("parses culture", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
-    expect(org.culture.preset).toBe('balanced');
-    expect(org.culture.escalationVelocity).toBe('fast');
+    expect(org.culture.preset).toBe("balanced");
+    expect(org.culture.escalationVelocity).toBe("fast");
     expect(org.culture.ackRequired).toBe(true);
   });
 
-  it('parses policies', () => {
+  it("parses policies", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
     expect(org.policies.perAgentBudget).toBe(50);
     expect(org.policies.alertThreshold).toBe(80);
   });
 
-  it('parses agents from structure', () => {
+  it("parses agents from structure", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
     expect(org.agents.length).toBe(4); // CEO + Lead + 2 devs
-    expect(org.agents[0].name).toBe('CEO');
+    expect(org.agents[0].name).toBe("CEO");
     expect(org.agents[0].level).toBe(10);
   });
 
-  it('handles count for multiple agents', () => {
+  it("handles count for multiple agents", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
-    const devs = org.agents.filter(a => a.name.startsWith('Developer'));
+    const devs = org.agents.filter((a) => a.name.startsWith("Developer"));
     expect(devs.length).toBe(2);
-    expect(devs[0].id).toBe('developer-1');
-    expect(devs[1].id).toBe('developer-2');
+    expect(devs[0].id).toBe("developer-1");
+    expect(devs[1].id).toBe("developer-2");
   });
 
-  it('roundtrips via generateOrgMd', () => {
+  it("roundtrips via generateOrgMd", () => {
     const org = parseOrgMdContent(SAMPLE_ORG);
     const md = generateOrgMd(org);
     const org2 = parseOrgMdContent(md);

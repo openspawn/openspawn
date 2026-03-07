@@ -2,8 +2,8 @@
  * TeamDetailPanel — shown in the global side panel when clicking a team.
  * Displays team info, stats, members list, and sub-teams.
  */
-import { useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+import { useMemo, useState } from "react";
+import { motion } from "motion/react";
 import {
   Users,
   Coins,
@@ -28,29 +28,37 @@ import {
   Wrench,
   Headphones,
   type LucideIcon,
-} from 'lucide-react';
-import { Badge } from './ui/badge';
-import { AgentAvatar } from './agent-avatar';
-import { AgentModeBadge } from './agent-mode-selector';
-import { Progress } from './ui/progress';
-import { getStatusVariant } from '../lib/status-colors';
-import {
-  type Team,
-  getTeamById,
-  getSubTeams,
-  getParentTeams,
-  getTeamColor,
-} from '../demo/teams';
-import { useAgents } from '../hooks/use-agents';
-import { useTeamStats } from '../hooks/use-teams';
-import { AgentMode, AgentStatus } from '../graphql/generated/graphql';
-import { TeamDialog, DeleteTeamDialog } from './team-management';
-import { Button } from './ui/button';
+} from "lucide-react";
+import { Badge } from "./ui/badge";
+import { AgentAvatar } from "./agent-avatar";
+import { AgentModeBadge } from "./agent-mode-selector";
+import { Progress } from "./ui/progress";
+import { getStatusVariant } from "../lib/status-colors";
+import { type Team, getTeamById, getSubTeams, getParentTeams, getTeamColor } from "../demo/teams";
+import { useAgents } from "../hooks/use-agents";
+import { useTeamStats } from "../hooks/use-teams";
+import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
+import { TeamDialog, DeleteTeamDialog } from "./team-management";
+import { Button } from "./ui/button";
 
 const ICON_MAP: Record<string, LucideIcon> = {
-  Crown, Code2, DollarSign, Megaphone, Users, Headphones,
-  Server, Monitor, ShieldCheck, Send, Handshake,
-  PenTool, BarChart3, UserPlus, Heart, MessageCircle, Wrench,
+  Crown,
+  Code2,
+  DollarSign,
+  Megaphone,
+  Users,
+  Headphones,
+  Server,
+  Monitor,
+  ShieldCheck,
+  Send,
+  Handshake,
+  PenTool,
+  BarChart3,
+  UserPlus,
+  Heart,
+  MessageCircle,
+  Wrench,
 };
 
 interface TeamDetailPanelProps {
@@ -68,10 +76,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
   const [deleteOpen, setDeleteOpen] = useState(false);
   const parentTeams = useMemo(() => getParentTeams(), []);
 
-  const members = useMemo(
-    () => agents.filter((a) => a.teamId === teamId),
-    [agents, teamId],
-  );
+  const members = useMemo(() => agents.filter((a) => a.teamId === teamId), [agents, teamId]);
 
   const lead = useMemo(
     () => (team?.leadAgentId ? agents.find((a) => a.id === team.leadAgentId) : undefined),
@@ -138,7 +143,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
           // DEFERRED: Team edits are not yet persisted to the backend.
           // Wire to the updateTeam GraphQL mutation when it is available:
           //   updateTeam({ variables: { id: updated.id, input: updated } })
-          console.log('Team updated (local only, not persisted):', updated);
+          console.log("Team updated (local only, not persisted):", updated);
         }}
       />
       {team && (
@@ -151,7 +156,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
             // DEFERRED: Team deletion is not yet wired to the backend.
             // Wire to the deleteTeam GraphQL mutation when it is available:
             //   deleteTeam({ variables: { id: team.id } })
-            console.log('Team deleted (local only, not persisted):', team.id);
+            console.log("Team deleted (local only, not persisted):", team.id);
           }}
         />
       )}
@@ -204,7 +209,14 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
             onClick={() => onAgentClick?.(lead.id)}
             className="w-full flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left"
           >
-            <AgentAvatar agentId={lead.agentId} name={lead.name} level={lead.level} size="md" avatar={lead.avatar} avatarColor={lead.avatarColor} />
+            <AgentAvatar
+              agentId={lead.agentId}
+              name={lead.name}
+              level={lead.level}
+              size="md"
+              avatar={lead.avatar}
+              avatarColor={lead.avatarColor}
+            />
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{lead.name}</p>
               <p className="text-xs text-muted-foreground">
@@ -279,7 +291,6 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
                   level={agent.level}
                   size="sm"
                   avatar={agent.avatar}
-
                   avatarUrl={agent.avatarUrl}
                   avatarColor={agent.avatarColor}
                 />

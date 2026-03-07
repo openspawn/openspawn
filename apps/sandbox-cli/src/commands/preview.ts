@@ -126,7 +126,7 @@ function printTree(agents: Agent[], prefix = "", isLast = true, isRoot = true): 
     const domainStr = pc.dim(`(${agent.domain})`);
 
     console.log(
-      `${prefix}${connector}${color(pc.bold(agent.name))}${poolStr} ${levelStr} ${domainStr}`
+      `${prefix}${connector}${color(pc.bold(agent.name))}${poolStr} ${levelStr} ${domainStr}`,
     );
 
     if (agent.children.length > 0) {
@@ -166,12 +166,8 @@ export function createPreviewCommand(): Command {
       }
 
       if (!existsSync(orgPath)) {
-        console.log(
-          `\n${icons.error} ${pc.red("ORG.md not found")} at ${pc.dim(orgPath)}`
-        );
-        console.log(
-          `\n  Run ${pc.cyan("openspawn init my-org")} to create one.\n`
-        );
+        console.log(`\n${icons.error} ${pc.red("ORG.md not found")} at ${pc.dim(orgPath)}`);
+        console.log(`\n  Run ${pc.cyan("openspawn init my-org")} to create one.\n`);
         process.exit(1);
       }
 
@@ -182,15 +178,13 @@ export function createPreviewCommand(): Command {
       const maxLevel = Math.max(
         ...org.agents.flatMap(function getLevel(a: Agent): number[] {
           return [a.level, ...a.children.flatMap(getLevel)];
-        })
+        }),
       );
 
       console.log("");
+      console.log(`${icons.rocket} ${pc.bold(pc.white(org.name))}`);
       console.log(
-        `${icons.rocket} ${pc.bold(pc.white(org.name))}`
-      );
-      console.log(
-        `  ${pc.dim(`${totalAgents} agents · ${domains.size} domains · max level L${maxLevel}`)}`
+        `  ${pc.dim(`${totalAgents} agents · ${domains.size} domains · max level L${maxLevel}`)}`,
       );
       console.log("");
       console.log(pc.dim("  Organization Structure:"));
@@ -201,14 +195,14 @@ export function createPreviewCommand(): Command {
       console.log("");
       console.log(pc.dim("  ─────────────────────────────────────"));
       console.log(
-        `  ${pc.dim("Agents:")} ${pc.bold(String(totalAgents))}  ${pc.dim("Domains:")} ${pc.bold(String(domains.size))}  ${pc.dim("Levels:")} L1-L${maxLevel}`
+        `  ${pc.dim("Agents:")} ${pc.bold(String(totalAgents))}  ${pc.dim("Domains:")} ${pc.bold(String(domains.size))}  ${pc.dim("Levels:")} L1-L${maxLevel}`,
       );
       console.log("");
       console.log(
-        `  ${pc.dim("Edit")} ${pc.cyan("ORG.md")} ${pc.dim("to customize your organization.")}`
+        `  ${pc.dim("Edit")} ${pc.cyan("ORG.md")} ${pc.dim("to customize your organization.")}`,
       );
       console.log(
-        `  ${pc.dim("Docs:")} ${pc.cyan("https://openspawn.ai/docs/reference/org-md-reference")}`
+        `  ${pc.dim("Docs:")} ${pc.cyan("https://openspawn.ai/docs/reference/org-md-reference")}`,
       );
       console.log("");
     });

@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 // ── OpenSpawn CLI ────────────────────────────────────────────────────────────
 
-import { parseArgs } from 'node:util';
-import { initCommand } from './commands/init.js';
-import { startCommand } from './commands/start.js';
-import { statusCommand } from './commands/status.js';
-import { hireCommand } from './commands/hire.js';
-import { fireCommand } from './commands/fire.js';
-import { taskCommand } from './commands/task.js';
-import { delegateCommand } from './commands/delegate.js';
-import { escalateCommand } from './commands/escalate.js';
-import { reportCommand } from './commands/report.js';
-import { budgetCommand } from './commands/budget.js';
-import { orgCommand } from './commands/org.js';
+import { parseArgs } from "node:util";
+import { initCommand } from "./commands/init.js";
+import { startCommand } from "./commands/start.js";
+import { statusCommand } from "./commands/status.js";
+import { hireCommand } from "./commands/hire.js";
+import { fireCommand } from "./commands/fire.js";
+import { taskCommand } from "./commands/task.js";
+import { delegateCommand } from "./commands/delegate.js";
+import { escalateCommand } from "./commands/escalate.js";
+import { reportCommand } from "./commands/report.js";
+import { budgetCommand } from "./commands/budget.js";
+import { orgCommand } from "./commands/org.js";
 
 const HELP = `
 openspawn - Multi-agent organization CLI
@@ -43,7 +43,7 @@ Options:
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
+  if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
     console.log(HELP);
     process.exit(0);
   }
@@ -52,14 +52,14 @@ async function main() {
   const rest = args.slice(1);
 
   // Extract global flags
-  const dirIdx = rest.indexOf('--dir');
+  const dirIdx = rest.indexOf("--dir");
   let dir = process.cwd();
   if (dirIdx >= 0 && rest[dirIdx + 1]) {
     dir = rest[dirIdx + 1];
     rest.splice(dirIdx, 2);
   }
 
-  const orgIdx = rest.indexOf('--org-file');
+  const orgIdx = rest.indexOf("--org-file");
   let orgFile: string | undefined;
   if (orgIdx >= 0 && rest[orgIdx + 1]) {
     orgFile = rest[orgIdx + 1];
@@ -69,17 +69,28 @@ async function main() {
   const ctx = { dir, orgFile };
 
   switch (command) {
-    case 'init': return initCommand(rest, ctx);
-    case 'start': return startCommand(rest, ctx);
-    case 'status': return statusCommand(rest, ctx);
-    case 'org': return orgCommand(rest, ctx);
-    case 'hire': return hireCommand(rest, ctx);
-    case 'fire': return fireCommand(rest, ctx);
-    case 'task': return taskCommand(rest, ctx);
-    case 'delegate': return delegateCommand(rest, ctx);
-    case 'escalate': return escalateCommand(rest, ctx);
-    case 'report': return reportCommand(rest, ctx);
-    case 'budget': return budgetCommand(rest, ctx);
+    case "init":
+      return initCommand(rest, ctx);
+    case "start":
+      return startCommand(rest, ctx);
+    case "status":
+      return statusCommand(rest, ctx);
+    case "org":
+      return orgCommand(rest, ctx);
+    case "hire":
+      return hireCommand(rest, ctx);
+    case "fire":
+      return fireCommand(rest, ctx);
+    case "task":
+      return taskCommand(rest, ctx);
+    case "delegate":
+      return delegateCommand(rest, ctx);
+    case "escalate":
+      return escalateCommand(rest, ctx);
+    case "report":
+      return reportCommand(rest, ctx);
+    case "budget":
+      return budgetCommand(rest, ctx);
     default:
       console.error(`Unknown command: ${command}`);
       console.log(HELP);
@@ -87,7 +98,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

@@ -3,12 +3,42 @@ import { Link } from "@tanstack/react-router";
 import { useTitle } from "../../hooks/use-title";
 
 const sections = [
-  { to: "/docs/getting-started", emoji: "🚀", title: "Getting Started", desc: "Get OpenSpawn running in 2 minutes." },
-  { to: "/docs/openclaw", emoji: "🦞", title: "OpenClaw Integration", desc: "Add org structure to your OpenClaw agents." },
-  { to: "/docs/protocols/a2a", emoji: "🔗", title: "A2A Protocol", desc: "Agent-to-Agent discovery, tasks, and streaming." },
-  { to: "/docs/protocols/mcp", emoji: "🔌", title: "MCP Tools", desc: "7 tools via Streamable HTTP." },
-  { to: "/docs/features/dashboard", emoji: "📊", title: "Dashboard", desc: "Real-time agent visualization." },
-  { to: "/docs/features/model-router", emoji: "🔀", title: "Model Router", desc: "Smart LLM routing with fallbacks." },
+  {
+    to: "/docs/getting-started",
+    emoji: "🚀",
+    title: "Getting Started",
+    desc: "Get OpenSpawn running in 2 minutes.",
+  },
+  {
+    to: "/docs/openclaw",
+    emoji: "🦞",
+    title: "OpenClaw Integration",
+    desc: "Add org structure to your OpenClaw agents.",
+  },
+  {
+    to: "/docs/protocols/a2a",
+    emoji: "🔗",
+    title: "A2A Protocol",
+    desc: "Agent-to-Agent discovery, tasks, and streaming.",
+  },
+  {
+    to: "/docs/protocols/mcp",
+    emoji: "🔌",
+    title: "MCP Tools",
+    desc: "7 tools via Streamable HTTP.",
+  },
+  {
+    to: "/docs/features/dashboard",
+    emoji: "📊",
+    title: "Dashboard",
+    desc: "Real-time agent visualization.",
+  },
+  {
+    to: "/docs/features/model-router",
+    emoji: "🔀",
+    title: "Model Router",
+    desc: "Smart LLM routing with fallbacks.",
+  },
 ];
 
 export function DocsIndex() {

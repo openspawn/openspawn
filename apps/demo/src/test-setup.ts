@@ -3,19 +3,33 @@ import "@testing-library/jest-dom";
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   readonly root = null;
-  readonly rootMargin = '0px';
+  readonly rootMargin = "0px";
   readonly thresholds = [0];
-  observe() { /* noop */ }
-  unobserve() { /* noop */ }
-  disconnect() { /* noop */ }
-  takeRecords() { return []; }
+  observe() {
+    /* noop */
+  }
+  unobserve() {
+    /* noop */
+  }
+  disconnect() {
+    /* noop */
+  }
+  takeRecords() {
+    return [];
+  }
 } as unknown as typeof IntersectionObserver;
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() { /* noop */ }
-  unobserve() { /* noop */ }
-  disconnect() { /* noop */ }
+  observe() {
+    /* noop */
+  }
+  unobserve() {
+    /* noop */
+  }
+  disconnect() {
+    /* noop */
+  }
 };
 import { vi } from "vitest";
 

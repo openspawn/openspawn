@@ -26,14 +26,19 @@ function levelLabel(level: number): string {
 }
 
 function initials(name: string) {
-  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }
 
 const ROLE_COLORS: Record<string, string> = {
   FOUNDER: "bg-amber-500/20 text-amber-400",
-  ADMIN:   "bg-cyan-500/20 text-cyan-400",
-  WORKER:  "bg-violet-500/20 text-violet-400",
-  HR:      "bg-emerald-500/20 text-emerald-400",
+  ADMIN: "bg-cyan-500/20 text-cyan-400",
+  WORKER: "bg-violet-500/20 text-violet-400",
+  HR: "bg-emerald-500/20 text-emerald-400",
 };
 
 export function AgentsPage() {
@@ -60,8 +65,13 @@ export function AgentsPage() {
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-          <input type="text" placeholder="Search agents..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder:text-white/30 focus:border-white/20 focus:outline-none" />
+          <input
+            type="text"
+            placeholder="Search agents..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder:text-white/30 focus:border-white/20 focus:outline-none"
+          />
         </div>
       </div>
       {loading ? (
@@ -73,29 +83,53 @@ export function AgentsPage() {
           {filtered.map((agent) => {
             const isActive = agent.status === AgentStatus.Active;
             const taskCount = tasksByAgent[agent.id] || 0;
-            const completion = agent.tasksCompleted > 0 ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100) : null;
+            const completion =
+              agent.tasksCompleted > 0
+                ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100)
+                : null;
             return (
-              <button key={agent.id} onClick={() => openAgentPanel(agent.id)}
+              <button
+                key={agent.id}
+                onClick={() => openAgentPanel(agent.id)}
                 className={cn(
                   "rounded-xl border bg-white/[0.02] p-4 space-y-4 transition-all text-left hover:bg-white/[0.04] hover:border-white/20 cursor-pointer group",
-                  isActive ? "border-cyan-500/20" : "border-white/5"
-                )}>
+                  isActive ? "border-cyan-500/20" : "border-white/5",
+                )}
+              >
                 <div className="flex items-start gap-3">
-                  <div className={cn("h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold", ROLE_COLORS[agent.role ?? ""] ?? "bg-slate-500/20 text-slate-400")}>
+                  <div
+                    className={cn(
+                      "h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+                      ROLE_COLORS[agent.role ?? ""] ?? "bg-slate-500/20 text-slate-400",
+                    )}
+                  >
                     {initials(agent.name)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-white text-sm truncate group-hover:text-cyan-300 transition-colors">{agent.name}</span>
-                      <Badge variant={isActive ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">{agent.status}</Badge>
+                      <span className="font-medium text-white text-sm truncate group-hover:text-cyan-300 transition-colors">
+                        {agent.name}
+                      </span>
+                      <Badge
+                        variant={isActive ? "default" : "secondary"}
+                        className="text-[10px] px-1.5 py-0"
+                      >
+                        {agent.status}
+                      </Badge>
                     </div>
                     {agent.role && <div className="text-xs text-white/40 mt-0.5">{agent.role}</div>}
-                    {agent.level != null && <div className="text-xs text-white/30">L{agent.level} · {levelLabel(agent.level)}</div>}
+                    {agent.level != null && (
+                      <div className="text-xs text-white/30">
+                        L{agent.level} · {levelLabel(agent.level)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
                   <div className="rounded-lg bg-white/5 px-3 py-2">
-                    <div className="text-white/40 mb-0.5 flex items-center gap-1"><Shield className="h-3 w-3" /> Trust</div>
+                    <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                      <Shield className="h-3 w-3" /> Trust
+                    </div>
                     <div className="font-semibold text-white">{agent.trustScore ?? "—"}%</div>
                   </div>
                   <div className="rounded-lg bg-white/5 px-3 py-2">
@@ -104,13 +138,19 @@ export function AgentsPage() {
                   </div>
                   {completion !== null && (
                     <div className="rounded-lg bg-white/5 px-3 py-2">
-                      <div className="text-white/40 mb-0.5 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Win rate</div>
+                      <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> Win rate
+                      </div>
                       <div className="font-semibold text-white">{completion}%</div>
                     </div>
                   )}
                   <div className="rounded-lg bg-white/5 px-3 py-2">
-                    <div className="text-white/40 mb-0.5 flex items-center gap-1"><Clock className="h-3 w-3" /> Last seen</div>
-                    <div className="font-semibold text-white truncate">{timeAgo(agent.lastActivityAt)}</div>
+                    <div className="text-white/40 mb-0.5 flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> Last seen
+                    </div>
+                    <div className="font-semibold text-white truncate">
+                      {timeAgo(agent.lastActivityAt)}
+                    </div>
                   </div>
                 </div>
               </button>

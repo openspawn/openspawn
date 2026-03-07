@@ -15,12 +15,13 @@ export function YourFirstOrgMd() {
       {/* Big Idea */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">The Big Idea</h2>
       <p className="mb-4 text-slate-400">
-        ORG.md is a single markdown file that defines your entire agent organization. Not a YAML config, not a JSON
-        blob — markdown. The kind you can read in GitHub, edit in any text editor, and check into version control
-        alongside your code.
+        ORG.md is a single markdown file that defines your entire agent organization. Not a YAML
+        config, not a JSON blob — markdown. The kind you can read in GitHub, edit in any text
+        editor, and check into version control alongside your code.
       </p>
       <p className="mb-4 text-slate-400">
-        It looks like documentation. It <em>is</em> documentation. But it's also the thing that runs your agents.
+        It looks like documentation. It <em>is</em> documentation. But it's also the thing that runs
+        your agents.
       </p>
       <CodeBlock title="flow">{`ORG.md  →  OpenSpawn reads it  →  agents spawn  →  tasks flow  →  org works`}</CodeBlock>
       <p className="mb-4 text-slate-400">
@@ -31,10 +32,12 @@ export function YourFirstOrgMd() {
       </p>
 
       {/* Part 1 */}
-      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Part 1 — The Minimal Org (3 Agents)</h2>
+      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">
+        Part 1 — The Minimal Org (3 Agents)
+      </h2>
       <p className="mb-4 text-slate-400">
-        Before we add any structure, let's ask: what's the <em>least</em> you need in an ORG.md to get a working
-        org? The answer is a name and a Structure section with at least one role.
+        Before we add any structure, let's ask: what's the <em>least</em> you need in an ORG.md to
+        get a working org? The answer is a name and a Structure section with at least one role.
       </p>
       <p className="mb-4 text-slate-400">
         Create a file called <code className="inline-code">ORG.md</code>:
@@ -58,8 +61,8 @@ Writes docs, blog posts, and marketing copy.
 - **Model:** claude-haiku
 - **Domain:** content`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        That's it. Three agents. A COO who receives tasks and delegates, a Developer who handles engineering work, and
-        a Writer who handles content.
+        That's it. Three agents. A COO who receives tasks and delegates, a Developer who handles
+        engineering work, and a Writer who handles content.
       </p>
       <CodeBlock title="bash">{`npx openspawn start`}</CodeBlock>
       <CodeBlock title="output">{`🚀 OpenSpawn starting...
@@ -74,37 +77,39 @@ Writes docs, blog posts, and marketing copy.
   -H 'Content-Type: application/json' \\
   -d '{"message": {"role": "user", "parts": [{"kind": "text", "text": "Write a README for our project"}]}}'`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Watch the dashboard. The COO receives the task, decides it's content work, and delegates to the Writer. The
-        Writer writes. The COO reports back.
+        Watch the dashboard. The COO receives the task, decides it's content work, and delegates to
+        the Writer. The Writer writes. The COO reports back.
       </p>
       <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
-        <strong>It works.</strong> Three agents, no configuration beyond what you just wrote, and you have a
-        functioning delegation chain.
+        <strong>It works.</strong> Three agents, no configuration beyond what you just wrote, and
+        you have a functioning delegation chain.
       </div>
 
       <h3 className="mt-8 mb-3 text-lg font-semibold text-slate-200">What's Happening Here</h3>
-      <p className="mb-3 text-slate-400">Let's break down what OpenSpawn is reading from those three roles.</p>
-      <p className="mb-2 text-slate-400">
-        <strong className="text-slate-200">The COO role — </strong>
-        <code className="inline-code">### COO</code> is an H3 heading. OpenSpawn
-        recognizes "COO" as a C-level keyword and assigns level L10 — this agent can delegate and has authority over
-        the whole org. The prose "Routes work to the right person." becomes the COO's system prompt context — the LLM
-        reads this and uses it to decide how to behave.
+      <p className="mb-3 text-slate-400">
+        Let's break down what OpenSpawn is reading from those three roles.
       </p>
       <p className="mb-2 text-slate-400">
-        <strong className="text-slate-200">Hierarchy inference: </strong>When the COO delegates, it matches the task
-        domain against available agents. "Write a README" matches{" "}
-        <code className="inline-code">domain: content</code>, so it goes to the
-        Writer. "Fix the auth bug" would match{" "}
-        <code className="inline-code">domain: engineering</code> and go to the
+        <strong className="text-slate-200">The COO role — </strong>
+        <code className="inline-code">### COO</code> is an H3 heading. OpenSpawn recognizes "COO" as
+        a C-level keyword and assigns level L10 — this agent can delegate and has authority over the
+        whole org. The prose "Routes work to the right person." becomes the COO's system prompt
+        context — the LLM reads this and uses it to decide how to behave.
+      </p>
+      <p className="mb-2 text-slate-400">
+        <strong className="text-slate-200">Hierarchy inference: </strong>When the COO delegates, it
+        matches the task domain against available agents. "Write a README" matches{" "}
+        <code className="inline-code">domain: content</code>, so it goes to the Writer. "Fix the
+        auth bug" would match <code className="inline-code">domain: engineering</code> and go to the
         Developer. No explicit routing rules needed.
       </p>
 
       {/* Part 2 */}
       <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Part 2 — Adding Departments</h2>
       <p className="mb-4 text-slate-400">
-        Three agents is fine for a personal project. But when you have more than ~5 agents, flat structures get messy.
-        The COO ends up managing too many direct reports, and tasks take too long to route. The answer is departments.
+        Three agents is fine for a personal project. But when you have more than ~5 agents, flat
+        structures get messy. The COO ends up managing too many direct reports, and tasks take too
+        long to route. The answer is departments.
       </p>
       <CodeBlock title="ORG.md">{`# Tandem
 
@@ -150,7 +155,8 @@ Writes docs, blog posts, landing pages, and release notes.
 - **Domain:** copywriting
 - **Count:** 2`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Apply this change to your running org — <strong className="text-slate-200">no restart needed</strong>:
+        Apply this change to your running org —{" "}
+        <strong className="text-slate-200">no restart needed</strong>:
       </p>
       <CodeBlock title="bash">{`npx openspawn apply ORG.md`}</CodeBlock>
       <CodeBlock title="output">{`Applying changes...
@@ -165,33 +171,34 @@ Writes docs, blog posts, landing pages, and release notes.
    Modified: Writer → removed (was replaced by Content structure)
    Existing: COO → unchanged`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Your org just grew from 3 to 8 agents, live, without restarting. The COO is still running. Any in-flight tasks
-        continue uninterrupted.
+        Your org just grew from 3 to 8 agents, live, without restarting. The COO is still running.
+        Any in-flight tasks continue uninterrupted.
       </p>
 
       <h3 className="mt-8 mb-3 text-lg font-semibold text-slate-200">Reading the New Structure</h3>
       <div className="mb-4 space-y-3 text-slate-400">
         <p>
-          <strong className="text-slate-200">Departments</strong> are H3 headings without role keywords —
-          "Engineering" isn't a role keyword, so it's read as a container for the roles nested beneath it. The prose
-          becomes context all agents in the department share.
+          <strong className="text-slate-200">Departments</strong> are H3 headings without role
+          keywords — "Engineering" isn't a role keyword, so it's read as a container for the roles
+          nested beneath it. The prose becomes context all agents in the department share.
         </p>
         <p>
-          <strong className="text-slate-200">Department leads</strong> are the first H4 role under the department. The
-          "Lead" keyword assigns level L7. L7+ agents can delegate to agents below them and receive work from the COO.
+          <strong className="text-slate-200">Department leads</strong> are the first H4 role under
+          the department. The "Lead" keyword assigns level L7. L7+ agents can delegate to agents
+          below them and receive work from the COO.
         </p>
         <p>
           <strong className="text-slate-200">
             <code className="inline-code">Count: 2</code>
           </strong>{" "}
-          spawns two agents: "Backend Developer 1" and "Backend Developer 2". They're independent — separate task
-          queues, separate trust scores. The Engineering Lead picks the one with capacity (or higher trust for harder
-          tasks).
+          spawns two agents: "Backend Developer 1" and "Backend Developer 2". They're independent —
+          separate task queues, separate trust scores. The Engineering Lead picks the one with
+          capacity (or higher trust for harder tasks).
         </p>
         <p>
-          <strong className="text-slate-200">Why ollama/qwen2.5 for workers?</strong> Economics. A backend developer
-          agent runs every tick. At Claude Sonnet prices, that's expensive at scale. A free local model handles
-          execution tasks just fine.
+          <strong className="text-slate-200">Why ollama/qwen2.5 for workers?</strong> Economics. A
+          backend developer agent runs every tick. At Claude Sonnet prices, that's expensive at
+          scale. A free local model handles execution tasks just fine.
         </p>
       </div>
 
@@ -255,22 +262,24 @@ preset: startup`}</CodeBlock>
 preset: startup
 - **Escalation:** delayed — we trust our leads, no need to escalate immediately`}</CodeBlock>
 
-      <h3 className="mt-8 mb-3 text-lg font-semibold text-slate-200">What Culture Actually Changes</h3>
+      <h3 className="mt-8 mb-3 text-lg font-semibold text-slate-200">
+        What Culture Actually Changes
+      </h3>
       <p className="mb-4 text-slate-400">
-        Culture maps directly to the Agent Communication Protocol (ACP) — the message-passing system that governs how
-        agents talk to each other. When you set{" "}
-        <code className="inline-code">Ack required: yes</code>, every delegation
-        automatically triggers an acknowledgment. When you set{" "}
-        <code className="inline-code">Escalation: immediate</code>, a blocked
-        agent escalates in the same tick it gets stuck. These aren't suggestions — they're ACP configuration. The
-        protocol enforces them.
+        Culture maps directly to the Agent Communication Protocol (ACP) — the message-passing system
+        that governs how agents talk to each other. When you set{" "}
+        <code className="inline-code">Ack required: yes</code>, every delegation automatically
+        triggers an acknowledgment. When you set{" "}
+        <code className="inline-code">Escalation: immediate</code>, a blocked agent escalates in the
+        same tick it gets stuck. These aren't suggestions — they're ACP configuration. The protocol
+        enforces them.
       </p>
 
       {/* Part 4 */}
       <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Part 4 — Adding Identity</h2>
       <p className="mb-4 text-slate-400">
-        Identity is ambient context for the entire org. Every agent has access to it. It answers: <em>why do we
-        exist, what are we building, what do we value?</em>
+        Identity is ambient context for the entire org. Every agent has access to it. It answers:{" "}
+        <em>why do we exist, what are we building, what do we value?</em>
       </p>
       <CodeBlock title="ORG.md">{`# Tandem
 
@@ -291,12 +300,13 @@ preset: startup
 ## Structure
 ...`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Identity influences agent behavior in subtle but meaningful ways. A marketing agent writing copy knows they're
-        writing for a developer tools audience. An engineering agent prioritizing work knows that "document
-        everything" is a value, not a suggestion.
+        Identity influences agent behavior in subtle but meaningful ways. A marketing agent writing
+        copy knows they're writing for a developer tools audience. An engineering agent prioritizing
+        work knows that "document everything" is a value, not a suggestion.
       </p>
       <p className="mb-4 text-slate-400">
-        Write Identity like you'd write the first page of a company handbook — terse, clear, honest about who you are.
+        Write Identity like you'd write the first page of a company handbook — terse, clear, honest
+        about who you are.
       </p>
 
       {/* Part 5 */}
@@ -338,28 +348,28 @@ If no domain match is found, the task goes to the COO for manual delegation.
 - **Exceptions:** tasks marked \`priority: critical\` run 24/7`}</CodeBlock>
       <div className="mb-4 space-y-3 text-slate-400">
         <p>
-          <strong className="text-slate-200">Budget limits are per-agent, not per-org.</strong> If Backend Developer 1
-          hits 500 credits, it pauses. Backend Developer 2 keeps running. Override per-agent by adding{" "}
-          <code className="inline-code">**Budget:** 1000 credits/period</code> to
-          any role.
+          <strong className="text-slate-200">Budget limits are per-agent, not per-org.</strong> If
+          Backend Developer 1 hits 500 credits, it pauses. Backend Developer 2 keeps running.
+          Override per-agent by adding{" "}
+          <code className="inline-code">**Budget:** 1000 credits/period</code> to any role.
         </p>
         <p>
-          <strong className="text-slate-200">Department caps prevent runaway spawning.</strong> Leads with L7+ can
-          spawn new agents when overloaded. Without a cap, an Engineering Lead could decide it needs 20 backend
-          developers and blow your budget.
+          <strong className="text-slate-200">Department caps prevent runaway spawning.</strong>{" "}
+          Leads with L7+ can spawn new agents when overloaded. Without a cap, an Engineering Lead
+          could decide it needs 20 backend developers and blow your budget.
         </p>
         <p>
-          <strong className="text-slate-200">Working hours are optional but powerful.</strong> If you're running agents
-          that cost real money, off-hours queuing means tasks pile up overnight and get processed in the morning —
-          nothing is lost, nothing is wasted.
+          <strong className="text-slate-200">Working hours are optional but powerful.</strong> If
+          you're running agents that cost real money, off-hours queuing means tasks pile up
+          overnight and get processed in the morning — nothing is lost, nothing is wasted.
         </p>
       </div>
 
       {/* Part 6 */}
       <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Part 6 — Adding Playbooks</h2>
       <p className="mb-4 text-slate-400">
-        Playbooks are reusable procedures. When a standard situation occurs — a new task arrives, an agent gets
-        blocked, a new agent joins — the relevant playbook kicks in.
+        Playbooks are reusable procedures. When a standard situation occurs — a new task arrives, an
+        agent gets blocked, a new agent joins — the relevant playbook kicks in.
       </p>
       <CodeBlock title="ORG.md">{`## Playbooks
 
@@ -392,8 +402,9 @@ If no domain match is found, the task goes to the COO for manual delegation.
 3. Delivers digest to human principal
 4. Proposes structural changes if patterns warrant it`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Playbooks aren't just documentation — they're instructions the system follows. When an agent status changes to
-        BLOCKED, OpenSpawn looks up the "Agent Blocked" playbook and executes the steps.
+        Playbooks aren't just documentation — they're instructions the system follows. When an agent
+        status changes to BLOCKED, OpenSpawn looks up the "Agent Blocked" playbook and executes the
+        steps.
       </p>
 
       {/* Complete ORG.md */}
@@ -509,14 +520,21 @@ npx openspawn deploy ORG.md
 npx openspawn apply ORG.md`}</CodeBlock>
 
       {/* What Happens */}
-      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">What Happens When You Run This</h2>
+      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">
+        What Happens When You Run This
+      </h2>
       <p className="mb-4 text-slate-400">
         Open the dashboard at{" "}
-        <a href="http://localhost:3333/app/" target="_blank" rel="noopener" className="text-cyan-400 underline">
+        <a
+          href="http://localhost:3333/app/"
+          target="_blank"
+          rel="noopener"
+          className="text-cyan-400 underline"
+        >
           http://localhost:3333/app/
         </a>
-        . You'll see a COO at the top, Engineering and Content departments branching down, with leads and workers
-        beneath each. Send a task:
+        . You'll see a COO at the top, Engineering and Content departments branching down, with
+        leads and workers beneath each. Send a task:
       </p>
       <CodeBlock title="bash">{`curl -X POST http://localhost:3333/a2a/message/send \\
   -H 'Content-Type: application/json' \\
@@ -532,8 +550,8 @@ npx openspawn apply ORG.md`}</CodeBlock>
         <li>COO closes task → reports to human</li>
       </ol>
       <p className="mb-4 text-slate-400">
-        The entire chain is logged. Click the task in the timeline to see every delegation message, every ack, every
-        status change.
+        The entire chain is logged. Click the task in the timeline to see every delegation message,
+        every ack, every status change.
       </p>
 
       {/* Iterating */}
@@ -541,16 +559,17 @@ npx openspawn apply ORG.md`}</CodeBlock>
       <p className="mb-3 text-slate-400">The file is alive. Change it as you learn.</p>
       <div className="mb-6 space-y-3 text-slate-400">
         <p>
-          <strong className="text-slate-200">High escalation rate?</strong> Check your Structure descriptions. Are
-          roles clear about what they own? An agent that receives an out-of-domain task will escalate because it
-          doesn't know how to handle it.
+          <strong className="text-slate-200">High escalation rate?</strong> Check your Structure
+          descriptions. Are roles clear about what they own? An agent that receives an out-of-domain
+          task will escalate because it doesn't know how to handle it.
         </p>
         <p>
-          <strong className="text-slate-200">An agent is always idle?</strong> Its domain might be too narrow. Broaden
-          the description or merge the role into a related one.
+          <strong className="text-slate-200">An agent is always idle?</strong> Its domain might be
+          too narrow. Broaden the description or merge the role into a related one.
         </p>
         <p>
-          <strong className="text-slate-200">Engineering is always at capacity?</strong> Add a backend developer:
+          <strong className="text-slate-200">Engineering is always at capacity?</strong> Add a
+          backend developer:
         </p>
       </div>
       <CodeBlock title="ORG.md">{`#### Backend Developer
@@ -564,9 +583,12 @@ Builds and maintains APIs, databases, and server infrastructure.
       </p>
 
       {/* Real-world example */}
-      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">A Real-World Example — Marketing Agency</h2>
+      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">
+        A Real-World Example — Marketing Agency
+      </h2>
       <p className="mb-4 text-slate-400">
-        Here's a complete ORG.md for a different context: a small marketing agency with client delivery teams.
+        Here's a complete ORG.md for a different context: a small marketing agency with client
+        delivery teams.
       </p>
       <CodeBlock title="ORG.md">{`# Fieldwork Agency
 
@@ -680,47 +702,47 @@ All client-deliverable tasks must complete within:
 3. If reassignment needed, Account Director is looped in
 4. Client is proactively updated (Account Director drafts message)`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        This org runs 11 agents across 3 departments. Every brief that comes in gets strategy, creative, and analytics
-        work done in sequence. The SLA policy ensures nothing sits idle.
+        This org runs 11 agents across 3 departments. Every brief that comes in gets strategy,
+        creative, and analytics work done in sequence. The SLA policy ensures nothing sits idle.
       </p>
 
       {/* Tips */}
-      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">Tips for Writing Good ORG.md Files</h2>
+      <h2 className="mt-12 mb-4 text-2xl font-bold text-slate-100">
+        Tips for Writing Good ORG.md Files
+      </h2>
       <div className="mb-6 space-y-3 text-slate-400">
         <p>
-          <strong className="text-slate-200">Be specific in role descriptions.</strong> "Does engineering work" is a
-          bad description. "Builds and maintains the REST API, database schemas, and authentication layer" is a good
-          one. Specific descriptions lead to accurate task routing.
+          <strong className="text-slate-200">Be specific in role descriptions.</strong> "Does
+          engineering work" is a bad description. "Builds and maintains the REST API, database
+          schemas, and authentication layer" is a good one. Specific descriptions lead to accurate
+          task routing.
         </p>
         <p>
-          <strong className="text-slate-200">Start smaller than you think you need.</strong> Three agents is enough to
-          see the whole system work. Add complexity only when you hit a real limit.
+          <strong className="text-slate-200">Start smaller than you think you need.</strong> Three
+          agents is enough to see the whole system work. Add complexity only when you hit a real
+          limit.
         </p>
         <p>
-          <strong className="text-slate-200">Use ollama/qwen2.5 for workers.</strong> Your leads need judgment (use
-          claude-haiku at minimum). Your workers need execution. Local models are fast and free for execution tasks.
+          <strong className="text-slate-200">Use ollama/qwen2.5 for workers.</strong> Your leads
+          need judgment (use claude-haiku at minimum). Your workers need execution. Local models are
+          fast and free for execution tasks.
         </p>
         <p>
-          <strong className="text-slate-200">Write Culture before you need it.</strong> The default communication
-          settings are fine for testing. Set{" "}
+          <strong className="text-slate-200">Write Culture before you need it.</strong> The default
+          communication settings are fine for testing. Set{" "}
           <code className="inline-code">ack required: yes</code> and{" "}
-          <code className="inline-code">escalation: immediate</code> from the
-          start.
+          <code className="inline-code">escalation: immediate</code> from the start.
         </p>
         <p>
-          <strong className="text-slate-200">Commit your ORG.md to git.</strong> Every change to your org is a git
-          commit. <code className="inline-code">git log ORG.md</code> becomes your
-          org history.{" "}
-          <code className="inline-code">git revert</code> undoes a structural
-          decision that didn't work out.
+          <strong className="text-slate-200">Commit your ORG.md to git.</strong> Every change to
+          your org is a git commit. <code className="inline-code">git log ORG.md</code> becomes your
+          org history. <code className="inline-code">git revert</code> undoes a structural decision
+          that didn't work out.
         </p>
         <p>
-          <strong className="text-slate-200">Export regularly.</strong> When leads spawn new agents dynamically, the
-          running org diverges from your file. Run{" "}
-          <code className="inline-code">
-            npx openspawn export &gt; ORG.md
-          </code>{" "}
-          to sync them.
+          <strong className="text-slate-200">Export regularly.</strong> When leads spawn new agents
+          dynamically, the running org diverges from your file. Run{" "}
+          <code className="inline-code">npx openspawn export &gt; ORG.md</code> to sync them.
         </p>
       </div>
 
@@ -761,9 +783,12 @@ All client-deliverable tasks must complete within:
       </div>
 
       <p className="mt-10 text-sm text-slate-500 italic">
-        Your ORG.md is a living document. The best ones aren't designed upfront — they're evolved over dozens of{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">npx openspawn apply</code> calls, each
-        one a lesson learned about how your agents actually work.
+        Your ORG.md is a living document. The best ones aren't designed upfront — they're evolved
+        over dozens of{" "}
+        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">
+          npx openspawn apply
+        </code>{" "}
+        calls, each one a lesson learned about how your agents actually work.
       </p>
     </DocsLayout>
   );

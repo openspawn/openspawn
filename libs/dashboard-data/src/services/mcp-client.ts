@@ -3,7 +3,7 @@
  * Falls back gracefully when the server isn't available.
  */
 
-const MCP_URL = import.meta.env.VITE_MCP_URL || '/mcp';
+const MCP_URL = import.meta.env.VITE_MCP_URL || "/mcp";
 
 export interface McpResponse<T = unknown> {
   result?: { content?: Array<{ type: string; text: string }> };
@@ -16,7 +16,7 @@ export class McpError extends Error {
     public code?: number,
   ) {
     super(message);
-    this.name = 'McpError';
+    this.name = "McpError";
   }
 }
 
@@ -27,17 +27,17 @@ export async function mcpCall<T = unknown>(
   let res: Response;
   try {
     res = await fetch(MCP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        jsonrpc: '2.0',
+        jsonrpc: "2.0",
         id: 1,
-        method: 'tools/call',
+        method: "tools/call",
         params: { name: tool, arguments: params },
       }),
     });
   } catch {
-    throw new McpError('MCP server not reachable');
+    throw new McpError("MCP server not reachable");
   }
 
   if (!res.ok) {
@@ -63,19 +63,18 @@ export async function mcpCall<T = unknown>(
 
 // ── Typed wrappers ──────────────────────────────────────────────────────
 
-export const taskList = (opts?: { status?: string }) =>
-  mcpCall('task_list', opts || {});
+export const taskList = (opts?: { status?: string }) => mcpCall("task_list", opts || {});
 
 export const taskCreate = (title: string, opts?: Record<string, unknown>) =>
-  mcpCall('task_create', { title, ...opts });
+  mcpCall("task_create", { title, ...opts });
 
 export const taskClaim = (taskId: string, agentId: string) =>
-  mcpCall('task_claim', { task_id: taskId, agent_id: agentId });
+  mcpCall("task_claim", { task_id: taskId, agent_id: agentId });
 
 export const taskComplete = (taskId: string, result: string) =>
-  mcpCall('task_complete', { task_id: taskId, result });
+  mcpCall("task_complete", { task_id: taskId, result });
 
-export const agentList = () => mcpCall('agent_list', {});
+export const agentList = () => mcpCall("agent_list", {});
 
 export const agentRegister = (agent: {
   id: string;
@@ -84,18 +83,16 @@ export const agentRegister = (agent: {
   level?: string;
   department?: string;
   model?: string;
-}) => mcpCall('agent_register', agent);
+}) => mcpCall("agent_register", agent);
 
 export const agentUpdateStatus = (id: string, status: string) =>
-  mcpCall('agent_update_status', { agent_id: id, status });
+  mcpCall("agent_update_status", { agent_id: id, status });
 
-export const agentFire = (id: string) =>
-  mcpCall('agent_fire', { agent_id: id });
+export const agentFire = (id: string) => mcpCall("agent_fire", { agent_id: id });
 
-export const orgStatus = () => mcpCall('org_status', {});
+export const orgStatus = () => mcpCall("org_status", {});
 
-export const eventList = (opts?: { agent_id?: string }) =>
-  mcpCall('event_list', opts || {});
+export const eventList = (opts?: { agent_id?: string }) => mcpCall("event_list", opts || {});
 
 export const escalate = (issue: string, severity?: string) =>
-  mcpCall('escalation_create', { issue, severity: severity || 'medium' });
+  mcpCall("escalation_create", { issue, severity: severity || "medium" });

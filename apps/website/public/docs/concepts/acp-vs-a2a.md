@@ -15,7 +15,7 @@ When to use OpenSpawn's Agent Communication Protocol versus Google's Agent-to-Ag
 
 1. Acknowledgment (ACK) Pull-based log entry written to the task as work progresses. The manager checks when they want to.
 
-3. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
+2. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
 
 ### Why This Matters
 
@@ -217,7 +217,7 @@ A2A makes your org interoperable with the broader agent ecosystem. It's the reas
 
 Connecting Real Agents →
 
-How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="_blank" rel="noopener"
+How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="\_blank" rel="noopener"
 
 A2A Protocol Docs →
 

@@ -3,16 +3,16 @@
  * Uses canvas-confetti for lightweight, performant animations
  */
 
-import confetti from 'canvas-confetti';
+import confetti from "canvas-confetti";
 
 // Default confetti colors matching our theme
-const THEME_COLORS = ['#f472b6', '#a78bfa', '#22c55e', '#06b6d4', '#fbbf24'];
+const THEME_COLORS = ["#f472b6", "#a78bfa", "#22c55e", "#06b6d4", "#fbbf24"];
 
 // Gold/celebration colors
-const CELEBRATION_COLORS = ['#ffd700', '#ffec8b', '#ffa500', '#ff6347', '#ff69b4'];
+const CELEBRATION_COLORS = ["#ffd700", "#ffec8b", "#ffa500", "#ff6347", "#ff69b4"];
 
 // Level-up colors (purple/gold)
-const LEVEL_UP_COLORS = ['#a78bfa', '#c4b5fd', '#ffd700', '#ffec8b', '#f472b6'];
+const LEVEL_UP_COLORS = ["#a78bfa", "#c4b5fd", "#ffd700", "#ffec8b", "#f472b6"];
 
 /**
  * Standard celebration burst (task completed, etc.)
@@ -65,7 +65,7 @@ export function celebrateLevelUp() {
     spread: 70,
     origin: { y: 0.6 },
     colors: LEVEL_UP_COLORS,
-    shapes: ['star', 'circle'],
+    shapes: ["star", "circle"],
     scalar: 1.1,
   });
 }
@@ -125,15 +125,15 @@ export function celebrateSparkle() {
  * Elite agent celebration (gold burst) - subtle version
  */
 export function celebrateElite() {
-  const colors = ['#ffd700', '#ffec8b', '#daa520', '#b8860b'];
-  
+  const colors = ["#ffd700", "#ffec8b", "#daa520", "#b8860b"];
+
   // Single elegant gold burst
   confetti({
     particleCount: 60,
     spread: 80,
     origin: { y: 0.5 },
     colors,
-    shapes: ['circle', 'star'],
+    shapes: ["circle", "star"],
     scalar: 1.2,
   });
 }
@@ -153,6 +153,6 @@ export type CelebrationType = keyof typeof celebrations;
 /**
  * Trigger a celebration by type
  */
-export function celebrate(type: CelebrationType = 'burst') {
+export function celebrate(type: CelebrationType = "burst") {
   celebrations[type]();
 }

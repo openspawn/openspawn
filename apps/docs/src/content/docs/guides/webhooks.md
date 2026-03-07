@@ -7,10 +7,10 @@ description: Connect OpenSpawn to any external system using inbound webhooks, ou
 
 OpenSpawn has two complementary webhook directions:
 
-| Direction | What it does |
-|---|---|
-| **Inbound webhooks** | External services POST events → OpenSpawn creates tasks |
-| **Outbound webhooks** | OpenSpawn POSTs events → your server reacts |
+| Direction             | What it does                                            |
+| --------------------- | ------------------------------------------------------- |
+| **Inbound webhooks**  | External services POST events → OpenSpawn creates tasks |
+| **Outbound webhooks** | OpenSpawn POSTs events → your server reacts             |
 
 This guide covers both, plus the built-in Discord and GitHub integrations that ship on top of this infrastructure.
 
@@ -20,7 +20,7 @@ This guide covers both, plus the built-in Discord and GitHub integrations that s
 
 ### Inbound webhooks — push work into OpenSpawn
 
-An inbound webhook is a **secure URL that accepts task creation requests**. You create a *webhook key*, which gives you:
+An inbound webhook is a **secure URL that accepts task creation requests**. You create a _webhook key_, which gives you:
 
 - A unique key string (format: `iwk_<64 hex chars>`) used in the URL path
 - A shared secret used to sign (and optionally verify) payloads
@@ -59,12 +59,12 @@ Authorization: Bearer <jwt>
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string (≤255) | ✅ | Human-readable label for this key |
-| `defaultAgentId` | UUID | — | Agent to assign tasks to when not specified in the payload |
-| `defaultPriority` | `urgent` \| `high` \| `normal` \| `low` | — | Fallback priority |
-| `defaultTags` | string[] | — | Tags always applied to tasks from this key |
+| Field             | Type                                    | Required | Description                                                |
+| ----------------- | --------------------------------------- | -------- | ---------------------------------------------------------- |
+| `name`            | string (≤255)                           | ✅       | Human-readable label for this key                          |
+| `defaultAgentId`  | UUID                                    | —        | Agent to assign tasks to when not specified in the payload |
+| `defaultPriority` | `urgent` \| `high` \| `normal` \| `low` | —        | Fallback priority                                          |
+| `defaultTags`     | string[]                                | —        | Tags always applied to tasks from this key                 |
 
 ### curl example
 
@@ -151,14 +151,14 @@ No authentication required — the key in the URL path authenticates the request
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `title` | string (≤500) | ✅ | Task title |
-| `description` | string | — | Full details (markdown supported) |
-| `priority` | `urgent` \| `high` \| `normal` \| `low` | — | Overrides key default |
-| `tags` | string[] | — | Merged with key's `defaultTags` |
-| `assigneeId` | UUID | — | Overrides key's `defaultAgentId` |
-| `metadata` | object | — | Arbitrary key/value data attached to the task |
+| Field         | Type                                    | Required | Description                                   |
+| ------------- | --------------------------------------- | -------- | --------------------------------------------- |
+| `title`       | string (≤500)                           | ✅       | Task title                                    |
+| `description` | string                                  | —        | Full details (markdown supported)             |
+| `priority`    | `urgent` \| `high` \| `normal` \| `low` | —        | Overrides key default                         |
+| `tags`        | string[]                                | —        | Merged with key's `defaultTags`               |
+| `assigneeId`  | UUID                                    | —        | Overrides key's `defaultAgentId`              |
+| `metadata`    | object                                  | —        | Arbitrary key/value data attached to the task |
 
 ### curl example
 
@@ -245,10 +245,7 @@ Signing is **optional** by default. If you provide the header and it doesn't mat
 import crypto from "node:crypto";
 
 function signWebhookPayload(secret, bodyString) {
-  return crypto
-    .createHmac("sha256", secret)
-    .update(bodyString)
-    .digest("hex");
+  return crypto.createHmac("sha256", secret).update(bodyString).digest("hex");
 }
 
 // Usage
@@ -269,12 +266,12 @@ await fetch(`https://api.openspawn.ai/api/v1/webhooks/inbound/${key}`, {
 
 When OpenSpawn calls your server it sends:
 
-| Header | Value |
-|---|---|
-| `X-BikiniBottom-Signature` | `sha256=<hmac-sha256-hex>` |
-| `X-BikiniBottom-Event` | Event type string (e.g. `task.created`) |
-| `X-BikiniBottom-Delivery` | Unique delivery UUID |
-| `X-BikiniBottom-Hook-Type` | `pre` or `post` |
+| Header                     | Value                                   |
+| -------------------------- | --------------------------------------- |
+| `X-BikiniBottom-Signature` | `sha256=<hmac-sha256-hex>`              |
+| `X-BikiniBottom-Event`     | Event type string (e.g. `task.created`) |
+| `X-BikiniBottom-Delivery`  | Unique delivery UUID                    |
+| `X-BikiniBottom-Hook-Type` | `pre` or `post`                         |
 
 Verify in Node.js:
 
@@ -282,16 +279,10 @@ Verify in Node.js:
 import crypto from "node:crypto";
 
 function verifyOutboundSignature(secret, rawBody, signatureHeader) {
-  const expected = "sha256=" + crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
+  const expected = "sha256=" + crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
 
   // Use constant-time comparison to prevent timing attacks
-  return crypto.timingSafeEqual(
-    Buffer.from(signatureHeader),
-    Buffer.from(expected)
-  );
+  return crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(expected));
 }
 
 // Express example
@@ -325,15 +316,15 @@ Authorization: Bearer <jwt>
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | ✅ | Label |
-| `url` | string (https) | ✅ | Must resolve to a public IP — localhost and RFC-1918 ranges are blocked |
-| `secret` | string | — | If set, OpenSpawn signs requests with `X-BikiniBottom-Signature` |
-| `events` | string[] | ✅ | Event types to subscribe to; `["*"]` subscribes to all |
-| `hookType` | `pre` \| `post` | — | Default: `post` |
-| `canBlock` | boolean | — | Pre-hooks only: whether a `{ allow: false }` response blocks the action |
-| `timeoutMs` | integer (1000–30000) | — | Request timeout; default 5000 |
+| Field       | Type                 | Required | Description                                                             |
+| ----------- | -------------------- | -------- | ----------------------------------------------------------------------- |
+| `name`      | string               | ✅       | Label                                                                   |
+| `url`       | string (https)       | ✅       | Must resolve to a public IP — localhost and RFC-1918 ranges are blocked |
+| `secret`    | string               | —        | If set, OpenSpawn signs requests with `X-BikiniBottom-Signature`        |
+| `events`    | string[]             | ✅       | Event types to subscribe to; `["*"]` subscribes to all                  |
+| `hookType`  | `pre` \| `post`      | —        | Default: `post`                                                         |
+| `canBlock`  | boolean              | —        | Pre-hooks only: whether a `{ allow: false }` response blocks the action |
+| `timeoutMs` | integer (1000–30000) | —        | Request timeout; default 5000                                           |
 
 ### curl example
 
@@ -394,21 +385,21 @@ This endpoint is **public** (no authentication) and expects a Discord message pa
 
 ### Message patterns recognized
 
-| Pattern | Action |
-|---|---|
-| Message contains `✅ Task: <title>` | Creates a new task |
-| Message contains `Created task: <title>` | Creates a new task |
-| Message contains `Task created: <title>` | Creates a new task |
+| Pattern                                                         | Action                   |
+| --------------------------------------------------------------- | ------------------------ |
+| Message contains `✅ Task: <title>`                             | Creates a new task       |
+| Message contains `Created task: <title>`                        | Creates a new task       |
+| Message contains `Task created: <title>`                        | Creates a new task       |
 | Message contains `Completed: <hint>` + `complete/finished/done` | Marks matching task done |
 
 Priority keywords are also parsed from the full message body:
 
-| Keyword | Priority |
-|---|---|
+| Keyword                      | Priority |
+| ---------------------------- | -------- |
 | `critical`, `urgent`, `asap` | `urgent` |
-| `high priority`, `important` | `high` |
-| `low priority` | `low` |
-| *(none)* | `normal` |
+| `high priority`, `important` | `high`   |
+| `low priority`               | `low`    |
+| _(none)_                     | `normal` |
 
 ### Sending a Discord message via curl (simulating the Discord payload)
 
@@ -448,7 +439,11 @@ A minimal Node.js forwarder:
 import { Client, GatewayIntentBits } from "discord.js";
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 client.on("messageCreate", async (message) => {
@@ -489,20 +484,20 @@ This endpoint is **public**. GitHub sends all events here. Signature verificatio
 
 ### Required headers (sent automatically by GitHub)
 
-| Header | Description |
-|---|---|
+| Header                | Description                                                     |
+| --------------------- | --------------------------------------------------------------- |
 | `X-Hub-Signature-256` | `sha256=<hmac>` — HMAC of the payload using your webhook secret |
-| `X-GitHub-Event` | Event type (e.g. `issues`, `pull_request`) |
-| `X-GitHub-Delivery` | Unique delivery UUID |
+| `X-GitHub-Event`      | Event type (e.g. `issues`, `pull_request`)                      |
+| `X-GitHub-Delivery`   | Unique delivery UUID                                            |
 
 ### Events handled
 
-| GitHub event | What OpenSpawn does |
-|---|---|
-| `issues` (opened/closed/etc.) | Creates or updates a task |
-| `issue_comment` | Adds a comment or updates task description |
-| `pull_request` | Creates or updates a task |
-| `check_suite` | Updates task status based on CI result |
+| GitHub event                  | What OpenSpawn does                        |
+| ----------------------------- | ------------------------------------------ |
+| `issues` (opened/closed/etc.) | Creates or updates a task                  |
+| `issue_comment`               | Adds a comment or updates task description |
+| `pull_request`                | Creates or updates a task                  |
+| `check_suite`                 | Updates task status based on CI result     |
 
 ### Setting up in GitHub
 
@@ -510,7 +505,7 @@ This endpoint is **public**. GitHub sends all events here. Signature verificatio
 2. **Payload URL:** `https://api.openspawn.ai/api/v1/integrations/github/webhook`
 3. **Content type:** `application/json`
 4. **Secret:** Your webhook secret (must match the secret stored in the GitHub connection record)
-5. **Events:** Select *Issues*, *Pull requests*, *Check suites* (or "Send me everything")
+5. **Events:** Select _Issues_, _Pull requests_, _Check suites_ (or "Send me everything")
 
 The GitHub connection must exist in OpenSpawn (via the GitHub integration setup) with a matching `installationId` derived from the payload's `installation.id` or `repository.owner.id`.
 

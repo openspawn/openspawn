@@ -21,16 +21,19 @@ openspawn:<org-id>:<agent-id>
 ```
 
 **Examples:**
+
 - `openspawn:krusty-krab:mr-krabs`
 - `openspawn:acme-corp:deploy-bot`
 - `openspawn:krusty-krab:squidward`
 
 Each agent has:
+
 - **One Ed25519 keypair** generated at hire time
 - **Private key** stored in the agent's workspace at `.identity/private.key`
 - **Public key** published in ORG.md and `.well-known/agents.json`
 
 Full workspace path for the private key:
+
 ```
 ~/.openclaw/workspace-<agent-id>/.identity/private.key
 ```
@@ -44,9 +47,9 @@ Full workspace path for the private key:
 Keys are generated automatically during `openspawn hire` or `openspawn init`.
 
 ```typescript
-import { generateKeyPairSync, createPublicKey } from 'node:crypto';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { generateKeyPairSync, createPublicKey } from "node:crypto";
+import { writeFileSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
 
 interface AgentIdentity {
   agentId: string;
@@ -55,31 +58,32 @@ interface AgentIdentity {
   fingerprint: string;
 }
 
-function generateAgentIdentity(orgId: string, agentId: string, workspacePath: string): AgentIdentity {
-  const { publicKey, privateKey } = generateKeyPairSync('ed25519');
+function generateAgentIdentity(
+  orgId: string,
+  agentId: string,
+  workspacePath: string,
+): AgentIdentity {
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
 
   // Store private key as PEM
-  const identityDir = join(workspacePath, '.identity');
+  const identityDir = join(workspacePath, ".identity");
   mkdirSync(identityDir, { recursive: true, mode: 0o700 });
   writeFileSync(
-    join(identityDir, 'private.key'),
-    privateKey.export({ type: 'pkcs8', format: 'pem' }),
-    { mode: 0o600 }
+    join(identityDir, "private.key"),
+    privateKey.export({ type: "pkcs8", format: "pem" }),
+    { mode: 0o600 },
   );
 
   // Export public key for publishing
-  const pubKeyDer = publicKey.export({ type: 'spki', format: 'der' });
-  const publicKeyBase64 = pubKeyDer.toString('base64');
+  const pubKeyDer = publicKey.export({ type: "spki", format: "der" });
+  const publicKeyBase64 = pubKeyDer.toString("base64");
 
   // Compute fingerprint
-  const { createHash } = require('node:crypto');
-  const fingerprint = 'SHA256:' + createHash('sha256').update(pubKeyDer).digest('base64url');
+  const { createHash } = require("node:crypto");
+  const fingerprint = "SHA256:" + createHash("sha256").update(pubKeyDer).digest("base64url");
 
   // Write public key PEM too (convenience)
-  writeFileSync(
-    join(identityDir, 'public.key'),
-    publicKey.export({ type: 'spki', format: 'pem' })
-  );
+  writeFileSync(join(identityDir, "public.key"), publicKey.export({ type: "spki", format: "pem" }));
 
   return { agentId, orgId, publicKeyBase64, fingerprint };
 }
@@ -87,11 +91,11 @@ function generateAgentIdentity(orgId: string, agentId: string, workspacePath: st
 
 ### Storage Summary
 
-| Artifact | Location | Permissions |
-|----------|----------|-------------|
-| Private key (PEM) | `<workspace>/.identity/private.key` | `0600` — agent only |
-| Public key (PEM) | `<workspace>/.identity/public.key` | `0644` — world-readable |
-| Public key (base64) | ORG.md + `.well-known/agents.json` | Public |
+| Artifact            | Location                            | Permissions             |
+| ------------------- | ----------------------------------- | ----------------------- |
+| Private key (PEM)   | `<workspace>/.identity/private.key` | `0600` — agent only     |
+| Public key (PEM)    | `<workspace>/.identity/public.key`  | `0644` — world-readable |
+| Public key (base64) | ORG.md + `.well-known/agents.json`  | Public                  |
 
 ### Key Rotation
 
@@ -100,6 +104,7 @@ openspawn rotate-keys mr-krabs
 ```
 
 This:
+
 1. Generates a new keypair
 2. Backs up the old private key to `.identity/private.key.bak`
 3. Updates ORG.md with the new public key and fingerprint
@@ -116,10 +121,10 @@ Every inter-agent message carries a cryptographic signature proving who sent it.
 
 ```typescript
 interface SignedMessage {
-  sender_id: string;      // "openspawn:krusty-krab:mr-krabs"
-  timestamp: string;       // ISO 8601
-  payload: string;         // message body
-  signature: string;       // base64-encoded Ed25519 signature
+  sender_id: string; // "openspawn:krusty-krab:mr-krabs"
+  timestamp: string; // ISO 8601
+  payload: string; // message body
+  signature: string; // base64-encoded Ed25519 signature
 }
 ```
 
@@ -128,20 +133,16 @@ interface SignedMessage {
 The signature covers: `sender_id + "\n" + timestamp + "\n" + SHA-256(payload)`
 
 ```typescript
-import { createPrivateKey, createHash, sign } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { createPrivateKey, createHash, sign } from "node:crypto";
+import { readFileSync } from "node:fs";
 
-function signMessage(
-  senderId: string,
-  payload: string,
-  privateKeyPath: string
-): SignedMessage {
+function signMessage(senderId: string, payload: string, privateKeyPath: string): SignedMessage {
   const timestamp = new Date().toISOString();
-  const payloadHash = createHash('sha256').update(payload).digest('hex');
+  const payloadHash = createHash("sha256").update(payload).digest("hex");
   const signable = `${senderId}\n${timestamp}\n${payloadHash}`;
 
   const privateKey = createPrivateKey(readFileSync(privateKeyPath));
-  const signature = sign(null, Buffer.from(signable), privateKey).toString('base64');
+  const signature = sign(null, Buffer.from(signable), privateKey).toString("base64");
 
   return { sender_id: senderId, timestamp, payload, signature };
 }
@@ -150,23 +151,20 @@ function signMessage(
 ### Verification
 
 ```typescript
-import { createPublicKey, verify } from 'node:crypto';
+import { createPublicKey, verify } from "node:crypto";
 
-function verifyMessage(
-  message: SignedMessage,
-  publicKeyPem: string
-): boolean {
+function verifyMessage(message: SignedMessage, publicKeyPem: string): boolean {
   // Replay protection: reject messages older than 5 minutes
   const messageAge = Date.now() - new Date(message.timestamp).getTime();
   if (messageAge > 5 * 60 * 1000 || messageAge < -30_000) {
     return false; // Expired or from the future
   }
 
-  const payloadHash = createHash('sha256').update(message.payload).digest('hex');
+  const payloadHash = createHash("sha256").update(message.payload).digest("hex");
   const signable = `${message.sender_id}\n${message.timestamp}\n${payloadHash}`;
 
   const publicKey = createPublicKey(publicKeyPem);
-  return verify(null, Buffer.from(signable), publicKey, Buffer.from(message.signature, 'base64'));
+  return verify(null, Buffer.from(signable), publicKey, Buffer.from(message.signature, "base64"));
 }
 ```
 
@@ -185,11 +183,13 @@ Agents authenticate to plugins using short-lived JWTs signed with their Ed25519 
 ### JWT Structure
 
 **Header:**
+
 ```json
 { "alg": "EdDSA", "typ": "JWT" }
 ```
 
 **Payload:**
+
 ```json
 {
   "sub": "openspawn:krusty-krab:mr-krabs",
@@ -206,29 +206,31 @@ Tokens expire after **15 minutes**. Agents mint fresh tokens as needed.
 ### Minting a Token
 
 ```typescript
-import { createPrivateKey, sign as cryptoSign } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { createPrivateKey, sign as cryptoSign } from "node:crypto";
+import { readFileSync } from "node:fs";
 
 function mintAgentJwt(
   agentId: string,
   orgId: string,
   permissions: string[],
-  privateKeyPath: string
+  privateKeyPath: string,
 ): string {
   const now = Math.floor(Date.now() / 1000);
-  const header = Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })).toString('base64url');
-  const payload = Buffer.from(JSON.stringify({
-    sub: `openspawn:${orgId}:${agentId}`,
-    agent_id: agentId,
-    org_id: orgId,
-    permissions,
-    iat: now,
-    exp: now + 900, // 15 minutes
-  })).toString('base64url');
+  const header = Buffer.from(JSON.stringify({ alg: "EdDSA", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(
+    JSON.stringify({
+      sub: `openspawn:${orgId}:${agentId}`,
+      agent_id: agentId,
+      org_id: orgId,
+      permissions,
+      iat: now,
+      exp: now + 900, // 15 minutes
+    }),
+  ).toString("base64url");
 
   const signable = `${header}.${payload}`;
   const privateKey = createPrivateKey(readFileSync(privateKeyPath));
-  const signature = cryptoSign(null, Buffer.from(signable), privateKey).toString('base64url');
+  const signature = cryptoSign(null, Buffer.from(signable), privateKey).toString("base64url");
 
   return `${signable}.${signature}`;
 }
@@ -239,10 +241,10 @@ function mintAgentJwt(
 ```typescript
 function verifyAgentJwt(
   token: string,
-  getPublicKey: (agentUri: string) => string | null
+  getPublicKey: (agentUri: string) => string | null,
 ): { valid: boolean; payload?: any } {
-  const [headerB64, payloadB64, signatureB64] = token.split('.');
-  const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
+  const [headerB64, payloadB64, signatureB64] = token.split(".");
+  const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString());
 
   // Check expiry
   if (payload.exp < Math.floor(Date.now() / 1000)) {
@@ -259,7 +261,7 @@ function verifyAgentJwt(
     null,
     Buffer.from(signable),
     publicKey,
-    Buffer.from(signatureB64, 'base64url')
+    Buffer.from(signatureB64, "base64url"),
   );
 
   return { valid, payload: valid ? payload : undefined };
@@ -331,6 +333,7 @@ Identity is declared inline in ORG.md alongside each agent's role:
 ## Agents
 
 ### Mr. Krabs
+
 - Role: CEO
 - Level: 10
 - Public Key: `ed25519:MCowBQYDK2VwAyEAr3nFGoJm8uR8VBh...`
@@ -338,6 +341,7 @@ Identity is declared inline in ORG.md alongside each agent's role:
 - Hired: 2026-01-15
 
 ### Squidward
+
 - Role: Cashier
 - Level: 3
 - Public Key: `ed25519:MCowBQYDK2VwAyEA8kP2q1mXvB9nRxZ...`
@@ -351,16 +355,16 @@ The `openspawn hire` and `openspawn rotate-keys` commands update these entries a
 
 ## 7. CLI Commands
 
-| Command | Description |
-|---------|-------------|
-| `openspawn init` | Generate keypairs for all agents in ORG.md that don't have one |
-| `openspawn hire <agent-id>` | Create agent workspace, generate keypair, update ORG.md |
-| `openspawn identity <agent-id>` | Print public key and fingerprint |
-| `openspawn verify <message-file>` | Verify a signed message against ORG.md keys |
-| `openspawn rotate-keys <agent-id>` | Generate new keypair, update ORG.md, backup old key |
-| `openspawn trust add <org-url>` | Add an org's agents.json URL to the trust store |
-| `openspawn trust remove <org-id>` | Revoke trust for an org |
-| `openspawn trust list` | Show all trusted orgs |
+| Command                            | Description                                                    |
+| ---------------------------------- | -------------------------------------------------------------- |
+| `openspawn init`                   | Generate keypairs for all agents in ORG.md that don't have one |
+| `openspawn hire <agent-id>`        | Create agent workspace, generate keypair, update ORG.md        |
+| `openspawn identity <agent-id>`    | Print public key and fingerprint                               |
+| `openspawn verify <message-file>`  | Verify a signed message against ORG.md keys                    |
+| `openspawn rotate-keys <agent-id>` | Generate new keypair, update ORG.md, backup old key            |
+| `openspawn trust add <org-url>`    | Add an org's agents.json URL to the trust store                |
+| `openspawn trust remove <org-id>`  | Revoke trust for an org                                        |
+| `openspawn trust list`             | Show all trusted orgs                                          |
 
 ### Example Usage
 
@@ -397,17 +401,20 @@ $ openspawn rotate-keys squidward
 ## 8. Security Considerations
 
 ### Key Protection
+
 - Private keys **never leave the agent workspace**
 - File permissions: `0600` (owner read/write only)
 - Agents must never log, print, or transmit private keys
 - The `.identity/` directory is `0700`
 
 ### Decentralized Registry
+
 - **No central key server** — ORG.md is the source of truth
 - No single point of failure for identity verification
 - Each org controls its own agent registry
 
 ### Compromise Response
+
 1. Remove the agent's public key from ORG.md (immediate revocation)
 2. Run `openspawn rotate-keys <agent-id>` to generate a new keypair
 3. All outstanding JWTs from the old key become unverifiable instantly
@@ -415,11 +422,13 @@ $ openspawn rotate-keys squidward
 5. Notify trusted orgs if the agent had cross-org access
 
 ### Replay Protection
+
 - Message signatures include a timestamp
 - Receiving agents reject messages outside a **5-minute window**
 - Clock skew tolerance: 30 seconds into the future
 
 ### Token Hygiene
+
 - JWTs expire after **15 minutes**
 - Agents mint tokens on-demand, not cached long-term
 - Permissions are scoped per-token (principle of least privilege)
@@ -428,14 +437,15 @@ $ openspawn rotate-keys squidward
 
 ## 9. Why Ed25519?
 
-| Approach | Decentralized | Auth Server | Non-Repudiation | Cost |
-|----------|:---:|:---:|:---:|:---:|
-| **Ed25519 keypairs** | ✅ | Not needed | ✅ | Free |
-| OAuth 2.0 | ❌ | Required | ✅ | Infrastructure |
-| JWTs (HMAC) | ❌ | Shared secret | ❌ | Free |
-| API keys | ❌ | Key store | ❌ | Free |
+| Approach             | Decentralized |  Auth Server  | Non-Repudiation |      Cost      |
+| -------------------- | :-----------: | :-----------: | :-------------: | :------------: |
+| **Ed25519 keypairs** |      ✅       |  Not needed   |       ✅        |      Free      |
+| OAuth 2.0            |      ❌       |   Required    |       ✅        | Infrastructure |
+| JWTs (HMAC)          |      ❌       | Shared secret |       ❌        |      Free      |
+| API keys             |      ❌       |   Key store   |       ❌        |      Free      |
 
 **Ed25519 specifically because:**
+
 - **Fast:** Signing and verification are sub-millisecond
 - **Small keys:** 32 bytes public, 64 bytes private
 - **Deterministic:** Same input always produces the same signature (no randomness bugs)
@@ -443,6 +453,7 @@ $ openspawn rotate-keys squidward
 - **Battle-tested:** Used by SSH, Signal, WireGuard, and Tor
 
 **What the alternatives lack:**
+
 - **OAuth** solves identity but requires running an authorization server, token endpoints, and refresh flows — overkill for agent-to-agent communication
 - **JWTs with HMAC** (HS256) use a shared secret, so any party that can verify can also forge — no non-repudiation
 - **API keys** are shared secrets with no cryptographic binding to identity — if leaked, anyone can impersonate the agent
@@ -461,36 +472,36 @@ import {
   createHash,
   sign,
   verify,
-} from 'node:crypto';
+} from "node:crypto";
 
 // --- Setup: generate a keypair ---
-const { publicKey, privateKey } = generateKeyPairSync('ed25519');
+const { publicKey, privateKey } = generateKeyPairSync("ed25519");
 
-const agentId = 'openspawn:krusty-krab:mr-krabs';
+const agentId = "openspawn:krusty-krab:mr-krabs";
 
 // --- Sign a message ---
-const payload = 'Give Squidward a raise? No.';
+const payload = "Give Squidward a raise? No.";
 const timestamp = new Date().toISOString();
-const payloadHash = createHash('sha256').update(payload).digest('hex');
+const payloadHash = createHash("sha256").update(payload).digest("hex");
 const signable = `${agentId}\n${timestamp}\n${payloadHash}`;
 
 const signature = sign(null, Buffer.from(signable), privateKey);
 
-console.log('Signature:', signature.toString('base64'));
+console.log("Signature:", signature.toString("base64"));
 
 // --- Verify the message ---
 const isValid = verify(null, Buffer.from(signable), publicKey, signature);
-console.log('Valid:', isValid); // true
+console.log("Valid:", isValid); // true
 
 // --- Tamper detection ---
-const tamperedPayload = 'Give Squidward a raise? Yes!';
-const tamperedHash = createHash('sha256').update(tamperedPayload).digest('hex');
+const tamperedPayload = "Give Squidward a raise? Yes!";
+const tamperedHash = createHash("sha256").update(tamperedPayload).digest("hex");
 const tamperedSignable = `${agentId}\n${timestamp}\n${tamperedHash}`;
 
 const isTamperValid = verify(null, Buffer.from(tamperedSignable), publicKey, signature);
-console.log('Tampered valid:', isTamperValid); // false
+console.log("Tampered valid:", isTamperValid); // false
 ```
 
 ---
 
-*This spec is a living document. As OpenSpawn evolves, so will the identity model.*
+_This spec is a living document. As OpenSpawn evolves, so will the identity model._

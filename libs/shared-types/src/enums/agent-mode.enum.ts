@@ -57,6 +57,5 @@ export const MODE_DESCRIPTIONS: Record<AgentMode, string> = {
     "Full operational access. Can execute tasks, spawn agents, and perform all actions.",
   [AgentMode.ORCHESTRATOR]:
     "Coordination only. Can spawn agents, assign tasks, and message, but cannot execute work directly.",
-  [AgentMode.OBSERVER]:
-    "Read-only access. Can observe the system but cannot make any changes.",
+  [AgentMode.OBSERVER]: "Read-only access. Can observe the system but cannot make any changes.",
 } as const;

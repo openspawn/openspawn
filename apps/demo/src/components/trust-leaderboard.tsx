@@ -63,7 +63,6 @@ export function TrustLeaderboard({
                   size="sm"
                   showRing={false}
                   avatar={entry.avatar}
-
                   avatarUrl={entry.avatarUrl}
                   avatarColor={entry.avatarColor}
                 />
@@ -88,9 +87,7 @@ export function TrustLeaderboard({
             </div>
           ))}
           {entries.length === 0 && (
-            <div className="text-center text-muted-foreground py-4">
-              No agents yet
-            </div>
+            <div className="text-center text-muted-foreground py-4">No agents yet</div>
           )}
         </div>
       </CardContent>

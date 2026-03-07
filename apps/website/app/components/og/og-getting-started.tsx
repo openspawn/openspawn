@@ -118,9 +118,16 @@ export function OgGettingStarted() {
             </span>
           </h1>
 
-          <p style={{ fontSize: 18, color: "var(--os-text-secondary, #94a3b8)", lineHeight: 1.6, margin: 0 }}>
-            In ~10 minutes: a local org of AI agents, coordinated by a markdown
-            file, visible in a real-time dashboard.
+          <p
+            style={{
+              fontSize: 18,
+              color: "var(--os-text-secondary, #94a3b8)",
+              lineHeight: 1.6,
+              margin: 0,
+            }}
+          >
+            In ~10 minutes: a local org of AI agents, coordinated by a markdown file, visible in a
+            real-time dashboard.
           </p>
 
           {/* Prereqs */}
@@ -163,10 +170,7 @@ export function OgGettingStarted() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background:
-                    i === 0
-                      ? "rgba(6,182,212,0.20)"
-                      : "rgba(255,255,255,0.06)",
+                  background: i === 0 ? "rgba(6,182,212,0.20)" : "rgba(255,255,255,0.06)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -184,7 +188,8 @@ export function OgGettingStarted() {
                   style={{
                     fontSize: 16,
                     fontWeight: 700,
-                    color: i === 0 ? "var(--os-text-primary, #f1f5f9)" : "var(--os-text-body, #cbd5e1)",
+                    color:
+                      i === 0 ? "var(--os-text-primary, #f1f5f9)" : "var(--os-text-body, #cbd5e1)",
                     marginBottom: 3,
                   }}
                 >

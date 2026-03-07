@@ -1,14 +1,14 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { motion, AnimatePresence } from 'motion/react';
-import { Command, X } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "motion/react";
+import { Command, X } from "lucide-react";
+import { cn } from "../lib/utils";
 
 interface Shortcut {
   key: string;
   description: string;
   action: () => void;
-  category: 'navigation' | 'actions' | 'help';
+  category: "navigation" | "actions" | "help";
 }
 
 export function useKeyboardShortcuts() {
@@ -17,17 +17,67 @@ export function useKeyboardShortcuts() {
 
   const shortcuts: Shortcut[] = [
     // Navigation (g + key)
-    { key: 'g d', description: 'Go to Dashboard', action: () => navigate({ to: '/' }), category: 'navigation' },
-    { key: 'g n', description: 'Go to Network', action: () => navigate({ to: '/network' }), category: 'navigation' },
-    { key: 'g t', description: 'Go to Tasks', action: () => navigate({ to: '/tasks' }), category: 'navigation' },
-    { key: 'g a', description: 'Go to Agents', action: () => navigate({ to: '/agents' }), category: 'navigation' },
-    { key: 'g m', description: 'Go to Messages', action: () => navigate({ to: '/messages' }), category: 'navigation' },
-    { key: 'g c', description: 'Go to Credits', action: () => navigate({ to: '/credits' }), category: 'navigation' },
-    { key: 'g e', description: 'Go to Events', action: () => navigate({ to: '/events' }), category: 'navigation' },
-    { key: 'g s', description: 'Go to Settings', action: () => navigate({ to: '/settings' }), category: 'navigation' },
+    {
+      key: "g d",
+      description: "Go to Dashboard",
+      action: () => navigate({ to: "/" }),
+      category: "navigation",
+    },
+    {
+      key: "g n",
+      description: "Go to Network",
+      action: () => navigate({ to: "/network" }),
+      category: "navigation",
+    },
+    {
+      key: "g t",
+      description: "Go to Tasks",
+      action: () => navigate({ to: "/tasks" }),
+      category: "navigation",
+    },
+    {
+      key: "g a",
+      description: "Go to Agents",
+      action: () => navigate({ to: "/agents" }),
+      category: "navigation",
+    },
+    {
+      key: "g m",
+      description: "Go to Messages",
+      action: () => navigate({ to: "/messages" }),
+      category: "navigation",
+    },
+    {
+      key: "g c",
+      description: "Go to Credits",
+      action: () => navigate({ to: "/credits" }),
+      category: "navigation",
+    },
+    {
+      key: "g e",
+      description: "Go to Events",
+      action: () => navigate({ to: "/events" }),
+      category: "navigation",
+    },
+    {
+      key: "g s",
+      description: "Go to Settings",
+      action: () => navigate({ to: "/settings" }),
+      category: "navigation",
+    },
     // Help
-    { key: '?', description: 'Show keyboard shortcuts', action: () => setHelpOpen(true), category: 'help' },
-    { key: 'Escape', description: 'Close modal', action: () => setHelpOpen(false), category: 'help' },
+    {
+      key: "?",
+      description: "Show keyboard shortcuts",
+      action: () => setHelpOpen(true),
+      category: "help",
+    },
+    {
+      key: "Escape",
+      description: "Close modal",
+      action: () => setHelpOpen(false),
+      category: "help",
+    },
   ];
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -37,14 +87,14 @@ export function useKeyboardShortcuts() {
     }
 
     // Handle ? for help
-    if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+    if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
       e.preventDefault();
       setHelpOpen((prev) => !prev);
       return;
     }
 
     // Handle Escape
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       setHelpOpen(false);
       return;
     }
@@ -60,7 +110,7 @@ export function useKeyboardShortcuts() {
         return;
       }
 
-      if (e.key === 'g' && !gPressed && !e.ctrlKey && !e.metaKey) {
+      if (e.key === "g" && !gPressed && !e.ctrlKey && !e.metaKey) {
         gPressed = true;
         timeout = setTimeout(() => {
           gPressed = false;
@@ -79,11 +129,11 @@ export function useKeyboardShortcuts() {
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keydown', handleKeySequence);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeySequence);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keydown', handleKeySequence);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeySequence);
       clearTimeout(timeout);
     };
   }, [handleKeyDown, shortcuts]);
@@ -95,16 +145,19 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
   const { shortcuts } = useKeyboardShortcuts();
 
   const categories = {
-    navigation: 'Navigation',
-    actions: 'Actions',
-    help: 'Help',
+    navigation: "Navigation",
+    actions: "Actions",
+    help: "Help",
   };
 
-  const grouped = shortcuts.reduce((acc, shortcut) => {
-    if (!acc[shortcut.category]) acc[shortcut.category] = [];
-    acc[shortcut.category].push(shortcut);
-    return acc;
-  }, {} as Record<string, Shortcut[]>);
+  const grouped = shortcuts.reduce(
+    (acc, shortcut) => {
+      if (!acc[shortcut.category]) acc[shortcut.category] = [];
+      acc[shortcut.category].push(shortcut);
+      return acc;
+    },
+    {} as Record<string, Shortcut[]>,
+  );
 
   return (
     <AnimatePresence>
@@ -121,7 +174,7 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg"
           >
             <div className="bg-muted border border-border rounded-xl shadow-2xl overflow-hidden">
@@ -148,10 +201,7 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
                     </h3>
                     <div className="space-y-2">
                       {items.map((shortcut) => (
-                        <div
-                          key={shortcut.key}
-                          className="flex items-center justify-between py-2"
-                        >
+                        <div key={shortcut.key} className="flex items-center justify-between py-2">
                           <span className="text-muted-foreground">{shortcut.description}</span>
                           <kbd className="px-2 py-1 text-xs font-mono bg-muted rounded border border-border">
                             {shortcut.key}
@@ -165,7 +215,8 @@ export function KeyboardShortcutsHelp({ open, onClose }: { open: boolean; onClos
 
               <div className="px-6 py-4 border-t border-border bg-muted/50">
                 <p className="text-sm text-muted-foreground">
-                  Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">?</kbd> to toggle this help
+                  Press <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">?</kbd> to
+                  toggle this help
                 </p>
               </div>
             </div>

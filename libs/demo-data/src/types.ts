@@ -1,13 +1,20 @@
 // Types matching our GraphQL schema
 
-export type AgentRole = 'hr' | 'manager' | 'senior' | 'worker';
-export type AgentStatus = 'pending' | 'active' | 'paused' | 'suspended' | 'revoked';
-export type TaskStatus = 'backlog' | 'pending' | 'assigned' | 'in_progress' | 'review' | 'done' | 'cancelled';
-export type TaskPriority = 'low' | 'normal' | 'high' | 'critical';
-export type CreditType = 'CREDIT' | 'DEBIT';
-export type EventSeverity = 'debug' | 'info' | 'success' | 'warning' | 'error' | 'critical';
+export type AgentRole = "hr" | "manager" | "senior" | "worker";
+export type AgentStatus = "pending" | "active" | "paused" | "suspended" | "revoked";
+export type TaskStatus =
+  | "backlog"
+  | "pending"
+  | "assigned"
+  | "in_progress"
+  | "review"
+  | "done"
+  | "cancelled";
+export type TaskPriority = "low" | "normal" | "high" | "critical";
+export type CreditType = "CREDIT" | "DEBIT";
+export type EventSeverity = "debug" | "info" | "success" | "warning" | "error" | "critical";
 
-export type ReputationLevel = 'NEW' | 'PROBATION' | 'TRUSTED' | 'VETERAN' | 'ELITE';
+export type ReputationLevel = "NEW" | "PROBATION" | "TRUSTED" | "VETERAN" | "ELITE";
 
 export interface DemoAgent {
   id: string;
@@ -20,14 +27,14 @@ export interface DemoAgent {
   currentBalance: number;
   lifetimeEarnings: number;
   createdAt: string;
-  parentId?: string;          // Who spawned this agent
-  domain?: string;            // e.g., "Engineering", "Finance"
-  teamId?: string;            // Team assignment for org chart
-  maxChildren?: number;       // Capacity for sub-agents
+  parentId?: string; // Who spawned this agent
+  domain?: string; // e.g., "Engineering", "Finance"
+  teamId?: string; // Team assignment for org chart
+  maxChildren?: number; // Capacity for sub-agents
   budgetPeriodLimit?: number; // Per-period spending limit
   budgetPeriodSpent?: number; // Spent this period
   // Trust & Reputation fields
-  trustScore?: number;        // 0-100, default 50
+  trustScore?: number; // 0-100, default 50
   reputationLevel?: ReputationLevel;
   tasksCompleted?: number;
   tasksSuccessful?: number;
@@ -90,7 +97,7 @@ export interface DemoEvent {
   taskId?: string;
 }
 
-export type MessageType = 'task' | 'status' | 'report' | 'question' | 'escalation' | 'general';
+export type MessageType = "task" | "status" | "report" | "question" | "escalation" | "general";
 
 export interface DemoMessage {
   id: string;
@@ -160,15 +167,31 @@ export interface SimulationState {
   simulatedTime: Date;
 }
 
-export type IdleReason = 'task_complete' | 'blocked' | 'awaiting_input' | 'unassigned' | 'newly_activated';
+export type IdleReason =
+  | "task_complete"
+  | "blocked"
+  | "awaiting_input"
+  | "unassigned"
+  | "newly_activated";
 
 export interface SimulationEvent {
-  type: 'agent_created' | 'agent_activated' | 'agent_promoted' | 'agent_terminated' |
-        'agent_status_changed' | 'agent_despawned' | 'agent_idle' |
-        'task_created' | 'task_assigned' | 'task_completed' | 'task_completion_rejected' |
-        'credit_earned' | 'credit_spent' |
-        'prehook_blocked' | 'prehook_allowed' |
-        'system_event';
+  type:
+    | "agent_created"
+    | "agent_activated"
+    | "agent_promoted"
+    | "agent_terminated"
+    | "agent_status_changed"
+    | "agent_despawned"
+    | "agent_idle"
+    | "task_created"
+    | "task_assigned"
+    | "task_completed"
+    | "task_completion_rejected"
+    | "credit_earned"
+    | "credit_spent"
+    | "prehook_blocked"
+    | "prehook_allowed"
+    | "system_event";
   payload: unknown;
   timestamp: Date;
 }
@@ -179,7 +202,7 @@ export interface DemoWebhook {
   url: string;
   events: string[];
   enabled: boolean;
-  hookType: 'pre' | 'post';
+  hookType: "pre" | "post";
   canBlock: boolean;
   timeoutMs: number;
   failureCount: number;

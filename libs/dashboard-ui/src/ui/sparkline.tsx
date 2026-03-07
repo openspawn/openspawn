@@ -2,14 +2,10 @@ import { useMemo, useId } from "react";
 import { motion } from "motion/react";
 
 // ── Sparkline Data Generator ─────────────────────────────────────────
-export function generateSparklineData(
-  points: number,
-  trend: "up" | "down" | "stable",
-): number[] {
+export function generateSparklineData(points: number, trend: "up" | "down" | "stable"): number[] {
   const data: number[] = [];
   let value = 50 + Math.random() * 20;
-  const drift =
-    trend === "up" ? 2.5 : trend === "down" ? -2.5 : 0;
+  const drift = trend === "up" ? 2.5 : trend === "down" ? -2.5 : 0;
 
   for (let i = 0; i < points; i++) {
     value += drift + (Math.random() - 0.5) * 8;
@@ -40,7 +36,10 @@ function monotonePath(pts: [number, number][]): string {
     if (m[i - 1] * m[i] <= 0) {
       alpha.push(0);
     } else {
-      alpha.push(3 * (dx[i - 1] + dx[i]) / ((2 * dx[i] + dx[i - 1]) / m[i - 1] + (dx[i] + 2 * dx[i - 1]) / m[i]));
+      alpha.push(
+        (3 * (dx[i - 1] + dx[i])) /
+          ((2 * dx[i] + dx[i - 1]) / m[i - 1] + (dx[i] + 2 * dx[i - 1]) / m[i]),
+      );
     }
   }
   alpha.push(m[n - 2]);

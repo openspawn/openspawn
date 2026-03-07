@@ -28,11 +28,11 @@ type Agent = AgentFieldsFragment;
 // ─── AgentDetailsDialog ───────────────────────────────────────────────────────
 
 export function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
-  const trustScore      = agent.trustScore ?? 50;
-  const repLevel        = agent.reputationLevel || 'TRUSTED';
-  const tasksCompleted  = agent.tasksCompleted ?? 0;
+  const trustScore = agent.trustScore ?? 50;
+  const repLevel = agent.reputationLevel || "TRUSTED";
+  const tasksCompleted = agent.tasksCompleted ?? 0;
   const tasksSuccessful = agent.tasksSuccessful ?? 0;
-  const successRate     = tasksCompleted > 0 ? Math.round((tasksSuccessful / tasksCompleted) * 100) : 0;
+  const successRate = tasksCompleted > 0 ? Math.round((tasksSuccessful / tasksCompleted) * 100) : 0;
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -61,8 +61,8 @@ export function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: 
             <Badge variant="outline">{agent.role}</Badge>
             <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="md" />
             <Badge variant="secondary">Level {agent.level}</Badge>
-            <Badge className={REPUTATION_COLORS[repLevel] || 'bg-blue-500'}>
-              {REPUTATION_EMOJI[repLevel] || '✅'} {repLevel}
+            <Badge className={REPUTATION_COLORS[repLevel] || "bg-blue-500"}>
+              {REPUTATION_EMOJI[repLevel] || "✅"} {repLevel}
             </Badge>
           </div>
 
@@ -128,10 +128,10 @@ export function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: 
 // ─── EditAgentDialog ──────────────────────────────────────────────────────────
 
 export function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
-  const [name,   setName]   = useState(agent.name);
-  const [model,  setModel]  = useState(agent.model);
+  const [name, setName] = useState(agent.name);
+  const [model, setModel] = useState(agent.model);
   const [status, setStatus] = useState(agent.status);
-  const [mode,   setMode]   = useState<AgentMode>(agent.mode ?? AgentMode.Worker);
+  const [mode, setMode] = useState<AgentMode>(agent.mode ?? AgentMode.Worker);
 
   function handleSave() {
     // DEFERRED: Agent edits are not yet persisted to the backend.
@@ -201,7 +201,7 @@ export function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () 
 
 export function AdjustCreditsDialog({ agent, onClose }: { agent: Agent; onClose: () => void }) {
   const [amount, setAmount] = useState("");
-  const [type,   setType]   = useState<"add" | "deduct">("add");
+  const [type, setType] = useState<"add" | "deduct">("add");
   const [reason, setReason] = useState("");
 
   function handleSubmit() {
@@ -226,10 +226,18 @@ export function AdjustCreditsDialog({ agent, onClose }: { agent: Agent; onClose:
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button variant={type === "add" ? "default" : "outline"} onClick={() => setType("add")} className="w-full">
+            <Button
+              variant={type === "add" ? "default" : "outline"}
+              onClick={() => setType("add")}
+              className="w-full"
+            >
               <Plus className="mr-2 h-4 w-4" /> Add Credits
             </Button>
-            <Button variant={type === "deduct" ? "destructive" : "outline"} onClick={() => setType("deduct")} className="w-full">
+            <Button
+              variant={type === "deduct" ? "destructive" : "outline"}
+              onClick={() => setType("deduct")}
+              className="w-full"
+            >
               <Coins className="mr-2 h-4 w-4" /> Deduct Credits
             </Button>
           </div>

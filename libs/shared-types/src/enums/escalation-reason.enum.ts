@@ -22,8 +22,8 @@ export enum EscalationReason {
  * Default escalation thresholds (in hours)
  */
 export const ESCALATION_THRESHOLDS: Record<string, number> = {
-  URGENT: 2,    // Escalate urgent tasks after 2 hours blocked
-  HIGH: 8,      // High priority after 8 hours
-  NORMAL: 24,   // Normal after 24 hours
-  LOW: 72,      // Low priority after 72 hours
+  URGENT: 2, // Escalate urgent tasks after 2 hours blocked
+  HIGH: 8, // High priority after 8 hours
+  NORMAL: 24, // Normal after 24 hours
+  LOW: 72, // Low priority after 72 hours
 };

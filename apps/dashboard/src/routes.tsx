@@ -10,7 +10,16 @@ import { Layout } from "./components";
 import { ProtectedRoute } from "./components/protected-route";
 import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
-import { TasksPage, AgentsPage, CreditsPage, EventsPage, LoginPage, AuthCallbackPage, SettingsPage, MessagesPage } from "./pages";
+import {
+  TasksPage,
+  AgentsPage,
+  CreditsPage,
+  EventsPage,
+  LoginPage,
+  AuthCallbackPage,
+  SettingsPage,
+  MessagesPage,
+} from "./pages";
 import { KanbanPage } from "./pages/kanban";
 import { TaskBoardPage } from "./pages/task-board";
 import { RouterPage } from "./pages/router";
@@ -25,11 +34,10 @@ import type { ReactNode } from "react";
 
 // Check for demo/sandbox mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
-const isDemoMode = urlParams.get('demo') === 'true' || import.meta.env.VITE_DEMO_MODE === 'true';
+const isDemoMode = urlParams.get("demo") === "true" || import.meta.env.VITE_DEMO_MODE === "true";
 
 const reduceMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const variants = reduceMotion
   ? { initial: {}, animate: {}, exit: {} }

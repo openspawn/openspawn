@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
-const STORAGE_KEY = 'bb-onboarding-complete';
+const STORAGE_KEY = "bb-onboarding-complete";
 const TOTAL_STEPS = 5;
 
 interface OnboardingContextType {
@@ -34,17 +34,17 @@ const OnboardingContext = createContext<OnboardingContextType | null>(null);
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY) === 'true';
+    return localStorage.getItem(STORAGE_KEY) === "true";
   });
   const [showWelcome, setShowWelcome] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY) !== 'true';
+    return localStorage.getItem(STORAGE_KEY) !== "true";
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
   const markComplete = useCallback(() => {
-    localStorage.setItem(STORAGE_KEY, 'true');
+    localStorage.setItem(STORAGE_KEY, "true");
     setHasCompletedOnboarding(true);
     setIsOnboarding(false);
     setShowWelcome(false);
@@ -116,7 +116,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 export function useOnboarding() {
   const ctx = useContext(OnboardingContext);
   if (!ctx) {
-    throw new Error('useOnboarding must be used within an OnboardingProvider');
+    throw new Error("useOnboarding must be used within an OnboardingProvider");
   }
   return ctx;
 }

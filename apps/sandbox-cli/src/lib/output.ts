@@ -201,7 +201,9 @@ export function formatAgent(agent: {
   console.log(`     ${pc.dim("Level:")} ${levelColor(pc.bold(`L${agent.level}`))}`);
   console.log(`     ${pc.dim("Status:")} ${statusColor(agent.status)}`);
   if (agent.currentBalance !== undefined) {
-    console.log(`     ${pc.dim("Balance:")} ${colors.credit(`${agent.currentBalance.toLocaleString()} credits`)}`);
+    console.log(
+      `     ${pc.dim("Balance:")} ${colors.credit(`${agent.currentBalance.toLocaleString()} credits`)}`,
+    );
   }
   console.log();
 }
@@ -257,7 +259,9 @@ export function formatCredits(balance: number, label = "Balance"): void {
   }
 
   console.log();
-  console.log(`  ${icons.credit} ${pc.dim(label + ":")} ${colors.credit(pc.bold(balance.toLocaleString()))} credits`);
+  console.log(
+    `  ${icons.credit} ${pc.dim(label + ":")} ${colors.credit(pc.bold(balance.toLocaleString()))} credits`,
+  );
   console.log();
 }
 
@@ -309,7 +313,7 @@ export function formatKeyValue(items: Record<string, string | number | boolean |
   }
 
   const maxKeyLen = Math.max(...Object.keys(items).map((k) => k.length));
-  
+
   console.log();
   for (const [key, value] of Object.entries(items)) {
     if (value === undefined) continue;

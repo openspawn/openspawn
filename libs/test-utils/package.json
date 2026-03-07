@@ -7,8 +7,8 @@
   "types": "src/index.ts",
   "peerDependencies": {
     "@tanstack/react-query": ">=5",
-    "@testing-library/react": ">=14",
     "@testing-library/jest-dom": ">=6",
+    "@testing-library/react": ">=14",
     "react": ">=18",
     "react-dom": ">=18",
     "vitest": ">=1"

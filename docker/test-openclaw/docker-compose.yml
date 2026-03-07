@@ -67,7 +67,7 @@ services:
       OPENSPAWN_API_KEY: ${OPENSPAWN_API_KEY:-test-key}
       OPENSPAWN_API_URL: http://api:3000/api/v1
     ports:
-      - "3333:3333"  # OpenClaw gateway port
+      - "3333:3333" # OpenClaw gateway port
     depends_on:
       - mcp
     volumes:

@@ -2,7 +2,9 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""Operational mode that restricts what actions an agent can perform"""
+"""
+Operational mode that restricts what actions an agent can perform
+"""
 enum AgentMode {
   OBSERVER
   ORCHESTRATOR
@@ -79,15 +81,23 @@ enum ChannelType {
   TASK
 }
 
-"""Result of a claimNextTask mutation"""
+"""
+Result of a claimNextTask mutation
+"""
 type ClaimTaskResultType {
-  """Message describing the result"""
+  """
+  Message describing the result
+  """
   message: String!
 
-  """Whether the claim was successful"""
+  """
+  Whether the claim was successful
+  """
   success: Boolean!
 
-  """The claimed task, if successful"""
+  """
+  The claimed task, if successful
+  """
   task: TaskType
 }
 
@@ -218,7 +228,9 @@ enum MessageType {
 }
 
 type Mutation {
-  """Claim the next available task"""
+  """
+  Claim the next available task
+  """
   claimNextTask(agentId: ID!, orgId: ID!): ClaimTaskResultType!
   createInboundWebhookKey(input: CreateInboundWebhookKeyInput!, orgId: ID!): InboundWebhookKeyType!
   createWebhook(input: CreateWebhookInput!, orgId: ID!): WebhookType!
@@ -228,7 +240,11 @@ type Mutation {
   rotateInboundWebhookKey(id: ID!, orgId: ID!): InboundWebhookKeyType!
   sendDirectMessage(input: SendDirectMessageInput!, orgId: ID!): DirectMessageType!
   testWebhook(id: ID!, orgId: ID!): Boolean!
-  updateInboundWebhookKey(id: ID!, input: UpdateInboundWebhookKeyInput!, orgId: ID!): InboundWebhookKeyType!
+  updateInboundWebhookKey(
+    id: ID!
+    input: UpdateInboundWebhookKeyInput!
+    orgId: ID!
+  ): InboundWebhookKeyType!
   updateWebhook(id: ID!, input: UpdateWebhookInput!, orgId: ID!): WebhookType!
 }
 
@@ -247,11 +263,24 @@ type Query {
   agents(orgId: ID!): [AgentType!]!
   channels(orgId: ID!): [ChannelGqlType!]!
 
-  """Get count of tasks available to claim"""
+  """
+  Get count of tasks available to claim
+  """
   claimableTaskCount(orgId: ID!): Int!
   conversations(agentId: ID!, orgId: ID!): [ConversationType!]!
-  creditHistory(agentId: ID, limit: Int! = 50, offset: Int! = 0, orgId: ID!): [CreditTransactionType!]!
-  directMessages(agent1Id: ID!, agent2Id: ID!, before: ID, limit: Int! = 50, orgId: ID!): [DirectMessageType!]!
+  creditHistory(
+    agentId: ID
+    limit: Int! = 50
+    offset: Int! = 0
+    orgId: ID!
+  ): [CreditTransactionType!]!
+  directMessages(
+    agent1Id: ID!
+    agent2Id: ID!
+    before: ID
+    limit: Int! = 50
+    orgId: ID!
+  ): [DirectMessageType!]!
   events(limit: Int! = 50, orgId: ID!, page: Int! = 1): [EventType!]!
   inboundWebhookKey(id: ID!, orgId: ID!): InboundWebhookKeyType
   inboundWebhookKeys(orgId: ID!): [InboundWebhookKeyType!]!
@@ -298,7 +327,9 @@ type Subscription {
   taskUpdated(orgId: ID!): TaskType!
 }
 
-"""Task priority level"""
+"""
+Task priority level
+"""
 enum TaskPriority {
   HIGH
   LOW
@@ -306,18 +337,28 @@ enum TaskPriority {
   URGENT
 }
 
-"""Rejection metadata when a task completion is rejected by a pre-hook"""
+"""
+Rejection metadata when a task completion is rejected by a pre-hook
+"""
 type TaskRejectionType {
-  """Feedback explaining why completion was rejected"""
+  """
+  Feedback explaining why completion was rejected
+  """
   feedback: String!
 
-  """When the rejection occurred"""
+  """
+  When the rejection occurred
+  """
   rejectedAt: DateTime!
 
-  """Who/what rejected the completion (webhook names)"""
+  """
+  Who/what rejected the completion (webhook names)
+  """
   rejectedBy: String!
 
-  """How many times this task has been rejected"""
+  """
+  How many times this task has been rejected
+  """
   rejectionCount: Int!
 }
 
@@ -346,7 +387,9 @@ type TaskType {
   parentTaskId: ID
   priority: TaskPriority!
 
-  """Present when task completion was rejected"""
+  """
+  Present when task completion was rejected
+  """
   rejection: TaskRejectionType
   status: TaskStatus!
   title: String!

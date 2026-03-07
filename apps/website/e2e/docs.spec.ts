@@ -27,7 +27,7 @@ test.describe("Docs — Getting Started page", () => {
       page.getByRole("heading", {
         name: "Getting Started with OpenSpawn",
         level: 1,
-      })
+      }),
     ).toBeVisible();
 
     // Should have a meaningful amount of text content
@@ -47,9 +47,7 @@ test.describe("Docs — Getting Started page", () => {
   test("has prev/next navigation", async ({ page }) => {
     // Getting Started is the 2nd page in the flat list, so it should have
     // a "Previous" (Overview) and "Next" (How It Works) link
-    const prevNext = page.locator('nav[class*="border-t"]').or(
-      page.locator('[class*="mt-16"]')
-    );
+    const prevNext = page.locator('nav[class*="border-t"]').or(page.locator('[class*="mt-16"]'));
     await expect(prevNext.getByText("← Previous")).toBeVisible();
     await expect(prevNext.getByText("Next →")).toBeVisible();
   });
@@ -62,9 +60,7 @@ test.describe("Docs — How It Works page", () => {
   });
 
   test("loads and has content", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: "How It Works", level: 1 })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How It Works", level: 1 })).toBeVisible();
 
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
     expect(bodyText.length).toBeGreaterThan(300);
@@ -94,9 +90,7 @@ test.describe("Docs — Your First ORG.md tutorial", () => {
   });
 
   test("loads and has content", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: "Your First ORG.md", level: 1 })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your First ORG.md", level: 1 })).toBeVisible();
 
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
     expect(bodyText.length).toBeGreaterThan(300);
@@ -107,9 +101,7 @@ test.describe("Docs — Your First ORG.md tutorial", () => {
     await expect(sidebar).toBeVisible();
 
     // Tutorial entry itself should be highlighted/active
-    await expect(
-      sidebar.getByRole("link", { name: "Your First ORG.md" })
-    ).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: "Your First ORG.md" })).toBeVisible();
   });
 
   test("has prev/next navigation", async ({ page }) => {
@@ -126,7 +118,7 @@ test.describe("Docs — Connecting Real Agents page", () => {
 
   test("loads and has content", async ({ page }) => {
     await expect(
-      page.getByRole("heading", { name: "Connecting Real Agents", level: 1 })
+      page.getByRole("heading", { name: "Connecting Real Agents", level: 1 }),
     ).toBeVisible();
 
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
@@ -155,9 +147,7 @@ test.describe("Docs — Dashboard Guide page", () => {
   });
 
   test("loads and has content", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: "Dashboard Guide", level: 1 })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dashboard Guide", level: 1 })).toBeVisible();
 
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
     expect(bodyText.length).toBeGreaterThan(500);
@@ -185,9 +175,7 @@ test.describe("Docs — ACP vs A2A page", () => {
   });
 
   test("loads and has content", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: "ACP vs A2A", level: 1 })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "ACP vs A2A", level: 1 })).toBeVisible();
 
     const bodyText = await page.evaluate(() => document.body.innerText.trim());
     expect(bodyText.length).toBeGreaterThan(500);
@@ -239,9 +227,7 @@ test.describe("Docs — all internal links resolve", () => {
     }
   });
 
-  test("prev/next links on docs pages all resolve to real pages", async ({
-    page,
-  }) => {
+  test("prev/next links on docs pages all resolve to real pages", async ({ page }) => {
     // Walk each docs page and click Next until we reach the end
     await page.goto("/docs");
     await page.waitForSelector("h1");

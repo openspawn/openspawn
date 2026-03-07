@@ -8,7 +8,18 @@
  */
 import { useState, useMemo } from "react";
 import { motion } from "motion/react";
-import { Bot, Plus, Filter, ArrowUpDown, Search, Users, Wallet, Zap, Trophy, Network } from "lucide-react";
+import {
+  Bot,
+  Plus,
+  Filter,
+  ArrowUpDown,
+  Search,
+  Users,
+  Wallet,
+  Zap,
+  Trophy,
+  Network,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { PageHeader } from "../components/ui/page-header";
@@ -50,16 +61,13 @@ export function AgentsPage() {
   const { agents, loading, error } = useAgents();
   const { currentPhase } = useCurrentPhase();
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [dialogMode, setDialogMode]       = useState<DialogMode>(null);
-  const [activeTab, setActiveTab]         = useState("agents");
+  const [dialogMode, setDialogMode] = useState<DialogMode>(null);
+  const [activeTab, setActiveTab] = useState("agents");
   const { openSidePanel, closeSidePanel } = useSidePanel();
   const [spawnModalOpen, setSpawnModalOpen] = useState(false);
 
   const openAgentDetail = (agentId: string) => {
-    openSidePanel(
-      <AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />,
-      { width: 520 },
-    );
+    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
   };
 
   const openTeamDetail = (teamId: string) => {
@@ -69,7 +77,7 @@ export function AgentsPage() {
         onAgentClick={openAgentDetail}
         onTeamClick={openTeamDetail}
       />,
-      { width: 480, title: 'Team Details' },
+      { width: 480, title: "Team Details" },
     );
   };
 
@@ -78,22 +86,25 @@ export function AgentsPage() {
 
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const agentSparklines = useMemo(() => ({
-    total:   generateSparklineData(7, "up"),
-    active:  generateSparklineData(7, "up"),
-    balance: generateSparklineData(7, "stable"),
-    level:   generateSparklineData(7, "up"),
-  }), []);
+  const agentSparklines = useMemo(
+    () => ({
+      total: generateSparklineData(7, "up"),
+      active: generateSparklineData(7, "up"),
+      balance: generateSparklineData(7, "stable"),
+      level: generateSparklineData(7, "up"),
+    }),
+    [],
+  );
 
   // Filtering state
-  const [searchQuery,     setSearchQuery]     = useState("");
-  const [statusFilter,    setStatusFilter]    = useState<string>("all");
-  const [levelFilter,     setLevelFilter]     = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
   const [teamFilterValue, setTeamFilterValue] = useState<string>("all");
   const { teams: allTeams } = useTeams();
 
   // Sorting state
-  const [sortField,     setSortField]     = useState<SortField>("level");
+  const [sortField, setSortField] = useState<SortField>("level");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const filteredAgents = useMemo(() => {
@@ -101,7 +112,9 @@ export function AgentsPage() {
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((a) => a.name.toLowerCase().includes(q) || a.agentId.toLowerCase().includes(q));
+      result = result.filter(
+        (a) => a.name.toLowerCase().includes(q) || a.agentId.toLowerCase().includes(q),
+      );
     }
     if (statusFilter !== "all") {
       result = result.filter((a) => a.status?.toUpperCase() === statusFilter.toUpperCase());
@@ -117,11 +130,21 @@ export function AgentsPage() {
     result.sort((a, b) => {
       let cmp = 0;
       switch (sortField) {
-        case "name":    cmp = a.name.localeCompare(b.name);                               break;
-        case "level":   cmp = a.level - b.level;                                          break;
-        case "balance": cmp = a.currentBalance - b.currentBalance;                        break;
-        case "status":  cmp = a.status.localeCompare(b.status);                          break;
-        case "created": cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); break;
+        case "name":
+          cmp = a.name.localeCompare(b.name);
+          break;
+        case "level":
+          cmp = a.level - b.level;
+          break;
+        case "balance":
+          cmp = a.currentBalance - b.currentBalance;
+          break;
+        case "status":
+          cmp = a.status.localeCompare(b.status);
+          break;
+        case "created":
+          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
       }
       return sortDirection === "desc" ? -cmp : cmp;
     });
@@ -130,8 +153,11 @@ export function AgentsPage() {
   }, [agents, searchQuery, statusFilter, levelFilter, teamFilterValue, sortField, sortDirection]);
 
   function handleSort(field: SortField) {
-    if (sortField === field) setSortDirection((d) => d === "asc" ? "desc" : "asc");
-    else { setSortField(field); setSortDirection("desc"); }
+    if (sortField === field) setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
   }
 
   function handleAction(agent: Agent, mode: DialogMode) {
@@ -237,7 +263,12 @@ export function AgentsPage() {
                 </Button>
               </div>
 
-              <div className={cn("flex-wrap gap-3 items-center", filtersOpen ? "flex" : "hidden sm:flex")}>
+              <div
+                className={cn(
+                  "flex-wrap gap-3 items-center",
+                  filtersOpen ? "flex" : "hidden sm:flex",
+                )}
+              >
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
@@ -263,7 +294,11 @@ export function AgentsPage() {
                   <option value="1-2">L1-2 (Probation)</option>
                 </select>
 
-                <TeamFilterDropdown value={teamFilterValue} onChange={setTeamFilterValue} teams={allTeams} />
+                <TeamFilterDropdown
+                  value={teamFilterValue}
+                  onChange={setTeamFilterValue}
+                  teams={allTeams}
+                />
 
                 <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
                   <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
@@ -277,7 +312,9 @@ export function AgentsPage() {
                     >
                       {field}
                       {sortField === field && (
-                        <ArrowUpDown className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                        <ArrowUpDown
+                          className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                        />
                       )}
                     </Button>
                   ))}
@@ -287,24 +324,62 @@ export function AgentsPage() {
 
             {/* Stats */}
             <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
-              <StatCard title="Total Agents"  value={agents.length}                                                                                                sparklineData={agentSparklines.total}   sparklineColor="#06b6d4" />
-              <StatCard title="Active"        value={agents.filter((a) => a.status === AgentStatus.Active).length}                                                 sparklineData={agentSparklines.active}  sparklineColor="#10b981" />
-              <StatCard title="Total Balance" value={agents.reduce((s, a) => s + a.currentBalance, 0).toLocaleString()}                                            sparklineData={agentSparklines.balance} sparklineColor="#f59e0b" />
-              <StatCard title="Avg Level"     value={agents.length ? (agents.reduce((s, a) => s + a.level, 0) / agents.length).toFixed(1) : "—"}                  sparklineData={agentSparklines.level}   sparklineColor="#8b5cf6" />
+              <StatCard
+                title="Total Agents"
+                value={agents.length}
+                sparklineData={agentSparklines.total}
+                sparklineColor="#06b6d4"
+              />
+              <StatCard
+                title="Active"
+                value={agents.filter((a) => a.status === AgentStatus.Active).length}
+                sparklineData={agentSparklines.active}
+                sparklineColor="#10b981"
+              />
+              <StatCard
+                title="Total Balance"
+                value={agents.reduce((s, a) => s + a.currentBalance, 0).toLocaleString()}
+                sparklineData={agentSparklines.balance}
+                sparklineColor="#f59e0b"
+              />
+              <StatCard
+                title="Avg Level"
+                value={
+                  agents.length
+                    ? (agents.reduce((s, a) => s + a.level, 0) / agents.length).toFixed(1)
+                    : "—"
+                }
+                sparklineData={agentSparklines.level}
+                sparklineColor="#8b5cf6"
+              />
             </div>
 
             <div className="text-sm text-muted-foreground">
               Showing {filteredAgents.length} of {agents.length} agents
             </div>
 
-            <AgentVirtualGrid filteredAgents={filteredAgents} onCardClick={openAgentDetail} onAction={handleAction} />
+            <AgentVirtualGrid
+              filteredAgents={filteredAgents}
+              onCardClick={openAgentDetail}
+              onAction={handleAction}
+            />
 
             {filteredAgents.length === 0 && agents.length > 0 && (
               <div className="flex flex-col items-center justify-center py-12 rounded-lg border border-dashed border-border">
                 <Filter className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No matching agents</h3>
-                <p className="text-muted-foreground text-center mb-4">Try adjusting your filters or search query.</p>
-                <Button variant="outline" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setLevelFilter("all"); setTeamFilterValue("all"); }}>
+                <p className="text-muted-foreground text-center mb-4">
+                  Try adjusting your filters or search query.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("all");
+                    setLevelFilter("all");
+                    setTeamFilterValue("all");
+                  }}
+                >
                   Clear Filters
                 </Button>
               </div>
@@ -316,14 +391,22 @@ export function AgentsPage() {
                 title="No agents registered yet"
                 description="Register your first agent to get started with the multi-agent system."
                 ctaLabel="Register your first agent →"
-                onCta={() => { /* noop */ }}
+                onCta={() => {
+                  /* noop */
+                }}
               />
             )}
 
             {/* Dialogs */}
-            {selectedAgent && dialogMode === "view"    && <AgentDetailsDialog  agent={selectedAgent} onClose={handleCloseDialog} />}
-            {selectedAgent && dialogMode === "edit"    && <EditAgentDialog     agent={selectedAgent} onClose={handleCloseDialog} />}
-            {selectedAgent && dialogMode === "credits" && <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />}
+            {selectedAgent && dialogMode === "view" && (
+              <AgentDetailsDialog agent={selectedAgent} onClose={handleCloseDialog} />
+            )}
+            {selectedAgent && dialogMode === "edit" && (
+              <EditAgentDialog agent={selectedAgent} onClose={handleCloseDialog} />
+            )}
+            {selectedAgent && dialogMode === "credits" && (
+              <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
+            )}
           </div>
         </TabsContent>
 
@@ -339,7 +422,10 @@ export function AgentsPage() {
             open={createTeamOpen}
             onOpenChange={setCreateTeamOpen}
             parentTeams={parentTeamsForDialog}
-            onSave={(t) => { console.log('Team created:', t); setCreateTeamOpen(false); }}
+            onSave={(t) => {
+              console.log("Team created:", t);
+              setCreateTeamOpen(false);
+            }}
           />
         </TabsContent>
 
@@ -367,7 +453,9 @@ export function AgentsPage() {
       <SpawnAgentModal
         open={spawnModalOpen}
         onOpenChange={setSpawnModalOpen}
-        onSpawned={(agent) => { console.log(`🐣 ${agent.name} has joined the team!`); }}
+        onSpawned={(agent) => {
+          console.log(`🐣 ${agent.name} has joined the team!`);
+        }}
       />
     </div>
   );

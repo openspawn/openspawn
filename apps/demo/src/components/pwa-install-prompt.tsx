@@ -11,8 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PwaInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -69,9 +68,7 @@ export function PwaInstallPrompt() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-cyan-50">
-                    Install OpenSpawn
-                  </h3>
+                  <h3 className="text-sm font-semibold text-cyan-50">Install OpenSpawn</h3>
                   <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
                     Add to your home screen for the full ocean experience
                   </p>

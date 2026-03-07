@@ -22,7 +22,7 @@ export default defineConfig({
     },
     {
       name: "tablet",
-      use: { 
+      use: {
         ...devices["iPad (gen 7)"],
         viewport: { width: 768, height: 1024 },
       },

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 export interface User {
   id: string;
@@ -26,7 +19,11 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string, totpCode?: string) => Promise<{ requiresTwoFactor?: boolean }>;
+  login: (
+    email: string,
+    password: string,
+    totpCode?: string,
+  ) => Promise<{ requiresTwoFactor?: boolean }>;
   loginWithGoogle: () => void;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
@@ -139,33 +136,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(newTokens));
   }, []);
 
-  const login = useCallback(async (
-    email: string,
-    password: string,
-    totpCode?: string,
-  ): Promise<{ requiresTwoFactor?: boolean }> => {
-    const response = await fetch(`${apiUrl}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, totpCode }),
-    });
+  const login = useCallback(
+    async (
+      email: string,
+      password: string,
+      totpCode?: string,
+    ): Promise<{ requiresTwoFactor?: boolean }> => {
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, totpCode }),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Login failed");
-    }
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data.requiresTwoFactor) {
-      return { requiresTwoFactor: true };
-    }
+      if (data.requiresTwoFactor) {
+        return { requiresTwoFactor: true };
+      }
 
-    saveTokens(data.accessToken, data.refreshToken, data.expiresIn);
-    setUser(data.user);
+      saveTokens(data.accessToken, data.refreshToken, data.expiresIn);
+      setUser(data.user);
 
-    return {};
-  }, [apiUrl, saveTokens]);
+      return {};
+    },
+    [apiUrl, saveTokens],
+  );
 
   const loginWithGoogle = useCallback(() => {
     // Redirect to Google OAuth
@@ -231,7 +231,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshSession,
         getAccessToken,
         token: getAccessToken(),
-        refreshUser: async () => { await refreshSession(); },
+        refreshUser: async () => {
+          await refreshSession();
+        },
       }}
     >
       {children}

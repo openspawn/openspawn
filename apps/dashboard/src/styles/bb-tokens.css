@@ -21,67 +21,67 @@
    * SpongeBob's sandy/pineapple yellow — the primary brand color.
    * This REPLACES cyan as the primary action color.
    */
-  --bb-sandy-50:        #FFFBEB;
-  --bb-sandy-100:       #FEF3C7;
-  --bb-sandy-200:       #FDE68A;
-  --bb-sandy-300:       #FCD34D;
-  --bb-sandy-400:       #F4C542;   /* ← PRIMARY brand color */
-  --bb-sandy-500:       #EAB308;
-  --bb-sandy-600:       #D4952A;
-  --bb-sandy-700:       #B45309;
-  --bb-sandy-800:       #92400E;
-  --bb-sandy-900:       #78350F;
+  --bb-sandy-50: #fffbeb;
+  --bb-sandy-100: #fef3c7;
+  --bb-sandy-200: #fde68a;
+  --bb-sandy-300: #fcd34d;
+  --bb-sandy-400: #f4c542; /* ← PRIMARY brand color */
+  --bb-sandy-500: #eab308;
+  --bb-sandy-600: #d4952a;
+  --bb-sandy-700: #b45309;
+  --bb-sandy-800: #92400e;
+  --bb-sandy-900: #78350f;
 
   /* ── Color: Ocean Blue (Background) ────────────────────────
    * The underwater world — rich ocean blue replacing pitch-black.
    * Lighter and warmer than OpenSpawn's #020817.
    */
-  --bb-ocean-abyss:     #030E1A;   /* deepest background (OLED mode) */
-  --bb-ocean-900:       #062A45;   /* primary background — the ocean floor */
-  --bb-ocean-800:       #0B3D60;   /* card backgrounds */
-  --bb-ocean-700:       #0B5E8A;   /* surface elements */
-  --bb-ocean-600:       #1A7DB5;   /* interactive surfaces */
-  --bb-ocean-500:       #2E97D1;   /* borders, dividers */
-  --bb-ocean-400:       #4AAED9;   /* secondary text, muted */
-  --bb-ocean-300:       #7EC8E8;   /* placeholder text */
-  --bb-ocean-200:       #B8E4F7;   /* primary text on dark bg */
-  --bb-ocean-100:       #D6F0FA;   /* near-white text */
-  --bb-ocean-50:        #E8F8FF;   /* bubble white (near pure white) */
+  --bb-ocean-abyss: #030e1a; /* deepest background (OLED mode) */
+  --bb-ocean-900: #062a45; /* primary background — the ocean floor */
+  --bb-ocean-800: #0b3d60; /* card backgrounds */
+  --bb-ocean-700: #0b5e8a; /* surface elements */
+  --bb-ocean-600: #1a7db5; /* interactive surfaces */
+  --bb-ocean-500: #2e97d1; /* borders, dividers */
+  --bb-ocean-400: #4aaed9; /* secondary text, muted */
+  --bb-ocean-300: #7ec8e8; /* placeholder text */
+  --bb-ocean-200: #b8e4f7; /* primary text on dark bg */
+  --bb-ocean-100: #d6f0fa; /* near-white text */
+  --bb-ocean-50: #e8f8ff; /* bubble white (near pure white) */
 
   /* ── Color: Coral (Alerts, Accents) ────────────────────────
    * Coral reef pinks — for errors, urgency, highlights.
    */
-  --bb-coral-900:       #7F1D1D;
-  --bb-coral-700:       #B91C1C;
-  --bb-coral-500:       #FF4757;   /* hot coral — error / critical */
-  --bb-coral-400:       #FF6B6B;   /* coral — warning accent */
-  --bb-coral-300:       #FF8E8E;
-  --bb-coral-200:       #FFB3B3;   /* soft coral — subtle */
-  --bb-coral-100:       #FFD9D9;
+  --bb-coral-900: #7f1d1d;
+  --bb-coral-700: #b91c1c;
+  --bb-coral-500: #ff4757; /* hot coral — error / critical */
+  --bb-coral-400: #ff6b6b; /* coral — warning accent */
+  --bb-coral-300: #ff8e8e;
+  --bb-coral-200: #ffb3b3; /* soft coral — subtle */
+  --bb-coral-100: #ffd9d9;
 
   /* ── Color: Kelp Green (Success, Active) ───────────────────
    * Healthy kelp — for success states and active agents.
    */
-  --bb-kelp-900:        #064E3B;
-  --bb-kelp-700:        #065F46;
-  --bb-kelp-600:        #1A8A4A;
-  --bb-kelp-500:        #2ECC71;   /* kelp green — success */
-  --bb-kelp-400:        #4AE88A;   /* bright kelp — glowing active */
-  --bb-kelp-300:        #6EF2A4;
-  --bb-kelp-200:        #A7F3C8;
-  --bb-kelp-100:        #D1FAE5;
+  --bb-kelp-900: #064e3b;
+  --bb-kelp-700: #065f46;
+  --bb-kelp-600: #1a8a4a;
+  --bb-kelp-500: #2ecc71; /* kelp green — success */
+  --bb-kelp-400: #4ae88a; /* bright kelp — glowing active */
+  --bb-kelp-300: #6ef2a4;
+  --bb-kelp-200: #a7f3c8;
+  --bb-kelp-100: #d1fae5;
 
   /* ── Color: Character Accents ───────────────────────────────
    * Specific character brand colors for cards and identity.
    */
-  --bb-krabby-red:      #C0392B;   /* Mr. Krabs */
-  --bb-pineapple:       #FFD43B;   /* SpongeBob's house */
-  --bb-squid-purple:    #9B59B6;   /* Squidward / Squilliam */
-  --bb-sandy-teal:      #16A085;   /* Sandy Cheeks */
-  --bb-pearl-pink:      #FF85C2;   /* Pearl Krabs */
-  --bb-plankton-green:  #1E8449;   /* Plankton */
-  --bb-patrick-salmon:  #F1948A;   /* Patrick Star */
-  --bb-dutchman-mist:   #76D7C4;   /* Flying Dutchman */
+  --bb-krabby-red: #c0392b; /* Mr. Krabs */
+  --bb-pineapple: #ffd43b; /* SpongeBob's house */
+  --bb-squid-purple: #9b59b6; /* Squidward / Squilliam */
+  --bb-sandy-teal: #16a085; /* Sandy Cheeks */
+  --bb-pearl-pink: #ff85c2; /* Pearl Krabs */
+  --bb-plankton-green: #1e8449; /* Plankton */
+  --bb-patrick-salmon: #f1948a; /* Patrick Star */
+  --bb-dutchman-mist: #76d7c4; /* Flying Dutchman */
 
   /* ── Semantic Color Assignments ─────────────────────────────
    * These map design tokens to UI roles.
@@ -89,124 +89,124 @@
    */
 
   /* Override OpenSpawn/shadcn variables with BB values */
-  --background:         210 90% 8%;   /* --bb-ocean-900 equivalent */
-  --foreground:         197 62% 93%;  /* --bb-ocean-200 equivalent */
-  --card:               210 85% 12%;  /* --bb-ocean-800 equivalent */
-  --card-foreground:    197 62% 93%;
-  --popover:            210 85% 14%;
+  --background: 210 90% 8%; /* --bb-ocean-900 equivalent */
+  --foreground: 197 62% 93%; /* --bb-ocean-200 equivalent */
+  --card: 210 85% 12%; /* --bb-ocean-800 equivalent */
+  --card-foreground: 197 62% 93%;
+  --popover: 210 85% 14%;
   --popover-foreground: 197 62% 93%;
-  --primary:            44 89% 61%;   /* --bb-sandy-400 — YELLOW primary */
-  --primary-foreground: 210 90% 8%;   /* dark text on yellow */
-  --secondary:          199 65% 28%;  /* --bb-ocean-700 */
+  --primary: 44 89% 61%; /* --bb-sandy-400 — YELLOW primary */
+  --primary-foreground: 210 90% 8%; /* dark text on yellow */
+  --secondary: 199 65% 28%; /* --bb-ocean-700 */
   --secondary-foreground: 197 62% 93%;
-  --muted:              210 75% 18%;
-  --muted-foreground:   199 55% 55%;  /* --bb-ocean-400 */
-  --accent:             149 62% 49%;  /* --bb-kelp-500 */
-  --accent-foreground:  210 90% 8%;
-  --destructive:        355 100% 65%; /* --bb-coral-500 */
+  --muted: 210 75% 18%;
+  --muted-foreground: 199 55% 55%; /* --bb-ocean-400 */
+  --accent: 149 62% 49%; /* --bb-kelp-500 */
+  --accent-foreground: 210 90% 8%;
+  --destructive: 355 100% 65%; /* --bb-coral-500 */
   --destructive-foreground: 0 0% 98%;
-  --success:            150 70% 49%;  /* --bb-kelp-500 */
+  --success: 150 70% 49%; /* --bb-kelp-500 */
   --success-foreground: 150 70% 10%;
-  --warning:            44 89% 61%;   /* --bb-sandy-400 */
+  --warning: 44 89% 61%; /* --bb-sandy-400 */
   --warning-foreground: 44 20% 10%;
-  --border:             199 60% 28%;  /* --bb-ocean-500 ish */
-  --input:              199 60% 28%;
-  --ring:               44 89% 61%;   /* sandy yellow ring focus */
-  --radius:             0.75rem;      /* slightly more rounded than OpenSpawn */
+  --border: 199 60% 28%; /* --bb-ocean-500 ish */
+  --input: 199 60% 28%;
+  --ring: 44 89% 61%; /* sandy yellow ring focus */
+  --radius: 0.75rem; /* slightly more rounded than OpenSpawn */
 
   /* ── Typography ─────────────────────────────────────────────
    * Playful, warm fonts. See bikinibottom-redesign.md for rationale.
    */
-  --bb-font-display:    'Baloo 2', 'Fredoka One', cursive;
-  --bb-font-body:       'Nunito', 'DM Sans', system-ui, sans-serif;
-  --bb-font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+  --bb-font-display: "Baloo 2", "Fredoka One", cursive;
+  --bb-font-body: "Nunito", "DM Sans", system-ui, sans-serif;
+  --bb-font-mono: "JetBrains Mono", "Fira Code", monospace;
 
   /* ── Type Scale ──────────────────────────────────────────── */
-  --bb-text-hero:       clamp(3rem, 8vw, 6rem);
-  --bb-text-title:      clamp(1.75rem, 4vw, 3rem);
-  --bb-text-heading:    1.25rem;
-  --bb-text-body:       1rem;
-  --bb-text-small:      0.875rem;
-  --bb-text-tiny:       0.75rem;
+  --bb-text-hero: clamp(3rem, 8vw, 6rem);
+  --bb-text-title: clamp(1.75rem, 4vw, 3rem);
+  --bb-text-heading: 1.25rem;
+  --bb-text-body: 1rem;
+  --bb-text-small: 0.875rem;
+  --bb-text-tiny: 0.75rem;
 
   /* Font weights */
-  --bb-weight-display:  800;         /* hero text, agent names */
-  --bb-weight-heading:  700;
-  --bb-weight-body:     500;         /* Nunito reads better at 500 */
-  --bb-weight-label:    600;
+  --bb-weight-display: 800; /* hero text, agent names */
+  --bb-weight-heading: 700;
+  --bb-weight-body: 500; /* Nunito reads better at 500 */
+  --bb-weight-label: 600;
 
   /* ── Spacing ─────────────────────────────────────────────── */
-  --bb-space-xs:        0.25rem;
-  --bb-space-sm:        0.5rem;
-  --bb-space-md:        1rem;
-  --bb-space-lg:        1.5rem;
-  --bb-space-xl:        2rem;
-  --bb-space-2xl:       3rem;
-  --bb-space-3xl:       4rem;
-  --bb-space-hero:      clamp(3rem, 8vh, 6rem);  /* hero vertical padding */
+  --bb-space-xs: 0.25rem;
+  --bb-space-sm: 0.5rem;
+  --bb-space-md: 1rem;
+  --bb-space-lg: 1.5rem;
+  --bb-space-xl: 2rem;
+  --bb-space-2xl: 3rem;
+  --bb-space-3xl: 4rem;
+  --bb-space-hero: clamp(3rem, 8vh, 6rem); /* hero vertical padding */
 
   /* ── Border Radius ───────────────────────────────────────── */
-  --bb-radius-sm:       0.375rem;
-  --bb-radius-md:       0.75rem;    /* more rounded than OpenSpawn's 0.5rem */
-  --bb-radius-lg:       1rem;
-  --bb-radius-xl:       1.5rem;
-  --bb-radius-card:     1.25rem;    /* character cards */
-  --bb-radius-pill:     9999px;     /* status badges */
-  --bb-radius-bubble:   50%;        /* avatar circles */
+  --bb-radius-sm: 0.375rem;
+  --bb-radius-md: 0.75rem; /* more rounded than OpenSpawn's 0.5rem */
+  --bb-radius-lg: 1rem;
+  --bb-radius-xl: 1.5rem;
+  --bb-radius-card: 1.25rem; /* character cards */
+  --bb-radius-pill: 9999px; /* status badges */
+  --bb-radius-bubble: 50%; /* avatar circles */
 
   /* ── Elevation / Shadow ──────────────────────────────────── */
-  --bb-shadow-sm:       0 2px 8px rgba(6, 42, 69, 0.4);
-  --bb-shadow-md:       0 4px 16px rgba(6, 42, 69, 0.5), 0 0 0 1px rgba(74, 174, 217, 0.1);
-  --bb-shadow-lg:       0 8px 32px rgba(6, 42, 69, 0.6), 0 0 0 1px rgba(74, 174, 217, 0.15);
-  --bb-shadow-card:     0 4px 20px rgba(6, 42, 69, 0.5), 0 1px 4px rgba(244, 197, 66, 0.1);
+  --bb-shadow-sm: 0 2px 8px rgba(6, 42, 69, 0.4);
+  --bb-shadow-md: 0 4px 16px rgba(6, 42, 69, 0.5), 0 0 0 1px rgba(74, 174, 217, 0.1);
+  --bb-shadow-lg: 0 8px 32px rgba(6, 42, 69, 0.6), 0 0 0 1px rgba(74, 174, 217, 0.15);
+  --bb-shadow-card: 0 4px 20px rgba(6, 42, 69, 0.5), 0 1px 4px rgba(244, 197, 66, 0.1);
 
   /* Glow effects for active states */
-  --bb-glow-sandy:      0 0 16px rgba(244, 197, 66, 0.5), 0 0 32px rgba(244, 197, 66, 0.25);
-  --bb-glow-kelp:       0 0 16px rgba(74, 232, 138, 0.5), 0 0 32px rgba(74, 232, 138, 0.25);
-  --bb-glow-coral:      0 0 16px rgba(255, 71, 87, 0.5), 0 0 32px rgba(255, 71, 87, 0.25);
-  --bb-glow-ocean:      0 0 16px rgba(74, 174, 217, 0.4), 0 0 32px rgba(74, 174, 217, 0.2);
+  --bb-glow-sandy: 0 0 16px rgba(244, 197, 66, 0.5), 0 0 32px rgba(244, 197, 66, 0.25);
+  --bb-glow-kelp: 0 0 16px rgba(74, 232, 138, 0.5), 0 0 32px rgba(74, 232, 138, 0.25);
+  --bb-glow-coral: 0 0 16px rgba(255, 71, 87, 0.5), 0 0 32px rgba(255, 71, 87, 0.25);
+  --bb-glow-ocean: 0 0 16px rgba(74, 174, 217, 0.4), 0 0 32px rgba(74, 174, 217, 0.2);
 
   /* ── Gradients ───────────────────────────────────────────── */
   --bb-gradient-hero:
     radial-gradient(ellipse at 20% 80%, rgba(11, 94, 138, 0.6) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(26, 125, 181, 0.4) 0%, transparent 50%),
-    linear-gradient(180deg, #062A45 0%, #030E1A 100%);
+    linear-gradient(180deg, #062a45 0%, #030e1a 100%);
 
-  --bb-gradient-card:
-    linear-gradient(135deg, rgba(26, 125, 181, 0.15) 0%, rgba(11, 61, 96, 0.4) 100%);
+  --bb-gradient-card: linear-gradient(
+    135deg,
+    rgba(26, 125, 181, 0.15) 0%,
+    rgba(11, 61, 96, 0.4) 100%
+  );
 
-  --bb-gradient-sandy:
-    linear-gradient(135deg, #F4C542 0%, #EAB308 100%);
+  --bb-gradient-sandy: linear-gradient(135deg, #f4c542 0%, #eab308 100%);
 
-  --bb-gradient-kelp:
-    linear-gradient(135deg, #4AE88A 0%, #2ECC71 100%);
+  --bb-gradient-kelp: linear-gradient(135deg, #4ae88a 0%, #2ecc71 100%);
 
-  --bb-gradient-coral:
-    linear-gradient(135deg, #FF8E8E 0%, #FF4757 100%);
+  --bb-gradient-coral: linear-gradient(135deg, #ff8e8e 0%, #ff4757 100%);
 
   /* ── Animation Timing ────────────────────────────────────── */
-  --bb-duration-fast:   150ms;
-  --bb-duration-base:   250ms;
-  --bb-duration-slow:   500ms;
-  --bb-duration-bob:    2s;
+  --bb-duration-fast: 150ms;
+  --bb-duration-base: 250ms;
+  --bb-duration-slow: 500ms;
+  --bb-duration-bob: 2s;
   --bb-duration-bubble: 12s;
-  --bb-duration-kelp:   4s;
-  --bb-duration-swim:   30s;
+  --bb-duration-kelp: 4s;
+  --bb-duration-swim: 30s;
 
-  --bb-ease-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);  /* bouncy hover */
-  --bb-ease-wave:       cubic-bezier(0.45, 0.05, 0.55, 0.95);
-  --bb-ease-float:      ease-in-out;
+  --bb-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* bouncy hover */
+  --bb-ease-wave: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --bb-ease-float: ease-in-out;
 
   /* ── Z-Index Scale ───────────────────────────────────────── */
-  --bb-z-ocean:         0;      /* underwater background */
-  --bb-z-kelp:          10;     /* kelp silhouettes */
-  --bb-z-bubbles:       20;     /* floating bubbles */
-  --bb-z-content:       30;     /* main content */
-  --bb-z-feed:          40;     /* live feed sidebar */
-  --bb-z-overlay:       50;     /* panels, side panels */
-  --bb-z-modal:         60;     /* modals */
-  --bb-z-toast:         70;     /* toast notifications */
-  --bb-z-top:           80;     /* act banners, critical overlays */
+  --bb-z-ocean: 0; /* underwater background */
+  --bb-z-kelp: 10; /* kelp silhouettes */
+  --bb-z-bubbles: 20; /* floating bubbles */
+  --bb-z-content: 30; /* main content */
+  --bb-z-feed: 40; /* live feed sidebar */
+  --bb-z-overlay: 50; /* panels, side panels */
+  --bb-z-modal: 60; /* modals */
+  --bb-z-toast: 70; /* toast notifications */
+  --bb-z-top: 80; /* act banners, critical overlays */
 }
 
 /* ============================================================
@@ -249,8 +249,13 @@
    ============================================================ */
 
 @keyframes bb-bob {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(var(--bb-bob-y, -4px)); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(var(--bb-bob-y, -4px));
+  }
 }
 
 @keyframes bb-bubble-float {
@@ -258,12 +263,16 @@
     transform: translateY(0) translateX(var(--bb-drift-x1, 0px)) scale(1);
     opacity: 0;
   }
-  5% { opacity: 0.5; }
+  5% {
+    opacity: 0.5;
+  }
   50% {
     transform: translateY(-50vh) translateX(var(--bb-drift-x2, 8px)) scale(0.9);
     opacity: 0.4;
   }
-  95% { opacity: 0.2; }
+  95% {
+    opacity: 0.2;
+  }
   100% {
     transform: translateY(-100vh) translateX(var(--bb-drift-x3, -4px)) scale(0.6);
     opacity: 0;
@@ -271,7 +280,8 @@
 }
 
 @keyframes bb-kelp-sway {
-  0%, 100% {
+  0%,
+  100% {
     transform: skewX(0deg) scaleY(1);
     transform-origin: bottom center;
   }
@@ -280,39 +290,56 @@
     transform-origin: bottom center;
   }
   75% {
-    transform: skewX(calc(-1 * var(--bb-sway-angle, 3deg))) scaleY(calc(1 - var(--bb-sway-scale, 0.01)));
+    transform: skewX(calc(-1 * var(--bb-sway-angle, 3deg)))
+      scaleY(calc(1 - var(--bb-sway-scale, 0.01)));
     transform-origin: bottom center;
   }
 }
 
 @keyframes bb-swim {
-  0%   { transform: translateX(110vw); }
-  100% { transform: translateX(-20vw); }
+  0% {
+    transform: translateX(110vw);
+  }
+  100% {
+    transform: translateX(-20vw);
+  }
 }
 
 @keyframes bb-caustic {
-  0%, 100% {
+  0%,
+  100% {
     opacity: var(--bb-caustic-min, 0.04);
     transform: scale(1) rotate(0deg) translateX(0px);
   }
   33% {
     opacity: var(--bb-caustic-max, 0.07);
-    transform: scale(1.1) rotate(var(--bb-caustic-rotate, 2deg)) translateX(var(--bb-caustic-drift, 0px));
+    transform: scale(1.1) rotate(var(--bb-caustic-rotate, 2deg))
+      translateX(var(--bb-caustic-drift, 0px));
   }
   66% {
     opacity: calc((var(--bb-caustic-min, 0.04) + var(--bb-caustic-max, 0.07)) / 2);
-    transform: scale(0.95) rotate(calc(-0.5 * var(--bb-caustic-rotate, 2deg))) translateX(calc(-0.5 * var(--bb-caustic-drift, 0px)));
+    transform: scale(0.95) rotate(calc(-0.5 * var(--bb-caustic-rotate, 2deg)))
+      translateX(calc(-0.5 * var(--bb-caustic-drift, 0px)));
   }
 }
 
 @keyframes bb-pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0px var(--bb-ring-color, rgba(244, 197, 66, 0.4)); }
-  50%       { box-shadow: 0 0 0 8px transparent; }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0px var(--bb-ring-color, rgba(244, 197, 66, 0.4));
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
 }
 
 @keyframes bb-shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes bb-enter-up {
@@ -340,7 +367,8 @@
 }
 
 @keyframes bb-cta-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 20px rgba(244, 197, 66, 0.5),
       0 0 40px rgba(244, 197, 66, 0.25),
@@ -374,45 +402,88 @@
 }
 
 @keyframes bb-feed-flash {
-  0%   { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.35); }
-  60%  { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.20); }
-  100% { background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.12); }
+  0% {
+    background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.35);
+  }
+  60% {
+    background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.2);
+  }
+  100% {
+    background: rgba(var(--bb-flash-r, 255), var(--bb-flash-g, 71), var(--bb-flash-b, 87), 0.12);
+  }
 }
 
 @keyframes bb-stat-tick {
-  0%   { color: #fff; text-shadow: 0 0 16px rgba(244, 197, 66, 0.9); }
-  40%  { color: #F4C542; text-shadow: 0 0 8px rgba(244, 197, 66, 0.5); }
-  100% { color: #F4C542; text-shadow: none; }
+  0% {
+    color: #fff;
+    text-shadow: 0 0 16px rgba(244, 197, 66, 0.9);
+  }
+  40% {
+    color: #f4c542;
+    text-shadow: 0 0 8px rgba(244, 197, 66, 0.5);
+  }
+  100% {
+    color: #f4c542;
+    text-shadow: none;
+  }
 }
 
 @keyframes bb-swim-bob {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  25%       { transform: translateY(-5px) rotate(-1deg); }
-  75%       { transform: translateY(3px) rotate(1deg); }
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(3px) rotate(1deg);
+  }
 }
 
 /* ============================================================
    ANIMATION UTILITIES
    ============================================================ */
 
-.bb-bob         { animation: bb-bob var(--bb-duration-bob) var(--bb-ease-float) infinite; will-change: transform; }
-.bb-bob-fast    { --bb-bob-y: -3px; animation: bb-bob 1s var(--bb-ease-float) infinite; will-change: transform; }
-.bb-sway        { animation: bb-kelp-sway var(--bb-duration-kelp) var(--bb-ease-float) infinite; will-change: transform; }
+.bb-bob {
+  animation: bb-bob var(--bb-duration-bob) var(--bb-ease-float) infinite;
+  will-change: transform;
+}
+.bb-bob-fast {
+  --bb-bob-y: -3px;
+  animation: bb-bob 1s var(--bb-ease-float) infinite;
+  will-change: transform;
+}
+.bb-sway {
+  animation: bb-kelp-sway var(--bb-duration-kelp) var(--bb-ease-float) infinite;
+  will-change: transform;
+}
 
 /* Status-based animation helpers */
-[data-status="working"]     { --bb-bob-y: -3px; animation: bb-bob 1s ease-in-out infinite; }
-[data-status="overwhelmed"] { --bb-bob-y: -2px; animation: bb-bob 0.6s ease-in-out infinite; }
-[data-status="idle"]        { animation: bb-bob 2.5s ease-in-out infinite; }
-[data-status="busy"]        { --bb-bob-y: -3px; animation: bb-bob 1.2s ease-in-out infinite; }
+[data-status="working"] {
+  --bb-bob-y: -3px;
+  animation: bb-bob 1s ease-in-out infinite;
+}
+[data-status="overwhelmed"] {
+  --bb-bob-y: -2px;
+  animation: bb-bob 0.6s ease-in-out infinite;
+}
+[data-status="idle"] {
+  animation: bb-bob 2.5s ease-in-out infinite;
+}
+[data-status="busy"] {
+  --bb-bob-y: -3px;
+  animation: bb-bob 1.2s ease-in-out infinite;
+}
 
 /* ============================================================
    COMPONENT TOKENS: CHARACTER CARDS
    ============================================================ */
 
 .bb-character-card {
-  --bb-card-bg:         rgba(11, 61, 96, 0.6);
-  --bb-card-border:     rgba(74, 174, 217, 0.2);
-  --bb-card-hover-bg:   rgba(26, 125, 181, 0.2);
+  --bb-card-bg: rgba(11, 61, 96, 0.6);
+  --bb-card-border: rgba(74, 174, 217, 0.2);
+  --bb-card-hover-bg: rgba(26, 125, 181, 0.2);
   --bb-card-hover-border: rgba(244, 197, 66, 0.4);
 
   background: var(--bb-card-bg);
@@ -434,14 +505,30 @@
 }
 
 /* Per-character accent overrides */
-.bb-card-krabs       { --bb-card-hover-border: rgba(192, 57, 43, 0.6); }
-.bb-card-spongebob   { --bb-card-hover-border: rgba(255, 212, 59, 0.7); }
-.bb-card-squidward   { --bb-card-hover-border: rgba(155, 89, 182, 0.5); }
-.bb-card-squilliam   { --bb-card-hover-border: rgba(99, 102, 241, 0.6); }
-.bb-card-sandy       { --bb-card-hover-border: rgba(22, 160, 133, 0.6); }
-.bb-card-karen       { --bb-card-hover-border: rgba(74, 174, 217, 0.7); }
-.bb-card-plankton    { --bb-card-hover-border: rgba(30, 132, 73, 0.6); }
-.bb-card-patrick     { --bb-card-hover-border: rgba(241, 148, 138, 0.6); }
+.bb-card-krabs {
+  --bb-card-hover-border: rgba(192, 57, 43, 0.6);
+}
+.bb-card-spongebob {
+  --bb-card-hover-border: rgba(255, 212, 59, 0.7);
+}
+.bb-card-squidward {
+  --bb-card-hover-border: rgba(155, 89, 182, 0.5);
+}
+.bb-card-squilliam {
+  --bb-card-hover-border: rgba(99, 102, 241, 0.6);
+}
+.bb-card-sandy {
+  --bb-card-hover-border: rgba(22, 160, 133, 0.6);
+}
+.bb-card-karen {
+  --bb-card-hover-border: rgba(74, 174, 217, 0.7);
+}
+.bb-card-plankton {
+  --bb-card-hover-border: rgba(30, 132, 73, 0.6);
+}
+.bb-card-patrick {
+  --bb-card-hover-border: rgba(241, 148, 138, 0.6);
+}
 
 /* ============================================================
    COMPONENT TOKENS: STATUS BADGES
@@ -461,7 +548,7 @@
 }
 
 .bb-status-badge::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -540,7 +627,9 @@
 
 .bb-btn-primary:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: var(--bb-glow-sandy), 0 8px 24px rgba(244, 197, 66, 0.3);
+  box-shadow:
+    var(--bb-glow-sandy),
+    0 8px 24px rgba(244, 197, 66, 0.3);
 }
 
 .bb-btn-primary:active {
@@ -685,11 +774,7 @@
 
 /* Node inner background */
 .bb-agent-inner {
-  background: radial-gradient(
-    circle at center,
-    var(--bb-ocean-800),
-    var(--bb-ocean-900)
-  );
+  background: radial-gradient(circle at center, var(--bb-ocean-800), var(--bb-ocean-900));
 }
 
 /* ============================================================
@@ -808,7 +893,7 @@
 
 .bb-caustics::before,
 .bb-caustics::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -817,12 +902,20 @@
 }
 
 .bb-caustics::before {
-  background: radial-gradient(ellipse 80% 60% at 30% 40%, rgba(74, 174, 217, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse 80% 60% at 30% 40%,
+    rgba(74, 174, 217, 0.08) 0%,
+    transparent 70%
+  );
   animation-delay: 0s;
 }
 
 .bb-caustics::after {
-  background: radial-gradient(ellipse 70% 50% at 70% 60%, rgba(46, 204, 113, 0.05) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse 70% 50% at 70% 60%,
+    rgba(46, 204, 113, 0.05) 0%,
+    transparent 70%
+  );
   animation-delay: -6s;
 }
 
@@ -862,11 +955,21 @@
   transform: translateY(0);
 }
 
-.bb-reveal-delay-1 { transition-delay: 0.1s; }
-.bb-reveal-delay-2 { transition-delay: 0.2s; }
-.bb-reveal-delay-3 { transition-delay: 0.3s; }
-.bb-reveal-delay-4 { transition-delay: 0.4s; }
-.bb-reveal-delay-5 { transition-delay: 0.5s; }
+.bb-reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+.bb-reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+.bb-reveal-delay-3 {
+  transition-delay: 0.3s;
+}
+.bb-reveal-delay-4 {
+  transition-delay: 0.4s;
+}
+.bb-reveal-delay-5 {
+  transition-delay: 0.5s;
+}
 
 /* Hero title words — stagger reveal */
 .bb-hero-word {
@@ -878,17 +981,43 @@
   animation: bb-enter-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.bb-hero-word:nth-child(1) { animation-delay: 0.2s; }
-.bb-hero-word:nth-child(2) { animation-delay: 0.45s; }
-.bb-hero-word:nth-child(3) { animation-delay: 0.65s; }
-.bb-hero-word:nth-child(4) { animation-delay: 0.82s; }
-.bb-hero-word:nth-child(5) { animation-delay: 0.95s; }
+.bb-hero-word:nth-child(1) {
+  animation-delay: 0.2s;
+}
+.bb-hero-word:nth-child(2) {
+  animation-delay: 0.45s;
+}
+.bb-hero-word:nth-child(3) {
+  animation-delay: 0.65s;
+}
+.bb-hero-word:nth-child(4) {
+  animation-delay: 0.82s;
+}
+.bb-hero-word:nth-child(5) {
+  animation-delay: 0.95s;
+}
 
 /* Hero subtitle and CTA fade-up */
-.bb-fade-up-1 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.0s ease forwards; }
-.bb-fade-up-2 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.3s ease forwards; }
-.bb-fade-up-3 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.5s ease forwards; }
-.bb-fade-up-4 { opacity: 0; --bb-enter-y: 20px; animation: bb-enter-up 0.8s 1.7s ease forwards; }
+.bb-fade-up-1 {
+  opacity: 0;
+  --bb-enter-y: 20px;
+  animation: bb-enter-up 0.8s 1s ease forwards;
+}
+.bb-fade-up-2 {
+  opacity: 0;
+  --bb-enter-y: 20px;
+  animation: bb-enter-up 0.8s 1.3s ease forwards;
+}
+.bb-fade-up-3 {
+  opacity: 0;
+  --bb-enter-y: 20px;
+  animation: bb-enter-up 0.8s 1.5s ease forwards;
+}
+.bb-fade-up-4 {
+  opacity: 0;
+  --bb-enter-y: 20px;
+  animation: bb-enter-up 0.8s 1.7s ease forwards;
+}
 
 /* Act banner enter */
 .bb-act-enter {
@@ -908,15 +1037,19 @@
 }
 
 .bb-feed-entry-escalation {
-  --bb-flash-r: 255; --bb-flash-g: 71; --bb-flash-b: 87;
+  --bb-flash-r: 255;
+  --bb-flash-g: 71;
+  --bb-flash-b: 87;
   animation: bb-feed-flash 0.6s ease forwards;
-  border-left: 4px solid #FF4757;
+  border-left: 4px solid #ff4757;
 }
 
 .bb-feed-entry-completion {
-  --bb-flash-r: 74; --bb-flash-g: 232; --bb-flash-b: 138;
+  --bb-flash-r: 74;
+  --bb-flash-g: 232;
+  --bb-flash-b: 138;
   animation: bb-feed-flash 0.5s ease forwards;
-  border-left: 4px solid #4AE88A;
+  border-left: 4px solid #4ae88a;
 }
 
 /* Stat value flash when it changes */

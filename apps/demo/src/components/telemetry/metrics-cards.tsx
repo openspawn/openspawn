@@ -51,9 +51,7 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {metric.label}
               </span>
-              {metric.icon && (
-                <span className="text-muted-foreground/70">{metric.icon}</span>
-              )}
+              {metric.icon && <span className="text-muted-foreground/70">{metric.icon}</span>}
             </div>
 
             <div className="flex items-baseline gap-1.5">

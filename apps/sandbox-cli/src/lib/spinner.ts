@@ -49,17 +49,18 @@ export async function withSpinner<T>(
   options: {
     successText?: string | ((result: T) => string);
     failText?: string;
-  } = {}
+  } = {},
 ): Promise<T> {
   const spinner = startSpinner(text);
 
   try {
     const result = await operation();
-    
-    const successMsg = typeof options.successText === "function"
-      ? options.successText(result)
-      : options.successText || text;
-    
+
+    const successMsg =
+      typeof options.successText === "function"
+        ? options.successText(result)
+        : options.successText || text;
+
     stopSpinner(true, successMsg);
     return result;
   } catch (error) {
@@ -84,9 +85,9 @@ export function progressBar(current: number, total: number, width = 20): string 
   const percent = Math.min(1, current / total);
   const filled = Math.round(width * percent);
   const empty = width - filled;
-  
+
   const bar = pc.cyan("█".repeat(filled)) + pc.dim("░".repeat(empty));
   const pct = pc.bold(`${Math.round(percent * 100)}%`);
-  
+
   return `${bar} ${pct}`;
 }

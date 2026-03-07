@@ -20,6 +20,7 @@ preset: agency
 ## Structure
 
 ### Ops Director — Live Operations Director
+
 The strategic center of the live ops team. Sets weekly content calendar, approves economy parameter changes, monitors overall game health metrics, and escalates critical issues (major economy exploits, review bombs) to Human Principal. Owns the player experience.
 
 - **Level:** 7
@@ -29,6 +30,7 @@ The strategic center of the live ops team. Sets weekly content calendar, approve
 - **Spawns:** Economy Tuner, Content Generator, Player Support Agent
 
 #### Economy Tuner — Game Economy Analyst
+
 Monitors game economy metrics continuously: currency inflation, item price drift, sink/faucet ratios, whale vs. F2P spending ratios, and retention curves by spending tier. Detects anomalies, proposes balance adjustments, and implements approved changes within guardrail thresholds.
 
 - **Level:** 6
@@ -38,6 +40,7 @@ Monitors game economy metrics continuously: currency inflation, item price drift
 - **Tools:** economy dashboard, telemetry pipeline, parameter configuration API, A/B test framework
 
 #### Content Generator — Live Content Specialist
+
 Produces daily and weekly live content: event descriptions, challenge text, reward messaging, seasonal themes, and push notification copy. Adapts tone to game voice guidelines. Generates localization-ready strings. Flags any content that touches lore or storyline for human creative review.
 
 - **Level:** 5
@@ -47,6 +50,7 @@ Produces daily and weekly live content: event descriptions, challenge text, rewa
 - **Tools:** game CMS, localization database, asset library, content calendar
 
 #### Player Support Agent — Community & Support Specialist
+
 Monitors app store reviews, social media sentiment, and in-game support tickets. Identifies emerging issues before they escalate (new bug reports, economy complaints, content confusion). Drafts response templates and escalates critical player issues to Ops Director.
 
 - **Level:** 4
@@ -58,17 +62,20 @@ Monitors app store reviews, social media sentiment, and in-game support tickets.
 ## Policies
 
 ### Budget
+
 - **Per-agent limit:** 1200 credits/week
 - **Alert threshold:** 80%
 - **Overage behavior:** Pause non-critical tasks; continue monitoring and escalation
 
 ### Economy Guardrails
+
 - **Maximum single-parameter change:** 15% per 24-hour window without Ops Director approval
 - **Maximum weekly drift:** 30% cumulative from baseline on any tracked parameter
 - **Auto-escalate if:** Currency inflation rate > 5% week-over-week; D7 retention drops > 3 percentage points; spending conversion drops > 2 percentage points
 - **Hard lock:** No Economy Tuner changes permitted during live events without Ops Director explicit approval
 
 ### Content Permissions
+
 - **Content Generator:** Can publish to staging automatically; Human Principal approval required for production publish of seasonal or storyline content
 - **Player Support Agent:** Can publish templated responses; cannot publish non-templated responses without Ops Director review
 
@@ -77,6 +84,7 @@ Monitors app store reviews, social media sentiment, and in-game support tickets.
 ### Daily Economy Health Check
 
 **Every morning (07:00 local)**
+
 1. Economy Tuner pulls 24-hour economy metrics
 2. Compares against baseline and weekly trend
 3. Flags any metrics outside 10% variance threshold
@@ -86,6 +94,7 @@ Monitors app store reviews, social media sentiment, and in-game support tickets.
 ### Weekly Content Release
 
 **Monday planning**
+
 1. Ops Director reviews content calendar and sets weekly theme
 2. Content Generator drafts all event and challenge text
 3. Content Generator submits draft to staging for Ops Director review
@@ -93,12 +102,15 @@ Monitors app store reviews, social media sentiment, and in-game support tickets.
 5. Approved content scheduled for production release
 
 **Release day**
+
 1. Content Generator confirms all strings published to production
 2. Economy Tuner monitors for unexpected economy impact from new content
 3. Player Support Agent monitors initial player sentiment on new content
 
 ### Economy Exploit Response
+
 If Economy Tuner detects exploit pattern (e.g., duplication bug, unintended infinite loop):
+
 1. Escalate to Ops Director immediately via escalation_create with severity: critical
 2. Ops Director evaluates: patch, parameter lock, or rollback
 3. If revenue impact > $10K estimated: Human Principal notified within 30 minutes
@@ -106,7 +118,9 @@ If Economy Tuner detects exploit pattern (e.g., duplication bug, unintended infi
 5. Player Support Agent prepares player communication if server action required
 
 ### Negative Sentiment Spike Response
+
 If Player Support Agent detects review score drop > 0.3 stars in 24 hours or social sentiment goes negative trending:
+
 1. Escalate to Ops Director with sentiment summary and top player complaint themes
 2. Ops Director determines root cause (economy, content, bug)
 3. Routes to appropriate specialist for investigation

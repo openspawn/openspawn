@@ -14,7 +14,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.listTasks(params);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -29,7 +29,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.createTask(params);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -41,7 +41,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.getTask(params.id);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -49,25 +49,15 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     "Transition a task to a new status",
     {
       id: z.string().describe("Task ID"),
-      status: z.enum([
-        "backlog",
-        "todo",
-        "in_progress",
-        "review",
-        "done",
-        "blocked",
-        "cancelled",
-      ]).describe("New status"),
+      status: z
+        .enum(["backlog", "todo", "in_progress", "review", "done", "blocked", "cancelled"])
+        .describe("New status"),
       reason: z.string().optional().describe("Reason for transition"),
     },
     async (params) => {
-      const result = await client.transitionTask(
-        params.id,
-        params.status,
-        params.reason
-      );
+      const result = await client.transitionTask(params.id, params.status, params.reason);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -80,7 +70,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.assignTask(params.id, params.assigneeId);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 
   server.tool(
@@ -93,6 +83,6 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     async (params) => {
       const result = await client.addTaskComment(params.taskId, params.body);
       return { content: [{ type: "text", text: JSON.stringify(result.data, null, 2) }] };
-    }
+    },
   );
 }

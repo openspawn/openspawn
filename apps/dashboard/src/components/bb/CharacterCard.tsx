@@ -5,9 +5,9 @@
  * NOTE: All animations use plain CSS (bb-tokens.css keyframes) — no motion/react.
  */
 
-import { useState } from 'react';
+import { useState } from "react";
 
-export type AgentStatus = 'idle' | 'working' | 'busy' | 'overwhelmed';
+export type AgentStatus = "idle" | "working" | "busy" | "overwhelmed";
 
 export interface AgentCharacter {
   id: string;
@@ -24,48 +24,48 @@ export interface AgentCharacter {
 }
 
 export const STATUS_LABEL: Record<AgentStatus, string> = {
-  idle:        'Waiting…',
-  working:     'ON IT 🔥',
-  busy:        'SWAMPED 😅',
-  overwhelmed: 'HELP 🚨',
+  idle: "Waiting…",
+  working: "ON IT 🔥",
+  busy: "SWAMPED 😅",
+  overwhelmed: "HELP 🚨",
 };
 
 const STATUS_STYLE: Record<AgentStatus, string> = {
-  idle:        'bg-[#4AAED9]/10 text-[#4AAED9] border border-[#4AAED9]/30',
-  working:     'bg-[#F4C542]/15 text-[#F4C542] border border-[#F4C542]/40',
-  busy:        'bg-[#FF6B6B]/15 text-[#FF6B6B] border border-[#FF6B6B]/40',
-  overwhelmed: 'bg-[#FF4757]/20 text-[#FF4757] border border-[#FF4757]/50',
+  idle: "bg-[#4AAED9]/10 text-[#4AAED9] border border-[#4AAED9]/30",
+  working: "bg-[#F4C542]/15 text-[#F4C542] border border-[#F4C542]/40",
+  busy: "bg-[#FF6B6B]/15 text-[#FF6B6B] border border-[#FF6B6B]/40",
+  overwhelmed: "bg-[#FF4757]/20 text-[#FF4757] border border-[#FF4757]/50",
 };
 
 const STATUS_RING: Record<AgentStatus, string> = {
-  idle:        'border-[#4AAED9]/30',
-  working:     'border-[#F4C542] shadow-[0_0_16px_rgba(244,197,66,0.5)]',
-  busy:        'border-[#FF6B6B] shadow-[0_0_12px_rgba(255,107,107,0.4)]',
-  overwhelmed: 'border-[#FF4757] shadow-[0_0_20px_rgba(255,71,87,0.6)]',
+  idle: "border-[#4AAED9]/30",
+  working: "border-[#F4C542] shadow-[0_0_16px_rgba(244,197,66,0.5)]",
+  busy: "border-[#FF6B6B] shadow-[0_0_12px_rgba(255,107,107,0.4)]",
+  overwhelmed: "border-[#FF4757] shadow-[0_0_20px_rgba(255,71,87,0.6)]",
 };
 
 const ANIM_CLASS: Record<AgentStatus, string> = {
-  idle:        'animate-[bb-bob_2.5s_ease-in-out_infinite]',
-  working:     'animate-[bb-bob_1s_ease-in-out_infinite]',
-  busy:        'animate-[bb-bob_1.2s_ease-in-out_infinite]',
-  overwhelmed: 'animate-[bb-bob_0.6s_ease-in-out_infinite]',
+  idle: "animate-[bb-bob_2.5s_ease-in-out_infinite]",
+  working: "animate-[bb-bob_1s_ease-in-out_infinite]",
+  busy: "animate-[bb-bob_1.2s_ease-in-out_infinite]",
+  overwhelmed: "animate-[bb-bob_0.6s_ease-in-out_infinite]",
 };
 
 interface CharacterCardProps {
   agent: AgentCharacter;
   onClick?: () => void;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
-export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProps) {
-  const isCrisis = agent.status === 'overwhelmed';
-  const isActive = agent.status === 'working' || agent.status === 'busy';
+export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProps) {
+  const isCrisis = agent.status === "overwhelmed";
+  const isActive = agent.status === "working" || agent.status === "busy";
 
-  const sizeClasses = { sm: 'p-3 gap-3', md: 'p-4 gap-4', lg: 'p-6 gap-5' };
+  const sizeClasses = { sm: "p-3 gap-3", md: "p-4 gap-4", lg: "p-6 gap-5" };
   const avatarSizes = {
-    sm: 'w-12 h-12 text-2xl',
-    md: 'w-16 h-16 text-3xl',
-    lg: 'w-24 h-24 text-5xl',
+    sm: "w-12 h-12 text-2xl",
+    md: "w-16 h-16 text-3xl",
+    lg: "w-24 h-24 text-5xl",
   };
 
   return (
@@ -76,16 +76,19 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
         rounded-[1.25rem] cursor-pointer
         backdrop-blur-[12px]
         transition-all duration-200 hover:-translate-y-1 hover:scale-[1.015]
-        ${agent.cardClass ?? ''}
+        ${agent.cardClass ?? ""}
       `}
       style={{
-        boxShadow: '0 4px 20px rgba(6,42,69,0.5), 0 1px 4px rgba(244,197,66,0.05)',
+        boxShadow: "0 4px 20px rgba(6,42,69,0.5), 0 1px 4px rgba(244,197,66,0.05)",
       }}
       onClick={onClick}
     >
       {/* Crisis overlay flash */}
       {isCrisis && (
-        <div className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]" style={{ '--bb-ring-color': 'rgba(255, 71, 87, 0.4)' } as React.CSSProperties} />
+        <div
+          className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]"
+          style={{ "--bb-ring-color": "rgba(255, 71, 87, 0.4)" } as React.CSSProperties}
+        />
       )}
 
       {/* Avatar */}
@@ -125,7 +128,7 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
         <div className="flex items-start justify-between gap-2 mb-0.5">
           <h3
             className="font-['Baloo_2'] font-bold text-[#E8F8FF] leading-tight truncate"
-            style={{ fontSize: size === 'lg' ? '1.125rem' : '0.9375rem' }}
+            style={{ fontSize: size === "lg" ? "1.125rem" : "0.9375rem" }}
           >
             {agent.name}
           </h3>
@@ -147,9 +150,7 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
         </p>
 
         {/* Team */}
-        <p className="text-[#B8E4F7]/50 text-[11px] font-['Nunito']">
-          {agent.team}
-        </p>
+        <p className="text-[#B8E4F7]/50 text-[11px] font-['Nunito']">{agent.team}</p>
 
         {/* Queue badge */}
         {agent.queueSize != null && agent.queueSize > 0 && (
@@ -162,7 +163,7 @@ export function CharacterCard({ agent, onClick, size = 'md' }: CharacterCardProp
         )}
 
         {/* Last message */}
-        {agent.lastMessage && size !== 'sm' && (
+        {agent.lastMessage && size !== "sm" && (
           <div className="mt-2 pt-2 border-t border-[rgba(74,174,217,0.1)]">
             <p className="text-[#B8E4F7]/60 text-[11px] font-['Nunito'] italic leading-snug line-clamp-2">
               "{agent.lastMessage}"
@@ -182,14 +183,18 @@ interface CharacterCardGridProps {
   onAgentClick?: (agent: AgentCharacter) => void;
 }
 
-export function CharacterCardGrid({ agents, maxVisible = 6, onAgentClick }: CharacterCardGridProps) {
+export function CharacterCardGrid({
+  agents,
+  maxVisible = 6,
+  onAgentClick,
+}: CharacterCardGridProps) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? agents : agents.slice(0, maxVisible);
 
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visible.map(agent => (
+        {visible.map((agent) => (
           <div key={agent.id}>
             <CharacterCard
               agent={agent}
@@ -203,10 +208,10 @@ export function CharacterCardGrid({ agents, maxVisible = 6, onAgentClick }: Char
       {agents.length > maxVisible && (
         <button
           className="mt-6 mx-auto flex items-center gap-2 text-[#4AAED9] font-['Nunito'] font-semibold text-sm hover:text-[#F4C542] transition-colors hover:scale-[1.02]"
-          onClick={() => setExpanded(e => !e)}
+          onClick={() => setExpanded((e) => !e)}
         >
           {expanded
-            ? 'Show fewer agents ↑'
+            ? "Show fewer agents ↑"
             : `See all ${agents.length} agents → (${agents.length - maxVisible} more)`}
         </button>
       )}

@@ -17,6 +17,7 @@ A: It isn't. Even "write a blog post" has decisions: topic angle, audience, leng
 ### Step 1: Read ORG.md
 
 Understand what you're working with:
+
 - **Mission** — what are we building/doing?
 - **Team** — who's available, what are their domains and levels?
 - **Culture** — escalation speed, communication norms
@@ -46,35 +47,42 @@ This is the core of the boot sequence. Your PLAN.md must contain:
 # PLAN.md
 
 ## Mission
+
 [Copied from ORG.md Identity section]
 
 ## Phases
+
 ### Phase 1: [Name]
+
 What gets built first and why.
 
 ### Phase 2: [Name]
+
 What depends on Phase 1.
 
 ## Tasks
 
-| ID | Task | Assigned To | Priority | Phase | Dependencies | Status |
-|----|------|-------------|----------|-------|-------------|--------|
-| T1 | Implement auth API | engineer | high | 1 | none | open |
-| T2 | Design login page | designer | high | 1 | none | open |
-| T3 | Integrate auth + UI | engineer | high | 2 | T1, T2 | blocked |
-| T4 | Write auth docs | writer | medium | 2 | T1 | blocked |
+| ID  | Task                | Assigned To | Priority | Phase | Dependencies | Status  |
+| --- | ------------------- | ----------- | -------- | ----- | ------------ | ------- |
+| T1  | Implement auth API  | engineer    | high     | 1     | none         | open    |
+| T2  | Design login page   | designer    | high     | 1     | none         | open    |
+| T3  | Integrate auth + UI | engineer    | high     | 2     | T1, T2       | blocked |
+| T4  | Write auth docs     | writer      | medium   | 2     | T1           | blocked |
 
 ## Success Criteria
+
 - [ ] Auth API returns JWT tokens
 - [ ] Login page matches design spec
 - [ ] All tests pass
 - [ ] Docs published
 
 ## Definition of Done
+
 [What "finished" looks like for this mission]
 ```
 
 **Rules for PLAN.md:**
+
 - Every task has exactly one assignee (use agent IDs from ORG.md)
 - Dependencies are explicit — no "whenever it's ready"
 - Priorities are `critical`, `high`, `medium`, or `low`
@@ -123,11 +131,13 @@ tool: org_status {}
 ```
 
 **Monitoring cadence:**
+
 - First check: 2 minutes after task creation
 - Ongoing: every 5 minutes
 - After escalation: every 2 minutes until resolved
 
 **What to look for:**
+
 - Tasks stuck in "in_progress" for too long (>15 min for simple tasks)
 - Escalations waiting for your decision
 - Phase transitions — when all Phase N tasks complete, create Phase N+1 tasks
@@ -136,13 +146,13 @@ tool: org_status {}
 
 When things go wrong (they will):
 
-| Situation | Action |
-|-----------|--------|
-| Task failed | Update PLAN.md, reassign or break into subtasks |
-| Agent stuck | Check their escalation, make a DECISION |
-| New requirement | Add tasks to PLAN.md, create via MCP |
-| Scope change | Rewrite affected phases, notify affected agents |
-| All tasks done | Proceed to Step 8 |
+| Situation       | Action                                          |
+| --------------- | ----------------------------------------------- |
+| Task failed     | Update PLAN.md, reassign or break into subtasks |
+| Agent stuck     | Check their escalation, make a DECISION         |
+| New requirement | Add tasks to PLAN.md, create via MCP            |
+| Scope change    | Rewrite affected phases, notify affected agents |
+| All tasks done  | Proceed to Step 8                               |
 
 **Always update PLAN.md first, then update tasks via MCP.** PLAN.md is the source of truth.
 

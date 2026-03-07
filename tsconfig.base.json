@@ -11,10 +11,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022", "DOM"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strict": true,
@@ -29,35 +26,15 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@openspawn/shared-types": [
-        "libs/shared-types/src/index.ts"
-      ],
-      "@openspawn/database": [
-        "libs/database/src/index.ts"
-      ],
-      "@openspawn/demo-data": [
-        "libs/demo-data/src/index.ts"
-      ],
-      "@openspawn/design-tokens": [
-        "libs/design-tokens/src/index.ts"
-      ],
-      "@openspawn/design-tokens/*": [
-        "libs/design-tokens/src/*"
-      ],
-      "@openspawn/dashboard-data": [
-        "libs/dashboard-data/src/index.ts"
-      ],
-      "@openspawn/dashboard-ui": [
-        "libs/dashboard-ui/src/index.ts"
-      ],
-      "@openspawn/test-utils": [
-        "libs/test-utils/src/index.ts"
-      ]
+      "@openspawn/shared-types": ["libs/shared-types/src/index.ts"],
+      "@openspawn/database": ["libs/database/src/index.ts"],
+      "@openspawn/demo-data": ["libs/demo-data/src/index.ts"],
+      "@openspawn/design-tokens": ["libs/design-tokens/src/index.ts"],
+      "@openspawn/design-tokens/*": ["libs/design-tokens/src/*"],
+      "@openspawn/dashboard-data": ["libs/dashboard-data/src/index.ts"],
+      "@openspawn/dashboard-ui": ["libs/dashboard-ui/src/index.ts"],
+      "@openspawn/test-utils": ["libs/test-utils/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

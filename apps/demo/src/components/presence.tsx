@@ -7,33 +7,33 @@
  * - ActiveAgentsBadge – "N agents active" header pill
  */
 
-import { motion } from 'motion/react';
-import { cn } from '../lib/utils';
-import type { PresenceStatus } from '../hooks/use-presence';
+import { motion } from "motion/react";
+import { cn } from "../lib/utils";
+import type { PresenceStatus } from "../hooks/use-presence";
 
 /* ------------------------------------------------------------------ */
 /*  Color mappings                                                     */
 /* ------------------------------------------------------------------ */
 
 const dotColors: Record<PresenceStatus, string> = {
-  active: 'bg-emerald-500',
-  busy: 'bg-amber-500',
-  error: 'bg-rose-500',
-  idle: 'bg-muted-foreground',
+  active: "bg-emerald-500",
+  busy: "bg-amber-500",
+  error: "bg-rose-500",
+  idle: "bg-muted-foreground",
 };
 
 const glowColors: Record<PresenceStatus, string> = {
-  active: 'rgba(16,185,129,0.45)',   // emerald
-  busy: 'rgba(245,158,11,0.35)',     // amber
-  error: 'rgba(244,63,94,0.45)',     // rose
-  idle: 'rgba(100,116,139,0.18)',    // slate
+  active: "rgba(16,185,129,0.45)", // emerald
+  busy: "rgba(245,158,11,0.35)", // amber
+  error: "rgba(244,63,94,0.45)", // rose
+  idle: "rgba(100,116,139,0.18)", // slate
 };
 
 const ringColors: Record<PresenceStatus, string> = {
-  active: 'ring-emerald-500/60',
-  busy: 'ring-amber-500/50',
-  error: 'ring-rose-500/60',
-  idle: 'ring-muted-foreground/25',
+  active: "ring-emerald-500/60",
+  busy: "ring-amber-500/50",
+  error: "ring-rose-500/60",
+  idle: "ring-muted-foreground/25",
 };
 
 /* ------------------------------------------------------------------ */
@@ -42,24 +42,32 @@ const ringColors: Record<PresenceStatus, string> = {
 
 interface StatusDotProps {
   status: PresenceStatus;
-  size?: 'sm' | 'md';
+  size?: "sm" | "md";
   className?: string;
 }
 
-export function StatusDot({ status, size = 'sm', className }: StatusDotProps) {
-  const sizeClass = size === 'sm' ? 'h-2 w-2' : 'h-2.5 w-2.5';
-  const shouldPulse = status === 'active' || status === 'error';
+export function StatusDot({ status, size = "sm", className }: StatusDotProps) {
+  const sizeClass = size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5";
+  const shouldPulse = status === "active" || status === "error";
 
   return (
-    <span className={cn('relative inline-flex', className)}>
+    <span className={cn("relative inline-flex", className)}>
       {shouldPulse && (
         <motion.span
-          className={cn('absolute inline-flex rounded-full opacity-75', sizeClass, dotColors[status])}
+          className={cn(
+            "absolute inline-flex rounded-full opacity-75",
+            sizeClass,
+            dotColors[status],
+          )}
           animate={{ scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
-          transition={{ repeat: Infinity, duration: status === 'error' ? 1.2 : 2, ease: 'easeInOut' }}
+          transition={{
+            repeat: Infinity,
+            duration: status === "error" ? 1.2 : 2,
+            ease: "easeInOut",
+          }}
         />
       )}
-      <span className={cn('relative inline-flex rounded-full', sizeClass, dotColors[status])} />
+      <span className={cn("relative inline-flex rounded-full", sizeClass, dotColors[status])} />
     </span>
   );
 }
@@ -75,28 +83,26 @@ interface PresenceGlowProps {
 }
 
 export function PresenceGlow({ status, children, className }: PresenceGlowProps) {
-  const shouldPulse = status === 'active' || status === 'error';
+  const shouldPulse = status === "active" || status === "error";
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn("relative", className)}>
       {shouldPulse ? (
         <motion.div
-          className={cn('absolute inset-0 rounded-full ring-2', ringColors[status])}
+          className={cn("absolute inset-0 rounded-full ring-2", ringColors[status])}
           animate={{
             scale: [1, 1.08, 1],
             opacity: [0.7, 1, 0.7],
           }}
           transition={{
             repeat: Infinity,
-            duration: status === 'error' ? 1.2 : 2.5,
-            ease: 'easeInOut',
+            duration: status === "error" ? 1.2 : 2.5,
+            ease: "easeInOut",
           }}
           style={{ boxShadow: `0 0 12px ${glowColors[status]}` }}
         />
       ) : (
-        <div
-          className={cn('absolute inset-0 rounded-full ring-1', ringColors[status])}
-        />
+        <div className={cn("absolute inset-0 rounded-full ring-1", ringColors[status])} />
       )}
       {children}
     </div>
@@ -114,7 +120,7 @@ interface TypingIndicatorProps {
 
 export function TypingIndicator({ agentName, className }: TypingIndicatorProps) {
   return (
-    <div className={cn('flex items-center gap-2 text-xs text-muted-foreground', className)}>
+    <div className={cn("flex items-center gap-2 text-xs text-muted-foreground", className)}>
       <span className="font-medium text-foreground/70">{agentName}</span>
       <span className="inline-flex items-center gap-0.5">
         is typing
@@ -127,7 +133,7 @@ export function TypingIndicator({ agentName, className }: TypingIndicatorProps) 
               repeat: Infinity,
               duration: 1,
               delay: i * 0.2,
-              ease: 'easeInOut',
+              ease: "easeInOut",
             }}
           />
         ))}
@@ -151,13 +157,13 @@ export function ActiveAgentsBadge({ count, className }: ActiveAgentsBadgeProps) 
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20',
-        className
+        "inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20",
+        className,
       )}
     >
       <StatusDot status="active" size="sm" />
       <span>
-        {count} agent{count !== 1 ? 's' : ''} active
+        {count} agent{count !== 1 ? "s" : ""} active
       </span>
     </div>
   );

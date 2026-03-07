@@ -8,26 +8,28 @@ export function GettingStarted() {
     <DocsLayout>
       <h1 className="mb-2 text-4xl font-bold text-slate-100">Getting Started with OpenSpawn</h1>
       <p className="mb-8 text-lg text-slate-400">
-        What you'll have in ~10 minutes: a local org of AI agents, coordinated by a markdown file, visible
-        in a real-time dashboard — with tasks flowing through a hierarchy you define.
+        What you'll have in ~10 minutes: a local org of AI agents, coordinated by a markdown file,
+        visible in a real-time dashboard — with tasks flowing through a hierarchy you define.
       </p>
 
       {/* What is OpenSpawn */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What is OpenSpawn?</h2>
       <p className="mb-4 text-slate-400">
-        OpenSpawn is a <strong className="text-slate-200">coordination layer for AI agents</strong>. It's not an agent
-        framework — you keep using whatever you're using (OpenClaw, LangGraph, Claude Code, or just raw API calls).
-        OpenSpawn adds the layer on top that most multi-agent systems are missing: <em>structure</em>.
+        OpenSpawn is a <strong className="text-slate-200">coordination layer for AI agents</strong>.
+        It's not an agent framework — you keep using whatever you're using (OpenClaw, LangGraph,
+        Claude Code, or just raw API calls). OpenSpawn adds the layer on top that most multi-agent
+        systems are missing: <em>structure</em>.
       </p>
       <p className="mb-4 text-slate-400">
-        Here's the problem it solves: you have agents. They can each do things. But they don't know who's in charge,
-        how to escalate a blocker, who should pick up what task, or how to divide work without stepping on each other.
-        You end up hand-holding every interaction.
+        Here's the problem it solves: you have agents. They can each do things. But they don't know
+        who's in charge, how to escalate a blocker, who should pick up what task, or how to divide
+        work without stepping on each other. You end up hand-holding every interaction.
       </p>
       <p className="mb-4 text-slate-400">
-        OpenSpawn gives your agents an org chart. A COO. Department leads. Workers with defined domains. A
-        communication protocol that mirrors how effective human teams operate — acknowledgments, progress updates,
-        escalations. And a real-time dashboard so you can see all of it.
+        OpenSpawn gives your agents an org chart. A COO. Department leads. Workers with defined
+        domains. A communication protocol that mirrors how effective human teams operate —
+        acknowledgments, progress updates, escalations. And a real-time dashboard so you can see all
+        of it.
       </p>
       <p className="mb-4 text-slate-400">
         The entire org is defined in a single markdown file:{" "}
@@ -35,8 +37,9 @@ export function GettingStarted() {
       </p>
       <CodeBlock title="flow">{`ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        If you're familiar with infrastructure-as-code (Terraform, Pulumi) — this is the same idea applied to agent
-        organizations. Define the org in version-controlled text, deploy it, watch it run, iterate.
+        If you're familiar with infrastructure-as-code (Terraform, Pulumi) — this is the same idea
+        applied to agent organizations. Define the org in version-controlled text, deploy it, watch
+        it run, iterate.
       </p>
 
       {/* Before You Start */}
@@ -46,8 +49,7 @@ export function GettingStarted() {
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
         <li>
-          Node.js 18 or newer (
-          <code className="inline-code">node --version</code> to check)
+          Node.js 18 or newer (<code className="inline-code">node --version</code> to check)
         </li>
       </ul>
       <p className="mb-3 text-slate-400">
@@ -55,7 +57,12 @@ export function GettingStarted() {
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
         <li>
-          <a href="https://ollama.ai" target="_blank" rel="noopener" className="text-cyan-400 underline">
+          <a
+            href="https://ollama.ai"
+            target="_blank"
+            rel="noopener"
+            className="text-cyan-400 underline"
+          >
             Ollama
           </a>{" "}
           for free local model inference — workers in your org can use{" "}
@@ -63,22 +70,32 @@ export function GettingStarted() {
         </li>
         <li>
           A{" "}
-          <a href="https://groq.com" target="_blank" rel="noopener" className="text-cyan-400 underline">
+          <a
+            href="https://groq.com"
+            target="_blank"
+            rel="noopener"
+            className="text-cyan-400 underline"
+          >
             Groq
           </a>{" "}
           API key for fast inference on mid-tier agents
         </li>
         <li>
           An{" "}
-          <a href="https://openrouter.ai" target="_blank" rel="noopener" className="text-cyan-400 underline">
+          <a
+            href="https://openrouter.ai"
+            target="_blank"
+            rel="noopener"
+            className="text-cyan-400 underline"
+          >
             OpenRouter
           </a>{" "}
           API key for top-tier models (Claude, GPT-4o) on your executive-level agents
         </li>
       </ul>
       <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
-        Don't have any of these? No problem — the default scaffold uses a demo/simulation mode that works without any
-        API keys. You'll still see the full coordination flow.
+        Don't have any of these? No problem — the default scaffold uses a demo/simulation mode that
+        works without any API keys. You'll still see the full coordination flow.
       </div>
 
       {/* Step 1 */}
@@ -89,8 +106,7 @@ export function GettingStarted() {
 ├── ORG.md                  # Your org definition — this is the important one
 └── openspawn.config.json   # Server config (port, model providers, etc.)`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Let's look at what <code className="inline-code">ORG.md</code> contains by
-        default:
+        Let's look at what <code className="inline-code">ORG.md</code> contains by default:
       </p>
       <CodeBlock title="ORG.md">{`# My Org
 
@@ -135,20 +151,21 @@ Write code, run tests, build APIs.
       <p className="mb-3 text-slate-400">Take a moment to read this. A few things to notice:</p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-2">
         <li>
-          <strong className="text-slate-200">Prose descriptions become system prompt context.</strong> "Triages
-          technical work. Breaks projects into tasks." isn't just a comment — it's injected into the Engineering Lead's
-          context every time it runs.
+          <strong className="text-slate-200">
+            Prose descriptions become system prompt context.
+          </strong>{" "}
+          "Triages technical work. Breaks projects into tasks." isn't just a comment — it's injected
+          into the Engineering Lead's context every time it runs.
         </li>
         <li>
           <strong className="text-slate-200">Heading levels define the hierarchy.</strong> H3 (
-          <code className="inline-code">###</code>) is a department or top-level
-          role. H4 (<code className="inline-code">####</code>) is a team member
-          that reports to the H3 above it.
+          <code className="inline-code">###</code>) is a department or top-level role. H4 (
+          <code className="inline-code">####</code>) is a team member that reports to the H3 above
+          it.
         </li>
         <li>
           <strong className="text-slate-200">
-            <code className="inline-code">Count: 2</code> spawns multiple
-            agents
+            <code className="inline-code">Count: 2</code> spawns multiple agents
           </strong>{" "}
           with the same role — auto-numbered as "Backend Worker 1", "Backend Worker 2".
         </li>
@@ -156,8 +173,8 @@ Write code, run tests, build APIs.
           <strong className="text-slate-200">
             <code className="inline-code">preset: startup</code>
           </strong>{" "}
-          is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow
-          hierarchy.
+          is shorthand for a set of communication defaults — immediate escalation, frequent progress
+          updates, shallow hierarchy.
         </li>
       </ul>
 
@@ -179,7 +196,12 @@ Write code, run tests, build APIs.
    Dashboard at  http://localhost:3333/app/`}</CodeBlock>
       <p className="mb-3 text-slate-400">
         Open{" "}
-        <a href="http://localhost:3333/app/" target="_blank" rel="noopener" className="text-cyan-400 underline">
+        <a
+          href="http://localhost:3333/app/"
+          target="_blank"
+          rel="noopener"
+          className="text-cyan-400 underline"
+        >
           http://localhost:3333/app/
         </a>{" "}
         — your dashboard is live.
@@ -189,20 +211,23 @@ Write code, run tests, build APIs.
       </p>
       <ul className="mb-4 list-disc pl-6 text-slate-400 space-y-1">
         <li>
-          <strong className="text-slate-200">Network graph:</strong> Your org hierarchy visualized. The COO is at the
-          top.
+          <strong className="text-slate-200">Network graph:</strong> Your org hierarchy visualized.
+          The COO is at the top.
         </li>
         <li>
-          <strong className="text-slate-200">Agent cards:</strong> Each agent with their level, domain, model, and
-          current status.
+          <strong className="text-slate-200">Agent cards:</strong> Each agent with their level,
+          domain, model, and current status.
         </li>
         <li>
-          <strong className="text-slate-200">Task timeline:</strong> Empty for now — we'll fix that next.
+          <strong className="text-slate-200">Task timeline:</strong> Empty for now — we'll fix that
+          next.
         </li>
       </ul>
 
       {/* Step 3 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 3 — Send Your First Task</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Step 3 — Send Your First Task
+      </h2>
       <CodeBlock title="bash">{`curl -X POST http://localhost:3333/a2a/message/send \\
   -H 'Content-Type: application/json' \\
   -d '{
@@ -211,20 +236,43 @@ Write code, run tests, build APIs.
       "parts": [{ "kind": "text", "text": "Build a REST API for user management with CRUD endpoints" }]
     }
   }'`}</CodeBlock>
-      <p className="mb-3 text-slate-400">You'll get back a response with a <code className="inline-code">taskId</code>. Watch what happens in the dashboard:</p>
+      <p className="mb-3 text-slate-400">
+        You'll get back a response with a <code className="inline-code">taskId</code>. Watch what
+        happens in the dashboard:
+      </p>
       <ol className="mb-4 list-decimal pl-6 text-slate-400 space-y-1">
-        <li><strong className="text-slate-200">Task created</strong> — appears in the task timeline as "submitted"</li>
-        <li><strong className="text-slate-200">COO wakes</strong> — acknowledges the task (👍 appears on the task card)</li>
-        <li><strong className="text-slate-200">COO delegates</strong> — routes to the Engineering Lead</li>
-        <li><strong className="text-slate-200">Engineering Lead</strong> — receives delegation, breaks it down, assigns sub-tasks to workers</li>
-        <li><strong className="text-slate-200">Workers start</strong> — status changes to "working", progress updates appear</li>
-        <li><strong className="text-slate-200">Workers complete</strong> — ✅ + summary flows back up the chain</li>
-        <li><strong className="text-slate-200">COO marks done</strong> — final ✅ and summary back to you</li>
+        <li>
+          <strong className="text-slate-200">Task created</strong> — appears in the task timeline as
+          "submitted"
+        </li>
+        <li>
+          <strong className="text-slate-200">COO wakes</strong> — acknowledges the task (👍 appears
+          on the task card)
+        </li>
+        <li>
+          <strong className="text-slate-200">COO delegates</strong> — routes to the Engineering Lead
+        </li>
+        <li>
+          <strong className="text-slate-200">Engineering Lead</strong> — receives delegation, breaks
+          it down, assigns sub-tasks to workers
+        </li>
+        <li>
+          <strong className="text-slate-200">Workers start</strong> — status changes to "working",
+          progress updates appear
+        </li>
+        <li>
+          <strong className="text-slate-200">Workers complete</strong> — ✅ + summary flows back up
+          the chain
+        </li>
+        <li>
+          <strong className="text-slate-200">COO marks done</strong> — final ✅ and summary back to
+          you
+        </li>
       </ol>
       <p className="mb-4 text-slate-400">
         This entire chain — delegation, acknowledgment, progress, completion — follows the{" "}
-        <strong className="text-slate-200">Agent Communication Protocol (ACP)</strong>. ACP is what keeps agents from
-        silently failing or stepping on each other.
+        <strong className="text-slate-200">Agent Communication Protocol (ACP)</strong>. ACP is what
+        keeps agents from silently failing or stepping on each other.
       </p>
       <p className="mb-2 text-slate-400">To trigger a visible escalation intentionally:</p>
       <CodeBlock title="bash">{`curl -X POST http://localhost:3333/a2a/message/send \\
@@ -236,12 +284,14 @@ Write code, run tests, build APIs.
     }
   }'`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        A sufficiently ambiguous task will trigger an escalation chain. Watch the task status change to "BLOCKED" in
-        the dashboard.
+        A sufficiently ambiguous task will trigger an escalation chain. Watch the task status change
+        to "BLOCKED" in the dashboard.
       </p>
 
       {/* Step 4 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 4 — Understand What You're Looking At</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Step 4 — Understand What You're Looking At
+      </h2>
       <p className="mb-3 text-slate-400">The dashboard is where you diagnose your org:</p>
       <div className="mb-4 space-y-4">
         <div>
@@ -270,7 +320,9 @@ Write code, run tests, build APIs.
         <div>
           <p className="mb-1 font-semibold text-slate-200">Health score (top of dashboard)</p>
           <ul className="list-disc pl-6 text-slate-400 space-y-1 text-sm">
-            <li>0–100 composite: ack latency, escalation rate, completion rate, budget, idle rate</li>
+            <li>
+              0–100 composite: ack latency, escalation rate, completion rate, budget, idle rate
+            </li>
             <li>Below 70 = needs attention. Below 50 = systemic issue.</li>
           </ul>
         </div>
@@ -303,24 +355,32 @@ Write code, run tests, build APIs.
         <li>In-flight tasks → not affected</li>
       </ul>
       <p className="mb-4 text-slate-400">
-        Watch the new Docs Agent appear in the network graph. It starts with trust score 30 (PROBATION).
+        Watch the new Docs Agent appear in the network graph. It starts with trust score 30
+        (PROBATION).
       </p>
       <div className="mb-8 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
         <strong>To remove an agent:</strong> delete their section from ORG.md and run{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono">apply</code>. The agent gracefully winds down:
-        finishes in-flight tasks, then deactivates.
+        <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono">apply</code>. The agent
+        gracefully winds down: finishes in-flight tasks, then deactivates.
       </div>
 
       {/* Step 6 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 6 — See It at Scale (Optional)</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Step 6 — See It at Scale (Optional)
+      </h2>
       <p className="mb-4 text-slate-400">
-        Check out the live <strong className="text-slate-200">BikiniBottom demo</strong> — 22 SpongeBob-character
-        agents running a fully staffed company, 24/7:
+        Check out the live <strong className="text-slate-200">BikiniBottom demo</strong> — 22
+        SpongeBob-character agents running a fully staffed company, 24/7:
       </p>
       <CodeBlock title="bash">{`curl https://bikinibottom.ai/.well-known/agent.json`}</CodeBlock>
       <p className="mb-3 text-slate-400">
         Or visit{" "}
-        <a href="https://bikinibottom.ai/app/" target="_blank" rel="noopener" className="text-cyan-400 underline">
+        <a
+          href="https://bikinibottom.ai/app/"
+          target="_blank"
+          rel="noopener"
+          className="text-cyan-400 underline"
+        >
           bikinibottom.ai/app/
         </a>{" "}
         — five departments, a full executive layer, real tasks in real time. Send it a task:
@@ -335,10 +395,12 @@ Write code, run tests, build APIs.
   }'`}</CodeBlock>
 
       {/* Step 7 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 7 — Expose Your Org via A2A</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Step 7 — Expose Your Org via A2A
+      </h2>
       <p className="mb-4 text-slate-400">
-        OpenSpawn automatically publishes an <strong className="text-slate-200">Agent Card</strong> at the standard A2A
-        discovery endpoint:
+        OpenSpawn automatically publishes an <strong className="text-slate-200">Agent Card</strong>{" "}
+        at the standard A2A discovery endpoint:
       </p>
       <CodeBlock title="bash">{`curl http://localhost:3333/.well-known/agent.json`}</CodeBlock>
       <CodeBlock title="Response">{`{
@@ -352,15 +414,18 @@ Write code, run tests, build APIs.
   ]
 }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Any A2A-compatible agent — from any framework — can discover your org and send it tasks. Each individual agent
-        also has their own Agent Card at{" "}
+        Any A2A-compatible agent — from any framework — can discover your org and send it tasks.
+        Each individual agent also has their own Agent Card at{" "}
         <code className="inline-code">/a2a/agents/:id/agent.json</code>.
       </p>
 
       {/* Step 8 */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Step 8 — Use as an MCP Tool Server</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Step 8 — Use as an MCP Tool Server
+      </h2>
       <p className="mb-4 text-slate-400">
-        If you're using Claude Desktop, Cursor, or any MCP-compatible client, add your org as a tool server:
+        If you're using Claude Desktop, Cursor, or any MCP-compatible client, add your org as a tool
+        server:
       </p>
       <CodeBlock title="mcp config">{`{
   "mcpServers": {
@@ -371,8 +436,7 @@ Write code, run tests, build APIs.
   }
 }`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        This exposes 7 tools:{" "}
-        <code className="inline-code">delegate_task</code>,{" "}
+        This exposes 7 tools: <code className="inline-code">delegate_task</code>,{" "}
         <code className="inline-code">list_agents</code>,{" "}
         <code className="inline-code">get_agent</code>,{" "}
         <code className="inline-code">list_tasks</code>,{" "}
@@ -382,25 +446,27 @@ Write code, run tests, build APIs.
       </p>
 
       {/* Under the Hood */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What's Actually Happening Under the Hood</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        What's Actually Happening Under the Hood
+      </h2>
       <div className="mb-4 space-y-4 text-slate-400">
         <p>
-          <strong className="text-slate-200">Tick-based execution:</strong> The server runs a loop. On each "tick",
-          every agent checks its inbox, decides what to do (work, delegate, escalate, complete, or idle), and acts.
-          Cheap local models poll every tick because they're nearly free. Expensive models can be configured to wake
-          only when they have actual work.
+          <strong className="text-slate-200">Tick-based execution:</strong> The server runs a loop.
+          On each "tick", every agent checks its inbox, decides what to do (work, delegate,
+          escalate, complete, or idle), and acts. Cheap local models poll every tick because they're
+          nearly free. Expensive models can be configured to wake only when they have actual work.
         </p>
         <p>
-          <strong className="text-slate-200">The model router:</strong> OpenSpawn automatically routes to the right
-          model based on agent level. L9–L10 executives get top-tier models. L7–L8 leads get mid-tier. L1–L6 workers
-          get local Ollama — free. A 25-agent org with naive polling on the best model could cost $36/hour. With tiered
-          routing, it's closer to $8.
+          <strong className="text-slate-200">The model router:</strong> OpenSpawn automatically
+          routes to the right model based on agent level. L9–L10 executives get top-tier models.
+          L7–L8 leads get mid-tier. L1–L6 workers get local Ollama — free. A 25-agent org with naive
+          polling on the best model could cost $36/hour. With tiered routing, it's closer to $8.
         </p>
         <p>
-          <strong className="text-slate-200">ACP is the nervous system:</strong> Every meaningful agent action
-          generates a structured message. Delegations, acknowledgments, progress updates, escalations, completions —
-          all flow through the Agent Communication Protocol. The dashboard reads ACP message streams in real-time via
-          SSE.
+          <strong className="text-slate-200">ACP is the nervous system:</strong> Every meaningful
+          agent action generates a structured message. Delegations, acknowledgments, progress
+          updates, escalations, completions — all flow through the Agent Communication Protocol. The
+          dashboard reads ACP message streams in real-time via SSE.
         </p>
       </div>
 
@@ -500,8 +566,8 @@ Write code, run tests, build APIs.
       </div>
 
       <p className="mt-10 text-sm text-slate-500 italic">
-        ORG.md is the thing. Everything else — the server, the dashboard, the protocols — is infrastructure that makes
-        ORG.md useful. Start there, and the rest follows.
+        ORG.md is the thing. Everything else — the server, the dashboard, the protocols — is
+        infrastructure that makes ORG.md useful. Start there, and the rest follows.
       </p>
     </DocsLayout>
   );

@@ -87,6 +87,7 @@ Add OpenSpawn as an MCP server in your Claude Code config:
 ```
 
 Your Claude Code agents can now:
+
 - Read your org structure (`org_read`)
 - Create and claim tasks (`task_create`, `task_claim`)
 - Delegate work down the hierarchy (`delegate`)
@@ -120,21 +121,21 @@ openspawn budget [agent]       Show budget status
 
 When running as an MCP server, OpenSpawn exposes 13 tools:
 
-| Tool | Description |
-|------|-------------|
-| `org_read` | Parse ORG.md, return structured org |
-| `org_update` | Modify ORG.md |
-| `task_list` | List tasks (filterable) |
-| `task_create` | Create a new task |
-| `task_claim` | Claim an available task |
-| `task_update` | Update task status |
-| `delegate` | Delegate task down hierarchy |
-| `escalate` | Escalate task up hierarchy |
-| `hire` | Add agent to org |
-| `fire` | Remove agent from org |
-| `budget_check` | Check remaining budget |
-| `budget_spend` | Record spend |
-| `report` | Report status/completion |
+| Tool           | Description                         |
+| -------------- | ----------------------------------- |
+| `org_read`     | Parse ORG.md, return structured org |
+| `org_update`   | Modify ORG.md                       |
+| `task_list`    | List tasks (filterable)             |
+| `task_create`  | Create a new task                   |
+| `task_claim`   | Claim an available task             |
+| `task_update`  | Update task status                  |
+| `delegate`     | Delegate task down hierarchy        |
+| `escalate`     | Escalate task up hierarchy          |
+| `hire`         | Add agent to org                    |
+| `fire`         | Remove agent from org               |
+| `budget_check` | Check remaining budget              |
+| `budget_spend` | Record spend                        |
+| `report`       | Report status/completion            |
 
 ## ORG.md Format Reference
 
@@ -159,14 +160,14 @@ When running as an MCP server, OpenSpawn exposes 13 tools:
 
 ## What OpenSpawn Adds
 
-| | With OpenSpawn | Without |
-|---|---|---|
-| **Memory** | Persistent across sessions | Session-scoped |
-| **Hierarchy** | 10-level (L1–L10) | Flat (lead/teammate) |
-| **Budget control** | Per-agent limits + tracking | None |
-| **Escalation** | Typed chain of command | Ad-hoc |
-| **Governance** | Policies, approval gates | None |
-| **Framework** | Any agent, any framework | Single platform |
+|                    | With OpenSpawn              | Without              |
+| ------------------ | --------------------------- | -------------------- |
+| **Memory**         | Persistent across sessions  | Session-scoped       |
+| **Hierarchy**      | 10-level (L1–L10)           | Flat (lead/teammate) |
+| **Budget control** | Per-agent limits + tracking | None                 |
+| **Escalation**     | Typed chain of command      | Ad-hoc               |
+| **Governance**     | Policies, approval gates    | None                 |
+| **Framework**      | Any agent, any framework    | Single platform      |
 
 ## Works With
 

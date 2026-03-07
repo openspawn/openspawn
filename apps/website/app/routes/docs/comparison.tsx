@@ -7,18 +7,16 @@ export function ComparisonPage() {
   useTitle("OpenSpawn vs CrewAI vs LangGraph");
   return (
     <DocsLayout>
-      <h1 className="mb-2 text-4xl font-bold text-slate-100">
-        OpenSpawn vs CrewAI vs LangGraph
-      </h1>
+      <h1 className="mb-2 text-4xl font-bold text-slate-100">OpenSpawn vs CrewAI vs LangGraph</h1>
       <p className="mb-8 text-lg text-slate-400">
         A detailed, honest comparison of the three most popular multi-agent frameworks in 2026 —
         feature tables, tradeoffs, and migration guides.
       </p>
 
       <Callout variant="info" className="mb-8">
-        <strong>Bottom line up front:</strong> CrewAI and LangGraph are excellent{" "}
-        <em>execution</em> frameworks. OpenSpawn is <em>coordination infrastructure</em>. They
-        solve different problems — and they're designed to work together.
+        <strong>Bottom line up front:</strong> CrewAI and LangGraph are excellent <em>execution</em>{" "}
+        frameworks. OpenSpawn is <em>coordination infrastructure</em>. They solve different problems
+        — and they're designed to work together.
       </Callout>
 
       <hr className="my-8 border-white/10" />
@@ -37,21 +35,56 @@ export function ComparisonPage() {
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration"],
+              [
+                "Primary Model",
+                "Coordination / control plane",
+                "Agent execution framework",
+                "Graph-based orchestration",
+              ],
               ["Languages", "TypeScript + Python SDKs", "Python", "Python"],
-              ["Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes"],
+              [
+                "Agent Hierarchy",
+                "10-level hierarchy, roles, trust scores",
+                "Flat crews",
+                "Flat nodes",
+              ],
               ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"],
-              ["Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools"],
+              [
+                "Protocol Support",
+                "MCP (native), A2A, REST, GraphQL",
+                "Plugins",
+                "LangChain tools",
+              ],
               ["Real Device Support", "✅ Via OpenClaw", "❌", "❌"],
-              ["Real-time Dashboard", "✅ React, network graph, live SSE", "❌ (CLI/LangSmith)", "❌ (LangSmith)"],
+              [
+                "Real-time Dashboard",
+                "✅ React, network graph, live SSE",
+                "❌ (CLI/LangSmith)",
+                "❌ (LangSmith)",
+              ],
               ["Self-hosted", "✅ MIT open source", "✅ Open source", "✅ Open source"],
               ["Budget / Credits", "✅ Built-in economic layer", "❌", "❌"],
-              ["Approval Gates", "✅ Pre-hooks before irreversible actions", "❌", "Conditional edges"],
+              [
+                "Approval Gates",
+                "✅ Pre-hooks before irreversible actions",
+                "❌",
+                "Conditional edges",
+              ],
               ["Trust / Reputation", "✅ Per-agent trust scores", "❌", "❌"],
               ["Escalation System", "✅ Typed escalation with chain of command", "❌", "❌"],
               ["Framework Agnostic", "✅ Works with any A2A/MCP agent", "❌", "❌"],
-              ["Pricing", "Free, self-hosted", "Free + Enterprise (paid)", "Free + LangSmith (paid)"],
-              ["Production Maturity", "Early-stage, actively developed", "Production-ready", "Production-ready"],
+              [
+                "Pricing",
+                "Free, self-hosted",
+                "Free + Enterprise (paid)",
+                "Free + LangSmith (paid)",
+              ],
+              [
+                "Production Maturity",
+                "Early-stage, actively developed",
+                "Production-ready",
+                "Production-ready",
+              ],
             ].map(([feature, os, crewai, langgraph]) => (
               <tr key={feature}>
                 <td className="py-2 pr-4 font-medium text-slate-300">{feature}</td>
@@ -70,14 +103,18 @@ export function ComparisonPage() {
       <h2 className="mt-10 mb-6 text-2xl font-bold text-slate-100">Where Each Framework Shines</h2>
 
       {/* CrewAI */}
-      <h3 className="mt-8 mb-3 text-xl font-semibold text-violet-400">CrewAI: Role-Based Task Crews</h3>
+      <h3 className="mt-8 mb-3 text-xl font-semibold text-violet-400">
+        CrewAI: Role-Based Task Crews
+      </h3>
       <p className="mb-4 text-slate-400">
         CrewAI excels at defining small, focused agent teams ("crews") that work together on a
         shared task. Its Python-first API is clean, the role system is intuitive, and the LangChain
         ecosystem means you can connect to almost anything out of the box.
       </p>
       <div className="mb-4 rounded-lg border border-violet-500/20 bg-violet-500/5 px-5 py-4">
-        <p className="mb-2 text-sm font-semibold text-violet-400">CrewAI is the right choice when:</p>
+        <p className="mb-2 text-sm font-semibold text-violet-400">
+          CrewAI is the right choice when:
+        </p>
         <ul className="space-y-1 text-sm text-slate-400">
           <li>• You want to ship a multi-agent pipeline in Python, fast</li>
           <li>• Your use case is a single workflow with a clear beginning and end</li>
@@ -92,7 +129,9 @@ export function ComparisonPage() {
       </Callout>
 
       {/* LangGraph */}
-      <h3 className="mt-8 mb-3 text-xl font-semibold text-emerald-400">LangGraph: Stateful Agent Graphs</h3>
+      <h3 className="mt-8 mb-3 text-xl font-semibold text-emerald-400">
+        LangGraph: Stateful Agent Graphs
+      </h3>
       <p className="mb-4 text-slate-400">
         LangGraph gives you precise, explicit control over agent flow as a directed graph. Each node
         is an agent or function. Edges define transitions. State is typed and checkpointed. For
@@ -100,7 +139,9 @@ export function ComparisonPage() {
         resume — LangGraph is the most expressive option available.
       </p>
       <div className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-5 py-4">
-        <p className="mb-2 text-sm font-semibold text-emerald-400">LangGraph is the right choice when:</p>
+        <p className="mb-2 text-sm font-semibold text-emerald-400">
+          LangGraph is the right choice when:
+        </p>
         <ul className="space-y-1 text-sm text-slate-400">
           <li>• You need fine-grained control over agent execution flow</li>
           <li>• Your workflow has complex branching logic or cycles</li>
@@ -115,7 +156,9 @@ export function ComparisonPage() {
       </Callout>
 
       {/* OpenSpawn */}
-      <h3 className="mt-8 mb-3 text-xl font-semibold text-cyan-400">OpenSpawn: Agent Coordination Infrastructure</h3>
+      <h3 className="mt-8 mb-3 text-xl font-semibold text-cyan-400">
+        OpenSpawn: Agent Coordination Infrastructure
+      </h3>
       <p className="mb-4 text-slate-400">
         OpenSpawn is not a framework you write agents in. It's the <em>company infrastructure</em>{" "}
         that your agents (built in CrewAI, LangGraph, or anything else) operate within.
@@ -125,13 +168,21 @@ export function ComparisonPage() {
         org chart, task management, budget, governance, communications.
       </p>
       <div className="mb-6 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-5 py-4">
-        <p className="mb-2 text-sm font-semibold text-cyan-400">OpenSpawn is the right choice when:</p>
+        <p className="mb-2 text-sm font-semibold text-cyan-400">
+          OpenSpawn is the right choice when:
+        </p>
         <ul className="space-y-1 text-sm text-slate-400">
           <li>• You're running multiple agents across multiple workflows simultaneously</li>
           <li>• You need governance: budget limits, approval gates, trust scores</li>
-          <li>• You want your org structure defined as code (<code className="inline-code">ORG.md</code>) and reviewable in git</li>
+          <li>
+            • You want your org structure defined as code (
+            <code className="inline-code">ORG.md</code>) and reviewable in git
+          </li>
           <li>• Your agents need to work on real devices (via OpenClaw)</li>
-          <li>• You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org</li>
+          <li>
+            • You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in
+            one org
+          </li>
         </ul>
       </div>
 
@@ -140,17 +191,26 @@ export function ComparisonPage() {
       {/* ── Where OpenSpawn Wins ──────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Where OpenSpawn Wins</h2>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">1. Real-World Device Support</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        1. Real-World Device Support
+      </h3>
       <p className="mb-6 text-slate-400">
         Via deep integration with{" "}
-        <a href="https://openclaw.ai" target="_blank" rel="noopener" className="text-cyan-400 hover:text-cyan-300 transition">
+        <a
+          href="https://openclaw.ai"
+          target="_blank"
+          rel="noopener"
+          className="text-cyan-400 hover:text-cyan-300 transition"
+        >
           OpenClaw
         </a>
         , OpenSpawn agents can operate on real computers — browsing the web, running code,
         interacting with applications, managing files. No other coordination platform offers this.
       </p>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">2. ORG.md — Organizations as Code</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        2. ORG.md — Organizations as Code
+      </h3>
       <CodeBlock title="ORG.md — SaaS Onboarding">{`# customer-onboarding
 > Mission: Onboard new enterprise customers end-to-end
 
@@ -181,12 +241,16 @@ Schedules check-ins, collects health scores, flags churn risk early.
 - **Model:** ollama/qwen2.5`}</CodeBlock>
       <p className="mb-6 text-slate-400">
         Human-readable, version-controllable, and deployable:{" "}
-        <code className="inline-code">npx openspawn deploy ORG.md</code>. The prose{" "}
-        <em>is</em> the system prompt. See all{" "}
-        <a href="/templates" className="text-cyan-400 hover:text-cyan-300 transition">industry templates →</a>
+        <code className="inline-code">npx openspawn deploy ORG.md</code>. The prose <em>is</em> the
+        system prompt. See all{" "}
+        <a href="/templates" className="text-cyan-400 hover:text-cyan-300 transition">
+          industry templates →
+        </a>
       </p>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">3. Protocol-Native from Day One</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        3. Protocol-Native from Day One
+      </h3>
       <p className="mb-4 text-slate-400">OpenSpawn is built on open protocols:</p>
       <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-2">
         <li>
@@ -226,7 +290,8 @@ Schedules check-ins, collects health scores, flags churn risk early.
         Honest Assessment: Where Competitors Are Ahead
       </h2>
       <Callout variant="info" className="mb-6">
-        We believe in honest comparisons. Here's where CrewAI and LangGraph have real advantages today.
+        We believe in honest comparisons. Here's where CrewAI and LangGraph have real advantages
+        today.
       </Callout>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -248,7 +313,8 @@ Schedules check-ins, collects health scores, flags churn risk early.
           <p className="mb-2 text-sm font-semibold text-slate-200">Python Ecosystem</p>
           <p className="text-xs text-slate-400">
             Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first with a Python
-            SDK on the roadmap. In the meantime, any language can integrate via REST API or MCP tools. If your team is all-Python, CrewAI/LangGraph will feel more native today.
+            SDK on the roadmap. In the meantime, any language can integrate via REST API or MCP
+            tools. If your team is all-Python, CrewAI/LangGraph will feel more native today.
           </p>
         </div>
       </div>
@@ -256,12 +322,16 @@ Schedules check-ins, collects health scores, flags churn risk early.
       <hr className="my-8 border-white/10" />
 
       {/* ── Migration Guides ──────────────────────────────────────────────── */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Switching From CrewAI to OpenSpawn</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Switching From CrewAI to OpenSpawn
+      </h2>
       <p className="mb-4 text-slate-400">
         OpenSpawn doesn't replace your CrewAI agents — it governs them. The migration is additive.
       </p>
 
-      <p className="mb-2 text-slate-300 font-semibold">Step 1: Deploy OpenSpawn alongside your existing setup</p>
+      <p className="mb-2 text-slate-300 font-semibold">
+        Step 1: Deploy OpenSpawn alongside your existing setup
+      </p>
       <CodeBlock title="bash">{`git clone https://github.com/openspawn/openspawn.git
 cd openspawn && pnpm install
 pnpm exec nx serve sandbox`}</CodeBlock>
@@ -284,7 +354,9 @@ Reads logs, traces, metrics. Runs your existing CrewAI pipeline via MCP.
 - **Model:** claude-sonnet
 - **Domain:** observability`}</CodeBlock>
 
-      <p className="mb-2 text-slate-300 font-semibold">Step 3: Connect your CrewAI agents via MCP</p>
+      <p className="mb-2 text-slate-300 font-semibold">
+        Step 3: Connect your CrewAI agents via MCP
+      </p>
       <CodeBlock title="python">{`from crewai_tools import MCPServerAdapter
 
 openspawn_tools = MCPServerAdapter(
@@ -293,9 +365,13 @@ openspawn_tools = MCPServerAdapter(
 
 # Your agents can now delegate_task, list_agents, get_org_stats`}</CodeBlock>
 
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Switching From LangGraph to OpenSpawn</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Switching From LangGraph to OpenSpawn
+      </h2>
 
-      <p className="mb-2 text-slate-300 font-semibold">Step 1: Expose your LangGraph workflow as an MCP tool</p>
+      <p className="mb-2 text-slate-300 font-semibold">
+        Step 1: Expose your LangGraph workflow as an MCP tool
+      </p>
       <CodeBlock title="python">{`from openspawn import OpenSpawn  # Python SDK: pip install openspawn
 from langgraph.graph import StateGraph
 
@@ -354,11 +430,26 @@ task = client.delegate_task(
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["CrewAI", "You want the easiest Python framework, the largest community, and a clean role-based API for small-to-medium crews"],
-              ["LangGraph", "You need precise control over complex, stateful, multi-step agent flows with excellent observability"],
-              ["OpenSpawn", "You're coordinating multiple agent teams, need governance / budget / approval gates, or want your org in version control"],
-              ["OpenSpawn + CrewAI", "You want CrewAI's execution simplicity with organizational governance on top"],
-              ["OpenSpawn + LangGraph", "You want LangGraph's graph power with budget enforcement, trust scores, and a real-time dashboard"],
+              [
+                "CrewAI",
+                "You want the easiest Python framework, the largest community, and a clean role-based API for small-to-medium crews",
+              ],
+              [
+                "LangGraph",
+                "You need precise control over complex, stateful, multi-step agent flows with excellent observability",
+              ],
+              [
+                "OpenSpawn",
+                "You're coordinating multiple agent teams, need governance / budget / approval gates, or want your org in version control",
+              ],
+              [
+                "OpenSpawn + CrewAI",
+                "You want CrewAI's execution simplicity with organizational governance on top",
+              ],
+              [
+                "OpenSpawn + LangGraph",
+                "You want LangGraph's graph power with budget enforcement, trust scores, and a real-time dashboard",
+              ],
             ].map(([use, when]) => (
               <tr key={use}>
                 <td className="py-2 pr-6 font-medium text-slate-300 whitespace-nowrap">{use}</td>
@@ -385,14 +476,18 @@ task = client.delegate_task(
           to="/docs/protocols/mcp-reference"
           className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-4 transition hover:border-white/10 hover:bg-white/[0.04] no-underline"
         >
-          <div className="text-sm font-semibold text-slate-200 mb-1">MCP Tools & Integrations →</div>
+          <div className="text-sm font-semibold text-slate-200 mb-1">
+            MCP Tools & Integrations →
+          </div>
           <div className="text-xs text-slate-500">Connect any MCP-capable agent to OpenSpawn</div>
         </Link>
         <Link
           to="/docs/concepts/acp-vs-a2a"
           className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-4 transition hover:border-white/10 hover:bg-white/[0.04] no-underline"
         >
-          <div className="text-sm font-semibold text-slate-200 mb-1">Agent Communication Protocol →</div>
+          <div className="text-sm font-semibold text-slate-200 mb-1">
+            Agent Communication Protocol →
+          </div>
           <div className="text-xs text-slate-500">How agents coordinate inside an org</div>
         </Link>
         <Link

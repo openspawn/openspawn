@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { motion } from 'motion/react';
-import { TrendingDown, TrendingUp, AlertTriangle, Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { cn } from '../lib/utils';
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import { TrendingDown, TrendingUp, AlertTriangle, Calendar } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { cn } from "../lib/utils";
 
 interface BudgetBurndownProps {
   budget: number;
@@ -13,20 +13,25 @@ interface BudgetBurndownProps {
 }
 
 // Generate demo spending data
-function generateSpendingData(budget: number, spent: number, periodDays: number, daysElapsed: number) {
+function generateSpendingData(
+  budget: number,
+  spent: number,
+  periodDays: number,
+  daysElapsed: number,
+) {
   const data: { day: number; actual: number; projected: number; ideal: number }[] = [];
   const dailyIdeal = budget / periodDays;
-  
+
   let cumulative = 0;
   for (let day = 1; day <= periodDays; day++) {
     const idealSpend = dailyIdeal * day;
-    
+
     if (day <= daysElapsed) {
       // Actual spending with some variance
       const variance = Math.sin(day * 0.5) * 0.3 + 1;
       cumulative += (spent / daysElapsed) * variance;
       cumulative = Math.min(cumulative, spent); // Cap at actual spent
-      
+
       data.push({
         day,
         actual: Math.round(cumulative),
@@ -37,7 +42,7 @@ function generateSpendingData(budget: number, spent: number, periodDays: number,
       // Projected future spending based on current rate
       const dailyRate = spent / daysElapsed;
       const projected = spent + dailyRate * (day - daysElapsed);
-      
+
       data.push({
         day,
         actual: -1, // No actual data yet
@@ -46,14 +51,14 @@ function generateSpendingData(budget: number, spent: number, periodDays: number,
       });
     }
   }
-  
+
   return data;
 }
 
 export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: BudgetBurndownProps) {
   const data = useMemo(
     () => generateSpendingData(budget, spent, periodDays, daysElapsed),
-    [budget, spent, periodDays, daysElapsed]
+    [budget, spent, periodDays, daysElapsed],
   );
 
   const dailyRate = spent / daysElapsed;
@@ -63,7 +68,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
   const daysRemaining = periodDays - daysElapsed;
   const budgetRemaining = budget - spent;
   const dailyBudgetRemaining = budgetRemaining / daysRemaining;
-  
+
   // Calculate runway
   const runwayDays = budgetRemaining / dailyRate;
 
@@ -77,13 +82,13 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
   // Create path for actual spending
   const actualPath = data
     .filter((d) => d.actual >= 0)
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${toX(d.day)} ${toY(d.actual)}`)
-    .join(' ');
+    .map((d, i) => `${i === 0 ? "M" : "L"} ${toX(d.day)} ${toY(d.actual)}`)
+    .join(" ");
 
   // Create path for projected spending
   const projectedPath = data
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${toX(d.day)} ${toY(d.projected)}`)
-    .join(' ');
+    .map((d, i) => `${i === 0 ? "M" : "L"} ${toX(d.day)} ${toY(d.projected)}`)
+    .join(" ");
 
   // Create path for ideal spending
   const idealPath = `M 0 ${chartHeight} L ${chartWidth} ${toY(budget)}`;
@@ -96,7 +101,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
             <Calendar className="w-5 h-5 text-cyan-400" />
             Budget Burn-down
           </CardTitle>
-          <Badge variant={projectedOver ? 'destructive' : 'default'} className="text-xs">
+          <Badge variant={projectedOver ? "destructive" : "default"} className="text-xs">
             {projectedOver ? (
               <>
                 <TrendingUp className="w-3 h-3 mr-1" />
@@ -168,7 +173,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
             <motion.path
               d={projectedPath}
               fill="none"
-              stroke={projectedOver ? '#ef4444' : '#6366f1'}
+              stroke={projectedOver ? "#ef4444" : "#6366f1"}
               strokeWidth={2}
               strokeDasharray="6 4"
               opacity={0.6}
@@ -197,7 +202,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
               fill="#6366f1"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 1.5, type: 'spring' }}
+              transition={{ delay: 1.5, type: "spring" }}
             />
 
             {/* Today line */}
@@ -220,15 +225,18 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
               <span className="text-muted-foreground">Actual</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-cyan-500/60 rounded" style={{ borderStyle: 'dashed' }} />
+              <div className="w-3 h-0.5 bg-cyan-500/60 rounded" style={{ borderStyle: "dashed" }} />
               <span className="text-muted-foreground">Projected</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-emerald-500/60 rounded" style={{ borderStyle: 'dashed' }} />
+              <div
+                className="w-3 h-0.5 bg-emerald-500/60 rounded"
+                style={{ borderStyle: "dashed" }}
+              />
               <span className="text-muted-foreground">Ideal</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-0.5 bg-red-500/60 rounded" style={{ borderStyle: 'dashed' }} />
+              <div className="w-3 h-0.5 bg-red-500/60 rounded" style={{ borderStyle: "dashed" }} />
               <span className="text-muted-foreground">Budget</span>
             </div>
           </div>
@@ -242,7 +250,9 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Remaining</p>
-            <p className="text-lg font-semibold text-emerald-400">{budgetRemaining.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-emerald-400">
+              {budgetRemaining.toLocaleString()}
+            </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Daily Rate</p>
@@ -250,10 +260,12 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Runway</p>
-            <p className={cn(
-              "text-lg font-semibold",
-              runwayDays < daysRemaining ? "text-red-400" : "text-emerald-400"
-            )}>
+            <p
+              className={cn(
+                "text-lg font-semibold",
+                runwayDays < daysRemaining ? "text-red-400" : "text-emerald-400",
+              )}
+            >
               {Math.round(runwayDays)} days
             </p>
           </div>
@@ -268,7 +280,7 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
           >
             <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
             <p className="text-sm text-red-300">
-              At current rate, you'll exceed budget by{' '}
+              At current rate, you'll exceed budget by{" "}
               <strong>{Math.round(projectedTotal - budget).toLocaleString()}</strong> credits
             </p>
           </motion.div>

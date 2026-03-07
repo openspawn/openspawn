@@ -10,9 +10,9 @@ import { createMcpServer } from "./server";
 async function main() {
   const server = createMcpServer();
   const transport = new StdioServerTransport();
-  
+
   await server.connect(transport);
-  
+
   // Keep running until stdin closes
   process.stdin.resume();
 }

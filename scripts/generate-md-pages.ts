@@ -1,6 +1,6 @@
 /**
  * Generate .md versions of every docs page for AI discoverability.
- * 
+ *
  * Strategy: Parse TSX files and extract ALL visible text content,
  * preserving structure (headings, paragraphs, lists, code blocks).
  */
@@ -20,8 +20,8 @@ interface Block {
 
 function extractBlocks(tsx: string): Block[] {
   const blocks: Block[] = [];
-  
-  // Remove imports and component boilerplate  
+
+  // Remove imports and component boilerplate
   const jsxMatch = tsx.match(/return\s*\(([\s\S]*)\);\s*\}/);
   const jsx = jsxMatch ? jsxMatch[1] : tsx;
 
@@ -33,12 +33,20 @@ function extractBlocks(tsx: string): Block[] {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    
+
     // Skip JSX-only lines
-    if (trimmed.startsWith("import ") || trimmed.startsWith("export ") || 
-        trimmed.startsWith("const ") || trimmed.startsWith("function ") ||
-        trimmed === "return (" || trimmed === ");" || trimmed === "}" ||
-        trimmed.startsWith("className=") || trimmed === "") continue;
+    if (
+      trimmed.startsWith("import ") ||
+      trimmed.startsWith("export ") ||
+      trimmed.startsWith("const ") ||
+      trimmed.startsWith("function ") ||
+      trimmed === "return (" ||
+      trimmed === ");" ||
+      trimmed === "}" ||
+      trimmed.startsWith("className=") ||
+      trimmed === ""
+    )
+      continue;
 
     // Headings
     const hMatch = trimmed.match(/<h([1-6])[^>]*>(.*)/);
@@ -63,7 +71,10 @@ function extractBlocks(tsx: string): Block[] {
       codeBuffer = "";
       continue;
     }
-    if (inCodeBlock && (trimmed.includes("</pre>") || trimmed.includes("</CodeBlock>") || trimmed === "```")) {
+    if (
+      inCodeBlock &&
+      (trimmed.includes("</pre>") || trimmed.includes("</CodeBlock>") || trimmed === "```")
+    ) {
       inCodeBlock = false;
       if (codeBuffer.trim()) {
         blocks.push({ type: "code", content: codeBuffer.trim() });
@@ -89,9 +100,15 @@ function extractBlocks(tsx: string): Block[] {
 
     // Paragraph text (anything with visible text after stripping tags)
     const text = stripTags(trimmed);
-    if (text.length > 3 && !text.startsWith("{") && !text.match(/^[</{}]/) &&
-        !text.includes("className") && !text.includes("onClick") &&
-        !text.includes("useState") && !text.includes("motion.")) {
+    if (
+      text.length > 3 &&
+      !text.startsWith("{") &&
+      !text.match(/^[</{}]/) &&
+      !text.includes("className") &&
+      !text.includes("onClick") &&
+      !text.includes("useState") &&
+      !text.includes("motion.")
+    ) {
       // Accumulate paragraph text
       if (currentText && !trimmed.startsWith("<")) {
         currentText += " " + text;
@@ -188,7 +205,7 @@ for (const route of routes) {
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, md);
   generated++;
-  
+
   const blockCount = blocks.length;
   const charCount = md.length;
   console.log(`  ${routePath}.md (${blockCount} blocks, ${charCount} chars)`);

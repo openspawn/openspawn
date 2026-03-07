@@ -17,7 +17,10 @@ export function OrgMdReference() {
 
       <p className="mb-8 text-slate-400">
         If you want a quick introduction before diving in, see the{" "}
-        <Link to="/docs/tutorials/your-first-org-md" className="text-cyan-400 hover:text-cyan-300 transition">
+        <Link
+          to="/docs/tutorials/your-first-org-md"
+          className="text-cyan-400 hover:text-cyan-300 transition"
+        >
           Your First ORG.md
         </Link>{" "}
         tutorial.
@@ -41,15 +44,17 @@ export function OrgMdReference() {
 ## Policies
 ## Playbooks`}</CodeBlock>
 
-      <p className="mb-4 text-slate-400">The file is parsed by OpenSpawn's org parser, which extracts:</p>
+      <p className="mb-4 text-slate-400">
+        The file is parsed by OpenSpawn's org parser, which extracts:
+      </p>
       <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-1">
         <li>
           <strong className="text-slate-200">Structured data</strong> from bullet lists:{" "}
           <code className="inline-code">- **Key:** Value</code>
         </li>
         <li>
-          <strong className="text-slate-200">Context</strong> from free text (becomes system
-          prompt context for agents)
+          <strong className="text-slate-200">Context</strong> from free text (becomes system prompt
+          context for agents)
         </li>
         <li>
           <strong className="text-slate-200">Hierarchy</strong> from heading levels (H3 =
@@ -62,8 +67,8 @@ export function OrgMdReference() {
       {/* ── Section: Identity ─────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Section: Identity</h2>
       <p className="mb-4 text-slate-400">
-        Defines who the organization is. This context is inherited by every agent in the org —
-        it's ambient background in their system prompt.
+        Defines who the organization is. This context is inherited by every agent in the org — it's
+        ambient background in their system prompt.
       </p>
       <CodeBlock title="ORG.md">{`## Identity
 
@@ -86,19 +91,25 @@ Every agent in this org serves that mission.
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">Industry</code></td>
+              <td className="py-2 pr-4">
+                <code className="inline-code">Industry</code>
+              </td>
               <td className="py-2 pr-4">string</td>
               <td className="py-2 pr-4">—</td>
               <td className="py-2">Business domain; gives agents market context</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">Stage</code></td>
+              <td className="py-2 pr-4">
+                <code className="inline-code">Stage</code>
+              </td>
               <td className="py-2 pr-4">string</td>
               <td className="py-2 pr-4">—</td>
               <td className="py-2">Company stage (Seed, Series A, etc.)</td>
             </tr>
             <tr>
-              <td className="py-2 pr-4"><code className="inline-code">Values</code></td>
+              <td className="py-2 pr-4">
+                <code className="inline-code">Values</code>
+              </td>
               <td className="py-2 pr-4">string</td>
               <td className="py-2 pr-4">—</td>
               <td className="py-2">Core values; influences agent decision-making</td>
@@ -107,7 +118,8 @@ Every agent in this org serves that mission.
         </table>
       </div>
       <Callout variant="info" className="mb-6">
-        Write the Identity section as if onboarding a new employee — that's exactly how agents use it.
+        Write the Identity section as if onboarding a new employee — that's exactly how agents use
+        it.
       </Callout>
 
       <hr className="my-8 border-white/10" />
@@ -117,7 +129,10 @@ Every agent in this org serves that mission.
       <p className="mb-4 text-slate-400">
         Controls how agents communicate — escalation speed, progress update frequency,
         acknowledgment requirements, and hierarchy depth. Maps directly to{" "}
-        <Link to="/docs/concepts/acp-vs-a2a" className="text-cyan-400 hover:text-cyan-300 transition">
+        <Link
+          to="/docs/concepts/acp-vs-a2a"
+          className="text-cyan-400 hover:text-cyan-300 transition"
+        >
           Agent Communication Protocol (ACP)
         </Link>{" "}
         parameters.
@@ -141,15 +156,35 @@ preset: startup`}</CodeBlock>
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["startup", "Immediate", "Frequent", "2–3 levels", "Fast, scrappy, everyone does everything"],
-              ["enterprise", "Batched (hourly)", "On phase change", "5–8 levels", "Process-driven, governance"],
+              [
+                "startup",
+                "Immediate",
+                "Frequent",
+                "2–3 levels",
+                "Fast, scrappy, everyone does everything",
+              ],
+              [
+                "enterprise",
+                "Batched (hourly)",
+                "On phase change",
+                "5–8 levels",
+                "Process-driven, governance",
+              ],
               ["agency", "Immediate", "Every tick", "3–4 levels", "Client-facing, deadline-driven"],
               ["research", "Delayed", "On request", "2–3 levels", "Exploratory, high autonomy"],
-              ["military", "Immediate", "Every tick", "Strict chain", "Zero ambiguity, mandatory acks"],
+              [
+                "military",
+                "Immediate",
+                "Every tick",
+                "Strict chain",
+                "Zero ambiguity, mandatory acks",
+              ],
               ["remote-async", "Delayed", "On request", "Flat", "High trust, timezone-distributed"],
             ].map(([preset, esc, prog, hier, vibe]) => (
               <tr key={preset}>
-                <td className="py-2 pr-4"><code className="inline-code">{preset}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{preset}</code>
+                </td>
                 <td className="py-2 pr-4">{esc}</td>
                 <td className="py-2 pr-4">{prog}</td>
                 <td className="py-2 pr-4">{hier}</td>
@@ -180,15 +215,47 @@ preset: startup
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["preset", "startup, enterprise, agency, research, military, remote-async", "None", "Baseline communication profile"],
-              ["Communication", "async-first, sync-preferred, mixed", "async-first", "Default communication mode"],
-              ["Escalation", "immediate, batched, delayed", "immediate", "How quickly blockers propagate upward"],
-              ["Progress updates", "every tick, on phase change, on request", "on phase change", "How often agents report progress"],
-              ["Ack required", "yes, no", "yes", "Whether agents must acknowledge task assignments"],
-              ["Hierarchy depth", "Any descriptive string", "Inferred from Structure", "Maximum org depth hint"],
+              [
+                "preset",
+                "startup, enterprise, agency, research, military, remote-async",
+                "None",
+                "Baseline communication profile",
+              ],
+              [
+                "Communication",
+                "async-first, sync-preferred, mixed",
+                "async-first",
+                "Default communication mode",
+              ],
+              [
+                "Escalation",
+                "immediate, batched, delayed",
+                "immediate",
+                "How quickly blockers propagate upward",
+              ],
+              [
+                "Progress updates",
+                "every tick, on phase change, on request",
+                "on phase change",
+                "How often agents report progress",
+              ],
+              [
+                "Ack required",
+                "yes, no",
+                "yes",
+                "Whether agents must acknowledge task assignments",
+              ],
+              [
+                "Hierarchy depth",
+                "Any descriptive string",
+                "Inferred from Structure",
+                "Maximum org depth hint",
+              ],
             ].map(([field, vals, def_, desc]) => (
               <tr key={field}>
-                <td className="py-2 pr-4"><code className="inline-code">{field}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{field}</code>
+                </td>
                 <td className="py-2 pr-4 text-xs">{vals}</td>
                 <td className="py-2 pr-4">{def_}</td>
                 <td className="py-2">{desc}</td>
@@ -207,7 +274,9 @@ preset: startup
         important section for most use cases.
       </p>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Heading Levels and Hierarchy</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        Heading Levels and Hierarchy
+      </h3>
       <div className="overflow-x-auto mb-4">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -225,7 +294,9 @@ preset: startup
               ["##### Sub-role or Junior", "Junior agent", "L1–3"],
             ].map(([h, m, l]) => (
               <tr key={h}>
-                <td className="py-2 pr-4"><code className="inline-code text-xs">{h}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code text-xs">{h}</code>
+                </td>
                 <td className="py-2 pr-4">{m}</td>
                 <td className="py-2">{l}</td>
               </tr>
@@ -272,13 +343,15 @@ Owns API, database, and server infrastructure.
             {[
               ["Model", "❌", "LLM to use for this role"],
               ["Domain", "❌", "Expertise domain for task routing"],
-              ["Reports to", "❌", "Override inferred parent (role name or \"Human Principal\")"],
+              ["Reports to", "❌", 'Override inferred parent (role name or "Human Principal")'],
               ["Count", "❌", "Spawn N identical agents with this role (auto-numbered)"],
               ["Level", "❌", "Explicit level override (1–10)"],
               ["Tools", "❌", "Comma-separated tool capabilities"],
             ].map(([field, req, desc]) => (
               <tr key={field}>
-                <td className="py-2 pr-4"><code className="inline-code">{field}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{field}</code>
+                </td>
                 <td className="py-2 pr-4">{req}</td>
                 <td className="py-2">{desc}</td>
               </tr>
@@ -308,7 +381,9 @@ Owns API, database, and server infrastructure.
               ["(omitted)", "Uses org-level default, or system default"],
             ].map(([val, desc]) => (
               <tr key={val}>
-                <td className="py-2 pr-6"><code className="inline-code">{val}</code></td>
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{val}</code>
+                </td>
                 <td className="py-2">{desc}</td>
               </tr>
             ))}
@@ -338,7 +413,9 @@ Owns API, database, and server infrastructure.
               ["Junior, Intern, Assistant", "L1–2", "❌", "❌"],
             ].map(([kw, level, del_, spawn]) => (
               <tr key={kw}>
-                <td className="py-2 pr-4"><code className="inline-code text-xs">{kw}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code text-xs">{kw}</code>
+                </td>
                 <td className="py-2 pr-4 text-cyan-400">{level}</td>
                 <td className="py-2 pr-4">{del_}</td>
                 <td className="py-2">{spawn}</td>
@@ -374,8 +451,8 @@ Be conservative — a false positive is better than a miss.
 - **Model:** claude-haiku
 - **Domain:** testing`}</CodeBlock>
       <Callout variant="info" className="mb-6">
-        The prose above the bullet list becomes the agent's behavioral context. Write it like
-        you're onboarding a real employee.
+        The prose above the bullet list becomes the agent's behavioral context. Write it like you're
+        onboarding a real employee.
       </Callout>
 
       <hr className="my-8 border-white/10" />
@@ -409,11 +486,17 @@ Be conservative — a false positive is better than a miss.
             {[
               ["Per-agent limit", "Unlimited", "Credit limit per agent per period"],
               ["Alert threshold", "80%", "Trigger alert at this % of budget consumed"],
-              ["Overage behavior", "pause and escalate", "pause and escalate | hard stop | allow with alert"],
+              [
+                "Overage behavior",
+                "pause and escalate",
+                "pause and escalate | hard stop | allow with alert",
+              ],
               ["Period", "weekly", "daily | weekly | monthly | per-task"],
             ].map(([field, def_, desc]) => (
               <tr key={field}>
-                <td className="py-2 pr-4"><code className="inline-code">{field}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{field}</code>
+                </td>
                 <td className="py-2 pr-4">{def_}</td>
                 <td className="py-2">{desc}</td>
               </tr>
@@ -424,9 +507,15 @@ Be conservative — a false positive is better than a miss.
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         {[
-          { val: "pause and escalate", desc: "Agent pauses, manager is alerted and decides next action (recommended)" },
+          {
+            val: "pause and escalate",
+            desc: "Agent pauses, manager is alerted and decides next action (recommended)",
+          },
           { val: "hard stop", desc: "Agent immediately terminates the task" },
-          { val: "allow with alert", desc: "Agent continues but an alert is sent — use with caution" },
+          {
+            val: "allow with alert",
+            desc: "Agent continues but an alert is sent — use with caution",
+          },
         ].map(({ val, desc }) => (
           <div key={val} className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3">
             <code className="inline-code text-xs mb-2 block">{val}</code>
@@ -490,8 +579,8 @@ Be conservative — a false positive is better than a miss.
       {/* ── Section: Playbooks ────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Section: Playbooks</h2>
       <p className="mb-4 text-slate-400">
-        Reusable procedures for common situations. Like runbooks, but for your agent org. Agents
-        can reference playbooks when they encounter the named scenario.
+        Reusable procedures for common situations. Like runbooks, but for your agent org. Agents can
+        reference playbooks when they encounter the named scenario.
       </p>
       <CodeBlock title="ORG.md">{`## Playbooks
 
@@ -535,7 +624,9 @@ Be conservative — a false positive is better than a miss.
               ["Agent Promoted", "An agent's trust score crosses a level threshold"],
             ].map(([trigger, when]) => (
               <tr key={trigger}>
-                <td className="py-2 pr-6"><code className="inline-code">{trigger}</code></td>
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{trigger}</code>
+                </td>
                 <td className="py-2">{when}</td>
               </tr>
             ))}
@@ -550,8 +641,8 @@ Be conservative — a false positive is better than a miss.
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Structured Data Extraction</h3>
       <p className="mb-4 text-slate-400">
-        Any bullet in the format{" "}
-        <code className="inline-code">- **Key:** Value</code> is extracted as a structured field:
+        Any bullet in the format <code className="inline-code">- **Key:** Value</code> is extracted
+        as a structured field:
       </p>
       <CodeBlock title="Parsed examples">{`- **Model:** claude-sonnet         → { model: "claude-sonnet" }
 - **Count:** 3                     → { count: 3 }
@@ -586,11 +677,23 @@ npx openspawn apply ORG.md`}</CodeBlock>
         <code className="inline-code">apply</code> diffs the current state against the new file:
       </p>
       <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-1">
-        <li><strong className="text-slate-200">New roles</strong> → spawn agents</li>
-        <li><strong className="text-slate-200">Removed roles</strong> → gracefully wind down (finish current tasks, then deactivate)</li>
-        <li><strong className="text-slate-200">Changed policies</strong> → apply immediately</li>
-        <li><strong className="text-slate-200">Changed culture</strong> → update ACP parameters live</li>
-        <li><strong className="text-slate-200">Changed descriptions</strong> → update system prompts on next tick</li>
+        <li>
+          <strong className="text-slate-200">New roles</strong> → spawn agents
+        </li>
+        <li>
+          <strong className="text-slate-200">Removed roles</strong> → gracefully wind down (finish
+          current tasks, then deactivate)
+        </li>
+        <li>
+          <strong className="text-slate-200">Changed policies</strong> → apply immediately
+        </li>
+        <li>
+          <strong className="text-slate-200">Changed culture</strong> → update ACP parameters live
+        </li>
+        <li>
+          <strong className="text-slate-200">Changed descriptions</strong> → update system prompts
+          on next tick
+        </li>
       </ul>
 
       <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Export</h3>
@@ -618,8 +721,8 @@ git log ORG.md
 git blame ORG.md`}</CodeBlock>
 
       <Callout variant="info" className="mb-6">
-        PR reviews for org changes let teams discuss: "Do we need a full team or just one
-        analyst?" — the same way you'd review infrastructure-as-code.
+        PR reviews for org changes let teams discuss: "Do we need a full team or just one analyst?"
+        — the same way you'd review infrastructure-as-code.
       </Callout>
 
       <hr className="my-8 border-white/10" />
@@ -627,7 +730,9 @@ git blame ORG.md`}</CodeBlock>
       {/* ── Complete Examples ─────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Complete Examples</h2>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Solo Developer + Agent Team</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        Solo Developer + Agent Team
+      </h3>
       <CodeBlock title="ORG.md">{`# My Dev Team
 
 ## Culture
@@ -653,7 +758,9 @@ Keeps documentation in sync with code changes.
 - **Model:** claude-haiku
 - **Domain:** documentation`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Engineering Organization (Startup)</h3>
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">
+        Engineering Organization (Startup)
+      </h3>
       <CodeBlock title="ORG.md">{`# Acme Engineering
 
 ## Identity
@@ -735,7 +842,9 @@ Sets research direction. Reviews findings.
       <hr className="my-8 border-white/10" />
 
       {/* ── Org Health ────────────────────────────────────────────────────── */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Org Health &amp; Self-Healing</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Org Health &amp; Self-Healing
+      </h2>
       <p className="mb-4 text-slate-400">
         Running orgs are monitored automatically. The health score (0–100) is computed from:
       </p>
@@ -771,10 +880,30 @@ Sets research direction. Reviews findings.
 
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         {[
-          { score: "90–100", label: "Elite", desc: "Highly efficient, minimal waste", color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" },
-          { score: "70–89", label: "Healthy", desc: "Normal operations, minor inefficiencies", color: "border-cyan-500/20 bg-cyan-500/5 text-cyan-400" },
-          { score: "50–69", label: "Needs attention", desc: "Bottlenecks or misrouting", color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
-          { score: "< 50", label: "Restructure recommended", desc: "Systemic issues", color: "border-red-500/20 bg-red-500/5 text-red-400" },
+          {
+            score: "90–100",
+            label: "Elite",
+            desc: "Highly efficient, minimal waste",
+            color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-400",
+          },
+          {
+            score: "70–89",
+            label: "Healthy",
+            desc: "Normal operations, minor inefficiencies",
+            color: "border-cyan-500/20 bg-cyan-500/5 text-cyan-400",
+          },
+          {
+            score: "50–69",
+            label: "Needs attention",
+            desc: "Bottlenecks or misrouting",
+            color: "border-amber-500/20 bg-amber-500/5 text-amber-400",
+          },
+          {
+            score: "< 50",
+            label: "Restructure recommended",
+            desc: "Systemic issues",
+            color: "border-red-500/20 bg-red-500/5 text-red-400",
+          },
         ].map(({ score, label, desc, color }) => (
           <div key={score} className={`rounded-lg border px-4 py-3 ${color}`}>
             <span className="font-bold">{score}</span>
@@ -803,7 +932,9 @@ Sets research direction. Reviews findings.
       <hr className="my-8 border-white/10" />
 
       {/* ── Relationship to Other Standards ───────────────────────────────── */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Relationship to Other Standards</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Relationship to Other Standards
+      </h2>
       <div className="overflow-x-auto mb-8">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -815,14 +946,36 @@ Sets research direction. Reviews findings.
           </thead>
           <tbody className="divide-y divide-white/5 text-slate-400">
             {[
-              ["CLAUDE.md", "One agent's behavior", "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md"],
-              ["AGENTS.md", "Workspace rules", "ORG.md is the superset — workspace rules + org structure + policies"],
-              ["ACP", "Communication protocol", "ORG.md's Culture section configures ACP parameters"],
-              ["A2A", "Inter-org communication", "ORG.md defines one org; A2A connects multiple orgs"],
-              ["Terraform / Pulumi", "Infrastructure as code", "ORG.md is the same pattern applied to agent organizations"],
+              [
+                "CLAUDE.md",
+                "One agent's behavior",
+                "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md",
+              ],
+              [
+                "AGENTS.md",
+                "Workspace rules",
+                "ORG.md is the superset — workspace rules + org structure + policies",
+              ],
+              [
+                "ACP",
+                "Communication protocol",
+                "ORG.md's Culture section configures ACP parameters",
+              ],
+              [
+                "A2A",
+                "Inter-org communication",
+                "ORG.md defines one org; A2A connects multiple orgs",
+              ],
+              [
+                "Terraform / Pulumi",
+                "Infrastructure as code",
+                "ORG.md is the same pattern applied to agent organizations",
+              ],
             ].map(([std, scope, rel]) => (
               <tr key={std}>
-                <td className="py-2 pr-4"><code className="inline-code">{std}</code></td>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{std}</code>
+                </td>
                 <td className="py-2 pr-4">{scope}</td>
                 <td className="py-2">{rel}</td>
               </tr>
@@ -847,14 +1000,18 @@ Sets research direction. Reviews findings.
           to="/docs/protocols/mcp-reference"
           className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-4 transition hover:border-white/10 hover:bg-white/[0.04] no-underline"
         >
-          <div className="text-sm font-semibold text-slate-200 mb-1">MCP Tools & Integrations →</div>
+          <div className="text-sm font-semibold text-slate-200 mb-1">
+            MCP Tools & Integrations →
+          </div>
           <div className="text-xs text-slate-500">Connect agents to your org via MCP</div>
         </Link>
         <Link
           to="/docs/concepts/acp-vs-a2a"
           className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-4 transition hover:border-white/10 hover:bg-white/[0.04] no-underline"
         >
-          <div className="text-sm font-semibold text-slate-200 mb-1">Agent Communication Protocol →</div>
+          <div className="text-sm font-semibold text-slate-200 mb-1">
+            Agent Communication Protocol →
+          </div>
           <div className="text-xs text-slate-500">How agents communicate within an org</div>
         </Link>
         <Link

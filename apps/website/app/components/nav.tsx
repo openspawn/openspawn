@@ -12,7 +12,10 @@ export function Nav() {
           <span className="gradient-text">OpenSpawn</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
-          <Link to="/getting-started" className="text-sm font-medium text-cyan-400 transition hover:text-cyan-300">
+          <Link
+            to="/getting-started"
+            className="text-sm font-medium text-cyan-400 transition hover:text-cyan-300"
+          >
             Get Started
           </Link>
           <Link to="/org-md" className="text-sm text-slate-400 transition hover:text-cyan-400">
@@ -51,11 +54,21 @@ export function Nav() {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+            >
               {menuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                />
               )}
             </svg>
           </button>
@@ -64,19 +77,39 @@ export function Nav() {
       {menuOpen && (
         <div className="border-t border-white/5 bg-navy-950/95 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1 px-8 py-4">
-            <Link to="/getting-started" className="rounded-lg px-3 py-2 text-sm font-medium text-cyan-400 transition hover:bg-white/5" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/getting-started"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-cyan-400 transition hover:bg-white/5"
+              onClick={() => setMenuOpen(false)}
+            >
               Get Started
             </Link>
-            <Link to="/org-md" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/org-md"
+              className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400"
+              onClick={() => setMenuOpen(false)}
+            >
               ORG.md
             </Link>
-            <Link to="/templates" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/templates"
+              className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400"
+              onClick={() => setMenuOpen(false)}
+            >
               Templates
             </Link>
-            <Link to="/plugins" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/plugins"
+              className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400"
+              onClick={() => setMenuOpen(false)}
+            >
               Plugins
             </Link>
-            <Link to="/docs" className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/docs"
+              className="rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-white/5 hover:text-cyan-400"
+              onClick={() => setMenuOpen(false)}
+            >
               Docs
             </Link>
             <a

@@ -2,8 +2,8 @@
  * Team CRUD — create, edit, delete teams from the dashboard.
  * In demo mode, changes persist to localStorage.
  */
-import { useState, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { useState, useMemo } from "react";
+import { motion } from "motion/react";
 import {
   Plus,
   Pencil,
@@ -27,9 +27,9 @@ import {
   Headphones,
   Palette,
   type LucideIcon,
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import {
   Dialog,
   DialogPopup,
@@ -38,36 +38,36 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from './ui/dialog';
+} from "./ui/dialog";
 import {
   type Team,
   teams as allTeams,
   getParentTeams,
   getTeamColor,
   TEAM_COLOR_MAP,
-} from '../demo/teams';
-import { useAgents } from '../hooks/use-agents';
-import { cn } from '../lib/utils';
+} from "../demo/teams";
+import { useAgents } from "../hooks/use-agents";
+import { cn } from "../lib/utils";
 
 // ── Available icons ─────────────────────────────────────────────────────────
 const ICON_OPTIONS: { name: string; icon: LucideIcon }[] = [
-  { name: 'Users', icon: Users },
-  { name: 'Crown', icon: Crown },
-  { name: 'Code2', icon: Code2 },
-  { name: 'DollarSign', icon: DollarSign },
-  { name: 'Megaphone', icon: Megaphone },
-  { name: 'Server', icon: Server },
-  { name: 'Monitor', icon: Monitor },
-  { name: 'ShieldCheck', icon: ShieldCheck },
-  { name: 'Send', icon: Send },
-  { name: 'Handshake', icon: Handshake },
-  { name: 'PenTool', icon: PenTool },
-  { name: 'BarChart3', icon: BarChart3 },
-  { name: 'UserPlus', icon: UserPlus },
-  { name: 'Heart', icon: Heart },
-  { name: 'MessageCircle', icon: MessageCircle },
-  { name: 'Wrench', icon: Wrench },
-  { name: 'Headphones', icon: Headphones },
+  { name: "Users", icon: Users },
+  { name: "Crown", icon: Crown },
+  { name: "Code2", icon: Code2 },
+  { name: "DollarSign", icon: DollarSign },
+  { name: "Megaphone", icon: Megaphone },
+  { name: "Server", icon: Server },
+  { name: "Monitor", icon: Monitor },
+  { name: "ShieldCheck", icon: ShieldCheck },
+  { name: "Send", icon: Send },
+  { name: "Handshake", icon: Handshake },
+  { name: "PenTool", icon: PenTool },
+  { name: "BarChart3", icon: BarChart3 },
+  { name: "UserPlus", icon: UserPlus },
+  { name: "Heart", icon: Heart },
+  { name: "MessageCircle", icon: MessageCircle },
+  { name: "Wrench", icon: Wrench },
+  { name: "Headphones", icon: Headphones },
 ];
 
 const COLOR_OPTIONS = Object.entries(TEAM_COLOR_MAP).map(([name, hex]) => ({
@@ -81,24 +81,18 @@ interface TeamDialogProps {
   onOpenChange: (open: boolean) => void;
   team?: Team | null;
   parentTeams: Team[];
-  onSave: (team: Omit<Team, 'id'> & { id?: string }) => void;
+  onSave: (team: Omit<Team, "id"> & { id?: string }) => void;
 }
 
-export function TeamDialog({
-  open,
-  onOpenChange,
-  team,
-  parentTeams,
-  onSave,
-}: TeamDialogProps) {
+export function TeamDialog({ open, onOpenChange, team, parentTeams, onSave }: TeamDialogProps) {
   const isEdit = !!team;
-  const [name, setName] = useState(team?.name ?? '');
-  const [description, setDescription] = useState(team?.description ?? '');
-  const [color, setColor] = useState(team?.color ?? 'cyan');
-  const [icon, setIcon] = useState(team?.icon ?? 'Users');
-  const [parentTeamId, setParentTeamId] = useState(team?.parentTeamId ?? '');
+  const [name, setName] = useState(team?.name ?? "");
+  const [description, setDescription] = useState(team?.description ?? "");
+  const [color, setColor] = useState(team?.color ?? "cyan");
+  const [icon, setIcon] = useState(team?.icon ?? "Users");
+  const [parentTeamId, setParentTeamId] = useState(team?.parentTeamId ?? "");
   const { agents } = useAgents();
-  const [leadAgentId, setLeadAgentId] = useState(team?.leadAgentId ?? '');
+  const [leadAgentId, setLeadAgentId] = useState(team?.leadAgentId ?? "");
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -118,11 +112,9 @@ export function TeamDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Team' : 'Create Team'}</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Team" : "Create Team"}</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? `Update ${team?.name} settings`
-              : 'Add a new team to your organization'}
+            {isEdit ? `Update ${team?.name} settings` : "Add a new team to your organization"}
           </DialogDescription>
         </DialogHeader>
 
@@ -199,10 +191,10 @@ export function TeamDialog({
                   key={opt.name}
                   onClick={() => setColor(opt.name)}
                   className={cn(
-                    'w-8 h-8 rounded-full border-2 transition-all',
+                    "w-8 h-8 rounded-full border-2 transition-all",
                     color === opt.name
-                      ? 'border-foreground scale-110'
-                      : 'border-transparent hover:scale-105',
+                      ? "border-foreground scale-110"
+                      : "border-transparent hover:scale-105",
                   )}
                   style={{ backgroundColor: opt.hex }}
                   title={opt.name}
@@ -223,10 +215,10 @@ export function TeamDialog({
                     key={opt.name}
                     onClick={() => setIcon(opt.name)}
                     className={cn(
-                      'p-2 rounded-lg border transition-all',
+                      "p-2 rounded-lg border transition-all",
                       icon === opt.name
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:bg-muted',
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:bg-muted",
                     )}
                     title={opt.name}
                   >
@@ -258,11 +250,9 @@ export function TeamDialog({
               </div>
               <div>
                 <p className="font-semibold" style={{ color: getTeamColor(color) }}>
-                  {name || 'Team Name'}
+                  {name || "Team Name"}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {description || 'Team description'}
-                </p>
+                <p className="text-xs text-muted-foreground">{description || "Team description"}</p>
               </div>
             </div>
           </div>
@@ -273,7 +263,7 @@ export function TeamDialog({
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button onClick={handleSave} disabled={!name.trim()}>
-            {isEdit ? 'Save Changes' : 'Create Team'}
+            {isEdit ? "Save Changes" : "Create Team"}
           </Button>
         </DialogFooter>
       </DialogPopup>
@@ -327,7 +317,7 @@ export function DeleteTeamDialog({
             <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
               <Users className="h-4 w-4 flex-shrink-0" />
               <p className="text-sm">
-                This team has <strong>{memberCount}</strong> member{memberCount !== 1 ? 's' : ''}.
+                This team has <strong>{memberCount}</strong> member{memberCount !== 1 ? "s" : ""}.
                 They will be unassigned.
               </p>
             </div>

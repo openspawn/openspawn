@@ -28,8 +28,8 @@ export function NotFoundPage() {
         </h1>
 
         <p className="mx-auto mb-10 max-w-md text-slate-400">
-          This page doesn't exist. Maybe your agent took a wrong turn. Let's get
-          you back to the surface.
+          This page doesn't exist. Maybe your agent took a wrong turn. Let's get you back to the
+          surface.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">

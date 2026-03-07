@@ -20,9 +20,7 @@ export function AuthCallbackPage() {
 
     // If no tokens in URL, check if we were redirected after storage
     const hasTokens =
-      searchParams?.accessToken &&
-      searchParams?.refreshToken &&
-      searchParams?.expiresIn;
+      searchParams?.accessToken && searchParams?.refreshToken && searchParams?.expiresIn;
 
     if (!hasTokens) {
       // OAuth callback should have redirected us, go to home

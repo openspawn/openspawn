@@ -54,11 +54,7 @@ export function SEOHead({
   schemaLd?: object | object[];
   children?: ReactNode;
 }) {
-  const schemas = schemaLd
-    ? Array.isArray(schemaLd)
-      ? schemaLd
-      : [schemaLd]
-    : [];
+  const schemas = schemaLd ? (Array.isArray(schemaLd) ? schemaLd : [schemaLd]) : [];
 
   return (
     <>
@@ -77,10 +73,7 @@ export interface BreadcrumbItem {
   href: string;
 }
 
-export function buildBreadcrumbSchema(
-  items: BreadcrumbItem[],
-  baseUrl = "https://openspawn.dev"
-) {
+export function buildBreadcrumbSchema(items: BreadcrumbItem[], baseUrl = "https://openspawn.dev") {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

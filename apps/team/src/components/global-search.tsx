@@ -78,7 +78,9 @@ export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
     } else {
       document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   /* Build results */
@@ -87,12 +89,24 @@ export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
     const q = query.toLowerCase();
     for (const a of agents) {
       if (a.name.toLowerCase().includes(q) || (a.role ?? "").toLowerCase().includes(q)) {
-        results.push({ id: `agent-${a.id}`, label: a.name, sublabel: a.role ?? "Agent", href: "/agents", kind: "agent" });
+        results.push({
+          id: `agent-${a.id}`,
+          label: a.name,
+          sublabel: a.role ?? "Agent",
+          href: "/agents",
+          kind: "agent",
+        });
       }
     }
     for (const t of tasks) {
       if (t.title.toLowerCase().includes(q)) {
-        results.push({ id: `task-${t.id}`, label: t.title, sublabel: t.status, href: "/tasks", kind: "task" });
+        results.push({
+          id: `task-${t.id}`,
+          label: t.title,
+          sublabel: t.status,
+          href: "/tasks",
+          kind: "task",
+        });
       }
     }
   }

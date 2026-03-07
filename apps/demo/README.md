@@ -11,13 +11,13 @@ pnpm exec nx serve demo -- --mode demo  # Demo mode (no backend)
 
 ## Env Vars
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `VITE_DEMO_MODE` | Run fully client-side (no API) | `false` |
-| `VITE_API_URL` | GraphQL API endpoint | `http://localhost:3000/graphql` |
-| `VITE_WS_URL` | WebSocket endpoint | `ws://localhost:3000/graphql` |
-| `VITE_SANDBOX_URL` | Sandbox server override | Auto-detected |
-| `VITE_DASHBOARD_THEME` | Theme (`openspawn`) | — |
+| Variable               | Purpose                        | Default                         |
+| ---------------------- | ------------------------------ | ------------------------------- |
+| `VITE_DEMO_MODE`       | Run fully client-side (no API) | `false`                         |
+| `VITE_API_URL`         | GraphQL API endpoint           | `http://localhost:3000/graphql` |
+| `VITE_WS_URL`          | WebSocket endpoint             | `ws://localhost:3000/graphql`   |
+| `VITE_SANDBOX_URL`     | Sandbox server override        | Auto-detected                   |
+| `VITE_DASHBOARD_THEME` | Theme (`openspawn`)            | —                               |
 
 ## Key Pages
 

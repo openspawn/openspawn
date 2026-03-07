@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { useTourSafe, TOUR_STEPS } from './tour-context';
-import { useLocation } from '@tanstack/react-router';
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useTourSafe, TOUR_STEPS } from "./tour-context";
+import { useLocation } from "@tanstack/react-router";
 
 interface SpotlightRect {
   top: number;
@@ -17,7 +17,8 @@ export function TourSpotlight() {
   const rafRef = useRef<number>(0);
 
   const step = tour?.isActive ? TOUR_STEPS[tour.currentStep] : null;
-  const isCurrentPage = step && location.pathname.replace(/\/$/, '') === `/app${step.path}`.replace(/\/$/, '');
+  const isCurrentPage =
+    step && location.pathname.replace(/\/$/, "") === `/app${step.path}`.replace(/\/$/, "");
   const selector = isCurrentPage ? step?.spotlightSelector : null;
 
   useEffect(() => {
@@ -82,7 +83,10 @@ export function TourSpotlight() {
               </mask>
             </defs>
             <rect
-              x="0" y="0" width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               fill="rgba(2, 8, 23, 0.6)"
               mask="url(#tour-spotlight-mask)"
             />
@@ -118,7 +122,9 @@ export function TourSpotlight() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
                 </span>
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">{step?.title}</span>
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                  {step?.title}
+                </span>
               </div>
               <p className="text-[11px] text-white/50 leading-relaxed">{step?.description}</p>
             </div>
@@ -142,7 +148,9 @@ export function TourSpotlight() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
               </span>
-              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">{step.title}</span>
+              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                {step.title}
+              </span>
             </div>
             <p className="text-[11px] text-white/50 leading-relaxed">{step.description}</p>
           </div>

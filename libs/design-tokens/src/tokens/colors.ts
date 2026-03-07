@@ -224,11 +224,11 @@ export const midnightAbyssColors: SemanticColorSet = {
 /** All OpenSpawn themes keyed by selector */
 export const openspawnThemes: Record<string, SemanticColorSet> = {
   ":root": lightColors,
-  ".dark, [data-theme=\"deep-ocean\"]": deepOceanColors,
-  "[data-theme=\"coral-reef\"]": coralReefColors,
-  "[data-theme=\"arctic-ice\"]": arcticIceColors,
-  "[data-theme=\"bioluminescent\"]": bioluminescentColors,
-  "[data-theme=\"midnight-abyss\"]": midnightAbyssColors,
+  '.dark, [data-theme="deep-ocean"]': deepOceanColors,
+  '[data-theme="coral-reef"]': coralReefColors,
+  '[data-theme="arctic-ice"]': arcticIceColors,
+  '[data-theme="bioluminescent"]': bioluminescentColors,
+  '[data-theme="midnight-abyss"]': midnightAbyssColors,
 };
 
 // ─── BikiniBottom Color Palette (hex) ───────────────────────────────────────

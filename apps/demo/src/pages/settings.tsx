@@ -15,10 +15,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Settings"
-        description="Manage your account and organization settings"
-      />
+      <PageHeader title="Settings" description="Manage your account and organization settings" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-7 lg:w-[980px] scrollbar-hide">

@@ -17,7 +17,7 @@ export interface TaskDelegation {
 export interface AgentActivity {
   taskCount: number;
   messageCount: number;
-  activityLevel: 'hot' | 'warm' | 'cool' | 'idle';
+  activityLevel: "hot" | "warm" | "cool" | "idle";
 }
 
 export interface EdgeMessageData {
@@ -29,7 +29,7 @@ export interface EdgeMessageData {
 export interface AgentHealthData {
   completionRate: number;
   creditUsage: number;
-  ringStatus: 'active' | 'idle' | 'busy' | 'error';
+  ringStatus: "active" | "idle" | "busy" | "error";
 }
 
 export interface NetworkContextValue {
@@ -58,7 +58,7 @@ export interface AgentNodeData extends Record<string, unknown> {
   isSpawning?: boolean;
   isDespawning?: boolean;
   compact?: boolean;
-  activityLevel?: 'hot' | 'warm' | 'cool' | 'idle';
+  activityLevel?: "hot" | "warm" | "cool" | "idle";
   taskCount?: number;
 }
 
@@ -66,11 +66,11 @@ export interface AgentNodeData extends Record<string, unknown> {
 
 /** Heat map colors based on agent activity level. */
 export const heatColors = {
-  hot: "#ef4444",      // red   – very busy
-  warm: "#f59e0b",     // amber – busy
+  hot: "#ef4444", // red   – very busy
+  warm: "#f59e0b", // amber – busy
   moderate: "#fbbf24", // yellow – moderate
-  cool: "#06b6d4",     // cyan  – light activity
-  idle: "#64748b",     // slate – idle
+  cool: "#06b6d4", // cyan  – light activity
+  idle: "#64748b", // slate – idle
 } as const;
 
 export const roleLabels: Record<string, string> = {

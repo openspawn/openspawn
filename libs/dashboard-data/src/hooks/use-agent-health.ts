@@ -3,8 +3,8 @@
  * Maps agent IDs to completion rates and credit usage.
  */
 
-import { useMemo } from 'react';
-import { usePresence, type PresenceStatus } from './use-presence';
+import { useMemo } from "react";
+import { usePresence, type PresenceStatus } from "./use-presence";
 
 export interface AgentHealth {
   completionRate: number;
@@ -22,7 +22,7 @@ function hash(s: string): number {
 }
 
 function seededRandom(id: string, offset: number): number {
-  return ((hash(id + String(offset)) % 1000) / 1000);
+  return (hash(id + String(offset)) % 1000) / 1000;
 }
 
 export function useAgentHealth(): Map<string, AgentHealth> {
@@ -37,21 +37,21 @@ export function useAgentHealth(): Map<string, AgentHealth> {
       let creditUsage: number;
 
       switch (s) {
-        case 'active':
-          completionRate = 0.65 + seededRandom(id, 1) * 0.3;  // 0.65-0.95
-          creditUsage = 0.3 + seededRandom(id, 2) * 0.35;     // 0.30-0.65
+        case "active":
+          completionRate = 0.65 + seededRandom(id, 1) * 0.3; // 0.65-0.95
+          creditUsage = 0.3 + seededRandom(id, 2) * 0.35; // 0.30-0.65
           break;
-        case 'busy':
+        case "busy":
           completionRate = 0.5 + seededRandom(id, 1) * 0.3;
           creditUsage = 0.4 + seededRandom(id, 2) * 0.3;
           break;
-        case 'error':
-          completionRate = 0.1 + seededRandom(id, 1) * 0.25;  // 0.10-0.35
-          creditUsage = 0.75 + seededRandom(id, 2) * 0.2;     // 0.75-0.95
+        case "error":
+          completionRate = 0.1 + seededRandom(id, 1) * 0.25; // 0.10-0.35
+          creditUsage = 0.75 + seededRandom(id, 2) * 0.2; // 0.75-0.95
           break;
         default: // idle
-          completionRate = 0.2 + seededRandom(id, 1) * 0.3;   // 0.20-0.50
-          creditUsage = 0.05 + seededRandom(id, 2) * 0.2;     // 0.05-0.25
+          completionRate = 0.2 + seededRandom(id, 1) * 0.3; // 0.20-0.50
+          creditUsage = 0.05 + seededRandom(id, 2) * 0.2; // 0.05-0.25
           break;
       }
 

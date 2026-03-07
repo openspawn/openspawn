@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   teams,
   type Team,
@@ -6,10 +6,10 @@ import {
   getSubTeams,
   getTeamById,
   getTeamColor,
-} from '../demo/teams';
-import { useAgents, type Agent } from './use-agents';
+} from "../demo/teams";
+import { useAgents, type Agent } from "./use-agents";
 
-export type { Team } from '../demo/teams';
+export type { Team } from "../demo/teams";
 
 /** Returns all teams. */
 export function useTeams() {
@@ -33,9 +33,7 @@ export function useTeamAgents(teamId: string | undefined) {
     if (!teamId) return [];
     // The mock-fetcher exposes `teamId` as an extra field on the mapped agent.
     // The GraphQL type doesn't know about it, so we cast through `any`.
-    return agents.filter(
-      (a) => (a as Agent & { teamId?: string }).teamId === teamId,
-    );
+    return agents.filter((a) => (a as Agent & { teamId?: string }).teamId === teamId);
   }, [agents, teamId]);
 }
 
@@ -60,30 +58,19 @@ export function useTeamStats(teamId: string | undefined): TeamStats {
     getSubTeams(teamId).forEach((sub) => teamIds.add(sub.id));
 
     const teamAgents = agents.filter((a) =>
-      teamIds.has((a as Agent & { teamId?: string }).teamId ?? ''),
+      teamIds.has((a as Agent & { teamId?: string }).teamId ?? ""),
     );
 
     const agentCount = teamAgents.length;
     const activeCount = teamAgents.filter(
-      (a) => a.status?.toString().toUpperCase() === 'ACTIVE',
+      (a) => a.status?.toString().toUpperCase() === "ACTIVE",
     ).length;
-    const totalCredits = teamAgents.reduce(
-      (sum, a) => sum + (a.currentBalance ?? 0),
-      0,
-    );
+    const totalCredits = teamAgents.reduce((sum, a) => sum + (a.currentBalance ?? 0), 0);
 
-    const totalCompleted = teamAgents.reduce(
-      (sum, a) => sum + (a.tasksCompleted ?? 0),
-      0,
-    );
-    const totalSuccessful = teamAgents.reduce(
-      (sum, a) => sum + (a.tasksSuccessful ?? 0),
-      0,
-    );
+    const totalCompleted = teamAgents.reduce((sum, a) => sum + (a.tasksCompleted ?? 0), 0);
+    const totalSuccessful = teamAgents.reduce((sum, a) => sum + (a.tasksSuccessful ?? 0), 0);
     const taskCompletionRate =
-      totalCompleted > 0
-        ? Math.round((totalSuccessful / totalCompleted) * 100)
-        : 0;
+      totalCompleted > 0 ? Math.round((totalSuccessful / totalCompleted) * 100) : 0;
 
     return { agentCount, activeCount, totalCredits, taskCompletionRate };
   }, [agents, teamId]);

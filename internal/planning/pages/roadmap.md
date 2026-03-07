@@ -1,6 +1,6 @@
 # Roadmap
 
-*Updated: Feb 26, 2026*
+_Updated: Feb 26, 2026_
 
 ## Phase 1: Foundation <span class="status status-done">Done</span>
 
@@ -60,16 +60,16 @@
 
 ## Open Decisions
 
-| Question | Options | Decision |
-|----------|---------|----------|
-| Coordination layer | Files vs SQLite vs Redis | **SQLite + MCP** (decided) |
-| Dashboard bundling | Embed in Go binary vs npx fetch | TBD |
-| npm package structure | Go binary wrapper vs pure JS | TBD |
-| When to extract ORG.md spec | After 10 adopters | TBD timing |
+| Question                    | Options                         | Decision                   |
+| --------------------------- | ------------------------------- | -------------------------- |
+| Coordination layer          | Files vs SQLite vs Redis        | **SQLite + MCP** (decided) |
+| Dashboard bundling          | Embed in Go binary vs npx fetch | TBD                        |
+| npm package structure       | Go binary wrapper vs pure JS    | TBD                        |
+| When to extract ORG.md spec | After 10 adopters               | TBD timing                 |
 
 ## Blockers
 
-| Blocker | Impact | Resolution |
-|---------|--------|------------|
-| npm auth | Can't publish CLI to npm | Need credentials from Adam |
+| Blocker                 | Impact                      | Resolution                        |
+| ----------------------- | --------------------------- | --------------------------------- |
+| npm auth                | Can't publish CLI to npm    | Need credentials from Adam        |
 | GitHub Actions disabled | agentdennis account flagged | Appeal drafted, need Adam to send |

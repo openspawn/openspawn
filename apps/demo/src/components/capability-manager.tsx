@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  Zap,
-  Plus,
-  Trash2,
-  Search,
-  TrendingUp,
-  Users,
-  Loader2,
-  Star,
-} from "lucide-react";
+import { Zap, Plus, Trash2, Search, TrendingUp, Users, Loader2, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Dialog, DialogPopup, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogPopup,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "./ui/dialog";
 
 type Proficiency = "basic" | "standard" | "expert";
 
@@ -56,9 +55,30 @@ const MOCK_AGENT_CAPABILITIES: Capability[] = [
 ];
 
 const MOCK_MATCHES: CapabilityMatch[] = [
-  { agentId: "agent-1", agentName: "Code Reviewer", level: 6, capability: "code-review", proficiency: "expert", score: 3 },
-  { agentId: "agent-2", agentName: "Senior Dev", level: 5, capability: "code-review", proficiency: "standard", score: 2 },
-  { agentId: "agent-3", agentName: "Bug Hunter", level: 4, capability: "code-review", proficiency: "basic", score: 1 },
+  {
+    agentId: "agent-1",
+    agentName: "Code Reviewer",
+    level: 6,
+    capability: "code-review",
+    proficiency: "expert",
+    score: 3,
+  },
+  {
+    agentId: "agent-2",
+    agentName: "Senior Dev",
+    level: 5,
+    capability: "code-review",
+    proficiency: "standard",
+    score: 2,
+  },
+  {
+    agentId: "agent-3",
+    agentName: "Bug Hunter",
+    level: 4,
+    capability: "code-review",
+    proficiency: "basic",
+    score: 1,
+  },
 ];
 
 const proficiencyColors: Record<Proficiency, string> = {
@@ -73,7 +93,13 @@ const proficiencyLabels: Record<Proficiency, string> = {
   expert: "Expert",
 };
 
-export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string; onAgentClick?: (id: string) => void }) {
+export function CapabilityManager({
+  agentId,
+  onAgentClick,
+}: {
+  agentId?: string;
+  onAgentClick?: (id: string) => void;
+}) {
   const [orgCapabilities] = useState<OrgCapability[]>(MOCK_ORG_CAPABILITIES);
   const [agentCapabilities, setAgentCapabilities] = useState<Capability[]>(MOCK_AGENT_CAPABILITIES);
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,12 +113,12 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
   const [removing, setRemoving] = useState<string | null>(null);
 
   const filteredOrgCaps = orgCapabilities.filter((c) =>
-    c.capability.toLowerCase().includes(searchQuery.toLowerCase())
+    c.capability.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleAddCapability = async () => {
     if (!newCapability.trim()) return;
-    
+
     // DEFERRED: Capability creation is not yet persisted to the backend.
     // Wire to the addAgentCapability GraphQL mutation when available:
     //   addAgentCapability({ variables: { agentId, capability: newCapability, proficiency: newProficiency } })
@@ -102,7 +128,7 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
       proficiency: newProficiency,
       agentId: agentId || "agent-1",
     };
-    
+
     setAgentCapabilities([...agentCapabilities, newCap]);
     setNewCapability("");
     setNewProficiency("standard");
@@ -121,7 +147,7 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
 
   const handleSearch = async () => {
     if (!matchQuery.trim()) return;
-    
+
     setSearching(true);
     // DEFERRED: Capability search is not yet wired to the backend.
     // Wire to the findAgentsByCapability GraphQL query when available:
@@ -173,7 +199,7 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
                       )}
                     </Button>
                   </div>
-                  
+
                   {matches.length > 0 && (
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">
@@ -271,9 +297,7 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
                 <DialogPopup>
                   <DialogHeader>
                     <DialogTitle>Add Capability</DialogTitle>
-                    <DialogDescription>
-                      Add a new capability to this agent
-                    </DialogDescription>
+                    <DialogDescription>Add a new capability to this agent</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
@@ -314,9 +338,7 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
                 </DialogPopup>
               </Dialog>
             </div>
-            <CardDescription>
-              {agentCapabilities.length} capabilities assigned
-            </CardDescription>
+            <CardDescription>{agentCapabilities.length} capabilities assigned</CardDescription>
           </CardHeader>
           <CardContent>
             {agentCapabilities.length === 0 ? (
@@ -340,7 +362,9 @@ export function CapabilityManager({ agentId, onAgentClick }: { agentId?: string;
                         <Zap className="h-5 w-5 text-primary" />
                         <div>
                           <p className="font-medium">{cap.capability}</p>
-                          <Badge className={`${proficiencyColors[cap.proficiency]} text-foreground`}>
+                          <Badge
+                            className={`${proficiencyColors[cap.proficiency]} text-foreground`}
+                          >
                             {proficiencyLabels[cap.proficiency]}
                           </Badge>
                         </div>

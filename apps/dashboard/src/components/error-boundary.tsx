@@ -68,7 +68,11 @@ export class AppErrorBoundary extends Component<Props, State> {
           }}
         >
           {/* Pineapple + title */}
-          <span style={{ fontSize: "4rem", marginBottom: "1rem" }} role="img" aria-label="pineapple">
+          <span
+            style={{ fontSize: "4rem", marginBottom: "1rem" }}
+            role="img"
+            aria-label="pineapple"
+          >
             🍍
           </span>
           <h1
@@ -136,7 +140,9 @@ export class AppErrorBoundary extends Component<Props, State> {
           )}
 
           {/* Action buttons */}
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
+          <div
+            style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}
+          >
             <button
               onClick={this.handleReload}
               style={{

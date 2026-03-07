@@ -73,9 +73,7 @@ export function StatCard({
             <span className="ml-1">from last week</span>
           </p>
         )}
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </CardContent>
     </Card>
   );

@@ -17,8 +17,9 @@ export function ConnectingAgents() {
       </Callout>
 
       <p className="mb-4 text-slate-400">
-        So far you've written an ORG.md and seen how OpenSpawn parses it into a structure. Now it's time to connect
-        actual LLM-powered agents — the workers that receive tasks, think, delegate, and complete real work.
+        So far you've written an ORG.md and seen how OpenSpawn parses it into a structure. Now it's
+        time to connect actual LLM-powered agents — the workers that receive tasks, think, delegate,
+        and complete real work.
       </p>
       <p className="mb-4 text-slate-400">This guide covers:</p>
       <ul className="mb-8 list-disc pl-6 text-slate-400 space-y-1">
@@ -32,18 +33,35 @@ export function ConnectingAgents() {
       {/* What Agents Are */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">What Agents Are in OpenSpawn</h2>
       <p className="mb-4 text-slate-400">
-        An OpenSpawn agent is an <strong className="text-slate-200">LLM-powered worker with a role</strong>. Each agent:
+        An OpenSpawn agent is an{" "}
+        <strong className="text-slate-200">LLM-powered worker with a role</strong>. Each agent:
       </p>
       <ol className="mb-4 list-decimal pl-6 text-slate-400 space-y-1">
-        <li><strong className="text-slate-200">Has a position in the org chart</strong> — defined by its level, parent, and domain</li>
-        <li><strong className="text-slate-200">Runs on a language model</strong> — configurable per-agent (GPT-4o, Claude, Gemini, etc.)</li>
-        <li><strong className="text-slate-200">Receives tasks</strong> — assigned by its manager or delegated from above</li>
-        <li><strong className="text-slate-200">Communicates via ACP</strong> — acknowledges, reports progress, escalates blockers, signals completion</li>
-        <li><strong className="text-slate-200">Earns a trust score</strong> — based on task success over time</li>
+        <li>
+          <strong className="text-slate-200">Has a position in the org chart</strong> — defined by
+          its level, parent, and domain
+        </li>
+        <li>
+          <strong className="text-slate-200">Runs on a language model</strong> — configurable
+          per-agent (GPT-4o, Claude, Gemini, etc.)
+        </li>
+        <li>
+          <strong className="text-slate-200">Receives tasks</strong> — assigned by its manager or
+          delegated from above
+        </li>
+        <li>
+          <strong className="text-slate-200">Communicates via ACP</strong> — acknowledges, reports
+          progress, escalates blockers, signals completion
+        </li>
+        <li>
+          <strong className="text-slate-200">Earns a trust score</strong> — based on task success
+          over time
+        </li>
       </ol>
       <p className="mb-4 text-slate-400">
-        Agents are not scripts. They're not hardcoded workflows. Each agent makes LLM-powered decisions on every tick:
-        what to work on, when to delegate, when to escalate, when to call it done.
+        Agents are not scripts. They're not hardcoded workflows. Each agent makes LLM-powered
+        decisions on every tick: what to work on, when to delegate, when to escalate, when to call
+        it done.
       </p>
       <CodeBlock title="agent profile">{`┌────────────────────────────────────────┐
 │            An OpenSpawn Agent          │
@@ -57,8 +75,8 @@ export function ConnectingAgents() {
 │  Status: Working                       │
 └────────────────────────────────────────┘`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The agent doesn't know it's a software agent — it just knows it's a backend engineer with a task to complete.
-        That's the power of the role-description approach.
+        The agent doesn't know it's a software agent — it just knows it's a backend engineer with a
+        task to complete. That's the power of the role-description approach.
       </p>
 
       {/* Configuring Agents */}
@@ -101,8 +119,12 @@ Owns API and database work.
               ["gemini-pro", "google/gemini-1.5-pro"],
             ].map(([alias, resolves]) => (
               <tr key={alias}>
-                <td className="py-2 pr-6"><code className="inline-code">{alias}</code></td>
-                <td className="py-2"><code className="inline-code">{resolves}</code></td>
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{alias}</code>
+                </td>
+                <td className="py-2">
+                  <code className="inline-code">{resolves}</code>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -121,20 +143,32 @@ Owns API and database work.
           <thead>
             <tr className="border-b border-white/10">
               <th className="py-2 pr-6 text-left font-semibold text-slate-300">Role type</th>
-              <th className="py-2 pr-6 text-left font-semibold text-slate-300">Recommended model</th>
+              <th className="py-2 pr-6 text-left font-semibold text-slate-300">
+                Recommended model
+              </th>
               <th className="py-2 text-left font-semibold text-slate-300">Why</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {[
-              ["C-suite / Director", "claude-sonnet or gpt-4o", "High-stakes decisions, complex reasoning"],
+              [
+                "C-suite / Director",
+                "claude-sonnet or gpt-4o",
+                "High-stakes decisions, complex reasoning",
+              ],
               ["Lead / Manager", "claude-sonnet or gpt-4o-mini", "Balance of capability and cost"],
-              ["Worker / Engineer", "claude-haiku or gpt-4o-mini", "Fast, cheap, handles scoped tasks well"],
+              [
+                "Worker / Engineer",
+                "claude-haiku or gpt-4o-mini",
+                "Fast, cheap, handles scoped tasks well",
+              ],
               ["Research / Creative", "claude-sonnet or claude-opus", "Needs depth and nuance"],
             ].map(([role, model, why]) => (
               <tr key={role}>
                 <td className="py-2 pr-6">{role}</td>
-                <td className="py-2 pr-6"><code className="inline-code">{model}</code></td>
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{model}</code>
+                </td>
                 <td className="py-2">{why}</td>
               </tr>
             ))}
@@ -144,8 +178,8 @@ Owns API and database work.
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Giving Agents Capabilities</h3>
       <p className="mb-4 text-slate-400">
-        Capabilities are the <strong className="text-slate-200">tools</strong> an agent can use. Configure them in the
-        role description or as a structured field:
+        Capabilities are the <strong className="text-slate-200">tools</strong> an agent can use.
+        Configure them in the role description or as a structured field:
       </p>
       <CodeBlock title="ORG.md">{`#### Content Writer
 Writes blog posts, social copy, and documentation.
@@ -172,7 +206,9 @@ Researches topics using web search before writing.
               ["spawn-agent", "Agent can spawn sub-agents (L6+ only)"],
             ].map(([cap, desc]) => (
               <tr key={cap}>
-                <td className="py-2 pr-6"><code className="inline-code">{cap}</code></td>
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{cap}</code>
+                </td>
                 <td className="py-2">{desc}</td>
               </tr>
             ))}
@@ -180,17 +216,23 @@ Researches topics using web search before writing.
         </table>
       </div>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Writing Effective Role Descriptions</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        Writing Effective Role Descriptions
+      </h3>
       <p className="mb-4 text-slate-400">
         The prose you write above each role becomes the agent's{" "}
-        <strong className="text-slate-200">system prompt context</strong>. This is the most powerful configuration
-        you can provide — more than any structured field.
+        <strong className="text-slate-200">system prompt context</strong>. This is the most powerful
+        configuration you can provide — more than any structured field.
       </p>
-      <p className="mb-2 text-slate-500 text-sm font-semibold uppercase tracking-wider">Weak description</p>
+      <p className="mb-2 text-slate-500 text-sm font-semibold uppercase tracking-wider">
+        Weak description
+      </p>
       <CodeBlock title="ORG.md">{`#### Backend Worker
 - **Model:** claude-haiku
 - **Domain:** backend`}</CodeBlock>
-      <p className="mb-2 text-slate-500 text-sm font-semibold uppercase tracking-wider">Strong description</p>
+      <p className="mb-2 text-slate-500 text-sm font-semibold uppercase tracking-wider">
+        Strong description
+      </p>
       <CodeBlock title="ORG.md">{`#### Backend Worker
 You own the API layer: REST endpoints, GraphQL schema, authentication, and database queries.
 When you receive a task, break it down into the smallest safe change. Write tests first.
@@ -198,25 +240,26 @@ If a task touches security (auth, permissions, data access), tag it for Security
 - **Model:** claude-haiku
 - **Domain:** backend`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The second version gives the agent real behavioral guidance. It knows to write tests first. It knows which
-        tasks need review. It knows what "owns the API layer" means. That guidance comes from your description, not
-        from any configuration field.
+        The second version gives the agent real behavioral guidance. It knows to write tests first.
+        It knows which tasks need review. It knows what "owns the API layer" means. That guidance
+        comes from your description, not from any configuration field.
       </p>
 
       {/* How ACP Works */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">How ACP Works in Practice</h2>
       <p className="mb-4 text-slate-400">
-        When you deploy a real agent, it doesn't just receive tasks in silence. It communicates through{" "}
-        <strong className="text-slate-200">ACP (Agent Communication Protocol)</strong> — a structured set of message
-        types that model how effective human organizations actually communicate.
+        When you deploy a real agent, it doesn't just receive tasks in silence. It communicates
+        through <strong className="text-slate-200">ACP (Agent Communication Protocol)</strong> — a
+        structured set of message types that model how effective human organizations actually
+        communicate.
       </p>
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">The Four Message Types</h3>
 
       <p className="mb-2 text-slate-300 font-semibold">1. Acknowledgment (ACK) — 👍</p>
       <p className="mb-4 text-slate-400">
-        When your agent receives a task, it immediately sends a 👍 reaction to its delegator. This happens
-        automatically — no LLM call required. It's the system saying "I got it."
+        When your agent receives a task, it immediately sends a 👍 reaction to its delegator. This
+        happens automatically — no LLM call required. It's the system saying "I got it."
       </p>
       <CodeBlock title="ACK flow">{`Engineering Lead assigns "Fix auth bug #42" to Backend Worker
 Backend Worker → 👍 (immediate, auto-generated)
@@ -225,8 +268,8 @@ Engineering Lead sees: task was received`}</CodeBlock>
       <p className="mb-2 text-slate-300 font-semibold">2. Progress Updates</p>
       <p className="mb-4 text-slate-400">
         As the agent works, it writes progress entries to the task's activity log. These are{" "}
-        <strong className="text-slate-200">pull-based</strong> — the manager checks when they want to, not on every
-        update.
+        <strong className="text-slate-200">pull-based</strong> — the manager checks when they want
+        to, not on every update.
       </p>
       <CodeBlock title="progress log">{`Backend Worker → task log:
   "Reproducing the bug locally. Auth middleware is rejecting valid JWTs."
@@ -235,12 +278,14 @@ Engineering Lead sees: task was received`}</CodeBlock>
   
   "Root cause: token expiry check uses server time, not UTC. Fixing."`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        Progress updates happen on meaningful phase changes — not on every micro-action. The agent decides when
-        something is worth logging.
+        Progress updates happen on meaningful phase changes — not on every micro-action. The agent
+        decides when something is worth logging.
       </p>
 
       <p className="mb-2 text-slate-300 font-semibold">3. Escalation — ⚠️</p>
-      <p className="mb-4 text-slate-400">If the agent hits a blocker it can't resolve, it escalates to its direct manager:</p>
+      <p className="mb-4 text-slate-400">
+        If the agent hits a blocker it can't resolve, it escalates to its direct manager:
+      </p>
       <CodeBlock title="escalation">{`Backend Worker → Engineering Lead:
   ⚠️ BLOCKED on "Fix auth bug #42"
   
@@ -248,8 +293,8 @@ Engineering Lead sees: task was received`}</CodeBlock>
   "Need the JWT secret key to test the fix. It's not in the .env file 
    and I can't find it in the codebase. Can you provide it?"`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The task status changes to <code className="inline-code">BLOCKED</code>. The manager sees it immediately —
-        this is push-based, because blockers need attention now.
+        The task status changes to <code className="inline-code">BLOCKED</code>. The manager sees it
+        immediately — this is push-based, because blockers need attention now.
       </p>
 
       <p className="mb-2 text-slate-300 font-semibold">4. Completion — ✅</p>
@@ -262,11 +307,13 @@ Engineering Lead sees: task was received`}</CodeBlock>
   not a permissions change.
   → View details: #task-42`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The ✅ reaction goes on the task (scannable), the summary message goes to the manager (readable), and the
-        full details live on the task itself (available when needed).
+        The ✅ reaction goes on the task (scannable), the summary message goes to the manager
+        (readable), and the full details live on the task itself (available when needed).
       </p>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">What This Looks Like in Your Dashboard</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        What This Looks Like in Your Dashboard
+      </h3>
       <p className="mb-2 text-slate-400">When real agents are working, you'll see:</p>
       <ul className="mb-8 list-disc pl-6 text-slate-400 space-y-1">
         <li>👍 reactions appearing on tasks as they're assigned</li>
@@ -320,7 +367,9 @@ then write a complete draft. Aim for clear, engaging prose.
         This task goes to the Editor (L9), who is the top of your hierarchy.
       </p>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Step 4: Watch ACP in Action</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        Step 4: Watch ACP in Action
+      </h3>
       <p className="mb-4 text-slate-400">Open the dashboard (or watch CLI output):</p>
       <CodeBlock title="ACP trace">{`[T+0s]   Human → Editor: "Write article about async-first remote work"
 [T+1s]   Editor 👍 ack
@@ -345,8 +394,8 @@ then write a complete draft. Aim for clear, engaging prose.
           "Article approved and published. 
            Good research, clear structure. Minor edits for tone."`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The whole pipeline — delegation, research, writing, review, completion — runs autonomously. You gave one
-        task; the org handled the rest.
+        The whole pipeline — delegation, research, writing, review, completion — runs autonomously.
+        You gave one task; the org handled the rest.
       </p>
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Step 5: Review the Output</h3>
@@ -355,8 +404,12 @@ openspawn messages             # All ACP messages
 cat articles/async-work.md     # The article itself`}</CodeBlock>
 
       {/* API Keys */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">API Keys and Model Configuration</h2>
-      <p className="mb-4 text-slate-400">Real agents need real API keys. Configure them before deploying:</p>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        API Keys and Model Configuration
+      </h2>
+      <p className="mb-4 text-slate-400">
+        Real agents need real API keys. Configure them before deploying:
+      </p>
       <CodeBlock title="bash">{`# Set provider keys
 openspawn config set ANTHROPIC_API_KEY=sk-ant-...
 openspawn config set OPENAI_API_KEY=sk-...
@@ -370,16 +423,21 @@ openspawn config set DEFAULT_MODEL=claude-haiku`}</CodeBlock>
 - **Lead model:** claude-sonnet
 - **Director model:** claude-opus`}</CodeBlock>
       <p className="mb-4 text-slate-400">
-        The system respects a model hierarchy: explicit role config → policy defaults → system default.
+        The system respects a model hierarchy: explicit role config → policy defaults → system
+        default.
       </p>
 
       {/* Troubleshooting */}
-      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Troubleshooting Common Issues</h2>
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Troubleshooting Common Issues
+      </h2>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Agent Gets Stuck (No Progress)</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        Agent Gets Stuck (No Progress)
+      </h3>
       <p className="mb-3 text-slate-400">
-        <strong className="text-slate-200">Symptom:</strong> Agent acknowledges a task but never sends progress
-        updates or completes.
+        <strong className="text-slate-200">Symptom:</strong> Agent acknowledges a task but never
+        sends progress updates or completes.
       </p>
       <p className="mb-2 text-slate-400">Causes and fixes:</p>
       <ol className="mb-4 list-decimal pl-6 text-slate-400 space-y-3">
@@ -387,10 +445,12 @@ openspawn config set DEFAULT_MODEL=claude-haiku`}</CodeBlock>
           <strong className="text-slate-200">Model API key missing or invalid</strong>
           <CodeBlock title="bash">{`openspawn status --agents   # Check agent health
 openspawn logs --agent=<id> # See raw error output`}</CodeBlock>
-          Fix: Check your API key config with <code className="inline-code">openspawn config show</code>.
+          Fix: Check your API key config with{" "}
+          <code className="inline-code">openspawn config show</code>.
         </li>
         <li>
-          <strong className="text-slate-200">Task too vague</strong> — Agent doesn't know what "done" looks like.
+          <strong className="text-slate-200">Task too vague</strong> — Agent doesn't know what
+          "done" looks like.
           <CodeBlock title="better task">{`# Before
 "Write an article about remote work"
 
@@ -399,20 +459,23 @@ openspawn logs --agent=<id> # See raw error output`}</CodeBlock>
  Done when: file is saved to articles/, has a clear intro/body/conclusion."`}</CodeBlock>
         </li>
         <li>
-          <strong className="text-slate-200">Agent lacks required capability</strong> — If the task requires web
-          search and your agent doesn't have <code className="inline-code">web-search</code>, it can't proceed. Add
-          the capability to the role in ORG.md and redeploy.
+          <strong className="text-slate-200">Agent lacks required capability</strong> — If the task
+          requires web search and your agent doesn't have{" "}
+          <code className="inline-code">web-search</code>, it can't proceed. Add the capability to
+          the role in ORG.md and redeploy.
         </li>
       </ol>
 
       <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Agent Escalates Everything</h3>
       <p className="mb-3 text-slate-400">
         <strong className="text-slate-200">Symptom:</strong> Agent keeps escalating with{" "}
-        <code className="inline-code">LOW_CONFIDENCE</code> or <code className="inline-code">BLOCKED</code>.
+        <code className="inline-code">LOW_CONFIDENCE</code> or{" "}
+        <code className="inline-code">BLOCKED</code>.
       </p>
       <ol className="mb-4 list-decimal pl-6 text-slate-400 space-y-3">
         <li>
-          <strong className="text-slate-200">Role description too narrow</strong> — Agent sees every task as out of domain.
+          <strong className="text-slate-200">Role description too narrow</strong> — Agent sees every
+          task as out of domain.
           <CodeBlock title="ORG.md">{`# Before
 You write blog posts.
 
@@ -433,13 +496,16 @@ preset: startup
         </li>
       </ol>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Tasks Completing Too Fast (Without Real Work)</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        Tasks Completing Too Fast (Without Real Work)
+      </h3>
       <p className="mb-3 text-slate-400">
-        <strong className="text-slate-200">Symptom:</strong> Agents complete tasks instantly with shallow output.
+        <strong className="text-slate-200">Symptom:</strong> Agents complete tasks instantly with
+        shallow output.
       </p>
       <p className="mb-3 text-slate-400">
-        <strong className="text-slate-200">Cause:</strong> Model is pattern-matching "task completion" without doing
-        real work.
+        <strong className="text-slate-200">Cause:</strong> Model is pattern-matching "task
+        completion" without doing real work.
       </p>
       <p className="mb-2 text-slate-400">
         <strong className="text-slate-200">Fix:</strong> Add specificity about what "done" means:
@@ -452,16 +518,19 @@ A task is complete ONLY when:
 3. The PR description explains what changed and why
 4. You've confirmed the change doesn't break existing tests`}</CodeBlock>
 
-      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">Agents Not Talking to Each Other</h3>
+      <h3 className="mt-6 mb-3 text-lg font-semibold text-slate-200">
+        Agents Not Talking to Each Other
+      </h3>
       <p className="mb-3 text-slate-400">
-        <strong className="text-slate-200">Symptom:</strong> Tasks don't flow down the hierarchy — everything sits
-        with the top-level agent.
+        <strong className="text-slate-200">Symptom:</strong> Tasks don't flow down the hierarchy —
+        everything sits with the top-level agent.
       </p>
       <p className="mb-3 text-slate-400">
         <strong className="text-slate-200">Cause:</strong> Top-level agent isn't delegating.
       </p>
       <p className="mb-2 text-slate-400">
-        <strong className="text-slate-200">Fix:</strong> Make delegation explicit in the role description:
+        <strong className="text-slate-200">Fix:</strong> Make delegation explicit in the role
+        description:
       </p>
       <CodeBlock title="ORG.md">{`### Engineering Lead
 You are a delegator, not a doer. When you receive a task:
@@ -479,7 +548,9 @@ Never do work that a worker could do.`}</CodeBlock>
           className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-4 transition hover:border-white/10 hover:bg-white/[0.04] no-underline"
         >
           <div className="text-sm font-semibold text-slate-200 mb-1">Dashboard Guide →</div>
-          <div className="text-xs text-slate-500">Read the live feed, network graph, and ACP metrics</div>
+          <div className="text-xs text-slate-500">
+            Read the live feed, network graph, and ACP metrics
+          </div>
         </Link>
         <Link
           to="/docs/tutorials/your-first-org-md"

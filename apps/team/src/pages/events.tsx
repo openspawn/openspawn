@@ -27,9 +27,7 @@ export function EventsPage() {
                   {event.actor && (
                     <span className="truncate max-w-[200px]">Agent: {event.actor.name}</span>
                   )}
-                  <span className="shrink-0">
-                    {new Date(event.createdAt).toLocaleString()}
-                  </span>
+                  <span className="shrink-0">{new Date(event.createdAt).toLocaleString()}</span>
                 </div>
               </div>
             </div>

@@ -105,10 +105,7 @@ export function ReputationCard({ reputation }: ReputationCardProps) {
                     {reputation.tasksCompleted} / {reputation.promotionProgress.tasksRequired}
                   </span>
                 </div>
-                <Progress
-                  value={reputation.promotionProgress.tasksProgress}
-                  className="h-1.5"
-                />
+                <Progress value={reputation.promotionProgress.tasksProgress} className="h-1.5" />
               </div>
             </div>
           </div>

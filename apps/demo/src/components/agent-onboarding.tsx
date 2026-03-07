@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  UserPlus,
-  Check,
-  X,
-  Clock,
-  Users,
-  Loader2,
-  } from "lucide-react";
+import { UserPlus, Check, X, Clock, Users, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";

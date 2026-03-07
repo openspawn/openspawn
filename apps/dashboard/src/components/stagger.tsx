@@ -2,8 +2,7 @@ import { motion } from "motion/react";
 import type { ReactNode, ComponentProps } from "react";
 
 const reduceMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 interface StaggerContainerProps extends ComponentProps<typeof motion.div> {
   children: ReactNode;

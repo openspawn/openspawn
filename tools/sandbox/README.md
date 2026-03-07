@@ -13,15 +13,15 @@ pnpm exec nx run sandbox:serve    # Sandbox only
 
 ## Env Vars
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `SANDBOX_PORT` | Server port | `3333` |
-| `SERVE_DASHBOARD` | Serve static dashboard | `0` |
-| `DASHBOARD_DIR` | Path to built demo app | Auto-detected |
-| `TEAM_DIR` | Path to built team app | Auto-detected |
-| `WEBSITE_DIR` | Path to built website | Auto-detected |
-| `SANDBOX_READONLY` | Disable mutations | `0` |
-| `SANDBOX_MODEL` | LLM model for simulation | `qwen3:0.6b` |
+| Variable           | Purpose                  | Default       |
+| ------------------ | ------------------------ | ------------- |
+| `SANDBOX_PORT`     | Server port              | `3333`        |
+| `SERVE_DASHBOARD`  | Serve static dashboard   | `0`           |
+| `DASHBOARD_DIR`    | Path to built demo app   | Auto-detected |
+| `TEAM_DIR`         | Path to built team app   | Auto-detected |
+| `WEBSITE_DIR`      | Path to built website    | Auto-detected |
+| `SANDBOX_READONLY` | Disable mutations        | `0`           |
+| `SANDBOX_MODEL`    | LLM model for simulation | `qwen3:0.6b`  |
 
 ## Static Apps Served (production)
 

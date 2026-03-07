@@ -54,19 +54,13 @@ maintaining operational excellence across all stations.
             The problem with agents
           </h2>
           <div className="space-y-4 text-slate-400 leading-relaxed text-lg">
+            <p>One agent is a tool. Two agents is a conversation. Ten agents is chaos.</p>
             <p>
-              One agent is a tool. Two agents is a conversation.
-              Ten agents is chaos.
+              You can give each agent a persona, a system prompt, a set of tools. But who decides
+              what the <em>team</em> believes? Who sets the budget? Who resolves conflicts? Who
+              defines "done"?
             </p>
-            <p>
-              You can give each agent a persona, a system prompt, a set of tools.
-              But who decides what the <em>team</em> believes? Who sets the budget?
-              Who resolves conflicts? Who defines "done"?
-            </p>
-            <p>
-              Individual brilliance doesn't scale.
-              Organizations do.
-            </p>
+            <p>Individual brilliance doesn't scale. Organizations do.</p>
           </div>
         </div>
       </section>
@@ -78,21 +72,15 @@ maintaining operational excellence across all stations.
             The org chart is the config
           </h2>
           <div className="space-y-4 text-slate-400 leading-relaxed text-lg">
+            <p>Not YAML. Not JSON. Not a dashboard with drag-and-drop boxes.</p>
+            <p className="text-slate-200 font-medium">Markdown.</p>
             <p>
-              Not YAML. Not JSON. Not a dashboard with drag-and-drop boxes.
-            </p>
-            <p className="text-slate-200 font-medium">
-              Markdown.
-            </p>
-            <p>
-              Human-readable. Version-controlled. Diffable. Reviewable.
-              The documentation <em>is</em> the configuration.
-              The README <em>is</em> the runtime.
+              Human-readable. Version-controlled. Diffable. Reviewable. The documentation{" "}
+              <em>is</em> the configuration. The README <em>is</em> the runtime.
             </p>
             <p>
-              You don't configure your org — you <em>write</em> it.
-              And because it's a file in git, your organization has history.
-              Every reorg is a commit. Every policy change is a PR.
+              You don't configure your org — you <em>write</em> it. And because it's a file in git,
+              your organization has history. Every reorg is a commit. Every policy change is a PR.
             </p>
           </div>
         </div>
@@ -122,8 +110,8 @@ maintaining operational excellence across all stations.
                 ORG.md
               </code>
               <p>
-                defines an entire organization — mission, culture, structure,
-                policy, playbooks. The whole machine.
+                defines an entire organization — mission, culture, structure, policy, playbooks. The
+                whole machine.
               </p>
             </div>
           </div>
@@ -133,17 +121,24 @@ maintaining operational excellence across all stations.
       {/* What goes in ORG.md */}
       <section className="py-16">
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-8 text-2xl font-bold text-slate-100 md:text-3xl">
-            What lives inside
-          </h2>
+          <h2 className="mb-8 text-2xl font-bold text-slate-100 md:text-3xl">What lives inside</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             {[
-              { label: "Identity", desc: "Mission, vision, values — the why behind every decision." },
-              { label: "Culture", desc: "Communication norms, conflict resolution, how the team thinks." },
+              {
+                label: "Identity",
+                desc: "Mission, vision, values — the why behind every decision.",
+              },
+              {
+                label: "Culture",
+                desc: "Communication norms, conflict resolution, how the team thinks.",
+              },
               { label: "Structure", desc: "Agents, teams, hierarchy — who reports to whom." },
               { label: "Policies", desc: "Budgets, permissions, escalation paths, guardrails." },
               { label: "Playbooks", desc: "How work flows — from ticket to deploy to retro." },
-              { label: "Evolution", desc: "Living document. Your org grows, the file grows with it." },
+              {
+                label: "Evolution",
+                desc: "Living document. Your org grows, the file grows with it.",
+              },
             ].map((item) => (
               <div
                 key={item.label}
@@ -152,9 +147,7 @@ maintaining operational excellence across all stations.
                 <h3 className="mb-2 text-sm font-semibold tracking-wide text-cyan-400 uppercase">
                   {item.label}
                 </h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  {item.desc}
-                </p>
+                <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -164,17 +157,13 @@ maintaining operational excellence across all stations.
       {/* A Taste */}
       <section className="py-16">
         <div className="mx-auto max-w-2xl">
-          <h2 className="mb-6 text-2xl font-bold text-slate-100 md:text-3xl">
-            A taste
-          </h2>
+          <h2 className="mb-6 text-2xl font-bold text-slate-100 md:text-3xl">A taste</h2>
           <div className="overflow-hidden rounded-xl border border-white/10 bg-navy-900/80 shadow-2xl">
             <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
               <div className="h-3 w-3 rounded-full bg-red-500/60" />
               <div className="h-3 w-3 rounded-full bg-yellow-500/60" />
               <div className="h-3 w-3 rounded-full bg-green-500/60" />
-              <span className="ml-2 font-mono text-xs text-slate-500">
-                ORG.md
-              </span>
+              <span className="ml-2 font-mono text-xs text-slate-500">ORG.md</span>
             </div>
             <pre className="overflow-x-auto p-5 font-mono text-sm leading-relaxed text-slate-300">
               {orgSnippet}
@@ -191,13 +180,12 @@ maintaining operational excellence across all stations.
           </h2>
           <div className="space-y-4 text-slate-400 leading-relaxed text-lg">
             <p>
-              Define your org. Deploy it. Watch it work.
-              See where the bottlenecks are. Tune. Commit. Push.
+              Define your org. Deploy it. Watch it work. See where the bottlenecks are. Tune.
+              Commit. Push.
             </p>
             <p>
-              Your organization evolves as a file in git.
-              Not as tribal knowledge. Not as a wiki nobody reads.
-              As code that runs.
+              Your organization evolves as a file in git. Not as tribal knowledge. Not as a wiki
+              nobody reads. As code that runs.
             </p>
             <p className="text-slate-300 italic">
               The best organizations aren't built — they're written.
@@ -209,12 +197,10 @@ maintaining operational excellence across all stations.
       {/* CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-4 text-3xl font-bold text-slate-100 md:text-4xl">
-            See it running
-          </h2>
+          <h2 className="mb-4 text-3xl font-bold text-slate-100 md:text-4xl">See it running</h2>
           <p className="mb-8 text-slate-400 text-lg">
-            The BikiniBottom demo is a live OpenSpawn reference implementation — 22 SpongeBob agents,
-            organized by ORG.md, running right now.
+            The BikiniBottom demo is a live OpenSpawn reference implementation — 22 SpongeBob
+            agents, organized by ORG.md, running right now.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a

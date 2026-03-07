@@ -8,27 +8,30 @@ import { execSync } from "node:child_process";
 import { resolve, join } from "node:path";
 
 const commitSha = (() => {
-  try { return execSync('git rev-parse --short HEAD').toString().trim(); }
-  catch { return 'unknown'; }
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "unknown";
+  }
 })();
 const buildTime = new Date().toISOString();
 
-const isDemo = process.env.VITE_DEMO_MODE === 'true';
-const basePath = isDemo ? '/openspawn/demo/' : '/app/';
+const isDemo = process.env.VITE_DEMO_MODE === "true";
+const basePath = isDemo ? "/openspawn/demo/" : "/app/";
 
 // Plugin to fix base href in HTML and create 404.html for SPA routing
 function fixBaseHref(): Plugin {
   return {
-    name: 'fix-base-href',
+    name: "fix-base-href",
     transformIndexHtml(html) {
       return html.replace('<base href="/" />', `<base href="${basePath}" />`);
     },
     closeBundle() {
       // For GitHub Pages: copy index.html to 404.html for SPA routing
       if (isDemo) {
-        const outDir = resolve(import.meta.dirname, '../../dist/apps/demo');
-        const indexPath = join(outDir, 'index.html');
-        const notFoundPath = join(outDir, '404.html');
+        const outDir = resolve(import.meta.dirname, "../../dist/apps/demo");
+        const indexPath = join(outDir, "index.html");
+        const notFoundPath = join(outDir, "404.html");
         if (existsSync(indexPath)) {
           copyFileSync(indexPath, notFoundPath);
         }
@@ -54,10 +57,10 @@ export default defineConfig(() => ({
     react({
       plugins: [
         [
-          '@swc-contrib/plugin-graphql-codegen-client-preset',
+          "@swc-contrib/plugin-graphql-codegen-client-preset",
           {
-            artifactDirectory: './src/graphql/generated',
-            gqlTagName: 'graphql',
+            artifactDirectory: "./src/graphql/generated",
+            gqlTagName: "graphql",
           },
         ],
       ],

@@ -8,7 +8,7 @@ import {
   formatTask,
   formatEmpty,
   icons,
-  } from "../lib/output.js";
+} from "../lib/output.js";
 import { withSpinner } from "../lib/spinner.js";
 
 interface Task {
@@ -61,13 +61,13 @@ function formatPriority(priority: string): string {
 
 function formatDueDate(dateStr?: string): string {
   if (!dateStr) return pc.dim("—");
-  
+
   const date = new Date(dateStr);
   const now = new Date();
   const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  
+
   const formatted = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  
+
   if (diffDays < 0) return pc.red(`${formatted} (overdue)`);
   if (diffDays === 0) return pc.yellow(`${formatted} (today)`);
   if (diffDays === 1) return pc.yellow(`${formatted} (tomorrow)`);
@@ -76,19 +76,17 @@ function formatDueDate(dateStr?: string): string {
 }
 
 export function createTasksCommand(): Command {
-  const tasks = new Command("tasks")
-    .description("Create and manage tasks")
-    .addHelpText(
-      "after",
-      `
+  const tasks = new Command("tasks").description("Create and manage tasks").addHelpText(
+    "after",
+    `
 ${pc.cyan("Examples:")}
   ${pc.dim("$")} openspawn tasks list
   ${pc.dim("$")} openspawn tasks list --status in_progress
   ${pc.dim("$")} openspawn tasks create --title "Build feature" --priority high
   ${pc.dim("$")} openspawn tasks assign TASK-001 --to agent-123
   ${pc.dim("$")} openspawn tasks transition TASK-001 --status done
-`
-    );
+`,
+  );
 
   tasks
     .command("list")
@@ -111,7 +109,7 @@ ${pc.cyan("Examples:")}
         }
         if (opts.priority) {
           taskList = taskList.filter(
-            (t) => t.priority?.toUpperCase() === opts.priority.toUpperCase()
+            (t) => t.priority?.toUpperCase() === opts.priority.toUpperCase(),
           );
         }
 
@@ -127,13 +125,15 @@ ${pc.cyan("Examples:")}
             "No tasks found",
             opts.status
               ? "Try a different status filter"
-              : `Run: ${pc.cyan("openspawn tasks create --title <title>")}`
+              : `Run: ${pc.cyan("openspawn tasks create --title <title>")}`,
           );
           return;
         }
 
         console.log();
-        console.log(`  ${icons.task} ${pc.bold(`${taskList.length} task${taskList.length === 1 ? "" : "s"}`)}`);
+        console.log(
+          `  ${icons.task} ${pc.bold(`${taskList.length} task${taskList.length === 1 ? "" : "s"}`)}`,
+        );
         console.log();
 
         outputTable({
@@ -186,7 +186,7 @@ ${pc.cyan("Examples:")}
       if (!validPriorities.includes(opts.priority.toLowerCase())) {
         outputError(
           `Invalid priority: ${opts.priority}`,
-          `Valid values: ${validPriorities.join(", ")}`
+          `Valid values: ${validPriorities.join(", ")}`,
         );
         process.exit(1);
       }
@@ -202,7 +202,7 @@ ${pc.cyan("Examples:")}
               priority: opts.priority.toUpperCase(),
             });
           },
-          { successText: `Task created!` }
+          { successText: `Task created!` },
         );
 
         const task = unwrap(data) as Task;
@@ -225,7 +225,7 @@ ${pc.cyan("Examples:")}
             const client = createClient();
             return client.assignTask(taskId, opts.to);
           },
-          { successText: `${taskId} assigned to ${opts.to}` }
+          { successText: `${taskId} assigned to ${opts.to}` },
         );
         console.log();
       } catch (err) {
@@ -242,12 +242,9 @@ ${pc.cyan("Examples:")}
     .action(async (taskId, opts) => {
       const validStatuses = ["backlog", "todo", "in_progress", "review", "done", "blocked"];
       const status = opts.status.toLowerCase().replace("-", "_");
-      
+
       if (!validStatuses.includes(status)) {
-        outputError(
-          `Invalid status: ${opts.status}`,
-          `Valid values: ${validStatuses.join(", ")}`
-        );
+        outputError(`Invalid status: ${opts.status}`, `Valid values: ${validStatuses.join(", ")}`);
         process.exit(1);
       }
 
@@ -258,7 +255,7 @@ ${pc.cyan("Examples:")}
             const client = createClient();
             return client.transitionTask(taskId, status.toUpperCase());
           },
-          { successText: `${taskId} → ${opts.status.toUpperCase()}` }
+          { successText: `${taskId} → ${opts.status.toUpperCase()}` },
         );
         console.log();
       } catch (err) {
@@ -273,16 +270,13 @@ ${pc.cyan("Examples:")}
     .requiredOption("--text <text>", "Comment text")
     .action(async (taskId, opts) => {
       try {
-        await withSpinner(
-          `Adding comment to ${pc.cyan(taskId)}...`,
-          async () => {
-            // DEFERRED: Task comment endpoint does not exist yet.
-            // When the API exposes it, replace with:
-            //   await createClient().addTaskComment(taskId, opts.text)
-            // Expected route: POST /tasks/:id/comments  { text }
-            await new Promise((r) => setTimeout(r, 500));
-          }
-        );
+        await withSpinner(`Adding comment to ${pc.cyan(taskId)}...`, async () => {
+          // DEFERRED: Task comment endpoint does not exist yet.
+          // When the API exposes it, replace with:
+          //   await createClient().addTaskComment(taskId, opts.text)
+          // Expected route: POST /tasks/:id/comments  { text }
+          await new Promise((r) => setTimeout(r, 500));
+        });
         outputSuccess(`Comment added to ${taskId}`);
       } catch (err) {
         outputError(err instanceof Error ? err.message : String(err));

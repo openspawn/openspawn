@@ -63,12 +63,8 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
       <div className="relative space-y-1">
         <AnimatePresence>
           {spans.map((span, i) => {
-            const left =
-              ((span.startTime - minTime) / totalDuration) * 100;
-            const width = Math.max(
-              (span.durationMs / totalDuration) * 100,
-              0.5,
-            );
+            const left = ((span.startTime - minTime) / totalDuration) * 100;
+            const width = Math.max((span.durationMs / totalDuration) * 100, 0.5);
 
             return (
               <motion.div
@@ -78,11 +74,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: i * 0.03, duration: 0.3 }}
                 className="group relative h-8 cursor-pointer"
-                onClick={() =>
-                  setSelectedSpan(
-                    selectedSpan?.spanId === span.spanId ? null : span,
-                  )
-                }
+                onClick={() => setSelectedSpan(selectedSpan?.spanId === span.spanId ? null : span)}
               >
                 <div className="absolute inset-0 rounded bg-muted/50" />
                 <motion.div
@@ -116,9 +108,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-muted-foreground">Operation</span>
-                <p className="text-foreground font-mono">
-                  {selectedSpan.operationName}
-                </p>
+                <p className="text-foreground font-mono">{selectedSpan.operationName}</p>
               </div>
               <div>
                 <span className="text-muted-foreground">Status</span>
@@ -130,9 +120,7 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
               </div>
               <div>
                 <span className="text-muted-foreground">Duration</span>
-                <p className="text-foreground tabular-nums">
-                  {selectedSpan.durationMs}ms
-                </p>
+                <p className="text-foreground tabular-nums">{selectedSpan.durationMs}ms</p>
               </div>
               <div>
                 <span className="text-muted-foreground">Service</span>
@@ -148,16 +136,12 @@ export function TraceTimeline({ spans }: TraceTimelineProps) {
                 <div className="col-span-2">
                   <span className="text-muted-foreground">Attributes</span>
                   <div className="mt-1 space-y-0.5">
-                    {Object.entries(selectedSpan.attributes).map(
-                      ([k, v]) => (
-                        <div key={k} className="flex gap-2">
-                          <span className="text-violet-400 font-mono">
-                            {k}
-                          </span>
-                          <span className="text-muted-foreground">{v}</span>
-                        </div>
-                      ),
-                    )}
+                    {Object.entries(selectedSpan.attributes).map(([k, v]) => (
+                      <div key={k} className="flex gap-2">
+                        <span className="text-violet-400 font-mono">{k}</span>
+                        <span className="text-muted-foreground">{v}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

@@ -1,22 +1,22 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { Bot, Layers, Wallet, Eye } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useOnboarding } from './onboarding-provider';
-import { useDemo } from '../../demo/DemoProvider';
-import { isSandboxMode } from '../../graphql/fetcher';
+import { motion, AnimatePresence } from "motion/react";
+import { Bot, Layers, Wallet, Eye } from "lucide-react";
+import { Button } from "../ui/button";
+import { useOnboarding } from "./onboarding-provider";
+import { useDemo } from "../../demo/DemoProvider";
+import { isSandboxMode } from "../../graphql/fetcher";
 
 const VALUE_PROPS = [
   {
     icon: Layers,
-    text: 'Orchestrate agents across tasks and teams',
+    text: "Orchestrate agents across tasks and teams",
   },
   {
     icon: Wallet,
-    text: 'Set budgets and track credit flow in real-time',
+    text: "Set budgets and track credit flow in real-time",
   },
   {
     icon: Eye,
-    text: 'Full visibility into every decision and action',
+    text: "Full visibility into every decision and action",
   },
 ];
 
@@ -46,7 +46,7 @@ export function WelcomeScreen() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 250, delay: 0.1 }}
+            transition={{ type: "spring", damping: 25, stiffness: 250, delay: 0.1 }}
             className="fixed inset-0 z-[101] flex items-center justify-center p-4"
           >
             <div className="w-full max-w-md text-center">
@@ -54,7 +54,7 @@ export function WelcomeScreen() {
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 200, delay: 0.2 }}
+                transition={{ type: "spring", damping: 20, stiffness: 200, delay: 0.2 }}
                 className="mx-auto mb-8 relative"
               >
                 <div className="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
@@ -63,7 +63,7 @@ export function WelcomeScreen() {
                 {/* Pulse rings */}
                 <motion.div
                   animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                   className="absolute inset-0 rounded-2xl border-2 border-cyan-400"
                 />
               </motion.div>

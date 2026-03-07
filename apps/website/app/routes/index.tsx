@@ -266,7 +266,7 @@ function useScrollReveal() {
           }
         }
       },
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" },
     );
 
     elements.forEach((el) => observer.observe(el));
@@ -275,13 +275,52 @@ function useScrollReveal() {
 }
 
 // ─── Industry scenario color map ──────────────────────────────────────────────
-const scenarioColorMap: Record<string, { border: string; bg: string; text: string; dot: string; iconContainer: string }> = {
-  cyan:    { border: "border-cyan-500/20",    bg: "bg-cyan-500/[0.05]",    text: "text-cyan-400",    dot: "bg-cyan-400",    iconContainer: "bg-cyan-500/10 border border-cyan-500/20"    },
-  rose:    { border: "border-rose-500/20",    bg: "bg-rose-500/[0.05]",    text: "text-rose-400",    dot: "bg-rose-400",    iconContainer: "bg-rose-500/10 border border-rose-500/20"    },
-  violet:  { border: "border-violet-500/20",  bg: "bg-violet-500/[0.05]",  text: "text-violet-400",  dot: "bg-violet-400",  iconContainer: "bg-violet-500/10 border border-violet-500/20"  },
-  emerald: { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.05]", text: "text-emerald-400", dot: "bg-emerald-400", iconContainer: "bg-emerald-500/10 border border-emerald-500/20" },
-  amber:   { border: "border-amber-500/20",   bg: "bg-amber-500/[0.05]",   text: "text-amber-400",   dot: "bg-amber-400",   iconContainer: "bg-amber-500/10 border border-amber-500/20"   },
-  slate:   { border: "border-white/10",       bg: "bg-white/[0.03]",       text: "text-slate-300",   dot: "bg-slate-400",   iconContainer: "bg-white/5 border border-white/10"             },
+const scenarioColorMap: Record<
+  string,
+  { border: string; bg: string; text: string; dot: string; iconContainer: string }
+> = {
+  cyan: {
+    border: "border-cyan-500/20",
+    bg: "bg-cyan-500/[0.05]",
+    text: "text-cyan-400",
+    dot: "bg-cyan-400",
+    iconContainer: "bg-cyan-500/10 border border-cyan-500/20",
+  },
+  rose: {
+    border: "border-rose-500/20",
+    bg: "bg-rose-500/[0.05]",
+    text: "text-rose-400",
+    dot: "bg-rose-400",
+    iconContainer: "bg-rose-500/10 border border-rose-500/20",
+  },
+  violet: {
+    border: "border-violet-500/20",
+    bg: "bg-violet-500/[0.05]",
+    text: "text-violet-400",
+    dot: "bg-violet-400",
+    iconContainer: "bg-violet-500/10 border border-violet-500/20",
+  },
+  emerald: {
+    border: "border-emerald-500/20",
+    bg: "bg-emerald-500/[0.05]",
+    text: "text-emerald-400",
+    dot: "bg-emerald-400",
+    iconContainer: "bg-emerald-500/10 border border-emerald-500/20",
+  },
+  amber: {
+    border: "border-amber-500/20",
+    bg: "bg-amber-500/[0.05]",
+    text: "text-amber-400",
+    dot: "bg-amber-400",
+    iconContainer: "bg-amber-500/10 border border-amber-500/20",
+  },
+  slate: {
+    border: "border-white/10",
+    bg: "bg-white/[0.03]",
+    text: "text-slate-300",
+    dot: "bg-slate-400",
+    iconContainer: "bg-white/5 border border-white/10",
+  },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -294,7 +333,9 @@ export function LandingPage() {
   useEffect(() => {
     fetch("https://api.github.com/repos/openspawn/openspawn")
       .then((r) => r.json())
-      .then((d) => { if (d.stargazers_count) setStars(d.stargazers_count); })
+      .then((d) => {
+        if (d.stargazers_count) setStars(d.stargazers_count);
+      })
       .catch(() => {});
   }, []);
 
@@ -306,12 +347,13 @@ export function LandingPage() {
 
   return (
     <div className="px-5 sm:px-6">
-
       {/* ── Social proof bar ───────────────────────────────────────────────── */}
       <div className="border-b border-white/5 bg-navy-950/60 py-2">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-slate-500">
           <span className="flex items-center gap-1.5">
-            <span className="text-cyan-400 font-semibold">{stars ? `⭐ ${stars.toLocaleString()}` : "⭐ Stars"}</span>
+            <span className="text-cyan-400 font-semibold">
+              {stars ? `⭐ ${stars.toLocaleString()}` : "⭐ Stars"}
+            </span>
             on GitHub
           </span>
           <span className="hidden h-3 w-px bg-white/10 sm:block" />
@@ -392,22 +434,23 @@ export function LandingPage() {
 
           {/* Sub-copy */}
           <p className="animate-fade-in-up animate-delay-300 mx-auto mb-10 max-w-xl text-base text-slate-400 md:text-lg leading-relaxed">
-            Your agents are powerful. OpenSpawn gives them structure — persistent memory,
-            hierarchy, budgets, and governance that compound across sessions.{" "}
+            Your agents are powerful. OpenSpawn gives them structure — persistent memory, hierarchy,
+            budgets, and governance that compound across sessions.{" "}
             <span className="text-slate-300">Add an org chart to any agent stack.</span>
           </p>
 
           {/* CTAs */}
           <div className="animate-fade-in-up animate-delay-400 mb-10 flex flex-wrap items-center justify-center gap-4">
-            <Button as="a" href="/docs/getting-started" variant="primary" size="lg" className="glow-cyan">
-              Get Started →
-            </Button>
             <Button
               as="a"
-              href="/templates"
-              variant="neutral"
+              href="/docs/getting-started"
+              variant="primary"
               size="lg"
+              className="glow-cyan"
             >
+              Get Started →
+            </Button>
+            <Button as="a" href="/templates" variant="neutral" size="lg">
               🏭 Browse Industry Templates →
             </Button>
           </div>
@@ -436,12 +479,28 @@ export function LandingPage() {
                 aria-label="Copy to clipboard"
               >
                 {copied ? (
-                  <svg className="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg
+                    className="h-4 w-4 text-cyan-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                 ) : (
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
+                    />
                   </svg>
                 )}
               </button>
@@ -464,9 +523,11 @@ export function LandingPage() {
             <span className="inline-block rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
               ORG.md
             </span>
-            <h2 id="org-md-hero" className="text-3xl font-extrabold text-slate-100 md:text-4xl lg:text-5xl tracking-tight">
-              One file.{" "}
-              <span className="gradient-text">Your entire agent organization.</span>
+            <h2
+              id="org-md-hero"
+              className="text-3xl font-extrabold text-slate-100 md:text-4xl lg:text-5xl tracking-tight"
+            >
+              One file. <span className="gradient-text">Your entire agent organization.</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400 leading-relaxed">
               Define your team in markdown. OpenSpawn reads it, spawns the agents, and keeps them
@@ -476,7 +537,6 @@ export function LandingPage() {
 
           {/* Transformation: ORG.md → Agents → Results */}
           <div className="reveal grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-start">
-
             {/* Column 1: ORG.md file */}
             <div className="overflow-hidden rounded-xl border border-cyan-500/30 bg-navy-900/80 ring-1 ring-cyan-500/10">
               <div className="flex items-center gap-2 border-b border-white/5 bg-cyan-500/[0.04] px-4 py-3">
@@ -494,7 +554,11 @@ export function LandingPage() {
             {/* Arrow 1 */}
             <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
               <div className="org-transform-arrow text-2xl text-cyan-500/60">→</div>
-              <span className="text-xs text-slate-600 text-center">openspawn<br />start</span>
+              <span className="text-xs text-slate-600 text-center">
+                openspawn
+                <br />
+                start
+              </span>
             </div>
             <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
 
@@ -506,18 +570,49 @@ export function LandingPage() {
               </div>
               <div className="p-4 space-y-2">
                 {[
-                  { emoji: "🎯", name: "Onboarding Lead", level: "L7", model: "sonnet", status: "working" },
-                  { emoji: "🤖", name: "Data Migration Specialist", level: "L5", model: "haiku", status: "working" },
-                  { emoji: "🤖", name: "Integration Engineer", level: "L5", model: "haiku", status: "idle" },
-                  { emoji: "🤖", name: "Success Agent", level: "L4", model: "qwen2.5", status: "idle" },
+                  {
+                    emoji: "🎯",
+                    name: "Onboarding Lead",
+                    level: "L7",
+                    model: "sonnet",
+                    status: "working",
+                  },
+                  {
+                    emoji: "🤖",
+                    name: "Data Migration Specialist",
+                    level: "L5",
+                    model: "haiku",
+                    status: "working",
+                  },
+                  {
+                    emoji: "🤖",
+                    name: "Integration Engineer",
+                    level: "L5",
+                    model: "haiku",
+                    status: "idle",
+                  },
+                  {
+                    emoji: "🤖",
+                    name: "Success Agent",
+                    level: "L4",
+                    model: "qwen2.5",
+                    status: "idle",
+                  },
                 ].map((agent) => (
-                  <div key={agent.name} className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
+                  <div
+                    key={agent.name}
+                    className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2"
+                  >
                     <span className="text-sm">{agent.emoji}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-slate-200 truncate">{agent.name}</p>
-                      <p className="text-xs text-slate-600">{agent.level} · {agent.model}</p>
+                      <p className="text-xs text-slate-600">
+                        {agent.level} · {agent.model}
+                      </p>
                     </div>
-                    <span className={`shrink-0 text-xs font-medium ${agent.status === "working" ? "text-emerald-400" : "text-slate-600"}`}>
+                    <span
+                      className={`shrink-0 text-xs font-medium ${agent.status === "working" ? "text-emerald-400" : "text-slate-600"}`}
+                    >
                       {agent.status === "working" ? "● working" : "○ idle"}
                     </span>
                   </div>
@@ -527,8 +622,17 @@ export function LandingPage() {
 
             {/* Arrow 2 */}
             <div className="hidden md:flex flex-col items-center justify-center pt-16 gap-1">
-              <div className="org-transform-arrow text-2xl text-cyan-500/60" style={{ animationDelay: "0.3s" }}>→</div>
-              <span className="text-xs text-slate-600 text-center">24 hrs<br />later</span>
+              <div
+                className="org-transform-arrow text-2xl text-cyan-500/60"
+                style={{ animationDelay: "0.3s" }}
+              >
+                →
+              </div>
+              <span className="text-xs text-slate-600 text-center">
+                24 hrs
+                <br />
+                later
+              </span>
             </div>
             <div className="flex md:hidden justify-center my-2 text-2xl text-cyan-500/50">↓</div>
 
@@ -559,11 +663,17 @@ export function LandingPage() {
           </div>
 
           <div className="reveal mt-8 text-center">
-            <a href="/org-md" className="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+            <a
+              href="/org-md"
+              className="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
               Learn about ORG.md →
             </a>
             <span className="mx-4 text-slate-700">·</span>
-            <a href="/templates" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 transition-colors">
+            <a
+              href="/templates"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 transition-colors"
+            >
               Browse templates →
             </a>
           </div>
@@ -580,12 +690,11 @@ export function LandingPage() {
               Industry Scenarios
             </span>
             <h2 id="industry-scenarios" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              Real workflows. Real teams.{" "}
-              <span className="gradient-text">One ORG.md each.</span>
+              Real workflows. Real teams. <span className="gradient-text">One ORG.md each.</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400">
-              Every scenario ships as a ready-to-use ORG.md template. Pick one, customize it,
-              and have a working agent org in minutes.
+              Every scenario ships as a ready-to-use ORG.md template. Pick one, customize it, and
+              have a working agent org in minutes.
             </p>
           </div>
 
@@ -605,8 +714,18 @@ export function LandingPage() {
                     className={`inline-flex items-center gap-1 text-xs font-semibold ${c.text} opacity-70 hover:opacity-100 transition-opacity`}
                   >
                     See ORG.md
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    <svg
+                      className="h-3 w-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                      />
                     </svg>
                   </a>
                 </div>
@@ -644,18 +763,22 @@ export function LandingPage() {
               ))}
             </div>
             <h2 className="mb-4 text-3xl font-extrabold text-slate-100 md:text-4xl lg:text-5xl tracking-tight leading-tight">
-              Your agents,{" "}
-              <span className="gradient-text">your devices,</span>
-              <br className="hidden sm:block" />
-              {" "}your rules.
+              Your agents, <span className="gradient-text">your devices,</span>
+              <br className="hidden sm:block" /> your rules.
             </h2>
             <p className="mx-auto mb-8 max-w-2xl text-slate-400 leading-relaxed">
-              While other platforms run AI agents in the cloud, OpenSpawn agents can control real phones,
-              read live cameras, push to screens, and interact with IoT devices — directly. This is the
-              frontier no competitor has crossed.
+              While other platforms run AI agents in the cloud, OpenSpawn agents can control real
+              phones, read live cameras, push to screens, and interact with IoT devices — directly.
+              This is the frontier no competitor has crossed.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-medium">
-              {["Phone cameras", "Desktop screens", "IoT sensors", "Live notifications", "Local models"].map((item) => (
+              {[
+                "Phone cameras",
+                "Desktop screens",
+                "IoT sensors",
+                "Live notifications",
+                "Local models",
+              ].map((item) => (
                 <span
                   key={item}
                   className="diff-pill flex items-center gap-1.5 rounded-full border border-cyan-500/20 bg-navy-950/60 px-4 py-1.5 text-cyan-300 cursor-default"
@@ -677,7 +800,10 @@ export function LandingPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
             {earlyAdopters.map((a) => (
-              <div key={a.name} className="flex items-center gap-2 text-slate-500 transition-colors duration-200 hover:text-slate-300">
+              <div
+                key={a.name}
+                className="flex items-center gap-2 text-slate-500 transition-colors duration-200 hover:text-slate-300"
+              >
                 <span>{a.emoji}</span>
                 <span className="text-sm font-medium">{a.name}</span>
               </div>
@@ -698,8 +824,8 @@ export function LandingPage() {
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400">
               Agent teams are going mainstream. OpenSpawn adds the organizational layer —
-              persistence, hierarchy, and governance — so your agents can grow from a sprint
-              into a company.
+              persistence, hierarchy, and governance — so your agents can grow from a sprint into a
+              company.
             </p>
           </div>
           <div className="reveal grid gap-4 sm:grid-cols-2">
@@ -710,12 +836,28 @@ export function LandingPage() {
                 <h3 className="font-semibold text-slate-300">Without OpenSpawn</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-500">
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Session-scoped memory</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are equal</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go wrong</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> No visibility into what agents are actually doing</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-rose-500">✗</span> Org structure lives only in the prompt</li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> Session-scoped memory
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> No hierarchy — all agents are
+                  equal
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> No budget tracking or cost caps
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> No escalation path when things go
+                  wrong
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> No visibility into what agents are
+                  actually doing
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-rose-500">✗</span> Org structure lives only in the
+                  prompt
+                </li>
               </ul>
             </div>
             {/* OpenSpawn column */}
@@ -725,12 +867,29 @@ export function LandingPage() {
                 <h3 className="font-semibold text-cyan-300">OpenSpawn org</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Persistent agents with continuous memory</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> 10-level hierarchy — delegation &amp; escalation built in</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Per-agent credit budgets with automatic tracking</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Typed escalation chain of command</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Live dashboard: network graph, task timeline, cost</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 text-cyan-400">✓</span> Org structure version-controlled in <code className="font-mono text-xs bg-white/10 px-1 rounded">ORG.md</code></li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> Persistent agents with continuous
+                  memory
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> 10-level hierarchy — delegation
+                  &amp; escalation built in
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> Per-agent credit budgets with
+                  automatic tracking
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> Typed escalation chain of command
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> Live dashboard: network graph,
+                  task timeline, cost
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-cyan-400">✓</span> Org structure version-controlled
+                  in <code className="font-mono text-xs bg-white/10 px-1 rounded">ORG.md</code>
+                </li>
               </ul>
             </div>
           </div>
@@ -740,8 +899,18 @@ export function LandingPage() {
               className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
             >
               Full framework comparison (vs CrewAI, LangGraph)
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                />
               </svg>
             </a>
           </div>
@@ -761,24 +930,24 @@ export function LandingPage() {
               <div className="mb-3 text-4xl">🧠</div>
               <h3 className="mb-2 font-bold text-slate-100">Persistent Agents</h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Your agents run continuously. They remember past tasks, build context over time,
-                and improve their trust score with every successful completion.
+                Your agents run continuously. They remember past tasks, build context over time, and
+                improve their trust score with every successful completion.
               </p>
             </div>
             <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.07] to-transparent p-6 text-center">
               <div className="mb-3 text-4xl">🏢</div>
               <h3 className="mb-2 font-bold text-slate-100">Team Coordination</h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Hierarchy, delegation, and escalation built in. Agents route tasks up and down
-                the org chart — no manual wiring required.
+                Hierarchy, delegation, and escalation built in. Agents route tasks up and down the
+                org chart — no manual wiring required.
               </p>
             </div>
             <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.07] to-transparent p-6 text-center">
               <div className="mb-3 text-4xl">💰</div>
               <h3 className="mb-2 font-bold text-slate-100">Budget Control</h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Per-agent credit limits, automatic cost tracking, and configurable overage
-                behavior. Know exactly what your org costs before the bill lands.
+                Per-agent credit limits, automatic cost tracking, and configurable overage behavior.
+                Know exactly what your org costs before the bill lands.
               </p>
             </div>
           </div>
@@ -793,29 +962,33 @@ export function LandingPage() {
               How It Works
             </span>
             <h2 id="how-it-works" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              From zero to running org in{" "}
-              <span className="gradient-text">3 commands</span>
+              From zero to running org in <span className="gradient-text">3 commands</span>
             </h2>
           </div>
           <ol className="reveal grid gap-6 sm:grid-cols-3" role="list">
             {/* Step 1 */}
             <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
               <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">1</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">
+                  1
+                </span>
                 <h3 className="font-bold text-slate-100">Init</h3>
               </div>
               <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
                 <code>npx openspawn init my-org</code>
               </pre>
               <p className="text-sm text-slate-400">
-                An interactive wizard creates your <code className="text-xs font-mono text-slate-300">ORG.md</code> — the single file that defines
-                your entire agent organization.
+                An interactive wizard creates your{" "}
+                <code className="text-xs font-mono text-slate-300">ORG.md</code> — the single file
+                that defines your entire agent organization.
               </p>
             </li>
             {/* Step 2 */}
             <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
               <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">2</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">
+                  2
+                </span>
                 <h3 className="font-bold text-slate-100">Start</h3>
               </div>
               <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
@@ -823,26 +996,32 @@ export function LandingPage() {
               </pre>
               <p className="text-sm text-slate-400">
                 Agents spawn in sandboxed containers, load their roles from ORG.md, and begin
-                listening for tasks immediately. Dashboard at <code className="text-xs font-mono text-slate-300">localhost:3333</code>.
+                listening for tasks immediately. Dashboard at{" "}
+                <code className="text-xs font-mono text-slate-300">localhost:3333</code>.
               </p>
             </li>
             {/* Step 3 */}
             <li className="relative rounded-xl border border-white/10 bg-navy-900/80 p-6">
               <div className="mb-4 flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">3</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400">
+                  3
+                </span>
                 <h3 className="font-bold text-slate-100">Done</h3>
               </div>
               <pre className="mb-3 overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-xs text-cyan-300">
                 <code>openspawn done</code>
               </pre>
               <p className="text-sm text-slate-400">
-                When the work is complete, graceful shutdown collects all artifacts, task logs,
-                and cost summaries into a portable archive.
+                When the work is complete, graceful shutdown collects all artifacts, task logs, and
+                cost summaries into a portable archive.
               </p>
             </li>
           </ol>
           <div className="reveal mt-8 text-center">
-            <a href="/getting-started" className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan">
+            <a
+              href="/getting-started"
+              className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-navy-950 transition hover:bg-cyan-400 glow-cyan"
+            >
               Get Started in 5 Minutes →
             </a>
           </div>
@@ -880,8 +1059,7 @@ export function LandingPage() {
       <section className="section-py-lg">
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="reveal mb-4 text-3xl font-bold text-slate-100">
-            Your agents can talk.{" "}
-            <span className="gradient-text">Now give them structure.</span>
+            Your agents can talk. <span className="gradient-text">Now give them structure.</span>
           </h2>
           <p className="reveal mx-auto mb-12 max-w-2xl text-slate-400">
             OpenClaw handles routing and isolation. OpenSpawn adds the org chart — teams, hierarchy,
@@ -922,7 +1100,12 @@ export function LandingPage() {
           </div>
           <p className="reveal mt-8 text-sm text-slate-500">
             Made for{" "}
-            <a href="https://openclaw.ai" target="_blank" rel="noopener" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+            <a
+              href="https://openclaw.ai"
+              target="_blank"
+              rel="noopener"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
               OpenClaw
             </a>
             . Works with any agent.
@@ -935,8 +1118,8 @@ export function LandingPage() {
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="reveal mb-4 text-3xl font-bold text-slate-100">Works with your stack</h2>
           <p className="reveal mx-auto mb-10 max-w-2xl text-slate-400">
-            Native OpenClaw integration. Plays nicely with CrewAI, LangGraph, AutoGen, and any
-            agent framework.
+            Native OpenClaw integration. Plays nicely with CrewAI, LangGraph, AutoGen, and any agent
+            framework.
           </p>
           <div className="reveal flex flex-wrap items-center justify-center gap-3">
             {ecosystemItems.map((f) => (
@@ -959,16 +1142,32 @@ export function LandingPage() {
       <section className="section-py-lg">
         <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
           <div className="reveal flex flex-col justify-center">
-            <span className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-400">Defining Feature</span>
+            <span className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-400">
+              Defining Feature
+            </span>
             <h2 className="mb-4 text-3xl font-bold text-slate-100">Organization as Code</h2>
             <p className="mb-6 text-slate-400 leading-relaxed">
-              Define your entire agent organization in a single markdown file. Mission, culture, teams,
-              policies — version-controlled and diffable. The documentation is the configuration.
+              Define your entire agent organization in a single markdown file. Mission, culture,
+              teams, policies — version-controlled and diffable. The documentation is the
+              configuration.
             </p>
-            <a href="/org-md" className="inline-flex items-center gap-1.5 text-cyan-400 transition-all duration-200 hover:text-cyan-300 hover:gap-2.5 w-fit">
+            <a
+              href="/org-md"
+              className="inline-flex items-center gap-1.5 text-cyan-400 transition-all duration-200 hover:text-cyan-300 hover:gap-2.5 w-fit"
+            >
               Read about ORG.md
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                />
               </svg>
             </a>
           </div>
@@ -991,10 +1190,10 @@ export function LandingPage() {
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-8 sm:gap-12 text-center">
           {[
             { value: String(agentCount), label: "Agents Live", color: "text-cyan-400" },
-            { value: "6",  label: "Industry Templates", color: "text-violet-400" },
-            { value: "7",  label: "MCP Tools",          color: "text-emerald-400" },
-            { value: "3",  label: "LLM Providers",      color: "text-amber-400" },
-            { value: "∞",  label: "Devices Possible",   color: "text-rose-400" },
+            { value: "6", label: "Industry Templates", color: "text-violet-400" },
+            { value: "7", label: "MCP Tools", color: "text-emerald-400" },
+            { value: "3", label: "LLM Providers", color: "text-amber-400" },
+            { value: "∞", label: "Devices Possible", color: "text-rose-400" },
           ].map((stat, i) => (
             <div key={stat.label}>
               <div
@@ -1017,13 +1216,14 @@ export function LandingPage() {
               How We Compare
             </span>
           </div>
-          <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">
-            How We Compare
-          </h2>
-          <p className="mb-4 text-center text-lg font-semibold text-slate-300">vs CrewAI &amp; LangGraph</p>
+          <h2 className="mb-2 text-center text-3xl font-bold text-slate-100">How We Compare</h2>
+          <p className="mb-4 text-center text-lg font-semibold text-slate-300">
+            vs CrewAI &amp; LangGraph
+          </p>
           <p className="mx-auto mb-10 max-w-xl text-center text-slate-400">
             CrewAI and LangGraph are great <em>execution</em> frameworks. OpenSpawn adds the{" "}
-            <em>coordination layer</em> — persistent orgs, governance, and budgets on top of any framework.
+            <em>coordination layer</em> — persistent orgs, governance, and budgets on top of any
+            framework.
           </p>
           <div className="mb-8 overflow-x-auto rounded-xl border border-white/10 bg-navy-900/50">
             <table className="w-full text-sm">
@@ -1076,8 +1276,7 @@ export function LandingPage() {
               Use Cases
             </span>
             <h2 id="use-cases" className="text-3xl font-bold text-slate-100 md:text-4xl">
-              Your org, your domain.{" "}
-              <span className="gradient-text">Any team. Any scale.</span>
+              Your org, your domain. <span className="gradient-text">Any team. Any scale.</span>
             </h2>
             <p className="mt-4 mx-auto max-w-2xl text-slate-400">
               OpenSpawn orgs map directly to real teams. Spin up agent organizations for any
@@ -1140,7 +1339,10 @@ export function LandingPage() {
         <div className="mx-auto max-w-3xl">
           <div className="reveal overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/[0.08] via-violet-500/[0.04] to-transparent p-10 text-center md:p-16">
             <div className="mb-4 text-5xl">🎓</div>
-            <h2 id="graduate-cta" className="mb-4 text-3xl font-extrabold text-slate-100 md:text-4xl tracking-tight">
+            <h2
+              id="graduate-cta"
+              className="mb-4 text-3xl font-extrabold text-slate-100 md:text-4xl tracking-tight"
+            >
               Ready to graduate?
             </h2>
             <p className="mx-auto mb-8 max-w-lg text-slate-400 leading-relaxed">
@@ -1161,7 +1363,9 @@ export function LandingPage() {
                 Browse industry templates
               </a>
             </div>
-            <p className="mt-6 text-xs text-slate-600">MIT licensed · No account required · Runs locally</p>
+            <p className="mt-6 text-xs text-slate-600">
+              MIT licensed · No account required · Runs locally
+            </p>
           </div>
         </div>
       </section>
