@@ -52,11 +52,15 @@ select = [
 ignore = [
   "E501", # line length handled by formatter
   "B008", # Depends() in function defaults is standard FastAPI pattern
+  "UP046", # Generic[T] required for Pydantic BaseModel generics
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports for column/relationship resolution
+"app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports
 "app/auth/*.py" = ["TCH002"]  # FastAPI dependencies need runtime type annotations
+"app/*/schemas.py" = ["TCH001", "TCH002", "TCH003"]  # Pydantic needs runtime type imports
+"app/*/router.py" = ["TCH002", "TCH003"]  # FastAPI routes need runtime type imports
+"app/schemas/*.py" = ["TCH003"]  # Pydantic needs runtime type imports
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
