@@ -1,10 +1,24 @@
-import { useMemo, useState } from "react";
-import { Brain, Search, Eye, EyeOff, Users, Shield, Database, TrendingUp } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import {
+  Brain,
+  Search,
+  Eye,
+  EyeOff,
+  Users,
+  Shield,
+  Database,
+  TrendingUp,
+  ThumbsUp,
+  ThumbsDown,
+  AlertTriangle,
+  ChevronDown,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { StatCard } from "../components/ui/stat-card";
 import { PageHeader } from "../components/ui/page-header";
 import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
   Select,
@@ -13,6 +27,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import { useAgents } from "../hooks";
 import { demoMemories, searchMemories } from "@openspawn/demo-data";
 import type { DemoMemory } from "@openspawn/demo-data";
@@ -46,6 +66,69 @@ const SOURCE_COLORS: Record<string, string> = {
   unknown: "bg-gray-500/10 text-gray-500",
 };
 
+enum ResolveStrategy {
+  KeepNewer = "keep_newer",
+  KeepOlder = "keep_older",
+  Merge = "merge",
+  Flag = "flag",
+}
+
+const RESOLVE_LABELS: Record<ResolveStrategy, string> = {
+  [ResolveStrategy.KeepNewer]: "Keep Newer",
+  [ResolveStrategy.KeepOlder]: "Keep Older",
+  [ResolveStrategy.Merge]: "Merge",
+  [ResolveStrategy.Flag]: "Flag for Review",
+};
+
+interface Contradiction {
+  id: string;
+  olderMemoryContent: string;
+  newerMemoryContent: string;
+  olderMemoryId: string;
+  newerMemoryId: string;
+  detectedAt: string;
+}
+
+const DEMO_CONTRADICTIONS: Contradiction[] = [
+  {
+    id: "contra-001",
+    olderMemoryId: "m0000000-0000-0000-0000-000000000004",
+    newerMemoryId: "m0000000-0000-0000-0000-000000000001",
+    olderMemoryContent:
+      "Production deploys require at least one L5+ approval and must happen Mon-Thu 10am-4pm UTC.",
+    newerMemoryContent:
+      "CI pipeline builds should use nx affected to save build time. Deploy window expanded to include Fridays for hotfixes.",
+    detectedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "contra-002",
+    olderMemoryId: "m0000000-0000-0000-0000-000000000002",
+    newerMemoryId: "m0000000-0000-0000-0000-000000000007",
+    olderMemoryContent:
+      "External analytics API rate-limits at 100 req/min. Use 500ms delay between batches.",
+    newerMemoryContent:
+      "Analytics API upgraded to 500 req/min. Batch delay reduced to 100ms for lead scoring pipeline.",
+    detectedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "contra-003",
+    olderMemoryId: "m0000000-0000-0000-0000-000000000010",
+    newerMemoryId: "m0000000-0000-0000-0000-000000000006",
+    olderMemoryContent:
+      "Brand voice should avoid jargon. Max 3 CTAs per page. Headlines must be benefit-driven.",
+    newerMemoryContent:
+      "Blog posts targeting developers should use technical jargon for credibility. SEO data shows jargon-heavy posts rank 2x higher.",
+    detectedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+interface FeedbackState {
+  helpful: boolean;
+  unhelpful: boolean;
+}
+
+type FeedbackMap = Map<string, FeedbackState>;
+
 function ConfidenceBar({ value }: { value: number }) {
   const color = value >= 80 ? "bg-emerald-500" : value >= 60 ? "bg-amber-500" : "bg-rose-500";
   return (
@@ -58,8 +141,27 @@ function ConfidenceBar({ value }: { value: number }) {
   );
 }
 
-function MemoryCard({ memory, agentName }: { memory: DemoMemory; agentName: string }) {
+function MemoryCard({
+  memory,
+  agentName,
+  feedback,
+  onToggleFeedback,
+}: {
+  memory: DemoMemory;
+  agentName: string;
+  feedback: FeedbackState;
+  onToggleFeedback: (memoryId: string, kind: "helpful" | "unhelpful") => void;
+}) {
   const VisIcon = VISIBILITY_ICONS[memory.visibility] ?? Eye;
+
+  const handleClickHelpful = () => {
+    onToggleFeedback(memory.id, "helpful");
+  };
+
+  const handleClickUnhelpful = () => {
+    onToggleFeedback(memory.id, "unhelpful");
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -93,6 +195,26 @@ function MemoryCard({ memory, agentName }: { memory: DemoMemory; agentName: stri
               ))}
             </div>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-6 px-1.5 gap-1 ${feedback.helpful ? "text-emerald-500" : "text-muted-foreground hover:text-emerald-500"}`}
+                  onClick={handleClickHelpful}
+                >
+                  <ThumbsUp className="h-3 w-3" />
+                  <span className="tabular-nums text-[10px]">{feedback.helpful ? 1 : 0}</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-6 px-1.5 gap-1 ${feedback.unhelpful ? "text-rose-500" : "text-muted-foreground hover:text-rose-500"}`}
+                  onClick={handleClickUnhelpful}
+                >
+                  <ThumbsDown className="h-3 w-3" />
+                  <span className="tabular-nums text-[10px]">{feedback.unhelpful ? 1 : 0}</span>
+                </Button>
+              </div>
               <span>{agentName}</span>
               <span>{memory.accessCount} accesses</span>
               <span>{formatDate(memory.createdAt)}</span>
@@ -108,6 +230,8 @@ export function MemoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>(new Map());
+  const [contradictions, setContradictions] = useState<Contradiction[]>(DEMO_CONTRADICTIONS);
   const { agents } = useAgents();
 
   const agentMap = useMemo(() => {
@@ -162,6 +286,33 @@ export function MemoryPage() {
   const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
+
+  const getFeedback = useCallback(
+    (memoryId: string): FeedbackState => {
+      return feedbackMap.get(memoryId) ?? { helpful: false, unhelpful: false };
+    },
+    [feedbackMap],
+  );
+
+  const handleToggleFeedback = useCallback(
+    (memoryId: string, kind: "helpful" | "unhelpful") => {
+      setFeedbackMap((prev) => {
+        const next = new Map(prev);
+        const current = next.get(memoryId) ?? { helpful: false, unhelpful: false };
+        if (kind === "helpful") {
+          next.set(memoryId, { helpful: !current.helpful, unhelpful: false });
+        } else {
+          next.set(memoryId, { helpful: false, unhelpful: !current.unhelpful });
+        }
+        return next;
+      });
+    },
+    [],
+  );
+
+  const handleResolveContradiction = useCallback((contradictionId: string, _strategy: ResolveStrategy) => {
+    setContradictions((prev) => prev.filter((c) => c.id !== contradictionId));
+  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -266,10 +417,82 @@ export function MemoryPage() {
               key={memory.id}
               memory={memory}
               agentName={agentMap.get(memory.agentId) ?? "Unknown Agent"}
+              feedback={getFeedback(memory.id)}
+              onToggleFeedback={handleToggleFeedback}
             />
           ))
         )}
       </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <CardTitle className="text-base">Contradictions</CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              {contradictions.length}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {contradictions.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No contradictions detected
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {contradictions.map((c) => (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 space-y-2"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 space-y-2 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+                          older
+                        </Badge>
+                        <p className="text-xs text-muted-foreground truncate">{c.olderMemoryContent}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 border-amber-500/30 text-amber-500">
+                          newer
+                        </Badge>
+                        <p className="text-xs truncate">{c.newerMemoryContent}</p>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="shrink-0 h-7 text-xs gap-1">
+                          Resolve
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {Object.values(ResolveStrategy).map((strategy) => (
+                          <DropdownMenuItem
+                            key={strategy}
+                            onClick={() => handleResolveContradiction(c.id, strategy)}
+                          >
+                            {RESOLVE_LABELS[strategy]}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    Detected {formatDate(c.detectedAt)}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
