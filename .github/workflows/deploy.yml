@@ -3,6 +3,16 @@ name: Deploy to VPS
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/demo/**"
+      - "apps/team/**"
+      - "apps/website/**"
+      - "apps/api/**"
+      - "tools/sandbox/**"
+      - "libs/**"
+      - "deploy/**"
+      - "Dockerfile"
+      - "pnpm-lock.yaml"
   workflow_dispatch:
 
 env:

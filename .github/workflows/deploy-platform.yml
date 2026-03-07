@@ -1,6 +1,12 @@
 name: Deploy Platform (openspawn.ai)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/platform/**"
+      - "Dockerfile.platform"
+      - "pnpm-lock.yaml"
   workflow_dispatch:
 
 env:
