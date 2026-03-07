@@ -49,16 +49,8 @@ export { SidePanelProvider, useSidePanel } from "./contexts/side-panel-context";
 // Mode detection
 export { isDemoMode, isSandboxMode } from "./lib/mode";
 
-// GraphQL (legacy — re-export for backward compat during migration)
-export {
-  fetcher,
-  graphqlClient,
-  setDemoFetcher,
-  setSandboxFetcher,
-} from "./graphql/fetcher";
-export * from "./graphql/operations";
-export * from "./graphql/generated/hooks";
-export * from "./graphql/generated/gql";
+// GraphQL fetcher (legacy — kept for demo/sandbox mock compatibility)
+export { fetcher, graphqlClient, setDemoFetcher, setSandboxFetcher } from "./graphql/fetcher";
 
 // Lib utilities
 export * from "./lib/avatar-utils";
@@ -71,16 +63,6 @@ export * from "./lib/resolve-avatar-url";
 export { SANDBOX_URL } from "./lib/sandbox-url";
 export * from "./lib/status-colors";
 export * from "./lib/toast";
-
-// Document node exports (used by demo mock-fetcher — legacy)
-export {
-  TasksDocument,
-  TaskDocument,
-  AgentsDocument,
-  CreditHistoryDocument,
-  EventsDocument,
-  MessagesDocument,
-} from "./graphql/generated/graphql";
 
 // REST hooks + client
 export { api } from "./rest/client";

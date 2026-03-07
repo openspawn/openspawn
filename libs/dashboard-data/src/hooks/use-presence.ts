@@ -7,7 +7,7 @@
 import { useMemo } from "react";
 import { useAgents } from "./use-agents";
 import { useTasks } from "./use-tasks";
-import { AgentStatus } from "../graphql/generated/graphql";
+import { AgentStatus } from "@openspawn/shared-types";
 
 export type PresenceStatus = "active" | "busy" | "idle" | "error";
 

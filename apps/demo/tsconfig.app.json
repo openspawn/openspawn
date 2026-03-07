@@ -29,6 +29,15 @@
   "references": [
     {
       "path": "../../libs/demo-data/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/dashboard-data"
+    },
+    {
+      "path": "../../libs/dashboard-ui"
+    },
+    {
+      "path": "../../libs/shared-types"
     }
   ]
 }

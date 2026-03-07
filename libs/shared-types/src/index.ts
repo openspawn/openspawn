@@ -1,11 +1,8 @@
 // Enums
 export * from "./enums";
 
-// Crypto utilities
-export * from "./crypto";
-
-// DTOs (to be added in PR 2+)
-// export * from './dtos';
-
 // Interfaces
 export * from "./interfaces";
+
+// Note: Crypto utilities (./crypto) are server-only and not re-exported
+// from the barrel. Import directly: import { ... } from "@openspawn/shared-types/crypto"

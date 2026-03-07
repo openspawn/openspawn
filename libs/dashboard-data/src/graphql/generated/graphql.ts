@@ -1,5 +1,10 @@
 /* eslint-disable */
-import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+// Inline type replaces @graphql-typed-document-node/core (removed dep)
+type DocumentNode<TResult = Record<string, unknown>, TVariables = Record<string, unknown>> = {
+  __apiType?: (variables: TVariables) => TResult;
+  kind: "Document";
+  definitions: readonly unknown[];
+};
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };

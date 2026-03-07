@@ -1,6 +1,11 @@
 /* eslint-disable */
 import * as types from "./graphql";
-import type { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+// Inline type replaces @graphql-typed-document-node/core (removed dep)
+type DocumentNode<TResult = Record<string, unknown>, TVariables = Record<string, unknown>> = {
+  __apiType?: (variables: TVariables) => TResult;
+  kind: "Document";
+  definitions: readonly unknown[];
+};
 
 /**
  * Map of all GraphQL operations in the project.
