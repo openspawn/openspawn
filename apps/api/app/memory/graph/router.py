@@ -208,3 +208,42 @@ async def cytoscape_graph(
                 )
 
     return DataResponse(data=CytoscapeGraph(nodes=nodes, edges=edges))
+
+
+# --- Agent File ---
+
+
+@router.post("/agent-file/export/{agent_id}")
+async def export_agent(
+    agent_id: uuid.UUID,
+    auth: AuthContext = Depends(require_auth),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    from app.memory.graph.agent_file import export_agent_file
+
+    result = await export_agent_file(auth.org_id, agent_id, session)
+    return result.model_dump()
+
+
+@router.post("/agent-file/import")
+async def import_agent(
+    data: dict,
+    auth: AuthContext = Depends(require_auth),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    from app.memory.graph.agent_file import AgentFileExport
+
+    agent_file = AgentFileExport.model_validate(data)
+    store = PostgresGraphStore(session)
+    imported_entities = 0
+    for entity in agent_file.entities:
+        await store.upsert_entity(
+            org_id=auth.org_id,
+            name=entity.name,
+            entity_type=entity.type,
+            description=entity.description,
+            embedding=None,
+        )
+        imported_entities += 1
+    await session.commit()
+    return {"imported_entities": imported_entities, "imported_memories": len(agent_file.memories)}
