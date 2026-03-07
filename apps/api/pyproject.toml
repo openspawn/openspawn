@@ -19,6 +19,10 @@ dependencies = [
   "pgvector>=0.3",
   "cryptography>=46.0.5",
   "fastmcp>=3.1.0",
+  "instructor>=1.7",
+  "litellm>=1.55",
+  "voyageai>=0.3",
+  "openai>=1.60",
 ]
 
 [project.optional-dependencies]
