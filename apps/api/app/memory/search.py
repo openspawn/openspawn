@@ -102,6 +102,10 @@ async def hybrid_search(
     # Build visibility filter
     visibility_filter = _build_visibility_filter(requesting_agent_id)
     type_filter = "AND m.type = :memory_type" if memory_type else ""
+    expiry_filter = (
+        "AND (m.expires_at IS NULL OR m.expires_at > NOW()) "
+        "AND (m.metadata->>'expired' IS NULL OR m.metadata->>'expired' != 'true')"
+    )
 
     params: dict[str, str | int | float] = {
         "org_id": str(org_id),
@@ -122,6 +126,7 @@ async def hybrid_search(
               AND 1 - (m.embedding <=> :embedding::vector) >= :threshold
               {visibility_filter}
               {type_filter}
+              {expiry_filter}
             ORDER BY m.embedding <=> :embedding::vector
             LIMIT :fetch_limit
         """)
@@ -141,6 +146,7 @@ async def hybrid_search(
           AND m.content_tsv @@ plainto_tsquery('english', :query)
           {visibility_filter}
           {type_filter}
+          {expiry_filter}
         ORDER BY rank_score DESC
         LIMIT :fetch_limit
     """)

@@ -28,6 +28,13 @@ async def store(
     auth: AuthContext = Depends(require_auth),
 ) -> DataMessageResponse[dict]:
     try:
+        # Compute expires_at from ttl_seconds if provided
+        expires_at = dto.expires_at
+        if expires_at is None and dto.ttl_seconds is not None:
+            import pendulum
+
+            expires_at = pendulum.now("UTC").add(seconds=dto.ttl_seconds)
+
         memory_id = await store_memory(
             session=db,
             org_id=auth.org_id,
@@ -38,7 +45,7 @@ async def store(
             visibility=dto.visibility,
             target_agent_ids=dto.target_agent_ids,
             occurred_at=dto.occurred_at.isoformat() if dto.occurred_at else None,
-            expires_at=dto.expires_at.isoformat() if dto.expires_at else None,
+            expires_at=expires_at.isoformat() if expires_at else None,
             metadata=dto.metadata,
         )
         await db.commit()
