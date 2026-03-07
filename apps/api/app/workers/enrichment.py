@@ -9,7 +9,7 @@ Runs via arq on a cron schedule:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 import structlog
 from arq import cron
@@ -19,9 +19,6 @@ from app.database import async_session
 from app.models.memory import Memory
 from app.workers.config import get_redis_settings
 from app.workers.expiry import expire_memories
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 logger = structlog.get_logger()
 
@@ -38,7 +35,7 @@ async def boost_co_retrieved(ctx: dict) -> int:
     """
     async with async_session() as session:
         # Find memories that share the same retrieval query within 24h
-        rows: Sequence[tuple[str]] = (
+        rows = (
             await session.execute(
                 text("""
                     SELECT m1.id
