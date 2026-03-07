@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 import structlog
+
+if TYPE_CHECKING:
+    from langfuse import Langfuse
 
 logger = structlog.get_logger()
 
@@ -23,7 +27,7 @@ def setup_logfire(app: object) -> None:
     logger.info("logfire enabled")
 
 
-def get_langfuse() -> object | None:
+def get_langfuse() -> Langfuse | None:
     """Return Langfuse client if keys configured, else None."""
     pub = os.getenv("LANGFUSE_PUBLIC_KEY")
     sec = os.getenv("LANGFUSE_SECRET_KEY")

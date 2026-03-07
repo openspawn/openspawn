@@ -138,7 +138,7 @@ async def _llm_decide(existing_content: str, new_content: str) -> DedupDecision:
     langfuse = get_langfuse()
     generation = None
     if langfuse:
-        trace = langfuse.trace(
+        trace = langfuse.trace(  # type: ignore[attr-defined]
             name="dedup_llm_decide",
             input={"existing": existing_content[:200], "new": new_content[:200]},
         )
