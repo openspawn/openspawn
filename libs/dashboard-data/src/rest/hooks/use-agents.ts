@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../client";
 
-export function useAgents() {
+export function useAgents(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
@@ -9,5 +9,6 @@ export function useAgents() {
       if (error) throw error;
       return data;
     },
+    enabled: options?.enabled ?? true,
   });
 }
