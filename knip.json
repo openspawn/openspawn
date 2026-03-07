@@ -17,7 +17,7 @@
       "entry": ["src/main.tsx", "src/routes/**/*.tsx"],
       "ignore": ["**/dist/**"]
     },
-    "apps/api": {
+    "apps/api-nestjs": {
       "entry": ["src/main.ts"],
       "ignore": ["**/dist/**"]
     },

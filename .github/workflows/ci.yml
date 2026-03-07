@@ -4,17 +4,17 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+      - ".gitignore"
   pull_request:
     branches: [main]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'LICENSE'
-      - '.gitignore'
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+      - ".gitignore"
   workflow_dispatch:
 
 concurrency:
@@ -24,7 +24,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:16
@@ -69,14 +69,14 @@ jobs:
 
       - name: Lint
         run: pnpm exec nx run-many -t lint --parallel=3
-        continue-on-error: true  # Don't fail on lint for now
+        continue-on-error: true # Don't fail on lint for now
 
       - name: Build
         run: pnpm exec nx run-many -t build --parallel=3
 
       - name: Test
         run: pnpm exec nx run-many -t test --parallel=3
-        continue-on-error: true  # Tests have pre-existing failures
+        continue-on-error: true # Tests have pre-existing failures
         env:
           DATABASE_URL: postgres://openspawn:openspawn@localhost:5432/openspawn
 
@@ -98,5 +98,34 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: TypeScript check
-        run: pnpm exec tsc --noEmit -p apps/api/tsconfig.app.json
-        continue-on-error: true  # May have issues, don't block
+        run: pnpm exec tsc --noEmit -p apps/api-nestjs/tsconfig.app.json
+        continue-on-error: true # May have issues, don't block
+
+  python-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Setup Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Lint
+        run: uv run ruff check app/ tests/
+
+      - name: Format check
+        run: uv run ruff format --check app/ tests/
+
+      - name: Type check
+        run: uv run pyright app/
+
+      - name: Test
+        run: uv run pytest tests/ -v
