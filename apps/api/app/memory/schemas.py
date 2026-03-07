@@ -55,6 +55,15 @@ class SearchMemoryDto(BaseModel):
     similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0)
 
 
+class ContradictionPairResponse(BaseModel):
+    older_memory: MemoryResponse
+    newer_memory: MemoryResponse
+
+
+class ResolveContradictionDto(BaseModel):
+    strategy: str = Field(description="Resolution strategy: keep_newer, keep_older, merge, flag")
+
+
 class SearchResultResponse(BaseModel):
     memory_id: uuid.UUID
     content: str
