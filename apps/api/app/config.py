@@ -15,7 +15,12 @@ class Settings(BaseSettings):
     database_pool_size: int = 10
     database_pool_max_overflow: int = 20
 
-    cors_origins: list[str] = ["http://localhost:4200", "http://localhost:3333"]
+    cors_origins: list[str] = [
+        "http://localhost:4200",
+        "http://localhost:3333",
+        "https://bikinibottom.ai",
+        "https://openspawn.ai",
+    ]
 
     log_level: str = "INFO"
     log_format: str = "json"

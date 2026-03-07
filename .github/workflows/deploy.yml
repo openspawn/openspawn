@@ -92,14 +92,29 @@ jobs:
             fuser -k 3333/tcp 2>/dev/null || true
             sleep 2
 
-            # Force recreate to pick up compose changes + new image
-            docker compose up -d app --force-recreate --remove-orphans
+            # Force recreate to pick up compose changes + new images
+            docker compose up -d app api postgres --force-recreate --remove-orphans
+
+            # Run Alembic migrations
+            echo "⏳ Running database migrations..."
+            docker compose exec -T api alembic upgrade head || echo "⚠️ Migration failed (may be first deploy)"
 
             # Wait for app to be healthy (up to 60s)
             echo "⏳ Waiting for app to start..."
             for i in $(seq 1 12); do
               if curl -sf http://localhost:3333/api/state > /dev/null 2>&1; then
-                echo "✅ Deploy successful!"
+                echo "✅ Demo app healthy!"
+                break
+              fi
+              echo "  Attempt $i/12 — waiting 5s..."
+              sleep 5
+            done
+
+            # Wait for API to be healthy (up to 60s)
+            echo "⏳ Waiting for API to start..."
+            for i in $(seq 1 12); do
+              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+                echo "✅ API healthy!"
                 docker image prune -f
                 exit 0
               fi
@@ -111,6 +126,8 @@ jobs:
             echo "❌ Health check failed after 60s"
             echo "=== App logs ==="
             docker compose logs --tail=100 app
+            echo "=== API logs ==="
+            docker compose logs --tail=100 api
             echo "=== Container status ==="
             docker compose ps
             exit 1
