@@ -233,7 +233,9 @@ async def record_feedback(
 
     if helpful:
         memory.helpful_count += 1
+        memory.confidence = min(100, memory.confidence + 2)
     else:
         memory.unhelpful_count += 1
+        memory.confidence = max(0, memory.confidence - 5)
 
     return True
