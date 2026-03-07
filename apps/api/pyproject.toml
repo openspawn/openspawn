@@ -1,0 +1,73 @@
+[project]
+name = "openspawn-api"
+version = "0.1.0"
+description = "OpenSpawn API — FastAPI backend for multi-agent coordination"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.34",
+  "pydantic>=2.10",
+  "pydantic-settings>=2.7",
+  "python-dotenv>=1.0",
+  "asyncpg>=0.30",
+  "sqlalchemy[asyncio]>=2.0",
+  "structlog>=24.4",
+  "httpx>=0.28",
+  "pendulum>=3.0",
+  "alembic>=1.18.4",
+  "cryptography>=46.0.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "pytest-cov>=6.0",
+  "ruff>=0.9",
+  "pyright>=1.1",
+  "respx>=0.22",
+  "factory-boy>=3.3",
+  "hypothesis>=6.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "F", # pyflakes
+  "I", # isort
+  "N", # pep8-naming
+  "UP", # pyupgrade
+  "B", # flake8-bugbear
+  "SIM", # flake8-simplify
+  "TCH", # flake8-type-checking
+  "RUF", # ruff-specific
+  "ASYNC", # flake8-async
+]
+ignore = [
+  "E501", # line length handled by formatter
+  "B008", # Depends() in function defaults is standard FastAPI pattern
+]
+
+[tool.ruff.lint.per-file-ignores]
+"app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports for column/relationship resolution
+"app/auth/*.py" = ["TCH002"]  # FastAPI dependencies need runtime type annotations
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

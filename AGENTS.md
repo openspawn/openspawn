@@ -6,19 +6,19 @@ Quick reference for AI agents working on OpenSpawn. Start here.
 
 Multi-agent coordination platform. Agents get tasks, earn credits, communicate. Humans monitor via dashboard.
 
-**Stack**: NestJS API + React Dashboard + PostgreSQL + MCP Server
-**Package Manager**: pnpm
+**Stack**: FastAPI (Python) + React Dashboard + PostgreSQL + MCP Server
+**Package Manager**: pnpm (frontend) + uv (Python API)
 **Build System**: Nx
 
 ---
 
 ## Domains & Deployment
 
-| Domain | What | Container | Port |
-|--------|------|-----------|------|
-| **bikinibottom.ai** | Live demo (sandbox + dashboard + team) | `app` | 3333 |
-| **openspawn.ai** | Website + landing page | `platform` | 3334 |
-| **docs.openspawn.ai** | Astro/Starlight docs | Not yet deployed | — |
+| Domain                | What                                   | Container        | Port |
+| --------------------- | -------------------------------------- | ---------------- | ---- |
+| **bikinibottom.ai**   | Live demo (sandbox + dashboard + team) | `app`            | 3333 |
+| **openspawn.ai**      | Website + landing page                 | `platform`       | 3334 |
+| **docs.openspawn.ai** | Astro/Starlight docs                   | Not yet deployed | —    |
 
 Both containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml` and `deploy-platform.yml` workflows.
 
@@ -32,7 +32,8 @@ apps/
   team/            -> Internal team dashboard
   website/         -> openspawn.ai marketing site
   platform/        -> openspawn.ai landing page
-  api/             -> NestJS backend (REST + GraphQL)
+  api/             -> FastAPI backend (REST + OpenAPI) — Python, uv
+  api-nestjs/      -> NestJS backend (legacy, being replaced)
   docs/            -> Astro Starlight documentation
   mcp/             -> MCP server for agent tools
   sandbox-cli/     -> CLI entry point for sandbox
@@ -64,8 +65,11 @@ packages/
 # Install
 pnpm install
 
-# Dev (API + Demo dashboard)
-pnpm exec nx run-many -t serve -p api,demo
+# Dev (FastAPI)
+cd apps/api && uv run uvicorn app.main:app --reload
+
+# Dev (Legacy NestJS API + Demo dashboard)
+pnpm exec nx run-many -t serve -p api-nestjs,demo
 
 # Dev (Sandbox + Dashboard together)
 pnpm run dev:sandbox
@@ -96,8 +100,9 @@ pnpm exec nx run api:seed
 - Demo dashboard: http://localhost:4200
 - Demo mode: http://localhost:4200/?demo=true
 - Sandbox: http://localhost:3333
-- API: http://localhost:3000
-- GraphQL: http://localhost:3000/graphql
+- API (FastAPI): http://localhost:8000
+- API docs: http://localhost:8000/docs
+- API (NestJS legacy): http://localhost:3000
 
 ---
 
@@ -105,7 +110,7 @@ pnpm exec nx run api:seed
 
 1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
 2. **Demo app** (`apps/demo/`) is the React dashboard for bikinibottom.ai
-3. **API** (`apps/api/`) manages tasks, credits, messages (NestJS + TypeORM)
+3. **API** (`apps/api/`) manages tasks, credits, messages (FastAPI + SQLAlchemy)
 4. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
 5. **Docker** builds demo + team + website, serves all via sandbox server on VPS
 
@@ -115,16 +120,16 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Database Entities
 
-| Entity | Purpose |
-|--------|---------|
-| `Agent` | AI agents with levels (L1-L10), parent hierarchy, balance |
-| `AgentCapability` | Skills per agent with proficiency level |
-| `Task` | Work items with Kanban status flow |
-| `TaskDependency` | Blocking relationships between tasks |
-| `CreditTransaction` | Debits/credits with audit trail |
-| `Channel` | Communication channels (task, DM, broadcast) |
-| `Message` | Messages in channels |
-| `Event` | Append-only system audit log |
+| Entity              | Purpose                                                   |
+| ------------------- | --------------------------------------------------------- |
+| `Agent`             | AI agents with levels (L1-L10), parent hierarchy, balance |
+| `AgentCapability`   | Skills per agent with proficiency level                   |
+| `Task`              | Work items with Kanban status flow                        |
+| `TaskDependency`    | Blocking relationships between tasks                      |
+| `CreditTransaction` | Debits/credits with audit trail                           |
+| `Channel`           | Communication channels (task, DM, broadcast)              |
+| `Message`           | Messages in channels                                      |
+| `Event`             | Append-only system audit log                              |
 
 ---
 
@@ -143,6 +148,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 ## Do Not
 
 - **Edit `apps/dashboard/`** — deprecated, use `apps/demo/` instead
+- **Edit `apps/api-nestjs/`** — legacy, being replaced by `apps/api/` (FastAPI)
 - **Use `npm` or `yarn`** — this project uses pnpm only
 - **Use `any` or `as` casts** — find the correct type
 - **Create barrel files** — use explicit import paths
@@ -164,17 +170,20 @@ pnpm exec nx run-many -t lint      # Lint
 ## Common Tasks
 
 ### Add a new dashboard page
+
 1. Create `apps/demo/src/pages/my-page.tsx`
 2. Export from `apps/demo/src/pages/index.ts`
 3. Add route in `apps/demo/src/app/app.tsx`
 4. Add nav link in `apps/demo/src/components/layout.tsx`
 
 ### Add a GraphQL query
+
 1. Add query to `apps/demo/src/graphql/operations.ts`
 2. Run `pnpm run codegen`
 3. Import hook from `libs/dashboard-data/src/graphql/generated/hooks`
 
 ### Add demo data
+
 1. Add fixtures to `libs/demo-data/src/fixtures/`
 2. Export from `libs/demo-data/src/fixtures/index.ts`
 3. Update scenarios in `libs/demo-data/src/scenarios/`
@@ -183,10 +192,10 @@ pnpm exec nx run-many -t lint      # Lint
 
 ## Deeper Docs
 
-| Topic | Document |
-|-------|----------|
-| Architecture & deployment | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Testing, PRs, dev guide | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Product requirements | [docs/openspawn/PRD.md](docs/openspawn/PRD.md) |
-| API reference (50+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md) |
-| Database schema | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md) |
+| Topic                         | Document                                             |
+| ----------------------------- | ---------------------------------------------------- |
+| Architecture & deployment     | [ARCHITECTURE.md](ARCHITECTURE.md)                   |
+| Testing, PRs, dev guide       | [CONTRIBUTING.md](CONTRIBUTING.md)                   |
+| Product requirements          | [docs/openspawn/PRD.md](docs/openspawn/PRD.md)       |
+| API reference (50+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md)       |
+| Database schema               | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md) |
