@@ -20,5 +20,10 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "json"
 
+    # Observability (all optional)
+    logfire_token: str | None = None
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: str | None = None
+
 
 settings = Settings()
