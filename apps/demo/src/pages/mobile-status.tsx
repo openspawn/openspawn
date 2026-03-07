@@ -30,8 +30,8 @@ import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { getLevelLabel, getLevelColor } from "../lib/status-colors";
-import { AgentStatus } from "@openspawn/shared-types";
-import type { AgentFieldsFragment } from "@openspawn/shared-types";
+import { AgentStatus } from "@openspawn/dashboard-data";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 /* ------------------------------------------------------------------ */
 /*  Status ordering & colors                                           */

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../client";
 
-export function useMessages(channelId?: string) {
+export function useRestMessages(channelId: string) {
   return useQuery({
     queryKey: ["messages", channelId],
     queryFn: async () => {

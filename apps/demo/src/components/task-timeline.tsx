@@ -27,7 +27,7 @@ import { useAgents, useTasks, useMessages } from "../hooks";
 import type { Task } from "../hooks/use-tasks";
 import type { Message } from "../hooks/use-messages";
 import { getTaskStatusVariant } from "../lib/status-colors";
-import { TaskStatus } from "@openspawn/shared-types";
+import { TaskStatus } from "@openspawn/dashboard-data";
 
 // ── Timeline event types ────────────────────────────────────────────────────
 

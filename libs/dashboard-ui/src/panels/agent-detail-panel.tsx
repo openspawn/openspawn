@@ -144,11 +144,11 @@ export function AgentDetailPanel({
   const successRate =
     agent.tasksCompleted > 0 ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100) : 0;
   const trustData = useMemo(
-    () => generateSparklineData(12, agent.trustScore, 8),
+    () => generateSparklineData(12, agent.trustScore > 50 ? "up" : "down"),
     [agent.trustScore],
   );
   const earningsData = useMemo(
-    () => generateSparklineData(12, agent.lifetimeEarnings / 100, 15),
+    () => generateSparklineData(12, agent.lifetimeEarnings > 5000 ? "up" : "stable"),
     [agent.lifetimeEarnings],
   );
   const activeTasks = tasks.filter((t) => !["DONE", "CANCELLED"].includes(t.status.toUpperCase()));

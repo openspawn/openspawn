@@ -8,6 +8,12 @@
   "references": [
     {
       "path": "./tools/sandbox"
+    },
+    {
+      "path": "./libs/dashboard-data"
+    },
+    {
+      "path": "./libs/dashboard-ui"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { AgentStatus, TaskStatus } from "@openspawn/shared-types";
+import { AgentStatus, TaskStatus } from "../graphql/generated/hooks";
 
 /**
  * Shared status → badge variant mapping for agent statuses.

@@ -11,7 +11,7 @@ import {
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-import { AgentMode } from "@openspawn/shared-types";
+import { AgentMode } from "@openspawn/dashboard-data";
 
 interface AgentModeSelectorProps {
   value: AgentMode;
