@@ -1,30 +1,30 @@
 <div align="center">
 
-# 🍍 BikiniBottom
+# 🐙 OpenSpawn
 
 The control plane your AI agents deserve.
 
 [![CI](https://github.com/openspawn/openspawn/actions/workflows/ci.yml/badge.svg)](https://github.com/openspawn/openspawn/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Live Demo](https://bikinibottom.ai/app/) · [Docs](https://bikinibottom.ai/docs) · [ORG.md](https://bikinibottom.ai/org-md) · [GitHub](https://github.com/openspawn/openspawn)
+[Live Demo](https://bikinibottom.ai/app/) · [Website](https://openspawn.ai) · [ORG.md](https://openspawn.ai/org-md) · [GitHub](https://github.com/openspawn/openspawn)
 
 </div>
 
-## What is BikiniBottom?
+## What is OpenSpawn?
 
-BikiniBottom is an open-source multi-agent coordination platform — the control plane for AI agent organizations. Define your org in markdown, coordinate agents via open protocols, and watch them work in a real-time dashboard.
+OpenSpawn is an open-source multi-agent coordination platform — the control plane for AI agent organizations. Define your org in markdown, coordinate agents via open protocols, and watch them work in a real-time dashboard.
 
-**Infrastructure, not a framework.** BikiniBottom doesn't replace your agent stack — it coordinates it. Works with CrewAI, LangGraph, AutoGen, or any A2A-compatible agent. Built on [OpenClaw](https://openclaw.ai).
+**Infrastructure, not a framework.** OpenSpawn doesn't replace your agent stack — it coordinates it. Works with CrewAI, LangGraph, AutoGen, or any A2A-compatible agent. Built on [OpenClaw](https://openclaw.ai).
 
 ## ✨ Key Features
 
-- **ORG.md** — define your entire agent org in markdown ([learn more](https://bikinibottom.ai/org-md))
+- **ORG.md** — define your entire agent org in markdown ([learn more](https://openspawn.ai/org-md))
 - **A2A Protocol** — every agent is discoverable via `/.well-known/agent.json`
 - **MCP Server** — 7 tools via Streamable HTTP at `POST /mcp`
 - **Model Router** — intelligent routing across Ollama, Groq, and OpenRouter
 - **Live Dashboard** — real-time network graph, task timeline, agent details, credits
-- **CLI** — `npx bikinibottom init` to scaffold a new org
+- **CLI** — `npx openspawn init` to scaffold a new org
 - **SSE Updates** — real-time event streaming, no polling
 
 ## ⚡ Quick Start
@@ -43,7 +43,7 @@ Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](ht
 
 ```
                          ┌─────────────────────┐
-  bikinibottom.ai/       │    Website (React)   │
+  openspawn.ai/          │    Website (React)   │
                          └──────────┬───────────┘
                                     │
   bikinibottom.ai/app/   ┌─────────┴───────────┐
@@ -67,11 +67,14 @@ Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](ht
 ## 📦 Project Structure
 
 ```
-apps/dashboard/          # React + TanStack Router dashboard SPA
-apps/website/            # Marketing site + docs
+apps/demo/               # BikiniBottom demo dashboard (bikinibottom.ai)
+apps/team/               # Team dashboard (team.openspawn.ai)
+apps/website/            # Marketing site (openspawn.ai)
+apps/api/                # Python API (FastAPI)
+apps/api-nestjs/         # NestJS API (legacy)
 tools/sandbox/           # Node.js sandbox server (the brain)
-packages/cli/            # BikiniBottom CLI
-docs/strategy/           # Design docs
+packages/cli/            # OpenSpawn CLI
+docs/                    # Design docs & RFCs
 ```
 
 ## 🔗 Protocols
