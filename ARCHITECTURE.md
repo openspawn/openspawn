@@ -1,6 +1,6 @@
 # Architecture
 
-OpenSpawn is an Nx monorepo — multi-agent coordination platform with React dashboards, NestJS API, and a sandbox server.
+OpenSpawn is an Nx monorepo — multi-agent coordination platform with React dashboards, FastAPI backend, and a sandbox server.
 
 ## Monorepo Structure
 
@@ -11,14 +11,12 @@ apps/
   website/         openspawn.ai marketing site
   platform/        openspawn.ai landing page server
   api/             FastAPI backend (REST + OpenAPI) — Python, managed by uv
-  api-nestjs/      NestJS backend (GraphQL + REST) — legacy, being replaced
   docs/            Astro Starlight documentation (docs.openspawn.ai)
   mcp/             MCP server for AI tool integration
   sandbox-cli/     CLI entry point for sandbox
-  dashboard/       DEPRECATED — replaced by demo
 
 libs/
-  dashboard-data/  Shared hooks, auth, GraphQL, utilities
+  dashboard-data/  Shared hooks, auth, utilities
   dashboard-ui/    Shared React UI components (shadcn/ui)
   design-tokens/   Design system tokens (colors, spacing, typography)
   database/        TypeORM entities, migrations, data source
@@ -28,7 +26,6 @@ libs/
 
 tools/
   sandbox/         Coordination sandbox server (SSE + MCP + A2A)
-  sandbox-python/  Python sandbox variant
 
 packages/
   openspawn/       npm CLI package (npx openspawn init)
@@ -38,19 +35,19 @@ packages/
 
 ## Tech Stack
 
-| Layer         | Technology                                                  |
-| ------------- | ----------------------------------------------------------- |
-| API Framework | FastAPI (Python) — migrating from NestJS 11                 |
-| API Protocol  | REST + OpenAPI — migrating from GraphQL (code-first) + REST |
-| Database      | PostgreSQL 16 + SQLAlchemy async — migrating from TypeORM   |
-| Frontend      | React 19 + Vite                                             |
-| Styling       | TailwindCSS v4                                              |
-| Animations    | framer-motion                                               |
-| Graph Viz     | @xyflow/react (ReactFlow)                                   |
-| Build System  | Nx                                                          |
-| Linting       | oxlint + oxfmt                                              |
-| Testing       | Vitest + Playwright                                         |
-| Language      | TypeScript (strict, bundler resolution)                     |
+| Layer         | Technology                              |
+| ------------- | --------------------------------------- |
+| API Framework | FastAPI (Python)                        |
+| API Protocol  | REST + OpenAPI                          |
+| Database      | PostgreSQL 16 + SQLAlchemy async        |
+| Frontend      | React 19 + Vite                         |
+| Styling       | TailwindCSS v4                          |
+| Animations    | framer-motion                           |
+| Graph Viz     | @xyflow/react (ReactFlow)               |
+| Build System  | Nx                                      |
+| Linting       | oxlint + oxfmt                          |
+| Testing       | Vitest + Playwright                     |
+| Language      | TypeScript (strict, bundler resolution) |
 
 ## Deployment Topology
 
@@ -59,21 +56,17 @@ All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy 
 | Domain            | Container  | Port | Serves                                          |
 | ----------------- | ---------- | ---- | ----------------------------------------------- |
 | bikinibottom.ai   | `app`      | 3333 | Sandbox server + demo + team + website (static) |
+| bikinibottom.ai   | `api`      | 8000 | FastAPI backend                                 |
 | openspawn.ai      | `platform` | 3334 | Platform landing page                           |
 | docs.openspawn.ai | —          | —    | Astro/Starlight docs (not yet deployed)         |
 
 The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
 
-| Container            | Domain          | Port | Apps Served                            |
-| -------------------- | --------------- | ---- | -------------------------------------- |
-| `app` (bikinibottom) | bikinibottom.ai | 3333 | sandbox server + demo + team + website |
-| `platform`           | openspawn.ai    | 3334 | platform landing page                  |
-
 ### CI/CD Workflows
 
 | Workflow              | Trigger      | What it does                                       |
 | --------------------- | ------------ | -------------------------------------------------- |
-| `ci.yml`              | All PRs      | Build, test, lint, codegen check                   |
+| `ci.yml`              | All PRs      | Build, test, lint, Python API checks               |
 | `deploy.yml`          | Push to main | Docker build + deploy to VPS (bikinibottom.ai)     |
 | `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai)      |
 | `pages.yml`           | Push to main | GitHub Pages (Jekyll docs + demo) — may be removed |
@@ -89,34 +82,13 @@ The main Dockerfile builds three apps in a multi-stage build:
 
 The runtime stage runs `tools/sandbox/src/index.ts` which serves the API and all static apps.
 
+The API Dockerfile (`apps/api/Dockerfile`) builds the FastAPI backend as a separate container using uv for dependency management.
+
 ## Key Patterns
-
-### GraphQL (Code-First) — Legacy
-
-The NestJS API (`apps/api-nestjs/`) uses code-first GraphQL. Types in `apps/api-nestjs/src/graphql/types/`, resolvers in `apps/api-nestjs/src/graphql/resolvers/`. Being replaced by REST-only FastAPI (`apps/api/`).
-
-### Event-Driven Architecture
-
-Internal events use NestJS's `@OnEvent` decorators for decoupled communication:
-
-- Task lifecycle events trigger webhook notifications
-- Integration sync (GitHub, Linear) listens for entity changes
-- Telemetry records spans on task/agent events
-
-### Integration Provider Interface
-
-All external integrations (GitHub, Linear, future ones) implement `IntegrationProvider`:
-
-```typescript
-interface IntegrationProvider {
-  processInboundWebhook(payload: unknown): Promise<void>;
-  syncOutbound(event: string, data: unknown): Promise<void>;
-}
-```
 
 ### Demo Mode
 
-The dashboard runs entirely client-side in demo mode using a simulation engine (`libs/demo-data/`). No backend needed — the engine generates realistic agent/task data and the mock fetcher intercepts GraphQL requests.
+The dashboard runs entirely client-side in demo mode using a simulation engine (`libs/demo-data/`). No backend needed — the engine generates realistic agent/task data.
 
 ### Agent Hierarchy
 
@@ -133,6 +105,6 @@ All integration endpoints use the `/integrations/` prefix:
 
 ## Database
 
-Entities live in `libs/database/src/entities/`. Migrations are in `libs/database/src/migrations/`. The data source is configured in `libs/database/src/data-source.ts`.
+FastAPI models live in `apps/api/app/models/`. Alembic migrations in `apps/api/alembic/`. TypeORM entities (legacy) in `libs/database/src/entities/`.
 
-Key entities: `Agent`, `Task`, `Message`, `CreditTransaction`, `Webhook`, `GitHubConnection`, `LinearConnection`, `IntegrationLink`.
+Key entities: `Agent`, `Task`, `Message`, `CreditTransaction`, `Memory`, `Organization`.

@@ -2,19 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
+      "type": "debugpy",
       "request": "launch",
-      "name": "Debug api-nestjs with Nx",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "api-nestjs"],
-      "env": {
-        "NODE_OPTIONS": "--inspect=9229"
-      },
+      "name": "Debug FastAPI",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload"],
+      "cwd": "${workspaceFolder}/apps/api",
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "skipFiles": ["<node_internals>/**"],
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/apps/api-nestjs/dist/**/*.(m|c|)js", "!**/node_modules/**"]
+      "justMyCode": true
     }
   ]
 }

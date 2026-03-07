@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import time
-import uuid  # noqa: TC003
+import uuid
 from collections import defaultdict
 from typing import TYPE_CHECKING
 

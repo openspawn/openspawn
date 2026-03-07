@@ -4,6 +4,15 @@ services:
   # API, MCP, and demo run on host via pnpm nx serve
 
   api:
+    build:
+      context: apps/api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/openspawn
+    depends_on:
+      postgres:
+        condition: service_healthy
     profiles: ["full"]
 
   mcp:
