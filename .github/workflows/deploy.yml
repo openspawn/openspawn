@@ -83,8 +83,8 @@ jobs:
             # Log in to GHCR to pull the image
             echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
 
-            # Pull latest image
-            docker compose pull
+            # Pull only the images this workflow builds
+            docker compose pull app api postgres
 
             # Stop native sandbox service if running (port 3333 conflict)
             systemctl stop sandbox 2>/dev/null || true
