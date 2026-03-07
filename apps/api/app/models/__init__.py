@@ -16,6 +16,9 @@ from app.models.enums import (
     EscalationReason,
     EventSeverity,
     IdleReason,
+    MemorySource,
+    MemoryType,
+    MemoryVisibility,
     MessageType,
     Proficiency,
     ReputationEventType,
@@ -28,6 +31,7 @@ from app.models.enums import (
 from app.models.escalation import Escalation
 from app.models.event import Event
 from app.models.integration import GitHubConnection, IntegrationLink, LinearConnection
+from app.models.memory import Memory
 from app.models.message import Channel, Message
 from app.models.organization import Organization
 from app.models.reputation import ReputationEvent
@@ -63,6 +67,10 @@ __all__ = [
     "InboundWebhookKey",
     "IntegrationLink",
     "LinearConnection",
+    "Memory",
+    "MemorySource",
+    "MemoryType",
+    "MemoryVisibility",
     "Message",
     "MessageType",
     "Nonce",

@@ -148,3 +148,23 @@ class ApiKeyScope(enum.StrEnum):
     READ = "read"
     WRITE = "write"
     ADMIN = "admin"
+
+
+class MemoryType(enum.StrEnum):
+    EPISODIC = "episodic"
+    SEMANTIC = "semantic"
+    GRAPH = "graph"
+
+
+class MemoryVisibility(enum.StrEnum):
+    SHARED = "shared"
+    PRIVATE = "private"
+    TARGETED = "targeted"
+
+
+class MemorySource(enum.StrEnum):
+    TASK_COMPLETION = "task_completion"
+    CODE_CHANGE = "code_change"
+    OBSERVATION = "observation"
+    INFERENCE = "inference"
+    UNKNOWN = "unknown"
