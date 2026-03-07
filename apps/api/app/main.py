@@ -5,9 +5,14 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.agents.router import router as agents_router
 from app.config import settings
+from app.credits.router import router as credits_router
 from app.database import engine
+from app.events.router import router as events_router
 from app.logging import setup_logging
+from app.messages.router import router as messages_router
+from app.tasks.router import router as tasks_router
 
 logger = structlog.stdlib.get_logger()
 
@@ -35,6 +40,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(agents_router)
+app.include_router(tasks_router)
+app.include_router(credits_router)
+app.include_router(messages_router)
+app.include_router(events_router)
 
 
 @app.get("/health")
