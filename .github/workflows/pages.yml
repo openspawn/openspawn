@@ -1,15 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - 'apps/dashboard/**'
-      - 'libs/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/pages.yml'
+  # Disabled: workflow references deprecated Jekyll docs + dashboard app.
+  # TODO: rewrite for Astro Starlight (apps/docs) when docs.openspawn.ai is ready.
   workflow_dispatch:
 
 permissions:
@@ -27,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Needed for Nx affected commands
+          fetch-depth: 0 # Needed for Nx affected commands
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -54,13 +47,13 @@ jobs:
       - name: Build demo dashboard
         run: pnpm exec nx build dashboard
         env:
-          VITE_DEMO_MODE: 'true'
-          VITE_API_URL: ''
+          VITE_DEMO_MODE: "true"
+          VITE_API_URL: ""
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: "3.2"
           bundler-cache: true
           working-directory: docs
 
