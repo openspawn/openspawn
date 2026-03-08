@@ -7,6 +7,6 @@ from pathlib import Path
 # Add the api root to sys.path so 'app' package is importable
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.main import app  # noqa: E402
+from app.main import app
 
 json.dump(app.openapi(), sys.stdout, indent=2)

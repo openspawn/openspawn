@@ -73,12 +73,12 @@ class TestEnrichmentWorkerUpdated:
         fn_names = [fn.__name__ for fn in WorkerSettings.functions]
         assert "merge_duplicate_entities" in fn_names
 
-    def test_five_functions_total(self) -> None:
+    def test_six_functions_total(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.functions) == 5
+        assert len(WorkerSettings.functions) == 6
 
-    def test_five_cron_jobs_total(self) -> None:
+    def test_six_cron_jobs_total(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.cron_jobs) == 5
+        assert len(WorkerSettings.cron_jobs) == 6
