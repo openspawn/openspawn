@@ -53,3 +53,69 @@ export interface TaskStore {
   tasks: Task[];
   budgets: Record<string, BudgetEntry>;
 }
+
+// ── Config Enums & Types ────────────────────────────────────────────────────
+
+export enum LlmProvider {
+  Anthropic = "anthropic",
+  OpenAI = "openai",
+  Ollama = "ollama",
+  Groq = "groq",
+  OpenRouter = "openrouter",
+}
+
+export enum OverageBehavior {
+  PauseAndEscalate = "pause-and-escalate",
+  WarnAndContinue = "warn-and-continue",
+  HardStop = "hard-stop",
+}
+
+export enum EscalationBehavior {
+  Immediate = "immediate",
+  Delayed = "delayed",
+  Batched = "batched",
+}
+
+export enum CulturePreset {
+  Agency = "agency",
+  Startup = "startup",
+  Professional = "professional",
+  Ops = "ops",
+  Enterprise = "enterprise",
+  Research = "research",
+  Compliance = "compliance",
+}
+
+export enum OrgValue {
+  Ownership = "ownership",
+  Transparency = "transparency",
+  Measurement = "measurement",
+  Subsidiarity = "subsidiarity",
+  ContinuousImprovement = "continuous-improvement",
+  Speed = "speed",
+  Rigor = "rigor",
+  Frugality = "frugality",
+}
+
+export interface OpenSpawnConfig {
+  orgFile: string;
+  coordinator: { port: number };
+  llm: {
+    provider: LlmProvider;
+    models: { default: string; senior: string };
+    seniorThreshold: number;
+  };
+  budget: {
+    perAgentLimit: number;
+    period: string;
+    alertThreshold: number;
+    overageBehavior: OverageBehavior;
+  };
+  escalation: { behavior: EscalationBehavior };
+  alignment: {
+    mission: string;
+    vision: string;
+    values: OrgValue[];
+  };
+  culture: { preset: CulturePreset };
+}
