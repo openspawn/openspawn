@@ -77,7 +77,7 @@ const features = [
     illustration: ZeroConfigCliIllustration,
     title: "Zero-Config CLI",
     description:
-      "Go from zero to a running agent org in under 30 seconds. Scaffold, start, and deploy with a single command.",
+      "Go from zero to a running agent org in under 30 seconds. The init wizard scaffolds roles, hierarchy, and alignment values drawn from Edmondson's psychological safety research, Drucker's management by objectives, and Katzenbach & Smith's team accountability model — each mapping to a specific agent behavior constraint.",
     color: "text-slate-300",
     href: "/docs/getting-started",
   },
