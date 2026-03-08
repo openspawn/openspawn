@@ -1,5 +1,5 @@
 # ── OpenSpawn Caddy Config ────────────────────────────────────────────────────
-# Auto-HTTPS via Let's Encrypt. Place at /opt/bikinibottom/Caddyfile
+# Auto-HTTPS via Let's Encrypt. Place at /opt/openspawn/Caddyfile
 
 bikinibottom.ai {
 	reverse_proxy app:3333

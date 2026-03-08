@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "deploy/docker-compose.yml,deploy/Caddyfile"
-          target: /opt/bikinibottom
+          target: /opt/openspawn
           strip_components: 1
 
       - name: Deploy to VPS
@@ -75,7 +75,7 @@ jobs:
           envs: GH_TOKEN
           script: |
             set -e
-            cd /opt/bikinibottom
+            cd /opt/openspawn
 
             # Create .env.production if it doesn't exist
             touch .env.production
