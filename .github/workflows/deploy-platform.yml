@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "deploy/docker-compose.yml"
-          target: /opt/bikinibottom
+          target: /opt/openspawn
           strip_components: 1
 
       - name: Deploy to VPS
@@ -61,7 +61,7 @@ jobs:
           envs: GH_TOKEN
           script: |
             set -e
-            cd /opt/bikinibottom
+            cd /opt/openspawn
 
             echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
 

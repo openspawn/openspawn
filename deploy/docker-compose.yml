@@ -5,7 +5,7 @@
 #   - platform (port 3334) — OpenSpawn landing at openspawn.ai
 # System Caddy handles HTTPS reverse proxy (see Caddyfile)
 #
-# Expected at /opt/bikinibottom/docker-compose.yml on the VPS
+# Expected at /opt/openspawn/docker-compose.yml on the VPS
 
 services:
   app:
