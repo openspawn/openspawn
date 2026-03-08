@@ -8,22 +8,22 @@ title: Values Framework
 
 Every agent in an OpenSpawn org gets a SOUL.md — its identity, constraints, and operating principles. During `openspawn init`, the wizard asks which alignment values to include. Each selected value becomes a ~50-token directive injected into every agent's SOUL.md, shaping how it handles ambiguity, prioritizes work, and communicates.
 
-Patrick Lencioni draws a useful distinction between *core* values (non-negotiable behaviors the org already exhibits) and *aspirational* values (behaviors the org wants but doesn't yet have) (*The Advantage*, 2012). OpenSpawn ships five core values enabled by default. Three additional aspirational values are available for orgs that need them — but they introduce tradeoffs.
+Patrick Lencioni draws a useful distinction between _core_ values (non-negotiable behaviors the org already exhibits) and _aspirational_ values (behaviors the org wants but doesn't yet have) (_The Advantage_, 2012). OpenSpawn ships five core values enabled by default. Three additional aspirational values are available for orgs that need them — but they introduce tradeoffs.
 
 ---
 
 ## Quick reference
 
-| Value | Default | Source | What it does |
-|-------|---------|--------|--------------|
-| [Ownership](#ownership) | Yes | Katzenbach & Smith (1993) | Single-threaded task ownership — every task ships or escalates |
-| [Transparency](#transparency) | Yes | Edmondson (1999) | Agents surface problems early instead of guessing |
-| [Measurement](#measurement) | Yes | Drucker (1954) | Agents report outcomes with evidence, not activity summaries |
-| [Subsidiarity](#subsidiarity) | Yes | Rogers & Blenko (2006) | Decisions made at the lowest competent level |
-| [Continuous Improvement](#continuous-improvement) | Yes | Senge (1990) | Mistakes documented, processes updated, never repeated |
-| [Speed](#speed) | No | — | Bias toward action; ship small, iterate fast |
-| [Rigor](#rigor) | No | — | Depth over speed; verify before asserting |
-| [Frugality](#frugality) | No | — | Cheap models for mechanical tasks, expensive for reasoning |
+| Value                                             | Default | Source                    | What it does                                                   |
+| ------------------------------------------------- | ------- | ------------------------- | -------------------------------------------------------------- |
+| [Ownership](#ownership)                           | Yes     | Katzenbach & Smith (1993) | Single-threaded task ownership — every task ships or escalates |
+| [Transparency](#transparency)                     | Yes     | Edmondson (1999)          | Agents surface problems early instead of guessing              |
+| [Measurement](#measurement)                       | Yes     | Drucker (1954)            | Agents report outcomes with evidence, not activity summaries   |
+| [Subsidiarity](#subsidiarity)                     | Yes     | Rogers & Blenko (2006)    | Decisions made at the lowest competent level                   |
+| [Continuous Improvement](#continuous-improvement) | Yes     | Senge (1990)              | Mistakes documented, processes updated, never repeated         |
+| [Speed](#speed)                                   | No      | —                         | Bias toward action; ship small, iterate fast                   |
+| [Rigor](#rigor)                                   | No      | —                         | Depth over speed; verify before asserting                      |
+| [Frugality](#frugality)                           | No      | —                         | Cheap models for mechanical tasks, expensive for reasoning     |
 
 ---
 
@@ -51,7 +51,7 @@ To change values: edit `openspawn.config.json` directly, or re-run `openspawn in
 
 > Every task has exactly one owner. It ships or it escalates — never drifts.
 
-**Source:** Katzenbach & Smith (1993). The Discipline of Teams. *Harvard Business Review*, 71(2), 111-120. The key finding: teams with clear individual accountability outperform teams with diffuse responsibility. "Mutual accountability" doesn't mean shared ownership — it means each person owns a specific deliverable.
+**Source:** Katzenbach & Smith (1993). The Discipline of Teams. _Harvard Business Review_, 71(2), 111-120. The key finding: teams with clear individual accountability outperform teams with diffuse responsibility. "Mutual accountability" doesn't mean shared ownership — it means each person owns a specific deliverable.
 
 **Agent behavior:** When an agent receives a task via `task_create`, it becomes the single-threaded owner. It doesn't wait for consensus or share the work. If blocked, it calls `escalate` immediately rather than stalling. If the task is outside its capability, it uses `delegate` to transfer ownership — not add a collaborator.
 
@@ -65,7 +65,7 @@ To change values: edit `openspawn.config.json` directly, or re-run `openspawn in
 
 > Surface problems early. Silent failure is the worst outcome.
 
-**Source:** Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. *Administrative Science Quarterly*, 44(2), 350-383. Edmondson's research at Harvard showed that teams with psychological safety report errors faster — and counterintuitively, higher-performing teams report *more* errors because they catch them earlier.
+**Source:** Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2), 350-383. Edmondson's research at Harvard showed that teams with psychological safety report errors faster — and counterintuitively, higher-performing teams report _more_ errors because they catch them earlier.
 
 **Agent behavior:** When an agent encounters ambiguity or a potential failure, it calls `escalate` with a clear description rather than guessing. When completing a task via `report`, it includes what went wrong alongside what succeeded. Agents never suppress errors or uncertainties to appear competent.
 
@@ -79,7 +79,7 @@ To change values: edit `openspawn.config.json` directly, or re-run `openspawn in
 
 > Track outcomes, not activity. Evidence over assertion.
 
-**Source:** Drucker, P. (1954). *The Practice of Management*. Harper & Brothers. Drucker's central insight: "What gets measured gets managed." But the emphasis is on measuring the *right* things — outcomes and results, not hours worked or tasks touched.
+**Source:** Drucker, P. (1954). _The Practice of Management_. Harper & Brothers. Drucker's central insight: "What gets measured gets managed." But the emphasis is on measuring the _right_ things — outcomes and results, not hours worked or tasks touched.
 
 **Agent behavior:** When an agent calls `report`, it includes measurable outcomes: row counts, pass/fail rates, error counts, duration. It never reports "worked on migration" — it reports "migrated 1.2M rows, 3 schema conflicts resolved, checksum verified." Status updates reference concrete artifacts.
 
@@ -93,7 +93,7 @@ To change values: edit `openspawn.config.json` directly, or re-run `openspawn in
 
 > Decisions at the lowest competent level. Solve before escalating.
 
-**Source:** Rogers, P. & Blenko, M. (2006). Who Has the D? *Harvard Business Review*, 84(1), 52-61. Their research at Bain found that decision bottlenecks — not lack of information — are the primary cause of organizational slowness. Pushing decisions downward eliminates round trips.
+**Source:** Rogers, P. & Blenko, M. (2006). Who Has the D? _Harvard Business Review_, 84(1), 52-61. Their research at Bain found that decision bottlenecks — not lack of information — are the primary cause of organizational slowness. Pushing decisions downward eliminates round trips.
 
 **Agent behavior:** Before calling `escalate`, the agent first attempts to resolve the issue using its own capabilities. An L5 agent that encounters a data format mismatch fixes it and documents the fix, rather than escalating to the L7 lead for a decision. Agents only escalate when the problem genuinely exceeds their capability or authority level.
 
@@ -107,7 +107,7 @@ To change values: edit `openspawn.config.json` directly, or re-run `openspawn in
 
 > Document every mistake. Update the process. Never repeat.
 
-**Source:** Senge, P. (1990). *The Fifth Discipline*. Doubleday. Senge's concept of the "learning organization" — systems that improve through feedback loops rather than static procedures. The key mechanism: structured reflection after every cycle.
+**Source:** Senge, P. (1990). _The Fifth Discipline_. Doubleday. Senge's concept of the "learning organization" — systems that improve through feedback loops rather than static procedures. The key mechanism: structured reflection after every cycle.
 
 **Agent behavior:** After completing or failing a task, the agent documents what happened and what should change. When an agent calls `report` on a failed task, it includes a root-cause analysis and a process update recommendation. Over time, this builds an institutional memory that prevents repeated mistakes.
 
@@ -171,11 +171,11 @@ These values address specific operational needs. They are not enabled by default
 
 ### Conflicting pairs
 
-| Pair | Conflict | Resolution |
-|------|----------|------------|
-| Speed + Rigor | Ship fast vs. verify first | Pick one based on domain. Incident response needs Speed. Compliance needs Rigor. |
-| Subsidiarity + Transparency | Solve locally vs. surface everything | These actually complement: solve locally *and* report what you solved. But in high-stakes domains, drop Subsidiarity so every decision is visible. |
-| Frugality + Rigor | Cheap models vs. thorough verification | Frugality routes mechanical tasks to cheap models. Rigor ensures verification on all tasks. Together, they work — but only if your task decomposition is clean enough to separate mechanical from reasoning work. |
+| Pair                        | Conflict                               | Resolution                                                                                                                                                                                                        |
+| --------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Speed + Rigor               | Ship fast vs. verify first             | Pick one based on domain. Incident response needs Speed. Compliance needs Rigor.                                                                                                                                  |
+| Subsidiarity + Transparency | Solve locally vs. surface everything   | These actually complement: solve locally _and_ report what you solved. But in high-stakes domains, drop Subsidiarity so every decision is visible.                                                                |
+| Frugality + Rigor           | Cheap models vs. thorough verification | Frugality routes mechanical tasks to cheap models. Rigor ensures verification on all tasks. Together, they work — but only if your task decomposition is clean enough to separate mechanical from reasoning work. |
 
 ### Token cost
 
@@ -189,13 +189,13 @@ Each value adds ~50 tokens to every agent's SOUL.md. With 5 values and 4 agents,
 
 Each template ships with values tuned to its domain:
 
-| Template | Values | Rationale |
-|----------|--------|-----------|
-| `assistant-team` | Ownership, Transparency, Measurement, Subsidiarity, Continuous Improvement | General-purpose — all five core values |
-| `dev-shop` | Ownership, Transparency, Measurement, Rigor | Engineering work needs verification over speed |
-| `incident-response` | Ownership, Transparency, Speed | Incidents need fast action with clear ownership |
-| `compliance-monitoring` | Ownership, Transparency, Measurement, Rigor | Regulatory work requires thorough, evidence-based output |
-| `research-lab` | Measurement, Subsidiarity, Rigor | Research agents need autonomy and depth |
+| Template                | Values                                                                     | Rationale                                                |
+| ----------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `assistant-team`        | Ownership, Transparency, Measurement, Subsidiarity, Continuous Improvement | General-purpose — all five core values                   |
+| `dev-shop`              | Ownership, Transparency, Measurement, Rigor                                | Engineering work needs verification over speed           |
+| `incident-response`     | Ownership, Transparency, Speed                                             | Incidents need fast action with clear ownership          |
+| `compliance-monitoring` | Ownership, Transparency, Measurement, Rigor                                | Regulatory work requires thorough, evidence-based output |
+| `research-lab`          | Measurement, Subsidiarity, Rigor                                           | Research agents need autonomy and depth                  |
 
 > **Q: Why doesn't every template include all five core values?**
 >
@@ -231,24 +231,24 @@ This walks through the 8-step wizard again, including value selection, without o
 
 ### Valid value identifiers
 
-| Identifier | Value |
-|------------|-------|
-| `ownership` | Ownership |
-| `transparency` | Transparency |
-| `measurement` | Measurement |
-| `subsidiarity` | Subsidiarity |
+| Identifier               | Value                  |
+| ------------------------ | ---------------------- |
+| `ownership`              | Ownership              |
+| `transparency`           | Transparency           |
+| `measurement`            | Measurement            |
+| `subsidiarity`           | Subsidiarity           |
 | `continuous-improvement` | Continuous Improvement |
-| `speed` | Speed |
-| `rigor` | Rigor |
-| `frugality` | Frugality |
+| `speed`                  | Speed                  |
+| `rigor`                  | Rigor                  |
+| `frugality`              | Frugality              |
 
 ---
 
 ## References
 
-- Drucker, P. (1954). *The Practice of Management*. Harper & Brothers.
-- Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. *Administrative Science Quarterly*, 44(2), 350-383.
-- Katzenbach, J. & Smith, D. (1993). The Discipline of Teams. *Harvard Business Review*, 71(2), 111-120.
-- Lencioni, P. (2012). *The Advantage*. Jossey-Bass.
-- Rogers, P. & Blenko, M. (2006). Who Has the D? *Harvard Business Review*, 84(1), 52-61.
-- Senge, P. (1990). *The Fifth Discipline*. Doubleday.
+- Drucker, P. (1954). _The Practice of Management_. Harper & Brothers.
+- Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2), 350-383.
+- Katzenbach, J. & Smith, D. (1993). The Discipline of Teams. _Harvard Business Review_, 71(2), 111-120.
+- Lencioni, P. (2012). _The Advantage_. Jossey-Bass.
+- Rogers, P. & Blenko, M. (2006). Who Has the D? _Harvard Business Review_, 84(1), 52-61.
+- Senge, P. (1990). _The Fifth Discipline_. Doubleday.

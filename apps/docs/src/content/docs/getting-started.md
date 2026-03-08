@@ -61,24 +61,24 @@ Choose from 11 templates:
 
 **General-purpose:**
 
-| Template | Use case |
-|----------|----------|
+| Template         | Use case                               |
+| ---------------- | -------------------------------------- |
 | `assistant-team` | Chief of staff + specialists (default) |
-| `content-agency` | Content production pipeline |
-| `dev-shop` | Software development team |
-| `research-lab` | Research & analysis team |
+| `content-agency` | Content production pipeline            |
+| `dev-shop`       | Software development team              |
+| `research-lab`   | Research & analysis team               |
 
 **Industry-specific:**
 
-| Template | Industry | Use case |
-|----------|----------|----------|
-| `saas-onboarding` | SaaS | Customer onboarding pipeline |
-| `incident-response` | DevOps | Production incident management |
-| `contract-review` | Legal | Contract review and risk analysis |
-| `compliance-monitoring` | Fintech | Transaction monitoring and reporting |
-| `game-live-ops` | Gaming | Live operations and player engagement |
-| `catalog-management` | E-commerce | Product catalog and pricing |
-| `clinical-trials` | Healthcare | Clinical trial data processing |
+| Template                | Industry   | Use case                              |
+| ----------------------- | ---------- | ------------------------------------- |
+| `saas-onboarding`       | SaaS       | Customer onboarding pipeline          |
+| `incident-response`     | DevOps     | Production incident management        |
+| `contract-review`       | Legal      | Contract review and risk analysis     |
+| `compliance-monitoring` | Fintech    | Transaction monitoring and reporting  |
+| `game-live-ops`         | Gaming     | Live operations and player engagement |
+| `catalog-management`    | E-commerce | Product catalog and pricing           |
+| `clinical-trials`       | Healthcare | Clinical trial data processing        |
 
 ### Step 2 — Org name
 
@@ -88,16 +88,16 @@ Name your organization. Default: "My Agent Team".
 
 Define your org's alignment values. The wizard offers 8 values — 5 enabled by default — each injected into agent system prompts (~50 tokens each) to shape decision-making without rigid rules.
 
-| Value | Default | Agent Behavior |
-|-------|---------|----------------|
-| Ownership | Yes | Single-threaded task ownership; ships or escalates |
-| Transparency | Yes | Escalate instead of silently failing |
-| Measurement | Yes | Report outcomes with evidence |
-| Subsidiarity | Yes | Solve at lowest competent level |
-| Continuous Improvement | Yes | Auto post-mortems, process updates |
-| Speed | No | Bias toward action, ship small |
-| Rigor | No | Depth over speed, verify first |
-| Frugality | No | Cheap models for mechanical tasks |
+| Value                  | Default | Agent Behavior                                     |
+| ---------------------- | ------- | -------------------------------------------------- |
+| Ownership              | Yes     | Single-threaded task ownership; ships or escalates |
+| Transparency           | Yes     | Escalate instead of silently failing               |
+| Measurement            | Yes     | Report outcomes with evidence                      |
+| Subsidiarity           | Yes     | Solve at lowest competent level                    |
+| Continuous Improvement | Yes     | Auto post-mortems, process updates                 |
+| Speed                  | No      | Bias toward action, ship small                     |
+| Rigor                  | No      | Depth over speed, verify first                     |
+| Frugality              | No      | Cheap models for mechanical tasks                  |
 
 Each value draws from established organizational research — Edmondson's work on psychological safety, Drucker's management by objectives, Katzenbach & Smith's team accountability model. Each directive is deliberately short (~50 tokens) so it fits in a system prompt without consuming your context window.
 
@@ -107,15 +107,15 @@ See the [Values Framework guide](/guides/values-framework/) for the full rationa
 
 Choose how agents communicate and escalate. Default: `agency`.
 
-| Preset | Escalation | Progress reports | Hierarchy depth |
-|--------|------------|------------------|-----------------|
-| `agency` | Immediate | Every tick | 3–4 levels |
-| `startup` | Immediate | Frequent | 2–3 levels |
-| `professional` | Batched | On milestone | 3–5 levels |
-| `ops` | Immediate | Every tick | Strict chain |
-| `enterprise` | Batched | On phase change | 5–8 levels |
-| `research` | Delayed | On request | 2–3 levels |
-| `compliance` | Immediate | Every action | 4–6 levels |
+| Preset         | Escalation | Progress reports | Hierarchy depth |
+| -------------- | ---------- | ---------------- | --------------- |
+| `agency`       | Immediate  | Every tick       | 3–4 levels      |
+| `startup`      | Immediate  | Frequent         | 2–3 levels      |
+| `professional` | Batched    | On milestone     | 3–5 levels      |
+| `ops`          | Immediate  | Every tick       | Strict chain    |
+| `enterprise`   | Batched    | On phase change  | 5–8 levels      |
+| `research`     | Delayed    | On request       | 2–3 levels      |
+| `compliance`   | Immediate  | Every action     | 4–6 levels      |
 
 ### Step 5 — LLM provider & model
 
@@ -200,6 +200,7 @@ This runs the MCP server over stdio instead of HTTP, suitable for direct integra
 > ```
 >
 > Or set it in `openspawn.config.json`:
+>
 > ```json
 > { "port": 9000 }
 > ```
@@ -244,38 +245,38 @@ The coordinator connects to Postgres for persistent task history and Redis for p
 
 Scaffold a new agent organization.
 
-| Flag | Description |
-|------|-------------|
-| `-t, --template <name>` | Use a specific template |
-| `-y, --yes` | Accept all defaults |
-| `--non-interactive` | No prompts, use defaults (same as `-y`) |
-| `--dry-run` | Preview output without writing files |
-| `--deploy` | Include docker-compose.yml for production |
-| `-p, --port <number>` | Set coordinator port (default: 8787) |
-| `-d, --directory <path>` | Output directory (default: org name) |
+| Flag                     | Description                               |
+| ------------------------ | ----------------------------------------- |
+| `-t, --template <name>`  | Use a specific template                   |
+| `-y, --yes`              | Accept all defaults                       |
+| `--non-interactive`      | No prompts, use defaults (same as `-y`)   |
+| `--dry-run`              | Preview output without writing files      |
+| `--deploy`               | Include docker-compose.yml for production |
+| `-p, --port <number>`    | Set coordinator port (default: 8787)      |
+| `-d, --directory <path>` | Output directory (default: org name)      |
 
 ### `openspawn start`
 
 Start the coordination server.
 
-| Flag | Description |
-|------|-------------|
+| Flag              | Description                 |
+| ----------------- | --------------------------- |
 | `--port <number>` | Server port (default: 8787) |
-| `--stdio` | Run MCP server over stdio |
+| `--stdio`         | Run MCP server over stdio   |
 
 ### Other commands
 
-| Command | Description |
-|---------|-------------|
-| `openspawn status` | Show agent hierarchy and task summary |
-| `openspawn org` | Display parsed ORG.md structure |
-| `openspawn hire <role>` | Add an agent to the org |
-| `openspawn fire <agent>` | Remove an agent from the org |
-| `openspawn task <description>` | Create a new task |
-| `openspawn delegate <task> <agent>` | Assign a task to an agent |
-| `openspawn escalate <task>` | Escalate a task up the chain |
-| `openspawn report <task>` | Get a task status report |
-| `openspawn budget` | Show credit balances and usage |
+| Command                             | Description                           |
+| ----------------------------------- | ------------------------------------- |
+| `openspawn status`                  | Show agent hierarchy and task summary |
+| `openspawn org`                     | Display parsed ORG.md structure       |
+| `openspawn hire <role>`             | Add an agent to the org               |
+| `openspawn fire <agent>`            | Remove an agent from the org          |
+| `openspawn task <description>`      | Create a new task                     |
+| `openspawn delegate <task> <agent>` | Assign a task to an agent             |
+| `openspawn escalate <task>`         | Escalate a task up the chain          |
+| `openspawn report <task>`           | Get a task status report              |
+| `openspawn budget`                  | Show credit balances and usage        |
 
 ---
 
