@@ -93,6 +93,9 @@ jobs:
             fuser -k 3333/tcp 2>/dev/null || true
             sleep 2
 
+            # Update Caddy config and reload
+            cp Caddyfile /etc/caddy/Caddyfile 2>/dev/null && systemctl reload caddy 2>/dev/null || true
+
             # Force recreate to pick up compose changes + new images
             docker compose up -d app api postgres --force-recreate --remove-orphans
 

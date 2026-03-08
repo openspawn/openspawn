@@ -1,8 +1,9 @@
 # ── OpenSpawn Caddy Config ────────────────────────────────────────────────────
 # Auto-HTTPS via Let's Encrypt. Place at /opt/openspawn/Caddyfile
+# Caddy runs on host, containers expose ports to localhost.
 
 bikinibottom.ai {
-	reverse_proxy app:3333
+	reverse_proxy localhost:3333
 
 	header {
 		X-Content-Type-Options nosniff
@@ -21,11 +22,11 @@ bikinibottom.ai {
 openspawn.ai {
 	# API at /api/ -> FastAPI container
 	handle_path /api/* {
-		reverse_proxy api:8000
+		reverse_proxy localhost:8000
 	}
 
 	# Everything else -> platform landing page
-	reverse_proxy platform:3334
+	reverse_proxy localhost:3334
 
 	header {
 		X-Content-Type-Options nosniff
