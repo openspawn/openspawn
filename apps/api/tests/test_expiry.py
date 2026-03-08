@@ -44,9 +44,9 @@ class TestExpiryWorkerRegistered:
     def test_expire_cron_registered(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.cron_jobs) == 5
+        assert len(WorkerSettings.cron_jobs) == 6
 
-    def test_worker_has_five_functions(self) -> None:
+    def test_worker_has_six_functions(self) -> None:
         from app.workers.enrichment import WorkerSettings
 
-        assert len(WorkerSettings.functions) == 5
+        assert len(WorkerSettings.functions) == 6

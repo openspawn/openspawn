@@ -15,6 +15,7 @@ import structlog
 from arq import cron
 from sqlalchemy import and_, select, text
 
+from app.coordination.sla_monitor import monitor_sla
 from app.database import async_session
 from app.models.memory import Memory
 from app.workers.config import get_redis_settings
@@ -160,6 +161,7 @@ class WorkerSettings:
         extract_entities,
         expire_memories,
         merge_duplicate_entities,
+        monitor_sla,
     ]
     cron_jobs: ClassVar[list] = [
         cron(boost_co_retrieved, hour={0, 6, 12, 18}),  # 4x daily
@@ -167,5 +169,6 @@ class WorkerSettings:
         cron(extract_entities, hour={4}),  # once daily at 4am
         cron(expire_memories, minute={0}),  # every hour
         cron(merge_duplicate_entities, hour={5}),  # once daily at 5am
+        cron(monitor_sla, second={0}),  # every minute
     ]
     redis_settings = get_redis_settings()

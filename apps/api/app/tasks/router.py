@@ -93,6 +93,7 @@ async def create_task(
         approval_required=dto.approval_required,
         due_date=dto.due_at,
         metadata_=dto.metadata,
+        required_capabilities=dto.required_capabilities,
     )
     db.add(task)
     await db.flush()
@@ -100,6 +101,12 @@ async def create_task(
     # Add tags
     for tag_str in dto.tags:
         db.add(TaskTag(org_id=auth.org_id, task_id=task.id, tag=tag_str))
+
+    # Auto-route if no assignee specified
+    if task.assignee_id is None and task.required_capabilities:
+        from app.coordination.router import route_task
+
+        await route_task(db, task, auth.org_id, creator_id)
 
     await db.commit()
     await db.refresh(task)
@@ -174,6 +181,12 @@ async def transition_task(
 
     if dto.status == TaskStatus.DONE:
         task.completed_at = pendulum.now("UTC")
+
+    # Sync parent status if this task has a parent
+    if task.parent_task_id:
+        from app.coordination.status_sync import sync_parent_status
+
+        await sync_parent_status(db, task, auth.id)
 
     await db.commit()
     await db.refresh(task)
