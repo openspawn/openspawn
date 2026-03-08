@@ -14,6 +14,7 @@ export default defineConfig({
             { label: "Introduction", link: "/getting-started/" },
             { label: "Agent Quickstart", link: "/guides/agent-quickstart/" },
             { label: "Templates Guide", link: "/guides/templates/" },
+            { label: "Values Framework", link: "/guides/values-framework/" },
             { label: "Comparison", link: "/guides/comparison/" },
             { label: "FAQ", link: "/faq/" },
           ],
