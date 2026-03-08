@@ -29,8 +29,7 @@ export const defaultConfig: OpenSpawnConfig = {
   alignment: {
     mission:
       "Deliver measurable outcomes through autonomous coordination, escalating when uncertain.",
-    vision:
-      "Every task owned, every blocker surfaced, every outcome measured.",
+    vision: "Every task owned, every blocker surfaced, every outcome measured.",
     values: [
       OrgValue.Ownership,
       OrgValue.Transparency,

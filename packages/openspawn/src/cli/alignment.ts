@@ -70,18 +70,14 @@ export const VALUE_DEFINITIONS: ValueDefinition[] = [
   },
 ];
 
-export const DEFAULT_VALUES: OrgValue[] = VALUE_DEFINITIONS
-  .filter((v) => v.isDefault)
-  .map((v) => v.value);
+export const DEFAULT_VALUES: OrgValue[] = VALUE_DEFINITIONS.filter((v) => v.isDefault).map(
+  (v) => v.value,
+);
 
 export function getConflicts(selected: string[]): string[] {
   const conflicts: string[] = [];
   for (const def of VALUE_DEFINITIONS) {
-    if (
-      def.conflictsWith &&
-      selected.includes(def.value) &&
-      selected.includes(def.conflictsWith)
-    ) {
+    if (def.conflictsWith && selected.includes(def.value) && selected.includes(def.conflictsWith)) {
       const other = VALUE_DEFINITIONS.find((d) => d.value === def.conflictsWith);
       if (other) {
         const msg = `${def.label} conflicts with ${other.label}`;

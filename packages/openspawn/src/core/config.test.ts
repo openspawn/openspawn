@@ -22,9 +22,7 @@ describe("parseConfig", () => {
     const config = parseConfig(dir);
     expect(config).toEqual(defaultConfig);
     expect(config.llm.provider).toBe(LlmProvider.Anthropic);
-    expect(config.budget.overageBehavior).toBe(
-      OverageBehavior.PauseAndEscalate,
-    );
+    expect(config.budget.overageBehavior).toBe(OverageBehavior.PauseAndEscalate);
     expect(config.escalation.behavior).toBe(EscalationBehavior.Immediate);
     expect(config.culture.preset).toBe(CulturePreset.Agency);
   });
@@ -37,11 +35,7 @@ describe("parseConfig", () => {
       },
       budget: { perAgentLimit: 50 },
     };
-    writeFileSync(
-      join(dir, "openspawn.config.json"),
-      JSON.stringify(partial),
-      "utf-8",
-    );
+    writeFileSync(join(dir, "openspawn.config.json"), JSON.stringify(partial), "utf-8");
 
     const config = parseConfig(dir);
 
@@ -54,12 +48,8 @@ describe("parseConfig", () => {
     // defaults preserved
     expect(config.llm.seniorThreshold).toBe(defaultConfig.llm.seniorThreshold);
     expect(config.budget.period).toBe(defaultConfig.budget.period);
-    expect(config.budget.alertThreshold).toBe(
-      defaultConfig.budget.alertThreshold,
-    );
-    expect(config.budget.overageBehavior).toBe(
-      defaultConfig.budget.overageBehavior,
-    );
+    expect(config.budget.alertThreshold).toBe(defaultConfig.budget.alertThreshold);
+    expect(config.budget.overageBehavior).toBe(defaultConfig.budget.overageBehavior);
     expect(config.coordinator.port).toBe(defaultConfig.coordinator.port);
     expect(config.alignment).toEqual(defaultConfig.alignment);
   });
@@ -70,11 +60,7 @@ describe("parseConfig", () => {
         values: [OrgValue.Speed, OrgValue.Rigor],
       },
     };
-    writeFileSync(
-      join(dir, "openspawn.config.json"),
-      JSON.stringify(partial),
-      "utf-8",
-    );
+    writeFileSync(join(dir, "openspawn.config.json"), JSON.stringify(partial), "utf-8");
 
     const config = parseConfig(dir);
     expect(config.alignment.values).toEqual([OrgValue.Speed, OrgValue.Rigor]);
@@ -85,10 +71,7 @@ describe("writeConfig", () => {
   it("writes config to file correctly", () => {
     writeConfig(dir, defaultConfig);
 
-    const raw = readFileSync(
-      join(dir, "openspawn.config.json"),
-      "utf-8",
-    );
+    const raw = readFileSync(join(dir, "openspawn.config.json"), "utf-8");
     const parsed: unknown = JSON.parse(raw);
     expect(parsed).toEqual(defaultConfig);
   });
