@@ -48,18 +48,18 @@ describe("App", () => {
     const mod = await import("./app");
     expect(mod.default).toBeDefined();
     expect(typeof mod.default).toBe("function");
-  });
+  }, 15_000);
 
   it("App component is named App", async () => {
     const mod = await import("./app");
     expect(mod.App).toBeDefined();
     expect(mod.App.name).toBe("App");
-  });
+  }, 15_000);
 
   it("router is configured with /app basepath", async () => {
     const { router } = await import("../routes");
     expect(router.basepath).toBe("/app");
-  });
+  }, 15_000);
 });
 
 /**

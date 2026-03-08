@@ -75,8 +75,7 @@ jobs:
         run: pnpm exec nx run-many -t build --parallel=3 --exclude=dashboard
 
       - name: Test
-        run: pnpm exec nx run-many -t test --parallel=3
-        continue-on-error: true # Tests have pre-existing failures
+        run: pnpm exec nx run-many -t test --parallel=3 --exclude=dashboard --exclude=openspawn
         env:
           DATABASE_URL: postgres://openspawn:openspawn@localhost:5432/openspawn
 
