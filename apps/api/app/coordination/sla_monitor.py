@@ -109,6 +109,8 @@ async def _emit_warning(db: AsyncSession, task: Task) -> None:
 
     task.sla_warning_sent_at = pendulum.now("UTC")
 
+    if task.due_date is None:
+        return
     total = (task.due_date - task.created_at).total_seconds()
     now = datetime.now(UTC)
     if task.created_at.tzinfo is None:

@@ -5757,6 +5757,13 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
+          },
+          "required_capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required Capabilities"
           }
         },
         "type": "object",
@@ -8700,6 +8707,29 @@
             ],
             "title": "Completed At"
           },
+          "required_capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required Capabilities"
+          },
+          "needs_attention": {
+            "type": "boolean",
+            "title": "Needs Attention"
+          },
+          "sla_warning_sent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Warning Sent At"
+          },
           "metadata_": {
             "additionalProperties": true,
             "type": "object",
@@ -8733,6 +8763,9 @@
           "approved_at",
           "due_date",
           "completed_at",
+          "required_capabilities",
+          "needs_attention",
+          "sla_warning_sent_at",
           "metadata_",
           "created_at",
           "updated_at"
