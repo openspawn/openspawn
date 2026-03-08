@@ -50,6 +50,9 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
     metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
     deleted_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    required_capabilities: Mapped[list] = mapped_column(JSONB, nullable=False, server_default="[]")
+    sla_warning_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    needs_attention: Mapped[bool] = mapped_column(nullable=False, server_default="false")
 
     organization: Mapped[Organization] = relationship("Organization", back_populates="tasks")
     assignee: Mapped[Agent | None] = relationship(

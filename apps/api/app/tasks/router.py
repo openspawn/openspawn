@@ -93,6 +93,7 @@ async def create_task(
         approval_required=dto.approval_required,
         due_date=dto.due_at,
         metadata_=dto.metadata,
+        required_capabilities=dto.required_capabilities,
     )
     db.add(task)
     await db.flush()

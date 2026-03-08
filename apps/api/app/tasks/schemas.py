@@ -27,6 +27,7 @@ class CreateTaskDto(BaseModel):
     due_at: datetime | None = None
     tags: list[str] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
+    required_capabilities: list[str] = Field(default_factory=list)
 
 
 class TransitionTaskDto(BaseModel):
@@ -94,6 +95,9 @@ class TaskResponse(BaseModel):
     approved_at: datetime | None
     due_date: datetime | None
     completed_at: datetime | None
+    required_capabilities: list[str]
+    needs_attention: bool
+    sla_warning_sent_at: datetime | None
     metadata: dict = Field(alias="metadata_")
     created_at: datetime
     updated_at: datetime
