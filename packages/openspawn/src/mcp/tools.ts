@@ -67,7 +67,12 @@ export function registerTools(server: McpServer, dir: string, orgFile?: string):
           (a) => a.id !== id && a.name.toLowerCase() !== params.agentName!.toLowerCase(),
         );
       } else if (params.action === "set_policy" && params.policyKey && params.policyValue) {
-        (org.policies as any)[params.policyKey] = params.policyValue;
+        const key = params.policyKey;
+        if (key === "perAgentBudget") {
+          org.policies.perAgentBudget = Number(params.policyValue);
+        } else if (key === "alertThreshold") {
+          org.policies.alertThreshold = Number(params.policyValue);
+        }
       }
 
       writeFileSync(path, generateOrgMd(org));

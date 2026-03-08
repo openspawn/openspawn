@@ -31,7 +31,7 @@ export async function startMcpServer(opts: ServerOptions): Promise<void> {
 
   const httpServer = createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/mcp") {
-      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
+      const transport = new StreamableHTTPServerTransport();
       await server.connect(transport);
       await transport.handleRequest(req, res);
     } else if (req.method === "GET" && req.url === "/health") {

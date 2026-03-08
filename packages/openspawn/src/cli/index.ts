@@ -20,25 +20,31 @@ openspawn - Multi-agent organization CLI
 Usage: openspawn <command> [options]
 
 Commands:
-  init [name]                  Scaffold ORG.md + .openspawn/
-  start                        Start MCP server
-  status                       Show org status
-  org                          Show org tree
-  hire <name> [options]        Add agent to org
-  fire <name>                  Remove agent from org
-  task list                    List all tasks
-  task create <desc>           Create task
-  task next                    Claim next available task
-  task done <id>               Mark task complete
+  init [directory]               Create agent organization
+    -t, --template <name>        Template to use
+    -y, --yes                    Skip wizard, use defaults
+    --non-interactive            Same as --yes
+    --dry-run                    Simulate after scaffold
+    --deploy                     Generate Docker infra
+    -p, --port <n>               Coordinator port (default: 8787)
+  start                          Start MCP server
+  status                         Show org status
+  org                            Show org tree
+  hire <name> [options]          Add agent to org
+  fire <name>                    Remove agent from org
+  task list                      List all tasks
+  task create <desc>             Create task
+  task next                      Claim next available task
+  task done <id>                 Mark task complete
   delegate --to <agent> --task <desc>
   escalate --task <id> --reason <R>
   report --status <S> [--pr N]
-  budget [agent]               Show budget status
+  budget [agent]                 Show budget status
 
 Options:
-  --org-file <path>            Path to ORG.md (default: ./ORG.md)
-  --dir <path>                 Working directory (default: .)
-  --help, -h                   Show help
+  --org-file <path>              Path to ORG.md (default: ./ORG.md)
+  --dir <path>                   Working directory (default: .)
+  --help, -h                     Show help
 `.trim();
 
 async function main() {
