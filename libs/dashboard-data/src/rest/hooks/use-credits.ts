@@ -14,3 +14,17 @@ export function useCreditHistory(agentId: string) {
     enabled: !!agentId,
   });
 }
+
+export function useRestCredits(options?: { enabled?: boolean; limit?: number }) {
+  return useQuery({
+    queryKey: ["credits", "history", options?.limit ?? 50],
+    queryFn: async () => {
+      const { data, error } = await api.GET("/credits/history", {
+        params: { query: { limit: options?.limit ?? 50 } },
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: options?.enabled ?? true,
+  });
+}
