@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { useAgents } from "../hooks";
-import { demoMemories, searchMemories } from "@openspawn/demo-data";
+import { useMemories, useMemorySearch } from "@openspawn/dashboard-data";
 import type { DemoMemory } from "@openspawn/demo-data";
 import { formatDate } from "../lib/date-format";
 
@@ -233,6 +233,8 @@ export function MemoryPage() {
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>(new Map());
   const [contradictions, setContradictions] = useState<Contradiction[]>(DEMO_CONTRADICTIONS);
   const { agents } = useAgents();
+  const { memories: allMemories } = useMemories();
+  const { memories: searchResults } = useMemorySearch(searchQuery);
 
   const agentMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -243,7 +245,9 @@ export function MemoryPage() {
   }, [agents]);
 
   const filteredMemories = useMemo(() => {
-    let result: DemoMemory[] = searchQuery ? searchMemories(searchQuery) : [...demoMemories];
+    let result: DemoMemory[] = searchQuery
+      ? ([...searchResults] as DemoMemory[])
+      : ([...allMemories] as DemoMemory[]);
 
     if (typeFilter !== "all") {
       result = result.filter((m) => m.type === typeFilter);
@@ -253,16 +257,26 @@ export function MemoryPage() {
     }
 
     return result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [searchQuery, typeFilter, sourceFilter]);
+  }, [searchQuery, typeFilter, sourceFilter, allMemories, searchResults]);
 
   const stats = useMemo(() => {
-    const total = demoMemories.length;
+    const memories = allMemories as DemoMemory[];
+    const total = memories.length;
+    if (total === 0)
+      return {
+        total: 0,
+        byType: { episodic: 0, semantic: 0, graph: 0 },
+        bySource: {},
+        avgAccess: 0,
+        avgConfidence: 0,
+      };
+
     const byType = { episodic: 0, semantic: 0, graph: 0 };
     const bySource: Record<string, number> = {};
     let totalAccess = 0;
     let avgConfidence = 0;
 
-    for (const m of demoMemories) {
+    for (const m of memories) {
       byType[m.type] = (byType[m.type] || 0) + 1;
       bySource[m.source] = (bySource[m.source] || 0) + 1;
       totalAccess += m.accessCount;
@@ -276,7 +290,7 @@ export function MemoryPage() {
       avgAccess: Math.round(totalAccess / total),
       avgConfidence: Math.round(avgConfidence / total),
     };
-  }, []);
+  }, [allMemories]);
 
   const typeSparkline = useMemo(
     () => [stats.byType.episodic, stats.byType.semantic, stats.byType.graph],
@@ -294,25 +308,25 @@ export function MemoryPage() {
     [feedbackMap],
   );
 
-  const handleToggleFeedback = useCallback(
-    (memoryId: string, kind: "helpful" | "unhelpful") => {
-      setFeedbackMap((prev) => {
-        const next = new Map(prev);
-        const current = next.get(memoryId) ?? { helpful: false, unhelpful: false };
-        if (kind === "helpful") {
-          next.set(memoryId, { helpful: !current.helpful, unhelpful: false });
-        } else {
-          next.set(memoryId, { helpful: false, unhelpful: !current.unhelpful });
-        }
-        return next;
-      });
+  const handleToggleFeedback = useCallback((memoryId: string, kind: "helpful" | "unhelpful") => {
+    setFeedbackMap((prev) => {
+      const next = new Map(prev);
+      const current = next.get(memoryId) ?? { helpful: false, unhelpful: false };
+      if (kind === "helpful") {
+        next.set(memoryId, { helpful: !current.helpful, unhelpful: false });
+      } else {
+        next.set(memoryId, { helpful: false, unhelpful: !current.unhelpful });
+      }
+      return next;
+    });
+  }, []);
+
+  const handleResolveContradiction = useCallback(
+    (contradictionId: string, _strategy: ResolveStrategy) => {
+      setContradictions((prev) => prev.filter((c) => c.id !== contradictionId));
     },
     [],
   );
-
-  const handleResolveContradiction = useCallback((contradictionId: string, _strategy: ResolveStrategy) => {
-    setContradictions((prev) => prev.filter((c) => c.id !== contradictionId));
-  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -456,10 +470,15 @@ export function MemoryPage() {
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
                           older
                         </Badge>
-                        <p className="text-xs text-muted-foreground truncate">{c.olderMemoryContent}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {c.olderMemoryContent}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 border-amber-500/30 text-amber-500">
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-1.5 py-0 shrink-0 border-amber-500/30 text-amber-500"
+                        >
                           newer
                         </Badge>
                         <p className="text-xs truncate">{c.newerMemoryContent}</p>

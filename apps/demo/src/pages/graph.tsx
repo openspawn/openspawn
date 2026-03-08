@@ -17,10 +17,10 @@ import {
 } from "../components/ui/select";
 import { useAgents } from "../hooks";
 import {
-  demoEntities,
-  demoRelationships,
-  getCytoscapeData,
-} from "@openspawn/demo-data";
+  useGraphEntities,
+  useGraphRelationships,
+  useGraphCytoscape,
+} from "@openspawn/dashboard-data";
 import type { DemoEntity } from "@openspawn/demo-data";
 
 const TYPE_COLORS: Record<string, string> = {
@@ -54,6 +54,11 @@ export function GraphPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
   const { agents } = useAgents();
+  const { entities } = useGraphEntities();
+  const { relationships } = useGraphRelationships();
+  const { nodes: cyNodes, edges: cyEdges } = useGraphCytoscape();
+
+  const typedEntities = entities as DemoEntity[];
 
   const agentMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -65,14 +70,14 @@ export function GraphPage() {
 
   const entityTypes = useMemo(() => {
     const types = new Set<string>();
-    for (const entity of demoEntities) {
+    for (const entity of typedEntities) {
       types.add(entity.entityType);
     }
     return Array.from(types).sort();
-  }, []);
+  }, [typedEntities]);
 
   const filteredEntityIds = useMemo(() => {
-    let result = demoEntities;
+    let result = typedEntities;
 
     if (typeFilter !== "all") {
       result = result.filter((e) => e.entityType === typeFilter);
@@ -83,15 +88,18 @@ export function GraphPage() {
     }
 
     return new Set(result.map((e) => e.id));
-  }, [typeFilter, searchQuery]);
+  }, [typeFilter, searchQuery, typedEntities]);
 
   const stats = useMemo(() => {
-    const totalEntities = demoEntities.length;
-    const totalRelationships = demoRelationships.length;
+    const totalEntities = typedEntities.length;
+    const totalRelationships = relationships.length;
+    if (totalEntities === 0)
+      return { totalEntities: 0, totalRelationships: 0, avgConfidence: 0, knowledgeGaps: 0 };
+
     let totalConfidence = 0;
     let knowledgeGaps = 0;
 
-    for (const entity of demoEntities) {
+    for (const entity of typedEntities) {
       totalConfidence += entity.confidence;
       if (entity.agentIds.length <= 1) {
         knowledgeGaps++;
@@ -104,7 +112,7 @@ export function GraphPage() {
       avgConfidence: Math.round(totalConfidence / totalEntities),
       knowledgeGaps,
     };
-  }, []);
+  }, [typedEntities, relationships]);
 
   const handleSelectNode = (entity: DemoEntity | null) => {
     setSelectedEntity(entity);
@@ -118,10 +126,10 @@ export function GraphPage() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const graphData = getCytoscapeData();
+    if (cyNodes.length === 0) return;
     const cy = cytoscape({
       container: containerRef.current,
-      elements: [...graphData.nodes, ...graphData.edges],
+      elements: [...cyNodes, ...cyEdges],
       style: [
         {
           selector: "node",
@@ -208,7 +216,7 @@ export function GraphPage() {
     // Node click handler
     cy.on("tap", "node", (evt: EventObject) => {
       const nodeId = evt.target.data("id") as string;
-      const entity = demoEntities.find((e) => e.id === nodeId);
+      const entity = typedEntities.find((e) => e.id === nodeId);
       if (entity) {
         handleSelectNode(entity);
       }
@@ -227,7 +235,7 @@ export function GraphPage() {
       cy.destroy();
       cyRef.current = null;
     };
-  }, []);
+  }, [cyNodes, cyEdges, typedEntities]);
 
   // Apply filter highlighting
   useEffect(() => {
@@ -273,10 +281,11 @@ export function GraphPage() {
 
   const entityRelationships = useMemo(() => {
     if (!selectedEntity) return [];
-    return demoRelationships.filter(
-      (r) => r.sourceEntityId === selectedEntity.id || r.targetEntityId === selectedEntity.id,
+    return relationships.filter(
+      (r: { sourceEntityId: string; targetEntityId: string }) =>
+        r.sourceEntityId === selectedEntity.id || r.targetEntityId === selectedEntity.id,
     );
-  }, [selectedEntity]);
+  }, [selectedEntity, relationships]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -364,7 +373,10 @@ export function GraphPage() {
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-lg font-semibold">{selectedEntity.name}</h3>
-                    <Badge variant="outline" className={TYPE_BADGE_COLORS[selectedEntity.entityType]}>
+                    <Badge
+                      variant="outline"
+                      className={TYPE_BADGE_COLORS[selectedEntity.entityType]}
+                    >
                       {selectedEntity.entityType}
                     </Badge>
                   </div>
@@ -408,7 +420,7 @@ export function GraphPage() {
                         {entityRelationships.map((rel) => {
                           const isSource = rel.sourceEntityId === selectedEntity.id;
                           const otherId = isSource ? rel.targetEntityId : rel.sourceEntityId;
-                          const otherEntity = demoEntities.find((e) => e.id === otherId);
+                          const otherEntity = typedEntities.find((e) => e.id === otherId);
                           return (
                             <div
                               key={rel.id}
@@ -435,7 +447,7 @@ export function GraphPage() {
                   <Share2 className="h-8 w-8 mb-2 opacity-50" />
                   <p className="text-sm">Click a node to inspect</p>
                   <p className="text-xs mt-1 opacity-70">
-                    {demoEntities.length} entities, {demoRelationships.length} relationships
+                    {typedEntities.length} entities, {relationships.length} relationships
                   </p>
                 </div>
               )}

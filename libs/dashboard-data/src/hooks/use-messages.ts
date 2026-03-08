@@ -1,23 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
+import { isDemoMode, isSandboxMode } from "../lib/mode";
 import { fetcher } from "../graphql/fetcher";
+import { useRestMessages } from "../rest/hooks/use-messages";
 
-// GraphQL queries for messages
+const isLiveMode = !isDemoMode && !isSandboxMode;
+
+// GraphQL queries (demo/sandbox mode)
 const MESSAGES_QUERY = `
   query Messages($limit: Int) {
     messages(limit: $limit) {
       id
       fromAgentId
       toAgentId
-      fromAgent {
-        id
-        name
-        level
-      }
-      toAgent {
-        id
-        name
-        level
-      }
+      fromAgent { id name level }
+      toAgent { id name level }
       content
       type
       taskRef
@@ -31,19 +27,10 @@ const CONVERSATIONS_QUERY = `
   query Conversations {
     conversations {
       id
-      agents {
-        id
-        name
-        level
-      }
+      agents { id name level }
       messageCount
       unreadCount
-      latestMessage {
-        id
-        content
-        type
-        createdAt
-      }
+      latestMessage { id content type createdAt }
       createdAt
     }
   }
@@ -55,16 +42,8 @@ const CONVERSATION_MESSAGES_QUERY = `
       id
       fromAgentId
       toAgentId
-      fromAgent {
-        id
-        name
-        level
-      }
-      toAgent {
-        id
-        name
-        level
-      }
+      fromAgent { id name level }
+      toAgent { id name level }
       content
       type
       taskRef
@@ -106,17 +85,27 @@ export interface Conversation {
 }
 
 export function useMessages(limit = 50) {
-  const { data, isLoading, error, refetch } = useQuery({
+  const rest = useRestMessages(undefined, { enabled: isLiveMode });
+  const gql = useQuery({
     queryKey: ["messages", limit],
     queryFn: fetcher<{ messages: Message[] }, { limit: number }>(MESSAGES_QUERY, { limit }),
-    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
+    enabled: !isLiveMode,
   });
 
+  if (!isLiveMode) {
+    return {
+      messages: gql.data?.messages || [],
+      loading: gql.isLoading,
+      error: gql.error?.message,
+      refetch: gql.refetch,
+    };
+  }
+
   return {
-    messages: data?.messages || [],
-    loading: isLoading,
-    error: error?.message,
-    refetch,
+    messages: Array.isArray(rest.data) ? rest.data : [],
+    loading: rest.isLoading,
+    error: rest.error?.message,
+    refetch: rest.refetch,
   };
 }
 
@@ -127,7 +116,7 @@ export function useConversations() {
       CONVERSATIONS_QUERY,
       {},
     ),
-    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
+    enabled: !isLiveMode,
   });
 
   return {
@@ -145,8 +134,7 @@ export function useConversationMessages(agent1Id: string, agent2Id: string) {
       CONVERSATION_MESSAGES_QUERY,
       { agent1Id, agent2Id },
     ),
-    enabled: Boolean(agent1Id && agent2Id),
-    // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
+    enabled: !isLiveMode && Boolean(agent1Id && agent2Id),
   });
 
   return {
