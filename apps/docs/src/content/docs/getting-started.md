@@ -63,10 +63,10 @@ Choose from 11 templates:
 
 | Template | Use case |
 |----------|----------|
-| `minimal` | Bare-bones single-agent starting point |
-| `starter` | Small team with basic hierarchy |
-| `standard` | Full org with departments and playbooks |
-| `advanced` | Multi-tier org with complex escalation |
+| `assistant-team` | Chief of staff + specialists (default) |
+| `content-agency` | Content production pipeline |
+| `dev-shop` | Software development team |
+| `research-lab` | Research & analysis team |
 
 **Industry-specific:**
 
@@ -99,7 +99,7 @@ Define your org's alignment values. The wizard offers 8 values — 5 enabled by 
 | Rigor | No | Depth over speed, verify first |
 | Frugality | No | Cheap models for mechanical tasks |
 
-The concept of alignment values draws on organizational behavior research — Amazon's leadership principles, Holacracy's distributed authority model, and the principle of subsidiarity from political philosophy (decisions made at the lowest competent level). Each value is deliberately short so it fits in a system prompt without consuming your context window.
+Each value draws from established organizational research — Edmondson's work on psychological safety, Drucker's management by objectives, Katzenbach & Smith's team accountability model. Each directive is deliberately short (~50 tokens) so it fits in a system prompt without consuming your context window.
 
 See the [Values Framework guide](/guides/values-framework/) for the full rationale behind each value and how they interact.
 
@@ -109,13 +109,13 @@ Choose how agents communicate and escalate. Default: `agency`.
 
 | Preset | Escalation | Progress reports | Hierarchy depth |
 |--------|------------|------------------|-----------------|
-| `startup` | Immediate | Frequent | 2–3 levels |
-| `enterprise` | Batched | On phase change | 5–8 levels |
 | `agency` | Immediate | Every tick | 3–4 levels |
+| `startup` | Immediate | Frequent | 2–3 levels |
+| `professional` | Batched | On milestone | 3–5 levels |
+| `ops` | Immediate | Every tick | Strict chain |
+| `enterprise` | Batched | On phase change | 5–8 levels |
 | `research` | Delayed | On request | 2–3 levels |
-| `military` | Immediate | Every tick | Strict chain |
-| `remote-async` | Delayed | On request | Flat |
-| `open-source` | Delayed | On merge | Flat |
+| `compliance` | Immediate | Every action | 4–6 levels |
 
 ### Step 5 — LLM provider & model
 
@@ -152,13 +152,14 @@ After the wizard completes, you'll have:
 ```
 my-agent-team/
 ├── ORG.md                    # Your org definition (the important one)
-├── openspawn.config.json     # Server config (port, models, budget)
-├── openclaw-agents.json      # Generated agent configs
-├── workspaces/
-│   ├── onboarding-lead/      # Agent workspace directories
-│   ├── data-migration/
-│   └── ...
-└── .gitignore
+├── openspawn.config.json     # All wizard answers persisted
+├── openclaw-agents.json      # Generated agent configs with model assignments
+├── .gitignore                # node_modules, .env, data/, *.db
+└── workspaces/
+    └── <agent-name>/
+        ├── SOUL.md           # Org alignment + identity + role
+        ├── AGENTS.md         # Workspace instructions
+        └── memory/           # Empty, for agent continuity
 ```
 
 ### Dry run
@@ -217,11 +218,6 @@ This generates a `docker-compose.yml` alongside your org scaffold:
 
 ```yaml
 services:
-  coordinator:
-    image: ghcr.io/openspawn/coordinator:latest
-    ports: ["8787:8787"]
-    depends_on: [postgres, redis]
-
   postgres:
     image: pgvector/pgvector:pg16
     volumes: [pgdata:/var/lib/postgresql/data]
@@ -231,13 +227,14 @@ services:
     volumes: [redisdata:/data]
 ```
 
-Start everything:
+Start the infra, then run the coordinator:
 
 ```bash
 docker compose up -d
+npx openspawn start
 ```
 
-The local `npx openspawn start` uses in-memory storage — fine for development. The Docker deployment gives you persistent task history, credit ledger, and vector search via pgvector.
+The coordinator connects to Postgres for persistent task history and Redis for pub/sub. Without Docker, `openspawn start` uses in-process SQLite — fine for development.
 
 ---
 
