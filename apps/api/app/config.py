@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     # Redis (for arq workers)
     redis_url: str = "redis://localhost:6379"
 
+    # Coordination engine
+    sla_warning_pct: int = 80
+    sla_breach_pct: int = 100
+
     # Observability (all optional)
     logfire_token: str | None = None
     langfuse_public_key: str | None = None
