@@ -77,8 +77,9 @@ jobs:
             set -e
             cd /opt/openspawn
 
-            # Create .env.production if it doesn't exist
+            # Source .env.production so compose interpolation works
             touch .env.production
+            set -a && source .env.production && set +a
 
             # Log in to GHCR to pull the image
             echo "${GH_TOKEN}" | docker login ghcr.io -u github-actions --password-stdin
