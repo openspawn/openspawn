@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { TaskStatus as SharedTaskStatus } from "@openspawn/shared-types";
 import { motion, AnimatePresence } from "motion/react";
 import {
   RefreshCw,
@@ -337,7 +338,10 @@ export function MobileStatusPage() {
 
   // Compute summary stats
   const inProgressTasks = useMemo(
-    () => (tasks ?? []).filter((t) => t.status === "in_progress" || t.status === "assigned").length,
+    () =>
+      (tasks ?? []).filter(
+        (t) => t.status === SharedTaskStatus.IN_PROGRESS || t.status === SharedTaskStatus.ASSIGNED,
+      ).length,
     [tasks],
   );
 

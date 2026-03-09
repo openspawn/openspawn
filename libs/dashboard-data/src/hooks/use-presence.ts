@@ -5,6 +5,7 @@
  */
 
 import { useMemo } from "react";
+import { TaskStatus } from "@openspawn/shared-types";
 import { useAgents } from "./use-agents";
 import { useTasks } from "./use-tasks";
 import { AgentStatus } from "../graphql/generated/hooks";
@@ -43,7 +44,8 @@ export function usePresence(): {
 
     // Find agents with in-progress tasks
     const inProgressTasks = (tasks ?? []).filter(
-      (t: { status: string }) => t.status === "in_progress" || t.status === "assigned",
+      (t: { status: string }) =>
+        t.status === TaskStatus.IN_PROGRESS || t.status === TaskStatus.ASSIGNED,
     );
 
     const busyAgentIds = new Set<string>();

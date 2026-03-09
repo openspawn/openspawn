@@ -18,6 +18,7 @@ import {
   DialogClose,
 } from "../components/ui/dialog";
 import { AgentModeBadge, AgentModeSelector } from "../components/agent-mode-selector";
+import { AgentStatus as SharedAgentStatus } from "@openspawn/shared-types";
 import { getStatusVariant } from "../lib/status-colors";
 import { REPUTATION_COLORS, REPUTATION_EMOJI } from "./agent-reputation-tab";
 import { AgentMode, AgentStatus } from "@openspawn/dashboard-data";
@@ -179,9 +180,9 @@ export function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () 
               onChange={(e) => setStatus(e.target.value as AgentStatus)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="suspended">Suspended</option>
+              <option value={SharedAgentStatus.ACTIVE}>Active</option>
+              <option value={SharedAgentStatus.PAUSED}>Paused</option>
+              <option value={SharedAgentStatus.SUSPENDED}>Suspended</option>
             </select>
           </div>
         </div>

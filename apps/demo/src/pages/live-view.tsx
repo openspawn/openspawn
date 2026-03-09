@@ -1,3 +1,4 @@
+import { TaskPriority } from "@openspawn/shared-types";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ExternalLink } from "lucide-react";
 import { IntroCard } from "../components/live/intro-card";
@@ -931,7 +932,7 @@ export function LiveViewPage() {
   );
 
   const handleEscalate = useCallback(() => {
-    escalate("Dashboard user escalation", "high").catch((err: unknown) =>
+    escalate("Dashboard user escalation", TaskPriority.HIGH).catch((err: unknown) =>
       console.warn("[MCP] escalate failed:", err instanceof Error ? err.message : err),
     );
     console.log("[LiveView] escalate: sending to CEO agent");

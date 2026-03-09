@@ -27,6 +27,7 @@ import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { AgentRole, TaskStatus } from "@openspawn/dashboard-data";
+import { AgentRole as SharedAgentRole } from "@openspawn/shared-types";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 // recharts v3 has infinite-loop bug — using custom bars instead
 // ChartTooltip removed — using custom bars
@@ -172,7 +173,9 @@ function OverviewTab({ agent }: { agent: Agent }) {
         </div>
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Mode</span>
-          <span className="text-sm font-medium capitalize">{agent.mode || "worker"}</span>
+          <span className="text-sm font-medium capitalize">
+            {agent.mode || SharedAgentRole.WORKER}
+          </span>
         </div>
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Created</span>

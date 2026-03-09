@@ -16,6 +16,10 @@ import { AgentAvatar } from "./agent-avatar";
 import { cn } from "../lib/utils";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
+import {
+  AgentStatus as GqlAgentStatus,
+  TaskStatus as GqlTaskStatus,
+} from "@openspawn/dashboard-data";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 // Idle reason mapping
@@ -153,7 +157,7 @@ export function IdleAgentsWidget({
   const idleAgents = useMemo<IdleAgentInfo[]>(() => {
     if (!agents.length) return [];
 
-    const activeAgents = agents.filter((a) => a.status === "ACTIVE");
+    const activeAgents = agents.filter((a) => a.status === GqlAgentStatus.Active);
 
     // Build task count map
     const agentTaskCounts = new Map<string, number>();
@@ -163,9 +167,13 @@ export function IdleAgentsWidget({
       if (!task.assigneeId) return;
 
       const status = task.status?.toUpperCase();
-      if (status === "TODO" || status === "IN_PROGRESS" || status === "REVIEW") {
+      if (
+        status === GqlTaskStatus.Todo ||
+        status === GqlTaskStatus.InProgress ||
+        status === GqlTaskStatus.Review
+      ) {
         agentTaskCounts.set(task.assigneeId, (agentTaskCounts.get(task.assigneeId) || 0) + 1);
-      } else if (status === "DONE" && !recentCompletedTasks.has(task.assigneeId)) {
+      } else if (status === GqlTaskStatus.Done && !recentCompletedTasks.has(task.assigneeId)) {
         recentCompletedTasks.set(task.assigneeId, task.title);
       }
     });
@@ -266,11 +274,11 @@ export function IdleAgentsWidget({
           </AnimatePresence>
         </div>
 
-        {agents.filter((a) => a.status === "ACTIVE").length > 0 && (
+        {agents.filter((a) => a.status === GqlAgentStatus.Active).length > 0 && (
           <div className="pt-2 text-center">
             <span className="text-xs text-muted-foreground">
-              {idleAgents.length} of {agents.filter((a) => a.status === "ACTIVE").length} agents
-              available
+              {idleAgents.length} of{" "}
+              {agents.filter((a) => a.status === GqlAgentStatus.Active).length} agents available
             </span>
           </div>
         )}

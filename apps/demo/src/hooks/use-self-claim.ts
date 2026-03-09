@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { TaskStatus as SharedTaskStatus } from "@openspawn/shared-types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDemo } from "../demo";
 import type { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
@@ -44,7 +45,8 @@ export function useSelfClaim({ agentId, onSuccess, onError }: UseSelfClaimOption
         .getTasks()
         .filter(
           (task: DemoTask) =>
-            !task.assigneeId && (task.status === "backlog" || task.status === "pending"),
+            !task.assigneeId &&
+            (task.status === SharedTaskStatus.BACKLOG || task.status === SharedTaskStatus.PENDING),
         ).length;
     },
     enabled: !!agentId,
@@ -58,13 +60,17 @@ export function useSelfClaim({ agentId, onSuccess, onError }: UseSelfClaimOption
         const tasks = engine.getTasks();
         const available = tasks.find(
           (task: DemoTask) =>
-            !task.assigneeId && (task.status === "backlog" || task.status === "pending"),
+            !task.assigneeId &&
+            (task.status === SharedTaskStatus.BACKLOG || task.status === SharedTaskStatus.PENDING),
         );
         if (!available) return { success: false, message: "No tasks", task: null };
         await new Promise((resolve) => setTimeout(resolve, 400));
         const claimed = engine
           .getTasks()
-          .find((task: DemoTask) => task.assigneeId === agentId && task.status === "in_progress");
+          .find(
+            (task: DemoTask) =>
+              task.assigneeId === agentId && task.status === SharedTaskStatus.IN_PROGRESS,
+          );
         return claimed
           ? {
               success: true,
