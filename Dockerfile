@@ -26,21 +26,16 @@ RUN pnpm nx run demo:build --configuration=production
 RUN pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
 
+# Create standalone sandbox package with resolved workspace deps
+RUN pnpm --filter @openspawn/sandbox deploy /app/sandbox-deploy --prod
+
 # Stage 2: Minimal runtime
 FROM node:24-alpine AS runtime
 WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install only what the sandbox needs (no monorepo overhead)
-COPY tools/sandbox/package.json ./package.json
-COPY tools/sandbox/tsconfig.json ./
-RUN corepack enable && corepack prepare pnpm@latest --activate \
-    && pnpm install --prod --no-frozen-lockfile \
-    && pnpm add tsx unified remark-parse remark-frontmatter
-
-# Copy sandbox source
-COPY tools/sandbox/src/ ./src/
-COPY tools/sandbox/ORG.md ./
-COPY tools/sandbox/org/ ./org/
+# Copy deployed sandbox (includes resolved node_modules with shared-types)
+COPY --from=build /app/sandbox-deploy ./
 
 # Copy built apps
 COPY --from=build /app/dist/apps/demo ./dashboard-dist
