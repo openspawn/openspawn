@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from unittest.mock import AsyncMock, patch
 
 from app.mcp_server.server import mcp
@@ -172,3 +173,33 @@ async def test_memory_graph_gaps() -> None:
         result = json.loads(await memory_graph_gaps())
         client.get.assert_called_once_with("/memory/graph/gaps")
         assert result["data"][0]["risk"] == "high"
+
+
+async def test_all_tools_have_schemas() -> None:
+    """Every tool must have an inputSchema with type=object and properties."""
+    tools = await mcp.list_tools()
+    for tool in tools:
+        mcp_tool = tool.to_mcp_tool()
+        schema = mcp_tool.inputSchema
+        assert schema is not None, f"{tool.name} missing inputSchema"
+        assert schema.get("type") == "object", (
+            f"{tool.name} inputSchema type is {schema.get('type')!r}, expected 'object'"
+        )
+        assert "properties" in schema, f"{tool.name} inputSchema missing 'properties' key"
+
+
+async def test_tool_names_are_snake_case() -> None:
+    """All tool names must be lowercase snake_case."""
+    pattern = re.compile(r"^[a-z][a-z0-9_]*$")
+    tools = await mcp.list_tools()
+    for tool in tools:
+        assert pattern.match(tool.name), f"Tool name {tool.name!r} is not snake_case"
+
+
+async def test_tool_descriptions_not_empty() -> None:
+    """Every tool must have a non-empty description."""
+    tools = await mcp.list_tools()
+    for tool in tools:
+        assert tool.description and tool.description.strip(), (
+            f"Tool {tool.name!r} has empty description"
+        )
