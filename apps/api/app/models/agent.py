@@ -5,10 +5,11 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, LargeBinary, SmallInteger, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import AgentMode, AgentRole, AgentStatus, Proficiency
 
 if TYPE_CHECKING:
@@ -57,7 +58,9 @@ class Agent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
     )
     max_children: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
     trust_score: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="50")
     tasks_completed: Mapped[int] = mapped_column(nullable=False, server_default="0")
     tasks_successful: Mapped[int] = mapped_column(nullable=False, server_default="0")

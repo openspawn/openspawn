@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import MessageType
 
 
@@ -27,7 +28,9 @@ class Channel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     task_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
     )
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
 
     organization: Mapped[Organization] = relationship("Organization")
     task: Mapped[Task | None] = relationship("Task")
@@ -62,7 +65,9 @@ class Message(UUIDPrimaryKeyMixin, Base):
     parent_message_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("messages.id"), nullable=True
     )
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")

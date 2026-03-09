@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, Numeric, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import AmountMode
 
 
@@ -47,7 +48,9 @@ class CreditTransaction(UUIDPrimaryKeyMixin, Base):
     idempotency_key: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), nullable=True, unique=True
     )
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")

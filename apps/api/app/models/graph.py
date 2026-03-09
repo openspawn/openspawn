@@ -4,11 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatVector
+from app.models.compat import CompatJSONB, CompatVector
 from app.models.memory import EMBEDDING_DIMENSIONS
 
 
@@ -30,7 +30,9 @@ class GraphEntity(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     mention_count: Mapped[int] = mapped_column(nullable=False, server_default="0")
     confidence: Mapped[float] = mapped_column(nullable=False, server_default="50.0")
     last_seen_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
 
 
 class GraphRelationship(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -55,7 +57,9 @@ class GraphRelationship(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     weight: Mapped[float] = mapped_column(nullable=False, server_default="0.5")
     last_seen_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     evidence_count: Mapped[int] = mapped_column(nullable=False, server_default="1")
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
 
 
 class MemoryEntityLink(Base):

@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import TaskPriority, TaskStatus
 
 
@@ -48,9 +49,13 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     approved_at: Mapped[datetime | None] = mapped_column(nullable=True)
     due_date: Mapped[datetime | None] = mapped_column(nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
     deleted_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    required_capabilities: Mapped[list] = mapped_column(JSONB, nullable=False, server_default="[]")
+    required_capabilities: Mapped[list] = mapped_column(
+        CompatJSONB(), nullable=False, server_default="[]"
+    )
     sla_warning_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
     needs_attention: Mapped[bool] = mapped_column(nullable=False, server_default="false")
 

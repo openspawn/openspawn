@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 
 if TYPE_CHECKING:
     from app.models.agent import Agent
@@ -20,7 +20,7 @@ class Organization(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     slug: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     task_prefix: Mapped[str] = mapped_column(String(20), nullable=False, server_default="TASK")
     next_task_number: Mapped[int] = mapped_column(nullable=False, server_default="1")
-    settings: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="{}")
+    settings: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False, server_default="{}")
 
     agents: Mapped[list[Agent]] = relationship(
         "Agent", back_populates="organization", lazy="select"

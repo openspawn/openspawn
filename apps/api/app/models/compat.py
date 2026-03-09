@@ -19,6 +19,23 @@ try:
 except ImportError:
     PG_ARRAY = None
 
+try:
+    from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
+except ImportError:
+    PG_JSONB = None
+
+
+class CompatJSONB(TypeDecorator[dict]):
+    """JSONB on Postgres, plain JSON on SQLite."""
+
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect: object) -> TypeEngine[dict]:
+        if dialect.name == "postgresql" and PG_JSONB:  # type: ignore[union-attr]
+            return dialect.type_descriptor(PG_JSONB())  # type: ignore[union-attr]
+        return dialect.type_descriptor(JSON())  # type: ignore[union-attr]
+
 
 class CompatVector(TypeDecorator[list[float]]):
     """Vector column: pgvector on Postgres, JSON on SQLite."""

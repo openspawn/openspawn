@@ -13,11 +13,11 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatArray, CompatTSVector, CompatVector
+from app.models.compat import CompatArray, CompatJSONB, CompatTSVector, CompatVector
 from app.models.enums import MemorySource, MemoryType, MemoryVisibility
 
 EMBEDDING_DIMENSIONS = 1024
@@ -78,5 +78,7 @@ class Memory(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     occurred_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
     last_accessed_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    retrieval_context: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    retrieval_context: Mapped[dict | None] = mapped_column(CompatJSONB(), nullable=True)
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )

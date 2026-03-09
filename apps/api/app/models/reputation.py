@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, SmallInteger, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 
 
 class ReputationEvent(UUIDPrimaryKeyMixin, Base):
@@ -35,7 +36,9 @@ class ReputationEvent(UUIDPrimaryKeyMixin, Base):
         UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
     )
     reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")

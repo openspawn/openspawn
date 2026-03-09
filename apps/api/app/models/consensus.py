@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, SmallInteger, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import ConsensusStatus
 
 
@@ -43,7 +44,9 @@ class ConsensusRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     votes_abstain: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
     decided_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
 
     organization: Mapped[Organization] = relationship("Organization")
     requester: Mapped[Agent] = relationship("Agent")
