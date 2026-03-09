@@ -22,8 +22,8 @@ import { AgentModeBadge } from "../components/agent-mode-selector";
 import { usePresence, useAgentHealth } from "../hooks";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
 import { TeamBadge } from "../components/team-badge";
-import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 type Agent = AgentFieldsFragment;
 
@@ -124,7 +124,7 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                               level={agent.level}
                               size="md"
                               avatar={agent.avatar}
-                              avatarUrl={agent.avatarUrl}
+                              avatarUrl={agent.avatar}
                               avatarColor={agent.avatarColor}
                               presenceStatus={presenceMap.get(agent.id)?.status}
                               completionRate={healthMap.get(agent.id)?.completionRate}
@@ -181,7 +181,7 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                         <CardContent>
                           <div className="flex flex-wrap gap-2 mb-4">
                             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
-                            <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="sm" />
+                            <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="sm" />
                             <TeamBadge teamId={agent.teamId} />
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -197,7 +197,7 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                               <Sparkline
                                 data={generateSparklineData(
                                   7,
-                                  agent.status === AgentStatus.Active ? "up" : "stable",
+                                  agent.status === AgentStatus.ACTIVE ? "up" : "stable",
                                 )}
                                 width={56}
                                 height={18}

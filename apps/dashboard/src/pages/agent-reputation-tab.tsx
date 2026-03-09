@@ -10,8 +10,8 @@ import { Progress } from "../components/ui/progress";
 import { AgentAvatar } from "../components/agent-avatar";
 import { TrustLeaderboard } from "../components/trust-leaderboard";
 import { usePresence, useAgentHealth } from "../hooks";
-import { AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 type Agent = AgentFieldsFragment;
 
@@ -47,7 +47,7 @@ export function ReputationTab({ agents, onAgentClick }: ReputationTabProps) {
   // Sort agents by trust score for leaderboard
   const leaderboardData = useMemo(() => {
     return [...agents]
-      .filter((a) => a.status === AgentStatus.Active)
+      .filter((a) => a.status === AgentStatus.ACTIVE)
       .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
       .slice(0, 10)
       .map((a) => ({

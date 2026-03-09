@@ -28,6 +28,7 @@ All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`
 
 ```
 apps/
+  dashboard/       -> User-facing dashboard (openspawn.ai)
   demo/            -> React dashboard (bikinibottom.ai)
   team/            -> Internal team dashboard
   website/         -> openspawn.ai marketing site
@@ -158,7 +159,6 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Do Not
 
-- **Edit `apps/dashboard/`** — deprecated, use `apps/demo/` instead
 - **Use `npm` or `yarn`** — this project uses pnpm only
 - **Use `any`, `as` casts, or `!` non-null assertions** — find the correct type, use type guards, or narrow via conditionals. TypeScript exists to catch type errors; casting hides them.
 - **Create barrel files** — use explicit import paths
@@ -174,8 +174,8 @@ Always run before finishing and before opening a PR:
 ```bash
 pnpm exec oxfmt --write .                                              # Format
 pnpm exec nx run-many -t lint                                          # Lint (must pass with 0 errors)
-pnpm exec nx run-many -t build --exclude=dashboard                     # Build
-pnpm exec nx run-many -t test --exclude=dashboard --exclude=openspawn  # Test (TS)
+pnpm exec nx run-many -t build                                         # Build
+pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
 cd apps/api && uv run pytest tests/ -v                                 # Test (Python)
 ```
 

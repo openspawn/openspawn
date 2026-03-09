@@ -69,6 +69,20 @@ export default defineConfig(() => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": [
+            "react",
+            "react-dom",
+            "@tanstack/react-router",
+            "@tanstack/react-query",
+          ],
+          "vendor-motion": ["motion/react"],
+          "vendor-xyflow": ["@xyflow/react", "elkjs"],
+        },
+      },
+    },
   },
   test: {
     name: "demo",

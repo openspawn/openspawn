@@ -26,8 +26,7 @@ import { Progress } from "./ui/progress";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
-import { AgentRole, TaskStatus } from "@openspawn/dashboard-data";
-import { AgentRole as SharedAgentRole } from "@openspawn/shared-types";
+import { AgentRole, TaskStatus } from "@openspawn/shared-types";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 // recharts v3 has infinite-loop bug — using custom bars instead
 // ChartTooltip removed — using custom bars
@@ -65,15 +64,15 @@ function getTaskStatusBadge(status: TaskStatus): {
   label: string;
 } {
   switch (status) {
-    case TaskStatus.Done:
+    case TaskStatus.DONE:
       return { variant: "success", label: "Completed" };
-    case TaskStatus.InProgress:
+    case TaskStatus.IN_PROGRESS:
       return { variant: "warning", label: "In Progress" };
-    case TaskStatus.Blocked:
-    case TaskStatus.Cancelled:
+    case TaskStatus.BLOCKED:
+    case TaskStatus.CANCELLED:
       return { variant: "destructive", label: status };
-    case TaskStatus.Backlog:
-    case TaskStatus.Todo:
+    case TaskStatus.BACKLOG:
+    case TaskStatus.TODO:
       return { variant: "secondary", label: "Pending" };
     default:
       return { variant: "secondary", label: status };
@@ -173,9 +172,7 @@ function OverviewTab({ agent }: { agent: Agent }) {
         </div>
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Mode</span>
-          <span className="text-sm font-medium capitalize">
-            {agent.mode || SharedAgentRole.WORKER}
-          </span>
+          <span className="text-sm font-medium capitalize">{agent.mode || AgentRole.WORKER}</span>
         </div>
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Created</span>
@@ -209,13 +206,13 @@ function TasksTab({ agent }: { agent: Agent }) {
 
   const tasksByStatus = useMemo(
     () => ({
-      completed: agentTasks.filter((t) => t.status === TaskStatus.Done),
-      inProgress: agentTasks.filter((t) => t.status === TaskStatus.InProgress),
+      completed: agentTasks.filter((t) => t.status === TaskStatus.DONE),
+      inProgress: agentTasks.filter((t) => t.status === TaskStatus.IN_PROGRESS),
       pending: agentTasks.filter(
-        (t) => t.status === TaskStatus.Backlog || t.status === TaskStatus.Todo,
+        (t) => t.status === TaskStatus.BACKLOG || t.status === TaskStatus.TODO,
       ),
       failed: agentTasks.filter(
-        (t) => t.status === TaskStatus.Cancelled || t.status === TaskStatus.Blocked,
+        (t) => t.status === TaskStatus.CANCELLED || t.status === TaskStatus.BLOCKED,
       ),
     }),
     [agentTasks],
@@ -713,7 +710,7 @@ function PromptTab({ agent }: { agent: Agent }) {
 // Settings Tab Content
 function SettingsTab({ agent }: { agent: Agent }) {
   const [name, setName] = useState(agent.name);
-  const [role, setRole] = useState(agent.role);
+  const [role, setRole] = useState<string>(agent.role);
   const [domain, setDomain] = useState(agent.domain || "");
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -755,7 +752,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
           <input
             type="text"
             value={role}
-            onChange={(e) => setRole(e.target.value as AgentRole)}
+            onChange={(e) => setRole(e.target.value)}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -843,7 +840,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
             level={agent.level}
             size="lg"
             avatar={agent.avatar}
-            avatarUrl={agent.avatarUrl}
+            avatarUrl={agent.avatar}
             avatarColor={agent.avatarColor}
           />
           <div className="flex-1 min-w-0">

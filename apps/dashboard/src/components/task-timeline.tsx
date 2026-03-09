@@ -27,7 +27,7 @@ import { useAgents, useTasks, useMessages } from "../hooks";
 import type { Task } from "../hooks/use-tasks";
 import type { Message } from "../hooks/use-messages";
 import { getTaskStatusVariant } from "../lib/status-colors";
-import { TaskStatus } from "../graphql/generated/graphql";
+import { TaskStatus } from "@openspawn/shared-types";
 
 // ── Timeline event types ────────────────────────────────────────────────────
 
@@ -80,7 +80,7 @@ function buildTimelineEvents(
   }
 
   // Started (infer from status being beyond 'pending')
-  if (task.status !== TaskStatus.Backlog && task.status !== TaskStatus.Todo) {
+  if (task.status !== TaskStatus.BACKLOG && task.status !== TaskStatus.TODO) {
     const startTime = new Date(new Date(task.createdAt).getTime() + 60000).toISOString();
     events.push({
       id: `${task.id}-started`,
@@ -125,7 +125,7 @@ function buildTimelineEvents(
   }
 
   // Review
-  if (task.status === TaskStatus.Review) {
+  if (task.status === TaskStatus.REVIEW) {
     events.push({
       id: `${task.id}-review`,
       type: "review",
