@@ -9,6 +9,17 @@ Coordination layer for AI agent organizations.
 - **Live Demo:** https://bikinibottom.ai
 - **Vision:** VISION.md
 
+## Domains & Deployment
+
+| Domain                | What                                   | Container        | Port       |
+| --------------------- | -------------------------------------- | ---------------- | ---------- |
+| **bikinibottom.ai**   | Live demo (sandbox + dashboard)        | `app`            | 3333       |
+| **openspawn.ai**      | API, website, landing page, MCP server | `api` `platform` | 8000, 3334 |
+| **team.openspawn.ai** | Internal team dashboard (password-protected) | `app`      | 3333       |
+| **docs.openspawn.ai** | Astro/Starlight docs                   | GitHub Pages     | —          |
+
+All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
+
 ## How to Contribute
 
 1. **Bugs and small fixes** — Open a PR
@@ -33,6 +44,21 @@ pnpm test
 ```bash
 npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres needed
 ```
+
+## Common Tasks
+
+### Add a new dashboard page
+
+1. Create `apps/demo/src/pages/my-page.tsx`
+2. Export from `apps/demo/src/pages/index.ts`
+3. Add route in `apps/demo/src/app/app.tsx`
+4. Add nav link in `apps/demo/src/components/layout.tsx`
+
+### Add demo data
+
+1. Add fixtures to `libs/demo-data/src/fixtures/`
+2. Export from `libs/demo-data/src/fixtures/index.ts`
+3. Update scenarios in `libs/demo-data/src/scenarios/`
 
 ## Testing
 
