@@ -12,11 +12,20 @@ class AgentRole(enum.StrEnum):
     HR = "hr"
     FOUNDER = "founder"
     ADMIN = "admin"
+    COO = "coo"
+    TALENT = "talent"
+    LEAD = "lead"
+    SENIOR = "senior"
+    MANAGER = "manager"
+    INTERN = "intern"
 
 
 class AgentStatus(enum.StrEnum):
     PENDING = "pending"
     ACTIVE = "active"
+    IDLE = "idle"
+    BUSY = "busy"
+    PAUSED = "paused"
     SUSPENDED = "suspended"
     REVOKED = "revoked"
 
@@ -77,9 +86,12 @@ class EscalationReason(enum.StrEnum):
 
 
 class EventSeverity(enum.StrEnum):
+    DEBUG = "debug"
     INFO = "info"
+    SUCCESS = "success"
     WARNING = "warning"
     ERROR = "error"
+    CRITICAL = "critical"
 
 
 class IdleReason(enum.StrEnum):
@@ -126,6 +138,7 @@ class ReputationLevel(enum.StrEnum):
 
 
 class TaskPriority(enum.StrEnum):
+    CRITICAL = "critical"
     URGENT = "urgent"
     HIGH = "high"
     NORMAL = "normal"
@@ -135,11 +148,14 @@ class TaskPriority(enum.StrEnum):
 class TaskStatus(enum.StrEnum):
     BACKLOG = "backlog"
     TODO = "todo"
+    PENDING = "pending"
+    ASSIGNED = "assigned"
     IN_PROGRESS = "in_progress"
     REVIEW = "review"
     DONE = "done"
     BLOCKED = "blocked"
     CANCELLED = "cancelled"
+    REJECTED = "rejected"
 
 
 class VoteValue(enum.StrEnum):
@@ -178,3 +194,59 @@ class MemorySource(enum.StrEnum):
     OBSERVATION = "observation"
     INFERENCE = "inference"
     UNKNOWN = "unknown"
+
+
+class SimulationEventType(enum.StrEnum):
+    AGENT_CREATED = "AGENT_CREATED"
+    AGENT_ACTIVATED = "AGENT_ACTIVATED"
+    AGENT_PROMOTED = "AGENT_PROMOTED"
+    AGENT_TERMINATED = "AGENT_TERMINATED"
+    AGENT_STATUS_CHANGED = "AGENT_STATUS_CHANGED"
+    AGENT_DESPAWNED = "AGENT_DESPAWNED"
+    AGENT_IDLE = "AGENT_IDLE"
+    TASK_CREATED = "TASK_CREATED"
+    TASK_ASSIGNED = "TASK_ASSIGNED"
+    TASK_COMPLETED = "TASK_COMPLETED"
+    TASK_COMPLETION_REJECTED = "TASK_COMPLETION_REJECTED"
+    CREDIT_EARNED = "CREDIT_EARNED"
+    CREDIT_SPENT = "CREDIT_SPENT"
+    PREHOOK_BLOCKED = "PREHOOK_BLOCKED"
+    PREHOOK_ALLOWED = "PREHOOK_ALLOWED"
+    SYSTEM_EVENT = "SYSTEM_EVENT"
+
+
+class DemoMessageCategory(enum.StrEnum):
+    TASK = "task"
+    STATUS = "status"
+    REPORT = "report"
+    QUESTION = "question"
+    ESCALATION = "escalation"
+    GENERAL = "general"
+
+
+class ACPMessageType(enum.StrEnum):
+    ACK = "ack"
+    PROGRESS = "progress"
+    ESCALATION = "escalation"
+    COMPLETION = "completion"
+    DELEGATION = "delegation"
+    STATUS_REQUEST = "status_request"
+
+
+class SandboxEscalationReason(enum.StrEnum):
+    BLOCKED = "BLOCKED"
+    OUT_OF_DOMAIN = "OUT_OF_DOMAIN"
+    OVER_BUDGET = "OVER_BUDGET"
+    LOW_CONFIDENCE = "LOW_CONFIDENCE"
+    TIMEOUT = "TIMEOUT"
+    DEPENDENCY = "DEPENDENCY"
+
+
+class TriggerMode(enum.StrEnum):
+    POLLING = "polling"
+    EVENT_DRIVEN = "event-driven"
+
+
+class WebhookHookType(enum.StrEnum):
+    PRE = "pre"
+    POST = "post"
