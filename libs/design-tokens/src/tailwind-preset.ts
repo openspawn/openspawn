@@ -28,6 +28,13 @@ export const openspawnPreset = {
         "bb-squid": bbColors.character.squid,
         "bb-pearl": bbColors.character.pearl,
         "bb-dutchman": bbColors.character.dutchman,
+        "bb-ocean-abyss": bbColors.ocean.abyss,
+        "bb-status": {
+          idle: bbColors.ocean[400],
+          working: bbColors.sandy[400],
+          busy: bbColors.coral[400],
+          overwhelmed: bbColors.coral[500],
+        },
       },
       screens: {
         landscape: {
