@@ -50,7 +50,7 @@ export function AgentControlPanel({
     <>
       <div
         className="fixed inset-y-0 right-0 w-80 max-w-[90vw] z-50 flex flex-col
-          bg-gradient-to-b from-bb-ocean-900/[0.97] to-bb-ocean-abyss/[0.98]
+          bg-linear-to-b from-bb-ocean-900/[0.97] to-bb-ocean-abyss/[0.98]
           border-l border-bb-ocean-400/20 backdrop-blur-2xl
           animate-[slide-in-right_0.25s_ease-out]"
       >
@@ -59,7 +59,7 @@ export function AgentControlPanel({
           <div
             className={cn(
               "w-12 h-12 rounded-full flex items-center justify-center overflow-hidden border-2 transition-opacity duration-300",
-              "bg-gradient-to-br from-bb-ocean-800 to-bb-ocean-900",
+              "bg-linear-to-br from-bb-ocean-800 to-bb-ocean-900",
               STATUS_BORDER[agent.status],
               isPaused && "opacity-50",
             )}

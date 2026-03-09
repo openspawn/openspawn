@@ -84,7 +84,7 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
         relative flex items-start ${sizeClasses[size]}
         bg-bb-ocean-800/60 border border-bb-ocean-400/20
         rounded-[1.25rem] cursor-pointer
-        backdrop-blur-[12px]
+        backdrop-blur-md
         transition-all duration-200 hover:-translate-y-1 hover:scale-[1.015]
         ${agent.cardClass ?? ""}
       `}
@@ -104,7 +104,7 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
         className={`
           relative shrink-0 ${avatarSizes[size]}
           rounded-full border-2 ${STATUS_RING[agent.status]}
-          bg-gradient-to-br from-bb-ocean-800 to-bb-ocean-900
+          bg-linear-to-br from-bb-ocean-800 to-bb-ocean-900
           flex items-center justify-center overflow-hidden
           ${ANIM_CLASS[agent.status]}
         `}

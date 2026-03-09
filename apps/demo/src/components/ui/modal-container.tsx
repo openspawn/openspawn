@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
 const modalPanelVariants = cva(
-  "relative w-full rounded-2xl bg-gradient-to-b from-bb-ocean-900/[0.98] to-bb-ocean-abyss/[0.99] backdrop-blur-2xl shadow-[0_0_40px]",
+  "relative w-full rounded-2xl bg-linear-to-b from-bb-ocean-900/[0.98] to-bb-ocean-abyss/[0.99] backdrop-blur-2xl shadow-[0_0_40px]",
   {
     variants: {
       intent: {
