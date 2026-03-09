@@ -56,7 +56,7 @@ describe("tasks", () => {
     expect(id).toBeTruthy();
     const tasks = listTasks(db);
     expect(tasks).toHaveLength(1);
-    expect((tasks[0] as any).title).toBe("Fix bug");
+    expect(tasks[0].title).toBe("Fix bug");
   });
 
   it("claims a task", () => {
@@ -64,7 +64,7 @@ describe("tasks", () => {
     claimTask(db, id, "a1");
     const tasks = listTasks(db, { assignee: "a1" });
     expect(tasks).toHaveLength(1);
-    expect((tasks[0] as any).status).toBe("in_progress");
+    expect(tasks[0].status).toBe("in_progress");
   });
 
   it("rejects claiming non-todo task", () => {
@@ -79,7 +79,7 @@ describe("tasks", () => {
     completeTask(db, id, "a1");
     const tasks = listTasks(db, { status: "done" });
     expect(tasks).toHaveLength(1);
-    expect((tasks[0] as any).completed_at).toBeTruthy();
+    expect(tasks[0].completed_at).toBeTruthy();
   });
 
   it("filters by status", () => {
@@ -95,7 +95,8 @@ describe("tasks", () => {
     const child = createTask(db, { title: "Subtask", parent_id: parent });
     const tasks = listTasks(db);
     expect(tasks).toHaveLength(2);
-    expect((tasks.find((t: any) => t.id === child) as any).parent_id).toBe(parent);
+    const childTask = tasks.find((t) => t.id === child);
+    expect(childTask?.parent_id).toBe(parent);
   });
 });
 
@@ -123,7 +124,7 @@ describe("events", () => {
 
     const events = getEvents(db);
     expect(events.length).toBeGreaterThanOrEqual(4); // hire, create, claim, complete
-    expect((events[0] as any).event_type).toBe("task.complete");
+    expect(events[0].event_type).toBe("task.complete");
   });
 });
 

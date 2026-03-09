@@ -17,7 +17,6 @@ import {
   listEscalations,
   getEvents,
   orgStatus,
-  logEvent,
 } from "./db.js";
 import { parseTaskResult } from "./schemas.js";
 
@@ -50,8 +49,9 @@ server.tool(
       return {
         content: [{ type: "text", text: `Registered agent ${params.id} (${params.name})` }],
       };
-    } catch (e: any) {
-      return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      return { content: [{ type: "text", text: `Error: ${message}` }], isError: true };
     }
   },
 );
@@ -117,8 +117,9 @@ server.tool(
     parent_id: z.string().optional().describe("Parent task ID for subtasks"),
   },
   async (params, extra) => {
-    const agentId = (extra as any)?.agentId;
-    const id = createTask(db, { ...params, created_by: agentId });
+    const authExtra = extra.authInfo?.extra;
+    const createdBy = typeof authExtra?.["agentId"] === "string" ? authExtra["agentId"] : undefined;
+    const id = createTask(db, { ...params, created_by: createdBy });
     return { content: [{ type: "text", text: `Created task ${id}: ${params.title}` }] };
   },
 );
@@ -138,8 +139,9 @@ server.tool(
           { type: "text", text: `Agent ${params.agent_id} claimed task ${params.task_id}` },
         ],
       };
-    } catch (e: any) {
-      return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      return { content: [{ type: "text", text: `Error: ${message}` }], isError: true };
     }
   },
 );
@@ -167,8 +169,9 @@ server.tool(
       const validated = params.result !== undefined ? parseTaskResult(params.result) : undefined;
       completeTask(db, params.task_id, params.agent_id, validated);
       return { content: [{ type: "text", text: `Task ${params.task_id} completed` }] };
-    } catch (e: any) {
-      return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      return { content: [{ type: "text", text: `Error: ${message}` }], isError: true };
     }
   },
 );
@@ -267,7 +270,7 @@ server.tool(
 
 const httpServer = createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/mcp") {
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
     await server.connect(transport);
     await transport.handleRequest(req, res);
   } else if (req.method === "GET" && req.url === "/health") {

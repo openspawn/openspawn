@@ -78,8 +78,9 @@ async function handleTaskClaim(db: Db, params: { task_id: string; agent_id: stri
   try {
     claimTask(db, params.task_id, params.agent_id);
     return toolOk(`Agent ${params.agent_id} claimed task ${params.task_id}`);
-  } catch (e: any) {
-    return toolErr(e.message);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    return toolErr(message);
   }
 }
 
@@ -87,8 +88,9 @@ async function handleTaskComplete(db: Db, params: { task_id: string; agent_id: s
   try {
     completeTask(db, params.task_id, params.agent_id);
     return toolOk(`Task ${params.task_id} completed`);
-  } catch (e: any) {
-    return toolErr(e.message);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    return toolErr(message);
   }
 }
 
@@ -116,8 +118,9 @@ async function handleAgentRegister(
   try {
     registerAgent(db, params);
     return toolOk(`Registered agent ${params.id} (${params.name})`);
-  } catch (e: any) {
-    return toolErr(e.message);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    return toolErr(message);
   }
 }
 
@@ -155,7 +158,7 @@ describe("task_create", () => {
 
   it("stores optional description and priority", async () => {
     await handleTaskCreate(db, { title: "Fix bug", description: "Null pointer", priority: 10 });
-    const tasks = listTasks(db) as any[];
+    const tasks = listTasks(db);
     expect(tasks[0].description).toBe("Null pointer");
     expect(tasks[0].priority).toBe(10);
   });
@@ -163,16 +166,17 @@ describe("task_create", () => {
   it("creates a subtask with parent_id", async () => {
     const parentResult = await handleTaskCreate(db, { title: "Epic" });
     // Extract the generated task id from the response text
-    const parentId = (listTasks(db) as any[])[0].id;
+    const parentId = listTasks(db)[0].id;
     await handleTaskCreate(db, { title: "Subtask", parent_id: parentId });
-    const tasks = listTasks(db) as any[];
-    expect(tasks.find((t: any) => t.title === "Subtask").parent_id).toBe(parentId);
+    const tasks = listTasks(db);
+    const subtask = tasks.find((t) => t.title === "Subtask");
+    expect(subtask?.parent_id).toBe(parentId);
     void parentResult; // used implicitly
   });
 
   it("records a created_by agent", async () => {
     await handleTaskCreate(db, { title: "Task A", created_by: "agent-1" });
-    const tasks = listTasks(db) as any[];
+    const tasks = listTasks(db);
     expect(tasks[0].created_by).toBe("agent-1");
   });
 });
@@ -187,7 +191,7 @@ describe("task_claim", () => {
     expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain("claimed task");
 
-    const tasks = listTasks(db, { status: "in_progress" }) as any[];
+    const tasks = listTasks(db, { status: "in_progress" });
     expect(tasks).toHaveLength(1);
     expect(tasks[0].assignee).toBe("agent-1");
   });
@@ -223,7 +227,7 @@ describe("task_complete", () => {
     const result = await handleTaskComplete(db, { task_id: taskId, agent_id: "agent-1" });
 
     expect(result.isError).toBeUndefined();
-    const done = listTasks(db, { status: "done" }) as any[];
+    const done = listTasks(db, { status: "done" });
     expect(done).toHaveLength(1);
     expect(done[0].completed_at).toBeTruthy();
   });
@@ -240,7 +244,7 @@ describe("task_complete", () => {
     const taskId = createTask(db, { title: "Todo task" });
     const result = await handleTaskComplete(db, { task_id: taskId, agent_id: "agent-1" });
     expect(result.isError).toBeUndefined();
-    const done = listTasks(db, { status: "done" }) as any[];
+    const done = listTasks(db, { status: "done" });
     expect(done).toHaveLength(1);
   });
 });
@@ -285,7 +289,7 @@ describe("task_update", () => {
     const taskId = createTask(db, { title: "Task" });
     await handleTaskUpdate(db, { task_id: taskId, status: "review" });
 
-    const tasks = listTasks(db, { status: "review" }) as any[];
+    const tasks = listTasks(db, { status: "review" });
     expect(tasks).toHaveLength(1);
   });
 
@@ -373,7 +377,7 @@ describe("org_status", () => {
     createTask(db, { title: "T2" });
     escalate(db, { from_agent: "agent-1", reason: "Help" });
 
-    const status = orgStatus(db) as any;
+    const status = orgStatus(db);
     expect(status.agents.active).toBe(2);
     expect(status.tasks.todo).toBe(2);
     expect(status.openEscalations).toBe(1);
@@ -381,7 +385,7 @@ describe("org_status", () => {
 
   it("includes recent events", () => {
     createTask(db, { title: "X" });
-    const status = orgStatus(db) as any;
+    const status = orgStatus(db);
     expect(status.recentEvents.length).toBeGreaterThan(0);
   });
 });
@@ -394,7 +398,7 @@ describe("event_log", () => {
     claimTask(db, taskId, "agent-1");
     completeTask(db, taskId, "agent-1");
 
-    const events = getEvents(db) as any[];
+    const events = getEvents(db);
     // Expect at least: task.create, task.claim, task.complete
     expect(events.length).toBeGreaterThanOrEqual(3);
   });
@@ -404,8 +408,8 @@ describe("event_log", () => {
     createTask(db, { title: "B", created_by: "agent-2" });
     claimTask(db, id1, "agent-1");
 
-    const events = getEvents(db, { agent_id: "agent-1" }) as any[];
-    expect(events.every((e: any) => e.agent_id === "agent-1")).toBe(true);
+    const events = getEvents(db, { agent_id: "agent-1" });
+    expect(events.every((e) => e.agent_id === "agent-1")).toBe(true);
   });
 
   it("filters by event_type", () => {
@@ -413,14 +417,14 @@ describe("event_log", () => {
     claimTask(db, id, "agent-1");
     completeTask(db, id, "agent-1");
 
-    const claimEvents = getEvents(db, { event_type: "task.claim" }) as any[];
-    expect(claimEvents.every((e: any) => e.event_type === "task.claim")).toBe(true);
+    const claimEvents = getEvents(db, { event_type: "task.claim" });
+    expect(claimEvents.every((e) => e.event_type === "task.claim")).toBe(true);
     expect(claimEvents.length).toBeGreaterThanOrEqual(1);
   });
 
   it("respects the limit parameter", () => {
     for (let i = 0; i < 10; i++) createTask(db, { title: `Task ${i}` });
-    const events = getEvents(db, { limit: 3 }) as any[];
+    const events = getEvents(db, { limit: 3 });
     expect(events.length).toBeLessThanOrEqual(3);
   });
 });
@@ -438,13 +442,17 @@ describe("concurrent access patterns", () => {
       handleTaskClaim(db, { task_id: taskId, agent_id: "agent-2" }),
     ]);
 
-    const successes = results.filter((r) => r.status === "fulfilled" && !(r.value as any).isError);
-    const failures = results.filter((r) => r.status === "fulfilled" && (r.value as any).isError);
+    const successes = results.filter(
+      (r): r is PromiseFulfilledResult<ToolResult> => r.status === "fulfilled" && !r.value.isError,
+    );
+    const failures = results.filter(
+      (r): r is PromiseFulfilledResult<ToolResult> => r.status === "fulfilled" && !!r.value.isError,
+    );
 
     expect(successes).toHaveLength(1);
     expect(failures).toHaveLength(1);
 
-    const inProgress = listTasks(db, { status: "in_progress" }) as any[];
+    const inProgress = listTasks(db, { status: "in_progress" });
     expect(inProgress).toHaveLength(1);
   });
 
@@ -467,7 +475,7 @@ describe("concurrent access patterns", () => {
     await handleTaskComplete(db, { task_id: "ghost", agent_id: "agent-1" });
 
     // Real task should still be intact
-    const inProgress = listTasks(db, { status: "in_progress" }) as any[];
+    const inProgress = listTasks(db, { status: "in_progress" });
     expect(inProgress).toHaveLength(1);
     expect(inProgress[0].id).toBe(taskId);
   });
@@ -484,7 +492,7 @@ describe("concurrent access patterns", () => {
     claimTask(db, extra, "agent-2");
 
     // All three tasks are now in_progress
-    const inProgress = listTasks(db, { status: "in_progress" }) as any[];
+    const inProgress = listTasks(db, { status: "in_progress" });
     expect(inProgress).toHaveLength(3);
   });
 
@@ -492,8 +500,8 @@ describe("concurrent access patterns", () => {
     await handleEscalate(db, { from_agent: "agent-1", reason: "Issue X" });
     await handleEscalate(db, { from_agent: "agent-2", reason: "Issue Y" });
 
-    const open = listEscalations(db, "open") as any[];
+    const open = listEscalations(db, "open");
     expect(open).toHaveLength(2);
-    expect(open.map((e: any) => e.from_agent).sort()).toEqual(["agent-1", "agent-2"]);
+    expect(open.map((e) => e.from_agent).sort()).toEqual(["agent-1", "agent-2"]);
   });
 });

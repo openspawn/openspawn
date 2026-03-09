@@ -1,6 +1,65 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
 
+// ─── Row types (mirror the SQLite schema) ────────────────────────────────────
+
+export interface AgentRow {
+  id: string;
+  name: string;
+  role: string | null;
+  level: number;
+  department: string | null;
+  status: string;
+  model: string | null;
+  hired_at: string;
+  metadata: string | null;
+}
+
+export interface TaskRow {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  assignee: string | null;
+  created_by: string | null;
+  priority: number;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+  result: string | null;
+  metadata: string | null;
+}
+
+export interface EventRow {
+  id: number;
+  timestamp: string;
+  agent_id: string | null;
+  event_type: string;
+  payload: string | null;
+  task_id: string | null;
+}
+
+export interface EscalationRow {
+  id: string;
+  from_agent: string;
+  to_agent: string | null;
+  task_id: string | null;
+  reason: string;
+  status: string;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+interface StatusCountRow {
+  status: string;
+  count: number;
+}
+
+interface CountRow {
+  count: number;
+}
+
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS agents (
   id          TEXT PRIMARY KEY,
@@ -107,11 +166,11 @@ export function registerAgent(
   logEvent(db, agent.id, "agent.hire", { name: agent.name, role: agent.role });
 }
 
-export function listAgents(db: Database.Database, status?: string) {
+export function listAgents(db: Database.Database, status?: string): AgentRow[] {
   if (status) {
-    return db.prepare("SELECT * FROM agents WHERE status = ?").all(status);
+    return db.prepare<[string], AgentRow>("SELECT * FROM agents WHERE status = ?").all(status);
   }
-  return db.prepare("SELECT * FROM agents").all();
+  return db.prepare<[], AgentRow>("SELECT * FROM agents").all();
 }
 
 export function updateAgentStatus(db: Database.Database, id: string, status: string) {
@@ -150,7 +209,7 @@ export function createTask(
 }
 
 export function claimTask(db: Database.Database, taskId: string, agentId: string) {
-  const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as any;
+  const task = db.prepare<[string], TaskRow>("SELECT * FROM tasks WHERE id = ?").get(taskId);
   if (!task) throw new Error(`Task ${taskId} not found`);
   if (task.status !== "todo") throw new Error(`Task ${taskId} is ${task.status}, not claimable`);
 
@@ -167,7 +226,7 @@ export function completeTask(
   agentId: string,
   result?: import("./schemas.js").TaskResult,
 ) {
-  const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(taskId) as any;
+  const task = db.prepare<[string], TaskRow>("SELECT * FROM tasks WHERE id = ?").get(taskId);
   if (!task) throw new Error(`Task ${taskId} not found`);
 
   db.prepare(`
@@ -175,7 +234,7 @@ export function completeTask(
     SET status = 'done', completed_at = datetime('now'), updated_at = datetime('now'), result = ?
     WHERE id = ?
   `).run(result ? JSON.stringify(result) : null, taskId);
-  logEvent(db, agentId, "task.complete", { taskId, result }, taskId);
+  logEvent(db, agentId, "task.complete", { taskId, result: result ?? null }, taskId);
 }
 
 export function listTasks(
@@ -186,7 +245,7 @@ export function listTasks(
   },
 ) {
   let query = "SELECT * FROM tasks WHERE 1=1";
-  const params: any[] = [];
+  const params: string[] = [];
   if (filters?.status) {
     query += " AND status = ?";
     params.push(filters.status);
@@ -196,7 +255,7 @@ export function listTasks(
     params.push(filters.assignee);
   }
   query += " ORDER BY priority DESC, created_at ASC";
-  return db.prepare(query).all(...params);
+  return db.prepare<string[], TaskRow>(query).all(...params);
 }
 
 export function updateTaskStatus(
@@ -250,11 +309,13 @@ export function resolveEscalation(db: Database.Database, id: string, agentId: st
   logEvent(db, agentId, "escalation.resolve", { id });
 }
 
-export function listEscalations(db: Database.Database, status?: string) {
+export function listEscalations(db: Database.Database, status?: string): EscalationRow[] {
   if (status) {
-    return db.prepare("SELECT * FROM escalations WHERE status = ?").all(status);
+    return db
+      .prepare<[string], EscalationRow>("SELECT * FROM escalations WHERE status = ?")
+      .all(status);
   }
-  return db.prepare("SELECT * FROM escalations ORDER BY created_at DESC").all();
+  return db.prepare<[], EscalationRow>("SELECT * FROM escalations ORDER BY created_at DESC").all();
 }
 
 // --- Event operations ---
@@ -263,7 +324,7 @@ export function logEvent(
   db: Database.Database,
   agentId: string | null,
   eventType: string,
-  payload?: any,
+  payload?: Record<string, unknown> | null,
   taskId?: string | null,
 ) {
   db.prepare(`
@@ -281,7 +342,7 @@ export function getEvents(
   },
 ) {
   let query = "SELECT * FROM events WHERE 1=1";
-  const params: any[] = [];
+  const params: (string | number)[] = [];
   if (opts?.agent_id) {
     query += " AND agent_id = ?";
     params.push(opts.agent_id);
@@ -295,27 +356,29 @@ export function getEvents(
     query += " LIMIT ?";
     params.push(opts.limit);
   }
-  return db.prepare(query).all(...params);
+  return db.prepare<(string | number)[], EventRow>(query).all(...params);
 }
 
 // --- Status/Dashboard ---
 
 export function orgStatus(db: Database.Database) {
   const agents = db
-    .prepare("SELECT status, COUNT(*) as count FROM agents GROUP BY status")
-    .all() as any[];
+    .prepare<[], StatusCountRow>("SELECT status, COUNT(*) as count FROM agents GROUP BY status")
+    .all();
   const tasks = db
-    .prepare("SELECT status, COUNT(*) as count FROM tasks GROUP BY status")
-    .all() as any[];
+    .prepare<[], StatusCountRow>("SELECT status, COUNT(*) as count FROM tasks GROUP BY status")
+    .all();
   const openEscalations = db
-    .prepare("SELECT COUNT(*) as count FROM escalations WHERE status = ?")
-    .get("open") as any;
-  const recentEvents = db.prepare("SELECT * FROM events ORDER BY id DESC LIMIT 10").all();
+    .prepare<[string], CountRow>("SELECT COUNT(*) as count FROM escalations WHERE status = ?")
+    .get("open");
+  const recentEvents = db
+    .prepare<[], EventRow>("SELECT * FROM events ORDER BY id DESC LIMIT 10")
+    .all();
 
   return {
-    agents: Object.fromEntries(agents.map((r: any) => [r.status, r.count])),
-    tasks: Object.fromEntries(tasks.map((r: any) => [r.status, r.count])),
-    openEscalations: openEscalations.count,
+    agents: Object.fromEntries(agents.map((r) => [r.status, r.count])),
+    tasks: Object.fromEntries(tasks.map((r) => [r.status, r.count])),
+    openEscalations: openEscalations?.count ?? 0,
     recentEvents,
   };
 }

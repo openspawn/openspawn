@@ -284,7 +284,7 @@ describe("completeTask — result storage integration", () => {
     const result: TaskResult = { type: "pr_merged", pr: 99, branch: "feat/ship" };
     completeTask(db, taskId, "agent-1", result);
 
-    const tasks = listTasks(db, { status: "done" }) as any[];
+    const tasks = listTasks(db, { status: "done" });
     expect(tasks).toHaveLength(1);
     const stored = JSON.parse(tasks[0].result);
     expect(stored.type).toBe("pr_merged");
@@ -296,7 +296,7 @@ describe("completeTask — result storage integration", () => {
     const taskId = createTask(db, { title: "Silent task" });
     completeTask(db, taskId, "agent-1");
 
-    const tasks = listTasks(db, { status: "done" }) as any[];
+    const tasks = listTasks(db, { status: "done" });
     expect(tasks).toHaveLength(1);
     expect(tasks[0].result).toBeNull();
   });
@@ -306,7 +306,7 @@ describe("completeTask — result storage integration", () => {
     const result: TaskResult = { type: "freeform", text: "Did some stuff" };
     completeTask(db, taskId, "agent-1", result);
 
-    const tasks = listTasks(db, { status: "done" }) as any[];
+    const tasks = listTasks(db, { status: "done" });
     const stored = JSON.parse(tasks[0].result);
     expect(stored.type).toBe("freeform");
     expect(stored.text).toBe("Did some stuff");
@@ -316,7 +316,7 @@ describe("completeTask — result storage integration", () => {
     const taskId = createTask(db, { title: "Timed task" });
     completeTask(db, taskId, "agent-1", { type: "freeform", text: "done" });
 
-    const tasks = listTasks(db, { status: "done" }) as any[];
+    const tasks = listTasks(db, { status: "done" });
     expect(tasks[0].completed_at).toBeTruthy();
   });
 });
