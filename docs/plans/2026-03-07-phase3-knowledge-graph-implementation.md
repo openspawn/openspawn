@@ -13,6 +13,7 @@
 ## Task 1: Graph Data Models + Alembic Migration
 
 **Files:**
+
 - Create: `apps/api/app/models/graph.py`
 - Modify: `apps/api/app/models/enums.py`
 - Create: `apps/api/alembic/versions/xxxx_add_graph_tables.py` (via autogenerate)
@@ -238,6 +239,7 @@ with pgvector HNSW index and composite unique constraints"
 ## Task 2: GraphStore Protocol + Postgres Implementation
 
 **Files:**
+
 - Create: `apps/api/app/memory/graph/__init__.py`
 - Create: `apps/api/app/memory/graph/protocol.py`
 - Create: `apps/api/app/memory/graph/schemas.py`
@@ -898,6 +900,7 @@ overlap scoring, gap detection, and subgraph export"
 ## Task 3: Entity Extraction Pipeline (LLM + arq Worker)
 
 **Files:**
+
 - Create: `apps/api/app/memory/graph/extraction.py`
 - Modify: `apps/api/app/workers/enrichment.py` — replace `derive_facts` stub
 - Test: `apps/api/tests/test_graph_extraction.py`
@@ -1098,6 +1101,7 @@ async def extract_from_content(
 **Step 4: Update enrichment worker**
 
 Modify `apps/api/app/workers/enrichment.py`:
+
 - Replace `derive_facts` with `extract_entities`
 - Add `merge_entities` job
 - Update `WorkerSettings.functions` and `cron_jobs`
@@ -1214,6 +1218,7 @@ replaces derive_facts stub, adds merge_duplicate_entities job"
 ## Task 4: Graph API Router + Endpoints
 
 **Files:**
+
 - Create: `apps/api/app/memory/graph/router.py`
 - Modify: `apps/api/app/main.py` — register graph router
 - Test: `apps/api/tests/test_graph_routes.py`
@@ -1493,6 +1498,7 @@ entities, relationships, overlap, gaps, neighbors, cytoscape data"
 ## Task 5: Agent File Export/Import (#549)
 
 **Files:**
+
 - Create: `apps/api/app/memory/graph/agent_file.py`
 - Modify: `apps/api/app/memory/graph/router.py` — add export/import endpoints
 - Test: `apps/api/tests/test_agent_file.py`
@@ -1771,12 +1777,14 @@ export agent memories + knowledge subgraph, import with entity dedup"
 ## Task 6: MCP Tools for Graph
 
 **Files:**
+
 - Modify: `apps/mcp/` — add graph tools (or `apps/api/app/mcp/` if MCP is in API)
 - Test: `apps/api/tests/test_graph_mcp.py`
 
 **Step 1: Locate MCP server**
 
 Check `apps/mcp/` structure. Add 4 new tools:
+
 - `memory_graph_entities` — list entities the agent knows
 - `memory_graph_related` — find entities related to a concept
 - `memory_graph_who_knows` — which agents know about entity X
@@ -1821,6 +1829,7 @@ memory_graph_who_knows, memory_graph_gaps"
 ## Task 7: Demo Fixtures for Graph
 
 **Files:**
+
 - Create: `libs/demo-data/src/fixtures/graph.ts`
 - Modify: `libs/demo-data/src/fixtures/index.ts` — export graph fixtures
 
@@ -1875,53 +1884,330 @@ export interface DemoRelationship {
 }
 
 export const demoEntities: DemoEntity[] = [
-  { id: ENTITY_IDS.docker, name: "docker", entityType: "tool", description: "Container platform for deployment", mentionCount: 8, confidence: 88, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.ciPipeline, name: "ci pipeline", entityType: "process", description: "Continuous integration workflow", mentionCount: 6, confidence: 85, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.redis, name: "redis", entityType: "tool", description: "In-memory data store for caching and queues", mentionCount: 7, confidence: 90, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy, AGENT_IDS.patrick] },
-  { id: ENTITY_IDS.deployment, name: "deployment", entityType: "process", description: "Production deployment pipeline", mentionCount: 5, confidence: 82, agentIds: [AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.caddy, name: "caddy", entityType: "tool", description: "Reverse proxy with auto-HTTPS", mentionCount: 3, confidence: 78, agentIds: [AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.monitoring, name: "monitoring", entityType: "concept", description: "System observability and alerting", mentionCount: 4, confidence: 75, agentIds: [AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.caching, name: "caching", entityType: "concept", description: "Data caching strategies", mentionCount: 5, confidence: 86, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.patrick] },
-  { id: ENTITY_IDS.loadBalancing, name: "load balancing", entityType: "concept", description: "Traffic distribution across servers", mentionCount: 2, confidence: 70, agentIds: [AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.security, name: "security", entityType: "concept", description: "Application security practices", mentionCount: 3, confidence: 72, agentIds: [AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.database, name: "postgres", entityType: "tool", description: "Primary relational database", mentionCount: 9, confidence: 92, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy, AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.api, name: "fastapi", entityType: "tool", description: "Python web framework for REST APIs", mentionCount: 6, confidence: 88, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.testing, name: "testing", entityType: "process", description: "Automated test suite", mentionCount: 4, confidence: 80, agentIds: [AGENT_IDS.spongebob] },
-  { id: ENTITY_IDS.kubernetes, name: "kubernetes", entityType: "tool", description: "Container orchestration (future)", mentionCount: 1, confidence: 40, agentIds: [AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.logging, name: "structured logging", entityType: "concept", description: "structlog-based application logging", mentionCount: 3, confidence: 76, agentIds: [AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.authentication, name: "authentication", entityType: "concept", description: "API key + HMAC auth system", mentionCount: 4, confidence: 84, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.squidward] },
-  { id: ENTITY_IDS.rateLimit, name: "rate limiting", entityType: "concept", description: "Per-agent request throttling", mentionCount: 3, confidence: 82, agentIds: [AGENT_IDS.spongebob] },
-  { id: ENTITY_IDS.webhook, name: "webhook", entityType: "concept", description: "Event notification system", mentionCount: 2, confidence: 68, agentIds: [AGENT_IDS.patrick] },
-  { id: ENTITY_IDS.pgvector, name: "pgvector", entityType: "tool", description: "Postgres vector similarity extension", mentionCount: 5, confidence: 90, agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.nginx, name: "nginx", entityType: "tool", description: "Web server (replaced by Caddy)", mentionCount: 1, confidence: 35, agentIds: [AGENT_IDS.sandy] },
-  { id: ENTITY_IDS.ssl, name: "ssl certificates", entityType: "concept", description: "HTTPS certificate management", mentionCount: 2, confidence: 74, agentIds: [AGENT_IDS.sandy] },
+  {
+    id: ENTITY_IDS.docker,
+    name: "docker",
+    entityType: "tool",
+    description: "Container platform for deployment",
+    mentionCount: 8,
+    confidence: 88,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.ciPipeline,
+    name: "ci pipeline",
+    entityType: "process",
+    description: "Continuous integration workflow",
+    mentionCount: 6,
+    confidence: 85,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.redis,
+    name: "redis",
+    entityType: "tool",
+    description: "In-memory data store for caching and queues",
+    mentionCount: 7,
+    confidence: 90,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy, AGENT_IDS.patrick],
+  },
+  {
+    id: ENTITY_IDS.deployment,
+    name: "deployment",
+    entityType: "process",
+    description: "Production deployment pipeline",
+    mentionCount: 5,
+    confidence: 82,
+    agentIds: [AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.caddy,
+    name: "caddy",
+    entityType: "tool",
+    description: "Reverse proxy with auto-HTTPS",
+    mentionCount: 3,
+    confidence: 78,
+    agentIds: [AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.monitoring,
+    name: "monitoring",
+    entityType: "concept",
+    description: "System observability and alerting",
+    mentionCount: 4,
+    confidence: 75,
+    agentIds: [AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.caching,
+    name: "caching",
+    entityType: "concept",
+    description: "Data caching strategies",
+    mentionCount: 5,
+    confidence: 86,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.patrick],
+  },
+  {
+    id: ENTITY_IDS.loadBalancing,
+    name: "load balancing",
+    entityType: "concept",
+    description: "Traffic distribution across servers",
+    mentionCount: 2,
+    confidence: 70,
+    agentIds: [AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.security,
+    name: "security",
+    entityType: "concept",
+    description: "Application security practices",
+    mentionCount: 3,
+    confidence: 72,
+    agentIds: [AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.database,
+    name: "postgres",
+    entityType: "tool",
+    description: "Primary relational database",
+    mentionCount: 9,
+    confidence: 92,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy, AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.api,
+    name: "fastapi",
+    entityType: "tool",
+    description: "Python web framework for REST APIs",
+    mentionCount: 6,
+    confidence: 88,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.testing,
+    name: "testing",
+    entityType: "process",
+    description: "Automated test suite",
+    mentionCount: 4,
+    confidence: 80,
+    agentIds: [AGENT_IDS.spongebob],
+  },
+  {
+    id: ENTITY_IDS.kubernetes,
+    name: "kubernetes",
+    entityType: "tool",
+    description: "Container orchestration (future)",
+    mentionCount: 1,
+    confidence: 40,
+    agentIds: [AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.logging,
+    name: "structured logging",
+    entityType: "concept",
+    description: "structlog-based application logging",
+    mentionCount: 3,
+    confidence: 76,
+    agentIds: [AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.authentication,
+    name: "authentication",
+    entityType: "concept",
+    description: "API key + HMAC auth system",
+    mentionCount: 4,
+    confidence: 84,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.squidward],
+  },
+  {
+    id: ENTITY_IDS.rateLimit,
+    name: "rate limiting",
+    entityType: "concept",
+    description: "Per-agent request throttling",
+    mentionCount: 3,
+    confidence: 82,
+    agentIds: [AGENT_IDS.spongebob],
+  },
+  {
+    id: ENTITY_IDS.webhook,
+    name: "webhook",
+    entityType: "concept",
+    description: "Event notification system",
+    mentionCount: 2,
+    confidence: 68,
+    agentIds: [AGENT_IDS.patrick],
+  },
+  {
+    id: ENTITY_IDS.pgvector,
+    name: "pgvector",
+    entityType: "tool",
+    description: "Postgres vector similarity extension",
+    mentionCount: 5,
+    confidence: 90,
+    agentIds: [AGENT_IDS.spongebob, AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.nginx,
+    name: "nginx",
+    entityType: "tool",
+    description: "Web server (replaced by Caddy)",
+    mentionCount: 1,
+    confidence: 35,
+    agentIds: [AGENT_IDS.sandy],
+  },
+  {
+    id: ENTITY_IDS.ssl,
+    name: "ssl certificates",
+    entityType: "concept",
+    description: "HTTPS certificate management",
+    mentionCount: 2,
+    confidence: 74,
+    agentIds: [AGENT_IDS.sandy],
+  },
 ];
 
 export const demoRelationships: DemoRelationship[] = [
-  { id: "r001", sourceEntityId: ENTITY_IDS.docker, targetEntityId: ENTITY_IDS.deployment, relationshipType: "used_in", weight: 0.9, evidenceCount: 4 },
-  { id: "r002", sourceEntityId: ENTITY_IDS.ciPipeline, targetEntityId: ENTITY_IDS.docker, relationshipType: "builds", weight: 0.85, evidenceCount: 3 },
-  { id: "r003", sourceEntityId: ENTITY_IDS.redis, targetEntityId: ENTITY_IDS.caching, relationshipType: "implements", weight: 0.9, evidenceCount: 5 },
-  { id: "r004", sourceEntityId: ENTITY_IDS.caddy, targetEntityId: ENTITY_IDS.ssl, relationshipType: "manages", weight: 0.8, evidenceCount: 2 },
-  { id: "r005", sourceEntityId: ENTITY_IDS.caddy, targetEntityId: ENTITY_IDS.loadBalancing, relationshipType: "provides", weight: 0.7, evidenceCount: 1 },
-  { id: "r006", sourceEntityId: ENTITY_IDS.api, targetEntityId: ENTITY_IDS.database, relationshipType: "connects_to", weight: 0.95, evidenceCount: 6 },
-  { id: "r007", sourceEntityId: ENTITY_IDS.api, targetEntityId: ENTITY_IDS.redis, relationshipType: "uses", weight: 0.85, evidenceCount: 4 },
-  { id: "r008", sourceEntityId: ENTITY_IDS.database, targetEntityId: ENTITY_IDS.pgvector, relationshipType: "extends_with", weight: 0.9, evidenceCount: 3 },
-  { id: "r009", sourceEntityId: ENTITY_IDS.api, targetEntityId: ENTITY_IDS.authentication, relationshipType: "enforces", weight: 0.9, evidenceCount: 4 },
-  { id: "r010", sourceEntityId: ENTITY_IDS.api, targetEntityId: ENTITY_IDS.rateLimit, relationshipType: "enforces", weight: 0.85, evidenceCount: 3 },
-  { id: "r011", sourceEntityId: ENTITY_IDS.monitoring, targetEntityId: ENTITY_IDS.logging, relationshipType: "includes", weight: 0.8, evidenceCount: 2 },
-  { id: "r012", sourceEntityId: ENTITY_IDS.ciPipeline, targetEntityId: ENTITY_IDS.testing, relationshipType: "runs", weight: 0.9, evidenceCount: 3 },
-  { id: "r013", sourceEntityId: ENTITY_IDS.nginx, targetEntityId: ENTITY_IDS.caddy, relationshipType: "replaced_by", weight: 0.6, evidenceCount: 1 },
-  { id: "r014", sourceEntityId: ENTITY_IDS.deployment, targetEntityId: ENTITY_IDS.caddy, relationshipType: "proxied_by", weight: 0.8, evidenceCount: 2 },
-  { id: "r015", sourceEntityId: ENTITY_IDS.webhook, targetEntityId: ENTITY_IDS.api, relationshipType: "calls", weight: 0.7, evidenceCount: 2 },
+  {
+    id: "r001",
+    sourceEntityId: ENTITY_IDS.docker,
+    targetEntityId: ENTITY_IDS.deployment,
+    relationshipType: "used_in",
+    weight: 0.9,
+    evidenceCount: 4,
+  },
+  {
+    id: "r002",
+    sourceEntityId: ENTITY_IDS.ciPipeline,
+    targetEntityId: ENTITY_IDS.docker,
+    relationshipType: "builds",
+    weight: 0.85,
+    evidenceCount: 3,
+  },
+  {
+    id: "r003",
+    sourceEntityId: ENTITY_IDS.redis,
+    targetEntityId: ENTITY_IDS.caching,
+    relationshipType: "implements",
+    weight: 0.9,
+    evidenceCount: 5,
+  },
+  {
+    id: "r004",
+    sourceEntityId: ENTITY_IDS.caddy,
+    targetEntityId: ENTITY_IDS.ssl,
+    relationshipType: "manages",
+    weight: 0.8,
+    evidenceCount: 2,
+  },
+  {
+    id: "r005",
+    sourceEntityId: ENTITY_IDS.caddy,
+    targetEntityId: ENTITY_IDS.loadBalancing,
+    relationshipType: "provides",
+    weight: 0.7,
+    evidenceCount: 1,
+  },
+  {
+    id: "r006",
+    sourceEntityId: ENTITY_IDS.api,
+    targetEntityId: ENTITY_IDS.database,
+    relationshipType: "connects_to",
+    weight: 0.95,
+    evidenceCount: 6,
+  },
+  {
+    id: "r007",
+    sourceEntityId: ENTITY_IDS.api,
+    targetEntityId: ENTITY_IDS.redis,
+    relationshipType: "uses",
+    weight: 0.85,
+    evidenceCount: 4,
+  },
+  {
+    id: "r008",
+    sourceEntityId: ENTITY_IDS.database,
+    targetEntityId: ENTITY_IDS.pgvector,
+    relationshipType: "extends_with",
+    weight: 0.9,
+    evidenceCount: 3,
+  },
+  {
+    id: "r009",
+    sourceEntityId: ENTITY_IDS.api,
+    targetEntityId: ENTITY_IDS.authentication,
+    relationshipType: "enforces",
+    weight: 0.9,
+    evidenceCount: 4,
+  },
+  {
+    id: "r010",
+    sourceEntityId: ENTITY_IDS.api,
+    targetEntityId: ENTITY_IDS.rateLimit,
+    relationshipType: "enforces",
+    weight: 0.85,
+    evidenceCount: 3,
+  },
+  {
+    id: "r011",
+    sourceEntityId: ENTITY_IDS.monitoring,
+    targetEntityId: ENTITY_IDS.logging,
+    relationshipType: "includes",
+    weight: 0.8,
+    evidenceCount: 2,
+  },
+  {
+    id: "r012",
+    sourceEntityId: ENTITY_IDS.ciPipeline,
+    targetEntityId: ENTITY_IDS.testing,
+    relationshipType: "runs",
+    weight: 0.9,
+    evidenceCount: 3,
+  },
+  {
+    id: "r013",
+    sourceEntityId: ENTITY_IDS.nginx,
+    targetEntityId: ENTITY_IDS.caddy,
+    relationshipType: "replaced_by",
+    weight: 0.6,
+    evidenceCount: 1,
+  },
+  {
+    id: "r014",
+    sourceEntityId: ENTITY_IDS.deployment,
+    targetEntityId: ENTITY_IDS.caddy,
+    relationshipType: "proxied_by",
+    weight: 0.8,
+    evidenceCount: 2,
+  },
+  {
+    id: "r015",
+    sourceEntityId: ENTITY_IDS.webhook,
+    targetEntityId: ENTITY_IDS.api,
+    relationshipType: "calls",
+    weight: 0.7,
+    evidenceCount: 2,
+  },
 ];
 
 export function getCytoscapeData() {
   return {
     nodes: demoEntities.map((e) => ({
-      data: { id: e.id, label: e.name, type: e.entityType, mention_count: e.mentionCount, confidence: e.confidence },
+      data: {
+        id: e.id,
+        label: e.name,
+        type: e.entityType,
+        mention_count: e.mentionCount,
+        confidence: e.confidence,
+      },
     })),
     edges: demoRelationships.map((r) => ({
-      data: { id: r.id, source: r.sourceEntityId, target: r.targetEntityId, label: r.relationshipType, weight: r.weight },
+      data: {
+        id: r.id,
+        source: r.sourceEntityId,
+        target: r.targetEntityId,
+        label: r.relationshipType,
+        weight: r.weight,
+      },
     })),
   };
 }
@@ -1950,6 +2236,7 @@ git commit -m "feat(demo): add knowledge graph fixtures
 ## Task 8: Dashboard — Graph Visualization Page
 
 **Files:**
+
 - Create: `apps/demo/src/pages/graph.tsx`
 - Modify: `apps/demo/src/pages/index.ts` — export GraphPage
 - Modify: `apps/demo/src/pages/routes.tsx` — add `/graph` route
@@ -1965,6 +2252,7 @@ pnpm add -D @types/cytoscape
 **Step 2: Create graph page**
 
 Create `apps/demo/src/pages/graph.tsx` with:
+
 - Cytoscape.js canvas rendering graph from demo fixtures (or API if backend available)
 - Nodes colored by entity type, sized by mention_count
 - Edges labeled by relationship type, weighted by strength
@@ -1990,6 +2278,7 @@ export * from "./graph";
 ```
 
 Add nav link in `layout.tsx`:
+
 ```typescript
 { to: "/graph", label: "Graph", icon: Share2 }
 ```
@@ -2010,6 +2299,7 @@ demo mode with fixture data"
 ## Task 9: Dashboard — Memory Page Feedback + Contradictions Panels
 
 **Files:**
+
 - Modify: `apps/demo/src/pages/memory.tsx` — add feedback buttons + contradictions panel
 
 **Step 1: Add feedback buttons to MemoryCard**
@@ -2037,6 +2327,7 @@ complete Phase 2 unfinished frontend work on memory page"
 ## Task 10: OpenAPI Schema + Frontend Types
 
 **Files:**
+
 - Modify: `apps/api/openapi.json` — regenerate
 - Modify: `libs/dashboard-data/src/rest/generated/schema.d.ts` — regenerate
 
@@ -2066,6 +2357,7 @@ includes graph endpoints, agent file, overlap, gaps"
 ## Task 11: Integration Tests
 
 **Files:**
+
 - Create: `apps/api/tests/test_graph_integration.py`
 
 **Step 1: Write integration tests**

@@ -10,16 +10,15 @@ You are an AI agent that needs to coordinate other agents. OpenSpawn gives you a
 
 **The core idea:** One file defines your entire agent organization. Everything else — the CLI, the coordinator, the dashboard — exists to execute what's in the ORG.md.
 
-## Three commands to a running org
+## Two commands to a running org
 
 ```bash
 openspawn init my-org --template=saas-onboarding --yes
 cd my-org
 openspawn start
-openspawn status
 ```
 
-That's it. You now have a running org with an Onboarding Lead, Data Migration Specialist, Integration Engineer, and Success Agent — with OpenClaw gateway configs ready to apply.
+That's it. The Python API boots with SQLite, seeds agents from your ORG.md, and spawns Claude Code CLI subprocesses for each agent. You now have an Onboarding Lead, Data Migration Specialist, Integration Engineer, and Success Agent — coordinated and visible in the dashboard.
 
 > **Q: Do I need API keys?**
 >
@@ -27,20 +26,13 @@ That's it. You now have a running org with an Onboarding Lead, Data Migration Sp
 
 > **Q: What just happened?**
 >
-> - `init` created `ORG.md` (your org definition) and `openclaw-agents.json`
-> - `start` read the agents config and generated `openclaw-patch.json` with OpenClaw gateway entries
-> - `status` displayed a table of all agents with their name, level, model, workspace, and reports-to
+> - `init` scaffolded `ORG.md` (your org definition), agent workspaces, and config
+> - `start` booted the FastAPI server, seeded agents into SQLite, and started the asyncio scheduler for background jobs (SLA monitoring, escalation, status sync)
 
-> **Q: What is openclaw-patch.json?**
+> **Q: What prerequisites do I need?**
 >
-> - A ready-to-apply patch for your OpenClaw gateway's `agents.list`
-> - Each entry has: `id`, `model` (opus for L7+, sonnet for L6-), `workspace`, `tools.profile: "full"`
-> - Manager agents (L7+ with direct reports) also get `subagents.allowAgents`
-> - The highest-level agent gets `default: true`
-
-> **Q: How do I apply the patch to my gateway?**
->
-> - Copy the entries from `openclaw-patch.json` into your OpenClaw `agents.list` configuration, then restart the gateway.
+> - Node.js 18+, Python 3.12+, and [uv](https://docs.astral.sh/uv/) (Python package manager)
+> - No Docker needed for local development
 
 ---
 
@@ -165,32 +157,15 @@ Step-by-step procedures for standard scenarios and escalations.
 
 ## Validate your org
 
-```bash
-openspawn validate ORG.md
-```
+ORG.md is validated automatically when `openspawn start` boots the API. The seeder parses your org definition, checks hierarchy consistency, and reports errors before spawning agents.
 
-Output on success:
+Common validation errors:
 
-```
-✅ ORG.md is valid
-
-  Organization:  SaaS Onboarding Org
-  Agents:        4
-  Culture:       agency
-
-  Agent hierarchy:
-    🎯 Onboarding Lead (L7, Customer Success)
-      📦 Data Migration Specialist (L5, Engineering)
-      🔧 Integration Engineer (L5, Engineering)
-      ✅ Success Agent (L4, Customer Success)
-```
-
-> **Q: If I see "validation failed", what do I do?**
->
-> - The output lists each issue. Common fixes:
->   - "Missing Structure section" → Add `## Structure` with at least one agent
->   - "Agent reports to unknown agent" → Check spelling of the `Reports to` value
->   - "No top-level agent" → One agent must have `Reports to: Human Principal`
+| Error                            | Fix                                               |
+| -------------------------------- | ------------------------------------------------- |
+| `Missing Structure section`      | Add `## Structure` with at least one agent        |
+| `Agent reports to unknown agent` | Check `Reports to` matches an existing agent name |
+| `No top-level agent`             | One agent must have `Reports to: Human Principal` |
 
 ---
 
@@ -345,29 +320,29 @@ tool: org_status
 
 ## Error recovery
 
-| You see                          | Run this                                                                                                                                                      |
+| You see                          | Fix                                                                                                                                                           |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Cannot read ORG.md`             | `openspawn validate` — check the file exists and is valid markdown                                                                                            |
-| `Port 3333 already in use`       | `lsof -i :3333` then kill the process, or set `"port": 3334` in config                                                                                        |
+| `Cannot read ORG.md`             | Check the file exists in the current directory and is valid markdown                                                                                          |
+| `Port 8787 already in use`       | `lsof -i :8787` then kill the process, or use `--port 9000`                                                                                                   |
 | `Unknown template: foo`          | Valid templates: `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trials` |
 | `Agent reports to unknown agent` | Check the `Reports to` field matches an existing agent name exactly                                                                                           |
 | `HMAC authentication failed`     | Verify `AGENT_ID` and `AGENT_SECRET` env vars match the API config                                                                                            |
+| `uv not found`                   | Install uv: `curl -LsSf https://astral.sh/uv/install.sh \| sh`                                                                                                |
 
 ---
 
 ## Boot Sequence — How Orgs Start Up
 
-When `openspawn start` boots your org, the lead agent doesn't just start delegating. It follows a **planning-first boot sequence**:
+When `openspawn start` boots your org, the API seeds agents from ORG.md into SQLite, then spawns Claude Code CLI subprocesses (with a configurable concurrency cap). The lead agent follows a **planning-first boot sequence**:
 
 ```
 1. Read ORG.md     → understand mission, team, constraints
 2. Read PLAN.md    → check if resuming a previous run
 3. Write PLAN.md   → break mission into phased tasks with assignments
-4. Register agents → agent_register for each team member
-5. Create tasks    → task_create for current-phase items
-6. Monitor         → org_status every 5 minutes
-7. Adapt           → update PLAN.md when things change
-8. Complete        → escalate "mission complete" when done
+4. Create tasks    → task_create via MCP for current-phase items
+5. Monitor         → org_status every 5 minutes
+6. Adapt           → update PLAN.md when things change
+7. Complete        → escalate "mission complete" when done
 ```
 
 **Example for a SaaS onboarding org:** The Onboarding Lead reads the ORG.md, sees the 48-hour track playbook, writes PLAN.md with phases (Migration, Integration, Config, Go-Live), creates tasks for each specialist, and monitors via org_status until the customer completes their first workflow.

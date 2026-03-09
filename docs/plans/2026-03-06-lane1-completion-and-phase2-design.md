@@ -24,21 +24,25 @@ Complete Lane 1 remaining issues (#532, #533, #534, #535) and Phase 2 memory int
 Add observability as **optional** — app works without tokens, instruments when configured.
 
 **Dependencies to add:**
+
 - `logfire[fastapi,sqlalchemy]` — auto-traces requests, Pydantic validation, SQLAlchemy
 - `langfuse` — LLM-specific spans for instructor/litellm calls
 - `opentelemetry-instrumentation-httpx` — trace outbound HTTP (embedding providers)
 
 **Integration points:**
+
 - `app/main.py` — `logfire.instrument_fastapi(app)` (guarded by `LOGFIRE_TOKEN` env var)
 - `app/memory/compression.py` — langfuse trace decorator on LLM compression calls
 - `app/memory/dedup.py` — langfuse trace decorator on LLM dedup decisions
 - `app/memory/providers/*.py` — logfire span on embed calls
 
 **Config (all optional env vars):**
+
 - `LOGFIRE_TOKEN` — enables logfire (no-op without)
 - `LANGFUSE_PUBLIC_KEY` + `LANGFUSE_SECRET_KEY` — enables langfuse (no-op without)
 
 **No-op pattern:**
+
 ```python
 import logfire
 logfire.configure()  # no-op if LOGFIRE_TOKEN not set
@@ -55,7 +59,7 @@ logfire.instrument_fastapi(app)
 - Deploy builds Node sandbox image only
 - `apps/api-nestjs/` — 170 files, ~19K lines, zero production usage, fully replaced
 - `tools/sandbox-python/` — experimental, not deployed
-- 13 @nestjs/* deps in root package.json
+- 13 @nestjs/\* deps in root package.json
 - CI has stale api-nestjs typecheck step
 
 ### Design
@@ -64,7 +68,7 @@ logfire.instrument_fastapi(app)
 
 - Delete `apps/api-nestjs/` entirely
 - Delete `tools/sandbox-python/` entirely
-- Remove 13 @nestjs/* deps from root `package.json`
+- Remove 13 @nestjs/\* deps from root `package.json`
 - Remove api-nestjs typecheck from `.github/workflows/ci.yml`
 - Remove api-nestjs from `knip.json`
 - Remove api-nestjs from `.vscode/launch.json`
@@ -72,6 +76,7 @@ logfire.instrument_fastapi(app)
 #### 2b. FastAPI Dockerfile
 
 Create `apps/api/Dockerfile`:
+
 ```dockerfile
 FROM ghcr.io/astral-sh/uv:python3.12-slim AS builder
 WORKDIR /app
@@ -91,6 +96,7 @@ CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "800
 #### 2c. docker-compose update
 
 Add `api` service:
+
 ```yaml
 api:
   build: apps/api
@@ -130,6 +136,7 @@ Add route in `tools/sandbox/src` to proxy `/api/*` → `http://api:8000` (contai
 **Step 1: Export OpenAPI schema**
 
 Script in `apps/api/scripts/export-openapi.py`:
+
 ```python
 from app.main import app
 import json, sys
@@ -147,6 +154,7 @@ pnpm add -D openapi-typescript openapi-fetch
 **Step 3: Codegen script**
 
 In root `package.json`:
+
 ```json
 "codegen:rest": "openapi-typescript apps/api/openapi.json -o libs/dashboard-data/src/rest/generated/schema.d.ts"
 ```
@@ -154,6 +162,7 @@ In root `package.json`:
 **Step 4: Typed fetch client**
 
 `libs/dashboard-data/src/rest/client.ts`:
+
 ```typescript
 import createClient from "openapi-fetch";
 import type { paths } from "./generated/schema";
@@ -162,6 +171,7 @@ export const api = createClient<paths>({ baseUrl: getSandboxUrl() });
 ```
 
 **Output structure:**
+
 ```
 libs/dashboard-data/src/rest/
   generated/
@@ -187,25 +197,26 @@ libs/dashboard-data/src/rest/
 
 In `libs/dashboard-data/src/hooks/`, create REST equivalents using TanStack Query + openapi-fetch client:
 
-| GraphQL Hook | REST Hook | Endpoint |
-|--|--|--|
-| useTasksQuery | useTasks | GET /tasks |
-| useTaskQuery | useTask | GET /tasks/:id |
-| useAgentsQuery | useAgents | GET /agents |
-| useCreditHistoryQuery | useCreditHistory | GET /credits |
-| useEventsQuery | useEvents | GET /events |
-| useChannelsQuery | useChannels | GET /channels |
-| useMessagesQuery | useMessages | GET /messages |
-| useWebhooksQuery | useWebhooks | GET /webhooks |
-| useWebhookQuery | useWebhook | GET /webhooks/:id |
-| useCreateWebhookMutation | useCreateWebhook | POST /webhooks |
-| useUpdateWebhookMutation | useUpdateWebhook | PATCH /webhooks/:id |
-| useDeleteWebhookMutation | useDeleteWebhook | DELETE /webhooks/:id |
-| useTestWebhookMutation | useTestWebhook | POST /webhooks/:id/test |
+| GraphQL Hook             | REST Hook        | Endpoint                |
+| ------------------------ | ---------------- | ----------------------- |
+| useTasksQuery            | useTasks         | GET /tasks              |
+| useTaskQuery             | useTask          | GET /tasks/:id          |
+| useAgentsQuery           | useAgents        | GET /agents             |
+| useCreditHistoryQuery    | useCreditHistory | GET /credits            |
+| useEventsQuery           | useEvents        | GET /events             |
+| useChannelsQuery         | useChannels      | GET /channels           |
+| useMessagesQuery         | useMessages      | GET /messages           |
+| useWebhooksQuery         | useWebhooks      | GET /webhooks           |
+| useWebhookQuery          | useWebhook       | GET /webhooks/:id       |
+| useCreateWebhookMutation | useCreateWebhook | POST /webhooks          |
+| useUpdateWebhookMutation | useUpdateWebhook | PATCH /webhooks/:id     |
+| useDeleteWebhookMutation | useDeleteWebhook | DELETE /webhooks/:id    |
+| useTestWebhookMutation   | useTestWebhook   | POST /webhooks/:id/test |
 
 **Step 2: Migrate consumers**
 
 Group migrations by domain (one PR per group):
+
 1. Agents (useAgents) — ~8 files
 2. Tasks (useTasks, useTask) — ~6 files
 3. Credits (useCreditHistory) — ~3 files
@@ -217,6 +228,7 @@ Group migrations by domain (one PR per group):
 **Step 3: Delete GraphQL**
 
 After all consumers migrated:
+
 - Delete `libs/dashboard-data/src/graphql/` (operations, generated hooks, fetcher)
 - Delete `schema.gql`
 - Delete `codegen.ts`
@@ -232,6 +244,7 @@ After all consumers migrated:
 **New deps:** `arq`, `redis`
 
 **Files:**
+
 - `app/workers/enrichment.py` — arq worker with jobs:
   - `boost_co_retrieved()` — increment strength for memories retrieved together
   - `identify_stale()` — flag low-confidence + low-access + old memories
@@ -240,10 +253,12 @@ After all consumers migrated:
 - `app/config.py` — add `REDIS_URL` setting
 
 **Triggers:**
+
 - Cron: run enrichment every 6 hours
 - Event: after every 100 new memories per org
 
 **Two-tier resilience (deferred from Phase 1):**
+
 - Fast path in `service.py`: store raw_content immediately (searchable via tsvector)
 - Enqueue arq job for async: LLM compression + embedding
 - If worker is down, memories still stored and searchable at lower quality
@@ -251,6 +266,7 @@ After all consumers migrated:
 ### 5b. #545 — Feedback Loop + Retrieval Optimization
 
 **Changes:**
+
 - `service.py` — on retrieval, store query in `retrieval_context` jsonb
 - `service.py` — on feedback (helpful/unhelpful), adjust confidence:
   - helpful: confidence += 2 (capped at 100)
@@ -264,6 +280,7 @@ After all consumers migrated:
 ### 5c. #546 — Contradiction Resolution
 
 **Changes:**
+
 - `dedup.py` — CONFLICT path already exists. Enhance:
   - Store both memories, link via `metadata.contradicts_id`
   - Reduce old memory confidence by 20
@@ -278,6 +295,7 @@ After all consumers migrated:
 ### 5d. #547 — Auto-Expire Time-Bound Memories
 
 **Changes:**
+
 - `router.py` — add optional `ttl_seconds` param to POST /memory
   - Sets `expires_at = now + ttl_seconds`
 - `app/workers/expiry.py` — arq periodic job (runs hourly):

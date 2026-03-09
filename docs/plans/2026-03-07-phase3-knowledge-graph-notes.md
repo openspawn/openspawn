@@ -15,6 +15,7 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 **Graph storage:** Postgres adjacency tables (default). GraphStore protocol for future Neo4j/etc backends.
 
 **Issues:**
+
 - #548: Knowledge graph + visualization
 - #549: Agent File export format
 - #550: Cross-agent knowledge overlap analysis
@@ -24,6 +25,7 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 ## What Exists Today
 
 ### Memory System (Phase 1-2, complete)
+
 - Memory model: content, raw_content, embedding(1024d), confidence, strength, source, visibility
 - 3-layer dedup: hash → vector(0.90) → LLM decision (ADD/UPDATE/NOOP/CONFLICT)
 - Hybrid search: pgvector cosine + tsvector BM25 + RRF fusion
@@ -37,15 +39,18 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 - Visibility: shared / private / targeted
 
 ### Existing Enums
+
 - MemoryType: EPISODIC, SEMANTIC, GRAPH (reserved for Phase 3)
 - MemorySource: TASK_COMPLETION, CODE_CHANGE, OBSERVATION, INFERENCE, UNKNOWN
 
 ### Agent Model
+
 - Agents have: id, name, level(1-10), role, status, trustScore, model, mode, teamId, parentId
 - Agent capabilities: skills with proficiency levels
 - Hierarchical: parent-child relationships, teams
 
 ### Dashboard
+
 - Memory page exists with search, filters, stats, source distribution
 - Demo mode with 12 fixture memories
 
@@ -56,6 +61,7 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 ### #548: Knowledge Graph + Visualization
 
 **Entity Extraction Pipeline:**
+
 - When a memory is stored, extract entities (people, tools, concepts, processes, systems)
 - Extract relationships between entities
 - LLM-based extraction via instructor/litellm (same pattern as compression/dedup)
@@ -63,12 +69,14 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 - Need entity deduplication (same concept from different agents/memories)
 
 **Entity Dedup:**
+
 - Exact name match (case-insensitive)
 - Semantic similarity via embedding (e.g., "CI pipeline" vs "continuous integration pipeline")
 - LLM decision for ambiguous cases (same as memory dedup pattern)
 - Merge entities when discovered to be the same thing
 
 **Graph Queries Needed:**
+
 - Get all entities for an org (nodes for visualization)
 - Get all relationships for an org (edges for visualization)
 - Get entity neighbors (1-2 hops)
@@ -78,6 +86,7 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 - Get agents who know about an entity
 
 **Visualization (Cytoscape.js on dashboard):**
+
 - Nodes = entities (colored by type, sized by mention_count)
 - Edges = relationships (weighted by strength, labeled by type)
 - Filter by: agent, entity type, time range
@@ -89,6 +98,7 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 ### #549: Agent File Export
 
 **Export Format:**
+
 - JSON (or YAML) containing:
   - Agent metadata (name, role, level, capabilities)
   - All memories for that agent (content, metadata, confidence, source, timestamps)
@@ -99,12 +109,14 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 - Should be importable to restore agent memory state
 
 **Import:**
+
 - Upload Agent File → create memories + entities + relationships
 - Handle entity dedup on import (merge with existing org entities)
 - Optionally create agent or import into existing agent
 - Validate format version, handle migrations
 
 **Questions:**
+
 - Do we include raw_content or just compressed content?
 - Do we include embeddings (large!) or re-embed on import?
 - What about private memories — export them? Redact them?
@@ -113,21 +125,25 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 ### #550: Cross-Agent Knowledge Overlap
 
 **Overlap Scoring:**
+
 - For each pair of agents, count shared entities
 - Normalize by total entities per agent (Jaccard similarity? Cosine?)
 - Score range 0-1 (0 = no overlap, 1 = identical knowledge)
 
 **Knowledge Gap Detection:**
+
 - Entities known by only 1 agent (single point of failure)
 - Entity types with no coverage (e.g., no agent knows about "security")
 - Topics where team has low confidence
 
 **Knowledge Sharing Suggestions:**
+
 - "Agent A knows about X, Agent B needs X for their current task"
 - Based on task assignments + entity coverage
 - Could feed into task routing ("assign this to Agent C, they have the most relevant knowledge")
 
 **Dashboard Visualization:**
+
 - Agent-to-agent overlap matrix (heatmap)
 - Or Venn diagram style for 2-3 agents
 - Knowledge coverage map (entity types vs agents)
@@ -138,19 +154,23 @@ OpenSpawn is a multi-agent coordination platform. Agents form organizational hie
 ## Things We Might Be Missing
 
 ### 1. Confidence Propagation
+
 If a memory has confidence=40 (inference), should entities extracted from it inherit that confidence? An entity mentioned in 5 high-confidence memories should be "more real" than one from a single low-confidence memory.
 
 **Proposal:** Entity confidence = weighted average of linked memory confidences.
 
 ### 2. Temporal Aspects
+
 Entities and relationships change over time. "Agent A uses Python" might become stale. The graph should reflect recency.
 
 **Proposal:** `last_seen_at` on entities/relationships. Decay weight in overlap scoring based on recency.
 
 ### 3. Visibility / Privacy
+
 If a memory is PRIVATE, should its entities appear in the org-wide graph? If Agent A privately learned about a security vulnerability, should that entity be visible to other agents?
 
 **Options:**
+
 - a) Private memory entities are visible in org graph (knowledge exists, source is hidden)
 - b) Private memory entities are only in that agent's subgraph
 - c) Private memory entities contribute to aggregate stats but not individual visibility
@@ -158,16 +178,19 @@ If a memory is PRIVATE, should its entities appear in the org-wide graph? If Age
 **Recommendation:** Option (b) — respect visibility. Private knowledge stays private. The agent can choose to share by storing a SHARED memory about the same topic.
 
 ### 4. Entity Merging
+
 Two agents might surface "CI/CD pipeline" and "continuous integration" as separate entities. We need a merge mechanism.
 
 **Proposal:** Embedding-based similarity check during extraction. If >0.90 cosine similarity to existing entity in same org, merge. Same pattern as memory vector dedup.
 
 ### 5. Relationship Weight Decay
+
 Relationships should weaken if not reinforced by new evidence. A relationship from 6 months ago with no new supporting memories is less relevant.
 
-**Proposal:** Weight = base_weight * recency_factor. Recency factor uses same exponential decay as memory search (half-life 30 days). Reinforced when new evidence memory is linked.
+**Proposal:** Weight = base_weight \* recency_factor. Recency factor uses same exponential decay as memory search (half-life 30 days). Reinforced when new evidence memory is linked.
 
 ### 6. Graph-Enhanced Search
+
 Currently search is pure vector+BM25+RRF over memories. Could we use the graph to enhance results?
 
 **Example:** Search for "deployment" → find "deployment" entity → find related entities ("CI pipeline", "Docker", "Caddy") → boost memories connected to those entities.
@@ -175,26 +198,32 @@ Currently search is pure vector+BM25+RRF over memories. Could we use the graph t
 **Proposal:** Phase 4. Don't couple graph into search yet. Keep them independent.
 
 ### 7. Agent Capability Matching via Graph
+
 The existing `agent_capabilities` table has skills with proficiency levels. The knowledge graph adds a richer signal — which agent has ACTUALLY worked with a concept, not just what they're configured to do.
 
 **Proposal:** Expose via API: "which agents have knowledge about entity X?" This is a simple JOIN. Task routing can use this later.
 
 ### 8. MCP Tools for Graph
+
 Agents interact via MCP. What graph tools should they have?
 
 **Candidates:**
+
 - `memory_graph_entities` — list entities the agent knows about
 - `memory_graph_related` — find entities related to a concept
 - `memory_graph_who_knows` — which other agents know about X
 - `memory_graph_gaps` — what knowledge gaps exist in the org
 
 ### 9. Demo Mode
+
 The dashboard works in demo mode (no backend). Need graph fixtures.
 
 **Proposal:** Add demo entities + relationships to libs/demo-data. Generate a small but realistic graph from the 12 existing fixture memories.
 
 ### 10. Extraction Prompt Engineering
+
 The LLM extraction prompt is critical. Need to extract:
+
 - Named entities with types
 - Relationships with labels
 - Temporal context ("as of March 2026")
@@ -203,26 +232,32 @@ The LLM extraction prompt is critical. Need to extract:
 **Proposal:** Use instructor structured output (same as compression/dedup). Define Pydantic models for extraction response.
 
 ### 11. Extraction Cost
+
 Every memory storage triggers LLM extraction. At 100 agents × 10 memories/day = 1000 LLM calls/day for extraction alone. Plus compression + dedup.
 
 **Proposal:** Use Claude Haiku (fast, cheap). Batch where possible. Make extraction optional (configurable per org). Run async via arq worker.
 
 ### 12. Graph Size Management
+
 At 100K memories with ~5 entities each = 500K entities. With dedup, maybe 50K-100K unique entities. That's manageable for Postgres but the visualization needs to be smart about what it shows.
 
 **Proposal:** Dashboard shows top N entities by mention_count. Filter/search to drill down. Don't render 100K nodes.
 
 ### 13. Alembic Migrations
+
 New tables need Alembic migrations. Need to handle:
+
 - graph_entities table + indexes
 - graph_relationships table + indexes
 - memory_entity_links table
 - Embedding column on graph_entities (pgvector)
 
 ### 14. OpenAPI Schema Update
+
 New endpoints need to be in the OpenAPI schema. Run codegen for frontend types.
 
 ### 15. Integration with Existing Enrichment Worker
+
 The `derive_facts` job in enrichment.py is currently a stub. It was designed to "cluster related memories and extract derived facts." This IS the entity extraction job.
 
 **Proposal:** Replace the `derive_facts` stub with the actual entity extraction pipeline. Add a new `merge_entities` job for periodic entity dedup.

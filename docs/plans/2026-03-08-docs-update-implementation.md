@@ -13,13 +13,14 @@
 ### Task 1: Create values framework guide
 
 **Files:**
+
 - Create: `apps/docs/src/content/docs/guides/values-framework.md`
 
 **Step 1: Write the values framework guide**
 
 Create the full guide at `apps/docs/src/content/docs/guides/values-framework.md`:
 
-```markdown
+````markdown
 ---
 title: Values Framework
 ---
@@ -45,21 +46,22 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
   }
 }
 ```
+````
 
 ---
 
 ## The 8 values
 
-| Value | Description | Source | Agent Behavior |
-|-------|-------------|--------|----------------|
-| Ownership | Every task has exactly one owner; it ships or it escalates | Katzenbach & Smith (1993) | Single-threaded task ownership |
-| Transparency | Surface problems early; silent failure is the worst outcome | Edmondson (1999) | Agents escalate instead of guessing |
-| Measurement | Track outcomes, not activity | Drucker (1954) | Report with evidence |
-| Subsidiarity | Decisions at the lowest competent level | Rogers & Blenko (2006) | Solve before escalating |
-| Continuous Improvement | Document every mistake, update process, never repeat | Senge (1990) | Auto post-mortems |
-| Speed | Bias toward action; ship small, iterate fast | — | Fast iteration |
-| Rigor | Depth over speed; verify before asserting | — | Thorough verification |
-| Frugality | Cheap models for mechanical tasks, expensive for reasoning | — | Model tier assignment |
+| Value                  | Description                                                 | Source                    | Agent Behavior                      |
+| ---------------------- | ----------------------------------------------------------- | ------------------------- | ----------------------------------- |
+| Ownership              | Every task has exactly one owner; it ships or it escalates  | Katzenbach & Smith (1993) | Single-threaded task ownership      |
+| Transparency           | Surface problems early; silent failure is the worst outcome | Edmondson (1999)          | Agents escalate instead of guessing |
+| Measurement            | Track outcomes, not activity                                | Drucker (1954)            | Report with evidence                |
+| Subsidiarity           | Decisions at the lowest competent level                     | Rogers & Blenko (2006)    | Solve before escalating             |
+| Continuous Improvement | Document every mistake, update process, never repeat        | Senge (1990)              | Auto post-mortems                   |
+| Speed                  | Bias toward action; ship small, iterate fast                | —                         | Fast iteration                      |
+| Rigor                  | Depth over speed; verify before asserting                   | —                         | Thorough verification               |
+| Frugality              | Cheap models for mechanical tasks, expensive for reasoning  | —                         | Model tier assignment               |
 
 ---
 
@@ -67,7 +69,7 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
 
 ### Ownership
 
-**Source:** Jon Katzenbach and Douglas Smith argued in *The Discipline of Teams* (Harvard Business Review, 1993) that high-performing teams require individual accountability — shared responsibility diffuses it. Their research across 50+ teams showed that "mutual accountability" works only when each member owns a specific deliverable.
+**Source:** Jon Katzenbach and Douglas Smith argued in _The Discipline of Teams_ (Harvard Business Review, 1993) that high-performing teams require individual accountability — shared responsibility diffuses it. Their research across 50+ teams showed that "mutual accountability" works only when each member owns a specific deliverable.
 
 **Agent behavior:** Every task has exactly one `assignee`. When a task is created via `task_create` or `delegate`, it belongs to one agent. That agent either completes it or escalates — there is no "someone else will handle it" state.
 
@@ -79,7 +81,7 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
 
 ### Transparency
 
-**Source:** Amy Edmondson's research on psychological safety (*Administrative Science Quarterly*, 1999) demonstrated that teams where members feel safe reporting problems outperform teams that suppress bad news. Her study of hospital nursing teams found that higher-performing units reported *more* errors — not because they made more, but because they surfaced them.
+**Source:** Amy Edmondson's research on psychological safety (_Administrative Science Quarterly_, 1999) demonstrated that teams where members feel safe reporting problems outperform teams that suppress bad news. Her study of hospital nursing teams found that higher-performing units reported _more_ errors — not because they made more, but because they surfaced them.
 
 **Agent behavior:** Agents escalate uncertainty rather than guessing. If an agent encounters a blocker, ambiguous instructions, or a task outside its domain, it calls `escalate` with a reason rather than producing a low-confidence result. Silent failure is treated as the worst possible outcome.
 
@@ -91,7 +93,7 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
 
 ### Measurement
 
-**Source:** Peter Drucker introduced management by objectives in *The Practice of Management* (1954), arguing that what gets measured gets managed. The principle applies directly to AI agents: without measurement constraints, agents report activity ("I worked on this") instead of outcomes ("Here's what changed").
+**Source:** Peter Drucker introduced management by objectives in _The Practice of Management_ (1954), arguing that what gets measured gets managed. The principle applies directly to AI agents: without measurement constraints, agents report activity ("I worked on this") instead of outcomes ("Here's what changed").
 
 **Agent behavior:** When an agent calls `report`, it includes evidence — a PR number, test results, a diff, or a metric. Status updates without measurable outcomes are treated as incomplete.
 
@@ -103,7 +105,7 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
 
 ### Subsidiarity
 
-**Source:** Paul Rogers and Marcia Blenko's *Who Has the D?* (Harvard Business Review, 2006) showed that decision-making speed correlates with pushing decisions to the lowest competent level. Organizations that centralize decisions create bottlenecks; those that delegate appropriately move faster without sacrificing quality.
+**Source:** Paul Rogers and Marcia Blenko's _Who Has the D?_ (Harvard Business Review, 2006) showed that decision-making speed correlates with pushing decisions to the lowest competent level. Organizations that centralize decisions create bottlenecks; those that delegate appropriately move faster without sacrificing quality.
 
 **Agent behavior:** Before escalating, agents attempt to resolve the issue at their level. A L5 worker with a formatting question doesn't escalate to the L7 lead — it applies its best judgment. Escalation is reserved for genuine blockers: missing permissions, ambiguous requirements, or out-of-domain tasks.
 
@@ -115,7 +117,7 @@ Each value adds ~50 tokens per agent per session. With 5 values and 4 agents, th
 
 ### Continuous Improvement
 
-**Source:** Peter Senge's *The Fifth Discipline* (1990) introduced the concept of the "learning organization" — one that systematically captures lessons from failure and modifies its processes. His research showed that organizations that institutionalize post-mortems improve faster than those that rely on individual memory.
+**Source:** Peter Senge's _The Fifth Discipline_ (1990) introduced the concept of the "learning organization" — one that systematically captures lessons from failure and modifies its processes. His research showed that organizations that institutionalize post-mortems improve faster than those that rely on individual memory.
 
 **Agent behavior:** After task completion (especially failed or escalated tasks), agents generate a brief post-mortem: what happened, what went wrong, what should change. These are stored in the agent's `memory/` directory and inform future decisions.
 
@@ -216,25 +218,26 @@ Then re-run `openspawn start` to regenerate agent workspaces with updated SOUL.m
 
 Some templates pre-select different value sets:
 
-| Template | Values |
-|----------|--------|
-| `assistant-team` | Ownership, Transparency, Measurement, Subsidiarity, Continuous Improvement |
-| `dev-shop` | Ownership, Transparency, Measurement, Rigor |
-| `incident-response` | Ownership, Transparency, Speed |
-| `compliance-monitoring` | Ownership, Transparency, Measurement, Rigor |
-| `research-lab` | Measurement, Subsidiarity, Rigor |
+| Template                | Values                                                                     |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `assistant-team`        | Ownership, Transparency, Measurement, Subsidiarity, Continuous Improvement |
+| `dev-shop`              | Ownership, Transparency, Measurement, Rigor                                |
+| `incident-response`     | Ownership, Transparency, Speed                                             |
+| `compliance-monitoring` | Ownership, Transparency, Measurement, Rigor                                |
+| `research-lab`          | Measurement, Subsidiarity, Rigor                                           |
 
 ---
 
 ## References
 
-- Drucker, P. (1954). *The Practice of Management*. Harper & Brothers.
-- Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. *Administrative Science Quarterly*, 44(2), 350-383.
-- Katzenbach, J. & Smith, D. (1993). The Discipline of Teams. *Harvard Business Review*, 71(2), 111-120.
-- Lencioni, P. (2012). *The Advantage*. Jossey-Bass.
-- Rogers, P. & Blenko, M. (2006). Who Has the D? *Harvard Business Review*, 84(1), 52-61.
-- Senge, P. (1990). *The Fifth Discipline*. Doubleday.
-```
+- Drucker, P. (1954). _The Practice of Management_. Harper & Brothers.
+- Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2), 350-383.
+- Katzenbach, J. & Smith, D. (1993). The Discipline of Teams. _Harvard Business Review_, 71(2), 111-120.
+- Lencioni, P. (2012). _The Advantage_. Jossey-Bass.
+- Rogers, P. & Blenko, M. (2006). Who Has the D? _Harvard Business Review_, 84(1), 52-61.
+- Senge, P. (1990). _The Fifth Discipline_. Doubleday.
+
+````
 
 **Step 2: Verify the file renders**
 
@@ -248,13 +251,14 @@ git add apps/docs/src/content/docs/guides/values-framework.md
 git commit -m "docs(guides): add values framework guide
 
 academic sources for each alignment value with agent behavior mapping"
-```
+````
 
 ---
 
 ### Task 2: Add values framework to docs sidebar
 
 **Files:**
+
 - Modify: `apps/docs/astro.config.mjs`
 
 **Step 1: Add sidebar entry**
@@ -287,6 +291,7 @@ git commit -m "docs(sidebar): add values framework to navigation"
 ### Task 3: Add alignment passage to website landing page
 
 **Files:**
+
 - Modify: `apps/website/app/routes/index.tsx`
 
 **Step 1: Add organic inline values passage**
@@ -321,6 +326,7 @@ organic inline references to Edmondson, Drucker, Katzenbach & Smith"
 ### Task 4: Rewrite getting-started guide
 
 **Files:**
+
 - Modify: `apps/docs/src/content/docs/getting-started.md`
 
 **Step 1: Rewrite getting-started.md**
@@ -341,10 +347,11 @@ title: Getting Started
 ## What is OpenSpawn?
 
 OpenSpawn is a **coordination layer for AI agents**. It is not an agent framework — you keep using whatever you're using (OpenClaw, LangGraph, Claude Code, raw API calls). OpenSpawn adds the layer most multi-agent systems are missing: _structure_.
+```
 
-```
-ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hierarchy  →  dashboard shows everything
-```
+ORG.md → OpenSpawn parses it → agents spawn → tasks flow through hierarchy → dashboard shows everything
+
+````
 
 **The key idea:** One file — `ORG.md` — defines your entire agent organization. Roles, hierarchy, alignment values, budget policies, and operating procedures all live in one readable, version-controlled markdown file.
 
@@ -369,7 +376,7 @@ ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hie
 
 ```bash
 npm install -g openspawn
-```
+````
 
 Or use without installing:
 
@@ -391,9 +398,9 @@ The interactive wizard walks you through 8 steps:
 
 Pick from 11 templates (4 general + 7 industry):
 
-| Category | Templates |
-|----------|-----------|
-| General | `assistant-team` (default), `content-agency`, `dev-shop`, `research-lab` |
+| Category | Templates                                                                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| General  | `assistant-team` (default), `content-agency`, `dev-shop`, `research-lab`                                                                               |
 | Industry | `saas-onboarding`, `incident-response`, `contract-review`, `compliance-monitoring`, `game-live-ops`, `catalog-management`, `clinical-trial-processing` |
 
 ### Step 2 — Organization name
@@ -406,16 +413,16 @@ Text input. Default: "My Agent Team".
 
 **Values** is a multi-select. OpenSpawn ships 8 alignment values, 5 selected by default:
 
-| Value | Default | Agent Behavior |
-|-------|---------|----------------|
-| Ownership | Yes | Single-threaded task ownership; ships or escalates |
-| Transparency | Yes | Escalate instead of silently failing |
-| Measurement | Yes | Report outcomes with evidence |
-| Subsidiarity | Yes | Solve at lowest competent level |
-| Continuous Improvement | Yes | Auto post-mortems, process updates |
-| Speed | No | Bias toward action, ship small |
-| Rigor | No | Depth over speed, verify first |
-| Frugality | No | Cheap models for mechanical tasks |
+| Value                  | Default | Agent Behavior                                     |
+| ---------------------- | ------- | -------------------------------------------------- |
+| Ownership              | Yes     | Single-threaded task ownership; ships or escalates |
+| Transparency           | Yes     | Escalate instead of silently failing               |
+| Measurement            | Yes     | Report outcomes with evidence                      |
+| Subsidiarity           | Yes     | Solve at lowest competent level                    |
+| Continuous Improvement | Yes     | Auto post-mortems, process updates                 |
+| Speed                  | No      | Bias toward action, ship small                     |
+| Rigor                  | No      | Depth over speed, verify first                     |
+| Frugality              | No      | Cheap models for mechanical tasks                  |
 
 Each value draws from established organizational research — Edmondson's work on psychological safety, Drucker's management by objectives, Katzenbach & Smith's team accountability model. See the [Values Framework guide](/guides/values-framework/) for sources and tradeoffs.
 
@@ -544,24 +551,24 @@ The coordinator connects to Postgres for durable task storage and Redis for pub/
 
 Scaffold a new agent org.
 
-| Flag | Short | Default | Effect |
-|------|-------|---------|--------|
-| `--template <name>` | `-t` | — | Skip template selection |
-| `--yes` | `-y` | `false` | Skip wizard, use all defaults |
-| `--non-interactive` | — | `false` | Alias for `--yes` |
-| `--dry-run` | — | `false` | Simulate without writing files |
-| `--deploy` | — | `false` | Generate Docker infra |
-| `--port <n>` | `-p` | `8787` | Coordinator port |
-| `--dir <path>` | `-d` | `.` | Target directory |
+| Flag                | Short | Default | Effect                         |
+| ------------------- | ----- | ------- | ------------------------------ |
+| `--template <name>` | `-t`  | —       | Skip template selection        |
+| `--yes`             | `-y`  | `false` | Skip wizard, use all defaults  |
+| `--non-interactive` | —     | `false` | Alias for `--yes`              |
+| `--dry-run`         | —     | `false` | Simulate without writing files |
+| `--deploy`          | —     | `false` | Generate Docker infra          |
+| `--port <n>`        | `-p`  | `8787`  | Coordinator port               |
+| `--dir <path>`      | `-d`  | `.`     | Target directory               |
 
 ### `openspawn start`
 
 Start the coordinator (MCP server + dashboard).
 
-| Flag | Default | Effect |
-|------|---------|--------|
-| `--port <n>` | `8787` | Server port |
-| `--stdio` | `false` | Use stdio transport |
+| Flag         | Default | Effect              |
+| ------------ | ------- | ------------------- |
+| `--port <n>` | `8787`  | Server port         |
+| `--stdio`    | `false` | Use stdio transport |
 
 ### `openspawn status`
 
@@ -575,12 +582,12 @@ Read the current ORG.md structure.
 
 Add an agent to the organization.
 
-| Flag | Default | Effect |
-|------|---------|--------|
-| `--level <n>` | `4` | Agent level |
+| Flag              | Default   | Effect       |
+| ----------------- | --------- | ------------ |
+| `--level <n>`     | `4`       | Agent level  |
 | `--domain <name>` | `general` | Agent domain |
-| `--parent <id>` | — | Parent agent |
-| `--model <name>` | — | LLM model |
+| `--parent <id>`   | —         | Parent agent |
+| `--model <name>`  | —         | LLM model    |
 
 ### `openspawn fire <name>`
 
@@ -638,7 +645,8 @@ Re-running in an existing directory lets you update your configuration interacti
 - **[FAQ](/faq/)**
 - **[Troubleshooting](/guides/troubleshooting/)**
 - **Live demo:** [bikinibottom.ai](https://bikinibottom.ai)
-```
+
+````
 
 **Step 2: Commit**
 
@@ -647,7 +655,7 @@ git add apps/docs/src/content/docs/getting-started.md
 git commit -m "docs(getting-started): full rewrite for two-tier deployment model
 
 structured around init wizard, start command, production deploy, CLI reference"
-```
+````
 
 ---
 

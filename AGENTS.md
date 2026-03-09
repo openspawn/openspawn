@@ -6,7 +6,7 @@ Quick reference for AI agents working on OpenSpawn. Start here.
 
 Multi-agent coordination platform. Agents get tasks, earn credits, communicate. Humans monitor via dashboard.
 
-**Stack**: FastAPI (Python) + React Dashboard + PostgreSQL + MCP Server
+**Stack**: FastAPI (Python) + React Dashboard + PostgreSQL (prod) / SQLite (local) + MCP (served by API)
 **Package Manager**: pnpm (frontend) + uv (Python API)
 **Build System**: Nx
 
@@ -14,11 +14,11 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ## Domains & Deployment
 
-| Domain                | What                                          | Container        | Port |
-| --------------------- | --------------------------------------------- | ---------------- | ---- |
-| **bikinibottom.ai**   | Live demo (sandbox + dashboard)               | `app`            | 3333 |
-| **openspawn.ai**      | API, website, landing page, MCP server        | `api` `platform` | 8000, 3334 |
-| **docs.openspawn.ai** | Astro/Starlight docs                          | GitHub Pages     | —    |
+| Domain                | What                                   | Container        | Port       |
+| --------------------- | -------------------------------------- | ---------------- | ---------- |
+| **bikinibottom.ai**   | Live demo (sandbox + dashboard)        | `app`            | 3333       |
+| **openspawn.ai**      | API, website, landing page, MCP server | `api` `platform` | 8000, 3334 |
+| **docs.openspawn.ai** | Astro/Starlight docs                   | GitHub Pages     | —          |
 
 All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
@@ -32,9 +32,8 @@ apps/
   team/            -> Internal team dashboard
   website/         -> openspawn.ai marketing site
   platform/        -> openspawn.ai landing page
-  api/             -> FastAPI backend (REST + OpenAPI) — Python, uv
+  api/             -> FastAPI backend (REST + OpenAPI + MCP) — Python, uv
   docs/            -> Astro Starlight documentation
-  mcp/             -> MCP server for agent tools
   sandbox-cli/     -> CLI entry point for sandbox
 libs/
   dashboard-data/  -> Shared hooks, auth, utilities
@@ -49,9 +48,8 @@ tools/
   sandbox/         -> Coordination sandbox server (SSE + MCP + A2A)
 
 packages/
-  openspawn/       -> npm CLI package (npx openspawn init)
+  openspawn/       -> npm CLI package — scaffolding (init) + coordinator launcher (start)
   coordinator/     -> Coordination server package
-  cli/             -> Go CLI (GoReleaser)
 ```
 
 ---
@@ -68,6 +66,12 @@ cd apps/api && uv run uvicorn app.main:app --reload
 # Dev (Sandbox + Dashboard together)
 pnpm run dev:sandbox
 
+# CLI — scaffold a new project
+npx openspawn init
+
+# CLI — start Python coordinator (FastAPI + SQLite) and spawn Claude Code CLI agents
+npx openspawn start
+
 # Build
 pnpm exec nx run-many -t build
 
@@ -79,15 +83,18 @@ pnpm exec nx e2e demo           # E2E tests
 pnpm exec nx run-many -t lint
 pnpm exec oxfmt --write .
 
-# Database (Alembic)
+# Database (Alembic — production PostgreSQL)
 cd apps/api && uv run alembic upgrade head
 ```
+
+> **Note:** Only two CLI commands exist: `init` (scaffold) and `start` (launch coordinator). Agents interact via MCP tools directly; humans use the REST API and dashboard.
 
 ---
 
 ## Key URLs
 
 **Production:**
+
 - Demo: https://bikinibottom.ai
 - API: https://openspawn.ai/api/
 - API docs: https://openspawn.ai/api/docs
@@ -95,6 +102,7 @@ cd apps/api && uv run alembic upgrade head
 - Docs: https://docs.openspawn.ai
 
 **Dev:**
+
 - Demo dashboard: http://localhost:4200
 - Demo mode: http://localhost:4200/?demo=true
 - Sandbox: http://localhost:3333
@@ -107,9 +115,11 @@ cd apps/api && uv run alembic upgrade head
 
 1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
 2. **Demo app** (`apps/demo/`) is the React dashboard for bikinibottom.ai
-3. **API** (`apps/api/`) manages tasks, credits, messages (FastAPI + SQLAlchemy)
-4. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
-5. **Docker** builds demo + team + website, serves all via sandbox server on VPS
+3. **API** (`apps/api/`) manages tasks, credits, messages, MCP tools, and agent spawning (FastAPI + SQLAlchemy)
+4. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
+5. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
+6. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
+7. **Docker** builds demo + team + website, serves all via sandbox server on VPS (Tier 2 only)
 
 Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 

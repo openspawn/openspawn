@@ -10,9 +10,8 @@ apps/
   team/            Internal team dashboard
   website/         openspawn.ai marketing site
   platform/        openspawn.ai landing page server
-  api/             FastAPI backend (REST + OpenAPI) — Python, managed by uv
+  api/             FastAPI backend (REST + OpenAPI + MCP) — Python, managed by uv
   docs/            Astro Starlight documentation (docs.openspawn.ai)
-  mcp/             MCP server for AI tool integration
   sandbox-cli/     CLI entry point for sandbox
 
 libs/
@@ -28,49 +27,49 @@ tools/
   sandbox/         Coordination sandbox server (SSE + MCP + A2A)
 
 packages/
-  openspawn/       npm CLI package (npx openspawn init)
+  openspawn/       npm CLI package — scaffolding (init) + coordinator launcher (start)
   coordinator/     Coordination server package
-  cli/             Go CLI (GoReleaser)
 ```
 
 ## Tech Stack
 
-| Layer         | Technology                              |
-| ------------- | --------------------------------------- |
-| API Framework | FastAPI (Python)                        |
-| API Protocol  | REST + OpenAPI                          |
-| Database      | PostgreSQL 16 + SQLAlchemy async        |
-| Frontend      | React 19 + Vite                         |
-| Styling       | TailwindCSS v4                          |
-| Animations    | framer-motion                           |
-| Graph Viz     | @xyflow/react (ReactFlow)               |
-| Build System  | Nx                                      |
-| Linting       | oxlint + oxfmt                          |
-| Testing       | Vitest + Playwright                     |
-| Language      | TypeScript (strict, bundler resolution) |
+| Layer          | Technology                                                      |
+| -------------- | --------------------------------------------------------------- |
+| API Framework  | FastAPI (Python)                                                |
+| API Protocol   | REST + OpenAPI + MCP                                            |
+| Database       | PostgreSQL 16 + SQLAlchemy async (prod) / SQLite (local)        |
+| Background     | arq + Redis (prod) / asyncio scheduler (local)                  |
+| Agent Spawning | Claude Code CLI subprocesses with concurrency cap               |
+| Frontend       | React 19 + Vite                                                 |
+| Styling        | TailwindCSS v4                                                  |
+| Animations     | framer-motion                                                   |
+| Graph Viz      | @xyflow/react (ReactFlow)                                       |
+| Build System   | Nx                                                              |
+| Linting        | oxlint + oxfmt                                                  |
+| Testing        | Vitest + Playwright                                             |
+| Language       | TypeScript (strict, bundler resolution)                         |
 
 ## Deployment Topology
 
 All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy for HTTPS termination.
 
-| Domain            | Container  | Port | Serves                                  |
-| ----------------- | ---------- | ---- | --------------------------------------- |
-| bikinibottom.ai   | `app`      | 3333 | Live demo (sandbox + dashboard)         |
-| openspawn.ai      | `platform` | 3334 | Website + landing page                  |
-| openspawn.ai/api/ | `api`      | 8000 | FastAPI backend (REST + OpenAPI)        |
-| docs.openspawn.ai | —          | —    | Astro/Starlight docs (GitHub Pages)     |
+| Domain            | Container  | Port | Serves                              |
+| ----------------- | ---------- | ---- | ----------------------------------- |
+| bikinibottom.ai   | `app`      | 3333 | Live demo (sandbox + dashboard)     |
+| openspawn.ai      | `platform` | 3334 | Website + landing page              |
+| openspawn.ai/api/ | `api`      | 8000 | FastAPI backend (REST + OpenAPI)    |
+| docs.openspawn.ai | —          | —    | Astro/Starlight docs (GitHub Pages) |
 
 The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
 
 ### CI/CD Workflows
 
-| Workflow              | Trigger      | What it does                                       |
-| --------------------- | ------------ | -------------------------------------------------- |
-| `ci.yml`              | All PRs      | Build, test, lint, Python API checks               |
+| Workflow              | Trigger      | What it does                                         |
+| --------------------- | ------------ | ---------------------------------------------------- |
+| `ci.yml`              | All PRs      | Build, test, lint, Python API checks                 |
 | `deploy.yml`          | Push to main | Docker build + deploy to VPS (bikinibottom.ai + API) |
 | `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai)        |
 | `deploy-docs.yml`     | Push to main | Build + deploy Starlight docs (docs.openspawn.ai)    |
-| `release-cli.yml`     | Tag push     | GoReleaser for packages/cli                        |
 
 ### Docker Build (Dockerfile)
 
@@ -93,6 +92,26 @@ The dashboard runs entirely client-side in demo mode using a simulation engine (
 ### Agent Hierarchy
 
 Agents have levels (L1-L10) determining their authority. Higher-level agents can assign tasks to lower-level ones. The orchestrator pattern (L9-L10) manages overall coordination.
+
+### Agent Spawning
+
+`openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses. Key config fields:
+
+- `spawning.maxConcurrentAgents` — concurrency cap for active agent processes
+- `spawning.idleTimeoutSeconds` — auto-terminate idle agents
+- `runtime.mode` — `local` or `deployed`
+- `runtime.database` — `sqlite` or `postgresql`
+
+### Two-Tier Deployment Model
+
+| Concern    | Tier 1 (Local)        | Tier 2 (Deployed)       |
+| ---------- | --------------------- | ----------------------- |
+| Database   | SQLite                | PostgreSQL 16           |
+| Background | asyncio scheduler     | arq + Redis             |
+| Docker     | Not required          | Required                |
+| Entry      | `npx openspawn start` | Docker Compose + Caddy  |
+
+Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQL.
 
 ## API Endpoints
 

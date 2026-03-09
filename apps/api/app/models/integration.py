@@ -3,10 +3,11 @@ from __future__ import annotations
 import uuid
 
 from sqlalchemy import ForeignKey, Index, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 
 
 class GitHubConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -20,8 +21,8 @@ class GitHubConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     webhook_secret: Mapped[str] = mapped_column(String(255), nullable=False)
     access_token: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    repo_filter: Mapped[list] = mapped_column(JSONB, nullable=False, server_default="[]")
-    sync_config: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    repo_filter: Mapped[list] = mapped_column(CompatJSONB(), nullable=False, server_default="[]")
+    sync_config: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False)
     enabled: Mapped[bool] = mapped_column(nullable=False, server_default="true")
     last_sync_at: Mapped[str | None] = mapped_column(nullable=True)
     last_error: Mapped[str | None] = mapped_column(String(1000), nullable=True)
@@ -40,8 +41,8 @@ class LinearConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     webhook_secret: Mapped[str] = mapped_column(String(255), nullable=False)
     api_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    team_filter: Mapped[list] = mapped_column(JSONB, nullable=False, server_default="[]")
-    sync_config: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    team_filter: Mapped[list] = mapped_column(CompatJSONB(), nullable=False, server_default="[]")
+    sync_config: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False)
     enabled: Mapped[bool] = mapped_column(nullable=False, server_default="true")
     last_sync_at: Mapped[str | None] = mapped_column(nullable=True)
     last_error: Mapped[str | None] = mapped_column(String(1000), nullable=True)
@@ -76,7 +77,9 @@ class IntegrationLink(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     source_id: Mapped[str] = mapped_column(String(255), nullable=False)
     target_type: Mapped[str] = mapped_column(String(50), nullable=False)
     target_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, server_default="{}")
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
+    )
 
     organization: Mapped[Organization] = relationship("Organization")
 

@@ -20,22 +20,26 @@ OpenSpawn is an open-source multi-agent coordination platform — the control pl
 ## ✨ Key Features
 
 - **ORG.md** — define your entire agent org in markdown ([learn more](https://openspawn.ai/org-md))
+- **Agent Spawning** — spawn Claude Code CLI agents as coordinated subprocesses
 - **A2A Protocol** — every agent is discoverable via `/.well-known/agent.json`
 - **MCP Server** — 7 tools via Streamable HTTP at `POST /mcp`
 - **Model Router** — intelligent routing across Ollama, Groq, and OpenRouter
 - **Live Dashboard** — real-time network graph, task timeline, agent details, credits
-- **CLI** — `npx openspawn init` to scaffold a new org
+- **CLI** — `npx openspawn init` to scaffold, `npx openspawn start` to run the coordinator
+- **SQLite Local Mode** — no Docker or Postgres needed for local development
 - **SSE Updates** — real-time event streaming, no polling
 
 ## ⚡ Quick Start
 
+**Prerequisites:** Node.js 18+, Python 3.12+, [uv](https://docs.astral.sh/uv/)
+
 ```bash
-git clone https://github.com/openspawn/openspawn.git
-cd openspawn && pnpm install
-pnpm exec nx serve sandbox
+npx openspawn init my-org     # scaffold a new org
+cd my-org
+npx openspawn start           # starts FastAPI coordinator (SQLite, no Docker needed)
 ```
 
-Open [http://localhost:3333](http://localhost:3333) 🎉
+Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API.
 
 Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](https://bikinibottom.ai/app/)**
 
@@ -70,20 +74,20 @@ Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](ht
 apps/demo/               # BikiniBottom demo dashboard (bikinibottom.ai)
 apps/team/               # Team dashboard (team.openspawn.ai)
 apps/website/            # Marketing site (openspawn.ai)
-apps/api/                # Python API (FastAPI)
-apps/api-nestjs/         # NestJS API (legacy)
+apps/api/                # Python API — FastAPI coordinator + agent spawning
 tools/sandbox/           # Node.js sandbox server (the brain)
-packages/cli/            # OpenSpawn CLI
+packages/openspawn/      # npm CLI (npx openspawn init / start)
+packages/coordinator/    # Coordination server package
 docs/                    # Design docs & RFCs
 ```
 
 ## 🔗 Protocols
 
-| Protocol | Endpoint | What it does |
-|----------|----------|-------------|
-| **A2A** | `/.well-known/agent.json` | Agent discovery + task management |
-| **MCP** | `POST /mcp` | 7 tools via Streamable HTTP |
-| **Model Router** | Internal | Routes to Ollama, Groq, OpenRouter |
+| Protocol         | Endpoint                  | What it does                       |
+| ---------------- | ------------------------- | ---------------------------------- |
+| **A2A**          | `/.well-known/agent.json` | Agent discovery + task management  |
+| **MCP**          | `POST /mcp`               | 7 tools via Streamable HTTP        |
+| **Model Router** | Internal                  | Routes to Ollama, Groq, OpenRouter |
 
 ## 🤝 Works With
 

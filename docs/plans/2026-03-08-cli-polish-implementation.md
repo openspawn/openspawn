@@ -15,6 +15,7 @@
 ### Task 1: Add @clack/prompts dependency
 
 **Files:**
+
 - Modify: `packages/openspawn/package.json`
 
 **Step 1: Install @clack/prompts**
@@ -45,6 +46,7 @@ git commit -m "chore(cli): add @clack/prompts dependency"
 ### Task 2: Define config schema and types
 
 **Files:**
+
 - Create: `packages/openspawn/src/core/config.ts`
 - Modify: `packages/openspawn/src/core/types.ts`
 - Test: `packages/openspawn/src/core/config.test.ts`
@@ -216,8 +218,7 @@ export const defaultConfig: OpenSpawnConfig = {
   alignment: {
     mission:
       "Deliver measurable outcomes through autonomous coordination, escalating when uncertain.",
-    vision:
-      "Every task owned, every blocker surfaced, every outcome measured.",
+    vision: "Every task owned, every blocker surfaced, every outcome measured.",
     values: [
       OrgValue.Ownership,
       OrgValue.Transparency,
@@ -283,6 +284,7 @@ git commit -m "feat(cli): add config schema with defaults and deep merge"
 ### Task 3: Create template system
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/templates/index.ts`
 - Create: `packages/openspawn/src/cli/templates/general.ts`
 - Create: `packages/openspawn/src/cli/templates/industry.ts`
@@ -394,8 +396,12 @@ import type { Template } from "./types.js";
 
 export function industryTemplates(): Template[] {
   return [
-    saasOnboarding(), incidentResponse(), contractReview(),
-    complianceMonitoring(), gameLiveOps(), catalogManagement(),
+    saasOnboarding(),
+    incidentResponse(),
+    contractReview(),
+    complianceMonitoring(),
+    gameLiveOps(),
+    catalogManagement(),
     clinicalTrialProcessing(),
   ];
 }
@@ -413,10 +419,7 @@ import { industryTemplates } from "./industry.js";
 export type { Template };
 export { type Template as TemplateType } from "./types.js";
 
-const ALL_TEMPLATES: Template[] = [
-  ...generalTemplates(),
-  ...industryTemplates(),
-];
+const ALL_TEMPLATES: Template[] = [...generalTemplates(), ...industryTemplates()];
 
 export function listTemplates(): Template[] {
   return ALL_TEMPLATES;
@@ -450,6 +453,7 @@ git commit -m "feat(cli): add 11 org templates (4 general + 7 industry)"
 ### Task 4: Create alignment framework
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/alignment.ts`
 - Test: `packages/openspawn/src/cli/alignment.test.ts`
 
@@ -579,18 +583,14 @@ export const VALUE_DEFINITIONS: ValueDefinition[] = [
   },
 ];
 
-export const DEFAULT_VALUES: OrgValue[] = VALUE_DEFINITIONS
-  .filter((v) => v.isDefault)
-  .map((v) => v.value);
+export const DEFAULT_VALUES: OrgValue[] = VALUE_DEFINITIONS.filter((v) => v.isDefault).map(
+  (v) => v.value,
+);
 
 export function getConflicts(selected: string[]): string[] {
   const conflicts: string[] = [];
   for (const def of VALUE_DEFINITIONS) {
-    if (
-      def.conflictsWith &&
-      selected.includes(def.value) &&
-      selected.includes(def.conflictsWith)
-    ) {
+    if (def.conflictsWith && selected.includes(def.value) && selected.includes(def.conflictsWith)) {
       const other = VALUE_DEFINITIONS.find((d) => d.value === def.conflictsWith);
       if (other) {
         const msg = `${def.label} conflicts with ${other.label}`;
@@ -628,6 +628,7 @@ git commit -m "feat(cli): add alignment framework with values, conflicts, warnin
 ### Task 5: Create OpenClaw workspace generator
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/workspace-generator.ts`
 - Test: `packages/openspawn/src/cli/workspace-generator.test.ts`
 
@@ -717,6 +718,7 @@ Expected: FAIL
 **Step 3: Implement workspace-generator.ts**
 
 Port logic from `packages/cli/internal/openclaw/generator.go`:
+
 - Parse ORG.md content using existing `parseOrgMdContent()` from `src/core/org-parser.ts`
 - For each agent: create `workspaces/<sanitized-name>/` with `SOUL.md`, `AGENTS.md`, `memory/`
 - SOUL.md includes: Organizational Alignment section (mission, values from config) + Identity section (name, role, domain, level, reports-to)
@@ -741,6 +743,7 @@ git commit -m "feat(cli): add OpenClaw workspace generator with SOUL.md + alignm
 ### Task 6: Create interactive wizard
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/wizard.ts`
 - Test: `packages/openspawn/src/cli/wizard.test.ts`
 
@@ -794,6 +797,7 @@ Expected: FAIL
 **Step 3: Implement wizard.ts**
 
 The wizard module has two paths:
+
 1. `runWizard()` — interactive, uses @clack/prompts (intro, select, text, multiselect, confirm)
 2. `buildAnswersFromFlags()` + `defaultAnswers()` — non-interactive, used by `-y` flag
 
@@ -837,6 +841,7 @@ export interface WizardAnswers {
 ```
 
 The `runWizard()` function follows the 8-step flow from the design doc. Each step uses @clack/prompts:
+
 - Step 1: `p.select()` for template (grouped by category)
 - Step 2: `p.text()` for org name
 - Step 3: `p.text()` for mission + vision, `p.multiselect()` for values with conflict detection
@@ -865,6 +870,7 @@ git commit -m "feat(cli): add interactive wizard with 8-step flow"
 ### Task 7: Create Docker infra generator
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/docker-generator.ts`
 - Test: `packages/openspawn/src/cli/docker-generator.test.ts`
 
@@ -994,6 +1000,7 @@ git commit -m "feat(cli): add Docker infra generator for Postgres + Redis"
 ### Task 8: Create dry-run validator
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/dry-run.ts`
 - Test: `packages/openspawn/src/cli/dry-run.test.ts`
 
@@ -1046,6 +1053,7 @@ Expected: FAIL
 **Step 3: Implement dry-run.ts**
 
 Uses `parseOrgMdContent()` to parse the generated ORG.md, then simulates:
+
 1. Registering each agent
 2. Creating a sample task assigned to the top-level agent
 3. Simulating delegation down the hierarchy
@@ -1069,6 +1077,7 @@ git commit -m "feat(cli): add dry-run simulation for init validation"
 ### Task 9: Rewrite init command + update CLI entry point
 
 **Files:**
+
 - Modify: `packages/openspawn/src/cli/commands/init.ts`
 - Modify: `packages/openspawn/src/cli/index.ts`
 - Test: `packages/openspawn/src/cli/commands/init.test.ts`
@@ -1153,6 +1162,7 @@ Expected: FAIL
 **Step 3: Rewrite init.ts**
 
 The new `init.ts` exports two functions:
+
 - `initCommand(args, ctx)` — parses flags, decides wizard vs non-interactive, calls `scaffold()`
 - `scaffold(dir, answers)` — pure function that writes all files
 
@@ -1175,6 +1185,7 @@ import type { OpenSpawnConfig } from "../../core/types.js";
 **Step 4: Update CLI entry point**
 
 Modify `packages/openspawn/src/cli/index.ts` to parse new flags:
+
 - `--template` / `-t`
 - `--yes` / `-y`
 - `--non-interactive`
@@ -1211,6 +1222,7 @@ git commit -m "feat(cli): rewrite init command with wizard, templates, workspace
 ### Task 10: Fix existing `as any` casts
 
 **Files:**
+
 - Modify: `packages/openspawn/src/mcp/server.ts` (line 34)
 - Modify: `packages/openspawn/src/mcp/tools.ts` (line 70)
 
@@ -1258,6 +1270,7 @@ Expected: Clean
 Run: `cd /tmp && npx /Users/adamdennis/github/openspawn/openspawn/packages/openspawn init test-org -y`
 
 Expected output:
+
 - Creates `test-org/` directory
 - `ORG.md` with assistant-team template
 - `openspawn.config.json` with defaults
@@ -1275,6 +1288,7 @@ git add -u && git commit -m "chore(cli): format and lint fixes"
 ### Task 12: Update documentation
 
 **Files:**
+
 - Modify: `apps/docs/src/content/docs/guides/templates.md` (if exists)
 - Modify: relevant getting-started docs
 
@@ -1292,19 +1306,19 @@ git add apps/docs/ && git commit -m "docs(cli): update CLI docs for new init wiz
 
 ## Summary
 
-| Task | What | New Files | Tests |
-|------|------|-----------|-------|
-| 1 | Add @clack/prompts | — | — |
-| 2 | Config schema + types | config.ts | 3 |
-| 3 | Template system (11) | templates/*.ts | 7 |
-| 4 | Alignment framework | alignment.ts | 6 |
-| 5 | Workspace generator | workspace-generator.ts | 6 |
-| 6 | Interactive wizard | wizard.ts | 3 |
-| 7 | Docker infra gen | docker-generator.ts | 3 |
-| 8 | Dry-run validator | dry-run.ts | 3 |
-| 9 | Rewrite init + CLI | init.ts, index.ts | 8 |
-| 10 | Fix `as any` casts | server.ts, tools.ts | — |
-| 11 | Build + lint + smoke | — | — |
-| 12 | Update docs | docs/ | — |
+| Task | What                  | New Files              | Tests |
+| ---- | --------------------- | ---------------------- | ----- |
+| 1    | Add @clack/prompts    | —                      | —     |
+| 2    | Config schema + types | config.ts              | 3     |
+| 3    | Template system (11)  | templates/\*.ts        | 7     |
+| 4    | Alignment framework   | alignment.ts           | 6     |
+| 5    | Workspace generator   | workspace-generator.ts | 6     |
+| 6    | Interactive wizard    | wizard.ts              | 3     |
+| 7    | Docker infra gen      | docker-generator.ts    | 3     |
+| 8    | Dry-run validator     | dry-run.ts             | 3     |
+| 9    | Rewrite init + CLI    | init.ts, index.ts      | 8     |
+| 10   | Fix `as any` casts    | server.ts, tools.ts    | —     |
+| 11   | Build + lint + smoke  | —                      | —     |
+| 12   | Update docs           | docs/                  | —     |
 
 **Total: ~39 new tests across 7 test files**

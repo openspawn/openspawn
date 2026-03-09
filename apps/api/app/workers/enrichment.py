@@ -18,10 +18,18 @@ from sqlalchemy import and_, select, text
 from app.coordination.sla_monitor import monitor_sla
 from app.database import async_session
 from app.models.memory import Memory
+from app.models.sql_helpers import ago, json_extract
 from app.workers.config import get_redis_settings
 from app.workers.expiry import expire_memories
 
 logger = structlog.get_logger()
+
+
+def _dialect() -> str:
+    from app.config import settings
+
+    return "sqlite" if settings.is_sqlite else "postgresql"
+
 
 STALE_CONFIDENCE_THRESHOLD = 30
 STALE_ACCESS_THRESHOLD = 3
@@ -36,17 +44,21 @@ async def boost_co_retrieved(ctx: dict) -> int:
     """
     async with async_session() as session:
         # Find memories that share the same retrieval query within 24h
+        d = _dialect()
+        jx = json_extract("m1.retrieval_context", "query", d)
+        jx2 = json_extract("m2.retrieval_context", "query", d)
+        cutoff = ago("24 hours", d)
         rows = (
             await session.execute(
-                text("""
+                text(f"""
                     SELECT m1.id
                     FROM memories m1
                     JOIN memories m2
                       ON m1.org_id = m2.org_id
                      AND m1.id < m2.id
-                     AND m1.retrieval_context->>'query' = m2.retrieval_context->>'query'
-                    WHERE m1.last_accessed_at > NOW() - INTERVAL '24 hours'
-                      AND m2.last_accessed_at > NOW() - INTERVAL '24 hours'
+                     AND {jx} = {jx2}
+                    WHERE m1.last_accessed_at > {cutoff}
+                      AND m2.last_accessed_at > {cutoff}
                       AND m1.retrieval_context IS NOT NULL
                     GROUP BY m1.id
                     HAVING COUNT(*) >= 2
@@ -69,7 +81,7 @@ async def boost_co_retrieved(ctx: dict) -> int:
 async def identify_stale(ctx: dict) -> int:
     """Flag memories with low confidence + low access + old age as stale."""
     async with async_session() as session:
-        cutoff = text(f"NOW() - INTERVAL '{STALE_AGE_DAYS} days'")
+        cutoff = text(ago(f"{STALE_AGE_DAYS} days", _dialect()))
         stale_mems = (
             await session.scalars(
                 select(Memory).where(
@@ -100,13 +112,14 @@ async def extract_entities(ctx: dict) -> None:
     from app.memory.graph.postgres_store import PostgresGraphStore
 
     async with async_session() as session:
+        cutoff = ago("24 hours", _dialect())
         result = await session.execute(
-            text("""
+            text(f"""
                 SELECT m.id, m.org_id, m.agent_id, m.content, m.confidence
                 FROM memories m
                 LEFT JOIN memory_entity_links mel ON mel.memory_id = m.id
                 WHERE mel.memory_id IS NULL
-                  AND m.created_at > NOW() - INTERVAL '24 hours'
+                  AND m.created_at > {cutoff}
                   AND m.content IS NOT NULL
                 ORDER BY m.created_at DESC
                 LIMIT 100

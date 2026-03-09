@@ -17,7 +17,7 @@
       "entry": ["src/main.tsx", "src/routes/**/*.tsx"],
       "ignore": ["**/dist/**"]
     },
-"libs/*": {
+    "libs/*": {
       "entry": ["src/index.ts"],
       "ignore": ["**/dist/**"]
     },

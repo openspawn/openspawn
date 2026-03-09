@@ -18,25 +18,36 @@ Coordination layer for AI agent organizations.
 
 ## Development Setup
 
+**Prerequisites:** Node.js 18+, pnpm, Python 3.12+, [uv](https://docs.astral.sh/uv/)
+
 ```bash
 git clone https://github.com/openspawn/openspawn.git
 cd openspawn
-pnpm install
+pnpm install                              # frontend dependencies
+cd apps/api && uv sync && cd ../..        # Python API dependencies
 pnpm test
+```
+
+**Running the coordinator locally:**
+
+```bash
+npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres needed
 ```
 
 ## Testing
 
 **What to write when:**
 
-| Layer | Tool | When | Location |
-|-------|------|------|----------|
-| Unit | Vitest | Pure functions, utils, transforms | `apps/demo/src/lib/__tests__/` |
-| Component | Vitest + RTL | React components in isolation | `*.spec.tsx` next to component |
-| E2E | Playwright | User flows, page loads, regressions | `apps/demo/e2e/tests/` |
-| Smoke | curl/Playwright | Post-deploy verification | Against production URL |
+| Layer     | Tool            | When                                | Location                       |
+| --------- | --------------- | ----------------------------------- | ------------------------------ |
+| Unit      | Vitest          | Pure functions, utils, transforms   | `apps/demo/src/lib/__tests__/` |
+| Component | Vitest + RTL    | React components in isolation       | `*.spec.tsx` next to component |
+| API       | pytest          | API endpoints, agent spawning       | `apps/api/tests/`              |
+| E2E       | Playwright      | User flows, page loads, regressions | `apps/demo/e2e/tests/`         |
+| Smoke     | curl/Playwright | Post-deploy verification            | Against production URL         |
 
 **PR requirements:**
+
 - New utility functions must have unit tests
 - New pages must have a "renders without error" E2E test
 - Bug fixes should include a regression test
@@ -47,6 +58,7 @@ pnpm test
 pnpm exec nx test demo           # Unit + component
 pnpm exec nx typecheck demo      # Type check
 pnpm exec nx e2e demo            # E2E (builds + starts sandbox)
+cd apps/api && uv run pytest     # Python API tests
 ```
 
 ## Animation Rules
@@ -79,6 +91,7 @@ pnpm exec nx e2e demo            # E2E (builds + starts sandbox)
 ## AI-Assisted PRs
 
 Welcome. Just be transparent:
+
 - Mark as AI-assisted in PR title or description
 - Note testing level (untested / lightly tested / fully tested)
 - Confirm you understand what the code does
@@ -86,14 +99,15 @@ Welcome. Just be transparent:
 ## Org Templates
 
 To contribute a new template:
+
 1. Create directory under `tools/sandbox/org/`
 2. Write ORG.md with agent roles, policies, playbooks
 3. Add brief README, open PR
 
 ## Code Style
 
-- TypeScript throughout, oxlint + oxfmt for linting/formatting
-- Vitest for testing, co-locate tests with source
+- TypeScript (frontend) + Python (API), oxlint + oxfmt for TS linting/formatting
+- Vitest for frontend tests, pytest for API tests, co-locate tests with source
 
 ## Security
 

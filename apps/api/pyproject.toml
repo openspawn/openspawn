@@ -2,7 +2,6 @@
 name = "openspawn-api"
 version = "0.1.0"
 description = "OpenSpawn API — FastAPI backend for multi-agent coordination"
-readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115",
@@ -29,7 +28,11 @@ dependencies = [
   "opentelemetry-instrumentation-httpx>=0.60b1",
   "arq>=0.27.0",
   "redis>=5.3.1",
+  "aiosqlite>=0.20.0",
 ]
+
+[project.scripts]
+openspawn-server = "app.local:main"
 
 [project.optional-dependencies]
 dev = [
@@ -42,6 +45,13 @@ dev = [
   "factory-boy>=3.3",
   "hypothesis>=6.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
 
 [tool.ruff]
 target-version = "py312"
@@ -68,15 +78,16 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"app/models/*.py" = ["TCH001", "TCH003"]  # SQLAlchemy needs runtime imports
-"app/auth/*.py" = ["TCH002"]  # FastAPI dependencies need runtime type annotations
-"app/*/schemas.py" = ["TCH001", "TCH002", "TCH003"]  # Pydantic needs runtime type imports
-"app/*/router.py" = ["TCH002", "TCH003"]  # FastAPI routes need runtime type imports
-"app/schemas/*.py" = ["TCH003"]  # Pydantic needs runtime type imports
-"app/mcp_server/*.py" = ["TCH002", "TCH003"]  # MCP tools need runtime type imports
-"app/memory/*.py" = ["TCH003"]  # Pydantic models need runtime type imports
-"app/memory/graph/router.py" = ["TCH002", "TCH003"]  # FastAPI routes need runtime type imports
-"tests/*.py" = ["TCH002"]  # Test fixtures need runtime type imports
+"app/models/*.py" = ["TCH001", "TCH003"] # SQLAlchemy needs runtime imports
+"app/auth/*.py" = ["TCH002"] # FastAPI dependencies need runtime type annotations
+"app/*/schemas.py" = ["TCH001", "TCH002", "TCH003"] # Pydantic needs runtime type imports
+"app/*/router.py" = ["TCH002", "TCH003"] # FastAPI routes need runtime type imports
+"app/schemas/*.py" = ["TCH003"] # Pydantic needs runtime type imports
+"app/mcp_server/*.py" = ["TCH002", "TCH003"] # MCP tools need runtime type imports
+"app/memory/*.py" = ["TCH003"] # Pydantic models need runtime type imports
+"app/memory/graph/router.py" = ["TCH002", "TCH003"] # FastAPI routes need runtime type imports
+"app/local.py" = ["ASYNC240"] # Sync path ops are fine in startup-only async code
+"tests/*.py" = ["TCH002"] # Test fixtures need runtime type imports
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]

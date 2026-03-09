@@ -11,6 +11,7 @@ The knowledge graph is the organizational brain of OpenSpawn. As agents learn th
 **Target deployment:** Mac Mini (16-48GB RAM) running 4-32 OpenClaw instances, or VPS (2GB+ RAM) for smaller setups.
 
 **Issues:**
+
 - #548: Knowledge graph + visualization
 - #549: Agent File export/import
 - #550: Cross-agent knowledge overlap analysis
@@ -23,47 +24,47 @@ Three new Postgres tables. No external graph DB required — Postgres adjacency 
 
 ### graph_entities
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | UUID | PK |
-| org_id | UUID | FK → organizations |
-| name | VARCHAR(255) | Indexed, case-insensitive |
-| entity_type | VARCHAR(50) | Enum: person, tool, concept, process, system, location, event |
-| description | TEXT | LLM-generated summary |
-| embedding | VECTOR(1024) | For semantic dedup |
-| mention_count | INT | Incremented on each new memory link |
-| confidence | FLOAT | Weighted avg of linked memory confidences |
-| last_seen_at | TIMESTAMPTZ | Updated on new memory link |
-| metadata | JSONB | Extensible |
-| created_at | TIMESTAMPTZ | |
+| Column        | Type         | Notes                                                         |
+| ------------- | ------------ | ------------------------------------------------------------- |
+| id            | UUID         | PK                                                            |
+| org_id        | UUID         | FK → organizations                                            |
+| name          | VARCHAR(255) | Indexed, case-insensitive                                     |
+| entity_type   | VARCHAR(50)  | Enum: person, tool, concept, process, system, location, event |
+| description   | TEXT         | LLM-generated summary                                         |
+| embedding     | VECTOR(1024) | For semantic dedup                                            |
+| mention_count | INT          | Incremented on each new memory link                           |
+| confidence    | FLOAT        | Weighted avg of linked memory confidences                     |
+| last_seen_at  | TIMESTAMPTZ  | Updated on new memory link                                    |
+| metadata      | JSONB        | Extensible                                                    |
+| created_at    | TIMESTAMPTZ  |                                                               |
 
 **Indexes:** `(org_id, name, entity_type)` unique, `embedding` ivfflat/hnsw, `(org_id, entity_type)`, `(org_id, mention_count DESC)`.
 
 ### graph_relationships
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | UUID | PK |
-| org_id | UUID | FK → organizations |
-| source_entity_id | UUID | FK → graph_entities |
-| target_entity_id | UUID | FK → graph_entities |
+| Column            | Type         | Notes                                          |
+| ----------------- | ------------ | ---------------------------------------------- |
+| id                | UUID         | PK                                             |
+| org_id            | UUID         | FK → organizations                             |
+| source_entity_id  | UUID         | FK → graph_entities                            |
+| target_entity_id  | UUID         | FK → graph_entities                            |
 | relationship_type | VARCHAR(100) | Free-form, LLM-generated, normalized lowercase |
-| weight | FLOAT | Base weight, subject to decay |
-| last_seen_at | TIMESTAMPTZ | For decay calculation |
-| evidence_count | INT | Number of supporting memories |
-| metadata | JSONB | |
-| created_at | TIMESTAMPTZ | |
+| weight            | FLOAT        | Base weight, subject to decay                  |
+| last_seen_at      | TIMESTAMPTZ  | For decay calculation                          |
+| evidence_count    | INT          | Number of supporting memories                  |
+| metadata          | JSONB        |                                                |
+| created_at        | TIMESTAMPTZ  |                                                |
 
 **Indexes:** `(source_entity_id)`, `(target_entity_id)`, `(org_id, relationship_type)`.
 
 ### memory_entity_links
 
-| Column | Type | Notes |
-|--------|------|-------|
-| memory_id | UUID | FK → memories |
-| entity_id | UUID | FK → graph_entities |
-| agent_id | UUID | FK → agents (who surfaced this link) |
-| created_at | TIMESTAMPTZ | |
+| Column     | Type        | Notes                                |
+| ---------- | ----------- | ------------------------------------ |
+| memory_id  | UUID        | FK → memories                        |
+| entity_id  | UUID        | FK → graph_entities                  |
+| agent_id   | UUID        | FK → agents (who surfaced this link) |
+| created_at | TIMESTAMPTZ |                                      |
 
 **Indexes:** `(memory_id)`, `(entity_id)`, `(agent_id, entity_id)`.
 
@@ -106,6 +107,7 @@ class ExtractionResult(BaseModel):
 ### Entity Dedup
 
 Three-layer dedup (mirrors memory dedup pattern):
+
 1. Exact name match (case-insensitive) within same org + entity_type
 2. Embedding cosine similarity >= 0.90 within same org
 3. Periodic `merge_entities` arq job for deferred dedup
@@ -113,6 +115,7 @@ Three-layer dedup (mirrors memory dedup pattern):
 ### Integration with Enrichment Worker
 
 Replaces the `derive_facts` stub in `enrichment.py`. New jobs:
+
 - `extract_entities`: runs on each new memory (replaces `derive_facts`)
 - `merge_entities`: periodic dedup sweep (new cron, daily)
 
@@ -232,7 +235,7 @@ POST   /memory/agent-file/import                          # import agent file
     "name": "agent-alpha",
     "role": "researcher",
     "level": 3,
-    "capabilities": [{"skill": "python", "proficiency": 8}]
+    "capabilities": [{ "skill": "python", "proficiency": 8 }]
   },
   "memories": [
     {
@@ -244,11 +247,9 @@ POST   /memory/agent-file/import                          # import agent file
       "created_at": "2026-03-01T10:00:00Z"
     }
   ],
-  "entities": [
-    {"name": "Docker", "type": "tool", "description": "..."}
-  ],
+  "entities": [{ "name": "Docker", "type": "tool", "description": "..." }],
   "relationships": [
-    {"source": "Docker", "target": "CI pipeline", "type": "used_by", "weight": 0.8}
+    { "source": "Docker", "target": "CI pipeline", "type": "used_by", "weight": 0.8 }
   ]
 }
 ```
@@ -289,12 +290,12 @@ Deferred to later phase. Start with visibility into gaps, not automated routing.
 
 Four new tools for agents:
 
-| Tool | Purpose |
-|------|---------|
-| `memory_graph_entities` | List entities the agent knows |
-| `memory_graph_related` | Find entities related to a concept |
-| `memory_graph_who_knows` | Which agents know about entity X |
-| `memory_graph_gaps` | Org knowledge gaps |
+| Tool                     | Purpose                            |
+| ------------------------ | ---------------------------------- |
+| `memory_graph_entities`  | List entities the agent knows      |
+| `memory_graph_related`   | Find entities related to a concept |
+| `memory_graph_who_knows` | Which agents know about entity X   |
+| `memory_graph_gaps`      | Org knowledge gaps                 |
 
 ---
 
@@ -325,6 +326,7 @@ These were designed in Phase 2 but only the backend was implemented. Ship with P
 ## Demo Mode
 
 Add graph fixtures to `libs/demo-data/`:
+
 - ~20 entities derived from the 12 existing fixture memories
 - ~15 relationships connecting them
 - Pre-formatted Cytoscape.js data for dashboard
@@ -334,6 +336,7 @@ Add graph fixtures to `libs/demo-data/`:
 ## Migrations
 
 New Alembic migrations:
+
 - `graph_entities` table + pgvector index + composite indexes
 - `graph_relationships` table + FK indexes
 - `memory_entity_links` table + FK indexes
@@ -370,20 +373,20 @@ New Alembic migrations:
 
 ## Decisions Summary
 
-| Decision | Choice | Reasoning |
-|----------|--------|-----------|
-| Graph storage | Postgres adjacency tables | Zero additional RAM, works everywhere, pgvector already available |
-| Pluggable backend | GraphStore protocol | Same pattern as EmbeddingProvider, future Neo4j optional |
-| Entity types | Fixed enum (7 types) | Simple, sufficient for v1, extensible via metadata later |
-| Relationship types | Free-form LLM-generated | Too many valid types to enumerate; normalize to lowercase |
-| Entity dedup | Embedding similarity >= 0.90 | Same proven pattern as memory vector dedup |
-| Overlap metric | Jaccard similarity | Simple, interpretable, 0-1 range |
-| Agent File embeddings | Exclude, re-embed on import | Too large, provider may differ |
-| Private entity visibility | Agent-only subgraph | Respect existing visibility model |
-| Graph-enhanced search | Phase 4 | Avoid coupling complexity now |
-| Extraction frequency | Every memory, async | arq worker pattern handles it cleanly |
-| Dashboard layout | Force-directed default | Most intuitive for knowledge graphs |
-| Extraction model | Claude Haiku | Fast, cheap, sufficient for structured extraction |
-| Graph module location | `app/memory/graph/` | Respects clean boundary rules from RFC |
-| Cognee for extraction | No — custom instructor + litellm | Matches existing patterns, full control over entity types/confidence (closes RFC "revisit" recommendation) |
-| Hallucination mitigation | Confidence propagation + min threshold (20) | Low-confidence entities excluded from org-wide views |
+| Decision                  | Choice                                      | Reasoning                                                                                                  |
+| ------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Graph storage             | Postgres adjacency tables                   | Zero additional RAM, works everywhere, pgvector already available                                          |
+| Pluggable backend         | GraphStore protocol                         | Same pattern as EmbeddingProvider, future Neo4j optional                                                   |
+| Entity types              | Fixed enum (7 types)                        | Simple, sufficient for v1, extensible via metadata later                                                   |
+| Relationship types        | Free-form LLM-generated                     | Too many valid types to enumerate; normalize to lowercase                                                  |
+| Entity dedup              | Embedding similarity >= 0.90                | Same proven pattern as memory vector dedup                                                                 |
+| Overlap metric            | Jaccard similarity                          | Simple, interpretable, 0-1 range                                                                           |
+| Agent File embeddings     | Exclude, re-embed on import                 | Too large, provider may differ                                                                             |
+| Private entity visibility | Agent-only subgraph                         | Respect existing visibility model                                                                          |
+| Graph-enhanced search     | Phase 4                                     | Avoid coupling complexity now                                                                              |
+| Extraction frequency      | Every memory, async                         | arq worker pattern handles it cleanly                                                                      |
+| Dashboard layout          | Force-directed default                      | Most intuitive for knowledge graphs                                                                        |
+| Extraction model          | Claude Haiku                                | Fast, cheap, sufficient for structured extraction                                                          |
+| Graph module location     | `app/memory/graph/`                         | Respects clean boundary rules from RFC                                                                     |
+| Cognee for extraction     | No — custom instructor + litellm            | Matches existing patterns, full control over entity types/confidence (closes RFC "revisit" recommendation) |
+| Hallucination mitigation  | Confidence propagation + min threshold (20) | Low-confidence entities excluded from org-wide views                                                       |

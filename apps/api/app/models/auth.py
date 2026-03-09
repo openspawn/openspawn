@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, LargeBinary, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatJSONB
 from app.models.enums import UserRole
 
 
@@ -71,7 +72,7 @@ class ApiKey(UUIDPrimaryKeyMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     key_prefix: Mapped[str] = mapped_column(String(12), nullable=False)
     key_hash: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    scopes: Mapped[list] = mapped_column(JSONB, nullable=False, server_default='["read"]')
+    scopes: Mapped[list] = mapped_column(CompatJSONB(), nullable=False, server_default='["read"]')
     last_used_at: Mapped[datetime | None] = mapped_column(nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
     revoked_at: Mapped[datetime | None] = mapped_column(nullable=True)
@@ -105,7 +106,7 @@ class IdempotencyKey(UUIDPrimaryKeyMixin, Base):
     method: Mapped[str] = mapped_column(String(10), nullable=False)
     path: Mapped[str] = mapped_column(String(500), nullable=False)
     status_code: Mapped[int] = mapped_column(nullable=False)
-    response_body: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    response_body: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 

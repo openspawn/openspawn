@@ -30,11 +30,13 @@ ORG.md  →  OpenSpawn parses it  →  agents spawn  →  tasks flow through hie
 
 **Required:**
 
-- Node.js 18+ (`node --version` to check)
+- Node.js 18+ (`node --version`)
+- Python 3.12+ (`python3 --version`)
+- [uv](https://docs.astral.sh/uv/) (`uv --version`) — Python package manager
 
 **Optional:**
 
-- Docker — for production deployment with Postgres and Redis
+- Docker — for production deployment with PostgreSQL (not needed locally)
 
 ---
 
@@ -180,18 +182,14 @@ This prints the agent hierarchy and a sample task routing to stdout.
 npx openspawn start
 ```
 
-This starts the coordination server on port 8787 (configurable with `--port`). The server hosts both:
+This boots the Python API server (FastAPI) with SQLite locally — no Docker required. The server provides:
 
 - **Dashboard** — real-time view of agents, tasks, and events at `http://localhost:8787`
-- **MCP server** — tool interface for agents to call into the coordinator
+- **MCP server** — tool interface for agents at `POST /mcp`
+- **Agent spawning** — Claude Code CLI subprocesses with configurable concurrency cap
+- **Background jobs** — asyncio scheduler for SLA monitoring, escalation, and status sync
 
-For use with Claude Desktop or other MCP clients:
-
-```bash
-npx openspawn start --stdio
-```
-
-This runs the MCP server over stdio instead of HTTP, suitable for direct integration.
+Under the hood, `openspawn start` invokes `uv run uvicorn` to launch the FastAPI app. SQLite is used for local persistence — zero external dependencies.
 
 > **Q: Port 8787 is in use?**
 >
@@ -209,7 +207,7 @@ This runs the MCP server over stdio instead of HTTP, suitable for direct integra
 
 ## Go to production
 
-For persistent deployments with Postgres and Redis:
+Locally, `openspawn start` uses SQLite and an asyncio scheduler — perfect for development. For production, upgrade to PostgreSQL:
 
 ```bash
 npx openspawn init --deploy
@@ -222,20 +220,26 @@ services:
   postgres:
     image: pgvector/pgvector:pg16
     volumes: [pgdata:/var/lib/postgresql/data]
-
-  redis:
-    image: redis:7-alpine
-    volumes: [redisdata:/data]
 ```
 
-Start the infra, then run the coordinator:
+Start the database, then run the coordinator:
 
 ```bash
 docker compose up -d
 npx openspawn start
 ```
 
-The coordinator connects to Postgres for persistent task history and Redis for pub/sub. Without Docker, `openspawn start` uses in-process SQLite — fine for development.
+The coordinator detects `DATABASE_URL` and connects to PostgreSQL instead of SQLite. The asyncio scheduler handles background jobs in both modes — no Redis required.
+
+**SQLite vs PostgreSQL:**
+
+| Concern      | SQLite (local)       | PostgreSQL (production) |
+| ------------ | -------------------- | ----------------------- |
+| Setup        | Zero config          | Docker or managed DB    |
+| Concurrency  | Single-writer        | Full MVCC               |
+| Persistence  | `data/openspawn.db`  | Volume-backed           |
+| Memory/pgvec | Works                | Better performance      |
+| Migration    | Automatic via seeder | Alembic migrations      |
 
 ---
 
@@ -257,26 +261,13 @@ Scaffold a new agent organization.
 
 ### `openspawn start`
 
-Start the coordination server.
+Boot the Python API server with agent spawning.
 
 | Flag              | Description                 |
 | ----------------- | --------------------------- |
 | `--port <number>` | Server port (default: 8787) |
-| `--stdio`         | Run MCP server over stdio   |
 
-### Other commands
-
-| Command                             | Description                           |
-| ----------------------------------- | ------------------------------------- |
-| `openspawn status`                  | Show agent hierarchy and task summary |
-| `openspawn org`                     | Display parsed ORG.md structure       |
-| `openspawn hire <role>`             | Add an agent to the org               |
-| `openspawn fire <agent>`            | Remove an agent from the org          |
-| `openspawn task <description>`      | Create a new task                     |
-| `openspawn delegate <task> <agent>` | Assign a task to an agent             |
-| `openspawn escalate <task>`         | Escalate a task up the chain          |
-| `openspawn report <task>`           | Get a task status report              |
-| `openspawn budget`                  | Show credit balances and usage        |
+All other operations (task management, delegation, escalation, status, budgets) are handled via MCP tools at `POST /mcp` — agents call them directly through the API.
 
 ---
 

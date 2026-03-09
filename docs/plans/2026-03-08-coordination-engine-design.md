@@ -47,6 +47,7 @@ Subtask Completed
 Synchronous function called when a task is created with no assignee.
 
 **Algorithm:**
+
 1. Parse task `required_capabilities` (new field on Task)
 2. Query agents with matching capabilities (`AgentCapability` table)
 3. Score candidates: `proficiency * availability_weight`
@@ -55,6 +56,7 @@ Synchronous function called when a task is created with no assignee.
 5. If no match found, assign to org's default coordinator agent
 
 **Key decisions:**
+
 - Capability matching first (not LLM-based) — deterministic, fast, testable
 - No queue — direct assignment on creation
 - Fallback to coordinator prevents orphaned tasks
@@ -64,6 +66,7 @@ Synchronous function called when a task is created with no assignee.
 arq cron job running every 60 seconds.
 
 **Algorithm:**
+
 1. Query tasks where `status = 'in_progress'` and `deadline IS NOT NULL`
 2. For each task, check two thresholds:
    - **Warning**: 80% of deadline elapsed → emit `task.sla.warning` event
@@ -71,6 +74,7 @@ arq cron job running every 60 seconds.
 3. Track `sla_warning_sent_at` to avoid duplicate warnings
 
 **Key decisions:**
+
 - Time-based + event-based escalation (SLA thresholds on deadline)
 - Configurable thresholds via `SLA_WARNING_PCT` and `SLA_BREACH_PCT` env vars (default 80%, 100%)
 - 60s poll interval balances responsiveness vs. DB load
@@ -80,6 +84,7 @@ arq cron job running every 60 seconds.
 Called by SLA Monitor when a task breaches its SLA.
 
 **Algorithm:**
+
 1. Look up current assignee's `parent_agent_id`
 2. If parent exists:
    - Reassign task to parent agent
@@ -90,6 +95,7 @@ Called by SLA Monitor when a task breaches its SLA.
    - Mark task with `needs_attention` flag
 
 **Key decisions:**
+
 - Semi-automatic: system escalates, but doesn't decompose or re-plan (no LLM in loop yet)
 - Escalation follows existing `parent_agent_id` hierarchy — no new relationship model needed
 - Future: LLM-based re-planning as opt-in upgrade path
@@ -99,6 +105,7 @@ Called by SLA Monitor when a task breaches its SLA.
 Event-driven, triggered when any subtask changes status.
 
 **Algorithm:**
+
 1. On subtask status change, look up parent task via `TaskDependency`
 2. Query all sibling subtasks
 3. If all siblings `completed` → mark parent `completed`
@@ -106,6 +113,7 @@ Event-driven, triggered when any subtask changes status.
 5. Emit `task.parent.status_synced` event
 
 **Key decisions:**
+
 - Uses existing `TaskDependency` table (no new parent_task_id column needed)
 - Only syncs upward (parent reflects children), never downward
 - `blocked` on failure lets coordinator decide next steps
@@ -139,13 +147,13 @@ None — existing `parent_agent_id` and `AgentCapability` table sufficient.
 
 ## Events
 
-| Event | Payload | When |
-|-------|---------|------|
-| `task.routed` | `{task_id, agent_id, score}` | Router assigns task |
-| `task.sla.warning` | `{task_id, deadline, elapsed_pct}` | 80% threshold |
-| `task.escalated` | `{task_id, from_agent, to_agent, reason}` | SLA breach escalation |
-| `task.escalation.unresolvable` | `{task_id, agent_id}` | No parent to escalate to |
-| `task.parent.status_synced` | `{parent_id, new_status, children}` | Parent status updated |
+| Event                          | Payload                                   | When                     |
+| ------------------------------ | ----------------------------------------- | ------------------------ |
+| `task.routed`                  | `{task_id, agent_id, score}`              | Router assigns task      |
+| `task.sla.warning`             | `{task_id, deadline, elapsed_pct}`        | 80% threshold            |
+| `task.escalated`               | `{task_id, from_agent, to_agent, reason}` | SLA breach escalation    |
+| `task.escalation.unresolvable` | `{task_id, agent_id}`                     | No parent to escalate to |
+| `task.parent.status_synced`    | `{parent_id, new_status, children}`       | Parent status updated    |
 
 ## Testing Strategy
 
@@ -155,10 +163,10 @@ None — existing `parent_agent_id` and `AgentCapability` table sufficient.
 
 ## Decisions Log
 
-| # | Decision | Chosen | Alternatives | Rationale |
-|---|----------|--------|-------------|-----------|
-| 1 | Routing mechanism | Capability matching | LLM-based, round-robin, manual | Deterministic, fast, testable; LLM option later |
-| 2 | Escalation trigger | Time + event (SLA thresholds) | Time-only, event-only, manual | Covers both slow tasks and deadline-critical work |
-| 3 | Delegation style | Semi-automatic (system routes/escalates) | Fully manual, fully autonomous (LLM) | Predictable now; LLM opt-in upgrade path preserved |
-| 4 | Parent status sync | Event-driven via TaskDependency | Polling, new parent_task_id column | Uses existing schema; real-time updates |
-| 5 | SLA monitor | arq cron (60s) | Celery beat, APScheduler, pg_cron | Already using arq; consistent with existing jobs |
+| #   | Decision           | Chosen                                   | Alternatives                         | Rationale                                          |
+| --- | ------------------ | ---------------------------------------- | ------------------------------------ | -------------------------------------------------- |
+| 1   | Routing mechanism  | Capability matching                      | LLM-based, round-robin, manual       | Deterministic, fast, testable; LLM option later    |
+| 2   | Escalation trigger | Time + event (SLA thresholds)            | Time-only, event-only, manual        | Covers both slow tasks and deadline-critical work  |
+| 3   | Delegation style   | Semi-automatic (system routes/escalates) | Fully manual, fully autonomous (LLM) | Predictable now; LLM opt-in upgrade path preserved |
+| 4   | Parent status sync | Event-driven via TaskDependency          | Polling, new parent_task_id column   | Uses existing schema; real-time updates            |
+| 5   | SLA monitor        | arq cron (60s)                           | Celery beat, APScheduler, pg_cron    | Already using arq; consistent with existing jobs   |

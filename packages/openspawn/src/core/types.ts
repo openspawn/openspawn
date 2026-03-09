@@ -86,6 +86,17 @@ export enum CulturePreset {
   Compliance = "compliance",
 }
 
+export enum RuntimeMode {
+  Local = "local",
+  Deployed = "deployed",
+}
+
+export enum BootstrapMode {
+  Hybrid = "hybrid",
+  TaskOnly = "task-only",
+  SelfDirected = "self-directed",
+}
+
 export enum OrgValue {
   Ownership = "ownership",
   Transparency = "transparency",
@@ -118,4 +129,13 @@ export interface OpenSpawnConfig {
     values: OrgValue[];
   };
   culture: { preset: CulturePreset };
+  spawning: {
+    maxConcurrentAgents: number;
+    idleTimeoutSeconds: number;
+    bootstrapMode: BootstrapMode;
+  };
+  runtime: {
+    mode: RuntimeMode;
+    database: string;
+  };
 }
