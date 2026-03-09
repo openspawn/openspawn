@@ -1,6 +1,6 @@
 #!/bin/bash
 # ── OpenSpawn VPS Setup Script ───────────────────────────────────────────────
-# Run this once on a fresh Hetzner CX22 (Ubuntu 24.04)
+# Run this once on a fresh VPS (tested on Ubuntu 24.04)
 # Usage: ssh root@your-vps-ip 'bash -s' < deploy/setup-vps.sh
 
 set -euo pipefail
