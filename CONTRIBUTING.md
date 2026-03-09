@@ -11,14 +11,30 @@ Coordination layer for AI agent organizations.
 
 ## Domains & Deployment
 
-| Domain                | What                                   | Container        | Port       |
-| --------------------- | -------------------------------------- | ---------------- | ---------- |
-| **bikinibottom.ai**   | Live demo (sandbox + dashboard)        | `app`            | 3333       |
-| **openspawn.ai**      | API, website, landing page, MCP server | `api` `platform` | 8000, 3334 |
-| **team.openspawn.ai** | Internal team dashboard (password-protected) | `app`      | 3333       |
-| **docs.openspawn.ai** | Astro/Starlight docs                   | GitHub Pages     | —          |
+All services run on a single VPS. Caddy handles HTTPS + routing. Cloudflare proxied.
+Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
-All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
+**Live:**
+
+| Domain                  | What                                          | Service        | Port |
+| ----------------------- | --------------------------------------------- | -------------- | ---- |
+| **openspawn.ai**        | Marketing website (React SPA, serves llms.txt + A2A agent.json) | `platform`     | 3334 |
+| **api.openspawn.ai**    | Core API — GraphQL + REST (NestJS; Python rewrite WIP) | `api`          | 8000 |
+| **bikinibottom.ai**     | Demo sandbox + dashboard                      | `app`          | 3333 |
+| **team.openspawn.ai**   | Internal team dashboard (basic auth)          | Caddy static   | —    |
+| **id.openspawn.ai**     | SSO/identity provider (Authentik, OIDC)       | `authentik`    | 9000 |
+| **wiki.openspawn.ai**   | Internal knowledge base (Outline)             | `outline`      | 3335 |
+
+**Reserved (DNS exists, not deployed):**
+
+| Domain                    | Intent                                      |
+| ------------------------- | ------------------------------------------- |
+| **docs.openspawn.ai**     | Developer docs (Starlight app at `apps/docs/`) |
+| **hub.openspawn.ai**      | Agent/skill marketplace UI                  |
+| **logs.openspawn.ai**     | Centralized logging/observability dashboard |
+| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)         |
+| **registry.openspawn.ai** | Agent/package registry API                  |
+| **status.openspawn.ai**   | Public status page                          |
 
 ## How to Contribute
 
