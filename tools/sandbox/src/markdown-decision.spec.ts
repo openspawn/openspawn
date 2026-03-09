@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { parseDecision, resolveAgentId, type DecisionAction } from "./markdown-decision.js";
 import type { SandboxAgent } from "./types.js";
+import { AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -8,14 +9,14 @@ function makeAgent(id: string, name: string): SandboxAgent {
   return {
     id,
     name,
-    role: "worker",
+    role: AgentRole.WORKER,
     level: 4,
     domain: "Engineering",
-    status: "active",
+    status: AgentStatus.ACTIVE,
     systemPrompt: "",
     taskIds: [],
     recentMessages: [],
-    trigger: "polling",
+    trigger: TriggerMode.POLLING,
     inbox: [],
     stats: {
       tasksCompleted: 0,

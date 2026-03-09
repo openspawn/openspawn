@@ -3,6 +3,7 @@
 // ~1800 decisions over 400 ticks across 4 phases.
 
 import type { ScenarioDefinition } from "../scenario-types.js";
+import { TaskPriority } from "@openspawn/shared-types";
 
 export const aiDevAgencyScenario: ScenarioDefinition = {
   meta: {
@@ -94,7 +95,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Client Alpha Onboarding",
       phase: "client-intake",
       domains: ["operations", "engineering"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Onboard Client Alpha — scope, environment, data pipeline.",
       taskTemplates: [
         {
@@ -146,7 +147,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Client Beta Onboarding",
       phase: "client-intake",
       domains: ["operations", "engineering"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Onboard Client Beta — prompt engineering engagement.",
       taskTemplates: [
         {
@@ -182,7 +183,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Internal: Platform Upgrade",
       phase: "client-intake",
       domains: ["engineering", "security"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description: "Upgrade internal platform — dependency audit, core upgrade, perf baseline.",
       taskTemplates: [
         {
@@ -234,7 +235,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Alpha: Model Evaluation Pipeline",
       phase: "parallel-sprints",
       domains: ["engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description: "Build model evaluation pipeline for Client Alpha.",
       dependsOnEpics: ["client-alpha-onboarding"],
       taskTemplates: [
@@ -255,7 +256,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
               action: "create_task",
               target: "Write Eval Methodology Doc",
               domain: "marketing",
-              priority: "normal",
+              priority: TaskPriority.NORMAL,
             },
           ],
         },
@@ -291,7 +292,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
               action: "create_task",
               target: "Security Review: Client Dashboard",
               domain: "security",
-              priority: "high",
+              priority: TaskPriority.HIGH,
             },
           ],
         },
@@ -317,7 +318,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Beta: Prompt Engineering Suite",
       phase: "parallel-sprints",
       domains: ["engineering"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Build prompt engineering tools for Client Beta.",
       dependsOnEpics: ["client-beta-onboarding"],
       taskTemplates: [
@@ -366,7 +367,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Internal: CI/CD Overhaul",
       phase: "parallel-sprints",
       domains: ["engineering"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description: "Overhaul CI/CD pipeline.",
       taskTemplates: [
         {
@@ -402,7 +403,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Marketing: Case Study",
       phase: "parallel-sprints",
       domains: ["marketing"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description: "Write case study for marketing.",
       taskTemplates: [
         {
@@ -440,7 +441,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Alpha: Demo Environment",
       phase: "demo-day-prep",
       domains: ["engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description: "Prepare demo environment for Client Alpha.",
       taskTemplates: [
         {
@@ -475,7 +476,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Beta: Demo Environment",
       phase: "demo-day-prep",
       domains: ["engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description: "Prepare demo environment for Client Beta.",
       taskTemplates: [
         {
@@ -509,7 +510,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Cross-Client: Shared Infrastructure",
       phase: "demo-day-prep",
       domains: ["engineering", "security"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Shared infra optimizations for both client demos.",
       taskTemplates: [
         {
@@ -545,7 +546,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Production Deployment",
       phase: "ship-celebrate",
       domains: ["engineering", "security"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description: "Deploy everything to production.",
       taskTemplates: [
         {
@@ -581,7 +582,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Final Billing",
       phase: "ship-celebrate",
       domains: ["finance"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Prepare and send final invoices.",
       taskTemplates: [
         {
@@ -603,7 +604,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
       title: "Sprint Retrospective",
       phase: "ship-celebrate",
       domains: ["operations"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description: "Run retrospective and document learnings.",
       taskTemplates: [
         {
@@ -637,14 +638,14 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
           {
             title: "Wire up local model fallback",
             domain: "engineering",
-            priority: "critical",
+            priority: TaskPriority.CRITICAL,
             subtaskCount: 2,
             durationRange: [3, 5],
           },
           {
             title: "Notify Client Alpha of delay",
             domain: "operations",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 1,
             durationRange: [1, 2],
           },
@@ -664,7 +665,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
           {
             title: "Billing Reconciliation",
             domain: "finance",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 3,
             durationRange: [2, 4],
           },
@@ -684,14 +685,14 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
           {
             title: "Rollback & Fix Production",
             domain: "engineering",
-            priority: "critical",
+            priority: TaskPriority.CRITICAL,
             subtaskCount: 4,
             durationRange: [2, 4],
           },
           {
             title: "Audit Deploy Permissions",
             domain: "security",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 2,
             durationRange: [2, 3],
           },
@@ -709,7 +710,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
         expandEpic: {
           taskCount: 3,
           domain: "engineering",
-          priority: "high",
+          priority: TaskPriority.HIGH,
         },
       },
     },
@@ -737,7 +738,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
           {
             title: "Fix critical production bug",
             domain: "engineering",
-            priority: "critical",
+            priority: TaskPriority.CRITICAL,
             subtaskCount: 5,
             durationRange: [2, 4],
           },
@@ -757,7 +758,7 @@ export const aiDevAgencyScenario: ScenarioDefinition = {
           {
             title: "Update requirements document",
             domain: "operations",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 2,
             durationRange: [2, 4],
           },

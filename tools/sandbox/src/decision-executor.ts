@@ -5,6 +5,14 @@ import { resolveAgentId, type AgentDecision } from "./markdown-decision.js";
 import { makeAgentPublic } from "./agents.js";
 import { createACPMessage, pushMessage } from "./acp.js";
 import type { SandboxAgent, SandboxTask } from "./types.js";
+import {
+  ACPMessageType,
+  AgentRole,
+  AgentStatus,
+  SandboxEscalationReason,
+  TaskPriority,
+  TaskStatus,
+} from "@openspawn/shared-types";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -58,7 +66,10 @@ function resolveTask(
   const upper = taskRef.toUpperCase();
   return (
     tasks.find((t) => t.id === upper) ||
-    tasks.find((t) => t.assigneeId === agent.id && !["done", "rejected"].includes(t.status))
+    tasks.find(
+      (t) =>
+        t.assigneeId === agent.id && ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+    )
   );
 }
 
@@ -67,8 +78,8 @@ function createTask(title: string, creator: SandboxAgent, tasks: SandboxTask[]):
     id: nextExecutorTaskId(),
     title,
     description: title,
-    priority: "high",
-    status: "backlog",
+    priority: TaskPriority.HIGH,
+    status: TaskStatus.BACKLOG,
     creatorId: creator.id,
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -98,17 +109,17 @@ function executeDelegation(
   }
 
   task.assigneeId = target.id;
-  task.status = "assigned";
+  task.status = TaskStatus.ASSIGNED;
   if (!target.taskIds.includes(task.id)) target.taskIds.push(task.id);
 
-  const msg = createACPMessage("delegation", agent.id, target.id, task.id, {
+  const msg = createACPMessage(ACPMessageType.DELEGATION, agent.id, target.id, task.id, {
     body: decision.message || `Delegating "${task.title}" to ${target.name}`,
   });
   pushMessage(ctx.agents, msg);
   task.activityLog.push(msg);
   agent.stats.messagesSent++;
 
-  const ack = createACPMessage("ack", target.id, agent.id, task.id, {
+  const ack = createACPMessage(ACPMessageType.ACK, target.id, agent.id, task.id, {
     body: `Acknowledged: "${task.title}"`,
   });
   pushMessage(ctx.agents, ack);
@@ -127,8 +138,8 @@ function executeEscalation(
   const task = resolveTask(decision.task, agent, ctx.tasks);
   const taskId = task?.id ?? "";
 
-  const msg = createACPMessage("escalation", agent.id, parent.id, taskId, {
-    reason: "BLOCKED",
+  const msg = createACPMessage(ACPMessageType.ESCALATION, agent.id, parent.id, taskId, {
+    reason: SandboxEscalationReason.BLOCKED,
     body: decision.message || `Escalating: ${decision.task}`,
   });
   pushMessage(ctx.agents, msg);
@@ -144,15 +155,15 @@ function executeCompletion(
   const task = resolveTask(decision.task, agent, ctx.tasks);
   if (!task) return;
 
-  task.status = "done";
+  task.status = TaskStatus.DONE;
   task.updatedAt = Date.now();
   agent.stats.tasksCompleted++;
   agent.stats.creditsEarned +=
-    task.priority === "critical" ? 100 : task.priority === "high" ? 50 : 25;
+    task.priority === TaskPriority.CRITICAL ? 100 : task.priority === TaskPriority.HIGH ? 50 : 25;
 
   const parent = agent.parentId ? ctx.agents.find((a) => a.id === agent.parentId) : undefined;
   if (parent) {
-    const msg = createACPMessage("completion", agent.id, parent.id, task.id, {
+    const msg = createACPMessage(ACPMessageType.COMPLETION, agent.id, parent.id, task.id, {
       summary: decision.message || `Completed: "${task.title}"`,
       body: `Completed: "${task.title}"`,
     });
@@ -167,7 +178,7 @@ function executeMessage(agent: SandboxAgent, decision: AgentDecision, ctx: Execu
   if (!targetId) return;
 
   const task = resolveTask(decision.task, agent, ctx.tasks);
-  const msg = createACPMessage("status_request", agent.id, targetId, task?.id ?? "", {
+  const msg = createACPMessage(ACPMessageType.STATUS_REQUEST, agent.id, targetId, task?.id ?? "", {
     body: decision.message,
   });
   pushMessage(ctx.agents, msg);
@@ -185,10 +196,10 @@ function executeHire(agent: SandboxAgent, decision: AgentDecision, ctx: Executio
 
   if (candidate) {
     candidate.parentId = agent.id;
-    candidate.status = "active";
+    candidate.status = AgentStatus.ACTIVE;
     ctx.agents.push(candidate);
 
-    const msg = createACPMessage("delegation", agent.id, candidate.id, "", {
+    const msg = createACPMessage(ACPMessageType.DELEGATION, agent.id, candidate.id, "", {
       body: decision.message || `Welcome aboard, ${candidate.name}!`,
     });
     pushMessage(ctx.agents, msg);
@@ -206,13 +217,13 @@ function executeHire(agent: SandboxAgent, decision: AgentDecision, ctx: Executio
       const newAgent = makeAgentPublic(
         id,
         name,
-        "worker",
+        AgentRole.WORKER,
         4,
         domain,
         agent.id,
         `Hired by ${agent.name}`,
       );
-      newAgent.status = "active";
+      newAgent.status = AgentStatus.ACTIVE;
       ctx.agents.push(newAgent);
       console.log(`  🐣 ${agent.name} created ${name} (L4 ${domain})`);
     }

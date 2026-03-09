@@ -448,6 +448,22 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.9)(@vitest/ui@4.0.18(vitest@4.0.18))(jiti@2.6.1)(jsdom@22.1.0)(less@4.5.1)(lightningcss@1.30.2)(msw@2.12.10(@types/node@20.19.9)(typescript@5.9.3))(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
 
+  tools/sandbox:
+    dependencies:
+      commander:
+        specifier: ^13.1.0
+        version: 13.1.0
+      ollama:
+        specifier: ^0.5.0
+        version: 0.5.18
+    devDependencies:
+      tsx:
+        specifier: ^4.0.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
 packages:
 
   '@adobe/css-tools@4.4.4':
@@ -5627,6 +5643,10 @@ packages:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
 
+  commander@13.1.0:
+    resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
+    engines: {node: '>=18'}
+
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
 
@@ -8491,6 +8511,9 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
+  ollama@0.5.18:
+    resolution: {integrity: sha512-lTFqTf9bo7Cd3hpF6CviBe/DEhewjoZYd9N/uCe7O20qYTvGqrNOFOBDj3lbZgFWHUgDv5EeyusYxsZSLS8nvg==}
+
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
@@ -11191,6 +11214,9 @@ packages:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
     deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+
+  whatwg-fetch@3.6.20:
+    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -17320,6 +17346,8 @@ snapshots:
 
   commander@12.1.0: {}
 
+  commander@13.1.0: {}
+
   commander@2.20.3: {}
 
   commander@7.2.0: {}
@@ -20828,6 +20856,10 @@ snapshots:
 
   ohash@2.0.11: {}
 
+  ollama@0.5.18:
+    dependencies:
+      whatwg-fetch: 3.6.20
+
   on-exit-leak-free@2.1.2: {}
 
   on-finished@2.4.1:
@@ -23850,6 +23882,8 @@ snapshots:
   whatwg-encoding@2.0.0:
     dependencies:
       iconv-lite: 0.6.3
+
+  whatwg-fetch@3.6.20: {}
 
   whatwg-mimetype@3.0.0: {}
 

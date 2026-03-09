@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { loadScenarios, matchScenario, ReplaySimulation } from "./replay-engine.js";
 import type { ReplayScenario } from "./replay-engine.js";
 import { makeAgentPublic } from "./agents.js";
+import { AgentRole, TriggerMode } from "@openspawn/shared-types";
 import type { SandboxAgent, SandboxConfig } from "./types.js";
 import { readFileSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
@@ -18,11 +19,11 @@ const DEFAULT_CONFIG: SandboxConfig = {
   maxConcurrentInferences: 1,
   contextWindowTokens: 4096,
   verbose: false,
-  defaultTrigger: "event-driven",
+  defaultTrigger: TriggerMode.EVENT_DRIVEN,
 };
 
 function makeCOO(id = "coo", name = "COO"): SandboxAgent {
-  return makeAgentPublic(id, name, "coo", 10, "Operations", undefined, "Test COO");
+  return makeAgentPublic(id, name, AgentRole.COO, 10, "Operations", undefined, "Test COO");
 }
 
 function makeLead(
@@ -31,7 +32,7 @@ function makeLead(
   parentId: string,
   domain = "Engineering",
 ): SandboxAgent {
-  return makeAgentPublic(id, name, "lead", 7, domain, parentId, `Lead for ${domain}`);
+  return makeAgentPublic(id, name, AgentRole.LEAD, 7, domain, parentId, `Lead for ${domain}`);
 }
 
 // ── Inline fixtures ──────────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ describe("replay-engine", () => {
       const d0 = s?.decisions[0];
       expect(d0?.tick).toBe(1);
       expect(d0?.agentName).toBe("Alice");
-      expect(d0?.agentRole).toBe("lead");
+      expect(d0?.agentRole).toBe(AgentRole.LEAD);
       expect(d0?.agentLevel).toBe(7);
       expect(d0?.action).toBe("delegate");
       expect(d0?.target).toBe("bob");

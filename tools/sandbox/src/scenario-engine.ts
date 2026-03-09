@@ -15,6 +15,7 @@ import type {
   CompletionCondition,
 } from "./scenario-types.js";
 import { SeededRandom, DIFFICULTY_PRESETS } from "./scenario-types.js";
+import { AgentRole, AgentStatus, TaskPriority, TaskStatus } from "@openspawn/shared-types";
 
 let scenarioTaskCounter = 1000;
 function nextScenarioTaskId(): string {
@@ -302,7 +303,7 @@ export class ScenarioEngine {
         title: taskTpl.title,
         description: `[${epic.title}] ${taskTpl.title}`,
         priority: template.priority,
-        status: "backlog",
+        status: TaskStatus.BACKLOG,
         creatorId: this.findLeadForDomain(taskTpl.domain)?.id ?? "scenario-engine",
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -320,7 +321,7 @@ export class ScenarioEngine {
         }
         if (deps.length > 0) {
           task.dependsOn = deps;
-          task.status = "blocked";
+          task.status = TaskStatus.BLOCKED;
           task.blockedReason = "Dependency not ready";
           this.dag.set(taskId, deps);
         }
@@ -338,7 +339,7 @@ export class ScenarioEngine {
           title: subtaskTpl.title,
           description: `Subtask of "${taskTpl.title}": ${subtaskTpl.title}`,
           priority: template.priority,
-          status: "backlog",
+          status: TaskStatus.BACKLOG,
           creatorId: task.creatorId,
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -376,7 +377,7 @@ export class ScenarioEngine {
   private assignBacklogTasks(): void {
     // Pass 1: Assign parent tasks to leads first
     for (const task of this.sim.tasks) {
-      if (task.status !== "backlog" || task.assigneeId) continue;
+      if (task.status !== TaskStatus.BACKLOG || task.assigneeId) continue;
       if (task.parentTaskId) continue; // skip subtasks in pass 1
 
       const epicId = task.epicId;
@@ -387,7 +388,7 @@ export class ScenarioEngine {
       if (lead) {
         task.assigneeId = lead.id;
         const hasSubtasks = task.subtaskIds && task.subtaskIds.length > 0;
-        task.status = hasSubtasks ? "in_progress" : "assigned";
+        task.status = hasSubtasks ? TaskStatus.IN_PROGRESS : TaskStatus.ASSIGNED;
         lead.taskIds.push(task.id);
         this.decisionCount++;
       }
@@ -395,7 +396,7 @@ export class ScenarioEngine {
 
     // Pass 2: Assign subtasks to the lead who owns the parent
     for (const task of this.sim.tasks) {
-      if (task.status !== "backlog" || task.assigneeId) continue;
+      if (task.status !== TaskStatus.BACKLOG || task.assigneeId) continue;
       if (!task.parentTaskId) continue; // only subtasks in pass 2
 
       const parent = this.sim.tasks.find((t) => t.id === task.parentTaskId);
@@ -404,10 +405,11 @@ export class ScenarioEngine {
       if (parent?.assigneeId) {
         const parentAssignee = this.sim.agents.find((a) => a.id === parent.assigneeId);
         lead =
-          parentAssignee && (parentAssignee.role === "lead" || parentAssignee.level >= 7)
+          parentAssignee && (parentAssignee.role === AgentRole.LEAD || parentAssignee.level >= 7)
             ? parentAssignee
             : this.sim.agents.find(
-                (a) => a.id === parentAssignee?.parentId && (a.role === "lead" || a.level >= 7),
+                (a) =>
+                  a.id === parentAssignee?.parentId && (a.role === AgentRole.LEAD || a.level >= 7),
               );
       }
 
@@ -419,7 +421,7 @@ export class ScenarioEngine {
 
       if (lead) {
         task.assigneeId = lead.id;
-        task.status = "assigned";
+        task.status = TaskStatus.ASSIGNED;
         lead.taskIds.push(task.id);
         this.decisionCount++;
       }
@@ -436,8 +438,8 @@ export class ScenarioEngine {
     const d = domain.toLowerCase();
     return (
       this.sim.agents.find(
-        (a) => (a.role === "lead" || a.level >= 7) && a.domain.toLowerCase().includes(d),
-      ) || this.sim.agents.find((a) => a.role === "lead")
+        (a) => (a.role === AgentRole.LEAD || a.level >= 7) && a.domain.toLowerCase().includes(d),
+      ) || this.sim.agents.find((a) => a.role === AgentRole.LEAD)
     );
   }
 
@@ -446,16 +448,16 @@ export class ScenarioEngine {
   private resolveDAG(): void {
     for (const [taskId, deps] of this.dag.entries()) {
       const task = this.sim.tasks.find((t) => t.id === taskId);
-      if (!task || task.status !== "blocked") continue;
+      if (!task || task.status !== TaskStatus.BLOCKED) continue;
       if (task.blockedReason !== "Dependency not ready") continue;
 
       const allMet = deps.every((depId) => {
         const dep = this.sim.tasks.find((t) => t.id === depId);
-        return dep && dep.status === "done";
+        return dep && dep.status === TaskStatus.DONE;
       });
 
       if (allMet) {
-        task.status = "backlog";
+        task.status = TaskStatus.BACKLOG;
         task.blockedReason = undefined;
         task.dependsOn = undefined;
         this.dag.delete(taskId);
@@ -524,7 +526,7 @@ export class ScenarioEngine {
           title: taskDef.title,
           description: `[Event: ${template.name}] ${taskDef.title}`,
           priority: taskDef.priority,
-          status: "backlog",
+          status: TaskStatus.BACKLOG,
           creatorId: "scenario-engine",
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -541,7 +543,7 @@ export class ScenarioEngine {
             title: `${taskDef.title} — step ${i + 1}`,
             description: `Subtask ${i + 1} of event task "${taskDef.title}"`,
             priority: taskDef.priority,
-            status: "backlog",
+            status: TaskStatus.BACKLOG,
             creatorId: "scenario-engine",
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -564,7 +566,7 @@ export class ScenarioEngine {
       const candidates = this.sim.agents.filter((a) => {
         if (blockSpec.domain && !a.domain.toLowerCase().includes(blockSpec.domain)) return false;
         if (blockSpec.role && a.role !== blockSpec.role) return false;
-        return a.role !== "coo";
+        return a.role !== AgentRole.COO;
       });
       const count = effect.blockAgents.count ?? 1;
       for (let i = 0; i < Math.min(count, candidates.length); i++) {
@@ -572,8 +574,8 @@ export class ScenarioEngine {
         // Block their current tasks
         for (const taskId of agent.taskIds) {
           const task = this.sim.tasks.find((t) => t.id === taskId);
-          if (task && !["done", "rejected"].includes(task.status)) {
-            task.status = "blocked";
+          if (task && ![TaskStatus.DONE, TaskStatus.REJECTED].includes(task.status)) {
+            task.status = TaskStatus.BLOCKED;
             task.blockedReason = `Agent ${agent.name} unavailable (${template.name})`;
           }
         }
@@ -594,10 +596,10 @@ export class ScenarioEngine {
 
     // Elevate priorities
     if (effect.elevatePriority) {
-      const inProgress = this.sim.tasks.filter((t) => t.status === "in_progress");
+      const inProgress = this.sim.tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS);
       for (let i = 0; i < Math.min(effect.elevatePriority, inProgress.length); i++) {
         const task = this.prng.pick(inProgress);
-        task.priority = "critical";
+        task.priority = TaskPriority.CRITICAL;
         this.log(`   ⬆️ "${task.title}" elevated to critical`);
       }
     }
@@ -614,7 +616,7 @@ export class ScenarioEngine {
             title: `Scope addition ${i + 1} for ${epic.title}`,
             description: `Added by ${template.name}`,
             priority: effect.expandEpic.priority,
-            status: "backlog",
+            status: TaskStatus.BACKLOG,
             creatorId: "scenario-engine",
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -634,7 +636,7 @@ export class ScenarioEngine {
 
   private updateResources(): void {
     const activeTasks = this.sim.tasks.filter((t) =>
-      ["in_progress", "assigned", "review"].includes(t.status),
+      [TaskStatus.IN_PROGRESS, TaskStatus.ASSIGNED, TaskStatus.REVIEW].includes(t.status),
     ).length;
 
     for (const pool of this.resources) {
@@ -658,8 +660,8 @@ export class ScenarioEngine {
         pool.depletedEffect === "pause-non-critical"
       ) {
         for (const task of this.sim.tasks) {
-          if (task.priority !== "critical" && task.status === "in_progress") {
-            task.status = "blocked";
+          if (task.priority !== TaskPriority.CRITICAL && task.status === TaskStatus.IN_PROGRESS) {
+            task.status = TaskStatus.BLOCKED;
             task.blockedReason = `Resource depleted: ${pool.name}`;
           }
         }
@@ -677,7 +679,7 @@ export class ScenarioEngine {
     this.lastDecisionSnapshot = totalMessages;
 
     // Also count task state changes
-    const completedNow = this.sim.tasks.filter((t) => t.status === "done").length;
+    const completedNow = this.sim.tasks.filter((t) => t.status === TaskStatus.DONE).length;
     if (completedNow > this.tasksCompletedCount) {
       this.decisionCount += completedNow - this.tasksCompletedCount;
       this.tasksCompletedCount = completedNow;
@@ -702,7 +704,7 @@ export class ScenarioEngine {
 
   private processTriggers(): void {
     for (const task of this.sim.tasks) {
-      if (task.status !== "done") continue;
+      if (task.status !== TaskStatus.DONE) continue;
       const triggers = task._crossDeptTriggers;
       if (!triggers || task._triggersProcessed) continue;
 
@@ -713,8 +715,8 @@ export class ScenarioEngine {
             id: taskId,
             title: trigger.target,
             description: `Triggered by completion of "${task.title}"`,
-            priority: trigger.priority ?? "high",
-            status: "backlog",
+            priority: trigger.priority ?? TaskPriority.HIGH,
+            status: TaskStatus.BACKLOG,
             creatorId: task.creatorId,
             createdAt: Date.now(),
             updatedAt: Date.now(),
@@ -747,7 +749,7 @@ export class ScenarioEngine {
       const tasks = epic.taskIds
         .map((id) => this.sim.tasks.find((t) => t.id === id))
         .filter(Boolean) as SandboxTask[];
-      const done = tasks.filter((t) => t.status === "done").length;
+      const done = tasks.filter((t) => t.status === TaskStatus.DONE).length;
       epic.completionPct = (done / tasks.length) * 100;
 
       if (epic.completionPct >= 100) {
@@ -764,9 +766,9 @@ export class ScenarioEngine {
   private computeScores(): Record<string, number> {
     const tick = this.sim?.tick ?? 1;
     const tasks = this.sim?.tasks ?? [];
-    const doneTasks = tasks.filter((t) => t.status === "done").length;
+    const doneTasks = tasks.filter((t) => t.status === TaskStatus.DONE).length;
     const totalTasks = Math.max(1, tasks.length);
-    const blockedTasks = tasks.filter((t) => t.status === "blocked").length;
+    const blockedTasks = tasks.filter((t) => t.status === TaskStatus.BLOCKED).length;
 
     // Velocity: tasks completed per tick, normalized to 0-100
     const velocity = Math.min(100, (doneTasks / Math.max(1, tick)) * 200);
@@ -786,7 +788,7 @@ export class ScenarioEngine {
 
     // Morale: based on block time and agent utilization
     const busyAgents = (this.sim?.agents ?? []).filter(
-      (a) => a.status === "busy" || a.taskIds.length > 0,
+      (a) => a.status === AgentStatus.BUSY || a.taskIds.length > 0,
     ).length;
     const totalAgents = Math.max(1, (this.sim?.agents ?? []).length);
     const morale = Math.min(100, (busyAgents / totalAgents) * 100 + 20);

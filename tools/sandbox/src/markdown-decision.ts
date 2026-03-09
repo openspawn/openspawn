@@ -3,6 +3,7 @@
 // from free-form markdown responses.
 
 import type { SandboxAgent, SandboxTask } from "./types.js";
+import { AgentStatus, TaskStatus } from "@openspawn/shared-types";
 import { loadAgentConfig, buildSystemPrompt } from "./config-loader.js";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -73,7 +74,9 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
 
   // Tasks: owned, created, or in this agent's domain that are unassigned
   const myTasks = tasks.filter((t) => t.assigneeId === agent.id || t.creatorId === agent.id);
-  const activeTasks = myTasks.filter((t) => !["done", "rejected"].includes(t.status));
+  const activeTasks = myTasks.filter(
+    (t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+  );
   const assignedToMe = activeTasks.filter((t) => t.assigneeId === agent.id);
   const iCreated = activeTasks.filter((t) => t.creatorId === agent.id && t.assigneeId !== agent.id);
 
@@ -99,7 +102,7 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
   // Unassigned tasks in the system (for managers to delegate)
   if (agent.level >= 7) {
     const unassigned = tasks.filter(
-      (t) => !t.assigneeId && !["done", "rejected"].includes(t.status),
+      (t) => !t.assigneeId && ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
     );
     if (unassigned.length > 0) {
       taskSection += `**Unassigned tasks (${unassigned.length} — delegate these!):**\n`;
@@ -117,13 +120,14 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
   }
 
   // Direct reports
-  const team = agents.filter((a) => a.parentId === agent.id && a.status === "active");
+  const team = agents.filter((a) => a.parentId === agent.id && a.status === AgentStatus.ACTIVE);
   const teamLines =
     team.length > 0
       ? team
           .map((a) => {
             const agentTasks = tasks.filter(
-              (t) => t.assigneeId === a.id && !["done", "rejected"].includes(t.status),
+              (t) =>
+                t.assigneeId === a.id && ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
             );
             const label = agentTasks.length > 0 ? `working (${agentTasks.length} tasks)` : "idle";
             return `- ${a.name} (${a.id}, L${a.level}) — ${label}`;
@@ -132,7 +136,9 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
       : "(no direct reports — you must WORK on tasks yourself or ESCALATE)";
 
   // Pending reports (not yet spawned)
-  const pendingTeam = agents.filter((a) => a.parentId === agent.id && a.status === "pending");
+  const pendingTeam = agents.filter(
+    (a) => a.parentId === agent.id && a.status === AgentStatus.PENDING,
+  );
   const pendingLine =
     pendingTeam.length > 0 ? `\n*(${pendingTeam.length} more team members joining soon)*` : "";
 
@@ -150,8 +156,10 @@ export function buildAgentPrompt(agent: SandboxAgent, state: SimulationState): s
 
   // Global situation awareness
   const totalTasks = tasks.length;
-  const doneTasks = tasks.filter((t) => t.status === "done").length;
-  const activeTotalTasks = tasks.filter((t) => !["done", "rejected"].includes(t.status)).length;
+  const doneTasks = tasks.filter((t) => t.status === TaskStatus.DONE).length;
+  const activeTotalTasks = tasks.filter(
+    (t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+  ).length;
 
   // Build the actions list based on agent level
   let actionsBlock = `**Actions (choose ONE — priority order!):**`;

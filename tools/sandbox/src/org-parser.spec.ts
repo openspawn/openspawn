@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { parseOrgMdContent, ParsedOrg } from "./org-parser.js";
+import { ACPMessageType, AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -212,7 +213,7 @@ describe("org-parser", () => {
       const result = parseOrgMdContent(MINIMAL_ORG);
       const alice = result.agents[0];
       expect(alice.level).toBe(10);
-      expect(alice.role).toBe("coo");
+      expect(alice.role).toBe(AgentRole.COO);
     });
 
     it("respects explicit level over inferred", () => {
@@ -225,14 +226,14 @@ describe("org-parser", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const carol = result.agents.find((a) => a.name === "Carol");
       expect(carol?.level).toBe(7);
-      expect(carol?.role).toBe("lead");
+      expect(carol?.role).toBe(AgentRole.LEAD);
     });
 
     it("infers intern role for level 1", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const eve = result.agents.find((a) => a.name === "Eve");
       expect(eve?.level).toBe(1);
-      expect(eve?.role).toBe("intern");
+      expect(eve?.role).toBe(AgentRole.INTERN);
     });
   });
 
@@ -240,13 +241,13 @@ describe("org-parser", () => {
     it("sets event-driven trigger for L7+", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const carol = result.agents.find((a) => a.name === "Carol");
-      expect(carol?.trigger).toBe("event-driven");
+      expect(carol?.trigger).toBe(TriggerMode.EVENT_DRIVEN);
     });
 
     it("sets polling trigger for L6 and below", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const dave = result.agents.find((a) => a.name === "Dave");
-      expect(dave?.trigger).toBe("polling");
+      expect(dave?.trigger).toBe(TriggerMode.POLLING);
     });
 
     it("L7+ systemPrompt includes DELEGATE instruction", () => {
@@ -280,7 +281,7 @@ describe("org-parser", () => {
 
     it("initializes status as active", () => {
       const result = parseOrgMdContent(MINIMAL_ORG);
-      expect(result.agents[0].status).toBe("active");
+      expect(result.agents[0].status).toBe(AgentStatus.ACTIVE);
     });
 
     it("initializes empty taskIds, recentMessages, inbox", () => {
@@ -380,20 +381,20 @@ describe("org-parser", () => {
     it("parses explicit event-driven trigger", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const manager = result.agents.find((a) => a.name === "Manager");
-      expect(manager?.trigger).toBe("event-driven");
+      expect(manager?.trigger).toBe(TriggerMode.EVENT_DRIVEN);
     });
 
     it("parses wake_on types", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const manager = result.agents.find((a) => a.name === "Manager");
-      expect(manager?.triggerOn).toContain("escalation");
-      expect(manager?.triggerOn).toContain("completion");
+      expect(manager?.triggerOn).toContain(ACPMessageType.ESCALATION);
+      expect(manager?.triggerOn).toContain(ACPMessageType.COMPLETION);
     });
 
     it("parses explicit polling trigger", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const poller = result.agents.find((a) => a.name === "Poller");
-      expect(poller?.trigger).toBe("polling");
+      expect(poller?.trigger).toBe(TriggerMode.POLLING);
     });
   });
 

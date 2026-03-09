@@ -12,6 +12,14 @@ import type {
 import { getAgentDecision, buildContext } from "./llm.js";
 import { makeAgentPublic, createCOO } from "./agents.js";
 import type { ParsedOrg } from "./org-parser.js";
+import {
+  ACPMessageType,
+  AgentRole,
+  AgentStatus,
+  TaskPriority,
+  TaskStatus,
+  TriggerMode,
+} from "@openspawn/shared-types";
 
 let taskCounter = 0;
 function nextTaskId(): string {
@@ -49,7 +57,7 @@ function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
       }
     }
     // Route to target agent's inbox if they are event-driven and message type matches
-    if (agent.id === msg.to && agent.trigger === "event-driven") {
+    if (agent.id === msg.to && agent.trigger === TriggerMode.EVENT_DRIVEN) {
       if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
         agent.inbox.push(msg);
       }
@@ -70,73 +78,73 @@ function createSeedTasks(): SandboxTask[] {
     {
       title: "Fix Safari login crash",
       desc: "Login page crashes on Safari 18. Reproduce and fix.",
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       domain: "Engineering",
     },
     {
       title: "Q1 financial report",
       desc: "Compile Q1 revenue, expenses, and projections.",
-      priority: "high",
+      priority: TaskPriority.HIGH,
       domain: "Finance",
     },
     {
       title: "Launch blog post for v2.0",
       desc: "Write and publish announcement post for BikiniBottom v2.0 release.",
-      priority: "high",
+      priority: TaskPriority.HIGH,
       domain: "Marketing",
     },
     {
       title: "Onboard 3 new agents",
       desc: "Process onboarding for recently approved agents.",
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       domain: "HR",
     },
     {
       title: "Resolve ticket backlog",
       desc: "47 unresolved support tickets from last week.",
-      priority: "high",
+      priority: TaskPriority.HIGH,
       domain: "Support",
     },
     {
       title: "Enterprise demo prep",
       desc: "Prepare demo environment for Acme Corp eval next week.",
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       domain: "Sales",
     },
     {
       title: "Add rate limiting to API",
       desc: "Implement token bucket rate limiter on /api endpoints.",
-      priority: "high",
+      priority: TaskPriority.HIGH,
       domain: "Engineering",
     },
     {
       title: "SEO audit for docs site",
       desc: "Run full SEO audit on docs.bikinibottom.dev",
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       domain: "Marketing",
     },
     {
       title: "Update pricing page",
       desc: "Refresh pricing page with new tier structure.",
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       domain: "Marketing",
     },
     {
       title: "Automate invoice generation",
       desc: "Script monthly invoice generation from billing data.",
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       domain: "Finance",
     },
     {
       title: "Write E2E tests for dashboard",
       desc: "Cover critical flows: login, agent view, task board.",
-      priority: "high",
+      priority: TaskPriority.HIGH,
       domain: "Engineering",
     },
     {
       title: "Cold outreach campaign",
       desc: "Launch email campaign to 200 qualified leads.",
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       domain: "Sales",
     },
   ];
@@ -146,7 +154,7 @@ function createSeedTasks(): SandboxTask[] {
     title: s.title,
     description: s.desc,
     priority: s.priority,
-    status: "backlog" as const,
+    status: TaskStatus.BACKLOG,
     creatorId: "mr-krabs",
     createdAt: now,
     updatedAt: now,
@@ -198,11 +206,11 @@ export class Simulation {
 
     // Kick the COO to start delegating seed tasks
     if (!skipSeedTasks) {
-      const coo = agents.find((a) => a.role === "coo" || a.level === 10);
+      const coo = agents.find((a) => a.role === AgentRole.COO || a.level === 10);
       if (coo) {
         const kickMsg: ACPMessage = {
           id: `acp-boot-${Date.now()}`,
-          type: "delegation",
+          type: ACPMessageType.DELEGATION,
           from: "system",
           to: coo.id,
           taskId: "",
@@ -294,7 +302,7 @@ export class Simulation {
     }
 
     const children = this.agents.filter(
-      (a) => a.parentId === fromAgent.id && a.status === "active",
+      (a) => a.parentId === fromAgent.id && a.status === AgentStatus.ACTIVE,
     );
     if (children.length > 0) return children[0];
 
@@ -303,7 +311,7 @@ export class Simulation {
 
   /** Auto-generate ACK message when task is assigned */
   private autoAck(task: SandboxTask, assigneeId: string, delegatorId: string): void {
-    const ack = createACPMessage("ack", assigneeId, delegatorId, task.id, {
+    const ack = createACPMessage(ACPMessageType.ACK, assigneeId, delegatorId, task.id, {
       body: `Acknowledged: "${task.title}"`,
     });
     pushMessage(this.agents, ack);
@@ -318,7 +326,7 @@ export class Simulation {
     assigneeId: string,
     reason: string,
   ): void {
-    const msg = createACPMessage("delegation", delegatorId, assigneeId, task.id, {
+    const msg = createACPMessage(ACPMessageType.DELEGATION, delegatorId, assigneeId, task.id, {
       body: reason,
     });
     pushMessage(this.agents, msg);
@@ -329,10 +337,16 @@ export class Simulation {
   private completeTask(task: SandboxTask, agentId: string, summary: string): void {
     // Find who delegated to this agent
     const delegatorId = task.creatorId;
-    const completionMsg = createACPMessage("completion", agentId, delegatorId, task.id, {
-      summary,
-      body: `Completed: "${task.title}"`,
-    });
+    const completionMsg = createACPMessage(
+      ACPMessageType.COMPLETION,
+      agentId,
+      delegatorId,
+      task.id,
+      {
+        summary,
+        body: `Completed: "${task.title}"`,
+      },
+    );
     pushMessage(this.agents, completionMsg);
     task.activityLog.push(completionMsg);
 
@@ -342,10 +356,16 @@ export class Simulation {
       const parentTask = this.tasks.find((t) => t.id === task.id && t.assigneeId === delegatorId);
       // If the delegator's parent assigned the original task, bubble completion
       if (parentTask || delegator.parentId) {
-        const bubbleMsg = createACPMessage("completion", delegatorId, delegator.parentId, task.id, {
-          summary,
-          body: `Completed (via ${this.agents.find((a) => a.id === agentId)?.name}): "${task.title}"`,
-        });
+        const bubbleMsg = createACPMessage(
+          ACPMessageType.COMPLETION,
+          delegatorId,
+          delegator.parentId,
+          task.id,
+          {
+            summary,
+            body: `Completed (via ${this.agents.find((a) => a.id === agentId)?.name}): "${task.title}"`,
+          },
+        );
         pushMessage(this.agents, bubbleMsg);
       }
     }
@@ -359,7 +379,7 @@ export class Simulation {
         const target = this.resolveAgent(agent, String(action.targetAgentId));
         if (task && target) {
           task.assigneeId = target.id;
-          task.status = "assigned";
+          task.status = TaskStatus.ASSIGNED;
           task.updatedAt = Date.now();
           target.taskIds.push(task.id);
           // ACP: delegation + auto-ack
@@ -369,11 +389,11 @@ export class Simulation {
           this.logAgent(agent, `📋 Delegated "${task.title}" → ${target.name}: ${reason}`, task.id);
         } else if (!task) {
           const fuzzyTask = this.tasks.find(
-            (t) => t.status === "backlog" || t.status === "pending",
+            (t) => t.status === TaskStatus.BACKLOG || t.status === TaskStatus.PENDING,
           );
           if (fuzzyTask && target) {
             fuzzyTask.assigneeId = target.id;
-            fuzzyTask.status = "assigned";
+            fuzzyTask.status = TaskStatus.ASSIGNED;
             fuzzyTask.updatedAt = Date.now();
             target.taskIds.push(fuzzyTask.id);
             const reason = action.reason || action.description || fuzzyTask.title;
@@ -398,10 +418,10 @@ export class Simulation {
       case "work": {
         const task = this.tasks.find((t) => t.id === action.taskId);
         if (task) {
-          if (task.status === "assigned") task.status = "in_progress";
-          else if (task.status === "in_progress") task.status = "review";
-          else if (task.status === "review") {
-            task.status = "done";
+          if (task.status === TaskStatus.ASSIGNED) task.status = TaskStatus.IN_PROGRESS;
+          else if (task.status === TaskStatus.IN_PROGRESS) task.status = TaskStatus.REVIEW;
+          else if (task.status === TaskStatus.REVIEW) {
+            task.status = TaskStatus.DONE;
             task.updatedAt = Date.now();
             agent.stats.tasksCompleted++;
             agent.stats.creditsEarned += 50;
@@ -411,12 +431,18 @@ export class Simulation {
           task.updatedAt = Date.now();
 
           // ACP: progress update (for non-done transitions)
-          if (task.status !== "done") {
+          if (task.status !== TaskStatus.DONE) {
             const pctMap: Record<string, number> = { in_progress: 30, review: 70 };
-            const progress = createACPMessage("progress", agent.id, task.creatorId, task.id, {
-              body: action.result,
-              pct: pctMap[task.status] ?? 50,
-            });
+            const progress = createACPMessage(
+              ACPMessageType.PROGRESS,
+              agent.id,
+              task.creatorId,
+              task.id,
+              {
+                body: action.result,
+                pct: pctMap[task.status] ?? 50,
+              },
+            );
             task.activityLog.push(progress);
             pushMessage(this.agents, progress);
           }
@@ -434,7 +460,7 @@ export class Simulation {
         const target = this.resolveAgent(agent, String(action.to));
         if (target) {
           // Use ACPMessage format for regular messages too
-          const msg = createACPMessage("status_request", agent.id, target.id, "", {
+          const msg = createACPMessage(ACPMessageType.STATUS_REQUEST, agent.id, target.id, "", {
             body: action.content,
           });
           pushMessage(this.agents, msg);
@@ -449,17 +475,23 @@ export class Simulation {
         const parent = this.agents.find((a) => a.id === agent.parentId);
         if (task && parent) {
           // ACP: escalation message
-          const reason = action.reason || "BLOCKED";
+          const reason = action.reason || SandboxEscalationReason.BLOCKED;
           const body = action.body || action.reason;
-          const escalation = createACPMessage("escalation", agent.id, parent.id, task.id, {
-            reason,
-            body: String(body),
-          });
+          const escalation = createACPMessage(
+            ACPMessageType.ESCALATION,
+            agent.id,
+            parent.id,
+            task.id,
+            {
+              reason,
+              body: String(body),
+            },
+          );
           pushMessage(this.agents, escalation);
           task.activityLog.push(escalation);
 
           task.assigneeId = undefined;
-          task.status = "blocked";
+          task.status = TaskStatus.BLOCKED;
           task.blockedReason = String(body);
           task.updatedAt = Date.now();
           agent.taskIds = agent.taskIds.filter((id) => id !== task.id);
@@ -477,10 +509,10 @@ export class Simulation {
           id: nextTaskId(),
           title: rawTitle ? String(rawTitle) : `${agent.name} - Task ${this.tasks.length + 1}`,
           description: String(action.description || action.desc || ""),
-          priority: ["low", "normal", "high", "critical"].includes(String(action.priority))
+          priority: Object.values<string>(TaskPriority).includes(String(action.priority))
             ? (String(action.priority) as SandboxTask["priority"])
-            : "normal",
-          status: "backlog",
+            : TaskPriority.NORMAL,
+          status: TaskStatus.BACKLOG,
           creatorId: agent.id,
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -496,7 +528,7 @@ export class Simulation {
         const task = this.tasks.find((t) => t.id === action.taskId);
         if (task) {
           if (action.verdict === "approve") {
-            task.status = "done";
+            task.status = TaskStatus.DONE;
             task.updatedAt = Date.now();
             const assignee = this.agents.find((a) => a.id === task.assigneeId);
             if (assignee) assignee.stats.tasksCompleted++;
@@ -504,7 +536,7 @@ export class Simulation {
             this.completeTask(task, task.assigneeId || agent.id, action.feedback);
             this.logAgent(agent, `✅ Approved "${task.title}": ${action.feedback}`);
           } else {
-            task.status = "in_progress";
+            task.status = TaskStatus.IN_PROGRESS;
             task.updatedAt = Date.now();
             this.logAgent(agent, `❌ Rejected "${task.title}": ${action.feedback}`);
           }
@@ -530,8 +562,8 @@ export class Simulation {
             (r) =>
               r.domain?.toLowerCase().includes(requestedDomain) ||
               requestedName.includes(r.name.toLowerCase().split(" ")[0]) ||
-              (requestedRole === "lead" &&
-                r.role === "lead" &&
+              (requestedRole === AgentRole.LEAD &&
+                r.role === AgentRole.LEAD &&
                 r.domain?.toLowerCase().includes(requestedDomain)),
           ) ||
           notYetHired.find(
@@ -553,11 +585,11 @@ export class Simulation {
 
         // No roster match — create a new agent
         const roleLevels: Record<string, number> = {
-          talent: 9,
-          lead: 7,
-          senior: 6,
-          worker: 4,
-          intern: 1,
+          [AgentRole.TALENT]: 9,
+          [AgentRole.LEAD]: 7,
+          [AgentRole.SENIOR]: 6,
+          [AgentRole.WORKER]: 4,
+          [AgentRole.INTERN]: 1,
         };
         const newRole = requestedRole;
         const newLevel = roleLevels[newRole] || 4;
@@ -607,7 +639,7 @@ export class Simulation {
     console.log(`\n${"═".repeat(60)}`);
     console.log(`🕐 TICK ${this.tick}`);
     console.log(
-      `   Tasks: ${this.tasks.length} total | ${this.tasks.filter((t) => t.status === "done").length} done | ${this.tasks.filter((t) => t.status !== "done" && t.status !== "rejected").length} active`,
+      `   Tasks: ${this.tasks.length} total | ${this.tasks.filter((t) => t.status === TaskStatus.DONE).length} done | ${this.tasks.filter((t) => t.status !== TaskStatus.DONE && t.status !== TaskStatus.REJECTED).length} active`,
     );
     console.log(`${"═".repeat(60)}`);
 
@@ -619,7 +651,7 @@ export class Simulation {
       }
 
       // Event-driven agents: ONLY act on new inbox messages
-      if (agent.trigger === "event-driven") {
+      if (agent.trigger === TriggerMode.EVENT_DRIVEN) {
         const hasInbox = agent.inbox.length > 0;
         if (hasInbox) console.log(`    ✉️ ${agent.name} inbox: ${agent.inbox.length} → WILL ACT`);
         else if (this.tick % 10 === 0)
@@ -657,7 +689,7 @@ export class Simulation {
         agent.lastActedTick = this.tick;
         // Clear inbox after event-driven agent processes its turn
         // BUT if agent took a productive action (not idle), re-queue so they continue next tick
-        if (agent.trigger === "event-driven") {
+        if (agent.trigger === TriggerMode.EVENT_DRIVEN) {
           const productiveActions = ["spawn_agent", "create_task", "delegate", "escalate"];
           if (!productiveActions.includes(action.action)) {
             agent.inbox = [];
@@ -665,7 +697,7 @@ export class Simulation {
             // Keep a continuation message so agent wakes again next tick
             const continuation: ACPMessage = {
               id: `acp-continue-${Date.now()}`,
-              type: "delegation",
+              type: ACPMessageType.DELEGATION,
               from: "system",
               to: agent.id,
               taskId: "",
@@ -685,11 +717,11 @@ export class Simulation {
     this.metricsHistory.push({
       tick: this.tick,
       timestamp: Date.now(),
-      activeAgents: this.agents.filter((a) => a.status === "active").length,
+      activeAgents: this.agents.filter((a) => a.status === AgentStatus.ACTIVE).length,
       totalTasks: this.tasks.length,
-      tasksDone: this.tasks.filter((t) => t.status === "done").length,
-      tasksInProgress: this.tasks.filter((t) => t.status === "in_progress").length,
-      tasksInReview: this.tasks.filter((t) => t.status === "review").length,
+      tasksDone: this.tasks.filter((t) => t.status === TaskStatus.DONE).length,
+      tasksInProgress: this.tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS).length,
+      tasksInReview: this.tasks.filter((t) => t.status === TaskStatus.REVIEW).length,
       totalCreditsEarned: this.agents.reduce((s, a) => s + a.stats.creditsEarned, 0),
       totalCreditsSpent: this.agents.reduce((s, a) => s + a.stats.creditsSpent, 0),
       messageCount: this.agents.reduce((s, a) => s + a.stats.messagesSent, 0),
@@ -705,7 +737,7 @@ export class Simulation {
       this.log(`🔄 Sandbox reset — full ORG.md reload (${this.agents.length} agents)`);
     } else if (this.parsedOrg) {
       // Organic: just the COO from the parsed org
-      const coo = this.parsedOrg.agents.find((a) => a.role === "coo");
+      const coo = this.parsedOrg.agents.find((a) => a.role === AgentRole.COO);
       this.agents = coo
         ? [
             {
@@ -713,8 +745,12 @@ export class Simulation {
               taskIds: [],
               recentMessages: [],
               inbox: [],
-              trigger: coo.trigger ?? "event-driven",
-              triggerOn: coo.triggerOn ?? ["escalation", "completion", "delegation"],
+              trigger: coo.trigger ?? TriggerMode.EVENT_DRIVEN,
+              triggerOn: coo.triggerOn ?? [
+                ACPMessageType.ESCALATION,
+                ACPMessageType.COMPLETION,
+                ACPMessageType.DELEGATION,
+              ],
               stats: {
                 tasksCompleted: 0,
                 tasksFailed: 0,
@@ -765,8 +801,10 @@ export class Simulation {
     console.log(`📊 SUMMARY (Tick ${this.tick})`);
     console.log(`${"─".repeat(60)}`);
 
-    const done = this.tasks.filter((t) => t.status === "done").length;
-    const active = this.tasks.filter((t) => !["done", "rejected"].includes(t.status)).length;
+    const done = this.tasks.filter((t) => t.status === TaskStatus.DONE).length;
+    const active = this.tasks.filter(
+      (t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+    ).length;
     console.log(`Tasks: ${done} done / ${active} active / ${this.tasks.length} total`);
 
     const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagesSent, 0);

@@ -7,6 +7,7 @@ import {
   getParent,
   makeAgentPublic,
 } from "./agents.js";
+import { AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 
 describe("createAgents", () => {
   const agents = createAgents();
@@ -23,7 +24,7 @@ describe("createAgents", () => {
       expect(a.level).toBeGreaterThanOrEqual(1);
       expect(a.level).toBeLessThanOrEqual(10);
       expect(a.domain).toBeTruthy();
-      expect(a.status).toBe("active");
+      expect(a.status).toBe(AgentStatus.ACTIVE);
       expect(a.systemPrompt).toBeTruthy();
       expect(a.taskIds).toEqual([]);
       expect(a.recentMessages).toEqual([]);
@@ -33,20 +34,20 @@ describe("createAgents", () => {
   });
 
   it("has exactly one COO at L10", () => {
-    const coos = agents.filter((a) => a.role === "coo");
+    const coos = agents.filter((a) => a.role === AgentRole.COO);
     expect(coos).toHaveLength(1);
     expect(coos[0].level).toBe(10);
     expect(coos[0].id).toBe("mr-krabs");
   });
 
   it("COO has no parent", () => {
-    const coo = agents.find((a) => a.role === "coo");
+    const coo = agents.find((a) => a.role === AgentRole.COO);
     expect(coo).toBeDefined();
     expect(coo?.parentId).toBeUndefined();
   });
 
   it("all non-COO agents have a parentId", () => {
-    const nonCoo = agents.filter((a) => a.role !== "coo");
+    const nonCoo = agents.filter((a) => a.role !== AgentRole.COO);
     for (const a of nonCoo) {
       expect(a.parentId).toBeTruthy();
     }
@@ -55,7 +56,7 @@ describe("createAgents", () => {
   it("L7+ agents are event-driven by default", () => {
     const highLevel = agents.filter((a) => a.level >= 7);
     for (const a of highLevel) {
-      expect(a.trigger).toBe("event-driven");
+      expect(a.trigger).toBe(TriggerMode.EVENT_DRIVEN);
       expect(a.triggerOn).toBeDefined();
     }
   });
@@ -63,7 +64,7 @@ describe("createAgents", () => {
   it("L1-6 agents are polling by default", () => {
     const lowLevel = agents.filter((a) => a.level < 7);
     for (const a of lowLevel) {
-      expect(a.trigger).toBe("polling");
+      expect(a.trigger).toBe(TriggerMode.POLLING);
     }
   });
 
@@ -93,12 +94,12 @@ describe("createAgents", () => {
 
   it("has all role types", () => {
     const roles = new Set(agents.map((a) => a.role));
-    expect(roles).toContain("coo");
-    expect(roles).toContain("talent");
-    expect(roles).toContain("lead");
-    expect(roles).toContain("senior");
-    expect(roles).toContain("worker");
-    expect(roles).toContain("intern");
+    expect(roles).toContain(AgentRole.COO);
+    expect(roles).toContain(AgentRole.TALENT);
+    expect(roles).toContain(AgentRole.LEAD);
+    expect(roles).toContain(AgentRole.SENIOR);
+    expect(roles).toContain(AgentRole.WORKER);
+    expect(roles).toContain(AgentRole.INTERN);
   });
 });
 
@@ -163,7 +164,7 @@ describe("makeAgentPublic", () => {
     const agent = makeAgentPublic(
       "test-agent",
       "Test",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Engineering",
       "parent-1",

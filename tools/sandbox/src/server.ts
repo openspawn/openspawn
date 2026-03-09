@@ -17,6 +17,14 @@ import { makeAgentPublic } from "./agents.js";
 import { A2AServer } from "./a2a-server.js";
 import { MCPServer } from "./mcp-server.js";
 import { ModelRouter } from "./model-router.js";
+import {
+  ACPMessageType,
+  AgentRole,
+  AgentStatus,
+  TaskPriority,
+  TaskStatus,
+  TriggerMode,
+} from "@openspawn/shared-types";
 
 const SCENARIO_REGISTRY: Record<string, import("./scenario-types.js").ScenarioDefinition> = {
   "ai-dev-agency": aiDevAgencyScenario,
@@ -79,7 +87,7 @@ function mapAgent(agent: SandboxAgent, _allAgents: SandboxAgent[]) {
     name: agent.name,
     role: agent.domain?.toUpperCase() ?? levelToRole[agent.role] ?? "WORKER",
     mode: agent.level >= 7 ? "ORCHESTRATOR" : "WORKER",
-    status: agent.status === "busy" ? "ACTIVE" : agent.status.toUpperCase(),
+    status: agent.status === AgentStatus.BUSY ? "ACTIVE" : agent.status.toUpperCase(),
     level: agent.level,
     model: getModelName(),
     currentBalance: Math.max(0, agent.stats.creditsEarned - agent.stats.creditsSpent),
@@ -109,14 +117,14 @@ function mapAgent(agent: SandboxAgent, _allAgents: SandboxAgent[]) {
 }
 
 const taskStatusMap: Record<string, string> = {
-  backlog: "BACKLOG",
-  pending: "TODO",
-  assigned: "TODO",
-  in_progress: "IN_PROGRESS",
-  review: "REVIEW",
-  done: "DONE",
-  rejected: "REVIEW",
-  blocked: "BLOCKED",
+  [TaskStatus.BACKLOG]: "BACKLOG",
+  [TaskStatus.PENDING]: "TODO",
+  [TaskStatus.ASSIGNED]: "TODO",
+  [TaskStatus.IN_PROGRESS]: "IN_PROGRESS",
+  [TaskStatus.REVIEW]: "REVIEW",
+  [TaskStatus.DONE]: "DONE",
+  [TaskStatus.REJECTED]: "REVIEW",
+  [TaskStatus.BLOCKED]: "BLOCKED",
 };
 
 function mapTask(task: SandboxTask, agents: SandboxAgent[]) {
@@ -141,7 +149,7 @@ function mapTask(task: SandboxTask, agents: SandboxAgent[]) {
     dueDate: null,
     createdAt: new Date(task.createdAt).toISOString(),
     updatedAt: new Date(task.updatedAt).toISOString(),
-    completedAt: task.status === "done" ? new Date(task.updatedAt).toISOString() : null,
+    completedAt: task.status === TaskStatus.DONE ? new Date(task.updatedAt).toISOString() : null,
     rejection: null,
   };
 }
@@ -642,7 +650,7 @@ export function startServer(sim: Simulation): void {
 
           const coo = sim.agents.find(
             (a) =>
-              a.role === "coo" ||
+              a.role === AgentRole.COO ||
               a.id.includes("mr-krabs") ||
               a.id.includes("krabs") ||
               a.level === 10,
@@ -654,7 +662,7 @@ export function startServer(sim: Simulation): void {
 
           const orderMsg = {
             id: `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            type: "delegation" as const,
+            type: ACPMessageType.DELEGATION,
             from: "human-principal",
             to: coo.id,
             taskId: "",
@@ -726,13 +734,13 @@ export function startServer(sim: Simulation): void {
           }
 
           // Determine parent: leads report to COO, others report to a lead in same domain or COO
-          const coo = sim.agents.find((a) => a.role === "coo" || a.level === 10);
+          const coo = sim.agents.find((a) => a.role === AgentRole.COO || a.level === 10);
           let parentId: string | undefined;
-          if (role === "lead") {
+          if (role === AgentRole.LEAD) {
             parentId = coo?.id;
           } else {
             const domainLead = sim.agents.find(
-              (a) => a.role === "lead" && a.domain?.toLowerCase() === domain?.toLowerCase(),
+              (a) => a.role === AgentRole.LEAD && a.domain?.toLowerCase() === domain?.toLowerCase(),
             );
             parentId = domainLead?.id ?? coo?.id;
           }
@@ -748,7 +756,7 @@ export function startServer(sim: Simulation): void {
           );
           agent.avatar = avatar;
           agent.avatarColor = avatarColor;
-          agent.status = "active";
+          agent.status = AgentStatus.ACTIVE;
           sim.agents.push(agent);
 
           // Emit SSE event
@@ -780,7 +788,7 @@ export function startServer(sim: Simulation): void {
         agentCount: sim.agents.length,
         taskCount: sim.tasks.length,
         eventCount: sim.events.length,
-        tasksDone: sim.tasks.filter((t) => t.status === "done").length,
+        tasksDone: sim.tasks.filter((t) => t.status === TaskStatus.DONE).length,
       });
       return;
     }
@@ -806,18 +814,18 @@ export function startServer(sim: Simulation): void {
               sim.agents.push({
                 id: event.agentId || from,
                 name: event.name || from,
-                role: event.role || "worker",
+                role: event.role || AgentRole.WORKER,
                 level: event.level ?? 4,
                 domain: event.domain || "Engineering",
                 avatar: event.avatar,
                 avatarColor: event.avatarColor,
                 avatarUrl: event.avatarUrl,
                 parentId: event.parentId,
-                status: "active",
+                status: AgentStatus.ACTIVE,
                 systemPrompt: "",
                 taskIds: [],
                 recentMessages: [],
-                trigger: "event-driven",
+                trigger: TriggerMode.EVENT_DRIVEN,
                 inbox: [],
                 stats: {
                   tasksCompleted: 0,
@@ -828,7 +836,7 @@ export function startServer(sim: Simulation): void {
                 },
               });
             } else {
-              existing.status = "active";
+              existing.status = AgentStatus.ACTIVE;
             }
             sim.events.push({
               type: "agent_activated",
@@ -843,8 +851,8 @@ export function startServer(sim: Simulation): void {
               id,
               title: task || "Untitled task",
               description: event.description || task || "",
-              priority: (event.priority || "normal") as "low" | "normal" | "high" | "critical",
-              status: "assigned" as const,
+              priority: (event.priority || TaskPriority.NORMAL) as SandboxTask["priority"],
+              status: TaskStatus.ASSIGNED,
               assigneeId: to,
               creatorId: from,
               createdAt: ts,
@@ -856,7 +864,7 @@ export function startServer(sim: Simulation): void {
             // Mark assignee as busy
             const assignee = sim.agents.find((a) => a.id === to);
             if (assignee) {
-              assignee.status = "busy";
+              assignee.status = AgentStatus.BUSY;
               assignee.taskIds.push(id);
             }
             sim.events.push({
@@ -871,12 +879,12 @@ export function startServer(sim: Simulation): void {
             if (t) {
               if (status) t.status = status;
               t.updatedAt = ts;
-              if (status === "done") {
+              if (status === TaskStatus.DONE) {
                 const agent = sim.agents.find((a) => a.id === t.assigneeId);
                 if (agent) {
                   agent.stats.tasksCompleted++;
                   agent.taskIds = agent.taskIds.filter((id) => id !== taskId);
-                  if (agent.taskIds.length === 0) agent.status = "idle";
+                  if (agent.taskIds.length === 0) agent.status = AgentStatus.IDLE;
                 }
               }
               sim.events.push({
@@ -1055,7 +1063,7 @@ export function startServer(sim: Simulation): void {
 
       for (const msg of allMessages) {
         switch (msg.type) {
-          case "ack":
+          case ACPMessageType.ACK:
             totalAcks++;
             {
               const key = `${msg.taskId}::${msg.from}`;
@@ -1065,17 +1073,17 @@ export function startServer(sim: Simulation): void {
               }
             }
             break;
-          case "delegation":
+          case ACPMessageType.DELEGATION:
             totalDelegations++;
             delegationTimestamps.set(`${msg.taskId}::${msg.to}`, msg.timestamp);
             break;
-          case "escalation":
+          case ACPMessageType.ESCALATION:
             totalEscalations++;
             if (msg.reason) {
               escalationsByReason[msg.reason] = (escalationsByReason[msg.reason] || 0) + 1;
             }
             break;
-          case "completion":
+          case ACPMessageType.COMPLETION:
             totalCompletions++;
             break;
         }
@@ -1087,7 +1095,7 @@ export function startServer(sim: Simulation): void {
       // Avg delegation depth: count delegation hops per task
       const taskDelegationCounts = new Map<string, number>();
       for (const msg of allMessages) {
-        if (msg.type === "delegation" && msg.taskId) {
+        if (msg.type === ACPMessageType.DELEGATION && msg.taskId) {
           taskDelegationCounts.set(msg.taskId, (taskDelegationCounts.get(msg.taskId) || 0) + 1);
         }
       }
@@ -1096,8 +1104,8 @@ export function startServer(sim: Simulation): void {
         depthValues.length > 0 ? depthValues.reduce((a, b) => a + b, 0) / depthValues.length : 0;
 
       // Completion rate: completed vs total non-backlog tasks
-      const nonBacklogTasks = tasks.filter((t) => t.status !== "backlog");
-      const doneTasks = tasks.filter((t) => t.status === "done");
+      const nonBacklogTasks = tasks.filter((t) => t.status !== TaskStatus.BACKLOG);
+      const doneTasks = tasks.filter((t) => t.status === TaskStatus.DONE);
       const completionRate =
         nonBacklogTasks.length > 0 ? doneTasks.length / nonBacklogTasks.length : 0;
 
@@ -1135,7 +1143,7 @@ export function startServer(sim: Simulation): void {
             json(res, { error: "Agent not found" });
             return;
           }
-          if (trigger !== "polling" && trigger !== "event-driven") {
+          if (trigger !== TriggerMode.POLLING && trigger !== TriggerMode.EVENT_DRIVEN) {
             json(res, { error: 'trigger must be "polling" or "event-driven"' });
             return;
           }
