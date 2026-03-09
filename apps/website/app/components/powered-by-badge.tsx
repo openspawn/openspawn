@@ -47,8 +47,16 @@ import type { SVGProps } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Variant = "inline" | "banner" | "card";
-type Theme = "dark" | "light";
+enum Variant {
+  Inline = "inline",
+  Banner = "banner",
+  Card = "card",
+}
+
+enum Theme {
+  Dark = "dark",
+  Light = "light",
+}
 
 interface PoweredByBadgeProps {
   variant?: Variant;
@@ -127,7 +135,7 @@ interface ThemeTokens {
 }
 
 const themes: Record<Theme, ThemeTokens> = {
-  dark: {
+  [Theme.Dark]: {
     // ── Inline ──────────────────────────────────────────────────────────────
     inlineWrap:
       "inline-flex items-center gap-2 rounded-full border border-white/10 " +
@@ -170,7 +178,7 @@ const themes: Record<Theme, ThemeTokens> = {
     cardFooter: "text-slate-500 text-xs",
   },
 
-  light: {
+  [Theme.Light]: {
     // ── Inline ──────────────────────────────────────────────────────────────
     inlineWrap:
       "inline-flex items-center gap-2 rounded-full border border-slate-200 " +
@@ -365,19 +373,19 @@ function CardBadge({
  *   <PoweredByBadge variant="card" ctaHref="https://openspawn.ai/templates" />
  */
 export function PoweredByBadge({
-  variant = "inline",
-  theme = "dark",
+  variant = Variant.Inline,
+  theme = Theme.Dark,
   ctaHref = "https://openspawn.ai",
   className = "",
 }: PoweredByBadgeProps) {
   const t = themes[theme];
 
   switch (variant) {
-    case "banner":
+    case Variant.Banner:
       return <BannerBadge t={t} className={className} />;
-    case "card":
+    case Variant.Card:
       return <CardBadge t={t} ctaHref={ctaHref} className={className} />;
-    case "inline":
+    case Variant.Inline:
     default:
       return <InlineBadge t={t} className={className} />;
   }

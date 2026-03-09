@@ -4,7 +4,7 @@
  */
 
 import { useMemo } from "react";
-import { usePresence, type PresenceStatus } from "./use-presence";
+import { usePresence, PresenceStatus } from "./use-presence";
 
 export interface AgentHealth {
   completionRate: number;
@@ -37,15 +37,15 @@ export function useAgentHealth(): Map<string, AgentHealth> {
       let creditUsage: number;
 
       switch (s) {
-        case "active":
+        case PresenceStatus.Active:
           completionRate = 0.65 + seededRandom(id, 1) * 0.3; // 0.65-0.95
           creditUsage = 0.3 + seededRandom(id, 2) * 0.35; // 0.30-0.65
           break;
-        case "busy":
+        case PresenceStatus.Busy:
           completionRate = 0.5 + seededRandom(id, 1) * 0.3;
           creditUsage = 0.4 + seededRandom(id, 2) * 0.3;
           break;
-        case "error":
+        case PresenceStatus.Error:
           completionRate = 0.1 + seededRandom(id, 1) * 0.25; // 0.10-0.35
           creditUsage = 0.75 + seededRandom(id, 2) * 0.2; // 0.75-0.95
           break;

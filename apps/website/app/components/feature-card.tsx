@@ -1,6 +1,13 @@
 import { Badge } from "./badge";
 
-type BadgeColor = "cyan" | "violet" | "amber" | "emerald" | "red" | "slate";
+enum BadgeColor {
+  Cyan = "cyan",
+  Violet = "violet",
+  Amber = "amber",
+  Emerald = "emerald",
+  Red = "red",
+  Slate = "slate",
+}
 
 interface FeatureCardProps {
   emoji: string;
@@ -28,7 +35,7 @@ export function FeatureCard({
   color,
   href,
   category,
-  badgeColor = "slate",
+  badgeColor = BadgeColor.Slate,
   illustration: Illustration,
 }: FeatureCardProps) {
   const inner = (

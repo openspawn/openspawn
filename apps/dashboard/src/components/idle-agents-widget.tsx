@@ -19,7 +19,13 @@ import { useTasks } from "../hooks/use-tasks";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 
 // Idle reason mapping
-type IdleReason = "task_complete" | "blocked" | "awaiting_input" | "unassigned" | "newly_activated";
+enum IdleReason {
+  TaskComplete = "task_complete",
+  Blocked = "blocked",
+  AwaitingInput = "awaiting_input",
+  Unassigned = "unassigned",
+  NewlyActivated = "newly_activated",
+}
 
 interface IdleAgentInfo {
   agent: AgentFieldsFragment;
@@ -37,31 +43,31 @@ const IDLE_REASON_CONFIG: Record<
     bgColor: string;
   }
 > = {
-  task_complete: {
+  [IdleReason.TaskComplete]: {
     icon: CheckCircle,
     label: "Completed Task",
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
   },
-  blocked: {
+  [IdleReason.Blocked]: {
     icon: AlertTriangle,
     label: "Blocked",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
   },
-  awaiting_input: {
+  [IdleReason.AwaitingInput]: {
     icon: Clock,
     label: "Awaiting Input",
     color: "text-blue-500",
     bgColor: "bg-cyan-500/10",
   },
-  unassigned: {
+  [IdleReason.Unassigned]: {
     icon: Inbox,
     label: "No Tasks",
     color: "text-muted-foreground",
     bgColor: "bg-muted",
   },
-  newly_activated: {
+  [IdleReason.NewlyActivated]: {
     icon: UserPlus,
     label: "Just Activated",
     color: "text-violet-500",
@@ -171,18 +177,18 @@ export function IdleAgentsWidget({
 
       if (taskCount === 0) {
         // Determine reason
-        let reason: IdleReason = "unassigned";
+        let reason: IdleReason = IdleReason.Unassigned;
         let previousTaskTitle: string | undefined;
 
         if (recentCompletedTasks.has(agent.id)) {
-          reason = "task_complete";
+          reason = IdleReason.TaskComplete;
           previousTaskTitle = recentCompletedTasks.get(agent.id);
         } else if (agent.createdAt) {
           // Check if recently created (within last hour simulation time)
           const createdAt = new Date(agent.createdAt);
           const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
           if (createdAt > hourAgo) {
-            reason = "newly_activated";
+            reason = IdleReason.NewlyActivated;
           }
         }
 
@@ -199,11 +205,11 @@ export function IdleAgentsWidget({
     return idle
       .sort((a, b) => {
         const orderMap: Record<IdleReason, number> = {
-          task_complete: 0,
-          newly_activated: 1,
-          blocked: 2,
-          awaiting_input: 3,
-          unassigned: 4,
+          [IdleReason.TaskComplete]: 0,
+          [IdleReason.NewlyActivated]: 1,
+          [IdleReason.Blocked]: 2,
+          [IdleReason.AwaitingInput]: 3,
+          [IdleReason.Unassigned]: 4,
         };
         const orderDiff = orderMap[a.reason] - orderMap[b.reason];
         if (orderDiff !== 0) return orderDiff;

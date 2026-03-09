@@ -3,6 +3,7 @@
 // Zero external deps: uses a simple line-based markdown parser instead of remark.
 
 import { readFileSync } from "node:fs";
+import { AgentStatus } from "./types.js";
 import type { Agent, ParsedOrg } from "./types.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -184,7 +185,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
             domain,
             parentId,
             model: deptMeta["model"],
-            status: "active",
+            status: AgentStatus.Active,
           });
           if (isCLevel) topLevelId = agentId;
         }
@@ -231,7 +232,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
             domain,
             parentId,
             model: subMeta["model"],
-            status: "active",
+            status: AgentStatus.Active,
           });
         }
       }

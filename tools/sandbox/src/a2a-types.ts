@@ -56,7 +56,10 @@ export interface Task {
 
 // ── Messages & Parts ─────────────────────────────────────────────────────────
 
-export type MessageRole = "user" | "agent";
+export enum MessageRole {
+  User = "user",
+  Agent = "agent",
+}
 
 export interface Message {
   role: MessageRole;

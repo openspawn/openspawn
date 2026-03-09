@@ -11,7 +11,12 @@
 import { motion } from "motion/react";
 import { cn } from "../../lib/utils";
 
-type RingStatus = "active" | "idle" | "busy" | "error";
+enum RingStatus {
+  Active = "active",
+  Idle = "idle",
+  Busy = "busy",
+  Error = "error",
+}
 
 interface StatusRingProps {
   /** Task completion rate 0-1 */
@@ -64,7 +69,7 @@ export function StatusRing({
   const outerColor = rateColor(completionRate);
   const innerColor = rateColor(creditUsage);
 
-  const shouldPulse = status === "active";
+  const shouldPulse = status === RingStatus.Active;
 
   return (
     <div

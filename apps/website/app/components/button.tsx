@@ -1,7 +1,16 @@
 import type { ReactNode, ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "ghost" | "neutral";
-type ButtonSize = "sm" | "md" | "lg";
+export enum ButtonVariant {
+  Primary = "primary",
+  Ghost = "ghost",
+  Neutral = "neutral",
+}
+
+export enum ButtonSize {
+  Sm = "sm",
+  Md = "md",
+  Lg = "lg",
+}
 
 interface ButtonBaseProps {
   variant?: ButtonVariant;
@@ -20,19 +29,19 @@ type AnchorProps = ButtonBaseProps &
 type Props = ButtonProps | AnchorProps;
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
+  [ButtonVariant.Primary]:
     "bg-cyan-500 text-navy-950 font-semibold " +
     "hover:bg-cyan-400 hover:shadow-[0_0_10px_rgba(6,182,212,0.20)] " +
     "active:bg-cyan-600 " +
     "focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 " +
     "focus-visible:ring-offset-navy-950 focus-visible:outline-none",
-  ghost:
+  [ButtonVariant.Ghost]:
     "bg-cyan-500/10 text-cyan-400 font-medium ring-1 ring-cyan-500/20 " +
     "hover:bg-cyan-500/20 " +
     "active:bg-cyan-500/30 " +
     "focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 " +
     "focus-visible:ring-offset-navy-950 focus-visible:outline-none",
-  neutral:
+  [ButtonVariant.Neutral]:
     "bg-white/5 text-slate-200 font-medium border border-white/10 " +
     "hover:bg-white/[0.08] " +
     "active:bg-white/[0.12] " +
@@ -41,9 +50,9 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "px-4 py-2 text-sm rounded-lg",
-  md: "px-6 py-3 text-base rounded-xl",
-  lg: "px-8 py-3.5 text-lg rounded-xl",
+  [ButtonSize.Sm]: "px-4 py-2 text-sm rounded-lg",
+  [ButtonSize.Md]: "px-6 py-3 text-base rounded-xl",
+  [ButtonSize.Lg]: "px-8 py-3.5 text-lg rounded-xl",
 };
 
 const baseStyles =
@@ -62,7 +71,13 @@ function classes(variant: ButtonVariant, size: ButtonSize, extra: string) {
  *   <Button variant="neutral" size="sm">GitHub ↗</Button>
  */
 export function Button(props: Props) {
-  const { variant = "primary", size = "md", children, className = "", as: tag } = props;
+  const {
+    variant = ButtonVariant.Primary,
+    size = ButtonSize.Md,
+    children,
+    className = "",
+    as: tag,
+  } = props;
 
   if (tag === "a") {
     const {

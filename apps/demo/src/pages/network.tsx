@@ -10,11 +10,14 @@ import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Network, GitBranch } from "lucide-react";
 
-type NetworkView = "network" | "orgchart";
+enum NetworkView {
+  Network = "network",
+  OrgChart = "orgchart",
+}
 
 export function NetworkPage() {
   const { agents } = useAgents();
-  const [view, setView] = useState<NetworkView>("network");
+  const [view, setView] = useState<NetworkView>(NetworkView.Network);
   const { openSidePanel, closeSidePanel } = useSidePanel();
   const openAgentDetail = (agentId: string) => {
     openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
@@ -66,10 +69,10 @@ export function NetworkPage() {
         <div className="flex gap-4 sm:gap-6 items-center">
           <div className="hidden sm:block">
             <h1 className="text-sm sm:text-base font-bold text-foreground leading-tight whitespace-nowrap">
-              {view === "network" ? "Agent Network" : "Org Chart"}
+              {view === NetworkView.Network ? "Agent Network" : "Org Chart"}
             </h1>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
-              {view === "network" ? "Real-time hierarchy" : "Team structure"}
+              {view === NetworkView.Network ? "Real-time hierarchy" : "Team structure"}
             </p>
           </div>
           <div className="w-px h-8 bg-border hidden sm:block" />
@@ -77,26 +80,26 @@ export function NetworkPage() {
           {/* View toggle */}
           <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
             <Button
-              variant={view === "network" ? "secondary" : "ghost"}
+              variant={view === NetworkView.Network ? "secondary" : "ghost"}
               size="sm"
               className="rounded-full h-7 px-3 text-xs"
-              onClick={() => setView("network")}
+              onClick={() => setView(NetworkView.Network)}
             >
               <Network className="h-3.5 w-3.5 mr-1" />
               Network
             </Button>
             <Button
-              variant={view === "orgchart" ? "secondary" : "ghost"}
+              variant={view === NetworkView.OrgChart ? "secondary" : "ghost"}
               size="sm"
               className="rounded-full h-7 px-3 text-xs"
-              onClick={() => setView("orgchart")}
+              onClick={() => setView(NetworkView.OrgChart)}
             >
               <GitBranch className="h-3.5 w-3.5 mr-1" />
               Org Chart
             </Button>
           </div>
 
-          {view === "network" && (
+          {view === NetworkView.Network && (
             <>
               <div className="w-px h-8 bg-border hidden sm:block" />
               <div className="flex gap-3 sm:gap-5 items-center">
@@ -130,7 +133,7 @@ export function NetworkPage() {
         </div>
       </div>
 
-      {view === "network" ? (
+      {view === NetworkView.Network ? (
         <AgentNetwork className="w-full h-full" onAgentClick={openAgentDetail} />
       ) : (
         <OrgChart

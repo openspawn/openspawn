@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Logo } from "../components/ui/logo";
 import { Button } from "../components/ui/button";
-import { useDemo, type ScenarioName } from "./DemoProvider";
+import { useDemo, ScenarioName } from "./DemoProvider";
 import { useOnboarding } from "../components/onboarding/onboarding-provider";
 
 const SCENARIOS: {
@@ -27,7 +27,7 @@ const SCENARIOS: {
   color: string;
 }[] = [
   {
-    id: "acmetech",
+    id: ScenarioName.Acmetech,
     name: "AcmeTech Product Launch",
     icon: <Building2 className="w-6 h-6" />,
     description:
@@ -36,7 +36,7 @@ const SCENARIOS: {
     color: "from-cyan-500 to-blue-600",
   },
   {
-    id: "startup",
+    id: ScenarioName.Startup,
     name: "Startup Team",
     icon: <Rocket className="w-6 h-6" />,
     description: "A nimble school of agents exploring shallow waters in their first sprint",
@@ -44,7 +44,7 @@ const SCENARIOS: {
     color: "from-orange-400 to-coral-500",
   },
   {
-    id: "growth",
+    id: ScenarioName.Growth,
     name: "Growth Stage",
     icon: <TrendingUp className="w-6 h-6" />,
     description: "Mid-depth operations — established currents and coordinated workflows",
@@ -52,7 +52,7 @@ const SCENARIOS: {
     color: "from-teal-500 to-emerald-600",
   },
   {
-    id: "enterprise",
+    id: ScenarioName.Enterprise,
     name: "Enterprise",
     icon: <Users className="w-6 h-6" />,
     description: "Deep ocean trenches — complex hierarchies and vast coordination networks",
@@ -60,7 +60,7 @@ const SCENARIOS: {
     color: "from-blue-600 to-indigo-700",
   },
   {
-    id: "fresh",
+    id: ScenarioName.Fresh,
     name: "Fresh Start",
     icon: <Sparkles className="w-6 h-6" />,
     description: "Pristine waters — witness the birth of your agent ecosystem from nothing",
@@ -82,7 +82,7 @@ export function DemoWelcome() {
   const { skipOnboarding, startOnboarding } = useOnboarding();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<"welcome" | "scenarios">("welcome");
-  const [selectedScenario, setSelectedScenario] = useState<ScenarioName>("acmetech");
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioName>(ScenarioName.Acmetech);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem(STORAGE_KEY);
@@ -92,9 +92,17 @@ export function DemoWelcome() {
   }, []);
 
   const handleStart = (withTour: boolean) => {
-    const validScenarios: ScenarioName[] = ["acmetech", "startup", "growth", "enterprise", "fresh"];
+    const validScenarios: ScenarioName[] = [
+      ScenarioName.Acmetech,
+      ScenarioName.Startup,
+      ScenarioName.Growth,
+      ScenarioName.Enterprise,
+      ScenarioName.Fresh,
+    ];
     const scenarioToStart =
-      selectedScenario && validScenarios.includes(selectedScenario) ? selectedScenario : "acmetech";
+      selectedScenario && validScenarios.includes(selectedScenario)
+        ? selectedScenario
+        : ScenarioName.Acmetech;
 
     localStorage.setItem(STORAGE_KEY, "true");
     setScenario(scenarioToStart, true);
@@ -272,7 +280,7 @@ export function DemoWelcome() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 <h3 className="font-semibold text-foreground">{scenario.name}</h3>
-                                {scenario.id === "acmetech" && (
+                                {scenario.id === ScenarioName.Acmetech && (
                                   <span className="px-1.5 py-0.5 text-[10px] font-medium bg-cyan-500/20 text-cyan-400 rounded">
                                     RECOMMENDED
                                   </span>

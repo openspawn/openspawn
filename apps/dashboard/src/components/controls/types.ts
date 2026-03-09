@@ -1,4 +1,4 @@
-import type { NodeStatus } from "../live/replay-data";
+import { type NodeStatus } from "../live/replay-data";
 
 export type AgentControlStatus = NodeStatus | "paused";
 

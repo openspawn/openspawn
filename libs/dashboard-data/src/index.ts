@@ -6,7 +6,7 @@ export { useContainerSize } from "./hooks/use-container-size";
 export { useCredits, type CreditTransaction } from "./hooks/use-credits";
 export { useEvents, type Event } from "./hooks/use-events";
 export { useMcpTasks, type KanbanTask } from "./hooks/use-mcp-tasks";
-export type {
+export {
   TaskPriority as McpTaskPriority,
   TaskStatus as McpTaskStatus,
 } from "./hooks/use-mcp-tasks";
@@ -18,8 +18,8 @@ export {
   type Message,
   type Conversation,
 } from "./hooks/use-messages";
-export { usePresence, type AgentPresence, type PresenceStatus } from "./hooks/use-presence";
-export { useRepoTasks, type RepoTask, type RepoTaskStatus } from "./hooks/use-repo-tasks";
+export { usePresence, PresenceStatus, type AgentPresence } from "./hooks/use-presence";
+export { useRepoTasks, RepoTaskStatus, type RepoTask } from "./hooks/use-repo-tasks";
 export {
   useSandboxMetrics,
   useSparklines,

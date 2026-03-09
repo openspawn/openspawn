@@ -13,7 +13,18 @@
 //   LLM_RATE_LIMIT_RPM  - Max requests per minute (default: 0 = unlimited)
 //   LLM_MAX_RETRIES     - Max retries on 429/5xx (default: 3)
 
-export type LLMProvider = "ollama" | "anthropic" | "openai";
+export enum LLMProvider {
+  Ollama = "ollama",
+  Anthropic = "anthropic",
+  OpenAI = "openai",
+}
+
+function isLLMProvider(value: string | undefined): value is LLMProvider {
+  if (!value) return false;
+  return (
+    value === LLMProvider.Ollama || value === LLMProvider.Anthropic || value === LLMProvider.OpenAI
+  );
+}
 
 export interface LLMConfig {
   provider: LLMProvider;
@@ -99,9 +110,13 @@ function resolveApiKey(provider: LLMProvider): string {
 }
 
 const PROVIDER_DEFAULTS: Record<LLMProvider, { model: string; baseUrl: string; rpm: number }> = {
-  ollama: { model: "qwen2.5:7b-instruct", baseUrl: "http://localhost:11434", rpm: 0 },
-  anthropic: { model: "claude-opus-4-0-20250514", baseUrl: "https://api.anthropic.com", rpm: 0 },
-  openai: {
+  [LLMProvider.Ollama]: { model: "qwen2.5:7b-instruct", baseUrl: "http://localhost:11434", rpm: 0 },
+  [LLMProvider.Anthropic]: {
+    model: "claude-opus-4-0-20250514",
+    baseUrl: "https://api.anthropic.com",
+    rpm: 0,
+  },
+  [LLMProvider.OpenAI]: {
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
     baseUrl: "https://api.groq.com/openai",
     rpm: 30,
@@ -110,9 +125,10 @@ const PROVIDER_DEFAULTS: Record<LLMProvider, { model: string; baseUrl: string; r
 
 /** Read LLM config from environment with sensible defaults */
 export function getLLMConfig(): LLMConfig {
-  const provider = (process.env.LLM_PROVIDER || "ollama") as LLMProvider;
-  const defaults = PROVIDER_DEFAULTS[provider] || PROVIDER_DEFAULTS.ollama;
-  const isCloud = provider !== "ollama";
+  const envProvider = process.env.LLM_PROVIDER;
+  const provider: LLMProvider = isLLMProvider(envProvider) ? envProvider : LLMProvider.Ollama;
+  const defaults = PROVIDER_DEFAULTS[provider] || PROVIDER_DEFAULTS[LLMProvider.Ollama];
+  const isCloud = provider !== LLMProvider.Ollama;
 
   return {
     provider,
@@ -139,9 +155,9 @@ export async function generate(prompt: string, config: LLMConfig): Promise<LLMRe
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
       switch (config.provider) {
-        case "anthropic":
+        case LLMProvider.Anthropic:
           return await generateAnthropic(prompt, config);
-        case "openai":
+        case LLMProvider.OpenAI:
           return await generateOpenAI(prompt, config);
         default:
           return await generateOllama(prompt, config);
@@ -339,7 +355,7 @@ async function generateOllama(prompt: string, config: LLMConfig): Promise<LLMRes
 
 /** Check if the configured LLM provider is reachable */
 export async function isLLMAvailable(config: LLMConfig): Promise<boolean> {
-  if (config.provider === "anthropic" || config.provider === "openai") {
+  if (config.provider === LLMProvider.Anthropic || config.provider === LLMProvider.OpenAI) {
     return !!config.apiKey;
   }
 

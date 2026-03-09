@@ -50,9 +50,16 @@ import { ReputationTab } from "./agent-reputation-tab";
 import { AgentVirtualGrid } from "./agent-virtual-grid";
 
 type Agent = AgentFieldsFragment;
-type DialogMode = "view" | "edit" | "credits" | null;
-type SortField = "name" | "level" | "balance" | "status" | "created";
-type SortDirection = "asc" | "desc";
+
+import { DialogModeValue, type DialogMode, SortDirection } from "../lib/enums";
+
+enum AgentAgentSortField {
+  Name = "name",
+  Level = "level",
+  Balance = "balance",
+  Status = "status",
+  Created = "created",
+}
 
 // Suppress unused-variable warning for usePresence (destructured but not used directly in JSX)
 void usePresence;
@@ -104,8 +111,8 @@ export function AgentsPage() {
   const { teams: allTeams } = useTeams();
 
   // Sorting state
-  const [sortField, setSortField] = useState<SortField>("level");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setAgentSortField] = useState<AgentSortField>(AgentSortField.Level);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Desc);
 
   const filteredAgents = useMemo(() => {
     let result = [...agents];
@@ -130,33 +137,34 @@ export function AgentsPage() {
     result.sort((a, b) => {
       let cmp = 0;
       switch (sortField) {
-        case "name":
+        case AgentSortField.Name:
           cmp = a.name.localeCompare(b.name);
           break;
-        case "level":
+        case AgentSortField.Level:
           cmp = a.level - b.level;
           break;
-        case "balance":
+        case AgentSortField.Balance:
           cmp = a.currentBalance - b.currentBalance;
           break;
-        case "status":
+        case AgentSortField.Status:
           cmp = a.status.localeCompare(b.status);
           break;
-        case "created":
+        case AgentSortField.Created:
           cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
       }
-      return sortDirection === "desc" ? -cmp : cmp;
+      return sortDirection === SortDirection.Desc ? -cmp : cmp;
     });
 
     return result;
   }, [agents, searchQuery, statusFilter, levelFilter, teamFilterValue, sortField, sortDirection]);
 
-  function handleSort(field: SortField) {
-    if (sortField === field) setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+  function handleSort(field: AgentSortField) {
+    if (sortField === field)
+      setSortDirection((d) => (d === SortDirection.Asc ? SortDirection.Desc : SortDirection.Asc));
     else {
-      setSortField(field);
-      setSortDirection("desc");
+      setAgentSortField(field);
+      setSortDirection(SortDirection.Desc);
     }
   }
 
@@ -302,7 +310,12 @@ export function AgentsPage() {
 
                 <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
                   <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
-                  {(["level", "name", "balance", "created"] as SortField[]).map((field) => (
+                  {[
+                    AgentSortField.Level,
+                    AgentSortField.Name,
+                    AgentSortField.Balance,
+                    AgentSortField.Created,
+                  ].map((field) => (
                     <Button
                       key={field}
                       variant={sortField === field ? "secondary" : "ghost"}
@@ -313,7 +326,7 @@ export function AgentsPage() {
                       {field}
                       {sortField === field && (
                         <ArrowUpDown
-                          className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                          className={`ml-1 h-3 w-3 ${sortDirection === SortDirection.Desc ? "rotate-180" : ""}`}
                         />
                       )}
                     </Button>
@@ -398,13 +411,13 @@ export function AgentsPage() {
             )}
 
             {/* Dialogs */}
-            {selectedAgent && dialogMode === "view" && (
+            {selectedAgent && dialogMode === DialogModeValue.View && (
               <AgentDetailsDialog agent={selectedAgent} onClose={handleCloseDialog} />
             )}
-            {selectedAgent && dialogMode === "edit" && (
+            {selectedAgent && dialogMode === DialogModeValue.Edit && (
               <EditAgentDialog agent={selectedAgent} onClose={handleCloseDialog} />
             )}
-            {selectedAgent && dialogMode === "credits" && (
+            {selectedAgent && dialogMode === DialogModeValue.Credits && (
               <AdjustCreditsDialog agent={selectedAgent} onClose={handleCloseDialog} />
             )}
           </div>

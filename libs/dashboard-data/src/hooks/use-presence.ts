@@ -9,7 +9,12 @@ import { useAgents } from "./use-agents";
 import { useTasks } from "./use-tasks";
 import { AgentStatus } from "../graphql/generated/hooks";
 
-export type PresenceStatus = "active" | "busy" | "idle" | "error";
+export enum PresenceStatus {
+  Active = "active",
+  Busy = "busy",
+  Idle = "idle",
+  Error = "error",
+}
 
 export interface AgentPresence {
   agentId: string;
@@ -64,7 +69,7 @@ export function usePresence(): {
 
       // Suspended/revoked → error
       if (agent.status === AgentStatus.Suspended || agent.status === AgentStatus.Revoked) {
-        map.set(id, { agentId: id, status: "error" });
+        map.set(id, { agentId: id, status: PresenceStatus.Error });
         if (!errorSet) errorSet = true;
         continue;
       }
@@ -74,7 +79,7 @@ export function usePresence(): {
         activeCount++;
         map.set(id, {
           agentId: id,
-          status: "active",
+          status: PresenceStatus.Active,
           currentTask: agentTaskMap.get(id),
           // First 2 active agents are "composing" for typing indicator demo
           isComposing: activeCount <= 2,
@@ -84,12 +89,12 @@ export function usePresence(): {
 
       // Paused → busy
       if (agent.status === AgentStatus.Pending) {
-        map.set(id, { agentId: id, status: "busy" });
+        map.set(id, { agentId: id, status: PresenceStatus.Busy });
         continue;
       }
 
       // Default idle
-      map.set(id, { agentId: id, status: "idle" });
+      map.set(id, { agentId: id, status: PresenceStatus.Idle });
     }
 
     // If no agents are active from tasks, pick first 3 active-status agents as active
@@ -101,7 +106,7 @@ export function usePresence(): {
         activeCount++;
         map.set(agent.id, {
           agentId: agent.id,
-          status: "active",
+          status: PresenceStatus.Active,
           currentTask: "Processing tasks...",
           isComposing: forced <= 2,
         });

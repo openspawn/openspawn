@@ -26,7 +26,8 @@ import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
 import type { AgentFieldsFragment } from "../graphql/generated/graphql";
 
 type Agent = AgentFieldsFragment;
-type DialogMode = "view" | "edit" | "credits" | null;
+
+import { DialogModeValue, type DialogMode } from "../lib/enums";
 
 interface AgentVirtualGridProps {
   filteredAgents: Agent[];
@@ -154,13 +155,19 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => onAction(agent, "view")}>
+                              <DropdownMenuItem
+                                onClick={() => onAction(agent, DialogModeValue.View)}
+                              >
                                 <Eye className="mr-2 h-4 w-4" /> View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => onAction(agent, "edit")}>
+                              <DropdownMenuItem
+                                onClick={() => onAction(agent, DialogModeValue.Edit)}
+                              >
                                 <Edit className="mr-2 h-4 w-4" /> Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => onAction(agent, "credits")}>
+                              <DropdownMenuItem
+                                onClick={() => onAction(agent, DialogModeValue.Credits)}
+                              >
                                 <Coins className="mr-2 h-4 w-4" /> Adjust Credits
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />

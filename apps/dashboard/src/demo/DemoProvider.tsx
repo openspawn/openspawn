@@ -24,7 +24,14 @@ import { setDemoEngine } from "./mock-fetcher";
 import { celebrateLevelUp, celebrateElite } from "../lib/confetti";
 import { debug } from "../lib/debug";
 
-export type ScenarioName = "acmetech" | "fresh" | "startup" | "growth" | "enterprise" | "sandbox";
+export enum ScenarioName {
+  Acmetech = "acmetech",
+  Fresh = "fresh",
+  Startup = "startup",
+  Growth = "growth",
+  Enterprise = "enterprise",
+  Sandbox = "sandbox",
+}
 
 // Re-export phase info for UI components
 export { PROJECT_PHASES };
@@ -58,7 +65,7 @@ export function useDemo(): DemoContextValue {
       isPlaying: false,
       speed: 1,
       currentTick: 0,
-      scenario: "fresh",
+      scenario: ScenarioName.Fresh,
       recentEvents: [],
       play: () => {
         /* noop */
@@ -85,25 +92,17 @@ export function useDemo(): DemoContextValue {
 }
 
 const SCENARIOS: Record<ScenarioName, DemoScenario> = {
-  acmetech: acmetechScenario, // Default: Realistic product launch
-  fresh: freshScenario,
-  startup: startupScenario,
-  growth: growthScenario,
-  enterprise: enterpriseScenario,
-  sandbox: freshScenario, // Sandbox reuses fresh scenario as base
+  [ScenarioName.Acmetech]: acmetechScenario, // Default: Realistic product launch
+  [ScenarioName.Fresh]: freshScenario,
+  [ScenarioName.Startup]: startupScenario,
+  [ScenarioName.Growth]: growthScenario,
+  [ScenarioName.Enterprise]: enterpriseScenario,
+  [ScenarioName.Sandbox]: freshScenario, // Sandbox reuses fresh scenario as base
 };
 
 function parseScenario(s: string | undefined | null): ScenarioName {
-  if (
-    s === "acmetech" ||
-    s === "fresh" ||
-    s === "startup" ||
-    s === "growth" ||
-    s === "enterprise" ||
-    s === "sandbox"
-  )
-    return s;
-  return "acmetech"; // Default to AcmeTech product launch
+  if (Object.values(ScenarioName).includes(s as ScenarioName)) return s as ScenarioName;
+  return ScenarioName.Acmetech; // Default to AcmeTech product launch
 }
 
 interface DemoProviderProps {

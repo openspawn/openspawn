@@ -14,7 +14,11 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 
-type Proficiency = "basic" | "standard" | "expert";
+enum Proficiency {
+  Basic = "basic",
+  Standard = "standard",
+  Expert = "expert",
+}
 
 interface Capability {
   id: string;
@@ -49,9 +53,9 @@ const MOCK_ORG_CAPABILITIES: OrgCapability[] = [
 ];
 
 const MOCK_AGENT_CAPABILITIES: Capability[] = [
-  { id: "cap-1", capability: "code-review", proficiency: "expert", agentId: "agent-1" },
-  { id: "cap-2", capability: "debugging", proficiency: "standard", agentId: "agent-1" },
-  { id: "cap-3", capability: "testing", proficiency: "basic", agentId: "agent-1" },
+  { id: "cap-1", capability: "code-review", proficiency: Proficiency.Expert, agentId: "agent-1" },
+  { id: "cap-2", capability: "debugging", proficiency: Proficiency.Standard, agentId: "agent-1" },
+  { id: "cap-3", capability: "testing", proficiency: Proficiency.Basic, agentId: "agent-1" },
 ];
 
 const MOCK_MATCHES: CapabilityMatch[] = [
@@ -60,7 +64,7 @@ const MOCK_MATCHES: CapabilityMatch[] = [
     agentName: "Code Reviewer",
     level: 6,
     capability: "code-review",
-    proficiency: "expert",
+    proficiency: Proficiency.Expert,
     score: 3,
   },
   {
@@ -68,7 +72,7 @@ const MOCK_MATCHES: CapabilityMatch[] = [
     agentName: "Senior Dev",
     level: 5,
     capability: "code-review",
-    proficiency: "standard",
+    proficiency: Proficiency.Standard,
     score: 2,
   },
   {
@@ -76,21 +80,21 @@ const MOCK_MATCHES: CapabilityMatch[] = [
     agentName: "Bug Hunter",
     level: 4,
     capability: "code-review",
-    proficiency: "basic",
+    proficiency: Proficiency.Basic,
     score: 1,
   },
 ];
 
 const proficiencyColors: Record<Proficiency, string> = {
-  basic: "bg-gray-500",
-  standard: "bg-cyan-500",
-  expert: "bg-violet-500",
+  [Proficiency.Basic]: "bg-gray-500",
+  [Proficiency.Standard]: "bg-cyan-500",
+  [Proficiency.Expert]: "bg-violet-500",
 };
 
 const proficiencyLabels: Record<Proficiency, string> = {
-  basic: "Basic",
-  standard: "Standard",
-  expert: "Expert",
+  [Proficiency.Basic]: "Basic",
+  [Proficiency.Standard]: "Standard",
+  [Proficiency.Expert]: "Expert",
 };
 
 export function CapabilityManager({
@@ -106,7 +110,7 @@ export function CapabilityManager({
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showMatchDialog, setShowMatchDialog] = useState(false);
   const [newCapability, setNewCapability] = useState("");
-  const [newProficiency, setNewProficiency] = useState<Proficiency>("standard");
+  const [newProficiency, setNewProficiency] = useState<Proficiency>(Proficiency.Standard);
   const [matchQuery, setMatchQuery] = useState("");
   const [matches, setMatches] = useState<CapabilityMatch[]>([]);
   const [searching, setSearching] = useState(false);
@@ -131,7 +135,7 @@ export function CapabilityManager({
 
     setAgentCapabilities([...agentCapabilities, newCap]);
     setNewCapability("");
-    setNewProficiency("standard");
+    setNewProficiency(Proficiency.Standard);
     setShowAddDialog(false);
   };
 
@@ -313,7 +317,7 @@ export function CapabilityManager({
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Proficiency</label>
                       <div className="flex gap-2">
-                        {(["basic", "standard", "expert"] as Proficiency[]).map((p) => (
+                        {[Proficiency.Basic, Proficiency.Standard, Proficiency.Expert].map((p) => (
                           <Button
                             key={p}
                             variant={newProficiency === p ? "default" : "outline"}

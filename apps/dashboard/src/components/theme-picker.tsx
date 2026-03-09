@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useTheme, type OceanTheme } from "./theme-provider";
+import { useTheme, Density, type OceanTheme } from "./theme-provider";
 import { cn } from "../lib/utils";
 
 function ThemeSwatch({
@@ -101,10 +101,10 @@ export function ThemePicker() {
         </DropdownMenuLabel>
         <div className="flex gap-1.5 mt-1.5">
           <button
-            onClick={() => setDensity("comfortable")}
+            onClick={() => setDensity(Density.Comfortable)}
             className={cn(
               "flex items-center gap-2 flex-1 rounded-md px-3 py-2 text-sm transition-colors",
-              density === "comfortable"
+              density === Density.Comfortable
                 ? "bg-secondary text-foreground"
                 : "hover:bg-muted text-muted-foreground hover:text-foreground",
             )}
@@ -113,10 +113,10 @@ export function ThemePicker() {
             Comfortable
           </button>
           <button
-            onClick={() => setDensity("compact")}
+            onClick={() => setDensity(Density.Compact)}
             className={cn(
               "flex items-center gap-2 flex-1 rounded-md px-3 py-2 text-sm transition-colors",
-              density === "compact"
+              density === Density.Compact
                 ? "bg-secondary text-foreground"
                 : "hover:bg-muted text-muted-foreground hover:text-foreground",
             )}
