@@ -11,8 +11,7 @@ import {
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-// Import the enum from generated types
-import { AgentMode } from "../graphql/generated/graphql";
+import { AgentMode } from "@openspawn/shared-types";
 
 interface AgentModeSelectorProps {
   value: AgentMode;
@@ -36,7 +35,7 @@ const MODE_CONFIG: Record<
     allowedActions: string[];
   }
 > = {
-  [AgentMode.Worker]: {
+  [AgentMode.WORKER]: {
     label: "Worker",
     icon: Briefcase,
     color: "text-emerald-500",
@@ -47,7 +46,7 @@ const MODE_CONFIG: Record<
     shortDescription: "Can do everything",
     allowedActions: ["Execute tasks", "Spawn agents", "Send messages", "All actions"],
   },
-  [AgentMode.Orchestrator]: {
+  [AgentMode.ORCHESTRATOR]: {
     label: "Orchestrator",
     icon: Network,
     color: "text-violet-500",
@@ -58,7 +57,7 @@ const MODE_CONFIG: Record<
     shortDescription: "Coordinate only",
     allowedActions: ["Spawn agents", "Assign tasks", "Send messages", "Approve/Reject"],
   },
-  [AgentMode.Observer]: {
+  [AgentMode.OBSERVER]: {
     label: "Observer",
     icon: Eye,
     color: "text-muted-foreground",
@@ -82,7 +81,7 @@ export function AgentModeBadge({
   size?: "sm" | "md" | "lg";
   showTooltip?: boolean;
 }) {
-  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.WORKER];
   const Icon = config.icon;
 
   const sizeClasses = {
@@ -250,7 +249,7 @@ export function AgentModeSelector({
  * Mode info card for detailed display
  */
 export function AgentModeCard({ mode, className }: { mode: AgentMode; className?: string }) {
-  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.WORKER];
   const Icon = config.icon;
 
   return (
@@ -293,7 +292,7 @@ export function AgentModeCard({ mode, className }: { mode: AgentMode; className?
  * Compact mode indicator for lists/tables
  */
 export function AgentModeIndicator({ mode }: { mode: AgentMode }) {
-  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.Worker];
+  const config = MODE_CONFIG[mode] || MODE_CONFIG[AgentMode.WORKER];
   const Icon = config.icon;
 
   return (

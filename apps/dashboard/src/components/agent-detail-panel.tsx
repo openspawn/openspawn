@@ -1,40 +1,39 @@
-import { useState, useEffect, useMemo } from "react";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
+import { TaskStatus } from "@openspawn/shared-types";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "motion/react";
 import {
-  X,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Zap,
-  MessageSquare,
-  Settings,
   Activity,
   Award,
-  Coins,
+  Calendar,
   Clock,
+  Coins,
+  MessageSquare,
+  Settings,
   Terminal,
+  TrendingDown,
+  TrendingUp,
+  X,
+  Zap,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useMemo, useState } from "react";
 import { isSandboxMode } from "../graphql/fetcher";
-import { SANDBOX_URL } from "../lib/sandbox-url";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { ScrollArea } from "./ui/scroll-area";
-import { AgentAvatar } from "./agent-avatar";
-import { Progress } from "./ui/progress";
 import { useAgents } from "../hooks/use-agents";
-import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
-import { AgentRole, TaskStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { useTasks } from "../hooks/use-tasks";
+import { SANDBOX_URL } from "../lib/sandbox-url";
+import { AgentAvatar } from "./agent-avatar";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Progress } from "./ui/progress";
+import { ScrollArea } from "./ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 // recharts v3 has infinite-loop bug — using custom bars instead
-import { useContainerSize } from "../hooks/use-container-size";
 // ChartTooltip removed — using custom bars
-import { Sparkline, generateSparklineData } from "./ui/sparkline";
-import { TimelineView } from "./timeline-view";
-import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
+import { getLevelColor, getLevelLabel, getStatusVariant } from "../lib/status-colors";
 import { TeamBadge } from "./team-badge";
+import { TimelineView } from "./timeline-view";
+import { Sparkline, generateSparklineData } from "./ui/sparkline";
 
 type Agent = AgentFieldsFragment;
 
@@ -48,15 +47,15 @@ function getTaskStatusBadge(status: TaskStatus): {
   label: string;
 } {
   switch (status) {
-    case TaskStatus.Done:
+    case TaskStatus.DONE:
       return { variant: "success", label: "Completed" };
-    case TaskStatus.InProgress:
+    case TaskStatus.IN_PROGRESS:
       return { variant: "warning", label: "In Progress" };
-    case TaskStatus.Blocked:
-    case TaskStatus.Cancelled:
+    case TaskStatus.BLOCKED:
+    case TaskStatus.CANCELLED:
       return { variant: "destructive", label: status };
-    case TaskStatus.Backlog:
-    case TaskStatus.Todo:
+    case TaskStatus.BACKLOG:
+    case TaskStatus.TODO:
       return { variant: "secondary", label: "Pending" };
     default:
       return { variant: "secondary", label: status };
@@ -191,13 +190,13 @@ function TasksTab({ agent }: { agent: Agent }) {
 
   const tasksByStatus = useMemo(
     () => ({
-      completed: agentTasks.filter((t) => t.status === TaskStatus.Done),
-      inProgress: agentTasks.filter((t) => t.status === TaskStatus.InProgress),
+      completed: agentTasks.filter((t) => t.status === TaskStatus.DONE),
+      inProgress: agentTasks.filter((t) => t.status === TaskStatus.IN_PROGRESS),
       pending: agentTasks.filter(
-        (t) => t.status === TaskStatus.Backlog || t.status === TaskStatus.Todo,
+        (t) => t.status === TaskStatus.BACKLOG || t.status === TaskStatus.TODO,
       ),
       failed: agentTasks.filter(
-        (t) => t.status === TaskStatus.Cancelled || t.status === TaskStatus.Blocked,
+        (t) => t.status === TaskStatus.CANCELLED || t.status === TaskStatus.BLOCKED,
       ),
     }),
     [agentTasks],
@@ -445,9 +444,21 @@ function CreditsTab({ agent }: { agent: Agent }) {
 
 // ACP message type styling
 const acpTypeStyles: Record<string, { icon: string; accent: string; bg: string }> = {
-  ack: { icon: "👍", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
-  delegation: { icon: "📋", accent: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/30" },
-  progress: { icon: "📊", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
+  ack: {
+    icon: "👍",
+    accent: "text-muted-foreground",
+    bg: "bg-muted/50 border-border",
+  },
+  delegation: {
+    icon: "📋",
+    accent: "text-blue-500",
+    bg: "bg-blue-500/10 border-blue-500/30",
+  },
+  progress: {
+    icon: "📊",
+    accent: "text-muted-foreground",
+    bg: "bg-muted/50 border-border",
+  },
   escalation: {
     icon: "⚠️",
     accent: "text-orange-500",
@@ -458,7 +469,11 @@ const acpTypeStyles: Record<string, { icon: string; accent: string; bg: string }
     accent: "text-emerald-500",
     bg: "bg-emerald-500/10 border-emerald-500/30",
   },
-  status_request: { icon: "💬", accent: "text-muted-foreground", bg: "bg-muted/50 border-border" },
+  status_request: {
+    icon: "💬",
+    accent: "text-muted-foreground",
+    bg: "bg-muted/50 border-border",
+  },
 };
 
 // Messages Tab Content
@@ -495,7 +510,11 @@ function MessagesTab({ agent }: { agent: Agent }) {
         body: `${agent.name}, please prioritize the ${domain} backlog items.`,
         offset: 1,
       });
-      pool.push({ type: "sent", body: `Acknowledged. Working on ${domain} tasks now.`, offset: 2 });
+      pool.push({
+        type: "sent",
+        body: `Acknowledged. Working on ${domain} tasks now.`,
+        offset: 2,
+      });
     }
     if (agent.tasksCompleted > 0) {
       pool.push({
@@ -517,7 +536,11 @@ function MessagesTab({ agent }: { agent: Agent }) {
       });
     }
     if (domain === "engineering" || domain === "code") {
-      pool.push({ type: "sent", body: "PR review complete. All checks passing.", offset: 6 });
+      pool.push({
+        type: "sent",
+        body: "PR review complete. All checks passing.",
+        offset: 6,
+      });
     } else if (domain === "security") {
       pool.push({
         type: "sent",
@@ -698,7 +721,7 @@ function PromptTab({ agent }: { agent: Agent }) {
 // Settings Tab Content
 function SettingsTab({ agent }: { agent: Agent }) {
   const [name, setName] = useState(agent.name);
-  const [role, setRole] = useState(agent.role);
+  const [role, setRole] = useState<string>(agent.role);
   const [domain, setDomain] = useState(agent.domain || "");
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -712,7 +735,11 @@ function SettingsTab({ agent }: { agent: Agent }) {
     // Wire to the updateAgent GraphQL mutation when available:
     //   updateAgent({ variables: { id: agent.id, name, role, domain } })
     // and call refetch() or update the Apollo cache on success.
-    console.log("Saving changes (local only, not persisted):", { name, role, domain });
+    console.log("Saving changes (local only, not persisted):", {
+      name,
+      role,
+      domain,
+    });
     setHasChanges(false);
   };
 
@@ -740,7 +767,7 @@ function SettingsTab({ agent }: { agent: Agent }) {
           <input
             type="text"
             value={role}
-            onChange={(e) => setRole(e.target.value as AgentRole)}
+            onChange={(e) => setRole(e.target.value)}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
@@ -828,7 +855,7 @@ export function AgentDetailPanel({ agentId, onClose }: AgentDetailPanelProps) {
             level={agent.level}
             size="lg"
             avatar={agent.avatar}
-            avatarUrl={agent.avatarUrl}
+            avatarUrl={agent.avatar}
             avatarColor={agent.avatarColor}
           />
           <div className="flex-1 min-w-0">

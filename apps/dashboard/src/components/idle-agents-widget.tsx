@@ -16,7 +16,7 @@ import { AgentAvatar } from "./agent-avatar";
 import { cn } from "../lib/utils";
 import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 // Idle reason mapping
 enum IdleReason {

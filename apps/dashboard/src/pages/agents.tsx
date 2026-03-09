@@ -41,8 +41,8 @@ import { getParentTeams } from "../demo/teams";
 import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
 import { useTeams } from "../hooks";
-import { AgentStatus } from "../graphql/generated/graphql";
-import type { AgentFieldsFragment } from "../graphql/generated/graphql";
+import { AgentStatus } from "@openspawn/shared-types";
+import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 // Extracted sub-components
 import { AgentDetailsDialog, EditAgentDialog, AdjustCreditsDialog } from "./agent-dialogs";
@@ -347,7 +347,7 @@ export function AgentsPage() {
               />
               <StatCard
                 title="Active"
-                value={agents.filter((a) => a.status === AgentStatus.Active).length}
+                value={agents.filter((a) => a.status === AgentStatus.ACTIVE).length}
                 sparklineData={agentSparklines.active}
                 sparklineColor="#10b981"
               />

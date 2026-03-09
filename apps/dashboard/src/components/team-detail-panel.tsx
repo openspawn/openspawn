@@ -37,7 +37,7 @@ import { getStatusVariant } from "../lib/status-colors";
 import { type Team, getTeamById, getSubTeams, getParentTeams, getTeamColor } from "../demo/teams";
 import { useAgents } from "../hooks/use-agents";
 import { useTeamStats } from "../hooks/use-teams";
-import { AgentMode, AgentStatus } from "../graphql/generated/graphql";
+import { AgentMode, AgentStatus } from "@openspawn/shared-types";
 import { TeamDialog, DeleteTeamDialog } from "./team-management";
 import { Button } from "./ui/button";
 
@@ -87,7 +87,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
 
   const hex = getTeamColor(team.color);
   const Icon = ICON_MAP[team.icon] || Users;
-  const activeCount = members.filter((m) => m.status === AgentStatus.Active).length;
+  const activeCount = members.filter((m) => m.status === AgentStatus.ACTIVE).length;
   const totalBalance = members.reduce((sum, m) => sum + m.currentBalance, 0);
   const avgTrust = members.length
     ? Math.round(members.reduce((sum, m) => sum + (m.trustScore ?? 50), 0) / members.length)
@@ -301,7 +301,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <AgentModeBadge mode={agent.mode ?? AgentMode.Worker} size="sm" />
+                  <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="sm" />
                   <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">
                     {agent.status}
                   </Badge>

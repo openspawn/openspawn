@@ -1,3 +1,4 @@
+import { AgentStatus, TaskStatus, EventSeverity } from "@openspawn/shared-types";
 /**
  * Demo mode fetcher that returns data from SimulationEngine
  * No service worker needed - works on any origin, including production
@@ -11,39 +12,18 @@ import type {
   DemoEvent,
   DemoMessage,
 } from "@openspawn/demo-data";
-import {
-  TasksDocument,
-  TaskDocument,
-  AgentsDocument,
-  CreditHistoryDocument,
-  EventsDocument,
-  MessagesDocument,
-} from "../graphql/generated/graphql";
 import { debug } from "../lib/debug";
 
-// Extract operation name from a DocumentNode at runtime
-
-import type { DocumentNode } from "graphql";
-
-function getOperationName(doc: DocumentNode): string {
-  const def = doc.definitions[0];
-  if ("name" in def && def.name) {
-    return def.name.value;
-  }
-  return "Unknown";
-}
-
-// Operation names derived from generated documents (type-safe)
+// Operation name constants (previously derived from GraphQL DocumentNodes)
 const OP = {
-  Tasks: getOperationName(TasksDocument),
-  Task: getOperationName(TaskDocument),
-  Agents: getOperationName(AgentsDocument),
-  CreditHistory: getOperationName(CreditHistoryDocument),
-  Events: getOperationName(EventsDocument),
-  Messages: getOperationName(MessagesDocument),
-  // Demo-only operations (not in codegen yet)
+  Tasks: "Tasks",
+  Task: "Task",
+  Agents: "Agents",
   Agent: "Agent",
+  CreditHistory: "CreditHistory",
   Credits: "Credits",
+  Events: "Events",
+  Messages: "Messages",
   AgentReputation: "AgentReputation",
   TrustLeaderboard: "TrustLeaderboard",
   ReputationHistory: "ReputationHistory",
@@ -61,12 +41,12 @@ export function setDemoEngine(getEngine: () => SimulationEngine | null) {
 
 // Severity mapping (demo uses lowercase, GraphQL expects uppercase)
 const severityMap: Record<string, string> = {
-  debug: "INFO",
-  info: "INFO",
-  success: "INFO",
-  warning: "WARNING",
-  error: "ERROR",
-  critical: "ERROR",
+  [EventSeverity.DEBUG]: "INFO",
+  [EventSeverity.INFO]: "INFO",
+  [EventSeverity.SUCCESS]: "INFO",
+  [EventSeverity.WARNING]: "WARNING",
+  [EventSeverity.ERROR]: "ERROR",
+  [EventSeverity.CRITICAL]: "ERROR",
 };
 
 // Map demo data to GraphQL response format
@@ -152,13 +132,13 @@ function mapAgentReputation(agent: DemoAgent) {
 
 // Map demo task status to GraphQL status
 const taskStatusMap: Record<string, string> = {
-  backlog: "BACKLOG",
-  pending: "TODO",
-  assigned: "TODO",
-  in_progress: "IN_PROGRESS",
-  review: "REVIEW",
-  done: "DONE",
-  cancelled: "CANCELLED",
+  [TaskStatus.BACKLOG]: "BACKLOG",
+  [TaskStatus.PENDING]: "TODO",
+  [TaskStatus.ASSIGNED]: "TODO",
+  [TaskStatus.IN_PROGRESS]: "IN_PROGRESS",
+  [TaskStatus.REVIEW]: "REVIEW",
+  [TaskStatus.DONE]: "DONE",
+  [TaskStatus.CANCELLED]: "CANCELLED",
 };
 
 function mapTask(task: DemoTask, agents: DemoAgent[]) {
@@ -334,7 +314,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
     case OP.TrustLeaderboard: {
       const leaderboardLimit = variables.limit ?? 10;
       const sortedByTrust = [...agents]
-        .filter((a) => a.status === "active")
+        .filter((a) => a.status === AgentStatus.ACTIVE)
         .sort((a, b) => (b.trustScore ?? 50) - (a.trustScore ?? 50))
         .slice(0, leaderboardLimit);
       return {
@@ -401,7 +381,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       messages.forEach((msg) => {
         const key = [msg.fromAgentId, msg.toAgentId].sort().join("::");
         if (!conversationMap.has(key)) conversationMap.set(key, []);
-        conversationMap.get(key)!.push(msg);
+        conversationMap.get(key)?.push(msg);
       });
 
       const conversations = Array.from(conversationMap.entries())
