@@ -10,9 +10,8 @@ apps/
   team/            Internal team dashboard
   website/         openspawn.ai marketing site
   platform/        openspawn.ai landing page server
-  api/             FastAPI backend (REST + OpenAPI) — Python, managed by uv
+  api/             FastAPI backend (REST + OpenAPI + MCP) — Python, managed by uv
   docs/            Astro Starlight documentation (docs.openspawn.ai)
-  mcp/             MCP server for AI tool integration
   sandbox-cli/     CLI entry point for sandbox
 
 libs/
@@ -28,26 +27,27 @@ tools/
   sandbox/         Coordination sandbox server (SSE + MCP + A2A)
 
 packages/
-  openspawn/       npm CLI package (npx openspawn init)
+  openspawn/       npm CLI package — scaffolding (init) + coordinator launcher (start)
   coordinator/     Coordination server package
-  cli/             Go CLI (GoReleaser)
 ```
 
 ## Tech Stack
 
-| Layer         | Technology                              |
-| ------------- | --------------------------------------- |
-| API Framework | FastAPI (Python)                        |
-| API Protocol  | REST + OpenAPI                          |
-| Database      | PostgreSQL 16 + SQLAlchemy async        |
-| Frontend      | React 19 + Vite                         |
-| Styling       | TailwindCSS v4                          |
-| Animations    | framer-motion                           |
-| Graph Viz     | @xyflow/react (ReactFlow)               |
-| Build System  | Nx                                      |
-| Linting       | oxlint + oxfmt                          |
-| Testing       | Vitest + Playwright                     |
-| Language      | TypeScript (strict, bundler resolution) |
+| Layer          | Technology                                                      |
+| -------------- | --------------------------------------------------------------- |
+| API Framework  | FastAPI (Python)                                                |
+| API Protocol   | REST + OpenAPI + MCP                                            |
+| Database       | PostgreSQL 16 + SQLAlchemy async (prod) / SQLite (local)        |
+| Background     | arq + Redis (prod) / asyncio scheduler (local)                  |
+| Agent Spawning | Claude Code CLI subprocesses with concurrency cap               |
+| Frontend       | React 19 + Vite                                                 |
+| Styling        | TailwindCSS v4                                                  |
+| Animations     | framer-motion                                                   |
+| Graph Viz      | @xyflow/react (ReactFlow)                                       |
+| Build System   | Nx                                                              |
+| Linting        | oxlint + oxfmt                                                  |
+| Testing        | Vitest + Playwright                                             |
+| Language       | TypeScript (strict, bundler resolution)                         |
 
 ## Deployment Topology
 
@@ -92,6 +92,26 @@ The dashboard runs entirely client-side in demo mode using a simulation engine (
 ### Agent Hierarchy
 
 Agents have levels (L1-L10) determining their authority. Higher-level agents can assign tasks to lower-level ones. The orchestrator pattern (L9-L10) manages overall coordination.
+
+### Agent Spawning
+
+`openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses. Key config fields:
+
+- `spawning.maxConcurrentAgents` — concurrency cap for active agent processes
+- `spawning.idleTimeoutSeconds` — auto-terminate idle agents
+- `runtime.mode` — `local` or `deployed`
+- `runtime.database` — `sqlite` or `postgresql`
+
+### Two-Tier Deployment Model
+
+| Concern    | Tier 1 (Local)        | Tier 2 (Deployed)       |
+| ---------- | --------------------- | ----------------------- |
+| Database   | SQLite                | PostgreSQL 16           |
+| Background | asyncio scheduler     | arq + Redis             |
+| Docker     | Not required          | Required                |
+| Entry      | `npx openspawn start` | Docker Compose + Caddy  |
+
+Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQL.
 
 ## API Endpoints
 

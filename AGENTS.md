@@ -32,9 +32,8 @@ apps/
   team/            -> Internal team dashboard
   website/         -> openspawn.ai marketing site
   platform/        -> openspawn.ai landing page
-  api/             -> FastAPI backend (REST + OpenAPI) — Python, uv
+  api/             -> FastAPI backend (REST + OpenAPI + MCP) — Python, uv
   docs/            -> Astro Starlight documentation
-  mcp/             -> MCP server for agent tools
   sandbox-cli/     -> CLI entry point for sandbox
 libs/
   dashboard-data/  -> Shared hooks, auth, utilities
@@ -49,7 +48,7 @@ tools/
   sandbox/         -> Coordination sandbox server (SSE + MCP + A2A)
 
 packages/
-  openspawn/       -> npm CLI package (npx openspawn init)
+  openspawn/       -> npm CLI package — scaffolding (init) + coordinator launcher (start)
   coordinator/     -> Coordination server package
 ```
 
@@ -67,6 +66,12 @@ cd apps/api && uv run uvicorn app.main:app --reload
 # Dev (Sandbox + Dashboard together)
 pnpm run dev:sandbox
 
+# CLI — scaffold a new project
+npx openspawn init
+
+# CLI — start Python coordinator (FastAPI + SQLite) and spawn Claude Code CLI agents
+npx openspawn start
+
 # Build
 pnpm exec nx run-many -t build
 
@@ -78,9 +83,11 @@ pnpm exec nx e2e demo           # E2E tests
 pnpm exec nx run-many -t lint
 pnpm exec oxfmt --write .
 
-# Database (Alembic)
+# Database (Alembic — production PostgreSQL)
 cd apps/api && uv run alembic upgrade head
 ```
+
+> **Note:** Only two CLI commands exist: `init` (scaffold) and `start` (launch coordinator). Agents interact via MCP tools directly; humans use the REST API and dashboard.
 
 ---
 
@@ -108,9 +115,11 @@ cd apps/api && uv run alembic upgrade head
 
 1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
 2. **Demo app** (`apps/demo/`) is the React dashboard for bikinibottom.ai
-3. **API** (`apps/api/`) manages tasks, credits, messages (FastAPI + SQLAlchemy)
-4. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
-5. **Docker** builds demo + team + website, serves all via sandbox server on VPS
+3. **API** (`apps/api/`) manages tasks, credits, messages, MCP tools, and agent spawning (FastAPI + SQLAlchemy)
+4. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
+5. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
+6. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
+7. **Docker** builds demo + team + website, serves all via sandbox server on VPS (Tier 2 only)
 
 Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
