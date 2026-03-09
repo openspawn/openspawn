@@ -16,7 +16,7 @@ import { generateWorkspaces } from "../workspace-generator.js";
 import { generateDockerInfra } from "../docker-generator.js";
 import { simulateDryRun } from "../dry-run.js";
 import { writeConfig } from "../../core/config.js";
-import type { OpenSpawnConfig } from "../../core/types.js";
+import { type OpenSpawnConfig, BootstrapMode, RuntimeMode } from "../../core/types.js";
 import { parseOrgMdContent } from "../../core/org-parser.js";
 import type { Agent } from "../../core/types.js";
 
@@ -205,6 +205,15 @@ function buildConfig(answers: WizardAnswers): OpenSpawnConfig {
       values: answers.values,
     },
     culture: { preset: answers.culturePreset },
+    spawning: {
+      maxConcurrentAgents: 2,
+      idleTimeoutSeconds: 300,
+      bootstrapMode: BootstrapMode.Hybrid,
+    },
+    runtime: {
+      mode: RuntimeMode.Local,
+      database: ".openspawn/openspawn.db",
+    },
   };
 }
 
