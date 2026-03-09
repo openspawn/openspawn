@@ -107,7 +107,7 @@ export function SelfClaimButton({ agentId, size = "md", showCount = true, onClai
 
 export function SelfClaimHero({
   agentId,
-  agentName,
+  agentName: _agentName,
   onClaimSuccess,
 }: {
   agentId: string;

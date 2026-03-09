@@ -10,7 +10,7 @@ import { Badge } from "./ui/badge";
 import { cn } from "../lib/utils";
 import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
-import { useAgents, type Message } from "../hooks";
+import { useAgents, type Agent, type Message } from "../hooks";
 
 interface ThreadViewProps {
   /** All messages in this conversation (between two agents) */
@@ -78,8 +78,8 @@ function formatThreadTime(dateStr: string) {
 export function ThreadView({ messages, onClose }: ThreadViewProps) {
   const { agents } = useAgents();
   const agentMap = useMemo(() => {
-    const map = new Map<string, any>();
-    agents.forEach((a: any) => map.set(a.id, a));
+    const map = new Map<string, Agent>();
+    agents.forEach((a) => map.set(a.id, a));
     return map;
   }, [agents]);
 
@@ -160,7 +160,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
               const sender = msg.fromAgent;
               const showAvatar = idx === 0 || sorted[idx - 1].fromAgentId !== msg.fromAgentId;
 
-              const acpType = (msg as any).acpType as string | undefined;
+              const acpType = msg.acpType;
               const acpStyle = acpType ? acpStyles[acpType] : undefined;
 
               // Compact ack chip
@@ -248,7 +248,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                     )}
                     {acpType === "escalation" && (
                       <p className="text-xs font-medium text-red-400 mb-0.5">
-                        ⚠️ Escalated: {(msg as any).reason || "unknown"}
+                        ⚠️ Escalated: {msg.reason || "unknown"}
                       </p>
                     )}
                     {acpType === "completion" && (
@@ -256,7 +256,7 @@ export function ThreadView({ messages, onClose }: ThreadViewProps) {
                     )}
                     {acpType === "progress" && (
                       <p className="text-xs font-medium text-muted-foreground mb-0.5">
-                        📊 Progress{(msg as any).pct != null ? ` (${(msg as any).pct}%)` : ""}
+                        📊 Progress{msg.pct != null ? ` (${msg.pct}%)` : ""}
                       </p>
                     )}
                     <p className="text-xs md:text-sm text-foreground/90 leading-relaxed">

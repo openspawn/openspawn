@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSandboxTickInvalidation } from "../hooks/use-sandbox-tick";
 import { Logo } from "./ui/logo";
-import { Link, useLocation, useSearch, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useSearch } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import {
   LayoutDashboard,
@@ -135,7 +135,6 @@ function useSidebarCollapsed() {
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const searchParams = useSearch({ strict: false }) as Record<string, string | undefined>;
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const demo = useDemo();
   const isDemo = searchParams?.demo === "true";
@@ -477,7 +476,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to={"/settings/profile" as any} className="flex items-center gap-2">
+                      <Link to="/settings" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Profile
                       </Link>
@@ -525,7 +524,7 @@ export function Layout({ children }: LayoutProps) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to={"/settings/profile" as any} className="flex items-center gap-2">
+                      <Link to="/settings" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Profile
                       </Link>

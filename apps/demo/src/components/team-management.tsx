@@ -2,11 +2,8 @@
  * Team CRUD — create, edit, delete teams from the dashboard.
  * In demo mode, changes persist to localStorage.
  */
-import { useState, useMemo } from "react";
-import { motion } from "motion/react";
+import { useState } from "react";
 import {
-  Plus,
-  Pencil,
   Trash2,
   Users,
   Crown,
@@ -29,7 +26,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import {
   Dialog,
   DialogPopup,
@@ -39,13 +35,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "./ui/dialog";
-import {
-  type Team,
-  teams as allTeams,
-  getParentTeams,
-  getTeamColor,
-  TEAM_COLOR_MAP,
-} from "../demo/teams";
+import { type Team, getTeamColor, TEAM_COLOR_MAP } from "../demo/teams";
 import { useAgents } from "../hooks/use-agents";
 import { cn } from "../lib/utils";
 

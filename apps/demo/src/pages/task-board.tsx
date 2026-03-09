@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useRepoTasks, type RepoTask, type RepoTaskStatus } from "../hooks/use-repo-tasks";
 import { PageHeader } from "../components/ui/page-header";
-import { Badge } from "../components/ui/badge";
 import { Clock, User, ExternalLink, Wifi, WifiOff, RefreshCw, AlertTriangle } from "lucide-react";
 import { cn } from "../lib/utils";
 

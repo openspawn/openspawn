@@ -11,12 +11,12 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { cn } from "../lib/utils";
 import { isSandboxMode } from "../graphql/fetcher";
 import { TeamBadge } from "../components/team-badge";
-import type { Message } from "../hooks";
+import type { Agent, Message } from "../hooks";
 import { InlineAvatar, formatTime, acpTypeRenderers } from "./message-utils";
 
 interface ConversationCardsProps {
   messages: Message[];
-  agents: any[];
+  agents: Agent[];
   onViewThread: (convoKey: string) => void;
 }
 
@@ -100,12 +100,8 @@ export function ConversationCards({ messages, agents, onViewThread }: Conversati
                         <p className="text-[10px] md:text-xs text-muted-foreground">
                           {msgs.length} messages
                         </p>
-                        {(agent1 as any)?.teamId && (
-                          <TeamBadge
-                            teamId={(agent1 as any).teamId}
-                            compact
-                            className="text-[8px]"
-                          />
+                        {agent1?.teamId && (
+                          <TeamBadge teamId={agent1.teamId} compact className="text-[8px]" />
                         )}
                       </div>
                     </div>
@@ -133,7 +129,7 @@ export function ConversationCards({ messages, agents, onViewThread }: Conversati
                           .slice(-10)
                           .map((msg) => {
                             const isAgent1 = msg.fromAgentId === agent1Id;
-                            const acpType = (msg as any).acpType as string | undefined;
+                            const acpType = msg.acpType;
                             const renderer =
                               acpType && isSandboxMode ? acpTypeRenderers[acpType] : undefined;
                             const acpResult = renderer?.(msg);

@@ -64,7 +64,6 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
   const [targetAgent, setTargetAgent] = useState("");
 
   const alertBudgets = budgets.filter((b) => (b.utilizationPercent || 0) >= 80);
-  const healthyBudgets = budgets.filter((b) => (b.utilizationPercent || 0) < 80);
 
   const handleTransfer = async () => {
     setTransferring(true);
@@ -119,7 +118,7 @@ export function BudgetManager({ onAgentClick }: { onAgentClick?: (id: string) =>
                     <Badge
                       variant="outline"
                       className={
-                        budget.utilizationPercent! >= 90
+                        (budget.utilizationPercent ?? 0) >= 90
                           ? "border-red-500 text-red-500"
                           : "border-amber-500 text-amber-500"
                       }

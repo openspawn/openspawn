@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 
-import { DASHBOARD_THEME, isOpenSpawnTheme } from "../lib/dashboard-theme";
+import { isOpenSpawnTheme } from "../lib/dashboard-theme";
 
 // Named ocean themes
 export const THEME_NAMES = [

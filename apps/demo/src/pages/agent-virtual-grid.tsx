@@ -137,7 +137,7 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                               </p>
                               {presenceMap.get(agent.id)?.currentTask && (
                                 <p className="text-[10px] text-emerald-400 truncate max-w-[160px]">
-                                  working on: {presenceMap.get(agent.id)!.currentTask}
+                                  working on: {presenceMap.get(agent.id)?.currentTask}
                                 </p>
                               )}
                             </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef, useCallback, type ReactNode } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 
 import { useNavigate, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
@@ -29,7 +29,6 @@ import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useCredits } from "../hooks/use-credits";
 import { useEvents } from "../hooks/use-events";
-import { EmptyState } from "../components/ui/empty-state";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 import { useSparklines } from "../hooks/use-sandbox-metrics";
 import { useACPMetrics } from "../hooks/use-acp-metrics";
@@ -175,72 +174,6 @@ export function DashboardPage() {
     () => transactions.filter((t) => t.type === "DEBIT").reduce((sum, t) => sum + t.amount, 0),
     [transactions],
   );
-
-  // Real task status counts from simulation (normalized to uppercase)
-  const tasksByStatus = useMemo(
-    () => [
-      {
-        status: "Backlog",
-        count: tasks.filter((t) => t.status?.toUpperCase() === "BACKLOG").length,
-        fill: "#64748b",
-      },
-      {
-        status: "To Do",
-        count: tasks.filter((t) => t.status?.toUpperCase() === "TODO").length,
-        fill: "#f59e0b",
-      },
-      {
-        status: "In Progress",
-        count: tasks.filter((t) => t.status?.toUpperCase() === "IN_PROGRESS").length,
-        fill: "#06b6d4",
-      },
-      {
-        status: "Review",
-        count: tasks.filter((t) => t.status?.toUpperCase() === "REVIEW").length,
-        fill: "#8b5cf6",
-      },
-      {
-        status: "Done",
-        count: tasks.filter((t) => t.status?.toUpperCase() === "DONE").length,
-        fill: "#10b981",
-      },
-    ],
-    [tasks],
-  );
-
-  // Real credit flow - aggregate last N transactions into buckets
-  const creditHistory = useMemo(() => {
-    // Group transactions into time buckets (last 10 "periods")
-    const bucketCount = 8;
-    const sortedTx = [...transactions].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-
-    if (sortedTx.length === 0) {
-      return Array.from({ length: bucketCount }, (_, i) => ({
-        period: `T${i + 1}`,
-        earned: 0,
-        spent: 0,
-      }));
-    }
-
-    const txPerBucket = Math.max(1, Math.ceil(sortedTx.length / bucketCount));
-    const buckets: { period: string; earned: number; spent: number }[] = [];
-
-    for (let i = 0; i < bucketCount; i++) {
-      const start = i * txPerBucket;
-      const end = Math.min(start + txPerBucket, sortedTx.length);
-      const bucketTx = sortedTx.slice(start, end);
-
-      buckets.push({
-        period: `T${i + 1}`,
-        earned: bucketTx.filter((t) => t.type === "CREDIT").reduce((sum, t) => sum + t.amount, 0),
-        spent: bucketTx.filter((t) => t.type === "DEBIT").reduce((sum, t) => sum + t.amount, 0),
-      });
-    }
-
-    return buckets;
-  }, [transactions]);
 
   // Widget render map
   const renderWidget = useCallback(
