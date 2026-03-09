@@ -38,7 +38,7 @@ export function usePresence(): {
 
     // Find agents with in-progress tasks
     const inProgressTasks = (tasks ?? []).filter(
-      (t: any) => t.status === "in_progress" || t.status === "assigned",
+      (t: { status: string }) => t.status === "in_progress" || t.status === "assigned",
     );
 
     const busyAgentIds = new Set<string>();

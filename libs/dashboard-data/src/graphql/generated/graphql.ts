@@ -1,4 +1,3 @@
-/* eslint-disable */
 // Inline type replaces @graphql-typed-document-node/core (removed dep)
 type DocumentNode<TResult = Record<string, unknown>, TVariables = Record<string, unknown>> = {
   __apiType?: (variables: TVariables) => TResult;

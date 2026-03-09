@@ -157,7 +157,9 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       })
-      .catch(() => {});
+      .catch(() => {
+        /* noop */
+      });
   };
 
   return (

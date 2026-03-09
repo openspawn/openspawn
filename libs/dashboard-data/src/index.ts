@@ -6,6 +6,10 @@ export { useContainerSize } from "./hooks/use-container-size";
 export { useCredits, type CreditTransaction } from "./hooks/use-credits";
 export { useEvents, type Event } from "./hooks/use-events";
 export { useMcpTasks, type KanbanTask } from "./hooks/use-mcp-tasks";
+export type {
+  TaskPriority as McpTaskPriority,
+  TaskStatus as McpTaskStatus,
+} from "./hooks/use-mcp-tasks";
 export { useMcpOrgStatus, type McpOrgData } from "./hooks/use-mcp";
 export {
   useMessages,
@@ -72,7 +76,7 @@ export * from "./lib/dashboard-theme";
 export * from "./lib/date-format";
 export * from "./lib/debug";
 export * from "./lib/resolve-avatar-url";
-export { SANDBOX_URL } from "./lib/sandbox-url";
+export { getSandboxUrl, SANDBOX_URL } from "./lib/sandbox-url";
 export * from "./lib/status-colors";
 export * from "./lib/toast";
 

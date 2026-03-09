@@ -106,7 +106,7 @@ export function useRepoTasks() {
     try {
       // Try local static file first (baked into Docker build)
       let res = await fetch(LOCAL_URL, { cache: "no-store" });
-      let src: "github" | "demo" = "github";
+      const src: "github" | "demo" = "github";
       if (!res.ok) {
         // Fall back to GitHub raw content
         res = await fetch(GITHUB_RAW_URL, { cache: "no-store" });

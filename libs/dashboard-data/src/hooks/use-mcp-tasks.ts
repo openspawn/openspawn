@@ -212,18 +212,19 @@ export function useMcpTasks(intervalMs = 5000) {
 
   const refresh = useCallback(async () => {
     try {
-      const result = (await taskList()) as any;
-      const raw: any[] = Array.isArray(result) ? result : (result?.tasks ?? []);
+      const result = (await taskList()) as Record<string, unknown>;
+      const rawResult = Array.isArray(result) ? result : ((result?.tasks as unknown[]) ?? []);
+      const raw = rawResult as Array<Record<string, unknown>>;
       if (raw.length > 0) {
-        const mapped: KanbanTask[] = raw.map((t: any) => ({
-          id: t.id || t.task_id || String(Math.random()),
-          title: t.title || t.name || "Untitled",
-          status: normalizeStatus(t.status || "open"),
-          priority: normalizePriority(t.priority),
-          assignee: t.assignee || t.agent_id || t.assigned_to || undefined,
-          description: t.description || undefined,
-          createdAt: t.created_at || t.createdAt || new Date().toISOString(),
-          updatedAt: t.updated_at || t.updatedAt || new Date().toISOString(),
+        const mapped: KanbanTask[] = raw.map((t) => ({
+          id: String(t.id || t.task_id || Math.random()),
+          title: String(t.title || t.name || "Untitled"),
+          status: normalizeStatus(String(t.status || "open")),
+          priority: normalizePriority(t.priority as string | undefined),
+          assignee: (t.assignee || t.agent_id || t.assigned_to || undefined) as string | undefined,
+          description: (t.description || undefined) as string | undefined,
+          createdAt: String(t.created_at || t.createdAt || new Date().toISOString()),
+          updatedAt: String(t.updated_at || t.updatedAt || new Date().toISOString()),
         }));
         setTasks(mapped);
       }

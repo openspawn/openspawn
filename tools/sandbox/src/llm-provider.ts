@@ -58,7 +58,7 @@ function estimateCost(model: string, inputTokens: number, outputTokens: number):
 
 class RateLimiter {
   private minIntervalMs: number;
-  private lastCallTime: number = 0;
+  private lastCallTime = 0;
 
   constructor(rpm: number) {
     // Convert RPM to minimum interval between calls (with 10% safety margin)

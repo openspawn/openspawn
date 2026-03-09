@@ -5,7 +5,7 @@
 
 const MCP_URL = import.meta.env.VITE_MCP_URL || "/mcp";
 
-export interface McpResponse<T = unknown> {
+export interface McpResponse {
   result?: { content?: Array<{ type: string; text: string }> };
   error?: { code: number; message: string };
 }

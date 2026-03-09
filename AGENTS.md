@@ -166,11 +166,14 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## After Making Changes
 
-Always run before finishing:
+Always run before finishing and before opening a PR:
 
 ```bash
-pnpm exec oxfmt --write .          # Format
-pnpm exec nx run-many -t lint      # Lint
+pnpm exec oxfmt --write .                                              # Format
+pnpm exec nx run-many -t lint                                          # Lint (must pass with 0 errors)
+pnpm exec nx run-many -t build --exclude=dashboard                     # Build
+pnpm exec nx run-many -t test --exclude=dashboard --exclude=openspawn  # Test (TS)
+cd apps/api && uv run pytest tests/ -v                                 # Test (Python)
 ```
 
 ---

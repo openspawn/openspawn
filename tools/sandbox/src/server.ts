@@ -815,7 +815,7 @@ export function startServer(sim: Simulation): void {
               message: `${event.name || from} activated`,
               timestamp: ts,
             });
-            sim.events.length; // SSE auto-emits via sim.onEvent through push to sim.events
+            void sim.events.length; // SSE auto-emits via sim.onEvent through push to sim.events
           } else if (type === "task_delegate") {
             const id = taskId || `LIVE-${Date.now().toString(36)}`;
             const newTask = {

@@ -252,7 +252,6 @@ export function InteractiveCliDemo() {
       clearTimers();
     };
     // runKey in deps causes the observer to re-attach after replay
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startAnimation, clearTimers, runKey]);
 
   const handleReplay = () => {
