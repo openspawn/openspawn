@@ -19,13 +19,13 @@ These are the questions people ask most often. Longer answers are in the section
 | 1   | **What is OpenSpawn?**                         | An open-source coordination layer for AI agent orgs — defined in one markdown file (`ORG.md`).                                 |
 | 2   | **Do I need to rewrite my agents?**            | No. OpenSpawn connects to existing agents via MCP, A2A, or REST.                                                               |
 | 3   | **Do I need API keys to try it?**              | No. `npx openspawn init my-org && openspawn start` works offline with simulated agents.                                        |
-| 4   | **What Node.js version do I need?**            | Node 18 or later. Check with `node --version`.                                                                                 |
-| 5   | **My ORG.md agents aren't showing up — why?**  | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Run `openspawn validate`. |
+| 4   | **What do I need installed?**                  | Node 18+, Python 3.12+, and [uv](https://docs.astral.sh/uv/). Docker optional (production only).                               |
+| 5   | **My ORG.md agents aren't showing up — why?**  | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Check startup logs.       |
 | 6   | **I get `Invalid credentials` from the API.**  | Clock skew or wrong signature message format. See [Auth Errors](./guides/troubleshooting#5-api-auth-errors).                   |
 | 7   | **Why is my task stuck and won't transition?** | `DONE` and `CANCELLED` are terminal — create a new task. `IN_PROGRESS → DONE` is invalid; go through `REVIEW` first.           |
 | 8   | **How do I fix port conflicts?**               | `lsof -i :3456` (MCP) or `lsof -i :3333` (sandbox), kill the process, or start with `--port`.                                  |
 | 9   | **The dashboard goes blank / SSE drops.**      | Proxy timeout. Set `proxy_read_timeout 86400s` (nginx) or `flush_interval -1` (Caddy).                                         |
-| 10  | **How do I debug a broken setup?**             | `openspawn validate` → check port → inspect `.openspawn/tasks.json` → see [Troubleshooting Guide](./guides/troubleshooting).   |
+| 10  | **How do I debug a broken setup?**             | Check startup logs → check port → inspect `data/openspawn.db` → see [Troubleshooting Guide](./guides/troubleshooting).         |
 
 ---
 
@@ -66,8 +66,8 @@ Your agents keep running as-is. OpenSpawn adds the coordination layer on top.
 ```bash
 npx openspawn init my-org --template=saas-onboarding --non-interactive
 cd my-org
-openspawn preview
-# Open http://localhost:3333
+openspawn start
+# Open http://localhost:8787
 ```
 
 You'll see the full coordination flow with simulated agents, no API keys needed.
@@ -84,24 +84,25 @@ Optional: paid hosted tier (in development) for teams that don't want to self-ho
 
 ### Q6: What are the prerequisites?
 
-- **Required:** Node.js 18+ (`node --version`)
-- **Optional for real inference:**
-  - [Ollama](https://ollama.ai) — free local models
-  - [Groq](https://groq.com) API key — fast mid-tier models
-  - [OpenRouter](https://openrouter.ai) API key — Claude/GPT-4o for executives
+- **Required:**
+  - Node.js 18+ (`node --version`)
+  - Python 3.12+ (`python3 --version`)
+  - [uv](https://docs.astral.sh/uv/) (`uv --version`) — Python package manager
+- **Optional:**
+  - Docker — for production deployment with PostgreSQL (not needed locally)
 
-### Q7: What are the three commands to get a running org?
+### Q7: How do I get a running org?
 
 ```bash
 openspawn init my-org --template=saas-onboarding --yes
 cd my-org
 openspawn start
-openspawn status
 ```
 
-- `init` — creates `ORG.md` and `openclaw-agents.json`
-- `start` — reads agents config, generates `openclaw-patch.json`
-- `status` — displays agent table (name, level, model, workspace, reports-to)
+- `init` — scaffolds `ORG.md`, agent workspaces, and config
+- `start` — boots the Python API (FastAPI + SQLite), seeds agents, spawns Claude Code subprocesses, starts the asyncio scheduler
+
+Agent status, tasks, and org health are visible in the dashboard at `http://localhost:8787`.
 
 ### Q8: Which template should I use?
 
@@ -133,13 +134,7 @@ All templates are starting points — edit the generated `ORG.md` freely.
 
 ### Q10: How do I validate my ORG.md?
 
-```bash
-openspawn validate
-# or
-openspawn validate path/to/ORG.md
-```
-
-Checks: valid markdown structure, required sections, agent role definitions, hierarchy consistency, policy completeness.
+ORG.md is validated automatically when `openspawn start` boots the API. The seeder parses your org definition, checks hierarchy consistency, and reports errors in the startup logs before spawning agents.
 
 **Common errors and fixes:**
 
@@ -206,6 +201,32 @@ preset: agency
 | `research`     | Delayed          | On request      | Exploration, long tasks    |
 | `military`     | Immediate        | Every tick      | Zero-ambiguity operations  |
 | `remote-async` | Delayed          | On request      | Distributed async teams    |
+
+---
+
+## Database & Infrastructure
+
+### Q14.5: SQLite or PostgreSQL?
+
+**SQLite** is the default for local development — zero config, no Docker. `openspawn start` creates `data/openspawn.db` automatically.
+
+**PostgreSQL** is recommended for production. Run `npx openspawn init --deploy` to generate a `docker-compose.yml`, then set `DATABASE_URL` to switch.
+
+| Concern      | SQLite (local)       | PostgreSQL (production) |
+| ------------ | -------------------- | ----------------------- |
+| Setup        | Zero config          | Docker or managed DB    |
+| Concurrency  | Single-writer        | Full MVCC               |
+| Persistence  | `data/openspawn.db`  | Volume-backed           |
+| Memory/pgvec | Works                | Better performance      |
+| Migration    | Automatic via seeder | Alembic migrations      |
+
+### Q14.6: Do I still need Redis?
+
+**No.** The asyncio scheduler replaces Redis for background jobs (SLA monitoring, escalation, status sync). Redis is no longer required in any mode.
+
+### Q14.7: Do I need Docker for local development?
+
+**No.** `openspawn start` boots a Python API with SQLite — no containers needed. Docker is only required for production PostgreSQL deployments.
 
 ---
 
@@ -354,9 +375,9 @@ The `clinical-trials` template is the most comprehensive example — it models 2
 
 ### Q26: Where do I go when something's broken?
 
-1. Run `openspawn validate` — catches most config errors
+1. Check `openspawn start` logs — ORG.md validation runs automatically on boot
 2. Read the [full Troubleshooting Guide](./guides/troubleshooting) — covers all error messages with exact fixes
-3. Check port conflicts: `lsof -i :3456` (MCP) and `lsof -i :3333` (sandbox)
+3. Check port conflicts: `lsof -i :8787` (API/dashboard)
 4. Review auth: verify `AGENT_ID` / `AGENT_SECRET`, timestamp skew (±5 min window), and nonce uniqueness
 5. Check task state: `DONE` and `CANCELLED` are terminal — can't be re-opened
 6. GitHub issues: https://github.com/openspawn/openspawn/issues

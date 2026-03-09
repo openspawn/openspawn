@@ -484,18 +484,16 @@ This architecture exposes gaps that become OpenSpawn features:
 
 **The gap:** Creating an agent requires mkdir + write 5 files + config.patch + restart. This is manual and error-prone.
 
-**The feature:** A CLI and API for agent lifecycle management.
+**The feature:** `openspawn start` handles agent lifecycle automatically. The API seeder parses ORG.md, provisions workspaces, and spawns Claude Code CLI subprocesses with a configurable concurrency cap.
 
-```bash
-# CLI
-openspawn hire --role "Engineering Lead" --level 7 --domain engineering
-openspawn fire eng-lead --graceful
-openspawn promote senior-dev-1 --to lead --domain backend
-
-# API (for CEO agent to call)
-POST /api/agents/hire { role, level, domain, soulPrompt }
-DELETE /api/agents/eng-lead?graceful=true
+```python
+# Seeder reads ORG.md → creates agent records in SQLite/PostgreSQL
+# Spawner manages Claude Code subprocesses per agent
+# Concurrency cap prevents resource exhaustion
+# Asyncio scheduler handles SLA monitoring, escalation, status sync
 ```
+
+Agent lifecycle is managed through ORG.md edits + restart — no separate hire/fire commands needed.
 
 ### 6.2 Hot-Reload Agent Management
 
@@ -527,13 +525,13 @@ await orgRouter.send("eng-lead", {
 
 **The gap:** ORG.md is a spec, not a runtime. There's no tool that reads an ORG.md and provisions real agents from it.
 
-**The feature:** `openspawn deploy ORG.md` reads the org chart and:
+**The feature:** `openspawn start` reads the org chart via the Python API seeder and:
 
-- Creates workspaces for each agent
-- Writes SOUL.md from role descriptions
-- Updates gateway config
-- Restarts (or hot-adds) agents
-- Onboards each agent with their role description
+- Parses ORG.md structure, hierarchy, and policies
+- Creates agent records in SQLite (or PostgreSQL in production)
+- Provisions per-agent workspaces with SOUL.md and AGENTS.md
+- Spawns Claude Code CLI subprocesses for each agent
+- Starts the asyncio scheduler for background coordination jobs
 
 ### 6.5 Org Health Dashboard
 
@@ -577,7 +575,7 @@ await orgRouter.send("eng-lead", {
 
 ### Phase 4: OpenSpawn Tooling (Week 3-4)
 
-- [ ] Build agent lifecycle CLI (`openspawn hire/fire/promote`)
+- [ ] Refine agent spawning (concurrency cap tuning, graceful shutdown)
 - [ ] Build unified communication router (local + A2A)
 - [ ] Prototype hot-reload agent management
 - [ ] Build org health monitoring
