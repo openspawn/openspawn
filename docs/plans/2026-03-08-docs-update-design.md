@@ -13,20 +13,20 @@ Two docs deliverables: (1) values framework guide explaining the organizational 
 
 ### Structure
 
-1. **Why alignment matters for AI agents** — values are decision-making heuristics, not aspirational posters. When an agent is uncertain, "Transparency" tells it to escalate rather than guess. "Subsidiarity" tells it to solve what it can before escalating. Cite Lencioni's distinction between core and aspirational values (*The Advantage*).
+1. **Why alignment matters for AI agents** — values are decision-making heuristics, not aspirational posters. When an agent is uncertain, "Transparency" tells it to escalate rather than guess. "Subsidiarity" tells it to solve what it can before escalating. Cite Lencioni's distinction between core and aspirational values (_The Advantage_).
 
 2. **The 8 values** — reference table:
 
-| Value | Description | Source | Agent Behavior |
-|-------|-------------|--------|----------------|
-| Ownership | Every task has exactly one owner; it ships or it escalates | Katzenbach & Smith, *The Discipline of Teams* | Single-threaded task ownership |
-| Transparency | Surface problems early; silent failure is the worst outcome | Amy Edmondson, psychological safety research | Agents escalate instead of guessing |
-| Measurement | Track outcomes, not activity | Peter Drucker, management by objectives | Report with evidence |
-| Subsidiarity | Decisions at the lowest competent level | Rogers & Blenko, *Who Has the D?* | Solve before escalating |
-| Continuous Improvement | Document every mistake, update process, never repeat | Peter Senge, learning organizations | Auto post-mortems |
-| Speed | Bias toward action; ship small, iterate fast | — | Fast iteration (conflicts with Rigor) |
-| Rigor | Depth over speed; verify before asserting | — | Thorough verification (conflicts with Speed) |
-| Frugality | Cheap models for mechanical tasks, expensive for reasoning | — | Model tier assignment |
+| Value                  | Description                                                 | Source                                        | Agent Behavior                               |
+| ---------------------- | ----------------------------------------------------------- | --------------------------------------------- | -------------------------------------------- |
+| Ownership              | Every task has exactly one owner; it ships or it escalates  | Katzenbach & Smith, _The Discipline of Teams_ | Single-threaded task ownership               |
+| Transparency           | Surface problems early; silent failure is the worst outcome | Amy Edmondson, psychological safety research  | Agents escalate instead of guessing          |
+| Measurement            | Track outcomes, not activity                                | Peter Drucker, management by objectives       | Report with evidence                         |
+| Subsidiarity           | Decisions at the lowest competent level                     | Rogers & Blenko, _Who Has the D?_             | Solve before escalating                      |
+| Continuous Improvement | Document every mistake, update process, never repeat        | Peter Senge, learning organizations           | Auto post-mortems                            |
+| Speed                  | Bias toward action; ship small, iterate fast                | —                                             | Fast iteration (conflicts with Rigor)        |
+| Rigor                  | Depth over speed; verify before asserting                   | —                                             | Thorough verification (conflicts with Speed) |
+| Frugality              | Cheap models for mechanical tasks, expensive for reasoning  | —                                             | Model tier assignment                        |
 
 3. **Deep dive per value** — subsection for each with:
    - Academic source, publication, key insight (1-2 sentences)
@@ -38,12 +38,12 @@ Two docs deliverables: (1) values framework guide explaining the organizational 
 5. **Customization** — edit `openspawn.config.json` alignment section, or re-run `npx openspawn init`
 
 6. **References** — full bibliography:
-   - Lencioni, P. (2012). *The Advantage*. Jossey-Bass.
-   - Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. *Administrative Science Quarterly*, 44(2).
-   - Drucker, P. (1954). *The Practice of Management*. Harper & Brothers.
-   - Katzenbach, J. & Smith, D. (1993). *The Discipline of Teams*. Harvard Business Review.
-   - Rogers, P. & Blenko, M. (2006). *Who Has the D?* Harvard Business Review.
-   - Senge, P. (1990). *The Fifth Discipline*. Doubleday.
+   - Lencioni, P. (2012). _The Advantage_. Jossey-Bass.
+   - Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2).
+   - Drucker, P. (1954). _The Practice of Management_. Harper & Brothers.
+   - Katzenbach, J. & Smith, D. (1993). _The Discipline of Teams_. Harvard Business Review.
+   - Rogers, P. & Blenko, M. (2006). _Who Has the D?_ Harvard Business Review.
+   - Senge, P. (1990). _The Fifth Discipline_. Doubleday.
 
 ### Tone
 

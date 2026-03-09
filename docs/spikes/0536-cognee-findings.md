@@ -19,6 +19,7 @@ Cognee is a capable knowledge graph + memory framework, but it is too opinionate
 ### 1. Custom embedding providers (Voyage 3.5, BGE-M3 via Ollama)?
 
 **PARTIAL** — Cognee supports custom embedding providers via env vars:
+
 - `EMBEDDING_PROVIDER` — supports `ollama`, `openai`, `azure`
 - `EMBEDDING_MODEL` — model name
 - `EMBEDDING_ENDPOINT` — custom endpoint URL
@@ -46,6 +47,7 @@ Voyage 3.5: would need OpenAI-compatible wrapper or custom provider class.
 ### 5. Dedup behavior controllable?
 
 **PARTIAL** — Cognee has `content_hash` on data models for basic hash dedup. However:
+
 - No vector similarity dedup (our RFC needs 0.90 threshold check)
 - No LLM-based ADD/UPDATE/NOOP/CONFLICT decision
 - No configurable dedup pipeline
@@ -55,6 +57,7 @@ Voyage 3.5: would need OpenAI-compatible wrapper or custom provider class.
 ### 6. Hybrid search (vector + full-text)?
 
 **FAIL** — Cognee search types:
+
 - `GRAPH_COMPLETION` — graph-traversal + LLM completion
 - `RAG_COMPLETION` — vector retrieval + LLM completion
 - `CHUNKS` — raw vector similarity
@@ -71,14 +74,14 @@ Voyage 3.5: would need OpenAI-compatible wrapper or custom provider class.
 
 ## Critical Gaps
 
-| Gap | Severity | Impact |
-|-----|----------|--------|
-| No hybrid search (vector + BM25 + RRF) | **HIGH** | Core search quality requirement unmet |
-| Basic dedup only (hash, no vector/LLM) | **HIGH** | Must build 3-layer dedup regardless |
-| Own data layer (tables, schema, graph DB) | **MEDIUM** | Conflicts with our custom Memory schema (20+ columns) |
-| No direct Voyage 3.5 provider | **LOW** | Solvable with wrapper, but adds complexity |
-| Graph DB dependency (kuzu/neo4j) | **MEDIUM** | Extra infra for Phase 1; not needed until Phase 3 |
-| Embedding dimensions not configurable | **LOW** | Model-determined; manageable with correct model choice |
+| Gap                                       | Severity   | Impact                                                 |
+| ----------------------------------------- | ---------- | ------------------------------------------------------ |
+| No hybrid search (vector + BM25 + RRF)    | **HIGH**   | Core search quality requirement unmet                  |
+| Basic dedup only (hash, no vector/LLM)    | **HIGH**   | Must build 3-layer dedup regardless                    |
+| Own data layer (tables, schema, graph DB) | **MEDIUM** | Conflicts with our custom Memory schema (20+ columns)  |
+| No direct Voyage 3.5 provider             | **LOW**    | Solvable with wrapper, but adds complexity             |
+| Graph DB dependency (kuzu/neo4j)          | **MEDIUM** | Extra infra for Phase 1; not needed until Phase 3      |
+| Embedding dimensions not configurable     | **LOW**    | Model-determined; manageable with correct model choice |
 
 ---
 
@@ -96,15 +99,15 @@ Cognee adds value for knowledge graph construction (Phase 3) but creates frictio
 
 Build with `instructor` + `litellm` + `pgvector` as the RFC's fallback path:
 
-| Component | Tool | Why |
-|-----------|------|-----|
-| Structured LLM I/O | instructor + litellm | Pydantic-native, provider-agnostic |
-| Embeddings | Voyage 3.5 / BGE-M3 via Ollama | Direct SDK, 1024d native |
-| Vector storage | pgvector (SQLAlchemy) | Already in our stack, no new infra |
-| Full-text search | PostgreSQL tsvector | Already in our stack |
-| Hybrid ranking | Custom RRF implementation | ~50 lines of Python |
-| Dedup | Custom 3-layer pipeline | SHA-256 + pgvector cosine + instructor |
-| Compression | instructor + litellm | Atomic fact extraction |
+| Component          | Tool                           | Why                                    |
+| ------------------ | ------------------------------ | -------------------------------------- |
+| Structured LLM I/O | instructor + litellm           | Pydantic-native, provider-agnostic     |
+| Embeddings         | Voyage 3.5 / BGE-M3 via Ollama | Direct SDK, 1024d native               |
+| Vector storage     | pgvector (SQLAlchemy)          | Already in our stack, no new infra     |
+| Full-text search   | PostgreSQL tsvector            | Already in our stack                   |
+| Hybrid ranking     | Custom RRF implementation      | ~50 lines of Python                    |
+| Dedup              | Custom 3-layer pipeline        | SHA-256 + pgvector cosine + instructor |
+| Compression        | instructor + litellm           | Atomic fact extraction                 |
 
 ### Revisit Cognee for Phase 3
 
@@ -126,10 +129,10 @@ uv run python spikes/cognee_spike.py
 
 ## Impact on Downstream Issues
 
-| Issue | Impact |
-|-------|--------|
-| #537 Memory entity + pgvector | No change — build with SQLAlchemy + pgvector directly |
-| #538 Cognee integration | **Rescoped** — becomes "Embedding providers + LLM compression" (instructor + litellm) |
-| #539 Dedup pipeline | No change — always planned as custom (hash + vector + LLM) |
-| #540 Hybrid search | No change — always planned as custom (pgvector + tsvector + RRF) |
-| #541-#543 | No change |
+| Issue                         | Impact                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| #537 Memory entity + pgvector | No change — build with SQLAlchemy + pgvector directly                                 |
+| #538 Cognee integration       | **Rescoped** — becomes "Embedding providers + LLM compression" (instructor + litellm) |
+| #539 Dedup pipeline           | No change — always planned as custom (hash + vector + LLM)                            |
+| #540 Hybrid search            | No change — always planned as custom (pgvector + tsvector + RRF)                      |
+| #541-#543                     | No change                                                                             |

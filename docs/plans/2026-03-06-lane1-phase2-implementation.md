@@ -13,6 +13,7 @@
 ## Task 1: #532 — Observability (logfire + langfuse + OTel)
 
 **Files:**
+
 - Modify: `apps/api/pyproject.toml` — add deps
 - Modify: `apps/api/app/config.py` — add env var settings
 - Modify: `apps/api/app/main.py` — init logfire
@@ -163,9 +164,10 @@ gh pr merge --squash --admin
 ## Task 2: #533 — NestJS Cleanup + FastAPI Docker + CI/CD
 
 **Files:**
+
 - Delete: `apps/api-nestjs/` (entire directory)
 - Delete: `tools/sandbox-python/` (entire directory)
-- Modify: `package.json` — remove 13 @nestjs/* deps
+- Modify: `package.json` — remove 13 @nestjs/\* deps
 - Modify: `.github/workflows/ci.yml` — remove api-nestjs typecheck
 - Modify: `knip.json` — remove api-nestjs workspace
 - Modify: `.vscode/launch.json` — remove api-nestjs debug config
@@ -186,16 +188,19 @@ rm -rf tools/sandbox-python/
 ### Step 2: Remove NestJS deps from root package.json
 
 Remove these from `dependencies`:
+
 - @nestjs/apollo, @nestjs/common, @nestjs/core, @nestjs/event-emitter
 - @nestjs/graphql, @nestjs/jwt, @nestjs/passport, @nestjs/platform-express
 - @nestjs/schedule, @nestjs/throttler, @nestjs/typeorm
 
 Remove from `devDependencies`:
+
 - @nestjs/schematics, @nestjs/testing
 
 ### Step 3: Remove api-nestjs from CI
 
 In `.github/workflows/ci.yml`, delete the typecheck step that runs:
+
 ```yaml
 - name: TypeScript check
   run: pnpm exec tsc --noEmit -p apps/api-nestjs/tsconfig.app.json
@@ -295,6 +300,7 @@ gh pr merge --squash --admin
 ## Task 3: #534 — openapi-typescript Codegen Pipeline
 
 **Files:**
+
 - Create: `apps/api/scripts/export_openapi.py`
 - Create: `libs/dashboard-data/src/rest/client.ts`
 - Create: `libs/dashboard-data/src/rest/generated/.gitkeep`
@@ -386,6 +392,7 @@ gh pr merge --squash --admin
 ## Task 4: #535 — GraphQL → REST Migration
 
 **Files:**
+
 - Create: `libs/dashboard-data/src/rest/hooks/use-agents.ts` (and 12 more hooks)
 - Modify: ~33 files in `apps/demo/src/` — switch imports
 - Delete: `libs/dashboard-data/src/graphql/` (operations, generated, fetcher)
@@ -418,6 +425,7 @@ export function useAgents() {
 Create one hook file per domain in `libs/dashboard-data/src/rest/hooks/`:
 
 **Query hooks:**
+
 - `use-agents.ts` — useAgents (GET /agents)
 - `use-tasks.ts` — useTasks (GET /tasks), useTask (GET /tasks/{id})
 - `use-credits.ts` — useCreditHistory (GET /credits)
@@ -427,6 +435,7 @@ Create one hook file per domain in `libs/dashboard-data/src/rest/hooks/`:
 - `use-webhooks.ts` — useWebhooks (GET /webhooks), useWebhook (GET /webhooks/{id})
 
 **Mutation hooks:**
+
 - `use-webhook-mutations.ts` — useCreateWebhook, useUpdateWebhook, useDeleteWebhook, useTestWebhook
 
 ### Step 3: Create barrel export
@@ -442,6 +451,7 @@ export * from "./use-tasks";
 ### Step 4: Migrate consumers — batch by domain
 
 For each of ~33 files in `apps/demo/src/`:
+
 - Replace `import { useAgentsQuery } from "@openspawn/dashboard-data/graphql/generated/hooks"`
 - With `import { useAgents } from "@openspawn/dashboard-data/rest/hooks"`
 - Update usage: `useAgentsQuery()` → `useAgents()`
@@ -458,6 +468,7 @@ rm schema.gql
 ```
 
 Remove from root `package.json`:
+
 - `graphql-request`
 - `@graphql-codegen/cli`
 - `@graphql-codegen/typescript`
@@ -497,6 +508,7 @@ gh pr merge --squash --admin
 ## Task 5: #544 — Background Enrichment Worker (arq)
 
 **Files:**
+
 - Modify: `apps/api/pyproject.toml` — add arq, redis
 - Modify: `apps/api/app/config.py` — add REDIS_URL
 - Create: `apps/api/app/workers/config.py` — arq WorkerSettings
@@ -671,6 +683,7 @@ gh pr merge --squash --admin
 ## Task 6: #545 — Feedback Loop + Retrieval Optimization
 
 **Files:**
+
 - Modify: `apps/api/app/memory/service.py` — adjust confidence on feedback
 - Modify: `apps/api/app/memory/search.py` — add helpfulness to scoring
 - Modify: `apps/api/app/memory/router.py` — store retrieval_context on search
@@ -810,6 +823,7 @@ gh pr merge --squash --admin
 ## Task 7: #546 — Contradiction Resolution
 
 **Files:**
+
 - Create: `apps/api/app/memory/contradictions.py` — contradiction logic
 - Modify: `apps/api/app/memory/dedup.py` — enhance CONFLICT path
 - Modify: `apps/api/app/memory/router.py` — add contradiction endpoints
@@ -931,6 +945,7 @@ Similar pattern to previous tasks.
 ## Task 8: #547 — Auto-Expire Time-Bound Memories
 
 **Files:**
+
 - Modify: `apps/api/app/memory/schemas.py` — add ttl_seconds to StoreMemoryDto
 - Modify: `apps/api/app/memory/service.py` — set expires_at from ttl
 - Create: `apps/api/app/workers/expiry.py` — periodic expiry job

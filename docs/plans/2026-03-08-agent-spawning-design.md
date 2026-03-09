@@ -104,33 +104,33 @@ Add to `openspawn.config.json`:
 
 Postgres-specific patterns that need abstraction:
 
-| Pattern | Postgres | SQLite |
-|---------|----------|--------|
+| Pattern         | Postgres                 | SQLite                         |
+| --------------- | ------------------------ | ------------------------------ |
 | Date arithmetic | `NOW() - INTERVAL '24h'` | `datetime('now', '-24 hours')` |
-| JSONB access | `col->>'key'` | `json_extract(col, '$.key')` |
-| Vector search | pgvector + HNSW | sqlite-vec + brute-force KNN |
-| Background jobs | arq + Redis | asyncio scheduled tasks |
+| JSONB access    | `col->>'key'`            | `json_extract(col, '$.key')`   |
+| Vector search   | pgvector + HNSW          | sqlite-vec + brute-force KNN   |
+| Background jobs | arq + Redis              | asyncio scheduled tasks        |
 
 Strategy: SQLAlchemy dialect handles most differences. Raw SQL queries wrapped in helper functions with dialect branching.
 
 ## Deprecated Code to Remove
 
-| Path | Reason |
-|------|--------|
-| `packages/cli/` | Go CLI, replaced by npm CLI |
-| `packages/openspawn/src/mcp/` | TS MCP server, replaced by Python API |
-| `packages/openspawn/src/core/task-store.ts` + tests | Tasks in API database |
-| `packages/openspawn/src/core/budget.ts` + tests | Budget in API database |
-| `packages/openspawn/src/cli/commands/start.ts` | Replaced by Python invocation |
-| `packages/openspawn/src/cli/commands/delegate.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/escalate.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/hire.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/fire.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/report.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/task.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/budget.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/org.ts` | Agents use MCP tools directly |
-| `packages/openspawn/src/cli/commands/status.ts` | Agents use MCP tools directly |
+| Path                                                | Reason                                |
+| --------------------------------------------------- | ------------------------------------- |
+| `packages/cli/`                                     | Go CLI, replaced by npm CLI           |
+| `packages/openspawn/src/mcp/`                       | TS MCP server, replaced by Python API |
+| `packages/openspawn/src/core/task-store.ts` + tests | Tasks in API database                 |
+| `packages/openspawn/src/core/budget.ts` + tests     | Budget in API database                |
+| `packages/openspawn/src/cli/commands/start.ts`      | Replaced by Python invocation         |
+| `packages/openspawn/src/cli/commands/delegate.ts`   | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/escalate.ts`   | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/hire.ts`       | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/fire.ts`       | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/report.ts`     | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/task.ts`       | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/budget.ts`     | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/org.ts`        | Agents use MCP tools directly         |
+| `packages/openspawn/src/cli/commands/status.ts`     | Agents use MCP tools directly         |
 
 ### Keep in TypeScript (`packages/openspawn/`)
 

@@ -12,7 +12,6 @@ from sqlalchemy import select
 
 from app.seeder import parse_org_md_content
 
-
 # ---------------------------------------------------------------------------
 # Pure parsing tests (no DB required)
 # ---------------------------------------------------------------------------

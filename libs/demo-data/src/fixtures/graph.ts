@@ -149,7 +149,12 @@ export const demoEntities: DemoEntity[] = [
     description: "Automated unit, integration, and end-to-end test suites",
     mentionCount: 9,
     confidence: 87,
-    agentIds: [AGENT_IDS.qaEngineer, AGENT_IDS.qaAutomation, AGENT_IDS.bugHunter, AGENT_IDS.codeReviewer],
+    agentIds: [
+      AGENT_IDS.qaEngineer,
+      AGENT_IDS.qaAutomation,
+      AGENT_IDS.bugHunter,
+      AGENT_IDS.codeReviewer,
+    ],
   },
   {
     id: ENTITY_IDS.kubernetes,

@@ -15,6 +15,7 @@
 ## Context for Implementer
 
 ### Existing code you need to know:
+
 - **Task model**: `apps/api/app/models/task.py` — already has `parent_task_id`, `subtasks` relationship, `due_date`
 - **Agent model**: `apps/api/app/models/agent.py` — has `parent_id`, `capabilities` (AgentCapability list)
 - **AgentCapability model**: `apps/api/app/models/agent.py:88-111` — has `capability` (str) and `proficiency` (Proficiency enum: BASIC/STANDARD/EXPERT)
@@ -28,12 +29,14 @@
 - **DB session**: `apps/api/app/database.py` — `async_session` (for workers), `get_db` (for routes)
 
 ### Enums already available:
+
 - `TaskStatus`: BACKLOG, TODO, IN_PROGRESS, REVIEW, DONE, BLOCKED, CANCELLED
 - `Proficiency`: BASIC, STANDARD, EXPERT
 - `EscalationReason`: BLOCKED_TIMEOUT, STALE_TASK, SLA_BREACH, ASSIGNEE_INACTIVE, QUALITY_ISSUES, MANUAL, CAPACITY_OVERFLOW
 - `AgentStatus`: PENDING, ACTIVE, SUSPENDED, REVOKED
 
 ### Test pattern:
+
 - Tests in `apps/api/tests/`
 - `conftest.py` provides `client` fixture (httpx AsyncClient with ASGITransport)
 - Auth smoke tests check 401; unit tests mock DB
@@ -45,6 +48,7 @@
 ## Task 1: Alembic migration — add coordination columns to tasks
 
 **Files:**
+
 - Create: `apps/api/alembic/versions/0004_add_coordination_columns.py`
 
 **Step 1: Write the migration**
@@ -121,6 +125,7 @@ required_capabilities, sla_warning_sent_at, needs_attention on tasks"
 ## Task 2: Update Task model with new columns
 
 **Files:**
+
 - Modify: `apps/api/app/models/task.py:14-52`
 
 **Step 1: Write failing test**
@@ -214,6 +219,7 @@ required_capabilities, sla_warning_sent_at, needs_attention"
 ## Task 3: Update schemas — CreateTaskDto and TaskResponse
 
 **Files:**
+
 - Modify: `apps/api/app/tasks/schemas.py:20-29` (CreateTaskDto)
 - Modify: `apps/api/app/tasks/schemas.py:79-99` (TaskResponse)
 
@@ -256,11 +262,13 @@ Expected: FAIL — `CreateTaskDto` has no `required_capabilities` field
 In `apps/api/app/tasks/schemas.py`:
 
 Add to `CreateTaskDto` (after `metadata` field):
+
 ```python
 required_capabilities: list[str] = Field(default_factory=list)
 ```
 
 Add to `TaskResponse` (after `completed_at` field):
+
 ```python
 required_capabilities: list[str]
 needs_attention: bool
@@ -275,6 +283,7 @@ Expected: PASS
 **Step 5: Update create_task handler to pass required_capabilities**
 
 In `apps/api/app/tasks/router.py`, update the `Task()` constructor in `create_task` (around line 83-96) to include:
+
 ```python
 required_capabilities=dto.required_capabilities,
 ```
@@ -293,6 +302,7 @@ CreateTaskDto accepts list[str], TaskResponse includes coordination fields"
 ## Task 4: Create coordination package + Task Router
 
 **Files:**
+
 - Create: `apps/api/app/coordination/__init__.py`
 - Create: `apps/api/app/coordination/router.py`
 - Create: `apps/api/tests/test_task_router.py`
@@ -538,6 +548,7 @@ scores agents by proficiency * availability, assigns best match"
 ## Task 5: Create Escalation Handler
 
 **Files:**
+
 - Create: `apps/api/app/coordination/escalation.py`
 - Create: `apps/api/tests/test_escalation_handler.py`
 
@@ -757,6 +768,7 @@ escalates to parent agent on SLA breach, marks needs_attention if no parent"
 ## Task 6: Create Parent Task Status Sync
 
 **Files:**
+
 - Create: `apps/api/app/coordination/status_sync.py`
 - Create: `apps/api/tests/test_status_sync.py`
 
@@ -949,6 +961,7 @@ computes parent status from children, syncs upward recursively"
 ## Task 7: Add SLA config to Settings
 
 **Files:**
+
 - Modify: `apps/api/app/config.py:5-47`
 
 **Step 1: Write failing test**
@@ -999,6 +1012,7 @@ sla_warning_pct (80%) and sla_breach_pct (100%) env vars"
 ## Task 8: Create SLA Monitor cron job
 
 **Files:**
+
 - Create: `apps/api/app/coordination/sla_monitor.py`
 - Create: `apps/api/tests/test_sla_monitor.py`
 
@@ -1249,6 +1263,7 @@ scans in-progress tasks, warns at threshold, escalates on breach"
 ## Task 9: Wire Task Router into create_task
 
 **Files:**
+
 - Modify: `apps/api/app/tasks/router.py:67-106`
 
 **Step 1: Write failing test**
@@ -1306,6 +1321,7 @@ auto-routes tasks with required_capabilities and no assignee"
 ## Task 10: Wire Status Sync into transition_task
 
 **Files:**
+
 - Modify: `apps/api/app/tasks/router.py:150-181`
 
 **Step 1: Update transition_task**
@@ -1338,6 +1354,7 @@ syncs parent task status when subtask transitions"
 ## Task 11: Add SLA monitor to worker settings
 
 **Files:**
+
 - Modify: `apps/api/app/workers/enrichment.py:154-171`
 
 **Step 1: Add import and cron entry**
@@ -1345,16 +1362,19 @@ syncs parent task status when subtask transitions"
 In `apps/api/app/workers/enrichment.py`:
 
 Add import at top (after existing imports):
+
 ```python
 from app.coordination.sla_monitor import monitor_sla
 ```
 
 Add to `WorkerSettings.functions` list:
+
 ```python
 monitor_sla,
 ```
 
 Add to `WorkerSettings.cron_jobs` list:
+
 ```python
 cron(monitor_sla, minute={0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59}),
 ```

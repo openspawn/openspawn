@@ -20,6 +20,7 @@ https://github.com/openspawn/openspawn/security/advisories/new
 ## Scope
 
 ### In Scope
+
 - API authentication and authorization bypass
 - Agent permission escalation (agent acting beyond its level)
 - HMAC signature forgery or bypass
@@ -29,6 +30,7 @@ https://github.com/openspawn/openspawn/security/advisories/new
 - Sandbox escape
 
 ### Out of Scope
+
 - Prompt injection (agents are expected to handle untrusted input)
 - Denial of service via normal API usage
 - Self-hosted configuration mistakes

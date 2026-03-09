@@ -116,7 +116,9 @@ def _parse_table(lines: list[str]) -> list[dict[str, str]]:
         return []
 
     header_line = lines[header_idx]
-    headers = [h.strip().lower().replace(" ", "_") for h in header_line.strip().strip("|").split("|")]
+    headers = [
+        h.strip().lower().replace(" ", "_") for h in header_line.strip().strip("|").split("|")
+    ]
 
     rows: list[dict[str, str]] = []
     for line in lines[header_idx + 1 :]:

@@ -6,7 +6,7 @@ Quick reference for AI agents working on OpenSpawn. Start here.
 
 Multi-agent coordination platform. Agents get tasks, earn credits, communicate. Humans monitor via dashboard.
 
-**Stack**: FastAPI (Python) + React Dashboard + PostgreSQL + MCP Server
+**Stack**: FastAPI (Python) + React Dashboard + PostgreSQL (prod) / SQLite (local) + MCP (served by API)
 **Package Manager**: pnpm (frontend) + uv (Python API)
 **Build System**: Nx
 
@@ -14,11 +14,11 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ## Domains & Deployment
 
-| Domain                | What                                          | Container        | Port |
-| --------------------- | --------------------------------------------- | ---------------- | ---- |
-| **bikinibottom.ai**   | Live demo (sandbox + dashboard)               | `app`            | 3333 |
-| **openspawn.ai**      | API, website, landing page, MCP server        | `api` `platform` | 8000, 3334 |
-| **docs.openspawn.ai** | Astro/Starlight docs                          | GitHub Pages     | —    |
+| Domain                | What                                   | Container        | Port       |
+| --------------------- | -------------------------------------- | ---------------- | ---------- |
+| **bikinibottom.ai**   | Live demo (sandbox + dashboard)        | `app`            | 3333       |
+| **openspawn.ai**      | API, website, landing page, MCP server | `api` `platform` | 8000, 3334 |
+| **docs.openspawn.ai** | Astro/Starlight docs                   | GitHub Pages     | —          |
 
 All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
@@ -87,6 +87,7 @@ cd apps/api && uv run alembic upgrade head
 ## Key URLs
 
 **Production:**
+
 - Demo: https://bikinibottom.ai
 - API: https://openspawn.ai/api/
 - API docs: https://openspawn.ai/api/docs
@@ -94,6 +95,7 @@ cd apps/api && uv run alembic upgrade head
 - Docs: https://docs.openspawn.ai
 
 **Dev:**
+
 - Demo dashboard: http://localhost:4200
 - Demo mode: http://localhost:4200/?demo=true
 - Sandbox: http://localhost:3333

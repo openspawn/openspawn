@@ -53,20 +53,20 @@ packages/
 
 All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy for HTTPS termination.
 
-| Domain            | Container  | Port | Serves                                  |
-| ----------------- | ---------- | ---- | --------------------------------------- |
-| bikinibottom.ai   | `app`      | 3333 | Live demo (sandbox + dashboard)         |
-| openspawn.ai      | `platform` | 3334 | Website + landing page                  |
-| openspawn.ai/api/ | `api`      | 8000 | FastAPI backend (REST + OpenAPI)        |
-| docs.openspawn.ai | —          | —    | Astro/Starlight docs (GitHub Pages)     |
+| Domain            | Container  | Port | Serves                              |
+| ----------------- | ---------- | ---- | ----------------------------------- |
+| bikinibottom.ai   | `app`      | 3333 | Live demo (sandbox + dashboard)     |
+| openspawn.ai      | `platform` | 3334 | Website + landing page              |
+| openspawn.ai/api/ | `api`      | 8000 | FastAPI backend (REST + OpenAPI)    |
+| docs.openspawn.ai | —          | —    | Astro/Starlight docs (GitHub Pages) |
 
 The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
 
 ### CI/CD Workflows
 
-| Workflow              | Trigger      | What it does                                       |
-| --------------------- | ------------ | -------------------------------------------------- |
-| `ci.yml`              | All PRs      | Build, test, lint, Python API checks               |
+| Workflow              | Trigger      | What it does                                         |
+| --------------------- | ------------ | ---------------------------------------------------- |
+| `ci.yml`              | All PRs      | Build, test, lint, Python API checks                 |
 | `deploy.yml`          | Push to main | Docker build + deploy to VPS (bikinibottom.ai + API) |
 | `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai)        |
 | `deploy-docs.yml`     | Push to main | Build + deploy Starlight docs (docs.openspawn.ai)    |

@@ -558,15 +558,15 @@ Track B — Memory System (parallel after #526):
 
 ## 17. Risks & Mitigations
 
-| Risk                                  | Mitigation                                                                          |
-| ------------------------------------- | ----------------------------------------------------------------------------------- |
-| Memory explosion                      | Rate limiting (limits) + hash/vector dedup + Phase 2 pruning                        |
-| Hallucination poisoning               | Confidence scoring + corroboration boost + contradiction tracking                   |
-| LLM provider dependency               | instructor + litellm abstracts providers; tenacity retries; graceful degradation    |
-| FastAPI migration breaks clients      | Same REST routes + response shapes, integration tests comparing NestJS vs FastAPI   |
-| Embedding provider outage             | Two-tier write (store raw immediately via fast path, embed async via arq)           |
-| pgvector perf at scale                | 1024d optimized, HNSW index, separate Postgres option documented                    |
-| LLM call failures (dedup/compression) | tenacity retries, graceful degradation (store uncompressed)                         |
+| Risk                                  | Mitigation                                                                        |
+| ------------------------------------- | --------------------------------------------------------------------------------- |
+| Memory explosion                      | Rate limiting (limits) + hash/vector dedup + Phase 2 pruning                      |
+| Hallucination poisoning               | Confidence scoring + corroboration boost + contradiction tracking                 |
+| LLM provider dependency               | instructor + litellm abstracts providers; tenacity retries; graceful degradation  |
+| FastAPI migration breaks clients      | Same REST routes + response shapes, integration tests comparing NestJS vs FastAPI |
+| Embedding provider outage             | Two-tier write (store raw immediately via fast path, embed async via arq)         |
+| pgvector perf at scale                | 1024d optimized, HNSW index, separate Postgres option documented                  |
+| LLM call failures (dedup/compression) | tenacity retries, graceful degradation (store uncompressed)                       |
 
 ---
 

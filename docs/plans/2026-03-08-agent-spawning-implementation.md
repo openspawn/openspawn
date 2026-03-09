@@ -19,6 +19,7 @@ Remove Go CLI, TypeScript MCP server, and CLI commands replaced by the Python AP
 ### Task 1.1: Remove Go CLI
 
 **Files:**
+
 - Delete: `packages/cli/` (entire directory)
 
 **Step 1: Verify no monorepo references**
@@ -48,6 +49,7 @@ replaced by npm CLI (packages/openspawn/) per agent-spawning design"
 ### Task 1.2: Remove TypeScript MCP Server & Runtime Modules
 
 **Files:**
+
 - Delete: `packages/openspawn/src/mcp/server.ts`
 - Delete: `packages/openspawn/src/mcp/tools.ts`
 - Delete: `packages/openspawn/src/core/task-store.ts`
@@ -75,6 +77,7 @@ rm packages/openspawn/src/core/budget.test.ts
 **Step 3: Update index.ts exports**
 
 Remove all re-exports of deleted modules. Keep only:
+
 - `core/types.js`
 - `core/org-parser.js`
 - `core/config.js`
@@ -100,6 +103,7 @@ replaced by Python API (apps/api/) per agent-spawning design"
 ### Task 1.3: Remove Deprecated CLI Commands
 
 **Files:**
+
 - Delete: `packages/openspawn/src/cli/commands/delegate.ts`
 - Delete: `packages/openspawn/src/cli/commands/escalate.ts`
 - Delete: `packages/openspawn/src/cli/commands/hire.ts`
@@ -121,6 +125,7 @@ rm packages/openspawn/src/cli/commands/{delegate,escalate,hire,fire,report,task,
 **Step 2: Update CLI router**
 
 Modify `packages/openspawn/src/cli/index.ts` to only route:
+
 - `init` — existing wizard/scaffold
 - `start` — new thin wrapper (Task 5.1)
 - `--help` / `--version`
@@ -150,11 +155,13 @@ Make the FastAPI backend work with both SQLite (local) and PostgreSQL (deployed)
 ### Task 2.1: Add SQLite Dependencies
 
 **Files:**
+
 - Modify: `apps/api/pyproject.toml`
 
 **Step 1: Add aiosqlite dependency**
 
 Add to `[project.dependencies]`:
+
 ```
 aiosqlite>=0.20.0
 ```
@@ -174,6 +181,7 @@ git commit -m "chore(api): add aiosqlite for SQLite backend support"
 ### Task 2.2: Dual-Backend Database Configuration
 
 **Files:**
+
 - Modify: `apps/api/app/config.py`
 - Modify: `apps/api/app/database.py`
 - Create: `apps/api/tests/test_sqlite_config.py`
@@ -215,6 +223,7 @@ Expected: FAIL (is_sqlite doesn't exist, URL gets rewritten)
 **Step 3: Update config.py**
 
 Modify `apps/api/app/config.py`:
+
 - Add `is_sqlite` computed property: `return self.database_url.startswith("sqlite")`
 - Guard the `postgresql://` → `postgresql+asyncpg://` rewrite: only apply if URL starts with `postgresql://`
 - Set `pool_size` and `max_overflow` to `0` when SQLite (not applicable)
@@ -222,6 +231,7 @@ Modify `apps/api/app/config.py`:
 **Step 4: Update database.py**
 
 Modify `apps/api/app/database.py`:
+
 - When SQLite: create engine without pool settings (`poolclass=StaticPool` for async SQLite)
 - When PostgreSQL: keep existing pool config
 - Add startup function: `create_tables()` that calls `Base.metadata.create_all()` for SQLite (no Alembic needed locally)
@@ -241,6 +251,7 @@ git commit -m "feat(api): dual-backend database config for SQLite and PostgreSQL
 ### Task 2.3: Abstract Postgres-Specific Column Types
 
 **Files:**
+
 - Create: `apps/api/app/models/compat.py`
 - Create: `apps/api/tests/test_model_compat.py`
 - Modify: `apps/api/app/models/memory.py`
@@ -325,6 +336,7 @@ def compat_tsvector(dialect_name: str):
 **Step 4: Update Memory model**
 
 Modify `apps/api/app/models/memory.py`:
+
 - Replace `Vector(1024)` with `CompatVector(1024)`
 - Replace `ARRAY(Text)` with `CompatArray()`
 - Replace `TSVECTOR` with `Text` (FTS5 handled separately)
@@ -333,6 +345,7 @@ Modify `apps/api/app/models/memory.py`:
 **Step 5: Update Graph models**
 
 Modify `apps/api/app/models/graph.py`:
+
 - Replace `Vector(1024)` with `CompatVector(1024)`
 
 **Step 6: Run all model tests**
@@ -352,6 +365,7 @@ CompatVector, CompatArray, compat_tsvector abstract pgvector/ARRAY/TSVECTOR"
 ### Task 2.4: Abstract Raw SQL Date Arithmetic
 
 **Files:**
+
 - Create: `apps/api/app/models/sql_helpers.py`
 - Create: `apps/api/tests/test_sql_helpers.py`
 - Modify: `apps/api/app/workers/enrichment.py`
@@ -437,11 +451,13 @@ git commit -m "feat(api): cross-dialect SQL helpers for date arithmetic and JSON
 ### Task 2.5: SQLite Integration Test
 
 **Files:**
+
 - Create: `apps/api/tests/test_sqlite_integration.py`
 
 **Step 1: Write integration test**
 
 Test that the full FastAPI app boots with SQLite and can:
+
 1. Create the schema (`create_all`)
 2. Register an agent
 3. Create a task
@@ -501,6 +517,7 @@ Wire `openspawn start` to boot the Python API with SQLite.
 ### Task 3.1: ORG.md Seeder
 
 **Files:**
+
 - Create: `apps/api/app/seeder.py`
 - Create: `apps/api/tests/test_seeder.py`
 
@@ -556,6 +573,7 @@ git commit -m "feat(api): ORG.md seeder for database initialization"
 ### Task 3.2: Local Mode Entrypoint
 
 **Files:**
+
 - Create: `apps/api/app/local.py`
 - Create: `apps/api/tests/test_local_entrypoint.py`
 
@@ -641,6 +659,7 @@ async def start_local(project_dir: str) -> None:
 **Step 4: Add CLI entrypoint**
 
 Add to `apps/api/pyproject.toml` under `[project.scripts]`:
+
 ```toml
 [project.scripts]
 openspawn-server = "app.local:main"
@@ -665,6 +684,7 @@ boots FastAPI with SQLite, seeds from ORG.md, no Docker required"
 ### Task 3.3: Thin TypeScript Start Command
 
 **Files:**
+
 - Create: `packages/openspawn/src/cli/commands/start.ts` (new version)
 - Create: `packages/openspawn/src/cli/commands/start.test.ts`
 
@@ -721,7 +741,9 @@ export async function startCommand(args: string[], ctx: { dir: string }) {
   try {
     execSync("uv --version", { stdio: "ignore" });
   } catch {
-    console.error("Error: uv is required. Install: curl -LsSf https://astral.sh/uv/install.sh | sh");
+    console.error(
+      "Error: uv is required. Install: curl -LsSf https://astral.sh/uv/install.sh | sh",
+    );
     process.exit(1);
   }
 
@@ -762,6 +784,7 @@ The core feature: spawn Claude Code CLI subprocesses as agents.
 ### Task 4.1: Spawning Config Schema
 
 **Files:**
+
 - Modify: `packages/openspawn/src/core/types.ts`
 - Modify: `packages/openspawn/src/core/config.ts`
 - Create: `packages/openspawn/src/core/config-spawn.test.ts`
@@ -814,11 +837,11 @@ spawning: {
   maxConcurrentAgents: number;
   idleTimeoutSeconds: number;
   bootstrapMode: BootstrapMode;
-};
+}
 runtime: {
   mode: RuntimeMode;
   database: string;
-};
+}
 ```
 
 **Step 4: Update defaultConfig**
@@ -852,6 +875,7 @@ git commit -m "feat(openspawn): add spawning and runtime config schema"
 ### Task 4.2: Agent Spawner (Python)
 
 **Files:**
+
 - Create: `apps/api/app/spawner/__init__.py`
 - Create: `apps/api/app/spawner/manager.py`
 - Create: `apps/api/app/spawner/process.py`
@@ -1117,6 +1141,7 @@ SpawnManager queues agents, respects maxConcurrentAgents, recycles slots on exit
 ### Task 4.3: Wire Spawner into Local Entrypoint
 
 **Files:**
+
 - Modify: `apps/api/app/local.py`
 - Create: `apps/api/tests/test_local_spawning.py`
 
@@ -1179,6 +1204,7 @@ Replace Redis + arq with asyncio scheduled tasks for local mode. This phase is n
 ### Task 5.1: Asyncio Cron Scheduler
 
 **Files:**
+
 - Create: `apps/api/app/workers/local_scheduler.py`
 - Create: `apps/api/tests/test_local_scheduler.py`
 
@@ -1283,19 +1309,20 @@ replaces arq + Redis for background enrichment jobs when running locally"
 ### Task 5.2: Wire Scheduler into Local Mode
 
 **Files:**
+
 - Modify: `apps/api/app/local.py`
 
 **Step 1: Add scheduler startup**
 
 In `start_local()`, after seeding agents, create a `LocalScheduler` with the same jobs as `WorkerSettings.cron_jobs` but at adjusted intervals:
 
-| Job | arq schedule | Local interval |
-|-----|-------------|----------------|
-| `boost_co_retrieved` | 4x daily | 6 hours (21600s) |
-| `identify_stale` | daily | 24 hours (86400s) |
-| `extract_entities` | daily | 1 hour (3600s) — more frequent locally for faster feedback |
-| `expire_memories` | hourly | 1 hour (3600s) |
-| `monitor_sla` | every minute | 60s |
+| Job                  | arq schedule | Local interval                                             |
+| -------------------- | ------------ | ---------------------------------------------------------- |
+| `boost_co_retrieved` | 4x daily     | 6 hours (21600s)                                           |
+| `identify_stale`     | daily        | 24 hours (86400s)                                          |
+| `extract_entities`   | daily        | 1 hour (3600s) — more frequent locally for faster feedback |
+| `expire_memories`    | hourly       | 1 hour (3600s)                                             |
+| `monitor_sla`        | every minute | 60s                                                        |
 
 Skip `merge_duplicate_entities` (stub).
 
@@ -1315,17 +1342,18 @@ git commit -m "feat(api): wire asyncio scheduler into local mode startup"
 
 ## Phase Summary
 
-| Phase | Tasks | Ships | Deferrable? |
-|-------|-------|-------|-------------|
-| 1: Prune | 3 | Clean codebase | No |
-| 2: SQLite | 5 | API works with SQLite | No |
-| 3: Local startup | 3 | `openspawn start` boots Python API | No |
-| 4: Agent spawning | 3 | Claude Code agents spawn and coordinate | No |
-| 5: Asyncio scheduler | 2 | Background enrichment without Redis | Yes (MVP works without) |
+| Phase                | Tasks | Ships                                   | Deferrable?             |
+| -------------------- | ----- | --------------------------------------- | ----------------------- |
+| 1: Prune             | 3     | Clean codebase                          | No                      |
+| 2: SQLite            | 5     | API works with SQLite                   | No                      |
+| 3: Local startup     | 3     | `openspawn start` boots Python API      | No                      |
+| 4: Agent spawning    | 3     | Claude Code agents spawn and coordinate | No                      |
+| 5: Asyncio scheduler | 2     | Background enrichment without Redis     | Yes (MVP works without) |
 
 ## Post-Implementation
 
 After all phases complete:
+
 - Update `AGENTS.md` to reflect new architecture
 - Update `ARCHITECTURE.md` with local mode details
 - Update `docs/` (Astro) getting started guide

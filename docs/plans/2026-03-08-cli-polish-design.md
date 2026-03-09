@@ -28,12 +28,14 @@ All steps have smart defaults. User can Enter through all of them.
 Select from 11 templates (4 general + 7 industry):
 
 **General:**
+
 - `assistant-team` (default) — Chief of staff + specialists
 - `content-agency` — Content production pipeline
 - `dev-shop` — Software development team
 - `research-lab` — Research & analysis team
 
 **Industry:**
+
 - `saas-onboarding` — Enterprise customer onboarding
 - `incident-response` — Production incident management
 - `contract-review` — Legal contract analysis
@@ -54,18 +56,19 @@ Text input, default: "My Agent Team"
 
 **Values** — multi-select with conflict warnings:
 
-| Value | Default | Source | Agent Behavior |
-|-------|---------|--------|----------------|
-| Ownership | Yes | Katzenbach & Smith, "The Discipline of Teams" | Single-threaded task ownership; ships or escalates |
-| Transparency | Yes | Amy Edmondson, psychological safety | Escalate instead of silently failing |
-| Measurement | Yes | Peter Drucker, management by objectives | Report outcomes with evidence |
-| Subsidiarity | Yes | Rogers & Blenko, "Who Has the D?" | Solve at lowest competent level |
-| Continuous improvement | Yes | Peter Senge, learning organizations | Auto post-mortems, process updates |
-| Speed | No | — | Bias toward action, ship small. Conflicts with: Rigor |
-| Rigor | No | — | Depth over speed, verify first. Conflicts with: Speed |
-| Frugality | No | — | Cheap models for mechanical tasks |
+| Value                  | Default | Source                                        | Agent Behavior                                        |
+| ---------------------- | ------- | --------------------------------------------- | ----------------------------------------------------- |
+| Ownership              | Yes     | Katzenbach & Smith, "The Discipline of Teams" | Single-threaded task ownership; ships or escalates    |
+| Transparency           | Yes     | Amy Edmondson, psychological safety           | Escalate instead of silently failing                  |
+| Measurement            | Yes     | Peter Drucker, management by objectives       | Report outcomes with evidence                         |
+| Subsidiarity           | Yes     | Rogers & Blenko, "Who Has the D?"             | Solve at lowest competent level                       |
+| Continuous improvement | Yes     | Peter Senge, learning organizations           | Auto post-mortems, process updates                    |
+| Speed                  | No      | —                                             | Bias toward action, ship small. Conflicts with: Rigor |
+| Rigor                  | No      | —                                             | Depth over speed, verify first. Conflicts with: Speed |
+| Frugality              | No      | —                                             | Cheap models for mechanical tasks                     |
 
 **Guardrails:**
+
 - Warn if >5 values selected (token cost + ambiguity)
 - Flag conflicting pairs (Speed + Rigor)
 - ~50 tokens per value per agent per session
@@ -154,15 +157,15 @@ Summary table of all selections. Y/n to proceed.
 
 ## CLI Flags
 
-| Flag | Short | Default | Effect |
-|------|-------|---------|--------|
-| `--template <name>` | `-t` | — | Skip template selection step |
-| `--yes` | `-y` | `false` | Skip wizard, all defaults (assistant-team) |
-| `--non-interactive` | — | `false` | Alias for --yes |
-| `--dry-run` | — | `false` | Simulate agent registration + sample task after scaffold |
-| `--deploy` | — | `false` | Generate docker-compose.yml + .env |
-| `--port <n>` | `-p` | `8787` | Coordinator port |
-| `--dir <path>` | `-d` | `.` | Target directory |
+| Flag                | Short | Default | Effect                                                   |
+| ------------------- | ----- | ------- | -------------------------------------------------------- |
+| `--template <name>` | `-t`  | —       | Skip template selection step                             |
+| `--yes`             | `-y`  | `false` | Skip wizard, all defaults (assistant-team)               |
+| `--non-interactive` | —     | `false` | Alias for --yes                                          |
+| `--dry-run`         | —     | `false` | Simulate agent registration + sample task after scaffold |
+| `--deploy`          | —     | `false` | Generate docker-compose.yml + .env                       |
+| `--port <n>`        | `-p`  | `8787`  | Coordinator port                                         |
+| `--dir <path>`      | `-d`  | `.`     | Target directory                                         |
 
 ## Post-Scaffold Validation
 

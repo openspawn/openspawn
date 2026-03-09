@@ -19,12 +19,14 @@ Everything starts with a single markdown file that defines roles, hierarchy, cul
 ## Current Focus
 
 **Priority:**
+
 - Getting `npx openspawn init` to a polished, zero-friction experience
 - Making the coordination engine production-grade (task routing, escalation, delegation)
 - Dashboard that lets humans see and control an entire agent organization
 - MCP server so any AI tool can manage an OpenSpawn org
 
 **Next priorities:**
+
 - Agent framework adapters (CrewAI, LangGraph, AutoGen integration)
 - Plugin system for custom coordination logic
 - Economic layer hardening (budgets, trust scores, performance tracking)
