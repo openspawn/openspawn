@@ -16,14 +16,14 @@ Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
 **Live:**
 
-| Domain                  | What                                          | Service        | Port |
-| ----------------------- | --------------------------------------------- | -------------- | ---- |
-| **openspawn.ai**        | Marketing website (React SPA, serves llms.txt + A2A agent.json) | `platform`     | 3334 |
-| **api.openspawn.ai**    | Core API — GraphQL + REST (NestJS; Python rewrite WIP) | `api`          | 8000 |
-| **bikinibottom.ai**     | Demo sandbox + dashboard                      | `app`          | 3333 |
-| **team.openspawn.ai**   | Internal team dashboard (basic auth)          | Caddy static   | —    |
-| **id.openspawn.ai**     | SSO/identity provider (Authentik, OIDC)       | `authentik`    | 9000 |
-| **wiki.openspawn.ai**   | Internal knowledge base (Outline)             | `outline`      | 3335 |
+| Domain                  | What                                                             |
+| ----------------------- | ---------------------------------------------------------------- |
+| **openspawn.ai**        | Marketing website (React SPA, serves llms.txt + A2A agent.json) |
+| **api.openspawn.ai**    | Core API — GraphQL + REST (Python rewrite WIP)                  |
+| **bikinibottom.ai**     | Demo sandbox + dashboard                                        |
+| **team.openspawn.ai**   | Internal team dashboard (password-protected)                    |
+| **id.openspawn.ai**     | SSO/identity provider (OIDC)                                    |
+| **wiki.openspawn.ai**   | Internal knowledge base                                         |
 
 **Reserved (DNS exists, not deployed):**
 
