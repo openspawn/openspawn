@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AGENTS, type NodeStatus, type SpawnedAgent } from "./replay-data";
+import { AGENTS, NodeStatus, type SpawnedAgent } from "./replay-data";
 import { resolveAvatarUrl } from "../../lib/resolve-avatar-url";
 import type { AgentNodeState } from "./org-chart-live";
 
@@ -44,17 +44,17 @@ const DEPARTMENTS: DeptDef[] = [
 ];
 
 const STATUS_COLOR: Record<NodeStatus, string> = {
-  idle: "#4AAED9",
-  working: "#F4C542",
-  busy: "#FF6B6B",
-  overwhelmed: "#FF4757",
+  [NodeStatus.Idle]: "#4AAED9",
+  [NodeStatus.Working]: "#F4C542",
+  [NodeStatus.Busy]: "#FF6B6B",
+  [NodeStatus.Overwhelmed]: "#FF4757",
 };
 
 const STATUS_LABEL: Record<NodeStatus, string> = {
-  idle: "IDLE",
-  working: "WORKING",
-  busy: "BUSY",
-  overwhelmed: "🔥 OVERWHELMED",
+  [NodeStatus.Idle]: "IDLE",
+  [NodeStatus.Working]: "WORKING",
+  [NodeStatus.Busy]: "BUSY",
+  [NodeStatus.Overwhelmed]: "🔥 OVERWHELMED",
 };
 
 interface AgentPillProps {
@@ -103,15 +103,15 @@ interface DeptCardProps {
 }
 
 function DeptCard({ dept, nodeStates, spawnedAgents, expanded, onToggle }: DeptCardProps) {
-  const vpState = nodeStates[dept.vpId] || { status: "idle" as NodeStatus };
+  const vpState = nodeStates[dept.vpId] || { status: NodeStatus.Idle };
   const vpAgent = AGENTS[dept.vpId];
   const vpColor = STATUS_COLOR[vpState.status];
-  const isOverwhelmed = vpState.status === "overwhelmed";
-  const isBusy = vpState.status === "busy" || vpState.status === "overwhelmed";
+  const isOverwhelmed = vpState.status === NodeStatus.Overwhelmed;
+  const isBusy = vpState.status === NodeStatus.Busy || vpState.status === NodeStatus.Overwhelmed;
 
   // Count working members
-  const memberStatuses = dept.memberIds.map((id) => nodeStates[id]?.status ?? "idle");
-  const activeCount = memberStatuses.filter((s) => s !== "idle").length;
+  const memberStatuses = dept.memberIds.map((id) => nodeStates[id]?.status ?? NodeStatus.Idle);
+  const activeCount = memberStatuses.filter((s) => s !== NodeStatus.Idle).length;
   const totalCount = dept.memberIds.length;
 
   // Sous-chef pool for kitchen dept
@@ -240,7 +240,11 @@ function DeptCard({ dept, nodeStates, spawnedAgents, expanded, onToggle }: DeptC
           </div>
           <div className="grid grid-cols-2 gap-1.5">
             {dept.memberIds.map((id) => (
-              <AgentPill key={id} agentId={id} state={nodeStates[id] || { status: "idle" }} />
+              <AgentPill
+                key={id}
+                agentId={id}
+                state={nodeStates[id] || { status: NodeStatus.Idle }}
+              />
             ))}
           </div>
 
@@ -281,7 +285,7 @@ interface MobileOrgChartProps {
 export function MobileOrgChart({ nodeStates, spawnedAgents }: MobileOrgChartProps) {
   const [expandedDept, setExpandedDept] = useState<string | null>(null);
 
-  const ceoState = nodeStates["mr-krabs"] || { status: "idle" as NodeStatus };
+  const ceoState = nodeStates["mr-krabs"] || { status: NodeStatus.Idle };
   const ceoColor = STATUS_COLOR[ceoState.status];
   const ceoAgent = AGENTS["mr-krabs"];
 
@@ -289,7 +293,7 @@ export function MobileOrgChart({ nodeStates, spawnedAgents }: MobileOrgChartProp
   useEffect(() => {
     for (const dept of DEPARTMENTS) {
       const vpState = nodeStates[dept.vpId];
-      if (vpState?.status === "overwhelmed" || vpState?.status === "busy") {
+      if (vpState?.status === NodeStatus.Overwhelmed || vpState?.status === NodeStatus.Busy) {
         setExpandedDept((prev) => prev ?? dept.id);
         break;
       }

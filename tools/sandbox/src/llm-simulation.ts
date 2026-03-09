@@ -64,11 +64,11 @@ export class LLMSimulation extends DeterministicSimulation {
   private recorder: DecisionRecorder | null = null;
   private recording: boolean;
   private llmAvailable: boolean | null = null; // null = not checked yet
-  private scenarioOrder: string = "";
-  private startTime: number = Date.now();
-  private totalCost: number = 0;
-  private totalInputTokens: number = 0;
-  private totalOutputTokens: number = 0;
+  private scenarioOrder = "";
+  private startTime = Date.now();
+  private totalCost = 0;
+  private totalInputTokens = 0;
+  private totalOutputTokens = 0;
 
   constructor(
     agents: SandboxAgent[],

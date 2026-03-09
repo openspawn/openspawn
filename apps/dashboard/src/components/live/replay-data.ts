@@ -114,7 +114,12 @@ export const ACTS = [
 
 // ── Replay Event ─────────────────────────────────────────────────────────────
 
-export type NodeStatus = "idle" | "working" | "busy" | "overwhelmed";
+export enum NodeStatus {
+  Idle = "idle",
+  Working = "working",
+  Busy = "busy",
+  Overwhelmed = "overwhelmed",
+}
 
 export interface SpawnedAgent {
   id: string;

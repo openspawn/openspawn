@@ -336,7 +336,9 @@ export function LandingPage() {
       .then((d) => {
         if (d.stargazers_count) setStars(d.stargazers_count);
       })
-      .catch(() => {});
+      .catch(() => {
+        /* noop */
+      });
   }, []);
 
   const handleCopy = () => {
@@ -1386,7 +1388,9 @@ export function LandingPage() {
               rel="noopener"
               variant="neutral"
             >
-              ⭐ {stars ? `${stars.toLocaleString()} Stars on GitHub` : "Star on GitHub"}
+              {stars && stars >= 500
+                ? `⭐ ${stars.toLocaleString()} Stars on GitHub`
+                : "⭐ Star on GitHub"}
             </Button>
             <Button as="a" href="/docs/getting-started" variant="ghost">
               Read the Docs →

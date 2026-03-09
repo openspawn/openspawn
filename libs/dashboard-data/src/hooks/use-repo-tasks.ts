@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 
-export type RepoTaskStatus = "open" | "claimed" | "in-progress" | "done" | "blocked";
+export enum RepoTaskStatus {
+  Open = "open",
+  Claimed = "claimed",
+  InProgress = "in-progress",
+  Done = "done",
+  Blocked = "blocked",
+}
 
 export interface RepoTask {
   id: string;
@@ -29,7 +35,7 @@ const DEMO_TASKS: RepoTask[] = [
     id: "task-001",
     description: "Set up CI pipeline for dashboard builds",
     assignee: "dennis",
-    status: "done",
+    status: RepoTaskStatus.Done,
     createdAt: "2026-02-25T10:00:00Z",
     updatedAt: "2026-02-26T14:30:00Z",
     pr: 450,
@@ -38,7 +44,7 @@ const DEMO_TASKS: RepoTask[] = [
     id: "task-002",
     description: "Add agent reputation scoring to dashboard",
     assignee: "ceo",
-    status: "in-progress",
+    status: RepoTaskStatus.InProgress,
     createdAt: "2026-02-26T09:00:00Z",
     updatedAt: "2026-02-28T16:00:00Z",
     pr: 455,
@@ -46,7 +52,7 @@ const DEMO_TASKS: RepoTask[] = [
   {
     id: "task-003",
     description: "Implement task delegation protocol",
-    status: "open",
+    status: RepoTaskStatus.Open,
     createdAt: "2026-02-27T11:00:00Z",
     updatedAt: "2026-02-27T11:00:00Z",
   },
@@ -54,7 +60,7 @@ const DEMO_TASKS: RepoTask[] = [
     id: "task-004",
     description: "Budget tracking per-agent breakdown",
     assignee: "dennis",
-    status: "in-progress",
+    status: RepoTaskStatus.InProgress,
     createdAt: "2026-02-27T14:00:00Z",
     updatedAt: "2026-03-01T09:00:00Z",
     budget: { spent: 0.42, currency: "USD" },
@@ -62,7 +68,7 @@ const DEMO_TASKS: RepoTask[] = [
   {
     id: "task-005",
     description: "Wire up escalation alerts to Discord",
-    status: "open",
+    status: RepoTaskStatus.Open,
     delegatedBy: "ceo",
     createdAt: "2026-02-28T08:00:00Z",
     updatedAt: "2026-02-28T08:00:00Z",
@@ -71,7 +77,7 @@ const DEMO_TASKS: RepoTask[] = [
     id: "task-006",
     description: "Tone cleanup — additive not competitive",
     assignee: "dennis",
-    status: "done",
+    status: RepoTaskStatus.Done,
     createdAt: "2026-02-28T12:00:00Z",
     updatedAt: "2026-03-01T10:00:00Z",
     pr: 460,
@@ -80,14 +86,14 @@ const DEMO_TASKS: RepoTask[] = [
     id: "task-007",
     description: "Add kanban board route to dashboard",
     assignee: "dennis",
-    status: "in-progress",
+    status: RepoTaskStatus.InProgress,
     createdAt: "2026-03-01T15:00:00Z",
     updatedAt: "2026-03-01T15:00:00Z",
   },
   {
     id: "task-008",
     description: "Review and merge infrastructure docs",
-    status: "blocked",
+    status: RepoTaskStatus.Blocked,
     assignee: "ceo",
     createdAt: "2026-02-28T10:00:00Z",
     updatedAt: "2026-03-01T08:00:00Z",
@@ -106,7 +112,7 @@ export function useRepoTasks() {
     try {
       // Try local static file first (baked into Docker build)
       let res = await fetch(LOCAL_URL, { cache: "no-store" });
-      let src: "github" | "demo" = "github";
+      const src: "github" | "demo" = "github";
       if (!res.ok) {
         // Fall back to GitHub raw content
         res = await fetch(GITHUB_RAW_URL, { cache: "no-store" });

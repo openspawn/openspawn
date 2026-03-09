@@ -22,34 +22,43 @@ const env = () => ({
   OLLAMA_URL: process.env.OLLAMA_URL || "http://localhost:11434",
 });
 
-export type Provider = "groq" | "openrouter" | "ollama";
+export enum Provider {
+  Groq = "groq",
+  OpenRouter = "openrouter",
+  Ollama = "ollama",
+}
+
+function isProvider(value: string | undefined): value is Provider {
+  if (!value) return false;
+  return value === Provider.Groq || value === Provider.OpenRouter || value === Provider.Ollama;
+}
 
 export function getProvider(): Provider {
-  const forced = process.env.LLM_PROVIDER as Provider | undefined;
-  if (forced && ["groq", "openrouter", "ollama"].includes(forced)) return forced;
-  if (env().GROQ_API_KEY) return "groq";
-  if (env().OPENROUTER_API_KEY) return "openrouter";
-  return "ollama";
+  const forced = process.env.LLM_PROVIDER;
+  if (isProvider(forced)) return forced;
+  if (env().GROQ_API_KEY) return Provider.Groq;
+  if (env().OPENROUTER_API_KEY) return Provider.OpenRouter;
+  return Provider.Ollama;
 }
 
 export function getProviderInfo(): string {
   switch (getProvider()) {
-    case "groq":
+    case Provider.Groq:
       return `Groq (model: ${env().GROQ_MODEL}, free tier, 14.4K req/day)`;
-    case "openrouter":
+    case Provider.OpenRouter:
       return `OpenRouter (workers: ${env().OPENROUTER_MODEL}, managers: ${env().OPENROUTER_MANAGER_MODEL})`;
-    case "ollama":
+    case Provider.Ollama:
       return `Ollama (local)`;
   }
 }
 
 export function getModelName(): string {
   switch (getProvider()) {
-    case "groq":
+    case Provider.Groq:
       return env().GROQ_MODEL;
-    case "openrouter":
+    case Provider.OpenRouter:
       return env().OPENROUTER_MODEL;
-    case "ollama":
+    case Provider.Ollama:
       return process.env.SANDBOX_MODEL || "qwen3:0.6b";
   }
 }
@@ -100,13 +109,17 @@ export async function initLLM(config: SandboxConfig): Promise<void> {
   // Groq: 30 RPM → 4 concurrent is safe with 5s ticks
   // OpenRouter free: ~20 RPM → 2 concurrent
   const maxConcurrent =
-    provider === "ollama" ? config.maxConcurrentInferences : provider === "groq" ? 4 : 2;
+    provider === Provider.Ollama
+      ? config.maxConcurrentInferences
+      : provider === Provider.Groq
+        ? 4
+        : 2;
   semaphore = new Semaphore(maxConcurrent);
 
   console.log(`  🧠 LLM provider: ${getProviderInfo()}`);
   console.log(`  🚦 Max concurrent: ${maxConcurrent}`);
 
-  if (provider === "groq") {
+  if (provider === Provider.Groq) {
     // Quick validation — make sure the key works
     try {
       const res = await fetch(`${env().GROQ_URL}/models`, {
@@ -291,9 +304,9 @@ export async function getAgentDecision(
 
     const provider = getProvider();
     const { content: raw, tokens } =
-      provider === "groq"
+      provider === Provider.Groq
         ? await callGroq(messages, agent)
-        : provider === "openrouter"
+        : provider === Provider.OpenRouter
           ? await callOpenRouter(messages, agent)
           : await callOllama(messages, config);
 

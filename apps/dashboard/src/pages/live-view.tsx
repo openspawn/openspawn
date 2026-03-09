@@ -14,6 +14,7 @@ import {
   TIMELINE,
   ACTS,
   AGENTS,
+  NodeStatus,
   type Stats,
   type ReplayEvent,
   type SpawnedAgent,
@@ -142,8 +143,8 @@ function useReplay() {
             nodeStatesRef.current = {
               ...nodeStatesRef.current,
               [d.agent]: {
-                ...(nodeStatesRef.current[d.agent] || { status: "idle" }),
-                status: d.status || "idle",
+                ...(nodeStatesRef.current[d.agent] || { status: NodeStatus.Idle }),
+                status: d.status || NodeStatus.Idle,
               },
             };
           }
@@ -154,7 +155,7 @@ function useReplay() {
             spawnedRef.current = [...spawnedRef.current, d.spawnAgent];
             nodeStatesRef.current = {
               ...nodeStatesRef.current,
-              [d.spawnAgent.id]: { status: "working" },
+              [d.spawnAgent.id]: { status: NodeStatus.Working },
             };
             edgeAnimsRef.current = [
               ...edgeAnimsRef.current,
@@ -237,7 +238,7 @@ function useReplay() {
         nodeStatesRef.current = {
           ...nodeStatesRef.current,
           "squidward-tentacles": {
-            ...(nodeStatesRef.current["squidward-tentacles"] || { status: "working" }),
+            ...(nodeStatesRef.current["squidward-tentacles"] || { status: NodeStatus.Working }),
             queueBadge: statsRef.current.queueSize,
           },
         };
@@ -721,7 +722,11 @@ function CompletionOverlay({
 
 // ── Mobile Tab Bar ───────────────────────────────────────────────────────────
 
-type MobileTab = "org" | "feed" | "stats";
+enum MobileTab {
+  Org = "org",
+  Feed = "feed",
+  Stats = "stats",
+}
 
 function MobileTabBar({
   active,
@@ -731,9 +736,9 @@ function MobileTabBar({
   onChange: (t: MobileTab) => void;
 }) {
   const tabs: { id: MobileTab; label: string; icon: string }[] = [
-    { id: "org", label: "Org Chart", icon: "🏢" },
-    { id: "feed", label: "Live Feed", icon: "💬" },
-    { id: "stats", label: "Stats", icon: "📊" },
+    { id: MobileTab.Org, label: "Org Chart", icon: "🏢" },
+    { id: MobileTab.Feed, label: "Live Feed", icon: "💬" },
+    { id: MobileTab.Stats, label: "Stats", icon: "📊" },
   ];
 
   return (
@@ -847,7 +852,7 @@ export function LiveViewPage() {
   const [showIntro, setShowIntro] = useState(() => {
     return !localStorage.getItem("live-intro-seen");
   });
-  const [mobileTab, setMobileTab] = useState<MobileTab>("org");
+  const [mobileTab, setMobileTab] = useState<MobileTab>(MobileTab.Org);
 
   // Agent control state
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -865,7 +870,7 @@ export function LiveViewPage() {
       if (!agentDef) return null;
       const overrides = agentOverrides[agentId] || {};
       const nodeState = nodeStates[agentId];
-      const baseStatus = nodeState?.status || "idle";
+      const baseStatus = nodeState?.status || NodeStatus.Idle;
       const status: AgentControlStatus = overrides.paused ? "paused" : baseStatus;
       return {
         id: agentId,
@@ -946,7 +951,7 @@ export function LiveViewPage() {
   // Auto-switch mobile tab to feed during key moments
   useEffect(() => {
     if (replay.tick === 13 || replay.tick === 70) {
-      setMobileTab("feed");
+      setMobileTab(MobileTab.Feed);
     }
   }, [replay.tick]);
 
@@ -1038,7 +1043,7 @@ export function LiveViewPage() {
 
           {/* Mobile: one panel at a time */}
           <div className="flex md:hidden flex-1 min-h-0 relative">
-            {mobileTab === "org" && (
+            {mobileTab === MobileTab.Org && (
               <div className="w-full h-full overflow-y-auto">
                 <MobileOrgChart
                   nodeStates={replay.nodeStates}
@@ -1046,12 +1051,12 @@ export function LiveViewPage() {
                 />
               </div>
             )}
-            {mobileTab === "feed" && (
+            {mobileTab === MobileTab.Feed && (
               <div className="w-full h-full">
                 <LiveFeed messages={replay.messages} />
               </div>
             )}
-            {mobileTab === "stats" && <MobileStatsPanel stats={replay.stats} />}
+            {mobileTab === MobileTab.Stats && <MobileStatsPanel stats={replay.stats} />}
             {/* Mobile annotation */}
             <AnnotationBubble annotation={annotation} />
           </div>

@@ -1,5 +1,10 @@
 // ── Core Types for OpenSpawn ─────────────────────────────────────────────────
 
+export enum AgentStatus {
+  Active = "active",
+  Inactive = "inactive",
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -8,7 +13,7 @@ export interface Agent {
   domain: string;
   parentId?: string;
   model?: string;
-  status: "active" | "inactive";
+  status: AgentStatus;
 }
 
 export interface ParsedOrg {
@@ -28,7 +33,13 @@ export interface ParsedOrg {
   };
 }
 
-export type TaskStatus = "open" | "claimed" | "in-progress" | "done" | "blocked";
+export enum TaskStatus {
+  Open = "open",
+  Claimed = "claimed",
+  InProgress = "in-progress",
+  Done = "done",
+  Blocked = "blocked",
+}
 
 export interface Task {
   id: string;

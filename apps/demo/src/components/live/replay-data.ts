@@ -114,7 +114,12 @@ export const ACTS = [
 
 // ── Replay Event ─────────────────────────────────────────────────────────────
 
-export type NodeStatus = "idle" | "working" | "busy" | "overwhelmed";
+export enum NodeStatus {
+  Idle = "idle",
+  Working = "working",
+  Busy = "busy",
+  Overwhelmed = "overwhelmed",
+}
 
 export interface SpawnedAgent {
   id: string;
@@ -168,7 +173,7 @@ export const TIMELINE: ReplayEvent[] = [
     type: "message",
     data: { from: "mr-krabs", text: "10,000?! 💰💰💰 MONEY MONEY MONEY!" },
   },
-  { tick: 2, type: "node_status", data: { agent: "mr-krabs", status: "working" } },
+  { tick: 2, type: "node_status", data: { agent: "mr-krabs", status: NodeStatus.Working } },
   {
     tick: 3,
     type: "stat_update",
@@ -194,7 +199,11 @@ export const TIMELINE: ReplayEvent[] = [
       text: "SpongeBob! Fire up every grill! 10,000 patties!",
     },
   },
-  { tick: 4, type: "node_status", data: { agent: "spongebob-squarepants", status: "working" } },
+  {
+    tick: 4,
+    type: "node_status",
+    data: { agent: "spongebob-squarepants", status: NodeStatus.Working },
+  },
   {
     tick: 6,
     type: "delegation",
@@ -204,7 +213,11 @@ export const TIMELINE: ReplayEvent[] = [
       text: "Squidward! You're on delivery. Move it!",
     },
   },
-  { tick: 6, type: "node_status", data: { agent: "squidward-tentacles", status: "working" } },
+  {
+    tick: 6,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Working },
+  },
   {
     tick: 8,
     type: "delegation",
@@ -214,7 +227,11 @@ export const TIMELINE: ReplayEvent[] = [
       text: "Squilliam — track every penny. I want P&L on my desk.",
     },
   },
-  { tick: 8, type: "node_status", data: { agent: "squilliam-fancyson", status: "working" } },
+  {
+    tick: 8,
+    type: "node_status",
+    data: { agent: "squilliam-fancyson", status: NodeStatus.Working },
+  },
   {
     tick: 10,
     type: "message",
@@ -270,7 +287,7 @@ export const TIMELINE: ReplayEvent[] = [
       text: "Sandy — architect the pipeline. I'm spinning up the team!",
     },
   },
-  { tick: 17, type: "node_status", data: { agent: "sandy-cheeks", status: "working" } },
+  { tick: 17, type: "node_status", data: { agent: "sandy-cheeks", status: NodeStatus.Working } },
   {
     tick: 18,
     type: "message",
@@ -357,7 +374,7 @@ export const TIMELINE: ReplayEvent[] = [
     type: "message",
     data: { from: "karen", text: "Running security scan on Plankton's order... 🔒" },
   },
-  { tick: 20, type: "node_status", data: { agent: "karen", status: "working" } },
+  { tick: 20, type: "node_status", data: { agent: "karen", status: NodeStatus.Working } },
   {
     tick: 21,
     type: "spawn",
@@ -612,7 +629,7 @@ export const TIMELINE: ReplayEvent[] = [
       text: "🔥 ALL 20 SOUS-CHEFS ONLINE! Production at 100/tick! I'M READY!",
     },
   },
-  { tick: 27, type: "node_status", data: { agent: "patrick-star", status: "working" } },
+  { tick: 27, type: "node_status", data: { agent: "patrick-star", status: NodeStatus.Working } },
   {
     tick: 28,
     type: "delegation",
@@ -622,7 +639,7 @@ export const TIMELINE: ReplayEvent[] = [
       text: "Gary — QA every 10th patty. Reject anything substandard.",
     },
   },
-  { tick: 28, type: "node_status", data: { agent: "gary", status: "working" } },
+  { tick: 28, type: "node_status", data: { agent: "gary", status: NodeStatus.Working } },
   { tick: 28, type: "message", data: { from: "gary", text: "Meow. 🔍 (QA initialized)" } },
   {
     tick: 29,
@@ -632,7 +649,7 @@ export const TIMELINE: ReplayEvent[] = [
       text: "📺 BREAKING: SpongeBob just hired 20 SOUS-CHEFS! Kitchen is a MACHINE!",
     },
   },
-  { tick: 29, type: "node_status", data: { agent: "perch-perkins", status: "working" } },
+  { tick: 29, type: "node_status", data: { agent: "perch-perkins", status: NodeStatus.Working } },
   {
     tick: 30,
     type: "stat_update",
@@ -711,7 +728,11 @@ export const TIMELINE: ReplayEvent[] = [
       text: "These patties are piling up faster than I can carry them!",
     },
   },
-  { tick: 42, type: "node_status", data: { agent: "squidward-tentacles", status: "busy" } },
+  {
+    tick: 42,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Busy },
+  },
   {
     tick: 45,
     type: "stat_update",
@@ -745,7 +766,7 @@ export const TIMELINE: ReplayEvent[] = [
       text: "⚠️ Support tickets spiking! Customers complaining about wait times.",
     },
   },
-  { tick: 52, type: "node_status", data: { agent: "barnacle-boy", status: "working" } },
+  { tick: 52, type: "node_status", data: { agent: "barnacle-boy", status: NodeStatus.Working } },
   {
     tick: 55,
     type: "stat_update",
@@ -764,7 +785,11 @@ export const TIMELINE: ReplayEvent[] = [
     type: "message",
     data: { from: "squidward-tentacles", text: "My back... my feet... my will to live... 😩" },
   },
-  { tick: 56, type: "node_status", data: { agent: "squidward-tentacles", status: "overwhelmed" } },
+  {
+    tick: 56,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Overwhelmed },
+  },
   {
     tick: 58,
     type: "message",
@@ -905,13 +930,13 @@ export const TIMELINE: ReplayEvent[] = [
     type: "reassign",
     data: { from: "mr-krabs", to: "pearl-krabs", text: "Pearl reassigned to delivery team" },
   },
-  { tick: 95, type: "node_status", data: { agent: "pearl-krabs", status: "working" } },
+  { tick: 95, type: "node_status", data: { agent: "pearl-krabs", status: NodeStatus.Working } },
   {
     tick: 96,
     type: "reassign",
     data: { from: "mr-krabs", to: "fred-1", text: "Fred reassigned to delivery team" },
   },
-  { tick: 96, type: "node_status", data: { agent: "fred-1", status: "working" } },
+  { tick: 96, type: "node_status", data: { agent: "fred-1", status: NodeStatus.Working } },
   {
     tick: 97,
     type: "message",
@@ -937,7 +962,11 @@ export const TIMELINE: ReplayEvent[] = [
     type: "message",
     data: { from: "squidward-tentacles", text: "Oh thank Neptune, reinforcements!" },
   },
-  { tick: 103, type: "node_status", data: { agent: "squidward-tentacles", status: "busy" } },
+  {
+    tick: 103,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Busy },
+  },
   {
     tick: 105,
     type: "stat_update",
@@ -1011,7 +1040,11 @@ export const TIMELINE: ReplayEvent[] = [
       },
     },
   },
-  { tick: 118, type: "node_status", data: { agent: "squidward-tentacles", status: "working" } },
+  {
+    tick: 118,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Working },
+  },
   {
     tick: 120,
     type: "stat_update",
@@ -1120,7 +1153,11 @@ export const TIMELINE: ReplayEvent[] = [
       text: "*collapses behind the counter* ...never again. 😵",
     },
   },
-  { tick: 143, type: "node_status", data: { agent: "squidward-tentacles", status: "idle" } },
+  {
+    tick: 143,
+    type: "node_status",
+    data: { agent: "squidward-tentacles", status: NodeStatus.Idle },
+  },
   {
     tick: 145,
     type: "message",
@@ -1133,17 +1170,25 @@ export const TIMELINE: ReplayEvent[] = [
     data: { from: "plankton", text: "Hmm... next time I'll order 20,000. HAHAHAHA!" },
   },
   // Final — all nodes green
-  { tick: 148, type: "node_status", data: { agent: "mr-krabs", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "spongebob-squarepants", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "squilliam-fancyson", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "sandy-cheeks", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "karen", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "patrick-star", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "gary", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "pearl-krabs", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "perch-perkins", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "barnacle-boy", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "fred-1", status: "idle" } },
+  { tick: 148, type: "node_status", data: { agent: "mr-krabs", status: NodeStatus.Idle } },
+  {
+    tick: 148,
+    type: "node_status",
+    data: { agent: "spongebob-squarepants", status: NodeStatus.Idle },
+  },
+  {
+    tick: 148,
+    type: "node_status",
+    data: { agent: "squilliam-fancyson", status: NodeStatus.Idle },
+  },
+  { tick: 148, type: "node_status", data: { agent: "sandy-cheeks", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "karen", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "patrick-star", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "gary", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "pearl-krabs", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "perch-perkins", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "barnacle-boy", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "fred-1", status: NodeStatus.Idle } },
   {
     tick: 150,
     type: "completion",

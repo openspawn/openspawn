@@ -14,18 +14,18 @@ title: FAQ
 
 These are the questions people ask most often. Longer answers are in the sections below.
 
-| #   | Question                                       | Short answer                                                                                                                   |
-| --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **What is OpenSpawn?**                         | An open-source coordination layer for AI agent orgs — defined in one markdown file (`ORG.md`).                                 |
-| 2   | **Do I need to rewrite my agents?**            | No. OpenSpawn connects to existing agents via MCP, A2A, or REST.                                                               |
-| 3   | **Do I need API keys to try it?**              | No. `npx openspawn init my-org && openspawn start` works offline with simulated agents.                                        |
-| 4   | **What do I need installed?**                  | Node 18+, Python 3.12+, and [uv](https://docs.astral.sh/uv/). Docker optional (production only).                               |
-| 5   | **My ORG.md agents aren't showing up — why?**  | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Check startup logs.       |
-| 6   | **I get `Invalid credentials` from the API.**  | Clock skew or wrong signature message format. See [Auth Errors](./guides/troubleshooting#5-api-auth-errors).                   |
-| 7   | **Why is my task stuck and won't transition?** | `DONE` and `CANCELLED` are terminal — create a new task. `IN_PROGRESS → DONE` is invalid; go through `REVIEW` first.           |
-| 8   | **How do I fix port conflicts?**               | `lsof -i :3456` (MCP) or `lsof -i :3333` (sandbox), kill the process, or start with `--port`.                                  |
-| 9   | **The dashboard goes blank / SSE drops.**      | Proxy timeout. Set `proxy_read_timeout 86400s` (nginx) or `flush_interval -1` (Caddy).                                         |
-| 10  | **How do I debug a broken setup?**             | Check startup logs → check port → inspect `data/openspawn.db` → see [Troubleshooting Guide](./guides/troubleshooting).         |
+| #   | Question                                       | Short answer                                                                                                             |
+| --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **What is OpenSpawn?**                         | An open-source coordination layer for AI agent orgs — defined in one markdown file (`ORG.md`).                           |
+| 2   | **Do I need to rewrite my agents?**            | No. OpenSpawn connects to existing agents via MCP, A2A, or REST.                                                         |
+| 3   | **Do I need API keys to try it?**              | No. `npx openspawn init my-org && openspawn start` works offline with simulated agents.                                  |
+| 4   | **What do I need installed?**                  | Node 18+, Python 3.12+, and [uv](https://docs.astral.sh/uv/). Docker optional (production only).                         |
+| 5   | **My ORG.md agents aren't showing up — why?**  | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Check startup logs. |
+| 6   | **I get `Invalid credentials` from the API.**  | Clock skew or wrong signature message format. See [Auth Errors](./guides/troubleshooting#5-api-auth-errors).             |
+| 7   | **Why is my task stuck and won't transition?** | `DONE` and `CANCELLED` are terminal — create a new task. `IN_PROGRESS → DONE` is invalid; go through `REVIEW` first.     |
+| 8   | **How do I fix port conflicts?**               | `lsof -i :3456` (MCP) or `lsof -i :3333` (sandbox), kill the process, or start with `--port`.                            |
+| 9   | **The dashboard goes blank / SSE drops.**      | Proxy timeout. Set `proxy_read_timeout 86400s` (nginx) or `flush_interval -1` (Caddy).                                   |
+| 10  | **How do I debug a broken setup?**             | Check startup logs → check port → inspect `data/openspawn.db` → see [Troubleshooting Guide](./guides/troubleshooting).   |
 
 ---
 

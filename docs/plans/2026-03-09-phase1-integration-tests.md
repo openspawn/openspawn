@@ -15,8 +15,13 @@
 ## Tasks
 
 ### Task 1: Process spawner unit tests (process.py — 0% → covered)
+
 ### Task 2: MCP tool schema validation (all 33 tools have valid schemas)
+
 ### Task 3: REST endpoint smoke tests on SQLite (auth gates work)
+
 ### Task 4: Seeder end-to-end on SQLite (ORG.md → DB round-trip)
+
 ### Task 5: CLI start command unit tests (TS bridge)
+
 ### Task 6: CLI init scaffold smoke tests (template validation)

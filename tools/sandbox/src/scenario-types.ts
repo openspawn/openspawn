@@ -73,7 +73,12 @@ export interface ScenarioMeta {
   totalTicks: number; // estimated total ticks for the scenario
 }
 
-export type Difficulty = "easy" | "normal" | "hard" | "chaos";
+export enum Difficulty {
+  Easy = "easy",
+  Normal = "normal",
+  Hard = "hard",
+  Chaos = "chaos",
+}
 
 export const DIFFICULTY_PRESETS: Record<
   Difficulty,
@@ -84,15 +89,30 @@ export const DIFFICULTY_PRESETS: Record<
     blockChance: number;
   }
 > = {
-  easy: { eventFrequencyMod: 0.5, reviewRejectPct: 0.05, resourceScarcity: 0, blockChance: 0.05 },
-  normal: {
+  [Difficulty.Easy]: {
+    eventFrequencyMod: 0.5,
+    reviewRejectPct: 0.05,
+    resourceScarcity: 0,
+    blockChance: 0.05,
+  },
+  [Difficulty.Normal]: {
     eventFrequencyMod: 1.0,
     reviewRejectPct: 0.15,
     resourceScarcity: 0.2,
     blockChance: 0.1,
   },
-  hard: { eventFrequencyMod: 1.5, reviewRejectPct: 0.25, resourceScarcity: 0.5, blockChance: 0.2 },
-  chaos: { eventFrequencyMod: 2.5, reviewRejectPct: 0.35, resourceScarcity: 0.8, blockChance: 0.3 },
+  [Difficulty.Hard]: {
+    eventFrequencyMod: 1.5,
+    reviewRejectPct: 0.25,
+    resourceScarcity: 0.5,
+    blockChance: 0.2,
+  },
+  [Difficulty.Chaos]: {
+    eventFrequencyMod: 2.5,
+    reviewRejectPct: 0.35,
+    resourceScarcity: 0.8,
+    blockChance: 0.3,
+  },
 };
 
 // ── Phases ───────────────────────────────────────────────────────────────────
@@ -214,7 +234,12 @@ export interface EventEffect {
 
 // ── Resources ────────────────────────────────────────────────────────────────
 
-export type ResourceType = "agent-hours" | "calendar" | "credits" | "compute";
+export enum ResourceType {
+  AgentHours = "agent-hours",
+  Calendar = "calendar",
+  Credits = "credits",
+  Compute = "compute",
+}
 
 export interface ResourcePool {
   id: string;

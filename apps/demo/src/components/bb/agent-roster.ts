@@ -3,7 +3,7 @@
  * Used by CharacterCardGrid on the landing page and agent detail panels.
  */
 
-import type { AgentCharacter } from "./CharacterCard";
+import { CharacterStatus, type AgentCharacter } from "./CharacterCard";
 
 export const AGENT_ROSTER: AgentCharacter[] = [
   {
@@ -15,7 +15,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Operations",
     cardClass: "bb-card-krabs",
     accentColor: "#C0392B",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "MONEY MONEY MONEY! Cook faster, boy!",
   },
   {
@@ -27,7 +27,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Kitchen Ops",
     cardClass: "bb-card-spongebob",
     accentColor: "#FFD43B",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Batch 47 started — 500 patties underway!",
   },
   {
@@ -39,7 +39,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Delivery",
     cardClass: "bb-card-squidward",
     accentColor: "#9B59B6",
-    status: "busy",
+    status: CharacterStatus.Busy,
     queueSize: 203,
     lastMessage: "I CANNOT deliver 200 batches alone. This is not what I signed up for.",
   },
@@ -51,7 +51,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "CFO / The Vault",
     team: "Finance",
     accentColor: "#6366F1",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Revenue is up 340%. Even I am impressed.",
   },
   {
@@ -63,7 +63,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Kitchen Engineering",
     cardClass: "bb-card-sandy",
     accentColor: "#16A085",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Optimizing the spatula algorithm for 15% throughput gain.",
   },
   {
@@ -75,7 +75,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Tech",
     cardClass: "bb-card-karen",
     accentColor: "#4AAED9",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "All systems nominal. Plankton, please stop asking me to betray Mr. Krabs.",
   },
   {
@@ -86,7 +86,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Customer Success",
     team: "Register",
     accentColor: "#FF85C2",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Like, OMG, Plankton just ordered 10,000 more??",
   },
   {
@@ -96,7 +96,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Head of PR / Media",
     team: "Communications",
     accentColor: "#F59E0B",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "Breaking news: Krusty Krab hits record deliveries!",
   },
   {
@@ -107,7 +107,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Security Team Lead",
     team: "Security",
     accentColor: "#1E3A5F",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "Perimeter secure. No Plankton infiltration detected.",
   },
   {
@@ -119,7 +119,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "…Intern",
     cardClass: "bb-card-plankton",
     accentColor: "#1E8449",
-    status: "busy",
+    status: CharacterStatus.Busy,
     lastMessage:
       "All I wanted was the secret formula. Now I have 10,000 patties. This was not the plan.",
   },
@@ -131,7 +131,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Training & Safety",
     team: "Operations",
     accentColor: "#F97316",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "SpongeBob passed spatula certification. I am shocked.",
   },
   {
@@ -143,7 +143,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     team: "Kitchen Ops",
     cardClass: "bb-card-patrick",
     accentColor: "#F1948A",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Is mayonnaise an instrument? Also I made 200 patties somehow.",
   },
   {
@@ -154,7 +154,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Systems Monitor",
     team: "Kitchen Ops",
     accentColor: "#10B981",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "Meow.",
   },
   {
@@ -164,7 +164,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Data Analytics",
     team: "Finance",
     accentColor: "#84CC16",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Dashboard shows 7,240 patties delivered. Chart going up.",
   },
   {
@@ -175,7 +175,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Legacy Systems Support",
     team: "Engineering",
     accentColor: "#EAB308",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "EVIL! Also the old fryer still works fine.",
   },
   {
@@ -186,7 +186,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Delivery Agent",
     team: "Delivery",
     accentColor: "#DC2626",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "Bro I just delivered batch 32. Arms are pumped.",
   },
   {
@@ -196,7 +196,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Quality Assurance",
     team: "QA",
     accentColor: "#0891B2",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "You forgot the pickles. AGAIN. Batch 46 rejected.",
   },
   {
@@ -206,7 +206,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Security Enforcement",
     team: "Security",
     accentColor: "#374151",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "Nobody leaves without their receipt.",
   },
   {
@@ -217,7 +217,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Ghost Accountant",
     team: "Finance",
     accentColor: "#76D7C4",
-    status: "idle",
+    status: CharacterStatus.Idle,
     lastMessage: "I have audited the books. Mr. Krabs owes me one shiny dime.",
   },
   {
@@ -227,7 +227,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Delivery Agent (Fred)",
     team: "Delivery",
     accentColor: "#6B7280",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "MY LEG!!! But also I delivered 50 orders.",
   },
   {
@@ -237,7 +237,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Delivery Agent (Fred's Clone)",
     team: "Delivery",
     accentColor: "#9CA3AF",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "MY LEG!!! Route 7 complete.",
   },
   {
@@ -247,7 +247,7 @@ export const AGENT_ROSTER: AgentCharacter[] = [
     jobTitle: "Delivery Agent (Fred's Clone)",
     team: "Delivery",
     accentColor: "#D1D5DB",
-    status: "working",
+    status: CharacterStatus.Working,
     lastMessage: "MY LEG!!! But batch 38 is on the way.",
   },
 ];

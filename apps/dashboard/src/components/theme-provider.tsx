@@ -14,7 +14,10 @@ export const THEME_NAMES = [
 
 export type OceanTheme = (typeof THEME_NAMES)[number];
 
-export type Density = "comfortable" | "compact";
+export enum Density {
+  Comfortable = "comfortable",
+  Compact = "compact",
+}
 
 export interface ThemeDefinition {
   id: OceanTheme;
@@ -115,9 +118,9 @@ export function ThemeProvider({
   });
 
   const [density, setDensityState] = useState<Density>(() => {
-    if (typeof window === "undefined") return "comfortable";
+    if (typeof window === "undefined") return Density.Comfortable;
     const stored = localStorage.getItem(DENSITY_STORAGE_KEY);
-    return stored === "compact" ? "compact" : "comfortable";
+    return stored === Density.Compact ? Density.Compact : Density.Comfortable;
   });
 
   const resolvedTheme = THEMES.find((t) => t.id === theme)?.isDark === false ? "light" : "dark";
@@ -161,7 +164,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("density-compact");
-    if (density === "compact") {
+    if (density === Density.Compact) {
       root.classList.add("density-compact");
     }
   }, [density]);

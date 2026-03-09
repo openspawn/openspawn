@@ -40,8 +40,14 @@ import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 
-type SortField = "created" | "priority" | "status" | "title";
-type SortDirection = "asc" | "desc";
+import { SortDirection } from "../lib/enums";
+
+enum TaskTaskSortField {
+  Created = "created",
+  Priority = "priority",
+  Status = "status",
+  Title = "title",
+}
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
@@ -699,8 +705,8 @@ export function TasksPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [teamFilterValue, setTeamFilterValue] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>("created");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc"); // newest first by default
+  const [sortField, setTaskSortField] = useState<TaskSortField>(TaskSortField.Created);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Desc); // newest first by default
 
   // Filter and sort tasks for list view
   const filteredAndSortedTasks = useMemo(() => {
@@ -739,24 +745,24 @@ export function TasksPage() {
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortField) {
-        case "created":
+        case TaskSortField.Created:
           comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
           break;
-        case "priority":
+        case TaskSortField.Priority:
           comparison =
             (PRIORITY_ORDER[a.priority?.toUpperCase() || "NORMAL"] || 2) -
             (PRIORITY_ORDER[b.priority?.toUpperCase() || "NORMAL"] || 2);
           break;
-        case "status":
+        case TaskSortField.Status:
           comparison =
             (STATUS_ORDER[a.status?.toUpperCase() || "BACKLOG"] || 3) -
             (STATUS_ORDER[b.status?.toUpperCase() || "BACKLOG"] || 3);
           break;
-        case "title":
+        case TaskSortField.Title:
           comparison = a.title.localeCompare(b.title);
           break;
       }
-      return sortDirection === "desc" ? -comparison : comparison;
+      return sortDirection === SortDirection.Desc ? -comparison : comparison;
     });
 
     return result;
@@ -771,12 +777,12 @@ export function TasksPage() {
     sortDirection,
   ]);
 
-  function handleSort(field: SortField) {
+  function handleSort(field: TaskSortField) {
     if (sortField === field) {
-      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+      setSortDirection((d) => (d === SortDirection.Asc ? SortDirection.Desc : SortDirection.Asc));
     } else {
-      setSortField(field);
-      setSortDirection("desc");
+      setTaskSortField(field);
+      setSortDirection(SortDirection.Desc);
     }
   }
 
@@ -933,7 +939,14 @@ export function TasksPage() {
               {/* Sort buttons */}
               <div className="flex items-center gap-1 sm:ml-auto overflow-x-auto">
                 <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
-                {(["created", "priority", "status", "title"] as SortField[]).map((field) => (
+                {(
+                  [
+                    TaskSortField.Created,
+                    TaskSortField.Priority,
+                    TaskSortField.Status,
+                    TaskSortField.Title,
+                  ] as TaskSortField[]
+                ).map((field) => (
                   <Button
                     key={field}
                     variant={sortField === field ? "secondary" : "ghost"}
@@ -941,10 +954,10 @@ export function TasksPage() {
                     onClick={() => handleSort(field)}
                     className="capitalize min-h-[44px] sm:min-h-0 shrink-0"
                   >
-                    {field === "created" ? "Date" : field}
+                    {field === TaskSortField.Created ? "Date" : field}
                     {sortField === field && (
                       <ArrowUpDown
-                        className={`ml-1 h-3 w-3 ${sortDirection === "desc" ? "rotate-180" : ""}`}
+                        className={`ml-1 h-3 w-3 ${sortDirection === SortDirection.Desc ? "rotate-180" : ""}`}
                       />
                     )}
                   </Button>

@@ -12,15 +12,39 @@ import { useSidePanel } from "../contexts/side-panel-context";
 // We use string-based type to avoid hard dependency on dashboard-ui at
 // the data layer. Consumers must pass the panel components once at app root.
 
+interface AgentPanelData {
+  id: string;
+  name: string;
+  parentId?: string;
+  [key: string]: unknown;
+}
+
+interface TaskPanelData {
+  id: string;
+  identifier: string;
+  title: string;
+  status: string;
+  priority: string;
+  assigneeId?: string;
+  assignee?: { id: string };
+  [key: string]: unknown;
+}
+
 interface PanelComponents {
   AgentDetailPanel: React.ComponentType<{
-    agent: any;
-    tasks?: any[];
+    agent: AgentPanelData;
+    tasks?: Array<{
+      id: string;
+      identifier: string;
+      title: string;
+      status: string;
+      priority: string;
+    }>;
     parentName?: string;
     onTaskClick?: (taskId: string) => void;
   }>;
   TaskDetailPanel: React.ComponentType<{
-    task: any;
+    task: TaskPanelData;
     onAgentClick?: (agentId: string) => void;
   }>;
 }
@@ -35,8 +59,8 @@ export function registerPanelComponents(panels: PanelComponents) {
 /* ── Hook ──────────────────────────────────────────────────────── */
 
 interface DashboardPanelsOptions {
-  agents: any[];
-  tasks: any[];
+  agents: AgentPanelData[];
+  tasks: TaskPanelData[];
 }
 
 export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
@@ -45,18 +69,18 @@ export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
   const openAgentPanel = useCallback(
     (agentId: string) => {
       if (!_panels) return;
-      const agent = agents.find((a: any) => a.id === agentId);
+      const agent = agents.find((a) => a.id === agentId);
       if (!agent) return;
 
       const agentTasks = tasks.filter(
-        (t: any) => t.assigneeId === agentId || t.assignee?.id === agentId,
+        (t) => t.assigneeId === agentId || t.assignee?.id === agentId,
       );
-      const parent = agent.parentId ? agents.find((a: any) => a.id === agent.parentId) : null;
+      const parent = agent.parentId ? agents.find((a) => a.id === agent.parentId) : null;
 
       openSidePanel(
         createElement(_panels.AgentDetailPanel, {
           agent,
-          tasks: agentTasks.map((t: any) => ({
+          tasks: agentTasks.map((t) => ({
             id: t.id,
             identifier: t.identifier,
             title: t.title,
@@ -75,7 +99,7 @@ export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
   const openTaskPanel = useCallback(
     (taskId: string) => {
       if (!_panels) return;
-      const task = tasks.find((t: any) => t.id === taskId);
+      const task = tasks.find((t) => t.id === taskId);
       if (!task) return;
 
       openSidePanel(

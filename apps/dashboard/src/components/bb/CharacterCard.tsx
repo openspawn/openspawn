@@ -7,7 +7,12 @@
 
 import { useState } from "react";
 
-export type AgentStatus = "idle" | "working" | "busy" | "overwhelmed";
+export enum CharacterStatus {
+  Idle = "idle",
+  Working = "working",
+  Busy = "busy",
+  Overwhelmed = "overwhelmed",
+}
 
 export interface AgentCharacter {
   id: string;
@@ -18,37 +23,37 @@ export interface AgentCharacter {
   team: string;
   cardClass?: string;
   accentColor: string;
-  status: AgentStatus;
+  status: CharacterStatus;
   lastMessage?: string;
   queueSize?: number;
 }
 
-export const STATUS_LABEL: Record<AgentStatus, string> = {
-  idle: "Waiting…",
-  working: "ON IT 🔥",
-  busy: "SWAMPED 😅",
-  overwhelmed: "HELP 🚨",
+export const STATUS_LABEL: Record<CharacterStatus, string> = {
+  [CharacterStatus.Idle]: "Waiting…",
+  [CharacterStatus.Working]: "ON IT 🔥",
+  [CharacterStatus.Busy]: "SWAMPED 😅",
+  [CharacterStatus.Overwhelmed]: "HELP 🚨",
 };
 
-const STATUS_STYLE: Record<AgentStatus, string> = {
-  idle: "bg-[#4AAED9]/10 text-[#4AAED9] border border-[#4AAED9]/30",
-  working: "bg-[#F4C542]/15 text-[#F4C542] border border-[#F4C542]/40",
-  busy: "bg-[#FF6B6B]/15 text-[#FF6B6B] border border-[#FF6B6B]/40",
-  overwhelmed: "bg-[#FF4757]/20 text-[#FF4757] border border-[#FF4757]/50",
+const STATUS_STYLE: Record<CharacterStatus, string> = {
+  [CharacterStatus.Idle]: "bg-[#4AAED9]/10 text-[#4AAED9] border border-[#4AAED9]/30",
+  [CharacterStatus.Working]: "bg-[#F4C542]/15 text-[#F4C542] border border-[#F4C542]/40",
+  [CharacterStatus.Busy]: "bg-[#FF6B6B]/15 text-[#FF6B6B] border border-[#FF6B6B]/40",
+  [CharacterStatus.Overwhelmed]: "bg-[#FF4757]/20 text-[#FF4757] border border-[#FF4757]/50",
 };
 
-const STATUS_RING: Record<AgentStatus, string> = {
-  idle: "border-[#4AAED9]/30",
-  working: "border-[#F4C542] shadow-[0_0_16px_rgba(244,197,66,0.5)]",
-  busy: "border-[#FF6B6B] shadow-[0_0_12px_rgba(255,107,107,0.4)]",
-  overwhelmed: "border-[#FF4757] shadow-[0_0_20px_rgba(255,71,87,0.6)]",
+const STATUS_RING: Record<CharacterStatus, string> = {
+  [CharacterStatus.Idle]: "border-[#4AAED9]/30",
+  [CharacterStatus.Working]: "border-[#F4C542] shadow-[0_0_16px_rgba(244,197,66,0.5)]",
+  [CharacterStatus.Busy]: "border-[#FF6B6B] shadow-[0_0_12px_rgba(255,107,107,0.4)]",
+  [CharacterStatus.Overwhelmed]: "border-[#FF4757] shadow-[0_0_20px_rgba(255,71,87,0.6)]",
 };
 
-const ANIM_CLASS: Record<AgentStatus, string> = {
-  idle: "animate-[bb-bob_2.5s_ease-in-out_infinite]",
-  working: "animate-[bb-bob_1s_ease-in-out_infinite]",
-  busy: "animate-[bb-bob_1.2s_ease-in-out_infinite]",
-  overwhelmed: "animate-[bb-bob_0.6s_ease-in-out_infinite]",
+const ANIM_CLASS: Record<CharacterStatus, string> = {
+  [CharacterStatus.Idle]: "animate-[bb-bob_2.5s_ease-in-out_infinite]",
+  [CharacterStatus.Working]: "animate-[bb-bob_1s_ease-in-out_infinite]",
+  [CharacterStatus.Busy]: "animate-[bb-bob_1.2s_ease-in-out_infinite]",
+  [CharacterStatus.Overwhelmed]: "animate-[bb-bob_0.6s_ease-in-out_infinite]",
 };
 
 interface CharacterCardProps {
@@ -58,8 +63,9 @@ interface CharacterCardProps {
 }
 
 export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProps) {
-  const isCrisis = agent.status === "overwhelmed";
-  const isActive = agent.status === "working" || agent.status === "busy";
+  const isCrisis = agent.status === CharacterStatus.Overwhelmed;
+  const isActive =
+    agent.status === CharacterStatus.Working || agent.status === CharacterStatus.Busy;
 
   const sizeClasses = { sm: "p-3 gap-3", md: "p-4 gap-4", lg: "p-6 gap-5" };
   const avatarSizes = {

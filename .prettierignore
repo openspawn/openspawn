@@ -3,3 +3,6 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
+
+# Generated files — must match codegen output exactly
+**/generated/**

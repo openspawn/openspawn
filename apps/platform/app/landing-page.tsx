@@ -170,7 +170,9 @@ export function LandingPage() {
       .then((d) => {
         if (d.stargazers_count) setStars(d.stargazers_count);
       })
-      .catch(() => {});
+      .catch(() => {
+        // ignore fetch errors for star count
+      });
   }, []);
 
   const copyCommand = () => {
@@ -470,7 +472,9 @@ export function LandingPage() {
               rel="noopener"
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-medium text-slate-200 transition hover:bg-white/10"
             >
-              ⭐ {stars ? `${stars.toLocaleString()} Stars on GitHub` : "Star on GitHub"}
+              {stars && stars >= 500
+                ? `⭐ ${stars.toLocaleString()} Stars on GitHub`
+                : "⭐ Star on GitHub"}
             </a>
           </div>
         </section>

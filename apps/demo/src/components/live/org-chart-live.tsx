@@ -13,7 +13,7 @@ import {
   type EdgeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { AGENTS, type NodeStatus, type SpawnedAgent } from "./replay-data";
+import { AGENTS, NodeStatus, type SpawnedAgent } from "./replay-data";
 import { resolveAvatarUrl } from "../../lib/resolve-avatar-url";
 
 // ── Node positions (hardcoded tree) ──────────────────────────────────────────
@@ -107,25 +107,25 @@ function LiveAgentNode({ data }: NodeProps) {
   const d = data as unknown as LiveNodeData;
   // BikiniBottom palette — NOT cyan like OpenSpawn
   const statusColors: Record<NodeStatus, string> = {
-    idle: "#4AAED9", // ocean-blue for idle
-    working: "#F4C542", // sandy yellow for active — primary brand color
-    busy: "#FF6B6B", // coral for swamped
-    overwhelmed: "#FF4757", // hot coral for crisis
+    [NodeStatus.Idle]: "#4AAED9", // ocean-blue for idle
+    [NodeStatus.Working]: "#F4C542", // sandy yellow for active — primary brand color
+    [NodeStatus.Busy]: "#FF6B6B", // coral for swamped
+    [NodeStatus.Overwhelmed]: "#FF4757", // hot coral for crisis
   };
   const ringColor = statusColors[d.status];
-  const isActive = d.status !== "idle";
-  const isPulsing = d.status === "overwhelmed" || d.status === "busy";
+  const isActive = d.status !== NodeStatus.Idle;
+  const isPulsing = d.status === NodeStatus.Overwhelmed || d.status === NodeStatus.Busy;
 
   // Animation based on status
   const getAnimation = () => {
-    if (d.status === "overwhelmed") return "jitter 0.3s ease-in-out infinite";
-    if (d.status === "working") return "bob 1.5s ease-in-out infinite";
+    if (d.status === NodeStatus.Overwhelmed) return "jitter 0.3s ease-in-out infinite";
+    if (d.status === NodeStatus.Working) return "bob 1.5s ease-in-out infinite";
     return "idle-pulse 3s ease-in-out infinite";
   };
 
   // Stagger delay for idle animation based on agent name hash
   const getAnimationDelay = () => {
-    if (d.status !== "idle") return "0s";
+    if (d.status !== NodeStatus.Idle) return "0s";
     const hash = d.agentId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return `${(hash % 3000) / 1000}s`;
   };
@@ -145,7 +145,7 @@ function LiveAgentNode({ data }: NodeProps) {
         style={{
           border: `3px solid ${ringColor}`,
           boxShadow: isActive
-            ? `0 0 ${d.status === "working" ? "16px" : "12px"} ${ringColor}60, 0 0 24px ${ringColor}20`
+            ? `0 0 ${d.status === NodeStatus.Working ? "16px" : "12px"} ${ringColor}60, 0 0 24px ${ringColor}20`
             : "none",
           animation: isPulsing ? "ring-pulse 1.5s ease-in-out infinite" : undefined,
         }}
@@ -319,7 +319,7 @@ function buildGraph(
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = NODE_LAYOUT.map((n) => {
     const agent = AGENTS[n.id];
-    const state = nodeStates[n.id] || { status: "idle" as NodeStatus };
+    const state = nodeStates[n.id] || { status: NodeStatus.Idle };
     return {
       id: n.id,
       type: "liveAgent",
@@ -343,7 +343,7 @@ function buildGraph(
     // Calculate throughput based on working agents
     const workingCount = spawnedAgents.filter((sa) => {
       const state = nodeStates[sa.id];
-      return state?.status === "working" || state?.status === "busy";
+      return state?.status === NodeStatus.Working || state?.status === NodeStatus.Busy;
     }).length;
     const throughput = Math.min(100, (workingCount / spawnedAgents.length) * 100);
 

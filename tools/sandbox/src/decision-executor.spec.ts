@@ -40,6 +40,7 @@ function createContext(agents: SandboxAgent[], tasks: SandboxTask[] = []): Execu
 
 /** Suppress console output during tests */
 beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
 

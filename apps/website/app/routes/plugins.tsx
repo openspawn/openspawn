@@ -4,8 +4,19 @@ import { Footer } from "../components/footer";
 
 /* ─── Plugin Data ──────────────────────────────────────────────────────────── */
 
-type Category = "Coordination" | "Identity" | "Communication" | "Monitoring" | "Storage" | "DevOps";
-type Status = "available" | "coming-soon";
+enum Category {
+  Coordination = "Coordination",
+  Identity = "Identity",
+  Communication = "Communication",
+  Monitoring = "Monitoring",
+  Storage = "Storage",
+  DevOps = "DevOps",
+}
+
+enum Status {
+  Available = "available",
+  ComingSoon = "coming-soon",
+}
 
 interface Plugin {
   name: string;
@@ -22,108 +33,108 @@ const plugins: Plugin[] = [
     name: "Coordinator",
     slug: "coordinator",
     emoji: "📋",
-    category: "Coordination",
+    category: Category.Coordination,
     tagline: "SQLite task board + MCP tools",
     description: "Atomic task claiming, budget tracking, event audit trail.",
-    status: "available",
+    status: Status.Available,
   },
   {
     name: "Dashboard",
     slug: "dashboard",
     emoji: "📊",
-    category: "Monitoring",
+    category: Category.Monitoring,
     tagline: "Real-time org visualization",
     description: "Kanban board, org chart, agent controls.",
-    status: "available",
+    status: Status.Available,
   },
   {
     name: "Identity",
     slug: "identity",
     emoji: "🔑",
-    category: "Identity",
+    category: Category.Identity,
     tagline: "Ed25519 agent keypairs",
     description: "Sign messages, verify identity, cross-org federation.",
-    status: "available",
+    status: Status.Available,
   },
   {
     name: "Budget Guard",
     slug: "budget-guard",
     emoji: "💰",
-    category: "Monitoring",
+    category: Category.Monitoring,
     tagline: "Token/cost enforcement",
     description: "Set per-agent limits, auto-pause on overspend.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "Git Sync",
     slug: "git-sync",
     emoji: "🔄",
-    category: "DevOps",
+    category: Category.DevOps,
     tagline: "Automatic git operations",
     description: "Branch per agent, auto-commit, PR creation.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "Slack Bridge",
     slug: "slack-bridge",
     emoji: "💬",
-    category: "Communication",
+    category: Category.Communication,
     tagline: "Agent ↔ Slack integration",
     description: "Human-in-the-loop via Slack channels.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "S3 Artifacts",
     slug: "s3-artifacts",
     emoji: "☁️",
-    category: "Storage",
+    category: Category.Storage,
     tagline: "Cloud artifact storage",
     description: "Upload results, share across orgs.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "Prometheus Exporter",
     slug: "prometheus-exporter",
     emoji: "📈",
-    category: "Monitoring",
+    category: Category.Monitoring,
     tagline: "Metrics export",
     description: "Grafana dashboards for agent performance.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "Review Gate",
     slug: "review-gate",
     emoji: "✅",
-    category: "DevOps",
+    category: Category.DevOps,
     tagline: "Automated code review",
     description: "PR quality checks before merge.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
   {
     name: "Webhook Router",
     slug: "webhook-router",
     emoji: "🔗",
-    category: "Communication",
+    category: Category.Communication,
     tagline: "External event triggers",
     description: "GitHub webhooks, CI notifications.",
-    status: "coming-soon",
+    status: Status.ComingSoon,
   },
 ];
 
 const categories: Array<"All" | Category> = [
   "All",
-  "Coordination",
-  "Identity",
-  "Communication",
-  "Monitoring",
-  "Storage",
-  "DevOps",
+  Category.Coordination,
+  Category.Identity,
+  Category.Communication,
+  Category.Monitoring,
+  Category.Storage,
+  Category.DevOps,
 ];
 
 /* ─── Components ───────────────────────────────────────────────────────────── */
 
 function StatusBadge({ status }: { status: Status }) {
-  if (status === "available") {
+  if (status === Status.Available) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -157,7 +168,9 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       })
-      .catch(() => {});
+      .catch(() => {
+        /* noop */
+      });
   };
 
   return (
@@ -171,7 +184,7 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
       <p className="mb-4 flex-1 text-sm text-slate-400">{plugin.description}</p>
       <div className="flex items-center justify-between gap-3">
         <CategoryBadge category={plugin.category} />
-        {plugin.status === "available" ? (
+        {plugin.status === Status.Available ? (
           <button
             type="button"
             onClick={handleInstall}
@@ -188,7 +201,7 @@ function PluginCard({ plugin }: { plugin: Plugin }) {
           </button>
         )}
       </div>
-      {plugin.status === "available" && (
+      {plugin.status === Status.Available && (
         <div className="mt-3 rounded-lg bg-navy-950/50 px-3 py-2 font-mono text-xs text-slate-500 ring-1 ring-white/5">
           openspawn plugin add {plugin.slug}
         </div>
@@ -296,9 +309,9 @@ export function PluginsPage() {
         {/* Stats */}
         <div className="mt-16 text-center">
           <p className="text-sm text-slate-500">
-            {plugins.filter((p) => p.status === "available").length} available ·{" "}
-            {plugins.filter((p) => p.status === "coming-soon").length} coming soon · More plugins
-            shipping every week
+            {plugins.filter((p) => p.status === Status.Available).length} available ·{" "}
+            {plugins.filter((p) => p.status === Status.ComingSoon).length} coming soon · More
+            plugins shipping every week
           </p>
         </div>
       </section>

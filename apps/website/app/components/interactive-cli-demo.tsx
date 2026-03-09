@@ -1,7 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type LineKind = "cmd" | "output" | "blank";
+enum LineKind {
+  Cmd = "cmd",
+  Output = "output",
+  Blank = "blank",
+}
 
 interface ScriptLine {
   kind: LineKind;
@@ -23,69 +27,79 @@ const INIT_DELAY = 500;
 
 const SCRIPT: ScriptLine[] = [
   {
-    kind: "cmd",
+    kind: LineKind.Cmd,
     text: "$ npx openspawn init my-startup",
     color: "text-slate-200",
     step: 1,
     charCount: 31,
   },
-  { kind: "output", text: "  Creating project structure...", color: "text-slate-400", step: 1 },
-  { kind: "output", text: "  ✓ ORG.md", color: "text-emerald-400", step: 1 },
-  { kind: "output", text: "  ✓ openspawn.config.ts", color: "text-emerald-400", step: 1 },
-  { kind: "output", text: "  ✓ .env.example", color: "text-emerald-400", step: 1 },
-  { kind: "output", text: "  🚀 my-startup is ready!", color: "text-cyan-400", step: 1 },
-  { kind: "blank", text: "", color: "", step: 1 },
-  { kind: "cmd", text: "$ openspawn org", color: "text-slate-200", step: 2, charCount: 15 },
-  { kind: "output", text: "  my-startup", color: "text-slate-300", step: 2 },
-  { kind: "output", text: "  ├── 🎯 CEO (claude-opus)", color: "text-violet-400", step: 2 },
   {
-    kind: "output",
+    kind: LineKind.Output,
+    text: "  Creating project structure...",
+    color: "text-slate-400",
+    step: 1,
+  },
+  { kind: LineKind.Output, text: "  ✓ ORG.md", color: "text-emerald-400", step: 1 },
+  { kind: LineKind.Output, text: "  ✓ openspawn.config.ts", color: "text-emerald-400", step: 1 },
+  { kind: LineKind.Output, text: "  ✓ .env.example", color: "text-emerald-400", step: 1 },
+  { kind: LineKind.Output, text: "  🚀 my-startup is ready!", color: "text-cyan-400", step: 1 },
+  { kind: LineKind.Blank, text: "", color: "", step: 1 },
+  { kind: LineKind.Cmd, text: "$ openspawn org", color: "text-slate-200", step: 2, charCount: 15 },
+  { kind: LineKind.Output, text: "  my-startup", color: "text-slate-300", step: 2 },
+  { kind: LineKind.Output, text: "  ├── 🎯 CEO (claude-opus)", color: "text-violet-400", step: 2 },
+  {
+    kind: LineKind.Output,
     text: "  │   ├── 🎨 Designer (claude-sonnet)",
     color: "text-cyan-400",
     step: 2,
   },
   {
-    kind: "output",
+    kind: LineKind.Output,
     text: "  │   └── 💻 Engineer (claude-sonnet)",
     color: "text-cyan-400",
     step: 2,
   },
-  { kind: "blank", text: "", color: "", step: 2 },
+  { kind: LineKind.Blank, text: "", color: "", step: 2 },
   {
-    kind: "cmd",
+    kind: LineKind.Cmd,
     text: '$ openspawn task create "Build landing page"',
     color: "text-slate-200",
     step: 3,
     charCount: 45,
   },
   {
-    kind: "output",
+    kind: LineKind.Output,
     text: '  ✓ Task #42: "Build landing page"',
     color: "text-emerald-400",
     step: 3,
   },
-  { kind: "output", text: "  → Status: queued · Priority: high", color: "text-slate-400", step: 3 },
-  { kind: "blank", text: "", color: "", step: 3 },
   {
-    kind: "cmd",
+    kind: LineKind.Output,
+    text: "  → Status: queued · Priority: high",
+    color: "text-slate-400",
+    step: 3,
+  },
+  { kind: LineKind.Blank, text: "", color: "", step: 3 },
+  {
+    kind: LineKind.Cmd,
     text: "$ openspawn delegate --to designer --task 42",
     color: "text-slate-200",
     step: 4,
     charCount: 45,
   },
   {
-    kind: "output",
+    kind: LineKind.Output,
     text: "  ✓ Delegated task #42 to Designer",
     color: "text-emerald-400",
     step: 4,
   },
   {
-    kind: "output",
+    kind: LineKind.Output,
     text: '  💬 Designer: "Starting on landing page..."',
     color: "text-violet-400",
     step: 4,
   },
-  { kind: "output", text: "  ● Task #42: in-progress", color: "text-cyan-400", step: 4 },
+  { kind: LineKind.Output, text: "  ● Task #42: in-progress", color: "text-cyan-400", step: 4 },
 ];
 
 // ─── Build timing schedule ────────────────────────────────────────────────────
@@ -103,17 +117,17 @@ function buildSchedule(): ScheduledLine[] {
     const line = SCRIPT[i];
 
     // Extra pause before a new command (comes after outputs/blanks)
-    if (line.kind === "cmd" && i > 0) {
+    if (line.kind === LineKind.Cmd && i > 0) {
       cursor += CMD_GAP;
     }
 
     schedule.push({ line, appearsAt: cursor });
 
-    if (line.kind === "cmd" && line.charCount) {
+    if (line.kind === LineKind.Cmd && line.charCount) {
       cursor += line.charCount * CHAR_MS + 280; // typing duration + short pause
-    } else if (line.kind === "output") {
+    } else if (line.kind === LineKind.Output) {
       cursor += OUT_GAP;
-    } else if (line.kind === "blank") {
+    } else if (line.kind === LineKind.Blank) {
       cursor += 80;
     }
 
@@ -131,7 +145,7 @@ const TOTAL_DURATION = SCHEDULE[SCHEDULE.length - 1].appearsAt + 2500;
 const STEP_START_TIMES = (() => {
   const times: Record<number, number> = {};
   for (const { line, appearsAt } of SCHEDULE) {
-    if (line.kind === "cmd" && !(line.step in times)) {
+    if (line.kind === LineKind.Cmd && !(line.step in times)) {
       times[line.step] = appearsAt;
     }
   }
@@ -252,7 +266,6 @@ export function InteractiveCliDemo() {
       clearTimers();
     };
     // runKey in deps causes the observer to re-attach after replay
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startAnimation, clearTimers, runKey]);
 
   const handleReplay = () => {
@@ -341,11 +354,11 @@ export function InteractiveCliDemo() {
               )}
 
               {visibleLines.map((line) => {
-                if (line.kind === "blank") {
+                if (line.kind === LineKind.Blank) {
                   return <div key={line.id} className="h-2" aria-hidden />;
                 }
 
-                if (line.kind === "cmd") {
+                if (line.kind === LineKind.Cmd) {
                   const chars = line.charCount ?? line.text.replace(/^\$ /, "").length;
                   const durationS = (chars * CHAR_MS) / 1000;
                   // The typing animation expands from width:0 to width:N ch.

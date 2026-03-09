@@ -5,12 +5,15 @@
  * "bikinibottom" = BB-themed demo for bikinibottom.ai
  */
 
-export type DashboardTheme = "openspawn" | "bikinibottom";
+export enum DashboardTheme {
+  OpenSpawn = "openspawn",
+  BikiniBottom = "bikinibottom",
+}
 
 export const DASHBOARD_THEME: DashboardTheme =
-  (import.meta.env.VITE_DASHBOARD_THEME as string) === "bikinibottom"
-    ? "bikinibottom"
-    : "openspawn";
+  (import.meta.env.VITE_DASHBOARD_THEME as string) === DashboardTheme.BikiniBottom
+    ? DashboardTheme.BikiniBottom
+    : DashboardTheme.OpenSpawn;
 
-export const isBBTheme = DASHBOARD_THEME === "bikinibottom";
-export const isOpenSpawnTheme = DASHBOARD_THEME === "openspawn";
+export const isBBTheme = DASHBOARD_THEME === DashboardTheme.BikiniBottom;
+export const isOpenSpawnTheme = DASHBOARD_THEME === DashboardTheme.OpenSpawn;

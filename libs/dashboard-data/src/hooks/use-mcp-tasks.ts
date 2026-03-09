@@ -6,8 +6,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { taskList, McpError } from "../services/mcp-client";
 
-export type TaskPriority = "low" | "normal" | "high" | "critical";
-export type TaskStatus = "open" | "claimed" | "in_progress" | "review" | "done";
+export enum TaskPriority {
+  Low = "low",
+  Normal = "normal",
+  High = "high",
+  Critical = "critical",
+}
+
+export enum TaskStatus {
+  Open = "open",
+  Claimed = "claimed",
+  InProgress = "in_progress",
+  Review = "review",
+  Done = "done",
+}
 
 export interface KanbanTask {
   id: string;
@@ -25,8 +37,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t1",
     title: "Fix order queue overflow",
-    status: "open",
-    priority: "critical",
+    status: TaskStatus.Open,
+    priority: TaskPriority.Critical,
     createdAt: "2026-02-26T10:00:00Z",
     updatedAt: "2026-02-26T10:00:00Z",
     description: "The Krusty Krab order queue crashes when more than 50 orders are pending.",
@@ -34,32 +46,32 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t2",
     title: "Design new menu layout",
-    status: "open",
-    priority: "normal",
+    status: TaskStatus.Open,
+    priority: TaskPriority.Normal,
     createdAt: "2026-02-26T09:00:00Z",
     updatedAt: "2026-02-26T09:00:00Z",
   },
   {
     id: "t3",
     title: "Audit jellyfish net inventory",
-    status: "open",
-    priority: "low",
+    status: TaskStatus.Open,
+    priority: TaskPriority.Low,
     createdAt: "2026-02-26T08:00:00Z",
     updatedAt: "2026-02-26T08:00:00Z",
   },
   {
     id: "t4",
     title: "Update health & safety docs",
-    status: "open",
-    priority: "normal",
+    status: TaskStatus.Open,
+    priority: TaskPriority.Normal,
     createdAt: "2026-02-26T07:30:00Z",
     updatedAt: "2026-02-26T07:30:00Z",
   },
   {
     id: "t5",
     title: "Implement secret formula vault",
-    status: "claimed",
-    priority: "critical",
+    status: TaskStatus.Claimed,
+    priority: TaskPriority.Critical,
     assignee: "Sandy",
     createdAt: "2026-02-25T14:00:00Z",
     updatedAt: "2026-02-26T08:00:00Z",
@@ -68,8 +80,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t6",
     title: "Restock shared dependencies",
-    status: "claimed",
-    priority: "low",
+    status: TaskStatus.Claimed,
+    priority: TaskPriority.Low,
     assignee: "Agent Alpha",
     createdAt: "2026-02-25T16:00:00Z",
     updatedAt: "2026-02-26T09:00:00Z",
@@ -77,8 +89,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t7",
     title: "Fix webhook endpoint",
-    status: "claimed",
-    priority: "high",
+    status: TaskStatus.Claimed,
+    priority: TaskPriority.High,
     assignee: "Agent Bravo",
     createdAt: "2026-02-25T12:00:00Z",
     updatedAt: "2026-02-26T07:00:00Z",
@@ -86,8 +98,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t8",
     title: "Optimize task throughput",
-    status: "in_progress",
-    priority: "high",
+    status: TaskStatus.InProgress,
+    priority: TaskPriority.High,
     assignee: "Agent Alpha",
     createdAt: "2026-02-25T10:00:00Z",
     updatedAt: "2026-02-26T11:00:00Z",
@@ -96,8 +108,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t9",
     title: "Build customer feedback kiosk",
-    status: "in_progress",
-    priority: "normal",
+    status: TaskStatus.InProgress,
+    priority: TaskPriority.Normal,
     assignee: "Sandy",
     createdAt: "2026-02-24T15:00:00Z",
     updatedAt: "2026-02-26T10:30:00Z",
@@ -105,8 +117,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t10",
     title: "Train new intake agent",
-    status: "in_progress",
-    priority: "normal",
+    status: TaskStatus.InProgress,
+    priority: TaskPriority.Normal,
     assignee: "Agent Charlie",
     createdAt: "2026-02-24T09:00:00Z",
     updatedAt: "2026-02-26T12:00:00Z",
@@ -114,8 +126,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t11",
     title: "Update dashboard UI",
-    status: "in_progress",
-    priority: "low",
+    status: TaskStatus.InProgress,
+    priority: TaskPriority.Low,
     assignee: "Agent Charlie",
     createdAt: "2026-02-23T14:00:00Z",
     updatedAt: "2026-02-26T09:00:00Z",
@@ -123,8 +135,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t12",
     title: "Review agent schedules",
-    status: "review",
-    priority: "high",
+    status: TaskStatus.Review,
+    priority: TaskPriority.High,
     assignee: "Agent Lead",
     createdAt: "2026-02-24T08:00:00Z",
     updatedAt: "2026-02-26T13:00:00Z",
@@ -133,8 +145,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t13",
     title: "Test new deployment pipeline",
-    status: "review",
-    priority: "normal",
+    status: TaskStatus.Review,
+    priority: TaskPriority.Normal,
     assignee: "Agent Alpha",
     createdAt: "2026-02-23T11:00:00Z",
     updatedAt: "2026-02-26T11:30:00Z",
@@ -142,8 +154,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t14",
     title: "Security camera installation",
-    status: "review",
-    priority: "high",
+    status: TaskStatus.Review,
+    priority: TaskPriority.High,
     assignee: "Sandy",
     createdAt: "2026-02-22T10:00:00Z",
     updatedAt: "2026-02-26T14:00:00Z",
@@ -151,8 +163,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t15",
     title: "Update POS system",
-    status: "done",
-    priority: "critical",
+    status: TaskStatus.Done,
+    priority: TaskPriority.Critical,
     assignee: "Sandy",
     createdAt: "2026-02-20T09:00:00Z",
     updatedAt: "2026-02-25T16:00:00Z",
@@ -160,8 +172,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t16",
     title: "Clean up stale branches",
-    status: "done",
-    priority: "normal",
+    status: TaskStatus.Done,
+    priority: TaskPriority.Normal,
     assignee: "Agent Alpha",
     createdAt: "2026-02-21T07:00:00Z",
     updatedAt: "2026-02-25T10:00:00Z",
@@ -169,8 +181,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t17",
     title: "Fix logging pipeline",
-    status: "done",
-    priority: "high",
+    status: TaskStatus.Done,
+    priority: TaskPriority.High,
     assignee: "Agent Bravo",
     createdAt: "2026-02-19T13:00:00Z",
     updatedAt: "2026-02-24T15:00:00Z",
@@ -178,8 +190,8 @@ const DEMO_TASKS: KanbanTask[] = [
   {
     id: "t18",
     title: "Order new API keys",
-    status: "done",
-    priority: "low",
+    status: TaskStatus.Done,
+    priority: TaskPriority.Low,
     assignee: "Agent Alpha",
     createdAt: "2026-02-18T10:00:00Z",
     updatedAt: "2026-02-23T09:00:00Z",
@@ -188,21 +200,23 @@ const DEMO_TASKS: KanbanTask[] = [
 
 function normalizeStatus(s: string): TaskStatus {
   const lower = s.toLowerCase().replace(/[\s-]/g, "_");
-  if (lower === "open" || lower === "pending" || lower === "todo") return "open";
-  if (lower === "claimed" || lower === "assigned") return "claimed";
-  if (lower === "in_progress" || lower === "active" || lower === "working") return "in_progress";
-  if (lower === "review" || lower === "reviewing" || lower === "completed") return "review";
-  if (lower === "done" || lower === "verified" || lower === "closed") return "done";
-  return "open";
+  if (lower === "open" || lower === "pending" || lower === "todo") return TaskStatus.Open;
+  if (lower === "claimed" || lower === "assigned") return TaskStatus.Claimed;
+  if (lower === "in_progress" || lower === "active" || lower === "working")
+    return TaskStatus.InProgress;
+  if (lower === "review" || lower === "reviewing" || lower === "completed")
+    return TaskStatus.Review;
+  if (lower === "done" || lower === "verified" || lower === "closed") return TaskStatus.Done;
+  return TaskStatus.Open;
 }
 
 function normalizePriority(p: string | undefined): TaskPriority {
-  if (!p) return "normal";
+  if (!p) return TaskPriority.Normal;
   const lower = p.toLowerCase();
-  if (lower === "critical" || lower === "urgent") return "critical";
-  if (lower === "high") return "high";
-  if (lower === "low") return "low";
-  return "normal";
+  if (lower === "critical" || lower === "urgent") return TaskPriority.Critical;
+  if (lower === "high") return TaskPriority.High;
+  if (lower === "low") return TaskPriority.Low;
+  return TaskPriority.Normal;
 }
 
 export function useMcpTasks(intervalMs = 5000) {
@@ -212,18 +226,19 @@ export function useMcpTasks(intervalMs = 5000) {
 
   const refresh = useCallback(async () => {
     try {
-      const result = (await taskList()) as any;
-      const raw: any[] = Array.isArray(result) ? result : (result?.tasks ?? []);
+      const result = (await taskList()) as Record<string, unknown>;
+      const rawResult = Array.isArray(result) ? result : ((result?.tasks as unknown[]) ?? []);
+      const raw = rawResult as Array<Record<string, unknown>>;
       if (raw.length > 0) {
-        const mapped: KanbanTask[] = raw.map((t: any) => ({
-          id: t.id || t.task_id || String(Math.random()),
-          title: t.title || t.name || "Untitled",
-          status: normalizeStatus(t.status || "open"),
-          priority: normalizePriority(t.priority),
-          assignee: t.assignee || t.agent_id || t.assigned_to || undefined,
-          description: t.description || undefined,
-          createdAt: t.created_at || t.createdAt || new Date().toISOString(),
-          updatedAt: t.updated_at || t.updatedAt || new Date().toISOString(),
+        const mapped: KanbanTask[] = raw.map((t) => ({
+          id: String(t.id || t.task_id || Math.random()),
+          title: String(t.title || t.name || "Untitled"),
+          status: normalizeStatus(String(t.status || "open")),
+          priority: normalizePriority(t.priority as string | undefined),
+          assignee: (t.assignee || t.agent_id || t.assigned_to || undefined) as string | undefined,
+          description: (t.description || undefined) as string | undefined,
+          createdAt: String(t.created_at || t.createdAt || new Date().toISOString()),
+          updatedAt: String(t.updated_at || t.updatedAt || new Date().toISOString()),
         }));
         setTasks(mapped);
       }
