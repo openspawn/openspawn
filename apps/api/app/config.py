@@ -1,4 +1,4 @@
-from pydantic import model_validator
+from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     debug: bool = False
 
     database_url: str = "postgresql+asyncpg://localhost:5432/openspawn"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def is_sqlite(self) -> bool:
+        """True when using a SQLite backend."""
+        return self.database_url.startswith("sqlite")
 
     @model_validator(mode="after")
     def _fix_database_url_scheme(self) -> "Settings":
