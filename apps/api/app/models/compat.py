@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from sqlalchemy import JSON, Text, TypeDecorator
 
@@ -59,7 +59,7 @@ class CompatArray(TypeDecorator[list[object]]):
     impl = JSON
     cache_ok = True
 
-    def __init__(self, inner: TypeEngine[object] | None = None):
+    def __init__(self, inner: TypeEngine[Any] | None = None):
         super().__init__()
         self._inner = inner or Text()
 
