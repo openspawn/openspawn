@@ -1,3 +1,4 @@
+import { SimulationEventType } from "@openspawn/shared-types";
 import {
   createContext,
   useContext,
@@ -177,7 +178,7 @@ export function DemoProvider({
     }
 
     // Only celebrate promotions (rare, meaningful events)
-    if (event.type === "agent_promoted") {
+    if (event.type === SimulationEventType.AGENT_PROMOTED) {
       lastConfettiRef.current = now;
       celebrateLevelUp();
     }

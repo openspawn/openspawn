@@ -2,6 +2,7 @@
 // Handles inference calls with concurrency limiting and retries
 
 import type { SandboxAgent, SandboxTask, AgentAction, SandboxConfig } from "./types.js";
+import { ACPMessageType, TaskStatus } from "@openspawn/shared-types";
 
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
 
@@ -171,7 +172,7 @@ export function buildContext(
   if (children.length > 0) {
     lines.push(`\n== YOUR DIRECT REPORTS (use targetAgentId exactly) ==`);
     for (const c of children) {
-      const cTasks = tasks.filter((t) => t.assigneeId === c.id && t.status !== "done");
+      const cTasks = tasks.filter((t) => t.assigneeId === c.id && t.status !== TaskStatus.DONE);
       lines.push(`- ID="${c.id}" ${c.name} [${c.domain}] ${cTasks.length} tasks`);
     }
   }
@@ -183,9 +184,9 @@ export function buildContext(
   }
 
   // Your tasks
-  const myTasks = tasks.filter((t) => t.assigneeId === agent.id && t.status !== "done");
+  const myTasks = tasks.filter((t) => t.assigneeId === agent.id && t.status !== TaskStatus.DONE);
   const pendingDelegation = tasks.filter(
-    (t) => t.creatorId === agent.id && t.status === "pending" && !t.assigneeId,
+    (t) => t.creatorId === agent.id && t.status === TaskStatus.PENDING && !t.assigneeId,
   );
 
   if (myTasks.length > 0) {
@@ -204,7 +205,7 @@ export function buildContext(
 
   // Unassigned tasks in your domain (for managers)
   if (agent.level >= 7) {
-    const unassigned = tasks.filter((t) => !t.assigneeId && t.status === "backlog");
+    const unassigned = tasks.filter((t) => !t.assigneeId && t.status === TaskStatus.BACKLOG);
     if (unassigned.length > 0) {
       lines.push(`\n== UNASSIGNED BACKLOG (${unassigned.length}) ==`);
       for (const t of unassigned.slice(0, 5)) {
@@ -216,12 +217,15 @@ export function buildContext(
 
   // Blocked/escalated tasks that need attention
   const blockedTasks = tasks.filter(
-    (t) => t.status === "blocked" && (t.creatorId === agent.id || t.assigneeId === agent.id),
+    (t) =>
+      t.status === TaskStatus.BLOCKED && (t.creatorId === agent.id || t.assigneeId === agent.id),
   );
   if (blockedTasks.length > 0) {
     lines.push(`\n== ⚠ BLOCKED TASKS (NEED YOUR ATTENTION) ==`);
     for (const t of blockedTasks) {
-      const lastEsc = [...t.activityLog].reverse().find((m) => m.type === "escalation");
+      const lastEsc = [...t.activityLog]
+        .reverse()
+        .find((m) => m.type === ACPMessageType.ESCALATION);
       const fromName = lastEsc
         ? allAgents.find((a) => a.id === lastEsc.from)?.name || lastEsc.from
         : "unknown";
@@ -239,15 +243,15 @@ export function buildContext(
     for (const m of myMessages) {
       const fromAgent = allAgents.find((a) => a.id === m.from);
       const prefix =
-        m.type === "ack"
+        m.type === ACPMessageType.ACK
           ? "👍"
-          : m.type === "completion"
+          : m.type === ACPMessageType.COMPLETION
             ? "✅"
-            : m.type === "escalation"
+            : m.type === ACPMessageType.ESCALATION
               ? "⚠"
-              : m.type === "delegation"
+              : m.type === ACPMessageType.DELEGATION
                 ? "📋"
-                : m.type === "progress"
+                : m.type === ACPMessageType.PROGRESS
                   ? "📊"
                   : "💬";
       const content = m.body || m.summary || "";
@@ -276,7 +280,7 @@ export function buildContext(
   // Give directive based on what's available
   const hasReports = children.length > 0;
   const hasUnassigned = tasks.some(
-    (t) => !t.assigneeId && (t.status === "backlog" || t.status === "pending"),
+    (t) => !t.assigneeId && (t.status === TaskStatus.BACKLOG || t.status === TaskStatus.PENDING),
   );
 
   if (agent.level >= 7 && !hasReports && hasUnassigned) {

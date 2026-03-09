@@ -1,3 +1,4 @@
+import { MemoryType, MemoryVisibility, MemorySource } from "@openspawn/shared-types";
 import type { DemoMemory } from "../types";
 import { AGENT_IDS } from "./agents";
 
@@ -28,9 +29,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.ciPipelineInsight,
     agentId: AGENT_IDS.codeReviewer,
-    type: "semantic",
-    visibility: "shared",
-    source: "task_completion",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.TASK_COMPLETION,
     content:
       "CI pipeline builds fail when Node version mismatches. Always pin Node 20.x in .nvmrc and Dockerfile. The nx affected command saves ~60% build time on PRs touching <5 projects.",
     tags: ["ci", "devops", "node", "nx"],
@@ -43,9 +44,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.apiRateLimit,
     agentId: AGENT_IDS.analyst,
-    type: "episodic",
-    visibility: "shared",
-    source: "observation",
+    type: MemoryType.EPISODIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.OBSERVATION,
     content:
       "External analytics API rate-limits at 100 req/min. Batch requests with 500ms delay between batches of 10. Retry with exponential backoff on 429 responses.",
     tags: ["api", "rate-limit", "analytics"],
@@ -58,9 +59,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.budgetPattern,
     agentId: AGENT_IDS.bookkeeper,
-    type: "semantic",
-    visibility: "shared",
-    source: "inference",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.INFERENCE,
     content:
       "Model costs spike on Mondays and Fridays. Monday spikes correlate with sprint planning (many agents querying simultaneously). Friday spikes are from end-of-week report generation.",
     tags: ["budget", "costs", "patterns"],
@@ -73,9 +74,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.deploymentPlaybook,
     agentId: AGENT_IDS.codeReviewer,
-    type: "semantic",
-    visibility: "shared",
-    source: "task_completion",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.TASK_COMPLETION,
     content:
       "Production deploys require: 1) All CI checks green, 2) At least one L5+ approval, 3) No open P0/P1 bugs, 4) Deploy window Mon-Thu 10am-4pm UTC. Rollback within 15 min if error rate >1%.",
     tags: ["deployment", "production", "playbook"],
@@ -88,9 +89,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.codeReviewChecklist,
     agentId: AGENT_IDS.codeReviewer,
-    type: "semantic",
-    visibility: "shared",
-    source: "code_change",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.CODE_CHANGE,
     content:
       "Code review priorities: 1) Security (injection, auth bypass), 2) Data integrity (migrations, schema changes), 3) Performance (N+1 queries, missing indexes), 4) Correctness, 5) Style (auto-handled by oxlint/oxfmt).",
     tags: ["code-review", "checklist", "quality"],
@@ -103,9 +104,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.seoStrategy,
     agentId: AGENT_IDS.seoBot,
-    type: "episodic",
-    visibility: "private",
-    source: "task_completion",
+    type: MemoryType.EPISODIC,
+    visibility: MemoryVisibility.PRIVATE,
+    source: MemorySource.TASK_COMPLETION,
     content:
       "Blog posts with 1500-2500 words rank best for our target keywords. Include 3-5 internal links and 2-3 external authority links. Publish Tuesdays or Wednesdays for peak organic reach.",
     tags: ["seo", "content", "strategy"],
@@ -118,9 +119,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.leadScoringModel,
     agentId: AGENT_IDS.prospector,
-    type: "semantic",
-    visibility: "targeted",
-    source: "inference",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.TARGETED,
+    source: MemorySource.INFERENCE,
     content:
       "Lead scoring weights: Company size (25%), tech stack match (20%), engagement recency (20%), role seniority (15%), industry fit (10%), budget signals (10%). Leads scoring >70 should be routed to Account Manager immediately.",
     tags: ["sales", "leads", "scoring"],
@@ -133,9 +134,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.onboardingFlow,
     agentId: AGENT_IDS.onboardingAgent,
-    type: "episodic",
-    visibility: "shared",
-    source: "observation",
+    type: MemoryType.EPISODIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.OBSERVATION,
     content:
       "New agent onboarding takes 2-3 simulated days. Agents that complete the sandbox tutorial before live tasks have 40% fewer errors in their first week. Always assign a buddy agent at L5+.",
     tags: ["onboarding", "training", "agents"],
@@ -148,9 +149,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.bugTriageRules,
     agentId: AGENT_IDS.bugHunter,
-    type: "semantic",
-    visibility: "shared",
-    source: "task_completion",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.TASK_COMPLETION,
     content:
       "Bug triage: P0 = data loss or security breach (fix immediately), P1 = feature broken for >10% users (fix within 4h), P2 = degraded experience (fix this sprint), P3 = cosmetic/minor (backlog). Always check error logs + Sentry before investigating.",
     tags: ["bugs", "triage", "priorities"],
@@ -163,9 +164,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.copyToneGuide,
     agentId: AGENT_IDS.copywriter,
-    type: "semantic",
-    visibility: "private",
-    source: "code_change",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.PRIVATE,
+    source: MemorySource.CODE_CHANGE,
     content:
       "Brand voice: Professional but approachable. Avoid jargon unless targeting developers. Use active voice. Headlines should be benefit-driven, not feature-driven. Max 3 CTAs per page.",
     tags: ["copy", "brand", "guidelines"],
@@ -178,9 +179,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.frontendPatterns,
     agentId: AGENT_IDS.frontendDev,
-    type: "semantic",
-    visibility: "shared",
-    source: "code_change",
+    type: MemoryType.SEMANTIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.CODE_CHANGE,
     content:
       "Use shadcn/ui components with Tailwind. No barrel files. Keep event handlers in named functions above JSX (handleClickSave, handleChangeName). Animations under 300ms with spring transitions. Respect prefers-reduced-motion.",
     tags: ["frontend", "react", "patterns", "tailwind"],
@@ -193,9 +194,9 @@ export const demoMemories: DemoMemory[] = [
   {
     id: MEMORY_IDS.qaRegressionPlan,
     agentId: AGENT_IDS.qaEngineer,
-    type: "episodic",
-    visibility: "shared",
-    source: "task_completion",
+    type: MemoryType.EPISODIC,
+    visibility: MemoryVisibility.SHARED,
+    source: MemorySource.TASK_COMPLETION,
     content:
       "Regression test suite covers: auth flows, task CRUD, credit transactions, agent spawning, webhook delivery. Run full suite before every release. Flaky tests should be quarantined within 24h, not skipped.",
     tags: ["qa", "testing", "regression"],

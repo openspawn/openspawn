@@ -1,4 +1,5 @@
-import type { DemoEvent, EventSeverity } from "../types";
+import { AgentRole, AgentStatus, EventSeverity, TaskStatus } from "@openspawn/shared-types";
+import type { DemoEvent } from "../types";
 import { AGENT_IDS } from "./agents";
 import { TASK_IDS } from "./tasks";
 
@@ -31,16 +32,16 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "agent.created",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Agent Dennis registered as COO",
     agentId: AGENT_IDS.agentDennis,
     createdAt: daysAgo(0),
-    metadata: { level: 10, role: "hr" },
+    metadata: { level: 10, role: AgentRole.HR },
   },
   {
     id: uuid(),
     type: "agent.created",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Tech Talent Agent spawned by Agent Dennis",
     agentId: AGENT_IDS.techTalent,
     createdAt: daysAgo(2),
@@ -49,7 +50,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "agent.promoted",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Code Reviewer promoted to Level 6",
     agentId: AGENT_IDS.codeReviewer,
     createdAt: daysAgo(12),
@@ -58,16 +59,16 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "agent.status_changed",
-    severity: "warning",
+    severity: EventSeverity.WARNING,
     message: "Bookkeeper paused for maintenance",
     agentId: AGENT_IDS.bookkeeper,
     createdAt: daysAgo(5),
-    metadata: { previousStatus: "active", newStatus: "paused" },
+    metadata: { previousStatus: AgentStatus.ACTIVE, newStatus: AgentStatus.PAUSED },
   },
   {
     id: uuid(),
     type: "agent.created",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "New Intern joined on probation",
     agentId: AGENT_IDS.newIntern,
     createdAt: daysAgo(25),
@@ -78,7 +79,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.created",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Task created: Implement OAuth2 authentication",
     taskId: TASK_IDS.implementAuth,
     agentId: AGENT_IDS.agentDennis,
@@ -87,7 +88,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.assigned",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Bug Hunter assigned to fix memory leak",
     taskId: TASK_IDS.fixBug123,
     agentId: AGENT_IDS.bugHunter,
@@ -96,7 +97,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.completed",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "CI pipeline setup completed",
     taskId: TASK_IDS.setupCI,
     agentId: AGENT_IDS.codeReviewer,
@@ -106,7 +107,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.completed",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Q4 financial report delivered",
     taskId: TASK_IDS.quarterlyReport,
     agentId: AGENT_IDS.analyst,
@@ -118,7 +119,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "credits.allocated",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "Initial budget of 100,000 credits allocated to COO",
     agentId: AGENT_IDS.agentDennis,
     createdAt: daysAgo(0),
@@ -127,7 +128,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "credits.transferred",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "5,000 credits transferred to Tech Talent",
     agentId: AGENT_IDS.techTalent,
     createdAt: daysAgo(10),
@@ -136,7 +137,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "credits.low_balance",
-    severity: "warning",
+    severity: EventSeverity.WARNING,
     message: "New Intern balance below 200 credits",
     agentId: AGENT_IDS.newIntern,
     createdAt: hoursAgo(6),
@@ -147,7 +148,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "system.startup",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "OpenSpawn system initialized",
     createdAt: daysAgo(0),
     metadata: { version: "0.1.0" },
@@ -155,7 +156,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "system.daily_reset",
-    severity: "debug",
+    severity: EventSeverity.DEBUG,
     message: "Daily budget reset job completed",
     createdAt: daysAgo(1),
     metadata: { agentsProcessed: 14 },
@@ -163,7 +164,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "system.health_check",
-    severity: "debug",
+    severity: EventSeverity.DEBUG,
     message: "System health check passed",
     createdAt: hoursAgo(1),
     metadata: { apiLatency: 45, dbLatency: 12 },
@@ -173,17 +174,17 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.status_changed",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "API refactor moved to in_progress",
     taskId: TASK_IDS.apiRefactor,
     agentId: AGENT_IDS.codeReviewer,
     createdAt: hoursAgo(2),
-    metadata: { previousStatus: "assigned", newStatus: "in_progress" },
+    metadata: { previousStatus: TaskStatus.ASSIGNED, newStatus: TaskStatus.IN_PROGRESS },
   },
   {
     id: uuid(),
     type: "credits.spent",
-    severity: "debug",
+    severity: EventSeverity.DEBUG,
     message: "Model usage: 45 credits for claude-sonnet-4",
     agentId: AGENT_IDS.codeReviewer,
     createdAt: hoursAgo(2),
@@ -192,7 +193,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "agent.activity",
-    severity: "debug",
+    severity: EventSeverity.DEBUG,
     message: "SEO Bot analyzing marketing site",
     agentId: AGENT_IDS.seoBot,
     taskId: TASK_IDS.seoAudit,
@@ -201,7 +202,7 @@ export const events: DemoEvent[] = [
   {
     id: uuid(),
     type: "task.review_requested",
-    severity: "info",
+    severity: EventSeverity.INFO,
     message: "PR review requested for caching layer",
     taskId: TASK_IDS.prReview,
     agentId: AGENT_IDS.codeReviewer,

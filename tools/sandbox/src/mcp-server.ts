@@ -3,6 +3,7 @@
 // No external dependencies — raw JSON-RPC handling
 
 import type { DeterministicSimulation } from "./deterministic.js";
+import { ACPMessageType, AgentStatus, TaskStatus } from "@openspawn/shared-types";
 
 // ── JSON-RPC Types ──────────────────────────────────────────────────────────
 
@@ -264,9 +265,10 @@ export class MCPServer {
     if (args.status && typeof args.status === "string") {
       const statusFilter = args.status;
       agents = agents.filter((a) => {
-        if (statusFilter === "idle") return a.status === "idle" || a.status === "active";
-        if (statusFilter === "busy") return a.status === "busy";
-        if (statusFilter === "offline") return a.status === "pending";
+        if (statusFilter === AgentStatus.IDLE)
+          return a.status === AgentStatus.IDLE || a.status === AgentStatus.ACTIVE;
+        if (statusFilter === AgentStatus.BUSY) return a.status === AgentStatus.BUSY;
+        if (statusFilter === "offline") return a.status === AgentStatus.PENDING;
         return true;
       });
     }
@@ -413,7 +415,7 @@ export class MCPServer {
 
     const msg = {
       id: `acp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      type: "delegation" as const,
+      type: ACPMessageType.DELEGATION,
       from: "mcp-client",
       to: agentId,
       taskId: "",
@@ -441,10 +443,13 @@ export class MCPServer {
 
     const result = {
       totalAgents: agents.length,
-      activeAgents: agents.filter((a) => a.status === "active" || a.status === "busy").length,
+      activeAgents: agents.filter(
+        (a) => a.status === AgentStatus.ACTIVE || a.status === AgentStatus.BUSY,
+      ).length,
       totalTasks: tasks.length,
-      completedTasks: tasks.filter((t) => t.status === "done").length,
-      pendingTasks: tasks.filter((t) => !["done", "rejected"].includes(t.status)).length,
+      completedTasks: tasks.filter((t) => t.status === TaskStatus.DONE).length,
+      pendingTasks: tasks.filter((t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status))
+        .length,
     };
 
     return { content: [{ type: "text", text: JSON.stringify(result) }], isError: false };

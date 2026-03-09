@@ -15,6 +15,15 @@ import { createACPMessage, pushMessage } from "./acp.js";
 import { createPRNG, type PRNG } from "./prng.js";
 import type { ScenarioEngine } from "./scenario-engine.js";
 import type { ModelRouter, RouteRequest } from "./model-router.js";
+import {
+  ACPMessageType,
+  AgentRole,
+  AgentStatus,
+  SandboxEscalationReason,
+  TaskPriority,
+  TaskStatus,
+  TriggerMode,
+} from "@openspawn/shared-types";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -128,7 +137,7 @@ function parseOrderIntoTasks(
         .trim();
       if (clean.length > 5) {
         const domain = detectDomain(clean);
-        tasks.push({ title: clean, domain, priority: "high" });
+        tasks.push({ title: clean, domain, priority: TaskPriority.HIGH });
       }
     }
   }
@@ -143,7 +152,7 @@ function parseOrderIntoTasks(
         !tasks.some((t) => t.title.toLowerCase().includes(clean.toLowerCase().slice(0, 20)))
       ) {
         const domain = detectDomain(clean);
-        tasks.push({ title: clean, domain, priority: "high" });
+        tasks.push({ title: clean, domain, priority: TaskPriority.HIGH });
       }
     }
   }
@@ -157,11 +166,11 @@ function parseOrderIntoTasks(
         tasks.push({
           title: `${domain.charAt(0).toUpperCase() + domain.slice(1)} work for: ${order.slice(0, 60)}`,
           domain,
-          priority: "high",
+          priority: TaskPriority.HIGH,
         });
       }
     } else {
-      tasks.push({ title: order.slice(0, 100), domain: domains[0], priority: "high" });
+      tasks.push({ title: order.slice(0, 100), domain: domains[0], priority: TaskPriority.HIGH });
     }
   }
 
@@ -178,7 +187,8 @@ function advanceWork(
 ): { advanced: boolean; done: boolean; status: string } {
   // Work progresses through stages: assigned → in_progress → review → done
   // Each stage takes 2-4 ticks based on priority
-  const ticksPerStage = task.priority === "critical" ? 2 : task.priority === "high" ? 3 : 4;
+  const ticksPerStage =
+    task.priority === TaskPriority.CRITICAL ? 2 : task.priority === TaskPriority.HIGH ? 3 : 4;
   const ticksInCurrentStage = task._stageTickCount || 0;
 
   if (ticksInCurrentStage < ticksPerStage) {
@@ -189,32 +199,32 @@ function advanceWork(
   // Advance to next stage
   task._stageTickCount = 0;
 
-  if (task.status === "assigned") {
-    task.status = "in_progress";
-    return { advanced: true, done: false, status: "in_progress" };
+  if (task.status === TaskStatus.ASSIGNED) {
+    task.status = TaskStatus.IN_PROGRESS;
+    return { advanced: true, done: false, status: TaskStatus.IN_PROGRESS };
   }
-  if (task.status === "in_progress") {
+  if (task.status === TaskStatus.IN_PROGRESS) {
     // 10% chance of getting blocked (adds drama)
     if (rng.chance(0.1)) {
-      task.status = "blocked";
+      task.status = TaskStatus.BLOCKED;
       task.blockedReason = rng.pick([
         "Missing requirements",
         "Dependency not ready",
         "Need clarification",
         "Waiting on external service",
       ]);
-      return { advanced: true, done: false, status: "blocked" };
+      return { advanced: true, done: false, status: TaskStatus.BLOCKED };
     }
-    task.status = "review";
-    return { advanced: true, done: false, status: "review" };
+    task.status = TaskStatus.REVIEW;
+    return { advanced: true, done: false, status: TaskStatus.REVIEW };
   }
-  if (task.status === "review") {
-    task.status = "done";
+  if (task.status === TaskStatus.REVIEW) {
+    task.status = TaskStatus.DONE;
     task.updatedAt = Date.now();
     agent.stats.tasksCompleted++;
     agent.stats.creditsEarned +=
-      task.priority === "critical" ? 100 : task.priority === "high" ? 50 : 25;
-    return { advanced: true, done: true, status: "done" };
+      task.priority === TaskPriority.CRITICAL ? 100 : task.priority === TaskPriority.HIGH ? 50 : 25;
+    return { advanced: true, done: true, status: TaskStatus.DONE };
   }
 
   return { advanced: false, done: false, status: task.status };
@@ -313,9 +323,9 @@ export class DeterministicSimulation {
     // Dynamic spawning: only the COO starts active.
     // All other agents stay in the ORG.md roster (parsedOrg.agents)
     // and get hired/spawned on demand via hireFromRoster().
-    const coo = agents.find((a) => a.role === "coo" || a.level >= 9);
+    const coo = agents.find((a) => a.role === AgentRole.COO || a.level >= 9);
     if (coo) {
-      coo.status = "active";
+      coo.status = AgentStatus.ACTIVE;
       this.agents = [coo];
     } else {
       // Fallback: no COO found, start with all agents
@@ -366,7 +376,7 @@ export class DeterministicSimulation {
   private hireFromRoster(
     manager: SandboxAgent,
     domain: string,
-    role: "lead" | "senior" | "worker" | "intern" = "lead",
+    role: SandboxAgent["role"] = AgentRole.LEAD,
   ): SandboxAgent | undefined {
     const roster = this.parsedOrg?.agents || [];
     const notYetHired = roster.filter((r) => !this.agents.find((a) => a.id === r.id));
@@ -409,7 +419,7 @@ export class DeterministicSimulation {
 
     if (candidate) {
       candidate.parentId = manager.id;
-      candidate.status = "active";
+      candidate.status = AgentStatus.ACTIVE;
       this.agents.push(candidate);
       this.logAgent(
         manager,
@@ -425,7 +435,7 @@ export class DeterministicSimulation {
       });
 
       // ACP hire message
-      const msg = createACPMessage("delegation", manager.id, candidate.id, "", {
+      const msg = createACPMessage(ACPMessageType.DELEGATION, manager.id, candidate.id, "", {
         body: this.rng.pick(HIRE_FLAVORS)(candidate.name, domain),
       });
       pushMessage(this.agents, msg);
@@ -440,7 +450,7 @@ export class DeterministicSimulation {
 
   /** COO receives an order and breaks it down */
   processOrder(order: string): void {
-    const coo = this.agents.find((a) => a.role === "coo" || a.level >= 9);
+    const coo = this.agents.find((a) => a.role === AgentRole.COO || a.level >= 9);
     if (!coo) return;
 
     this.logAgent(coo, `📢 Received order: "${order.slice(0, 80)}..."`);
@@ -452,7 +462,7 @@ export class DeterministicSimulation {
     // Determine which domains need leads
     const neededDomains = [...new Set(taskDefs.map((t) => t.domain))];
     const existingLeadDomains = this.agents
-      .filter((a) => a.role === "lead" && a.parentId === coo.id)
+      .filter((a) => a.role === AgentRole.LEAD && a.parentId === coo.id)
       .map((a) => a.domain.toLowerCase());
 
     // Queue hires for missing domains
@@ -476,7 +486,7 @@ export class DeterministicSimulation {
     while (this.pendingHires.length > 0) {
       const domain = this.pendingHires.shift();
       if (!domain) break;
-      const hired = this.hireFromRoster(coo, domain, "lead");
+      const hired = this.hireFromRoster(coo, domain, AgentRole.LEAD);
       if (!hired) {
         // No roster match — create generic lead
         const name = `${domain.charAt(0).toUpperCase() + domain.slice(1)} Lead`;
@@ -485,7 +495,7 @@ export class DeterministicSimulation {
           const newAgent = makeAgentPublic(
             id,
             name,
-            "lead",
+            AgentRole.LEAD,
             7,
             domain,
             coo.id,
@@ -512,7 +522,7 @@ export class DeterministicSimulation {
         title: taskDef.title,
         description: taskDef.title,
         priority: taskDef.priority,
-        status: "backlog",
+        status: TaskStatus.BACKLOG,
         creatorId: coo.id,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -525,21 +535,27 @@ export class DeterministicSimulation {
       const lead =
         this.agents.find(
           (a) => a.parentId === coo.id && a.domain.toLowerCase().includes(taskDef.domain),
-        ) || this.agents.find((a) => a.parentId === coo.id && a.role === "lead");
+        ) || this.agents.find((a) => a.parentId === coo.id && a.role === AgentRole.LEAD);
 
       if (lead) {
         task.assigneeId = lead.id;
-        task.status = "assigned";
+        task.status = TaskStatus.ASSIGNED;
         lead.taskIds.push(task.id);
 
-        const delegationMsg = createACPMessage("delegation", coo.id, lead.id, task.id, {
-          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
-        });
+        const delegationMsg = createACPMessage(
+          ACPMessageType.DELEGATION,
+          coo.id,
+          lead.id,
+          task.id,
+          {
+            body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
+          },
+        );
         pushMessage(this.agents, delegationMsg);
         task.activityLog.push(delegationMsg);
 
         // Auto-ack
-        const ack = createACPMessage("ack", lead.id, coo.id, task.id, {
+        const ack = createACPMessage(ACPMessageType.ACK, lead.id, coo.id, task.id, {
           body: `Acknowledged: "${task.title}"`,
         });
         pushMessage(this.agents, ack);
@@ -557,7 +573,7 @@ export class DeterministicSimulation {
     // 3. Pick up unassigned backlog tasks (e.g. from scenario engine) and delegate
     //    Process multiple tasks per tick — COO is a coordinator, not a bottleneck
     const unassignedBacklog = this.tasks.filter(
-      (t) => t.status === "backlog" && !t.assigneeId && !t.parentTaskId,
+      (t) => t.status === TaskStatus.BACKLOG && !t.assigneeId && !t.parentTaskId,
     );
     const domainsHiredThisTick = new Set<string>();
     let delegatedThisTick = 0;
@@ -573,20 +589,27 @@ export class DeterministicSimulation {
           (a) =>
             a.parentId === coo.id &&
             a.domain.toLowerCase().includes(domain) &&
-            a.status === "active",
+            a.status === AgentStatus.ACTIVE,
         ) ||
         this.agents.find(
-          (a) => a.parentId === coo.id && a.role === "lead" && a.status === "active",
+          (a) =>
+            a.parentId === coo.id && a.role === AgentRole.LEAD && a.status === AgentStatus.ACTIVE,
         );
 
       if (lead) {
         task.assigneeId = lead.id;
-        task.status = "assigned";
+        task.status = TaskStatus.ASSIGNED;
         lead.taskIds.push(task.id);
 
-        const delegationMsg = createACPMessage("delegation", coo.id, lead.id, task.id, {
-          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
-        });
+        const delegationMsg = createACPMessage(
+          ACPMessageType.DELEGATION,
+          coo.id,
+          lead.id,
+          task.id,
+          {
+            body: this.rng.pick(DELEGATION_FLAVORS)(task.title, lead.name),
+          },
+        );
         pushMessage(this.agents, delegationMsg);
         task.activityLog.push(delegationMsg);
         task.acked = true;
@@ -596,7 +619,7 @@ export class DeterministicSimulation {
         delegatedThisTick++;
       } else if (!domainsHiredThisTick.has(domain)) {
         // No lead for this domain yet — hire one from roster (once per domain per tick)
-        const hired = this.hireFromRoster(coo, domain, "lead");
+        const hired = this.hireFromRoster(coo, domain, AgentRole.LEAD);
         if (hired) {
           this.logAgent(
             coo,
@@ -613,7 +636,8 @@ export class DeterministicSimulation {
   private tickLead(lead: SandboxAgent): void {
     // Find tasks assigned to this lead that haven't been sub-delegated
     const myTasks = this.tasks.filter(
-      (t) => t.assigneeId === lead.id && ["assigned", "backlog"].includes(t.status),
+      (t) =>
+        t.assigneeId === lead.id && [TaskStatus.ASSIGNED, TaskStatus.BACKLOG].includes(t.status),
     );
 
     for (const task of myTasks) {
@@ -621,23 +645,32 @@ export class DeterministicSimulation {
       const workers = this.agents.filter(
         (a) =>
           a.parentId === lead.id &&
-          (a.role === "worker" || a.role === "senior" || a.role === "intern"),
+          (a.role === AgentRole.WORKER ||
+            a.role === AgentRole.SENIOR ||
+            a.role === AgentRole.INTERN),
       );
       const availableWorker = workers.find((a) => {
         const workerTasks = this.tasks.filter(
-          (t) => t.assigneeId === a.id && !["done", "rejected"].includes(t.status),
+          (t) =>
+            t.assigneeId === a.id && ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
         );
         return workerTasks.length < 2; // Max 2 concurrent tasks
       });
 
       if (availableWorker) {
         task.assigneeId = availableWorker.id;
-        task.status = "assigned";
+        task.status = TaskStatus.ASSIGNED;
         availableWorker.taskIds.push(task.id);
 
-        const msg = createACPMessage("delegation", lead.id, availableWorker.id, task.id, {
-          body: this.rng.pick(DELEGATION_FLAVORS)(task.title, availableWorker.name),
-        });
+        const msg = createACPMessage(
+          ACPMessageType.DELEGATION,
+          lead.id,
+          availableWorker.id,
+          task.id,
+          {
+            body: this.rng.pick(DELEGATION_FLAVORS)(task.title, availableWorker.name),
+          },
+        );
         pushMessage(this.agents, msg);
         task.activityLog.push(msg);
         lead.stats.messagesSent++;
@@ -648,7 +681,7 @@ export class DeterministicSimulation {
         const hired = this.hireFromRoster(
           lead,
           lead.domain.toLowerCase(),
-          workers.length === 0 ? "senior" : "worker",
+          workers.length === 0 ? AgentRole.SENIOR : AgentRole.WORKER,
         );
         if (hired) {
           // Will assign on next tick
@@ -665,7 +698,9 @@ export class DeterministicSimulation {
     const myTasks = this.tasks.filter(
       (t) =>
         t.assigneeId === worker.id &&
-        !["done", "rejected", "backlog", "blocked"].includes(t.status),
+        ![TaskStatus.DONE, TaskStatus.REJECTED, TaskStatus.BACKLOG, TaskStatus.BLOCKED].includes(
+          t.status,
+        ),
     );
 
     for (const task of myTasks) {
@@ -676,48 +711,75 @@ export class DeterministicSimulation {
           // Send completion message up the chain
           const parent = this.agents.find((a) => a.id === worker.parentId);
           if (parent) {
-            const completionMsg = createACPMessage("completion", worker.id, parent.id, task.id, {
-              summary: this.rng.pick(COMPLETION_FLAVORS)(task.title),
-              body: `Completed: "${task.title}"`,
-            });
+            const completionMsg = createACPMessage(
+              ACPMessageType.COMPLETION,
+              worker.id,
+              parent.id,
+              task.id,
+              {
+                summary: this.rng.pick(COMPLETION_FLAVORS)(task.title),
+                body: `Completed: "${task.title}"`,
+              },
+            );
             pushMessage(this.agents, completionMsg);
             task.activityLog.push(completionMsg);
             worker.stats.messagesSent++;
             this.logAgent(worker, `✅ Completed "${task.title}"`, task.id);
           }
-        } else if (result.status === "blocked") {
+        } else if (result.status === TaskStatus.BLOCKED) {
           // Escalate
           const parent = this.agents.find((a) => a.id === worker.parentId);
           if (parent) {
-            const escMsg = createACPMessage("escalation", worker.id, parent.id, task.id, {
-              reason: "BLOCKED",
-              body: this.rng.pick(ESCALATION_FLAVORS)(task.title, task.blockedReason || "Unknown"),
-            });
+            const escMsg = createACPMessage(
+              ACPMessageType.ESCALATION,
+              worker.id,
+              parent.id,
+              task.id,
+              {
+                reason: SandboxEscalationReason.BLOCKED,
+                body: this.rng.pick(ESCALATION_FLAVORS)(
+                  task.title,
+                  task.blockedReason || "Unknown",
+                ),
+              },
+            );
             pushMessage(this.agents, escMsg);
             task.activityLog.push(escMsg);
             worker.stats.messagesSent++;
             this.logAgent(worker, `⬆️ Escalated "${task.title}": ${task.blockedReason}`, task.id);
           }
-        } else if (result.status === "in_progress") {
+        } else if (result.status === TaskStatus.IN_PROGRESS) {
           // Progress message
           const parent = this.agents.find((a) => a.id === worker.parentId);
           if (parent) {
-            const progressMsg = createACPMessage("progress", worker.id, parent.id, task.id, {
-              body: this.rng.pick(PROGRESS_FLAVORS)(task.title),
-              pct: 30,
-            });
+            const progressMsg = createACPMessage(
+              ACPMessageType.PROGRESS,
+              worker.id,
+              parent.id,
+              task.id,
+              {
+                body: this.rng.pick(PROGRESS_FLAVORS)(task.title),
+                pct: 30,
+              },
+            );
             pushMessage(this.agents, progressMsg);
             task.activityLog.push(progressMsg);
             worker.stats.messagesSent++;
           }
           this.logAgent(worker, `🔨 Working on "${task.title}" → ${result.status}`, task.id);
-        } else if (result.status === "review") {
+        } else if (result.status === TaskStatus.REVIEW) {
           const parent = this.agents.find((a) => a.id === worker.parentId);
           if (parent) {
-            const progressMsg = createACPMessage("progress", worker.id, parent.id, task.id, {
-              body: `"${task.title}" ready for review`,
-              pct: 80,
-            });
+            const progressMsg = createACPMessage(
+              ACPMessageType.PROGRESS,
+              worker.id,
+              parent.id,
+              task.id,
+              {
+                body: `"${task.title}" ready for review`,
+                pct: 80,
+              },
+            );
             pushMessage(this.agents, progressMsg);
             task.activityLog.push(progressMsg);
           }
@@ -730,14 +792,16 @@ export class DeterministicSimulation {
   /** Handle blocked tasks: manager unblocks after a few ticks */
   private tickUnblock(manager: SandboxAgent): void {
     const blockedTasks = this.tasks.filter(
-      (t) => t.status === "blocked" && (t.creatorId === manager.id || t.assigneeId === manager.id),
+      (t) =>
+        t.status === TaskStatus.BLOCKED &&
+        (t.creatorId === manager.id || t.assigneeId === manager.id),
     );
 
     for (const task of blockedTasks) {
       const ticksBlocked = task._blockedTicks || 0;
       if (ticksBlocked >= 3) {
         // Manager "resolves" the blocker
-        task.status = "in_progress";
+        task.status = TaskStatus.IN_PROGRESS;
         task.blockedReason = undefined;
         task._blockedTicks = 0;
         task._stageTickCount = 0;
@@ -753,8 +817,10 @@ export class DeterministicSimulation {
   async runTick(): Promise<void> {
     this.tick++;
 
-    const done = this.tasks.filter((t) => t.status === "done").length;
-    const active = this.tasks.filter((t) => !["done", "rejected"].includes(t.status)).length;
+    const done = this.tasks.filter((t) => t.status === TaskStatus.DONE).length;
+    const active = this.tasks.filter(
+      (t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+    ).length;
 
     console.log(`\n${"═".repeat(60)}`);
     console.log(`🕐 TICK ${this.tick}`);
@@ -770,17 +836,17 @@ export class DeterministicSimulation {
 
     // Process agents by level (top-down) — only active agents
     const sortedAgents = [...this.agents]
-      .filter((a) => a.status === "active")
+      .filter((a) => a.status === AgentStatus.ACTIVE)
       .sort((a, b) => b.level - a.level);
 
     for (const agent of sortedAgents) {
       // Skip agents already handled by LLM (populated by LLMSimulation subclass)
       if (this.skipAgentIds.has(agent.id)) continue;
 
-      if (agent.role === "coo" || agent.level >= 9) {
+      if (agent.role === AgentRole.COO || agent.level >= 9) {
         this.tickCOO(agent);
         this.tickUnblock(agent);
-      } else if (agent.role === "lead") {
+      } else if (agent.role === AgentRole.LEAD) {
         this.tickLead(agent);
         this.tickUnblock(agent);
       } else {
@@ -801,7 +867,7 @@ export class DeterministicSimulation {
     if (modelRouter) {
       const workingAgents = sortedAgents.filter((a) => {
         const activeTasks = this.tasks.filter(
-          (t) => t.assigneeId === a.id && t.status === "in_progress",
+          (t) => t.assigneeId === a.id && t.status === TaskStatus.IN_PROGRESS,
         );
         return activeTasks.length > 0;
       });
@@ -815,9 +881,9 @@ export class DeterministicSimulation {
           "simple",
         ];
         const taskType =
-          agent.role === "coo"
+          agent.role === AgentRole.COO
             ? "delegation"
-            : agent.role === "lead"
+            : agent.role === AgentRole.LEAD
               ? "analysis"
               : this.rng.pick(taskTypes);
         const decision = modelRouter.route({
@@ -843,11 +909,11 @@ export class DeterministicSimulation {
     this.metricsHistory.push({
       tick: this.tick,
       timestamp: Date.now(),
-      activeAgents: this.agents.filter((a) => a.status === "active").length,
+      activeAgents: this.agents.filter((a) => a.status === AgentStatus.ACTIVE).length,
       totalTasks: this.tasks.length,
-      tasksDone: this.tasks.filter((t) => t.status === "done").length,
-      tasksInProgress: this.tasks.filter((t) => t.status === "in_progress").length,
-      tasksInReview: this.tasks.filter((t) => t.status === "review").length,
+      tasksDone: this.tasks.filter((t) => t.status === TaskStatus.DONE).length,
+      tasksInProgress: this.tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS).length,
+      tasksInReview: this.tasks.filter((t) => t.status === TaskStatus.REVIEW).length,
       totalCreditsEarned: this.agents.reduce((s, a) => s + a.stats.creditsEarned, 0),
       totalCreditsSpent: this.agents.reduce((s, a) => s + a.stats.creditsSpent, 0),
       messageCount: this.agents.reduce((s, a) => s + a.stats.messagesSent, 0),
@@ -869,7 +935,7 @@ export class DeterministicSimulation {
       this.agents = [...this.parsedOrg.agents];
       this.log(`🔄 Reset — full ORG.md reload (${this.agents.length} agents)`);
     } else if (this.parsedOrg) {
-      const coo = this.parsedOrg.agents.find((a) => a.role === "coo");
+      const coo = this.parsedOrg.agents.find((a) => a.role === AgentRole.COO);
       if (coo) {
         this.agents = [
           {
@@ -877,8 +943,12 @@ export class DeterministicSimulation {
             taskIds: [],
             recentMessages: [],
             inbox: [],
-            trigger: coo.trigger ?? "event-driven",
-            triggerOn: coo.triggerOn ?? ["escalation", "completion", "delegation"],
+            trigger: coo.trigger ?? TriggerMode.EVENT_DRIVEN,
+            triggerOn: coo.triggerOn ?? [
+              ACPMessageType.ESCALATION,
+              ACPMessageType.COMPLETION,
+              ACPMessageType.DELEGATION,
+            ],
             stats: {
               tasksCompleted: 0,
               tasksFailed: 0,
@@ -918,8 +988,10 @@ export class DeterministicSimulation {
     console.log(`\n${"─".repeat(60)}`);
     console.log(`📊 SUMMARY (Tick ${this.tick})`);
     console.log(`${"─".repeat(60)}`);
-    const done = this.tasks.filter((t) => t.status === "done").length;
-    const active = this.tasks.filter((t) => !["done", "rejected"].includes(t.status)).length;
+    const done = this.tasks.filter((t) => t.status === TaskStatus.DONE).length;
+    const active = this.tasks.filter(
+      (t) => ![TaskStatus.DONE, TaskStatus.REJECTED].includes(t.status),
+    ).length;
     console.log(`Tasks: ${done} done / ${active} active / ${this.tasks.length} total`);
     console.log(`Agents: ${this.agents.length}`);
     const totalMessages = this.agents.reduce((sum, a) => sum + a.stats.messagesSent, 0);

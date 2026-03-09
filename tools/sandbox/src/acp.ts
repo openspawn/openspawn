@@ -3,6 +3,7 @@
 // Used by all simulation engines for creating and routing ACP messages.
 
 import type { SandboxAgent, ACPMessage } from "./types.js";
+import { TriggerMode } from "@openspawn/shared-types";
 
 let acpCounter = 0;
 
@@ -36,7 +37,7 @@ export function pushMessage(agents: SandboxAgent[], msg: ACPMessage): void {
         agent.recentMessages = agent.recentMessages.slice(-10);
       }
     }
-    if (agent.id === msg.to && agent.trigger === "event-driven") {
+    if (agent.id === msg.to && agent.trigger === TriggerMode.EVENT_DRIVEN) {
       if (!agent.triggerOn || agent.triggerOn.includes(msg.type)) {
         agent.inbox.push(msg);
       }

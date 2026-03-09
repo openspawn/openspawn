@@ -3,6 +3,7 @@
 // Each agent gets a unique system prompt defining their personality and responsibilities
 
 import type { SandboxAgent } from "./types.js";
+import { ACPMessageType, AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 
 function makeAgent(
   id: string,
@@ -12,7 +13,7 @@ function makeAgent(
   domain: string,
   parentId: string | undefined,
   personality: string,
-  triggerOverride?: { trigger: "polling" | "event-driven"; triggerOn?: SandboxAgent["triggerOn"] },
+  triggerOverride?: { trigger: TriggerMode; triggerOn?: SandboxAgent["triggerOn"] },
 ): SandboxAgent {
   const canSpawn = level >= 7;
   const roleInstruction =
@@ -39,9 +40,16 @@ Respond with JSON ONLY. Actions:
 - {"action":"idle"}`;
 
   // Determine trigger mode: L7+ default to event-driven, L1-6 to polling
-  const defaultTrigger: "polling" | "event-driven" = level >= 7 ? "event-driven" : "polling";
+  const defaultTrigger = level >= 7 ? TriggerMode.EVENT_DRIVEN : TriggerMode.POLLING;
   const defaultTriggerOn: SandboxAgent["triggerOn"] =
-    level >= 7 ? ["escalation", "completion", "delegation", "status_request"] : undefined;
+    level >= 7
+      ? [
+          ACPMessageType.ESCALATION,
+          ACPMessageType.COMPLETION,
+          ACPMessageType.DELEGATION,
+          ACPMessageType.STATUS_REQUEST,
+        ]
+      : undefined;
 
   return {
     id,
@@ -50,7 +58,7 @@ Respond with JSON ONLY. Actions:
     level,
     domain,
     parentId,
-    status: "active",
+    status: AgentStatus.ACTIVE,
     systemPrompt,
     taskIds: [],
     recentMessages: [],
@@ -73,7 +81,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "mr-krabs",
       "Mr. Krabs",
-      "coo",
+      AgentRole.COO,
       10,
       "Operations",
       undefined,
@@ -84,7 +92,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "tech-talent",
       "Tech Talent Agent",
-      "talent",
+      AgentRole.TALENT,
       9,
       "Engineering",
       "mr-krabs",
@@ -93,7 +101,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "finance-talent",
       "Finance Talent Agent",
-      "talent",
+      AgentRole.TALENT,
       9,
       "Finance",
       "mr-krabs",
@@ -102,7 +110,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "marketing-talent",
       "Marketing Talent Agent",
-      "talent",
+      AgentRole.TALENT,
       9,
       "Marketing",
       "mr-krabs",
@@ -111,7 +119,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "sales-talent",
       "Sales Talent Agent",
-      "talent",
+      AgentRole.TALENT,
       9,
       "Sales",
       "mr-krabs",
@@ -122,7 +130,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "support-lead",
       "Support Lead",
-      "lead",
+      AgentRole.LEAD,
       7,
       "Support",
       "mr-krabs",
@@ -131,7 +139,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "hr-coordinator",
       "HR Coordinator",
-      "lead",
+      AgentRole.LEAD,
       6,
       "HR",
       "mr-krabs",
@@ -142,7 +150,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "code-reviewer",
       "Code Reviewer",
-      "senior",
+      AgentRole.SENIOR,
       6,
       "Engineering",
       "tech-talent",
@@ -151,7 +159,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "copywriter",
       "Copywriter",
-      "senior",
+      AgentRole.SENIOR,
       6,
       "Marketing",
       "marketing-talent",
@@ -162,7 +170,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "analyst",
       "Data Analyst",
-      "senior",
+      AgentRole.SENIOR,
       5,
       "Finance",
       "finance-talent",
@@ -171,7 +179,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "account-mgr",
       "Account Manager",
-      "senior",
+      AgentRole.SENIOR,
       5,
       "Sales",
       "finance-talent",
@@ -180,7 +188,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "escalation-spec",
       "Escalation Specialist",
-      "senior",
+      AgentRole.SENIOR,
       5,
       "Support",
       "support-lead",
@@ -191,7 +199,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "bug-hunter",
       "Bug Hunter",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Engineering",
       "tech-talent",
@@ -200,7 +208,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "frontend-dev",
       "Frontend Dev",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Engineering",
       "tech-talent",
@@ -209,7 +217,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "seo-bot",
       "SEO Bot",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Marketing",
       "marketing-talent",
@@ -218,7 +226,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "qa-engineer",
       "QA Engineer",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Engineering",
       "tech-talent",
@@ -227,7 +235,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "recruiter",
       "Recruiter Bot",
-      "worker",
+      AgentRole.WORKER,
       4,
       "HR",
       "hr-coordinator",
@@ -236,7 +244,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "tier2-tech",
       "Tier 2 Tech",
-      "worker",
+      AgentRole.WORKER,
       4,
       "Support",
       "support-lead",
@@ -247,7 +255,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "bookkeeper",
       "Bookkeeper",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Finance",
       "finance-talent",
@@ -256,7 +264,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "prospector",
       "Lead Prospector",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Sales",
       "sales-talent",
@@ -265,7 +273,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "outbound-rep",
       "Outbound Rep",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Sales",
       "sales-talent",
@@ -274,7 +282,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "onboarding",
       "Onboarding Agent",
-      "worker",
+      AgentRole.WORKER,
       3,
       "HR",
       "hr-coordinator",
@@ -283,7 +291,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "tier1-a",
       "Tier 1 Helper",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Support",
       "support-lead",
@@ -292,7 +300,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "tier1-b",
       "Tier 1 Responder",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Support",
       "support-lead",
@@ -301,7 +309,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "qa-automation",
       "QA Automation",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Engineering",
       "tech-talent",
@@ -310,7 +318,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "analytics-bot",
       "Analytics Bot",
-      "worker",
+      AgentRole.WORKER,
       3,
       "Marketing",
       "marketing-talent",
@@ -321,7 +329,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "intern-1",
       "New Intern",
-      "intern",
+      AgentRole.INTERN,
       1,
       "Engineering",
       "code-reviewer",
@@ -330,7 +338,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "intern-2",
       "Marketing Intern",
-      "intern",
+      AgentRole.INTERN,
       1,
       "Marketing",
       "copywriter",
@@ -339,7 +347,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "trainee-support",
       "Support Trainee",
-      "intern",
+      AgentRole.INTERN,
       2,
       "Support",
       "tier1-a",
@@ -348,7 +356,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "trainee-sales",
       "Sales Trainee",
-      "intern",
+      AgentRole.INTERN,
       2,
       "Sales",
       "prospector",
@@ -357,7 +365,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "trainee-finance",
       "Finance Trainee",
-      "intern",
+      AgentRole.INTERN,
       2,
       "Finance",
       "bookkeeper",
@@ -366,7 +374,7 @@ export function createAgents(): SandboxAgent[] {
     makeAgent(
       "trainee-eng",
       "Engineering Trainee",
-      "intern",
+      AgentRole.INTERN,
       2,
       "Engineering",
       "frontend-dev",
@@ -384,7 +392,7 @@ export function createCOO(): SandboxAgent[] {
     makeAgent(
       "mr-krabs",
       "Mr. Krabs",
-      "coo",
+      AgentRole.COO,
       10,
       "Operations",
       undefined,

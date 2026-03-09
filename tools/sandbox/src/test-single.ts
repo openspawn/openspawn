@@ -2,6 +2,7 @@
 import { createAgents } from "./agents.js";
 import { buildContext, initOllama, getAgentDecision } from "./ollama.js";
 import type { SandboxTask, SandboxConfig } from "./types.js";
+import { TaskPriority, TaskStatus, TriggerMode } from "@openspawn/shared-types";
 
 const config: SandboxConfig = {
   model: "qwen3:0.6b",
@@ -10,7 +11,7 @@ const config: SandboxConfig = {
   maxConcurrentInferences: 1,
   contextWindowTokens: 2048,
   verbose: true,
-  defaultTrigger: "polling",
+  defaultTrigger: TriggerMode.POLLING,
 };
 
 initOllama(config);
@@ -23,8 +24,8 @@ const tasks: SandboxTask[] = [
     id: "TASK-0001",
     title: "Fix Safari login crash",
     description: "",
-    priority: "critical",
-    status: "backlog",
+    priority: TaskPriority.CRITICAL,
+    status: TaskStatus.BACKLOG,
     creatorId: "dennis",
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -35,8 +36,8 @@ const tasks: SandboxTask[] = [
     id: "TASK-0002",
     title: "Q1 financial report",
     description: "",
-    priority: "high",
-    status: "backlog",
+    priority: TaskPriority.HIGH,
+    status: TaskStatus.BACKLOG,
     creatorId: "dennis",
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -47,8 +48,8 @@ const tasks: SandboxTask[] = [
     id: "TASK-0003",
     title: "Launch blog post for v2.0",
     description: "",
-    priority: "high",
-    status: "backlog",
+    priority: TaskPriority.HIGH,
+    status: TaskStatus.BACKLOG,
     creatorId: "dennis",
     createdAt: Date.now(),
     updatedAt: Date.now(),

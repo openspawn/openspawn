@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
+import { TaskStatus, AgentStatus } from "@openspawn/shared-types";
 
 // ─── Row types (mirror the SQLite schema) ────────────────────────────────────
 
@@ -211,12 +212,13 @@ export function createTask(
 export function claimTask(db: Database.Database, taskId: string, agentId: string) {
   const task = db.prepare<[string], TaskRow>("SELECT * FROM tasks WHERE id = ?").get(taskId);
   if (!task) throw new Error(`Task ${taskId} not found`);
-  if (task.status !== "todo") throw new Error(`Task ${taskId} is ${task.status}, not claimable`);
+  if (task.status !== TaskStatus.TODO)
+    throw new Error(`Task ${taskId} is ${task.status}, not claimable`);
 
   db.prepare(`
-    UPDATE tasks SET assignee = ?, status = 'in_progress', updated_at = datetime('now')
+    UPDATE tasks SET assignee = ?, status = ?, updated_at = datetime('now')
     WHERE id = ?
-  `).run(agentId, taskId);
+  `).run(agentId, TaskStatus.IN_PROGRESS, taskId);
   logEvent(db, agentId, "task.claim", { taskId }, taskId);
 }
 
@@ -231,9 +233,9 @@ export function completeTask(
 
   db.prepare(`
     UPDATE tasks
-    SET status = 'done', completed_at = datetime('now'), updated_at = datetime('now'), result = ?
+    SET status = ?, completed_at = datetime('now'), updated_at = datetime('now'), result = ?
     WHERE id = ?
-  `).run(result ? JSON.stringify(result) : null, taskId);
+  `).run(TaskStatus.DONE, result ? JSON.stringify(result) : null, taskId);
   logEvent(db, agentId, "task.complete", { taskId, result: result ?? null }, taskId);
 }
 

@@ -1,20 +1,36 @@
-// Types matching our GraphQL schema
+// Re-export enums from shared-types (replaces local string union aliases)
+export {
+  AgentRole,
+  AgentStatus,
+  TaskStatus,
+  TaskPriority,
+  CreditType,
+  EventSeverity,
+  ReputationLevel,
+  DemoMessageCategory,
+  IdleReason,
+  MemoryType,
+  MemoryVisibility,
+  MemorySource,
+  SimulationEventType,
+  WebhookHookType,
+} from "@openspawn/shared-types";
 
-export type AgentRole = "hr" | "manager" | "senior" | "worker";
-export type AgentStatus = "pending" | "active" | "paused" | "suspended" | "revoked";
-export type TaskStatus =
-  | "backlog"
-  | "pending"
-  | "assigned"
-  | "in_progress"
-  | "review"
-  | "done"
-  | "cancelled";
-export type TaskPriority = "low" | "normal" | "high" | "critical";
-export type CreditType = "CREDIT" | "DEBIT";
-export type EventSeverity = "debug" | "info" | "success" | "warning" | "error" | "critical";
-
-export type ReputationLevel = "NEW" | "PROBATION" | "TRUSTED" | "VETERAN" | "ELITE";
+import type {
+  AgentRole,
+  AgentStatus,
+  TaskStatus,
+  TaskPriority,
+  CreditType,
+  EventSeverity,
+  ReputationLevel,
+  DemoMessageCategory,
+  MemoryType,
+  MemoryVisibility,
+  MemorySource,
+  SimulationEventType,
+  WebhookHookType,
+} from "@openspawn/shared-types";
 
 export interface DemoAgent {
   id: string;
@@ -97,14 +113,12 @@ export interface DemoEvent {
   taskId?: string;
 }
 
-export type MessageType = "task" | "status" | "report" | "question" | "escalation" | "general";
-
 export interface DemoMessage {
   id: string;
   fromAgentId: string;
   toAgentId: string;
   content: string;
-  type: MessageType;
+  type: DemoMessageCategory;
   taskRef?: string;
   read: boolean;
   createdAt: string;
@@ -167,31 +181,8 @@ export interface SimulationState {
   simulatedTime: Date;
 }
 
-export type IdleReason =
-  | "task_complete"
-  | "blocked"
-  | "awaiting_input"
-  | "unassigned"
-  | "newly_activated";
-
 export interface SimulationEvent {
-  type:
-    | "agent_created"
-    | "agent_activated"
-    | "agent_promoted"
-    | "agent_terminated"
-    | "agent_status_changed"
-    | "agent_despawned"
-    | "agent_idle"
-    | "task_created"
-    | "task_assigned"
-    | "task_completed"
-    | "task_completion_rejected"
-    | "credit_earned"
-    | "credit_spent"
-    | "prehook_blocked"
-    | "prehook_allowed"
-    | "system_event";
+  type: SimulationEventType;
   payload: unknown;
   timestamp: Date;
 }
@@ -202,7 +193,7 @@ export interface DemoWebhook {
   url: string;
   events: string[];
   enabled: boolean;
-  hookType: "pre" | "post";
+  hookType: WebhookHookType;
   canBlock: boolean;
   timeoutMs: number;
   failureCount: number;
@@ -210,15 +201,6 @@ export interface DemoWebhook {
   lastError?: string;
   createdAt: string;
 }
-
-export type MemoryType = "episodic" | "semantic" | "graph";
-export type MemoryVisibility = "shared" | "private" | "targeted";
-export type MemorySource =
-  | "task_completion"
-  | "code_change"
-  | "observation"
-  | "inference"
-  | "unknown";
 
 export interface DemoMemory {
   id: string;

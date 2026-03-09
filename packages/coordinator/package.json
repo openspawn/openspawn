@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "@openspawn/shared-types": "workspace:*",
     "better-sqlite3": "^11.10.0",
     "zod": "^4.3.0"
   },

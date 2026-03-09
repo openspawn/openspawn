@@ -42,6 +42,7 @@ import { useSidePanel } from "../contexts";
 import { TeamFilterDropdown } from "../components/team-badge";
 import { useTeams } from "../hooks";
 import { AgentStatus } from "@openspawn/dashboard-data";
+import { AgentStatus as SharedAgentStatus } from "@openspawn/shared-types";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 // Extracted sub-components
@@ -275,10 +276,10 @@ export function AgentsPage() {
                   className="px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring min-h-[44px] sm:min-h-0"
                 >
                   <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="pending">Pending</option>
-                  <option value="paused">Paused</option>
-                  <option value="suspended">Suspended</option>
+                  <option value={SharedAgentStatus.ACTIVE}>Active</option>
+                  <option value={SharedAgentStatus.PENDING}>Pending</option>
+                  <option value={SharedAgentStatus.PAUSED}>Paused</option>
+                  <option value={SharedAgentStatus.SUSPENDED}>Suspended</option>
                 </select>
 
                 <select

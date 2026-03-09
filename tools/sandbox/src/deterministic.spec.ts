@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { DeterministicSimulation } from "./deterministic.js";
 import { makeAgentPublic } from "./agents.js";
 import { parseOrgMdContent } from "./org-parser.js";
+import { ACPMessageType, AgentRole, TaskStatus, TriggerMode } from "@openspawn/shared-types";
 import type { SandboxAgent, SandboxConfig, SandboxEvent } from "./types.js";
 
 // ── Test Helpers ─────────────────────────────────────────────────────────────
@@ -13,14 +14,14 @@ const DEFAULT_CONFIG: SandboxConfig = {
   maxConcurrentInferences: 1,
   contextWindowTokens: 4096,
   verbose: false,
-  defaultTrigger: "event-driven",
+  defaultTrigger: TriggerMode.EVENT_DRIVEN,
 };
 
 /** Fixed seed for deterministic tests */
 const TEST_SEED = 42;
 
 function makeCOO(id = "coo", name = "COO"): SandboxAgent {
-  return makeAgentPublic(id, name, "coo", 10, "Operations", undefined, "Test COO");
+  return makeAgentPublic(id, name, AgentRole.COO, 10, "Operations", undefined, "Test COO");
 }
 
 function makeLead(
@@ -29,7 +30,7 @@ function makeLead(
   parentId: string,
   domain = "Engineering",
 ): SandboxAgent {
-  return makeAgentPublic(id, name, "lead", 7, domain, parentId, `Test lead for ${domain}`);
+  return makeAgentPublic(id, name, AgentRole.LEAD, 7, domain, parentId, `Test lead for ${domain}`);
 }
 
 function makeWorker(
@@ -38,7 +39,15 @@ function makeWorker(
   parentId: string,
   domain = "Engineering",
 ): SandboxAgent {
-  return makeAgentPublic(id, name, "worker", 4, domain, parentId, `Test worker in ${domain}`);
+  return makeAgentPublic(
+    id,
+    name,
+    AgentRole.WORKER,
+    4,
+    domain,
+    parentId,
+    `Test worker in ${domain}`,
+  );
 }
 
 /** Suppress console output during tests */
@@ -275,7 +284,7 @@ describe("DeterministicSimulation", () => {
       for (let i = 0; i < 20; i++) await sim.runTick();
 
       // At least some tasks should have progressed beyond backlog
-      const nonBacklog = sim.tasks.filter((t) => t.status !== "backlog");
+      const nonBacklog = sim.tasks.filter((t) => t.status !== TaskStatus.BACKLOG);
       expect(nonBacklog.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -293,7 +302,7 @@ describe("DeterministicSimulation", () => {
       for (let i = 0; i < 30; i++) await sim.runTick();
 
       const totalCompleted = sim.agents.reduce((s, a) => s + a.stats.tasksCompleted, 0);
-      const doneTasks = sim.tasks.filter((t) => t.status === "done").length;
+      const doneTasks = sim.tasks.filter((t) => t.status === TaskStatus.DONE).length;
 
       // At least some work should complete in 30 ticks
       expect(totalCompleted + doneTasks).toBeGreaterThanOrEqual(0); // Soft check — completion depends on RNG
@@ -316,7 +325,7 @@ describe("DeterministicSimulation", () => {
         const task = assignedTasks[0];
         expect(task.activityLog.length).toBeGreaterThanOrEqual(1);
 
-        const delegationMsg = task.activityLog.find((m) => m.type === "delegation");
+        const delegationMsg = task.activityLog.find((m) => m.type === ACPMessageType.DELEGATION);
         expect(delegationMsg).toBeDefined();
         expect(delegationMsg?.from).toBe("coo");
       }

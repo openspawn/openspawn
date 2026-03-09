@@ -1,3 +1,12 @@
+import {
+  AgentStatus,
+  CreditType,
+  DemoMessageCategory,
+  EventSeverity,
+  SimulationEventType,
+  TaskStatus,
+  WebhookHookType,
+} from "@openspawn/shared-types";
 import type {
   DemoScenario,
   SimulationState,
@@ -7,8 +16,6 @@ import type {
   DemoCreditTransaction,
   DemoEvent,
   DemoMessage,
-  TaskStatus,
-  AgentStatus,
 } from "../types";
 import {
   generateRandomAgent,
@@ -50,9 +57,9 @@ const PROBABILITIES = {
 
 // Demo webhooks for simulation
 const DEMO_WEBHOOKS = [
-  { name: "Compliance Check", hookType: "pre" as const, canBlock: true, blockChance: 0.15 },
-  { name: "Budget Guard", hookType: "pre" as const, canBlock: true, blockChance: 0.1 },
-  { name: "QA Review", hookType: "pre" as const, canBlock: true, blockChance: 0.08 },
+  { name: "Compliance Check", hookType: WebhookHookType.PRE, canBlock: true, blockChance: 0.15 },
+  { name: "Budget Guard", hookType: WebhookHookType.PRE, canBlock: true, blockChance: 0.1 },
+  { name: "QA Review", hookType: WebhookHookType.PRE, canBlock: true, blockChance: 0.08 },
 ];
 
 // QA rejection reasons for task completion
@@ -84,14 +91,14 @@ const CAPACITY_BY_LEVEL: Record<number, number> = {
 };
 
 // Task status flow
-const TASK_STATUS_FLOW: Record<TaskStatus, TaskStatus | null> = {
-  backlog: "pending",
-  pending: "assigned",
-  assigned: "in_progress",
-  in_progress: "review",
-  review: "done",
-  done: null,
-  cancelled: null,
+const TASK_STATUS_FLOW: Partial<Record<TaskStatus, TaskStatus | null>> = {
+  [TaskStatus.BACKLOG]: TaskStatus.PENDING,
+  [TaskStatus.PENDING]: TaskStatus.ASSIGNED,
+  [TaskStatus.ASSIGNED]: TaskStatus.IN_PROGRESS,
+  [TaskStatus.IN_PROGRESS]: TaskStatus.REVIEW,
+  [TaskStatus.REVIEW]: TaskStatus.DONE,
+  [TaskStatus.DONE]: null,
+  [TaskStatus.CANCELLED]: null,
 };
 
 // Random element from array
@@ -124,7 +131,7 @@ export class SimulationEngine {
     if (this.state.scenario.events.length === 0) {
       const startEvent = generateEvent(
         "system.started",
-        "info",
+        EventSeverity.INFO,
         `Simulation started with ${this.state.scenario.agents.length} agent(s)`,
         { metadata: { scenarioName: scenario.name } },
       );
@@ -331,7 +338,7 @@ export class SimulationEngine {
   private createAgent(): SimulationEvent | null {
     // Higher level agents can spawn new agents (L7+ can spawn, L9+ preferred)
     const activeAgents = this.state.scenario.agents.filter(
-      (a) => a.status === "active" && a.level >= 7,
+      (a) => a.status === AgentStatus.ACTIVE && a.level >= 7,
     );
     if (activeAgents.length === 0) return null;
 
@@ -344,21 +351,21 @@ export class SimulationEngine {
       parentId: parent.id,
       domain: parent.domain,
       level: startLevel,
-      status: "pending",
+      status: AgentStatus.PENDING,
     });
 
     this.state.scenario.agents.push(newAgent);
 
     const systemEvent = generateEvent(
       "agent.created",
-      "info",
+      EventSeverity.INFO,
       `${newAgent.name} spawned by ${parent.name}`,
       { agentId: newAgent.id, metadata: { parentId: parent.id } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "agent_created",
+      type: SimulationEventType.AGENT_CREATED,
       payload: newAgent,
       timestamp: new Date(),
     };
@@ -367,19 +374,19 @@ export class SimulationEngine {
   private activatePendingAgent(): SimulationEvent | null {
     // Find active parents who have pending children and capacity
     const parentsWithCapacity = this.state.scenario.agents.filter((parent) => {
-      if (parent.status !== "active") return false;
+      if (parent.status !== AgentStatus.ACTIVE) return false;
 
       const maxCapacity = CAPACITY_BY_LEVEL[parent.level] || 0;
       if (maxCapacity === 0) return false;
 
       // Count active children
       const activeChildren = this.state.scenario.agents.filter(
-        (a) => a.parentId === parent.id && a.status === "active",
+        (a) => a.parentId === parent.id && a.status === AgentStatus.ACTIVE,
       ).length;
 
       // Check if parent has pending children
       const pendingChildren = this.state.scenario.agents.filter(
-        (a) => a.parentId === parent.id && a.status === "pending",
+        (a) => a.parentId === parent.id && a.status === AgentStatus.PENDING,
       );
 
       return activeChildren < maxCapacity && pendingChildren.length > 0;
@@ -393,11 +400,11 @@ export class SimulationEngine {
 
     // Get their pending children (activate oldest first - FIFO)
     const pendingChildren = this.state.scenario.agents
-      .filter((a) => a.parentId === parent.id && a.status === "pending")
+      .filter((a) => a.parentId === parent.id && a.status === AgentStatus.PENDING)
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     const child = pendingChildren[0];
-    child.status = "active";
+    child.status = AgentStatus.ACTIVE;
 
     // Activation bonus credits from parent
     const activationBonus = 50;
@@ -406,14 +413,14 @@ export class SimulationEngine {
 
     const systemEvent = generateEvent(
       "agent.activated",
-      "success",
+      EventSeverity.SUCCESS,
       `${parent.name} activated ${child.name}`,
       { agentId: child.id, metadata: { activatedBy: parent.id } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "agent_activated",
+      type: SimulationEventType.AGENT_ACTIVATED,
       payload: { agent: child, activatedBy: parent },
       timestamp: new Date(),
     };
@@ -421,7 +428,7 @@ export class SimulationEngine {
 
   private promoteAgent(): SimulationEvent | null {
     const eligibleAgents = this.state.scenario.agents.filter(
-      (a) => a.status === "active" && a.level < 9,
+      (a) => a.status === AgentStatus.ACTIVE && a.level < 9,
     );
     if (eligibleAgents.length === 0) return null;
 
@@ -436,14 +443,14 @@ export class SimulationEngine {
 
     const systemEvent = generateEvent(
       "agent.promoted",
-      "info",
+      EventSeverity.INFO,
       `${agent.name} promoted to Level ${agent.level}`,
       { agentId: agent.id, metadata: { previousLevel: oldLevel, newLevel: agent.level } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "agent_promoted",
+      type: SimulationEventType.AGENT_PROMOTED,
       payload: { agent, oldLevel, newLevel: agent.level },
       timestamp: new Date(),
     };
@@ -457,29 +464,29 @@ export class SimulationEngine {
     const oldStatus = agent.status;
 
     // Status transitions - allow pausing/resuming
-    const transitions: Record<AgentStatus, AgentStatus[]> = {
-      pending: ["active"],
-      active: ["paused"], // Can pause active agents
-      paused: ["active"], // Can resume paused agents
-      suspended: ["active"], // Can reactivate suspended agents
-      revoked: [], // Terminal state
+    const transitions: Partial<Record<AgentStatus, AgentStatus[]>> = {
+      [AgentStatus.PENDING]: [AgentStatus.ACTIVE],
+      [AgentStatus.ACTIVE]: [AgentStatus.PAUSED],
+      [AgentStatus.PAUSED]: [AgentStatus.ACTIVE],
+      [AgentStatus.SUSPENDED]: [AgentStatus.ACTIVE],
+      [AgentStatus.REVOKED]: [],
     };
 
     const possibleStatuses = transitions[agent.status];
-    if (possibleStatuses.length === 0) return null;
+    if (!possibleStatuses || possibleStatuses.length === 0) return null;
 
     agent.status = randomFrom(possibleStatuses);
 
     const systemEvent = generateEvent(
       "agent.status_changed",
-      "info",
+      EventSeverity.INFO,
       `${agent.name} status changed to ${agent.status}`,
       { agentId: agent.id, metadata: { previousStatus: oldStatus, newStatus: agent.status } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "agent_status_changed",
+      type: SimulationEventType.AGENT_STATUS_CHANGED,
       payload: { agent, oldStatus, newStatus: agent.status },
       timestamp: new Date(),
     };
@@ -488,7 +495,7 @@ export class SimulationEngine {
   private despawnAgent(): SimulationEvent | null {
     // Only despawn low-level agents (L1-L4) that are active and have been around
     const despawnableAgents = this.state.scenario.agents.filter(
-      (a) => a.status === "active" && a.level <= 4 && a.level >= 1,
+      (a) => a.status === AgentStatus.ACTIVE && a.level <= 4 && a.level >= 1,
     );
     if (despawnableAgents.length <= 2) return null; // Keep at least 2 low-level agents
 
@@ -496,16 +503,17 @@ export class SimulationEngine {
     const oldStatus = agent.status;
 
     // 70% chance suspended (can be reactivated), 30% chance revoked (permanent)
-    agent.status = Math.random() < 0.7 ? "suspended" : "revoked";
+    agent.status = Math.random() < 0.7 ? AgentStatus.SUSPENDED : AgentStatus.REVOKED;
 
-    const severity = agent.status === "revoked" ? "warning" : "info";
+    const severity =
+      agent.status === AgentStatus.REVOKED ? EventSeverity.WARNING : EventSeverity.INFO;
     const reason =
-      agent.status === "revoked"
+      agent.status === AgentStatus.REVOKED
         ? "Agent permanently terminated due to inactivity"
         : "Agent suspended for resource optimization";
 
     const systemEvent = generateEvent(
-      agent.status === "revoked" ? "agent.revoked" : "agent.suspended",
+      agent.status === AgentStatus.REVOKED ? "agent.revoked" : "agent.suspended",
       severity,
       `${agent.name} ${agent.status}: ${reason}`,
       { agentId: agent.id, metadata: { previousStatus: oldStatus, reason } },
@@ -513,32 +521,37 @@ export class SimulationEngine {
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "agent_despawned",
+      type: SimulationEventType.AGENT_DESPAWNED,
       payload: { agent, oldStatus, newStatus: agent.status, reason },
       timestamp: new Date(),
     };
   }
 
   private createTask(): SimulationEvent | null {
-    const activeAgents = this.state.scenario.agents.filter((a) => a.status === "active");
+    const activeAgents = this.state.scenario.agents.filter((a) => a.status === AgentStatus.ACTIVE);
     if (activeAgents.length === 0) return null;
 
     const creator = randomFrom(activeAgents);
     const task = generateRandomTask({
       creatorId: creator.id,
-      status: "backlog",
+      status: TaskStatus.BACKLOG,
     });
 
     this.state.scenario.tasks.push(task);
 
-    const systemEvent = generateEvent("task.created", "info", `Task created: ${task.title}`, {
-      taskId: task.id,
-      agentId: creator.id,
-    });
+    const systemEvent = generateEvent(
+      "task.created",
+      EventSeverity.INFO,
+      `Task created: ${task.title}`,
+      {
+        taskId: task.id,
+        agentId: creator.id,
+      },
+    );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "task_created",
+      type: SimulationEventType.TASK_CREATED,
       payload: task,
       timestamp: new Date(),
     };
@@ -546,27 +559,27 @@ export class SimulationEngine {
 
   private advanceTask(): SimulationEvent | null {
     const activeTasks = this.state.scenario.tasks.filter(
-      (t) => t.status !== "done" && t.status !== "cancelled",
+      (t) => t.status !== TaskStatus.DONE && t.status !== TaskStatus.CANCELLED,
     );
     if (activeTasks.length === 0) return null;
 
     // Prefer tasks that are further along (weighted selection)
-    const weights: Record<TaskStatus, number> = {
-      backlog: 1,
-      pending: 2,
-      assigned: 3,
-      in_progress: 4,
-      review: 6, // Higher weight = more likely to be selected
-      done: 0,
-      cancelled: 0,
+    const weights: Partial<Record<TaskStatus, number>> = {
+      [TaskStatus.BACKLOG]: 1,
+      [TaskStatus.PENDING]: 2,
+      [TaskStatus.ASSIGNED]: 3,
+      [TaskStatus.IN_PROGRESS]: 4,
+      [TaskStatus.REVIEW]: 6, // Higher weight = more likely to be selected
+      [TaskStatus.DONE]: 0,
+      [TaskStatus.CANCELLED]: 0,
     };
 
     // Weighted random selection
-    const totalWeight = activeTasks.reduce((sum, t) => sum + weights[t.status], 0);
+    const totalWeight = activeTasks.reduce((sum, t) => sum + (weights[t.status] ?? 0), 0);
     let random = Math.random() * totalWeight;
     let task = activeTasks[0];
     for (const t of activeTasks) {
-      random -= weights[t.status];
+      random -= weights[t.status] ?? 0;
       if (random <= 0) {
         task = t;
         break;
@@ -579,9 +592,9 @@ export class SimulationEngine {
     if (!newStatus) return null;
 
     // Assign to an agent if moving to assigned
-    if (newStatus === "assigned" && !task.assigneeId) {
+    if (newStatus === TaskStatus.ASSIGNED && !task.assigneeId) {
       const workers = this.state.scenario.agents.filter(
-        (a) => a.status === "active" && a.level <= 6,
+        (a) => a.status === AgentStatus.ACTIVE && a.level <= 6,
       );
       if (workers.length > 0) {
         task.assigneeId = randomFrom(workers).id;
@@ -589,9 +602,9 @@ export class SimulationEngine {
     }
 
     // Check for task completion rejection when moving to done
-    if (newStatus === "done" && shouldFire(PROBABILITIES.taskCompletionRejection)) {
+    if (newStatus === TaskStatus.DONE && shouldFire(PROBABILITIES.taskCompletionRejection)) {
       // Reject the completion - send back to review with feedback
-      task.status = "review";
+      task.status = TaskStatus.REVIEW;
       task.updatedAt = new Date().toISOString();
 
       const rejectionReason = randomFrom(QA_REJECTION_REASONS);
@@ -605,14 +618,14 @@ export class SimulationEngine {
 
       const systemEvent = generateEvent(
         "task.completion_rejected",
-        "warning",
+        EventSeverity.WARNING,
         `${task.title} completion rejected: ${rejectionReason}`,
         { taskId: task.id, agentId: task.assigneeId, metadata: { reason: rejectionReason } },
       );
       this.state.scenario.events.push(systemEvent);
 
       return {
-        type: "task_completion_rejected",
+        type: SimulationEventType.TASK_COMPLETION_REJECTED,
         payload: {
           task,
           oldStatus,
@@ -627,7 +640,11 @@ export class SimulationEngine {
     task.updatedAt = new Date().toISOString();
 
     // Clear rejection metadata when moving back to in_progress from review
-    if (newStatus === "in_progress" && oldStatus === "review" && task.metadata?.rejectionFeedback) {
+    if (
+      newStatus === TaskStatus.IN_PROGRESS &&
+      oldStatus === TaskStatus.REVIEW &&
+      task.metadata?.rejectionFeedback
+    ) {
       task.metadata = {
         ...task.metadata,
         rejectionFeedback: undefined,
@@ -638,20 +655,20 @@ export class SimulationEngine {
     }
 
     // Mark completed if done
-    if (newStatus === "done") {
+    if (newStatus === TaskStatus.DONE) {
       task.completedAt = new Date().toISOString();
     }
 
     const systemEvent = generateEvent(
-      `task.${newStatus === "done" ? "completed" : "status_changed"}`,
-      newStatus === "done" ? "success" : "info",
+      `task.${newStatus === TaskStatus.DONE ? "completed" : "status_changed"}`,
+      newStatus === TaskStatus.DONE ? EventSeverity.SUCCESS : EventSeverity.INFO,
       `${task.title} moved to ${newStatus}`,
       { taskId: task.id, agentId: task.assigneeId },
     );
     this.state.scenario.events.push(systemEvent);
 
     // Emit idle event if agent completed a task and has no more work
-    if (newStatus === "done" && task.assigneeId) {
+    if (newStatus === TaskStatus.DONE && task.assigneeId) {
       const idleEvent = this.checkAndEmitAgentIdle(task.assigneeId, task.id, task.title);
       if (idleEvent) {
         this.emit(idleEvent);
@@ -659,7 +676,10 @@ export class SimulationEngine {
     }
 
     return {
-      type: newStatus === "done" ? "task_completed" : "task_assigned",
+      type:
+        newStatus === TaskStatus.DONE
+          ? SimulationEventType.TASK_COMPLETED
+          : SimulationEventType.TASK_ASSIGNED,
       payload: { task, oldStatus, newStatus },
       timestamp: new Date(),
     };
@@ -680,7 +700,7 @@ export class SimulationEngine {
   }
 
   private earnCredits(): SimulationEvent | null {
-    const activeAgents = this.state.scenario.agents.filter((a) => a.status === "active");
+    const activeAgents = this.state.scenario.agents.filter((a) => a.status === AgentStatus.ACTIVE);
     if (activeAgents.length === 0) return null;
 
     const agent = randomFrom(activeAgents);
@@ -691,7 +711,7 @@ export class SimulationEngine {
 
     const transaction = generateCreditTransaction(
       agent.id,
-      "CREDIT",
+      CreditType.CREDIT,
       amount,
       "Task completion reward",
     );
@@ -700,14 +720,14 @@ export class SimulationEngine {
     // Also create a DemoEvent for the Events feed
     const systemEvent = generateEvent(
       "credits.earned",
-      "info",
+      EventSeverity.INFO,
       `${agent.name} earned ${amount} credits`,
       { agentId: agent.id, metadata: { amount, reason: "Task completion reward" } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "credit_earned",
+      type: SimulationEventType.CREDIT_EARNED,
       payload: { agent, amount, transaction },
       timestamp: new Date(),
     };
@@ -715,7 +735,7 @@ export class SimulationEngine {
 
   private spendCredits(): SimulationEvent | null {
     const activeAgents = this.state.scenario.agents.filter(
-      (a) => a.status === "active" && a.currentBalance > 50,
+      (a) => a.status === AgentStatus.ACTIVE && a.currentBalance > 50,
     );
     if (activeAgents.length === 0) return null;
 
@@ -724,20 +744,25 @@ export class SimulationEngine {
 
     agent.currentBalance -= amount;
 
-    const transaction = generateCreditTransaction(agent.id, "DEBIT", amount, "Model usage");
+    const transaction = generateCreditTransaction(
+      agent.id,
+      CreditType.DEBIT,
+      amount,
+      "Model usage",
+    );
     this.state.scenario.credits.push(transaction);
 
     // Also create a DemoEvent for the Events feed
     const systemEvent = generateEvent(
       "credits.spent",
-      "debug",
+      EventSeverity.DEBUG,
       `${agent.name} spent ${amount} credits on model usage`,
       { agentId: agent.id, metadata: { amount, model: agent.model } },
     );
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: "credit_spent",
+      type: SimulationEventType.CREDIT_SPENT,
       payload: { agent, amount, transaction },
       timestamp: new Date(),
     };
@@ -752,10 +777,13 @@ export class SimulationEngine {
     completedTaskTitle?: string,
   ): SimulationEvent | null {
     const agent = this.state.scenario.agents.find((a) => a.id === agentId);
-    if (!agent || agent.status !== "active") return null;
+    if (!agent || agent.status !== AgentStatus.ACTIVE) return null;
 
     const activeTasks = this.state.scenario.tasks.filter(
-      (t) => t.assigneeId === agentId && t.status !== "done" && t.status !== "cancelled",
+      (t) =>
+        t.assigneeId === agentId &&
+        t.status !== TaskStatus.DONE &&
+        t.status !== TaskStatus.CANCELLED,
     );
 
     if (activeTasks.length > 0) return null;
@@ -764,7 +792,7 @@ export class SimulationEngine {
 
     const idleEvent = generateEvent(
       "agent.idle",
-      "info",
+      EventSeverity.INFO,
       completedTaskTitle
         ? `${agent.name} completed "${completedTaskTitle}" and is now available`
         : `${agent.name} is now available for work`,
@@ -781,7 +809,7 @@ export class SimulationEngine {
     this.state.scenario.events.push(idleEvent);
 
     return {
-      type: "agent_idle",
+      type: SimulationEventType.AGENT_IDLE,
       payload: {
         agent,
         reason,
@@ -794,7 +822,7 @@ export class SimulationEngine {
   }
 
   private sendMessage(): SimulationEvent | null {
-    const activeAgents = this.state.scenario.agents.filter((a) => a.status === "active");
+    const activeAgents = this.state.scenario.agents.filter((a) => a.status === AgentStatus.ACTIVE);
     if (activeAgents.length < 2) return null;
 
     // Pick two different agents
@@ -807,14 +835,20 @@ export class SimulationEngine {
 
     // Get a task to reference
     const activeTasks = this.state.scenario.tasks.filter(
-      (t) => t.status !== "done" && t.status !== "cancelled",
+      (t) => t.status !== TaskStatus.DONE && t.status !== TaskStatus.CANCELLED,
     );
     const taskRef =
       taskRelated && activeTasks.length > 0 ? randomFrom(activeTasks).identifier : undefined;
 
     // Generate the message
     const message = generateMessage(fromAgent.id, toAgent.id, {
-      type: taskRef ? "task" : randomFrom(["status", "general", "question"] as const),
+      type: taskRef
+        ? DemoMessageCategory.TASK
+        : randomFrom([
+            DemoMessageCategory.STATUS,
+            DemoMessageCategory.GENERAL,
+            DemoMessageCategory.QUESTION,
+          ]),
       taskRef,
       hoursAgo: 0, // Just now
     });
@@ -822,7 +856,7 @@ export class SimulationEngine {
     this.state.scenario.messages.push(message);
 
     return {
-      type: "system_event",
+      type: SimulationEventType.SYSTEM_EVENT,
       payload: { message, from: fromAgent, to: toAgent },
       timestamp: new Date(),
     };
@@ -859,18 +893,22 @@ export class SimulationEngine {
 
     if (eventType === "task.transition") {
       const activeTasks = this.state.scenario.tasks.filter(
-        (t) => t.status !== "done" && t.status !== "cancelled",
+        (t) => t.status !== TaskStatus.DONE && t.status !== TaskStatus.CANCELLED,
       );
       if (activeTasks.length > 0) {
         context.task = randomFrom(activeTasks);
       }
     } else if (eventType === "agent.spawned") {
-      const activeAgents = this.state.scenario.agents.filter((a) => a.status === "active");
+      const activeAgents = this.state.scenario.agents.filter(
+        (a) => a.status === AgentStatus.ACTIVE,
+      );
       if (activeAgents.length > 0) {
         context.agent = randomFrom(activeAgents);
       }
     } else if (eventType === "credit.spent") {
-      const activeAgents = this.state.scenario.agents.filter((a) => a.status === "active");
+      const activeAgents = this.state.scenario.agents.filter(
+        (a) => a.status === AgentStatus.ACTIVE,
+      );
       if (activeAgents.length > 0) {
         context.agent = randomFrom(activeAgents);
         context.amount = 50 + Math.floor(Math.random() * 200);
@@ -891,7 +929,7 @@ export class SimulationEngine {
     const reason = blocked ? randomFrom(reasons) : undefined;
 
     // Create system event
-    const severity = blocked ? "warning" : "info";
+    const severity = blocked ? EventSeverity.WARNING : EventSeverity.INFO;
     const message = blocked
       ? `${webhook.name} blocked ${eventType}: ${reason}`
       : `${webhook.name} approved ${eventType}`;
@@ -916,7 +954,7 @@ export class SimulationEngine {
     this.state.scenario.events.push(systemEvent);
 
     return {
-      type: blocked ? "prehook_blocked" : "prehook_allowed",
+      type: blocked ? SimulationEventType.PREHOOK_BLOCKED : SimulationEventType.PREHOOK_ALLOWED,
       payload: {
         webhookName: webhook.name,
         eventType,

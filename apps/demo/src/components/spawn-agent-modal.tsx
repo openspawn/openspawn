@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AgentRole } from "@openspawn/shared-types";
 import { notify } from "../lib/toast";
 import {
   Dialog,
@@ -25,7 +26,7 @@ const OCEAN_NAMES = [
   "Pearl Fisher",
 ];
 
-const ROLES = ["lead", "senior", "worker", "intern"] as const;
+const ROLES = [AgentRole.LEAD, AgentRole.SENIOR, AgentRole.WORKER, AgentRole.INTERN] as const;
 const DOMAINS = [
   "Engineering",
   "Finance",
@@ -51,7 +52,12 @@ const COLORS = [
   "#ec4899",
 ];
 
-const ROLE_LEVEL_DEFAULTS: Record<string, number> = { lead: 7, senior: 6, worker: 4, intern: 2 };
+const ROLE_LEVEL_DEFAULTS: Record<string, number> = {
+  [AgentRole.LEAD]: 7,
+  [AgentRole.SENIOR]: 6,
+  [AgentRole.WORKER]: 4,
+  [AgentRole.INTERN]: 2,
+};
 
 function randomFrom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -65,7 +71,7 @@ interface SpawnAgentModalProps {
 
 export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentModalProps) {
   const [name, setName] = useState("");
-  const [role, setRole] = useState<string>("worker");
+  const [role, setRole] = useState<string>(AgentRole.WORKER);
   const [domain, setDomain] = useState("Engineering");
   const [level, setLevel] = useState(4);
   const [avatar, setAvatar] = useState(() => randomFrom(EMOJIS));
@@ -82,7 +88,7 @@ export function SpawnAgentModal({ open, onOpenChange, onSpawned }: SpawnAgentMod
   useEffect(() => {
     if (open) {
       setName("");
-      setRole("worker");
+      setRole(AgentRole.WORKER);
       setDomain("Engineering");
       setLevel(4);
       setAvatar(randomFrom(EMOJIS));

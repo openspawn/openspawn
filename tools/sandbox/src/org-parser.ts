@@ -19,6 +19,7 @@ import type {
 } from "mdast";
 import type { SandboxAgent } from "./types.js";
 import type { ACPMessage } from "./types.js";
+import { ACPMessageType, AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 
 // Map character names to avatar image files served at /avatars/ by the sandbox API
 const AVATAR_FILES: Record<string, string> = {
@@ -92,12 +93,12 @@ function nameFromHeading(heading: string): string {
 
 function inferLevelAndRole(name: string): { level: number; role: SandboxAgent["role"] } {
   const n = name.toLowerCase();
-  if (/\b(coo|cto|ceo)\b/.test(n)) return { level: 10, role: "coo" };
-  if (/\b(cfo|vp|director|talent)\b/.test(n)) return { level: 9, role: "talent" };
-  if (/\b(lead|manager)\b/.test(n)) return { level: 7, role: "lead" };
-  if (/\b(senior|principal)\b/.test(n)) return { level: 6, role: "senior" };
-  if (/\b(junior|intern|assistant)\b/.test(n)) return { level: 1, role: "intern" };
-  return { level: 4, role: "worker" };
+  if (/\b(coo|cto|ceo)\b/.test(n)) return { level: 10, role: AgentRole.COO };
+  if (/\b(cfo|vp|director|talent)\b/.test(n)) return { level: 9, role: AgentRole.TALENT };
+  if (/\b(lead|manager)\b/.test(n)) return { level: 7, role: AgentRole.LEAD };
+  if (/\b(senior|principal)\b/.test(n)) return { level: 6, role: AgentRole.SENIOR };
+  if (/\b(junior|intern|assistant)\b/.test(n)) return { level: 1, role: AgentRole.INTERN };
+  return { level: 4, role: AgentRole.WORKER };
 }
 
 /** Extract text content from a phrasing node tree */
@@ -184,27 +185,27 @@ function extractProseFromNodes(nodes: Content[]): string {
 }
 
 const wakeOnMap: Record<string, ACPMessage["type"]> = {
-  escalations: "escalation",
-  escalation: "escalation",
-  completions: "completion",
-  completion: "completion",
-  delegations: "delegation",
-  delegation: "delegation",
-  orders: "delegation",
-  progress: "progress",
-  ack: "ack",
-  status: "status_request",
+  escalations: ACPMessageType.ESCALATION,
+  escalation: ACPMessageType.ESCALATION,
+  completions: ACPMessageType.COMPLETION,
+  completion: ACPMessageType.COMPLETION,
+  delegations: ACPMessageType.DELEGATION,
+  delegation: ACPMessageType.DELEGATION,
+  orders: ACPMessageType.DELEGATION,
+  progress: ACPMessageType.PROGRESS,
+  ack: ACPMessageType.ACK,
+  status: ACPMessageType.STATUS_REQUEST,
 };
 
 function parseTriggerMeta(meta: Record<string, string>): {
-  trigger?: "polling" | "event-driven";
+  trigger?: TriggerMode;
   triggerOn?: ACPMessage["type"][];
 } {
-  const result: { trigger?: "polling" | "event-driven"; triggerOn?: ACPMessage["type"][] } = {};
+  const result: { trigger?: TriggerMode; triggerOn?: ACPMessage["type"][] } = {};
   if (meta["trigger"]) {
     const t = meta["trigger"].toLowerCase().trim();
-    if (t === "event-driven" || t === "event_driven") result.trigger = "event-driven";
-    else if (t === "polling") result.trigger = "polling";
+    if (t === "event-driven" || t === "event_driven") result.trigger = TriggerMode.EVENT_DRIVEN;
+    else if (t === "polling") result.trigger = TriggerMode.POLLING;
   }
   if (meta["wake_on"]) {
     result.triggerOn = meta["wake_on"]
@@ -224,7 +225,7 @@ function makeAgent(
   domain: string,
   parentId: string | undefined,
   systemPrompt: string,
-  triggerConfig?: { trigger?: "polling" | "event-driven"; triggerOn?: ACPMessage["type"][] },
+  triggerConfig?: { trigger?: TriggerMode; triggerOn?: ACPMessage["type"][] },
   avatar?: string,
   avatarColor?: string,
   avatarUrl?: string,
@@ -253,9 +254,16 @@ Respond with JSON ONLY. Actions:
 - {"action":"review","taskId":"ID","verdict":"approve","feedback":"..."}${spawnAction}
 - {"action":"idle"}`;
 
-  const defaultTrigger: "polling" | "event-driven" = level >= 7 ? "event-driven" : "polling";
+  const defaultTrigger: TriggerMode = level >= 7 ? TriggerMode.EVENT_DRIVEN : TriggerMode.POLLING;
   const defaultTriggerOn: ACPMessage["type"][] | undefined =
-    level >= 7 ? ["escalation", "completion", "delegation", "status_request"] : undefined;
+    level >= 7
+      ? [
+          ACPMessageType.ESCALATION,
+          ACPMessageType.COMPLETION,
+          ACPMessageType.DELEGATION,
+          ACPMessageType.STATUS_REQUEST,
+        ]
+      : undefined;
 
   return {
     id,
@@ -267,7 +275,7 @@ Respond with JSON ONLY. Actions:
     avatarColor,
     avatarUrl: avatarUrl || nameToAvatarUrl(name),
     parentId,
-    status: "active",
+    status: AgentStatus.ACTIVE,
     systemPrompt: fullPrompt,
     taskIds: [],
     recentMessages: [],

@@ -1,21 +1,29 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { executeDecision, type ExecutionContext } from "./decision-executor.js";
 import { makeAgentPublic } from "./agents.js";
+import {
+  ACPMessageType,
+  AgentRole,
+  AgentStatus,
+  SandboxEscalationReason,
+  TaskPriority,
+  TaskStatus,
+} from "@openspawn/shared-types";
 import type { SandboxAgent, SandboxTask } from "./types.js";
 import type { AgentDecision } from "./markdown-decision.js";
 
 // ── Test Helpers ─────────────────────────────────────────────────────────────
 
 function makeCOO(): SandboxAgent {
-  return makeAgentPublic("coo", "COO", "coo", 10, "Operations", undefined, "Test COO");
+  return makeAgentPublic("coo", "COO", AgentRole.COO, 10, "Operations", undefined, "Test COO");
 }
 
 function makeLead(id = "lead", name = "Lead"): SandboxAgent {
-  return makeAgentPublic(id, name, "lead", 7, "Engineering", "coo", "Test lead");
+  return makeAgentPublic(id, name, AgentRole.LEAD, 7, "Engineering", "coo", "Test lead");
 }
 
 function makeWorker(id = "worker", name = "Worker"): SandboxAgent {
-  return makeAgentPublic(id, name, "worker", 4, "Engineering", "lead", "Test worker");
+  return makeAgentPublic(id, name, AgentRole.WORKER, 4, "Engineering", "lead", "Test worker");
 }
 
 function makeTask(id = "TASK-0001", assigneeId?: string): SandboxTask {
@@ -23,8 +31,8 @@ function makeTask(id = "TASK-0001", assigneeId?: string): SandboxTask {
     id,
     title: `Test task ${id}`,
     description: `Description for ${id}`,
-    priority: "high",
-    status: "assigned",
+    priority: TaskPriority.HIGH,
+    status: TaskStatus.ASSIGNED,
     assigneeId,
     creatorId: "coo",
     createdAt: Date.now(),
@@ -64,7 +72,7 @@ describe("decision-executor", () => {
       executeDecision(coo, decision, ctx);
 
       expect(task.assigneeId).toBe("lead");
-      expect(task.status).toBe("assigned");
+      expect(task.status).toBe(TaskStatus.ASSIGNED);
       expect(lead.taskIds).toContain("TASK-0001");
     });
 
@@ -85,7 +93,7 @@ describe("decision-executor", () => {
         ctx,
       );
 
-      const delegationMsg = task.activityLog.find((m) => m.type === "delegation");
+      const delegationMsg = task.activityLog.find((m) => m.type === ACPMessageType.DELEGATION);
       expect(delegationMsg).toBeDefined();
       expect(delegationMsg?.from).toBe("coo");
       expect(delegationMsg?.to).toBe("lead");
@@ -109,7 +117,7 @@ describe("decision-executor", () => {
       );
 
       expect(task.acked).toBe(true);
-      const ackMsg = task.activityLog.find((m) => m.type === "ack");
+      const ackMsg = task.activityLog.find((m) => m.type === ACPMessageType.ACK);
       expect(ackMsg).toBeDefined();
     });
 
@@ -192,11 +200,11 @@ describe("decision-executor", () => {
         ctx,
       );
 
-      const escMsg = task.activityLog.find((m) => m.type === "escalation");
+      const escMsg = task.activityLog.find((m) => m.type === ACPMessageType.ESCALATION);
       expect(escMsg).toBeDefined();
       expect(escMsg?.from).toBe("lead");
       expect(escMsg?.to).toBe("coo");
-      expect(escMsg?.reason).toBe("BLOCKED");
+      expect(escMsg?.reason).toBe(SandboxEscalationReason.BLOCKED);
     });
 
     it("increments messagesSent on escalation", () => {
@@ -222,7 +230,7 @@ describe("decision-executor", () => {
       const orphan = makeAgentPublic(
         "orphan",
         "Orphan",
-        "worker",
+        AgentRole.WORKER,
         4,
         "Eng",
         undefined,
@@ -264,7 +272,7 @@ describe("decision-executor", () => {
         ctx,
       );
 
-      expect(task.status).toBe("done");
+      expect(task.status).toBe(TaskStatus.DONE);
     });
 
     it("increments tasksCompleted stat", () => {
@@ -291,7 +299,7 @@ describe("decision-executor", () => {
       const coo = makeCOO();
       const worker = makeWorker();
       const task = makeTask("TASK-0001", "worker");
-      task.priority = "high";
+      task.priority = TaskPriority.HIGH;
       const ctx = createContext([coo, worker], [task]);
 
       executeDecision(
@@ -312,7 +320,7 @@ describe("decision-executor", () => {
       const coo = makeCOO();
       const worker = makeWorker();
       const task = makeTask("TASK-0001", "worker");
-      task.priority = "critical";
+      task.priority = TaskPriority.CRITICAL;
       const ctx = createContext([coo, worker], [task]);
 
       executeDecision(
@@ -347,7 +355,7 @@ describe("decision-executor", () => {
         ctx,
       );
 
-      const completionMsg = task.activityLog.find((m) => m.type === "completion");
+      const completionMsg = task.activityLog.find((m) => m.type === ACPMessageType.COMPLETION);
       expect(completionMsg).toBeDefined();
       expect(completionMsg?.from).toBe("worker");
       expect(completionMsg?.to).toBe("lead"); // worker's parent
@@ -405,7 +413,7 @@ describe("decision-executor", () => {
       const rosterAgent = makeAgentPublic(
         "alice",
         "Alice",
-        "lead",
+        AgentRole.LEAD,
         7,
         "Engineering",
         undefined,
@@ -457,7 +465,7 @@ describe("decision-executor", () => {
       const rosterAgent = makeAgentPublic(
         "bob",
         "Bob",
-        "worker",
+        AgentRole.WORKER,
         4,
         "Finance",
         undefined,
@@ -478,7 +486,7 @@ describe("decision-executor", () => {
       );
 
       const bob = ctx.agents.find((a) => a.id === "bob");
-      expect(bob?.status).toBe("active");
+      expect(bob?.status).toBe(AgentStatus.ACTIVE);
       expect(bob?.parentId).toBe("coo");
     });
   });
@@ -503,7 +511,7 @@ describe("decision-executor", () => {
       );
 
       // COO should have the escalation in inbox (event-driven + escalation is in triggerOn)
-      const cooInbox = coo.inbox.filter((m) => m.type === "escalation");
+      const cooInbox = coo.inbox.filter((m) => m.type === ACPMessageType.ESCALATION);
       expect(cooInbox.length).toBeGreaterThanOrEqual(1);
     });
 

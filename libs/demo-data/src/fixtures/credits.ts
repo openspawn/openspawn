@@ -1,3 +1,4 @@
+import { CreditType } from "@openspawn/shared-types";
 import type { DemoCreditTransaction } from "../types";
 import { AGENT_IDS } from "./agents";
 import { TASK_IDS } from "./tasks";
@@ -27,7 +28,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.agentDennis,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 100000,
     description: "Initial COO budget allocation",
     createdAt: daysAgo(0),
@@ -35,7 +36,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.techTalent,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 25000,
     description: "Initial department budget",
     createdAt: daysAgo(2),
@@ -43,7 +44,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.financeTalent,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 20000,
     description: "Initial department budget",
     createdAt: daysAgo(3),
@@ -51,7 +52,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.marketingTalent,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 18000,
     description: "Initial department budget",
     createdAt: daysAgo(5),
@@ -59,7 +60,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.salesTalent,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 15000,
     description: "Initial department budget",
     createdAt: daysAgo(7),
@@ -69,7 +70,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.codeReviewer,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 150,
     description: "Task completion: Setup CI pipeline",
     taskId: TASK_IDS.setupCI,
@@ -78,7 +79,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.copywriter,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 120,
     description: "Task completion: Landing page hero",
     taskId: TASK_IDS.landingPage,
@@ -87,7 +88,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.analyst,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 200,
     description: "Task completion: Q4 financial report",
     taskId: TASK_IDS.quarterlyReport,
@@ -98,7 +99,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.codeReviewer,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 45,
     description: "Model usage: claude-sonnet-4 (2.3k tokens)",
     createdAt: hoursAgo(2),
@@ -106,7 +107,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.bugHunter,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 12,
     description: "Model usage: gpt-4o-mini (1.5k tokens)",
     createdAt: hoursAgo(4),
@@ -114,7 +115,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.copywriter,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 38,
     description: "Model usage: claude-sonnet-4 (1.8k tokens)",
     createdAt: hoursAgo(6),
@@ -122,7 +123,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.seoBot,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 8,
     description: "Model usage: gpt-4o-mini (900 tokens)",
     createdAt: hoursAgo(1),
@@ -132,7 +133,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.agentDennis,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 5000,
     description: "Budget transfer to Tech Talent",
     createdAt: daysAgo(10),
@@ -140,7 +141,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.techTalent,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 5000,
     description: "Budget transfer from COO",
     createdAt: daysAgo(10),
@@ -148,7 +149,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.techTalent,
-    type: "DEBIT",
+    type: CreditType.DEBIT,
     amount: 2000,
     description: "Budget allocation to Code Reviewer",
     createdAt: daysAgo(8),
@@ -156,7 +157,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.codeReviewer,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 2000,
     description: "Budget allocation from Tech Talent",
     createdAt: daysAgo(8),
@@ -166,7 +167,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.analyst,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 500,
     description: "Performance bonus: Exceeded Q4 targets",
     createdAt: daysAgo(14),
@@ -174,7 +175,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.codeReviewer,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 300,
     description: "Level up bonus: Promoted to L6",
     createdAt: daysAgo(12),
@@ -184,7 +185,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.prospector,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 50,
     description: "Lead generation: 5 qualified leads",
     createdAt: hoursAgo(8),
@@ -192,7 +193,7 @@ export const creditTransactions: DemoCreditTransaction[] = [
   {
     id: uuid(),
     agentId: AGENT_IDS.newIntern,
-    type: "CREDIT",
+    type: CreditType.CREDIT,
     amount: 25,
     description: "Onboarding completion bonus",
     createdAt: hoursAgo(12),
@@ -205,22 +206,22 @@ export function getTransactionsByAgent(agentId: string): DemoCreditTransaction[]
 }
 
 export function getCredits(): DemoCreditTransaction[] {
-  return creditTransactions.filter((t) => t.type === "CREDIT");
+  return creditTransactions.filter((t) => t.type === CreditType.CREDIT);
 }
 
 export function getDebits(): DemoCreditTransaction[] {
-  return creditTransactions.filter((t) => t.type === "DEBIT");
+  return creditTransactions.filter((t) => t.type === CreditType.DEBIT);
 }
 
 export function getTotalCredits(agentId: string): number {
   return creditTransactions
     .filter((t) => t.agentId === agentId)
-    .reduce((sum, t) => sum + (t.type === "CREDIT" ? t.amount : -t.amount), 0);
+    .reduce((sum, t) => sum + (t.type === CreditType.CREDIT ? t.amount : -t.amount), 0);
 }
 
 export function generateCreditTransaction(
   agentId: string,
-  type: "CREDIT" | "DEBIT",
+  type: CreditType,
   amount: number,
   description: string,
 ): DemoCreditTransaction {

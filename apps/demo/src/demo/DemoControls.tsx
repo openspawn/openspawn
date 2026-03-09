@@ -1,3 +1,4 @@
+import { SimulationEventType } from "@openspawn/shared-types";
 import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory } from "lucide-react";
 import { useDemo } from "./DemoProvider";
 import { Button } from "../components/ui/button";
@@ -349,55 +350,55 @@ function isEventPayload(value: unknown): value is EventPayload {
 function EventLabel({ event }: { event: { type: string; payload: unknown } }) {
   const p: EventPayload = isEventPayload(event.payload) ? event.payload : {};
   switch (event.type) {
-    case "agent_created":
+    case SimulationEventType.AGENT_CREATED:
       return (
         <span className="text-green-500">
           🤖 <strong>{p.name}</strong> spawned
         </span>
       );
-    case "agent_promoted":
+    case SimulationEventType.AGENT_PROMOTED:
       return (
         <span className="text-blue-500">
           ⬆️ <strong>{p.agent?.name}</strong> promoted to L{p.newLevel}
         </span>
       );
-    case "agent_terminated":
+    case SimulationEventType.AGENT_TERMINATED:
       return (
         <span className="text-orange-500">
           ⏸️ <strong>{p.agent?.name}</strong> → {p.newStatus}
         </span>
       );
-    case "task_created":
+    case SimulationEventType.TASK_CREATED:
       return (
         <span className="text-purple-500">
           📋 Task created: <strong>{p.title}</strong>
         </span>
       );
-    case "task_completed":
+    case SimulationEventType.TASK_COMPLETED:
       return (
         <span className="text-emerald-500">
           ✅ Task done: <strong>{p.task?.title}</strong>
         </span>
       );
-    case "credit_earned":
+    case SimulationEventType.CREDIT_EARNED:
       return (
         <span className="text-yellow-500">
           💰 <strong>{p.agent?.name}</strong> earned {p.amount} credits
         </span>
       );
-    case "credit_spent":
+    case SimulationEventType.CREDIT_SPENT:
       return (
         <span className="text-red-400">
           💸 <strong>{p.agent?.name}</strong> spent {p.amount} credits
         </span>
       );
-    case "prehook_blocked":
+    case SimulationEventType.PREHOOK_BLOCKED:
       return (
         <span className="text-amber-500">
           🛡️ <strong>{p.webhookName}</strong> blocked: {p.reason || p.eventType}
         </span>
       );
-    case "prehook_allowed":
+    case SimulationEventType.PREHOOK_ALLOWED:
       return (
         <span className="text-green-400">
           ✓ <strong>{p.webhookName}</strong> approved {p.eventType}

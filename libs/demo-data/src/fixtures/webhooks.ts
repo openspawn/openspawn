@@ -1,3 +1,4 @@
+import { WebhookHookType } from "@openspawn/shared-types";
 import type { DemoWebhook } from "../types";
 
 /**
@@ -10,7 +11,7 @@ export const demoWebhooks: DemoWebhook[] = [
     url: "https://compliance.example.com/webhook",
     events: ["task.transition"],
     enabled: true,
-    hookType: "pre",
+    hookType: WebhookHookType.PRE,
     canBlock: true,
     timeoutMs: 5000,
     failureCount: 0,
@@ -23,7 +24,7 @@ export const demoWebhooks: DemoWebhook[] = [
     url: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX",
     events: ["task.created", "task.transition", "agent.spawned"],
     enabled: true,
-    hookType: "post",
+    hookType: WebhookHookType.POST,
     canBlock: false,
     timeoutMs: 10000,
     failureCount: 0,
@@ -36,7 +37,7 @@ export const demoWebhooks: DemoWebhook[] = [
     url: "https://budget-api.internal.corp/check",
     events: ["credit.spent"],
     enabled: true,
-    hookType: "pre",
+    hookType: WebhookHookType.PRE,
     canBlock: true,
     timeoutMs: 3000,
     failureCount: 2,
@@ -50,7 +51,7 @@ export const demoWebhooks: DemoWebhook[] = [
     url: "https://analytics.company.com/ingest/events",
     events: ["*"],
     enabled: true,
-    hookType: "post",
+    hookType: WebhookHookType.POST,
     canBlock: false,
     timeoutMs: 10000,
     failureCount: 0,
@@ -63,7 +64,7 @@ export const demoWebhooks: DemoWebhook[] = [
     url: "https://security-audit.internal.corp/webhook",
     events: ["agent.spawned", "task.transition"],
     enabled: false,
-    hookType: "post",
+    hookType: WebhookHookType.POST,
     canBlock: false,
     timeoutMs: 10000,
     failureCount: 5,

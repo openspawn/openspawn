@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { ScenarioEngine } from "./scenario-engine.js";
 import { DeterministicSimulation } from "./deterministic.js";
 import { makeAgentPublic } from "./agents.js";
+import { AgentRole, TriggerMode } from "@openspawn/shared-types";
 import type { SandboxAgent, SandboxConfig } from "./types.js";
 import type { ScenarioDefinition } from "./scenario-types.js";
 
@@ -14,11 +15,11 @@ const DEFAULT_CONFIG: SandboxConfig = {
   maxConcurrentInferences: 1,
   contextWindowTokens: 4096,
   verbose: false,
-  defaultTrigger: "event-driven",
+  defaultTrigger: TriggerMode.EVENT_DRIVEN,
 };
 
 function makeCOO(id = "coo", name = "COO"): SandboxAgent {
-  return makeAgentPublic(id, name, "coo", 10, "Operations", undefined, "Test COO");
+  return makeAgentPublic(id, name, AgentRole.COO, 10, "Operations", undefined, "Test COO");
 }
 
 function makeLead(
@@ -27,7 +28,7 @@ function makeLead(
   parentId: string,
   domain = "Engineering",
 ): SandboxAgent {
-  return makeAgentPublic(id, name, "lead", 7, domain, parentId, `Lead for ${domain}`);
+  return makeAgentPublic(id, name, AgentRole.LEAD, 7, domain, parentId, `Lead for ${domain}`);
 }
 
 function _makeWorker(
@@ -36,7 +37,7 @@ function _makeWorker(
   parentId: string,
   domain = "Engineering",
 ): SandboxAgent {
-  return makeAgentPublic(id, name, "worker", 5, domain, parentId, `Worker in ${domain}`);
+  return makeAgentPublic(id, name, AgentRole.WORKER, 5, domain, parentId, `Worker in ${domain}`);
 }
 
 function buildMinimalScenario(overrides?: Partial<ScenarioDefinition>): ScenarioDefinition {

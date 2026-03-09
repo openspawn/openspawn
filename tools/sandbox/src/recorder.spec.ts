@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { DecisionRecorder } from "./recorder.js";
+import { AgentRole, AgentStatus, TriggerMode } from "@openspawn/shared-types";
 import type { SandboxAgent } from "./types.js";
 import type { AgentDecision } from "./markdown-decision.js";
 
@@ -9,14 +10,14 @@ function makeAgent(overrides: Partial<SandboxAgent> = {}): SandboxAgent {
   return {
     id: "agent-1",
     name: "Test Agent",
-    role: "worker",
+    role: AgentRole.WORKER,
     level: 4,
     domain: "Engineering",
-    status: "active",
+    status: AgentStatus.ACTIVE,
     systemPrompt: "",
     taskIds: [],
     recentMessages: [],
-    trigger: "polling",
+    trigger: TriggerMode.POLLING,
     inbox: [],
     stats: {
       tasksCompleted: 0,
@@ -82,7 +83,7 @@ describe("DecisionRecorder – toMarkdown", () => {
   it("includes tick and agent info in body", () => {
     const rec = new DecisionRecorder("test", "model");
     rec.record(
-      makeAgent({ name: "Alice", role: "lead", level: 7 }),
+      makeAgent({ name: "Alice", role: AgentRole.LEAD, level: 7 }),
       makeDecision({ action: "delegate" }),
       5,
     );

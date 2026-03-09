@@ -4,6 +4,7 @@
 import type { ServerResponse } from "node:http";
 import type { DeterministicSimulation } from "./deterministic.js";
 import type { SandboxTask } from "./types.js";
+import { TaskStatus } from "@openspawn/shared-types";
 import type {
   AgentCard,
   AgentSkill,
@@ -32,18 +33,18 @@ function generateContextId(): string {
 /** Map SandboxTask.status → A2A TaskState */
 function mapStatus(status: SandboxTask["status"]): TaskState {
   switch (status) {
-    case "backlog":
-    case "pending":
-    case "assigned":
+    case TaskStatus.BACKLOG:
+    case TaskStatus.PENDING:
+    case TaskStatus.ASSIGNED:
       return "submitted";
-    case "in_progress":
-    case "review":
+    case TaskStatus.IN_PROGRESS:
+    case TaskStatus.REVIEW:
       return "working";
-    case "done":
+    case TaskStatus.DONE:
       return "completed";
-    case "blocked":
+    case TaskStatus.BLOCKED:
       return "input-required";
-    case "rejected":
+    case TaskStatus.REJECTED:
       return "failed";
     default:
       return "submitted";
@@ -428,7 +429,7 @@ export class A2AServer {
       a2aTask.metadata = { sandboxTaskId: latestTask.id, domain: detectDomain(text) };
 
       // Update to working if already assigned
-      if (latestTask.status !== "backlog") {
+      if (latestTask.status !== TaskStatus.BACKLOG) {
         a2aTask.status = {
           state: "working",
           message: {
@@ -579,7 +580,7 @@ export class A2AServer {
     if (tracked.sandboxTaskId) {
       const sandboxTask = this.sim.tasks.find((t) => t.id === tracked.sandboxTaskId);
       if (sandboxTask) {
-        sandboxTask.status = "rejected";
+        sandboxTask.status = TaskStatus.REJECTED;
         sandboxTask.updatedAt = Date.now();
       }
     }

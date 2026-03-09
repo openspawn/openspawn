@@ -40,6 +40,7 @@ import { DeterministicSimulation } from "./deterministic.js";
 import { startServer } from "./server.js";
 import { loadAgentConfig, buildSystemPrompt } from "./config-loader.js";
 import type { SandboxConfig } from "./types.js";
+import { AgentRole, TriggerMode } from "@openspawn/shared-types";
 
 const config: SandboxConfig = {
   model: process.env.SANDBOX_MODEL || "qwen3:0.6b",
@@ -54,7 +55,7 @@ const config: SandboxConfig = {
   maxConcurrentInferences: Number(process.env.MAX_CONCURRENT) || 4,
   contextWindowTokens: 2048,
   verbose: process.env.VERBOSE !== "0",
-  defaultTrigger: (process.env.DEFAULT_TRIGGER as "polling" | "event-driven") || "polling",
+  defaultTrigger: (process.env.DEFAULT_TRIGGER as TriggerMode) || TriggerMode.POLLING,
 };
 
 console.log(`
@@ -97,7 +98,7 @@ if (existsSync(orgPath)) {
     if (cofounderMode) {
       // Cofounder mode: just the COO, but ORG.md is the "hiring plan"
       // Mr. Krabs starts alone and spawns from the roster as needed
-      agents = parsedOrg.agents.filter((a) => a.role === "coo" || a.level >= 9);
+      agents = parsedOrg.agents.filter((a) => a.role === AgentRole.COO || a.level >= 9);
       console.log(`\n🦀 Cofounder mode — Mr. Krabs starts alone`);
       console.log(`   ${parsedOrg.agents.length} candidates in the hiring plan (ORG.md)`);
     } else {

@@ -1,3 +1,10 @@
+import {
+  AgentRole,
+  AgentStatus,
+  CreditType,
+  EventSeverity,
+  TaskPriority,
+} from "@openspawn/shared-types";
 import type { DemoScenario, DemoAgent, DemoTask, DemoCreditTransaction, DemoEvent } from "../types";
 import { agents, AGENT_IDS, generateRandomAgent } from "../fixtures/agents";
 import { tasks, generateRandomTask } from "../fixtures/tasks";
@@ -35,9 +42,9 @@ function generateEnterpriseAgents(): DemoAgent[] {
     extraAgents.push(
       generateRandomAgent({
         name,
-        role: "hr",
+        role: AgentRole.HR,
         level: 9,
-        status: "active",
+        status: AgentStatus.ACTIVE,
         model: i % 2 === 0 ? "claude-sonnet-4" : "gpt-4o",
         currentBalance: 8000 + Math.floor(Math.random() * 5000),
         lifetimeEarnings: 20000 + Math.floor(Math.random() * 15000),
@@ -53,9 +60,9 @@ function generateEnterpriseAgents(): DemoAgent[] {
       extraAgents.push(
         generateRandomAgent({
           name: `${domain} Senior ${i + 1}`,
-          role: "senior",
+          role: AgentRole.SENIOR,
           level: 5 + Math.floor(Math.random() * 2),
-          status: Math.random() > 0.9 ? "paused" : "active",
+          status: Math.random() > 0.9 ? AgentStatus.PAUSED : AgentStatus.ACTIVE,
           model: Math.random() > 0.5 ? "claude-sonnet-4" : "gpt-4o",
           currentBalance: 1500 + Math.floor(Math.random() * 2000),
           lifetimeEarnings: 8000 + Math.floor(Math.random() * 8000),
@@ -71,9 +78,9 @@ function generateEnterpriseAgents(): DemoAgent[] {
       extraAgents.push(
         generateRandomAgent({
           name: `${domain} Worker ${i + 1}`,
-          role: "worker",
+          role: AgentRole.WORKER,
           level: 2 + Math.floor(Math.random() * 3),
-          status: Math.random() > 0.85 ? "pending" : "active",
+          status: Math.random() > 0.85 ? AgentStatus.PENDING : AgentStatus.ACTIVE,
           model: "gpt-4o-mini",
           currentBalance: 500 + Math.floor(Math.random() * 1500),
           lifetimeEarnings: 2000 + Math.floor(Math.random() * 5000),
@@ -90,14 +97,14 @@ function generateEnterpriseAgents(): DemoAgent[] {
 function generateEnterpriseTasks(): DemoTask[] {
   const extraTasks: DemoTask[] = [];
   const taskTemplates = [
-    { title: "Review documentation", priority: "normal" as const },
-    { title: "Fix critical bug", priority: "critical" as const },
-    { title: "Implement feature", priority: "high" as const },
-    { title: "Write tests", priority: "normal" as const },
-    { title: "Performance optimization", priority: "high" as const },
-    { title: "Security audit", priority: "critical" as const },
-    { title: "User research", priority: "normal" as const },
-    { title: "Create report", priority: "low" as const },
+    { title: "Review documentation", priority: TaskPriority.NORMAL },
+    { title: "Fix critical bug", priority: TaskPriority.CRITICAL },
+    { title: "Implement feature", priority: TaskPriority.HIGH },
+    { title: "Write tests", priority: TaskPriority.NORMAL },
+    { title: "Performance optimization", priority: TaskPriority.HIGH },
+    { title: "Security audit", priority: TaskPriority.CRITICAL },
+    { title: "User research", priority: TaskPriority.NORMAL },
+    { title: "Create report", priority: TaskPriority.LOW },
   ];
 
   for (let i = 0; i < 40; i++) {
@@ -122,7 +129,7 @@ function generateEnterpriseCredits(enterpriseAgents: DemoAgent[]): DemoCreditTra
     extraCredits.push(
       generateCreditTransaction(
         agent.id,
-        "CREDIT",
+        CreditType.CREDIT,
         agent.currentBalance + 1000,
         `Initial budget for ${agent.name}`,
       ),
@@ -133,7 +140,7 @@ function generateEnterpriseCredits(enterpriseAgents: DemoAgent[]): DemoCreditTra
       extraCredits.push(
         generateCreditTransaction(
           agent.id,
-          "DEBIT",
+          CreditType.DEBIT,
           Math.floor(Math.random() * 100),
           "Model usage",
         ),
@@ -150,7 +157,7 @@ function generateEnterpriseEvents(enterpriseAgents: DemoAgent[]): DemoEvent[] {
 
   enterpriseAgents.forEach((agent) => {
     extraEvents.push(
-      generateEvent("agent.created", "info", `${agent.name} joined the organization`, {
+      generateEvent("agent.created", EventSeverity.INFO, `${agent.name} joined the organization`, {
         agentId: agent.id,
         metadata: { level: agent.level, domain: agent.domain },
       }),

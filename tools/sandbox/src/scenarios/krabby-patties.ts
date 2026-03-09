@@ -4,6 +4,7 @@
 // ~2000 decisions over 300 ticks across 5 acts.
 
 import type { ScenarioDefinition } from "../scenario-types.js";
+import { TaskPriority } from "@openspawn/shared-types";
 
 export const krabbyPattiesScenario: ScenarioDefinition = {
   meta: {
@@ -121,7 +122,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Order Intake & Delegation",
       phase: "the-order",
       domains: ["operations", "engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description:
         "Plankton's 10,000 patty order arrives. Mr. Krabs accepts and delegates to SpongeBob (production) and Squidward (delivery).",
       taskTemplates: [
@@ -173,7 +174,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Financial Tracking Setup",
       phase: "the-order",
       domains: ["finance"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Squilliam sets up cost tracking for the massive order.",
       taskTemplates: [
         {
@@ -209,7 +210,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Security: Why Does Plankton Want 10,000?",
       phase: "the-order",
       domains: ["security"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Karen flags Plankton's order as suspicious. Initial threat assessment.",
       taskTemplates: [
         {
@@ -235,7 +236,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Batch Production Pipeline",
       phase: "kitchen-heats-up",
       domains: ["engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description:
         "SpongeBob's team builds and runs the parallel patty production pipeline. Target: 50 batches/tick.",
       dependsOnEpics: ["order-intake"],
@@ -318,7 +319,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Quality Assurance — Gary's QA Pipeline",
       phase: "kitchen-heats-up",
       domains: ["engineering"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Gary QAs every batch. Plankton Jr. assists (poorly).",
       taskTemplates: [
         {
@@ -355,7 +356,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Marketing: Live Coverage",
       phase: "kitchen-heats-up",
       domains: ["marketing"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description:
         "Perch Perkins live-tweets the operation. Larry writes copy. Bubble Bass does SEO.",
       taskTemplates: [
@@ -392,7 +393,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Security: Plankton Investigation",
       phase: "kitchen-heats-up",
       domains: ["security"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Karen deepens the investigation into Plankton's motives.",
       dependsOnEpics: ["security-threat-assessment"],
       taskTemplates: [
@@ -431,7 +432,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Delivery Operations — Squidward Solo",
       phase: "delivery-crisis",
       domains: ["operations"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description:
         "Squidward delivers every batch. Alone. 8 batches/tick while production runs at 50/tick. The queue grows.",
       dependsOnEpics: ["order-intake"],
@@ -496,7 +497,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Order Tracking UI — Pearl Under Pressure",
       phase: "delivery-crisis",
       domains: ["frontend"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Pearl must rebuild the order tracking UI to handle the scale.",
       taskTemplates: [
         {
@@ -516,7 +517,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
               action: "create_task",
               target: "Security Review: Tracking Dashboard",
               domain: "security",
-              priority: "normal",
+              priority: TaskPriority.NORMAL,
             },
           ],
         },
@@ -540,7 +541,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Support Ticket Surge — Barnacle Boy's Crisis",
       phase: "delivery-crisis",
       domains: ["operations"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description:
         "Customer complaints spike. Barnacle Boy, Flying Dutchman, and the Freds scramble.",
       taskTemplates: [
@@ -581,7 +582,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Resource Reallocation — THE DECISION",
       phase: "the-bottleneck",
       domains: ["operations", "engineering"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description:
         "Mr. Krabs faces the decision: spend money to reallocate Pearl + Fred to delivery, or let the order fail.",
       taskTemplates: [
@@ -617,7 +618,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
               action: "create_task",
               target: "Overtime Cost Impact Analysis",
               domain: "finance",
-              priority: "high",
+              priority: TaskPriority.HIGH,
             },
           ],
         },
@@ -628,7 +629,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Overtime Cost Analysis — Squilliam's Warning",
       phase: "the-bottleneck",
       domains: ["finance"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Squilliam warns that overtime costs are eating the profit margin.",
       taskTemplates: [
         {
@@ -651,7 +652,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Kitchen Idle Management",
       phase: "the-bottleneck",
       domains: ["engineering"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description:
         "SpongeBob's team starts idling — blocked by delivery capacity. Backpressure hits production.",
       taskTemplates: [
@@ -678,7 +679,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Scaled Delivery — Triple Throughput",
       phase: "pipeline-balances",
       domains: ["operations"],
-      priority: "critical",
+      priority: TaskPriority.CRITICAL,
       description: "Pearl + Fred join Squidward. Delivery rate triples to 24 batches/tick.",
       dependsOnEpics: ["resource-reallocation"],
       taskTemplates: [
@@ -741,7 +742,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Final Production Push",
       phase: "pipeline-balances",
       domains: ["engineering"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Kitchen resumes full speed as delivery unblocks. Final batches produced.",
       taskTemplates: [
         {
@@ -764,7 +765,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Financial Reconciliation — Squilliam's Final P&L",
       phase: "pipeline-balances",
       domains: ["finance"],
-      priority: "high",
+      priority: TaskPriority.HIGH,
       description: "Squilliam prepares the final profit & loss statement.",
       taskTemplates: [
         {
@@ -790,7 +791,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
       title: "Security Final Report — Karen's Verdict",
       phase: "pipeline-balances",
       domains: ["security"],
-      priority: "normal",
+      priority: TaskPriority.NORMAL,
       description:
         "Karen reports Plankton accessed the tracking API 47 times — but no breach detected.",
       taskTemplates: [
@@ -840,7 +841,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Repair grill station",
             domain: "engineering",
-            priority: "critical",
+            priority: TaskPriority.CRITICAL,
             subtaskCount: 3,
             durationRange: [2, 4],
           },
@@ -862,7 +863,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Emergency ingredient resupply",
             domain: "operations",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 3,
             durationRange: [3, 5],
           },
@@ -884,14 +885,14 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Salvage contaminated batch",
             domain: "engineering",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 3,
             durationRange: [2, 4],
           },
           {
             title: "Retrain Plankton Jr. (again)",
             domain: "engineering",
-            priority: "normal",
+            priority: TaskPriority.NORMAL,
             subtaskCount: 2,
             durationRange: [2, 3],
           },
@@ -911,14 +912,14 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Re-make dropped batch",
             domain: "backend",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 2,
             durationRange: [2, 4],
           },
           {
             title: "Re-deliver dropped batch",
             domain: "operations",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 1,
             durationRange: [2, 3],
           },
@@ -937,7 +938,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Re-route misdelivered order",
             domain: "operations",
-            priority: "high",
+            priority: TaskPriority.HIGH,
             subtaskCount: 2,
             durationRange: [1, 3],
           },
@@ -956,7 +957,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
         expandEpic: {
           taskCount: 3,
           domain: "operations",
-          priority: "high",
+          priority: TaskPriority.HIGH,
         },
       },
     },
@@ -974,7 +975,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Investigate Plankton API access",
             domain: "security",
-            priority: "normal",
+            priority: TaskPriority.NORMAL,
             subtaskCount: 1,
             durationRange: [1, 3],
           },
@@ -997,7 +998,7 @@ export const krabbyPattiesScenario: ScenarioDefinition = {
           {
             title: "Mr. Krabs motivational speech",
             domain: "operations",
-            priority: "critical",
+            priority: TaskPriority.CRITICAL,
             subtaskCount: 2,
             durationRange: [2, 3],
           },
