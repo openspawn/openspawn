@@ -1,6 +1,7 @@
 """Local mode entrypoint for openspawn start.
 
-Boots FastAPI with SQLite backend, seeds from ORG.md, serves API.
+Boots FastAPI with SQLite backend, seeds from ORG.md, serves API,
+and spawns Claude Code agents from workspaces/.
 Usage: openspawn-server [--project-dir /path/to/org]
 """
 
@@ -10,6 +11,7 @@ import argparse
 import asyncio
 import json
 import os
+import signal
 from pathlib import Path
 
 import structlog
@@ -41,9 +43,34 @@ def build_local_config(project_dir: str) -> dict[str, str | int]:
     }
 
 
+def resolve_agents_to_spawn(project_dir: str) -> list[dict[str, str]]:
+    """Scan workspaces/ for agent directories with SOUL.md."""
+    workspaces = Path(project_dir) / "workspaces"
+    if not workspaces.exists():
+        return []
+
+    agents: list[dict[str, str]] = []
+    for ws_dir in sorted(workspaces.iterdir()):
+        if not ws_dir.is_dir():
+            continue
+        soul_path = ws_dir / "SOUL.md"
+        if not soul_path.exists():
+            continue
+        agents.append(
+            {
+                "name": ws_dir.name,
+                "workspace": str(ws_dir),
+                "soul_md": soul_path.read_text(),
+            }
+        )
+    return agents
+
+
 async def start_local(project_dir: str) -> None:
-    """Boot FastAPI in local mode with SQLite."""
+    """Boot FastAPI in local mode with SQLite, then spawn agents."""
     import uvicorn
+
+    from app.spawner import SpawnManager, build_bootstrap_prompt
 
     config = build_local_config(project_dir)
 
@@ -77,22 +104,73 @@ async def start_local(project_dir: str) -> None:
         except ImportError:
             logger.warning("seeder not available, skipping ORG.md import")
 
+    # Read user config for spawning settings
+    config_path = Path(project_dir) / "openspawn.config.json"
+    user_config: dict[str, object] = {}
+    if config_path.exists():
+        user_config = json.loads(config_path.read_text())
+
+    spawning = user_config.get("spawning", {})
+    max_concurrent = spawning.get("maxConcurrentAgents", 2) if isinstance(spawning, dict) else 2
+
+    # Prepare spawn manager
+    manager = SpawnManager(max_concurrent=int(max_concurrent))
+    agents = resolve_agents_to_spawn(project_dir)
+
+    port = int(config["port"])
+    for agent in agents:
+        prompt = build_bootstrap_prompt(
+            agent_name=agent["name"],
+            soul_md=agent["soul_md"],
+            mcp_url=f"http://localhost:{port}",
+        )
+        manager.enqueue(agent["name"], agent["workspace"], prompt)
+
     logger.info(
         "local.starting",
-        port=config["port"],
+        port=port,
         database=config["database_url"],
         project_dir=project_dir,
+        agents=len(agents),
+        max_concurrent=max_concurrent,
     )
 
     # Start server
     uvicorn_config = uvicorn.Config(
         "app.main:app",
         host="0.0.0.0",
-        port=int(config["port"]),
+        port=port,
         log_level="info",
     )
     server = uvicorn.Server(uvicorn_config)
+
+    async def spawn_after_ready() -> None:
+        """Poll for server readiness, then drain the spawn queue."""
+        # uvicorn.Server.started is a plain bool — no event to await
+        while not server.started:  # noqa: ASYNC110
+            await asyncio.sleep(0.5)
+        # Extra delay to ensure connections accepted
+        await asyncio.sleep(1)
+        logger.info("spawner.draining", agents=manager.queued_count)
+        await manager.drain()
+
+    # Handle signals for graceful shutdown
+    loop = asyncio.get_event_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(
+            sig,
+            lambda: asyncio.create_task(manager.shutdown()),
+        )
+
+    # Run server and spawner concurrently
+    spawn_task: asyncio.Task[None] | None = None
+    if agents:
+        spawn_task = asyncio.create_task(spawn_after_ready())
+
     await server.serve()
+
+    if spawn_task and not spawn_task.done():
+        spawn_task.cancel()
 
 
 def main() -> None:
