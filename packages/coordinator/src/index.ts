@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer } from "http";
 import { z } from "zod";
+import { AgentStatus, TaskStatus } from "@openspawn/shared-types";
 import {
   createDb,
   registerAgent,
@@ -75,7 +76,7 @@ server.tool(
     id: z.string(),
   },
   async (params) => {
-    updateAgentStatus(db, params.id, "paused");
+    updateAgentStatus(db, params.id, AgentStatus.PAUSED);
     return { content: [{ type: "text", text: `Paused agent ${params.id}` }] };
   },
 );
@@ -87,7 +88,7 @@ server.tool(
     id: z.string(),
   },
   async (params) => {
-    updateAgentStatus(db, params.id, "active");
+    updateAgentStatus(db, params.id, AgentStatus.ACTIVE);
     return { content: [{ type: "text", text: `Resumed agent ${params.id}` }] };
   },
 );
@@ -194,7 +195,14 @@ server.tool(
   "Update task status",
   {
     task_id: z.string(),
-    status: z.enum(["todo", "in_progress", "review", "done", "blocked", "cancelled"]),
+    status: z.enum([
+      TaskStatus.TODO,
+      TaskStatus.IN_PROGRESS,
+      TaskStatus.REVIEW,
+      TaskStatus.DONE,
+      TaskStatus.BLOCKED,
+      TaskStatus.CANCELLED,
+    ]),
     agent_id: z.string().optional(),
   },
   async (params) => {
