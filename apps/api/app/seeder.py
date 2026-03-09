@@ -10,15 +10,19 @@ from __future__ import annotations
 import logging
 import os
 import re
-import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.agent import Agent
 from app.models.enums import AgentMode, AgentRole, AgentStatus
 from app.models.organization import Organization
+
+if TYPE_CHECKING:
+    import uuid
+
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +158,7 @@ def _agents_from_table(rows: list[dict[str, str]]) -> list[dict[str, object]]:
 
         # Normalize empty/dash reports_to
         parent_agent_id: str | None = None
-        if reports_to and reports_to not in ("—", "-", "–", "none", ""):
+        if reports_to and reports_to not in ("\u2014", "-", "\u2013", "none", ""):
             parent_agent_id = _make_id(reports_to)
 
         agents.append(
