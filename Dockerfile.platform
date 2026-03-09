@@ -7,7 +7,7 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json .npmrc ./
 COPY apps/website/ ./apps/website/
 COPY apps/platform/server.ts ./apps/platform/server.ts
 
