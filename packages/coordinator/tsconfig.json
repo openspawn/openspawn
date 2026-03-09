@@ -1,17 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
     "moduleResolution": "bundler",
     "outDir": "dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@openspawn/shared-types": ["../../libs/shared-types/src/index.ts"]
-    }
+    "declaration": true
   },
   "include": ["src"]
 }
