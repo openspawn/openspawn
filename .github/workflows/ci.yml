@@ -72,10 +72,10 @@ jobs:
         continue-on-error: true # Don't fail on lint for now
 
       - name: Build
-        run: pnpm exec nx run-many -t build --parallel=3 --exclude=dashboard
+        run: pnpm exec nx run-many -t build --parallel=3
 
       - name: Test
-        run: pnpm exec nx run-many -t test --parallel=3 --exclude=dashboard --exclude=openspawn
+        run: pnpm exec nx run-many -t test --parallel=3 --exclude=openspawn
         env:
           DATABASE_URL: postgres://openspawn:openspawn@localhost:5432/openspawn
 
