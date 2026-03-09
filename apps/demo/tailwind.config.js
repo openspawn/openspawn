@@ -67,6 +67,12 @@ module.exports = {
         "bb-squid": "#9B59B6",
         "bb-pearl": "#FF85C2",
         "bb-dutchman": "#76D7C4",
+        "bb-status": {
+          idle: "#4AAED9",
+          working: "#F4C542",
+          busy: "#FF6B6B",
+          overwhelmed: "#FF4757",
+        },
       },
       animation: {
         "bb-bob": "bb-bob 2s ease-in-out infinite",

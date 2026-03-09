@@ -36,17 +36,21 @@ export const STATUS_LABEL: Record<CharacterStatus, string> = {
 };
 
 const STATUS_STYLE: Record<CharacterStatus, string> = {
-  [CharacterStatus.Idle]: "bg-[#4AAED9]/10 text-[#4AAED9] border border-[#4AAED9]/30",
-  [CharacterStatus.Working]: "bg-[#F4C542]/15 text-[#F4C542] border border-[#F4C542]/40",
-  [CharacterStatus.Busy]: "bg-[#FF6B6B]/15 text-[#FF6B6B] border border-[#FF6B6B]/40",
-  [CharacterStatus.Overwhelmed]: "bg-[#FF4757]/20 text-[#FF4757] border border-[#FF4757]/50",
+  [CharacterStatus.Idle]:
+    "bg-bb-status-idle/10 text-bb-status-idle border border-bb-status-idle/30",
+  [CharacterStatus.Working]:
+    "bg-bb-status-working/15 text-bb-status-working border border-bb-status-working/40",
+  [CharacterStatus.Busy]:
+    "bg-bb-status-busy/15 text-bb-status-busy border border-bb-status-busy/40",
+  [CharacterStatus.Overwhelmed]:
+    "bg-bb-status-overwhelmed/20 text-bb-status-overwhelmed border border-bb-status-overwhelmed/50",
 };
 
 const STATUS_RING: Record<CharacterStatus, string> = {
-  [CharacterStatus.Idle]: "border-[#4AAED9]/30",
-  [CharacterStatus.Working]: "border-[#F4C542] shadow-[0_0_16px_rgba(244,197,66,0.5)]",
-  [CharacterStatus.Busy]: "border-[#FF6B6B] shadow-[0_0_12px_rgba(255,107,107,0.4)]",
-  [CharacterStatus.Overwhelmed]: "border-[#FF4757] shadow-[0_0_20px_rgba(255,71,87,0.6)]",
+  [CharacterStatus.Idle]: "border-bb-ocean-400/30",
+  [CharacterStatus.Working]: "border-bb-sandy-400 shadow-[0_0_16px] shadow-bb-sandy-400/50",
+  [CharacterStatus.Busy]: "border-bb-coral-400 shadow-[0_0_12px] shadow-bb-coral-400/40",
+  [CharacterStatus.Overwhelmed]: "border-bb-coral-500 shadow-[0_0_20px] shadow-bb-coral-500/60",
 };
 
 const ANIM_CLASS: Record<CharacterStatus, string> = {
@@ -78,21 +82,19 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
     <div
       className={`
         relative flex items-start ${sizeClasses[size]}
-        bg-[rgba(11,61,96,0.6)] border border-[rgba(74,174,217,0.2)]
+        bg-bb-ocean-800/60 border border-bb-ocean-400/20
         rounded-[1.25rem] cursor-pointer
         backdrop-blur-[12px]
         transition-all duration-200 hover:-translate-y-1 hover:scale-[1.015]
         ${agent.cardClass ?? ""}
       `}
-      style={{
-        boxShadow: "0 4px 20px rgba(6,42,69,0.5), 0 1px 4px rgba(244,197,66,0.05)",
-      }}
+      style={{ boxShadow: "var(--bb-shadow-card)" }}
       onClick={onClick}
     >
       {/* Crisis overlay flash */}
       {isCrisis && (
         <div
-          className="absolute inset-0 rounded-[1.25rem] bg-[#FF4757]/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]"
+          className="absolute inset-0 rounded-[1.25rem] bg-bb-coral-500/5 pointer-events-none animate-[bb-pulse-ring_1s_ease-in-out_infinite]"
           style={{ "--bb-ring-color": "rgba(255, 71, 87, 0.4)" } as React.CSSProperties}
         />
       )}
@@ -102,7 +104,7 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
         className={`
           relative shrink-0 ${avatarSizes[size]}
           rounded-full border-2 ${STATUS_RING[agent.status]}
-          bg-gradient-to-br from-[#0B3D60] to-[#062A45]
+          bg-gradient-to-br from-bb-ocean-800 to-bb-ocean-900
           flex items-center justify-center overflow-hidden
           ${ANIM_CLASS[agent.status]}
         `}
@@ -133,7 +135,7 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
         {/* Name + status */}
         <div className="flex items-start justify-between gap-2 mb-0.5">
           <h3
-            className="font-['Baloo_2'] font-bold text-[#E8F8FF] leading-tight truncate"
+            className="font-display font-bold text-bb-ocean-50 leading-tight truncate"
             style={{ fontSize: size === "lg" ? "1.125rem" : "0.9375rem" }}
           >
             {agent.name}
@@ -141,7 +143,7 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
           <span
             className={`
               shrink-0 inline-flex items-center gap-1
-              px-2 py-0.5 rounded-full text-[10px] font-['Nunito'] font-semibold
+              px-2 py-0.5 rounded-full text-[10px] font-body font-semibold
               uppercase tracking-wide
               ${STATUS_STYLE[agent.status]}
             `}
@@ -151,17 +153,15 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
         </div>
 
         {/* Job title */}
-        <p className="text-[#4AAED9] text-xs font-['Nunito'] font-medium mb-0.5">
-          {agent.jobTitle}
-        </p>
+        <p className="text-bb-ocean-400 text-xs font-body font-medium mb-0.5">{agent.jobTitle}</p>
 
         {/* Team */}
-        <p className="text-[#B8E4F7]/50 text-[11px] font-['Nunito']">{agent.team}</p>
+        <p className="text-bb-ocean-200/50 text-[11px] font-body">{agent.team}</p>
 
         {/* Queue badge */}
         {agent.queueSize != null && agent.queueSize > 0 && (
           <div className="mt-1.5 flex items-center gap-1">
-            <span className="text-[#FF6B6B] text-[11px] font-['Nunito'] font-semibold">
+            <span className="text-bb-coral-400 text-[11px] font-body font-semibold">
               {agent.queueSize} in queue
             </span>
             {agent.queueSize > 50 && <span className="text-[10px]">🚨</span>}
@@ -170,8 +170,8 @@ export function CharacterCard({ agent, onClick, size = "md" }: CharacterCardProp
 
         {/* Last message */}
         {agent.lastMessage && size !== "sm" && (
-          <div className="mt-2 pt-2 border-t border-[rgba(74,174,217,0.1)]">
-            <p className="text-[#B8E4F7]/60 text-[11px] font-['Nunito'] italic leading-snug line-clamp-2">
+          <div className="mt-2 pt-2 border-t border-bb-ocean-400/10">
+            <p className="text-bb-ocean-200/60 text-[11px] font-body italic leading-snug line-clamp-2">
               "{agent.lastMessage}"
             </p>
           </div>
@@ -213,7 +213,7 @@ export function CharacterCardGrid({
 
       {agents.length > maxVisible && (
         <button
-          className="mt-6 mx-auto flex items-center gap-2 text-[#4AAED9] font-['Nunito'] font-semibold text-sm hover:text-[#F4C542] transition-colors hover:scale-[1.02]"
+          className="mt-6 mx-auto flex items-center gap-2 text-bb-ocean-400 font-body font-semibold text-sm hover:text-bb-sandy-400 transition-colors hover:scale-[1.02]"
           onClick={() => setExpanded((e) => !e)}
         >
           {expanded
