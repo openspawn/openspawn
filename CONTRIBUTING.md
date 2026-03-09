@@ -45,6 +45,7 @@ npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres neede
 | API       | pytest          | API endpoints, agent spawning       | `apps/api/tests/`              |
 | E2E       | Playwright      | User flows, page loads, regressions | `apps/demo/e2e/tests/`         |
 | Smoke     | curl/Playwright | Post-deploy verification            | Against production URL         |
+| Profiling | pytest + script | Latency benchmarks, perf regression | `apps/api/tests/`, `scripts/`  |
 
 **PR requirements:**
 
@@ -60,6 +61,19 @@ pnpm exec nx typecheck demo      # Type check
 pnpm exec nx e2e demo            # E2E (builds + starts sandbox)
 cd apps/api && uv run pytest     # Python API tests
 ```
+
+**Latency profiling:**
+
+```bash
+# CI benchmarks — coordination algorithm latency (always $0)
+cd apps/api && uv run pytest tests/test_latency_profile.py -v -s
+
+# Manual profiling — measures real API response times against a running server
+# Run after `npx openspawn start` or against production
+python scripts/latency-profile.py --base-url http://localhost:8000
+```
+
+The manual script profiles health checks, agent/task CRUD, routing, transitions, and memory ops. Outputs a formatted table + CSV. Use it before deploys, after infra changes, or to evaluate hosting performance.
 
 ## Animation Rules
 

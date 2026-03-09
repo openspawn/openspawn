@@ -83,6 +83,9 @@ pnpm exec nx e2e demo           # E2E tests
 pnpm exec nx run-many -t lint
 pnpm exec oxfmt --write .
 
+# Profiling — measure coordination latency (manual, against running server)
+python scripts/latency-profile.py --base-url http://localhost:8000
+
 # Database (Alembic — production PostgreSQL)
 cd apps/api && uv run alembic upgrade head
 ```
