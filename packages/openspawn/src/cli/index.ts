@@ -2,6 +2,7 @@
 // ── OpenSpawn CLI ────────────────────────────────────────────────────────────
 
 import { initCommand } from "./commands/init.js";
+import { startCommand } from "./commands/start.js";
 
 const HELP = `
 openspawn - Multi-agent organization CLI
@@ -66,9 +67,7 @@ async function main() {
     case "init":
       return initCommand(rest, ctx);
     case "start":
-      console.log("Start command will be available in next release");
-      process.exit(0);
-      break;
+      return startCommand(rest, ctx);
     default:
       console.error(`Unknown command: ${command}`);
       console.log(HELP);
