@@ -2,10 +2,8 @@ import { RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
-import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
 import { isSandboxMode } from "../graphql/fetcher";
-import { CommandPalette } from "../components/command-palette";
 import { OfflineIndicator } from "../components/offline-indicator";
 
 import { isBBTheme } from "../lib/dashboard-theme";
@@ -63,16 +61,6 @@ function DemoWrapper({ children }: { children: ReactNode }) {
       <DemoWelcome />
       <DemoControls />
     </DemoProvider>
-  );
-}
-
-function KeyboardShortcutsWrapper({ children }: { children: ReactNode }) {
-  const { helpOpen, setHelpOpen } = useKeyboardShortcuts();
-  return (
-    <>
-      {children}
-      <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
-    </>
   );
 }
 

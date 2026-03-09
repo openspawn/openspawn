@@ -268,12 +268,12 @@ ${pc.cyan("Examples:")}
     .command("comment <taskId>")
     .description("Add a comment to a task")
     .requiredOption("--text <text>", "Comment text")
-    .action(async (taskId, opts) => {
+    .action(async (taskId, _opts) => {
       try {
         await withSpinner(`Adding comment to ${pc.cyan(taskId)}...`, async () => {
           // DEFERRED: Task comment endpoint does not exist yet.
           // When the API exposes it, replace with:
-          //   await createClient().addTaskComment(taskId, opts.text)
+          //   await createClient().addTaskComment(taskId, _opts.text)
           // Expected route: POST /tasks/:id/comments  { text }
           await new Promise((r) => setTimeout(r, 500));
         });

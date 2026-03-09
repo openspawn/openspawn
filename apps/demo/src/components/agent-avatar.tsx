@@ -153,7 +153,7 @@ export function AgentAvatar({
           : undefined
       }
     >
-      <AvatarImage src={avatarUrl!} alt={name || agentId} />
+      <AvatarImage src={avatarUrl ?? ""} alt={name || agentId} />
       <AvatarFallback style={{ backgroundColor: `${levelColor}20` }}>
         <Bot className="h-1/2 w-1/2" style={{ color: levelColor }} />
       </AvatarFallback>

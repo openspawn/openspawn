@@ -1,12 +1,5 @@
 import { useMemo } from "react";
-import {
-  teams,
-  type Team,
-  getParentTeams,
-  getSubTeams,
-  getTeamById,
-  getTeamColor,
-} from "../demo/teams";
+import { teams, getParentTeams, getSubTeams, getTeamById, getTeamColor } from "../demo/teams";
 import { useAgents, type Agent } from "./use-agents";
 
 export type { Team } from "../demo/teams";

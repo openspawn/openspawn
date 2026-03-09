@@ -5,7 +5,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { execSync } from "node:child_process";
 import { Command } from "commander";
-import { readConfig, writeConfig, findAgent, addAgent } from "./config.js";
+import { readConfig, writeConfig, findAgent, addAgent, type AgentEntry } from "./config.js";
 import { generateSoulMd, generateAgentsMd, generateToolsMd, generateUserMd } from "./templates.js";
 
 export function registerHireCommand(program: Command): void {
@@ -51,7 +51,7 @@ export function registerHireCommand(program: Command): void {
       writeFileSync(join(workspaceDir, "USER.md"), generateUserMd());
 
       // 3. Update config
-      const agentEntry: Record<string, unknown> = {
+      const agentEntry: AgentEntry = {
         id: agentId,
         name: opts.name,
         workspace: workspaceDir,
@@ -60,7 +60,7 @@ export function registerHireCommand(program: Command): void {
         agentEntry.reportsTo = opts.reportsTo;
       }
 
-      addAgent(config, agentEntry as any);
+      addAgent(config, agentEntry);
       writeConfig(config);
 
       // 4. Optionally restart gateway

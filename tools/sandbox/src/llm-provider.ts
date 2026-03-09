@@ -99,7 +99,7 @@ function getRateLimiter(config: LLMConfig): RateLimiter {
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-function resolveApiKey(provider: LLMProvider): string {
+function resolveApiKey(_provider: LLMProvider): string {
   return (
     process.env.LLM_API_KEY ||
     process.env.ANTHROPIC_API_KEY ||

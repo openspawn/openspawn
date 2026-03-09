@@ -20,7 +20,7 @@ describe("templates", () => {
   it("gets template by name", () => {
     const tmpl = getTemplate("assistant-team");
     expect(tmpl).toBeDefined();
-    expect(tmpl!.label).toBe("Personal Assistant Team");
+    expect(tmpl?.label).toBe("Personal Assistant Team");
   });
 
   it("returns undefined for unknown template", () => {
@@ -28,7 +28,9 @@ describe("templates", () => {
   });
 
   it("renders template with team name", () => {
-    const tmpl = getTemplate("assistant-team")!;
+    const tmpl = getTemplate("assistant-team");
+    expect(tmpl).toBeDefined();
+    if (!tmpl) return;
     const rendered = renderTemplate(tmpl, "Acme Corp");
     expect(rendered).toContain("# Acme Corp");
     expect(rendered).not.toContain("{{TEAM_NAME}}");

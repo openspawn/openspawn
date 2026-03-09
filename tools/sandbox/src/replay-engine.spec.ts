@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { loadScenarios, matchScenario, ReplaySimulation } from "./replay-engine.js";
 import type { ReplayScenario } from "./replay-engine.js";
 import { makeAgentPublic } from "./agents.js";
@@ -117,24 +117,25 @@ describe("replay-engine", () => {
     it("parses valid scenario markdown", () => {
       const s = loadFromString(VALID_SCENARIO_MD);
       expect(s).not.toBeNull();
-      expect(s!.name).toBe("Build a Spaceship");
-      expect(s!.metadata.model).toBe("gpt-test");
-      expect(s!.metadata.ticks).toBe(3);
-      expect(s!.metadata.agents).toBe(2);
-      expect(s!.decisions).toHaveLength(3);
+      expect(s?.name).toBe("Build a Spaceship");
+      expect(s?.metadata.model).toBe("gpt-test");
+      expect(s?.metadata.ticks).toBe(3);
+      expect(s?.metadata.agents).toBe(2);
+      expect(s?.decisions).toHaveLength(3);
     });
 
     it("extracts decision fields correctly", () => {
-      const s = loadFromString(VALID_SCENARIO_MD)!;
-      const d0 = s.decisions[0];
-      expect(d0.tick).toBe(1);
-      expect(d0.agentName).toBe("Alice");
-      expect(d0.agentRole).toBe("lead");
-      expect(d0.agentLevel).toBe(7);
-      expect(d0.action).toBe("delegate");
-      expect(d0.target).toBe("bob");
-      expect(d0.task).toBe("TASK-001");
-      expect(d0.message).toContain("hull");
+      const s = loadFromString(VALID_SCENARIO_MD);
+      expect(s).not.toBeNull();
+      const d0 = s?.decisions[0];
+      expect(d0?.tick).toBe(1);
+      expect(d0?.agentName).toBe("Alice");
+      expect(d0?.agentRole).toBe("lead");
+      expect(d0?.agentLevel).toBe(7);
+      expect(d0?.action).toBe("delegate");
+      expect(d0?.target).toBe("bob");
+      expect(d0?.task).toBe("TASK-001");
+      expect(d0?.message).toContain("hull");
     });
 
     it("returns null for markdown without frontmatter", () => {
@@ -150,22 +151,24 @@ describe("replay-engine", () => {
     it("parses minimal single-decision scenario", () => {
       const s = loadFromString(MINIMAL_SCENARIO_MD);
       expect(s).not.toBeNull();
-      expect(s!.decisions).toHaveLength(1);
-      expect(s!.decisions[0].agentName).toBe("Solo");
-      expect(s!.decisions[0].action).toBe("work");
+      expect(s?.decisions).toHaveLength(1);
+      expect(s?.decisions[0].agentName).toBe("Solo");
+      expect(s?.decisions[0].action).toBe("work");
     });
 
     it("builds keywords from frontmatter and scenario name", () => {
-      const s = loadFromString(VALID_SCENARIO_MD)!;
-      expect(s.keywords).toContain("spaceship");
-      expect(s.keywords).toContain("build");
-      expect(s.keywords).toContain("rocket");
+      const s = loadFromString(VALID_SCENARIO_MD);
+      expect(s).not.toBeNull();
+      expect(s?.keywords).toContain("spaceship");
+      expect(s?.keywords).toContain("build");
+      expect(s?.keywords).toContain("rocket");
     });
 
     it("includes keywords from decision messages", () => {
-      const s = loadFromString(VALID_SCENARIO_MD)!;
+      const s = loadFromString(VALID_SCENARIO_MD);
+      expect(s).not.toBeNull();
       // "hull", "designing", "schematics", "propulsion" should be extracted
-      expect(s.keywords.some((k) => k === "hull" || k === "designing" || k === "propulsion")).toBe(
+      expect(s?.keywords.some((k) => k === "hull" || k === "designing" || k === "propulsion")).toBe(
         true,
       );
     });
@@ -211,19 +214,22 @@ describe("replay-engine", () => {
     let scenarios: ReplayScenario[];
 
     beforeEach(() => {
-      scenarios = [loadFromString(VALID_SCENARIO_MD)!, loadFromString(MINIMAL_SCENARIO_MD)!];
+      const valid = loadFromString(VALID_SCENARIO_MD);
+      const minimal = loadFromString(MINIMAL_SCENARIO_MD);
+      if (!valid || !minimal) throw new Error("Failed to parse test scenarios");
+      scenarios = [valid, minimal];
     });
 
     it("matches by keyword overlap", () => {
       const match = matchScenario("build a spaceship", scenarios);
       expect(match).not.toBeNull();
-      expect(match!.name).toBe("Build a Spaceship");
+      expect(match?.name).toBe("Build a Spaceship");
     });
 
     it("matches by substring containment", () => {
       const match = matchScenario("Build a Spaceship for Mars", scenarios);
       expect(match).not.toBeNull();
-      expect(match!.name).toBe("Build a Spaceship");
+      expect(match?.name).toBe("Build a Spaceship");
     });
 
     it("returns null for unrelated order", () => {
@@ -239,7 +245,7 @@ describe("replay-engine", () => {
     it("picks the best match among multiple scenarios", () => {
       const match = matchScenario("rocket spaceship hull", scenarios);
       expect(match).not.toBeNull();
-      expect(match!.name).toBe("Build a Spaceship");
+      expect(match?.name).toBe("Build a Spaceship");
     });
   });
 

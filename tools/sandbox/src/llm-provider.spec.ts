@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getLLMConfig, type LLMConfig } from "./llm-provider.js";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { getLLMConfig } from "./llm-provider.js";
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 

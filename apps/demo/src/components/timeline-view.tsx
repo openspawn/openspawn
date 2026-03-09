@@ -391,7 +391,7 @@ export function TimelineView({ events: eventsProp, agentId, className }: Timelin
     for (const ev of events) {
       const key = ev.taskId ?? "__general__";
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(ev);
+      map.get(key)?.push(ev);
     }
     return Array.from(map.entries()).map(([taskId, evts]) => ({
       taskId: taskId === "__general__" ? null : taskId,

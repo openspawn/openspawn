@@ -178,7 +178,7 @@ if (!useLLM && !useHybrid && !useReplay) {
 }
 
 // Start HTTP API server for dashboard integration
-startServer(sim as any);
+startServer(sim);
 
 // Auto-start scenario — defaults to ai-dev-agency in deterministic mode
 // Set SCENARIO=none to disable, or SCENARIO=<id> to pick a specific one
@@ -215,10 +215,15 @@ if (scenarioId !== "none" && !useLLM) {
 }
 
 // Save recording on Ctrl+C / kill
-if (useHybrid && "saveRecording" in sim) {
+if (
+  useHybrid &&
+  "saveRecording" in sim &&
+  typeof (sim as Record<string, unknown>).saveRecording === "function"
+) {
+  const saveRecording = (sim as Record<string, unknown>).saveRecording as () => Promise<void>;
   const save = async () => {
     console.log("\n⏹️  Stopping simulation...");
-    await (sim as any).saveRecording();
+    await saveRecording.call(sim);
     process.exit(0);
   };
   process.on("SIGINT", save);

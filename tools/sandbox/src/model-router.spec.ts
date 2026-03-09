@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { ModelRouter, type ProviderConfig, type RouteRequest } from "./model-router.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -260,13 +260,13 @@ describe("ModelRouter – updateProvider", () => {
   it("disables a provider", () => {
     const router = new ModelRouter(minimalProviders);
     expect(router.updateProvider("local", { enabled: false })).toBe(true);
-    expect(router.getConfig().find((p) => p.id === "local")!.enabled).toBe(false);
+    expect(router.getConfig().find((p) => p.id === "local")?.enabled).toBe(false);
   });
 
   it("changes priority", () => {
     const router = new ModelRouter(minimalProviders);
     router.updateProvider("cloud", { priority: 0 });
-    expect(router.getConfig().find((p) => p.id === "cloud")!.priority).toBe(0);
+    expect(router.getConfig().find((p) => p.id === "cloud")?.priority).toBe(0);
   });
 
   it("returns false for unknown provider", () => {

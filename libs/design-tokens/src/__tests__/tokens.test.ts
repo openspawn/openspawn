@@ -11,7 +11,7 @@ import {
   openspawnThemes,
 } from "../tokens/colors.js";
 import { fontFamilies, fontSizes, fontWeights } from "../tokens/typography.js";
-import { spacing, radii, shadows } from "../tokens/spacing.js";
+import { spacing, radii } from "../tokens/spacing.js";
 import { durations, easings } from "../tokens/animation.js";
 
 const HSL_PATTERN = /^\d{1,3}\s+[\d.]+%?\s+[\d.]+%?$/;

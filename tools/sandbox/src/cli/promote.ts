@@ -22,7 +22,7 @@ function parseSoulMd(content: string): {
   return {
     name: get("Name"),
     role: get("Role"),
-    level: get("Level") ? parseInt(get("Level")!.replace(/^L/, ""), 10) : undefined,
+    level: get("Level") ? parseInt((get("Level") ?? "").replace(/^L/, ""), 10) : undefined,
     domain: get("Domain"),
     reportsTo: get("Reports to"),
   };

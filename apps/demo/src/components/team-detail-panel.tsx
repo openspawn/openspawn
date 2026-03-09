@@ -34,9 +34,8 @@ import { AgentAvatar } from "./agent-avatar";
 import { AgentModeBadge } from "./agent-mode-selector";
 import { Progress } from "./ui/progress";
 import { getStatusVariant } from "../lib/status-colors";
-import { type Team, getTeamById, getSubTeams, getParentTeams, getTeamColor } from "../demo/teams";
+import { getTeamById, getSubTeams, getParentTeams, getTeamColor } from "../demo/teams";
 import { useAgents } from "../hooks/use-agents";
-import { useTeamStats } from "../hooks/use-teams";
 import { AgentMode, AgentStatus } from "@openspawn/dashboard-data";
 import { TeamDialog, DeleteTeamDialog } from "./team-management";
 import { Button } from "./ui/button";
@@ -71,7 +70,6 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
   const team = useMemo(() => getTeamById(teamId), [teamId]);
   const subTeams = useMemo(() => getSubTeams(teamId), [teamId]);
   const { agents } = useAgents();
-  const stats = useTeamStats(teamId);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const parentTeams = useMemo(() => getParentTeams(), []);

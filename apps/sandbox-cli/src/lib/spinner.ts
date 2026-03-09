@@ -1,6 +1,5 @@
 import ora, { type Ora } from "ora";
 import pc from "picocolors";
-import figures from "figures";
 import { isJsonOutput } from "./output.js";
 
 let activeSpinner: Ora | null = null;
@@ -51,7 +50,7 @@ export async function withSpinner<T>(
     failText?: string;
   } = {},
 ): Promise<T> {
-  const spinner = startSpinner(text);
+  startSpinner(text);
 
   try {
     const result = await operation();

@@ -101,7 +101,7 @@ const MAX_TICK = Math.ceil(totalTicks * SCALE);
 interface Ev {
   tick: number;
   type: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }
 const events: Ev[] = [];
 const seen = new Set<string>();

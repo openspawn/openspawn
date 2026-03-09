@@ -24,9 +24,11 @@ import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import type { Message } from "../hooks";
 import { InlineAvatar, formatTime } from "./message-utils";
 
+import type { Agent } from "../hooks";
+
 interface CommunicationGraphProps {
   messages: Message[];
-  agents: any[];
+  agents: Agent[];
 }
 
 export function CommunicationGraph({ messages, agents }: CommunicationGraphProps) {

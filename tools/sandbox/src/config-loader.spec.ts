@@ -18,7 +18,7 @@ beforeEach(() => {
 
 describe("loadAgentConfig", () => {
   it("loads agent-specific files when they exist", () => {
-    mockExists.mockImplementation((p: any) => {
+    mockExists.mockImplementation((p: unknown) => {
       const path = String(p);
       return path.includes("/agents/alice/SOUL.md");
     });
@@ -29,7 +29,7 @@ describe("loadAgentConfig", () => {
   });
 
   it("falls back to _defaults when agent file missing", () => {
-    mockExists.mockImplementation((p: any) => {
+    mockExists.mockImplementation((p: unknown) => {
       const path = String(p);
       return path.includes("_defaults/SOUL.md");
     });
@@ -51,7 +51,7 @@ describe("loadAgentConfig", () => {
 
   it("loads all five config files", () => {
     mockExists.mockReturnValue(true);
-    mockRead.mockImplementation((p: any) => `content of ${String(p).split("/").pop()}`);
+    mockRead.mockImplementation((p: unknown) => `content of ${String(p).split("/").pop()}`);
 
     const config = loadAgentConfig("alice", "/org");
     expect(config.soul).toContain("SOUL.md");
@@ -62,11 +62,11 @@ describe("loadAgentConfig", () => {
   });
 
   it("prefers agent-specific over defaults", () => {
-    mockExists.mockImplementation((p: any) => {
+    mockExists.mockImplementation((p: unknown) => {
       const path = String(p);
       return path.includes("/agents/alice/SOUL.md") || path.includes("_defaults/SOUL.md");
     });
-    mockRead.mockImplementation((p: any) => {
+    mockRead.mockImplementation((p: unknown) => {
       const path = String(p);
       return path.includes("alice") ? "Alice soul" : "Default soul";
     });

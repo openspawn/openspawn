@@ -113,7 +113,7 @@ function levelLabel(level: number): string {
   return labels[level] || `L${level}`;
 }
 
-function printTree(agents: Agent[], prefix = "", isLast = true, isRoot = true): void {
+function printTree(agents: Agent[], prefix = "", _isLast = true, isRoot = true): void {
   for (let i = 0; i < agents.length; i++) {
     const agent = agents[i];
     const last = i === agents.length - 1;

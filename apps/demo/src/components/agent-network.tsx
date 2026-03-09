@@ -94,11 +94,28 @@ async function getLayoutedElements(
 
 // ─── Activity + edge-message calculations ─────────────────────────────────────
 
+interface NetworkTask {
+  assignedToId?: string;
+}
+
+interface NetworkMessage {
+  fromAgentId?: string;
+  toAgentId?: string;
+  content?: string;
+  createdAt?: string;
+}
+
+interface NetworkConversation {
+  agents?: { id: string }[];
+  messageCount?: number;
+  latestMessage?: { content?: string; createdAt?: string };
+}
+
 function calculateAgentActivity(
   agents: Agent[],
-  tasks: any[],
-  messages: any[],
-  conversations: any[],
+  tasks: NetworkTask[],
+  messages: NetworkMessage[],
+  conversations: NetworkConversation[],
 ): Map<string, AgentActivity> {
   const activityMap = new Map<string, AgentActivity>();
 
@@ -134,8 +151,8 @@ function calculateAgentActivity(
 }
 
 function calculateEdgeMessages(
-  messages: any[],
-  conversations: any[],
+  messages: NetworkMessage[],
+  conversations: NetworkConversation[],
 ): Map<string, EdgeMessageData> {
   const edgeMap = new Map<string, EdgeMessageData>();
 
@@ -306,7 +323,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const { tasks, loading: tasksLoading } = useTasks();
   const { messages } = useMessages(100);
   const { conversations } = useConversations();
-  const { fitView, zoomIn, setCenter } = useReactFlow();
+  const { fitView, setCenter } = useReactFlow();
   const { isMobileOrTouch, isMobile } = useTouchDevice();
 
   const [selectedEdge, setSelectedEdge] = useState<{
@@ -455,7 +472,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     if (node.id !== "human") onAgentClick?.(node.id);
   }
 
-  function handleNodeMouseDown(_event: React.MouseEvent, node: Node) {
+  function handleNodeMouseDown(_event: React.MouseEvent, node: Node, _nodes: Node[]) {
     if (!isMobileOrTouch) return;
     longPressNodeRef.current = node.id;
     longPressTimerRef.current = setTimeout(() => {
@@ -463,7 +480,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     }, 500);
   }
 
-  function handleNodeMouseUp() {
+  function handleNodeMouseUp(_event?: React.MouseEvent, _node?: Node, _nodes?: Node[]) {
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
@@ -544,8 +561,8 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
             markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
             style: { stroke: "#6366f1", strokeWidth: 2 },
           }}
-          onNodeDragStart={handleNodeMouseDown as any}
-          onNodeDragStop={handleNodeMouseUp as any}
+          onNodeDragStart={handleNodeMouseDown}
+          onNodeDragStop={handleNodeMouseUp}
         >
           <Background
             variant={BackgroundVariant.Dots}

@@ -103,7 +103,6 @@ ${pc.cyan("Examples:")}
 
         if (balance.budgetPeriodLimit) {
           const spent = balance.budgetPeriodSpent || 0;
-          const pct = (spent / balance.budgetPeriodLimit) * 100;
           console.log();
           console.log(
             `  ${pc.dim("Budget:")}      ${spent.toLocaleString()} / ${balance.budgetPeriodLimit.toLocaleString()}`,

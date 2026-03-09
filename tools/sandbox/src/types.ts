@@ -81,6 +81,17 @@ export interface SandboxTask {
   parentTaskId?: string;
   dependsOn?: string[];
   subtaskIds?: string[];
+  /** Internal simulation tick counters */
+  _stageTickCount?: number;
+  _blockedTicks?: number;
+  _targetDuration?: number;
+  _crossDeptTriggers?: Array<{
+    action: string;
+    target: string;
+    priority?: SandboxTask["priority"];
+  }>;
+  _triggersProcessed?: boolean;
+  _resourceCost?: Record<string, number>;
 }
 
 export interface SandboxEvent {

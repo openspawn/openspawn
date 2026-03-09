@@ -7,16 +7,12 @@ import type { DeterministicSimulation } from "./deterministic.js";
 import type { SandboxTask, SandboxEvent, SandboxAgent } from "./types.js";
 import type {
   ScenarioDefinition,
-  ScenarioPhase,
   EpicTemplate,
   EpicInstance,
   EventTemplate,
-  EventEffect,
   ResourcePool,
   ScoreCard,
-  TaskTemplate,
   CompletionCondition,
-  CrossDeptTrigger,
 } from "./scenario-types.js";
 import { SeededRandom, DIFFICULTY_PRESETS } from "./scenario-types.js";
 
@@ -258,7 +254,7 @@ export class ScenarioEngine {
     }
 
     if (condition.epicCompletionPct !== undefined) {
-      return activeEpics.every((e) => e.completionPct >= condition.epicCompletionPct!);
+      return activeEpics.every((e) => e.completionPct >= (condition.epicCompletionPct ?? 0));
     }
 
     if (condition.specificEpics) {
@@ -287,7 +283,7 @@ export class ScenarioEngine {
         if (!allDone) continue;
       }
 
-      this.expandEpic(epic, template!);
+      if (template) this.expandEpic(epic, template);
     }
   }
 
@@ -323,7 +319,7 @@ export class ScenarioEngine {
           if (depTaskId) deps.push(depTaskId);
         }
         if (deps.length > 0) {
-          (task as any).dependsOn = deps;
+          task.dependsOn = deps;
           task.status = "blocked";
           task.blockedReason = "Dependency not ready";
           this.dag.set(taskId, deps);
@@ -353,23 +349,23 @@ export class ScenarioEngine {
         };
 
         // Store duration hint for the simulation
-        (subtask as any)._targetDuration = duration;
-        (subtask as any)._stageTickCount = 0;
+        subtask._targetDuration = duration;
+        subtask._stageTickCount = 0;
 
         this.sim.tasks.push(subtask);
-        if (!(task as any).subtaskIds) (task as any).subtaskIds = [];
-        (task as any).subtaskIds.push(subtaskId);
+        if (!task.subtaskIds) task.subtaskIds = [];
+        task.subtaskIds.push(subtaskId);
         epic.taskIds.push(subtaskId);
       }
 
       // Store trigger info on the task for postTick processing
       if (taskTpl.crossDeptTriggers) {
-        (task as any)._crossDeptTriggers = taskTpl.crossDeptTriggers;
+        task._crossDeptTriggers = taskTpl.crossDeptTriggers;
       }
 
       // Store resource cost
       if (taskTpl.resourceCost) {
-        (task as any)._resourceCost = taskTpl.resourceCost;
+        task._resourceCost = taskTpl.resourceCost;
       }
     }
 
@@ -381,16 +377,16 @@ export class ScenarioEngine {
     // Pass 1: Assign parent tasks to leads first
     for (const task of this.sim.tasks) {
       if (task.status !== "backlog" || task.assigneeId) continue;
-      if ((task as any).parentTaskId) continue; // skip subtasks in pass 1
+      if (task.parentTaskId) continue; // skip subtasks in pass 1
 
-      const epicId = (task as any).epicId;
+      const epicId = task.epicId;
       if (!epicId) continue;
 
       const domain = this.getDomainFromTask(task);
       const lead = this.findLeadForDomain(domain);
       if (lead) {
         task.assigneeId = lead.id;
-        const hasSubtasks = (task as any).subtaskIds && (task as any).subtaskIds.length > 0;
+        const hasSubtasks = task.subtaskIds && task.subtaskIds.length > 0;
         task.status = hasSubtasks ? "in_progress" : "assigned";
         lead.taskIds.push(task.id);
         this.decisionCount++;
@@ -400,9 +396,9 @@ export class ScenarioEngine {
     // Pass 2: Assign subtasks to the lead who owns the parent
     for (const task of this.sim.tasks) {
       if (task.status !== "backlog" || task.assigneeId) continue;
-      if (!(task as any).parentTaskId) continue; // only subtasks in pass 2
+      if (!task.parentTaskId) continue; // only subtasks in pass 2
 
-      const parent = this.sim.tasks.find((t) => t.id === (task as any).parentTaskId);
+      const parent = this.sim.tasks.find((t) => t.id === task.parentTaskId);
       let lead: SandboxAgent | undefined;
 
       if (parent?.assigneeId) {
@@ -461,7 +457,7 @@ export class ScenarioEngine {
       if (allMet) {
         task.status = "backlog";
         task.blockedReason = undefined;
-        (task as any).dependsOn = undefined;
+        task.dependsOn = undefined;
         this.dag.delete(taskId);
         this.log(`🔓 Unblocked "${task.title}" (dependencies met)`);
         this.decisionCount++; // unblock = 1 decision
@@ -554,7 +550,7 @@ export class ScenarioEngine {
             parentTaskId: taskId,
           };
           const dur = this.prng.int(taskDef.durationRange[0], taskDef.durationRange[1]);
-          (sub as any)._targetDuration = dur;
+          sub._targetDuration = dur;
           this.sim.tasks.push(sub);
         }
 
@@ -564,13 +560,10 @@ export class ScenarioEngine {
 
     // Block agents
     if (effect.blockAgents) {
+      const blockSpec = effect.blockAgents;
       const candidates = this.sim.agents.filter((a) => {
-        if (
-          effect.blockAgents!.domain &&
-          !a.domain.toLowerCase().includes(effect.blockAgents!.domain)
-        )
-          return false;
-        if (effect.blockAgents!.role && a.role !== effect.blockAgents!.role) return false;
+        if (blockSpec.domain && !a.domain.toLowerCase().includes(blockSpec.domain)) return false;
+        if (blockSpec.role && a.role !== blockSpec.role) return false;
         return a.role !== "coo";
       });
       const count = effect.blockAgents.count ?? 1;
@@ -710,8 +703,8 @@ export class ScenarioEngine {
   private processTriggers(): void {
     for (const task of this.sim.tasks) {
       if (task.status !== "done") continue;
-      const triggers = (task as any)._crossDeptTriggers as CrossDeptTrigger[] | undefined;
-      if (!triggers || (task as any)._triggersProcessed) continue;
+      const triggers = task._crossDeptTriggers;
+      if (!triggers || task._triggersProcessed) continue;
 
       for (const trigger of triggers) {
         if (trigger.action === "create_task") {
@@ -740,7 +733,7 @@ export class ScenarioEngine {
           }
         }
       }
-      (task as any)._triggersProcessed = true;
+      task._triggersProcessed = true;
     }
   }
 

@@ -87,8 +87,8 @@ describe("decision-executor", () => {
 
       const delegationMsg = task.activityLog.find((m) => m.type === "delegation");
       expect(delegationMsg).toBeDefined();
-      expect(delegationMsg!.from).toBe("coo");
-      expect(delegationMsg!.to).toBe("lead");
+      expect(delegationMsg?.from).toBe("coo");
+      expect(delegationMsg?.to).toBe("lead");
     });
 
     it("auto-acks delegation", () => {
@@ -194,9 +194,9 @@ describe("decision-executor", () => {
 
       const escMsg = task.activityLog.find((m) => m.type === "escalation");
       expect(escMsg).toBeDefined();
-      expect(escMsg!.from).toBe("lead");
-      expect(escMsg!.to).toBe("coo");
-      expect(escMsg!.reason).toBe("BLOCKED");
+      expect(escMsg?.from).toBe("lead");
+      expect(escMsg?.to).toBe("coo");
+      expect(escMsg?.reason).toBe("BLOCKED");
     });
 
     it("increments messagesSent on escalation", () => {
@@ -349,8 +349,8 @@ describe("decision-executor", () => {
 
       const completionMsg = task.activityLog.find((m) => m.type === "completion");
       expect(completionMsg).toBeDefined();
-      expect(completionMsg!.from).toBe("worker");
-      expect(completionMsg!.to).toBe("lead"); // worker's parent
+      expect(completionMsg?.from).toBe("worker");
+      expect(completionMsg?.to).toBe("lead"); // worker's parent
     });
 
     it("does nothing when task not found", () => {
@@ -395,7 +395,7 @@ describe("decision-executor", () => {
       // Lead should have received the message
       const received = lead.recentMessages.find((m) => m.from === "coo");
       expect(received).toBeDefined();
-      expect(received!.body).toBe("How is everything going?");
+      expect(received?.body).toBe("How is everything going?");
     });
   });
 
@@ -427,7 +427,7 @@ describe("decision-executor", () => {
 
       expect(ctx.agents).toHaveLength(2);
       expect(ctx.agents.find((a) => a.id === "alice")).toBeDefined();
-      expect(ctx.agents.find((a) => a.id === "alice")!.parentId).toBe("coo");
+      expect(ctx.agents.find((a) => a.id === "alice")?.parentId).toBe("coo");
     });
 
     it("creates generic agent when no roster match", () => {
@@ -449,7 +449,7 @@ describe("decision-executor", () => {
       expect(ctx.agents).toHaveLength(2);
       const hired = ctx.agents.find((a) => a.id !== "coo");
       expect(hired).toBeDefined();
-      expect(hired!.name).toBe("New Worker");
+      expect(hired?.name).toBe("New Worker");
     });
 
     it("sets hired agent as active with correct parent", () => {
@@ -478,8 +478,8 @@ describe("decision-executor", () => {
       );
 
       const bob = ctx.agents.find((a) => a.id === "bob");
-      expect(bob!.status).toBe("active");
-      expect(bob!.parentId).toBe("coo");
+      expect(bob?.status).toBe("active");
+      expect(bob?.parentId).toBe("coo");
     });
   });
 

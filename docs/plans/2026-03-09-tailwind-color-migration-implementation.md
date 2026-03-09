@@ -13,6 +13,7 @@
 ### Task 1: Extend Tailwind Preset with Missing Tokens
 
 **Files:**
+
 - Modify: `libs/design-tokens/src/tailwind-preset.ts`
 
 **Step 1: Add ocean-abyss and semantic status tokens**
@@ -61,6 +62,7 @@ git commit -m "feat(design-tokens): add ocean-abyss + semantic status tokens to 
 ### Task 2: Create StatusBadge CVA Component
 
 **Files:**
+
 - Create: `apps/demo/src/components/ui/status-badge.tsx`
 
 **Step 1: Create the component**
@@ -77,7 +79,8 @@ const statusBadgeVariants = cva(
         idle: "bg-bb-status-idle/10 text-bb-status-idle border-bb-status-idle/30",
         working: "bg-bb-status-working/15 text-bb-status-working border-bb-status-working/40",
         busy: "bg-bb-status-busy/15 text-bb-status-busy border-bb-status-busy/40",
-        overwhelmed: "bg-bb-status-overwhelmed/20 text-bb-status-overwhelmed border-bb-status-overwhelmed/50",
+        overwhelmed:
+          "bg-bb-status-overwhelmed/20 text-bb-status-overwhelmed border-bb-status-overwhelmed/50",
         paused: "bg-slate-400/15 text-slate-400 border-slate-400/30",
       },
     },
@@ -103,8 +106,7 @@ const statusDotVariants = cva("w-2 h-2 rounded-full shrink-0", {
 });
 
 interface StatusBadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof statusBadgeVariants> {
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof statusBadgeVariants> {
   label: string;
   showDot?: boolean;
 }
@@ -144,6 +146,7 @@ git commit -m "feat(demo): add StatusBadge CVA component with bb-status tokens"
 ### Task 3: Create ActionButton CVA Component
 
 **Files:**
+
 - Create: `apps/demo/src/components/ui/action-button.tsx`
 
 **Step 1: Create the component**
@@ -157,10 +160,13 @@ const actionButtonVariants = cva(
   {
     variants: {
       intent: {
-        ocean: "bg-bb-ocean-400/10 border-bb-ocean-400/20 text-bb-ocean-200 hover:bg-bb-ocean-400/15",
+        ocean:
+          "bg-bb-ocean-400/10 border-bb-ocean-400/20 text-bb-ocean-200 hover:bg-bb-ocean-400/15",
         kelp: "bg-bb-kelp-400/12 border-bb-kelp-400/25 text-bb-kelp-400 hover:bg-bb-kelp-400/18",
-        sandy: "bg-bb-sandy-400/12 border-bb-sandy-400/25 text-bb-sandy-400 hover:bg-bb-sandy-400/18",
-        coral: "bg-bb-coral-500/8 border-bb-coral-500/20 text-bb-coral-500 hover:bg-bb-coral-500/15",
+        sandy:
+          "bg-bb-sandy-400/12 border-bb-sandy-400/25 text-bb-sandy-400 hover:bg-bb-sandy-400/18",
+        coral:
+          "bg-bb-coral-500/8 border-bb-coral-500/20 text-bb-coral-500 hover:bg-bb-coral-500/15",
         indigo: "bg-indigo-400/10 border-indigo-400/20 text-indigo-400 hover:bg-indigo-400/15",
       },
       size: {
@@ -182,16 +188,11 @@ const actionButtonVariants = cva(
 );
 
 interface ActionButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof actionButtonVariants> {}
 
-export function ActionButton({
-  intent,
-  size,
-  fullWidth,
-  className,
-  ...props
-}: ActionButtonProps) {
+export function ActionButton({ intent, size, fullWidth, className, ...props }: ActionButtonProps) {
   return (
     <button
       className={cn(actionButtonVariants({ intent, size, fullWidth }), className)}
@@ -220,6 +221,7 @@ git commit -m "feat(demo): add ActionButton CVA component with bb-* intent varia
 ### Task 4: Create ModalContainer Component
 
 **Files:**
+
 - Create: `apps/demo/src/components/ui/modal-container.tsx`
 
 **Step 1: Create the component**
@@ -263,13 +265,8 @@ export function ModalContainer({
   className,
 }: ModalContainerProps) {
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-[fade-in_0.15s_ease-out]"
-    >
-      <div
-        className="absolute inset-0 bg-bb-ocean-abyss/60"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-[fade-in_0.15s_ease-out]">
+      <div className="absolute inset-0 bg-bb-ocean-abyss/60" onClick={onClose} />
       <div
         className={cn(
           modalPanelVariants({ intent, size }),
@@ -303,6 +300,7 @@ git commit -m "feat(demo): add ModalContainer CVA component with default/destruc
 ### Task 5: Convert AgentControlPanel
 
 **Files:**
+
 - Modify: `apps/demo/src/components/controls/AgentControlPanel.tsx`
 
 **Step 1: Replace STATUS_COLORS with StatusBadge import**
@@ -310,6 +308,7 @@ git commit -m "feat(demo): add ModalContainer CVA component with default/destruc
 Remove the `STATUS_COLORS` constant (lines 17-23). Import `StatusBadge` and `ActionButton`.
 
 Replace the status badge JSX (lines 102-121) with:
+
 ```tsx
 <StatusBadge
   status={agent.status === "paused" ? "paused" : agent.status}
@@ -320,12 +319,14 @@ Replace the status badge JSX (lines 102-121) with:
 **Step 2: Convert the panel container**
 
 Replace the outer `div` inline styles (line 52-56) with Tailwind classes:
+
 ```tsx
 className="fixed inset-y-0 right-0 w-80 max-w-[90vw] z-50 flex flex-col
   bg-gradient-to-b from-bb-ocean-900/[0.97] to-bb-ocean-abyss/[0.98]
   border-l border-bb-ocean-400/20 backdrop-blur-2xl
   animate-[slide-in-right_0.25s_ease-out]"
 ```
+
 Remove the `style` prop entirely.
 
 **Step 3: Convert the header section**
@@ -382,6 +383,7 @@ git commit -m "refactor(demo): convert AgentControlPanel to tailwind tokens + CV
 ### Task 6: Convert TaskControlBar
 
 **Files:**
+
 - Modify: `apps/demo/src/components/controls/TaskControlBar.tsx`
 
 **Step 1: Convert HireModal to use ModalContainer + ActionButton**
@@ -426,6 +428,7 @@ git commit -m "refactor(demo): convert TaskControlBar to tailwind tokens + CVA c
 ### Task 7: Convert ConfirmModal
 
 **Files:**
+
 - Modify: `apps/demo/src/components/controls/ConfirmModal.tsx`
 
 **Step 1: Rewrite using ModalContainer + ActionButton**
@@ -451,12 +454,8 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <ModalContainer intent="destructive" size="sm" onClose={onCancel}>
-      <div className="text-base font-bold font-display text-bb-coral-500 mb-2">
-        ⚠️ {title}
-      </div>
-      <p className="text-sm font-body text-bb-ocean-200/60 leading-relaxed mb-6">
-        {message}
-      </p>
+      <div className="text-base font-bold font-display text-bb-coral-500 mb-2">⚠️ {title}</div>
+      <p className="text-sm font-body text-bb-ocean-200/60 leading-relaxed mb-6">{message}</p>
       <div className="flex gap-3">
         <ActionButton intent="ocean" size="lg" fullWidth onClick={onCancel}>
           Cancel
@@ -485,17 +484,23 @@ git commit -m "refactor(demo): convert ConfirmModal to ModalContainer + ActionBu
 ### Task 8: Convert CharacterCard
 
 **Files:**
+
 - Modify: `apps/demo/src/components/bb/CharacterCard.tsx`
 
 **Step 1: Convert STATUS_STYLE map**
 
 Replace hex brackets with `bb-status-*` tokens:
+
 ```ts
 const STATUS_STYLE: Record<CharacterStatus, string> = {
-  [CharacterStatus.Idle]: "bg-bb-status-idle/10 text-bb-status-idle border border-bb-status-idle/30",
-  [CharacterStatus.Working]: "bg-bb-status-working/15 text-bb-status-working border border-bb-status-working/40",
-  [CharacterStatus.Busy]: "bg-bb-status-busy/15 text-bb-status-busy border border-bb-status-busy/40",
-  [CharacterStatus.Overwhelmed]: "bg-bb-status-overwhelmed/20 text-bb-status-overwhelmed border border-bb-status-overwhelmed/50",
+  [CharacterStatus.Idle]:
+    "bg-bb-status-idle/10 text-bb-status-idle border border-bb-status-idle/30",
+  [CharacterStatus.Working]:
+    "bg-bb-status-working/15 text-bb-status-working border border-bb-status-working/40",
+  [CharacterStatus.Busy]:
+    "bg-bb-status-busy/15 text-bb-status-busy border border-bb-status-busy/40",
+  [CharacterStatus.Overwhelmed]:
+    "bg-bb-status-overwhelmed/20 text-bb-status-overwhelmed border border-bb-status-overwhelmed/50",
 };
 ```
 
@@ -546,6 +551,7 @@ git commit -m "refactor(demo): convert CharacterCard to bb-* tailwind tokens"
 ### Task 9: Convert LiveTickerFeed
 
 **Files:**
+
 - Modify: `apps/demo/src/components/bb/LiveTickerFeed.tsx`
 
 **Step 1: Convert TYPE_STYLE and BORDER_STYLE maps**
@@ -595,6 +601,7 @@ git commit -m "refactor(demo): convert LiveTickerFeed to bb-* tailwind tokens"
 ### Task 10: Convert Presence Component
 
 **Files:**
+
 - Modify: `apps/demo/src/components/presence.tsx`
 
 **Step 1: Convert glowColors to use CSS vars or Tailwind**

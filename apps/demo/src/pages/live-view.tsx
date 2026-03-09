@@ -35,10 +35,7 @@ import {
   agentRegister,
   escalate,
   eventList,
-  taskList,
-  McpError,
 } from "../services/mcp-client";
-import { useMcpOrgStatus } from "../hooks/use-mcp";
 import "../components/controls/control-animations.css";
 
 // ── Variable tick timing ──────────────────────────────────────────────────────
@@ -944,7 +941,6 @@ export function LiveViewPage() {
     console.log("[LiveView] view-plan: opening PLAN.md");
   }, []);
 
-  const mcpOrg = useMcpOrgStatus();
   const replay = useReplay();
   const annotation = getActiveAnnotation(replay.tick);
 

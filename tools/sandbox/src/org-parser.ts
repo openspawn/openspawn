@@ -17,7 +17,8 @@ import type {
   Strong,
   PhrasingContent,
 } from "mdast";
-import type { SandboxAgent, ACPMessage } from "./types.js";
+import type { SandboxAgent } from "./types.js";
+import type { ACPMessage } from "./types.js";
 
 // Map character names to avatar image files served at /avatars/ by the sandbox API
 const AVATAR_FILES: Record<string, string> = {
@@ -104,7 +105,7 @@ function phrasingToText(nodes: PhrasingContent[]): string {
   return nodes
     .map((n) => {
       if (n.type === "text") return (n as Text).value;
-      if ("children" in n) return phrasingToText((n as any).children);
+      if ("children" in n) return phrasingToText((n as { children: PhrasingContent[] }).children);
       return "";
     })
     .join("");
@@ -113,12 +114,13 @@ function phrasingToText(nodes: PhrasingContent[]): string {
 /** Extract text from any mdast node */
 function nodeToText(node: Content): string {
   if (node.type === "text") return (node as Text).value;
-  if ("children" in node) return (node as any).children.map((c: Content) => nodeToText(c)).join("");
+  if ("children" in node)
+    return (node as { children: Content[] }).children.map((c: Content) => nodeToText(c)).join("");
   return "";
 }
 
 /** Extract bold-key: value pairs from a list in mdast */
-function extractMetaFromList(items: ListItem[]): Record<string, string> {
+function _extractMetaFromList(items: ListItem[]): Record<string, string> {
   const meta: Record<string, string> = {};
   for (const item of items) {
     const text = item.children

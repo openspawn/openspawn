@@ -186,7 +186,7 @@ describe("DeterministicSimulation", () => {
 
       const tickComplete = events.find((e) => e.type === "tick_complete");
       expect(tickComplete).toBeDefined();
-      expect(tickComplete!.message).toContain("Tick 1");
+      expect(tickComplete?.message).toContain("Tick 1");
     });
   });
 
@@ -318,7 +318,7 @@ describe("DeterministicSimulation", () => {
 
         const delegationMsg = task.activityLog.find((m) => m.type === "delegation");
         expect(delegationMsg).toBeDefined();
-        expect(delegationMsg!.from).toBe("coo");
+        expect(delegationMsg?.from).toBe("coo");
       }
     });
 
@@ -335,7 +335,7 @@ describe("DeterministicSimulation", () => {
       // If any delegation happened, the lead should have recent messages
       const leadAgent = sim.agents.find((a) => a.id === "lead-eng");
       if (sim.tasks.some((t) => t.assigneeId === "lead-eng")) {
-        expect(leadAgent!.recentMessages.length).toBeGreaterThan(0);
+        expect(leadAgent?.recentMessages.length).toBeGreaterThan(0);
       }
     });
   });
@@ -531,8 +531,8 @@ describe("DeterministicSimulation", () => {
       }
 
       // Different seeds → at least some tasks will differ in status (blocking is RNG-based)
-      const statuses1 = sim1.tasks.map((t) => t.status).join(",");
-      const statuses2 = sim2.tasks.map((t) => t.status).join(",");
+      const _statuses1 = sim1.tasks.map((t) => t.status).join(",");
+      const _statuses2 = sim2.tasks.map((t) => t.status).join(",");
       // Not guaranteed to differ for all seeds/tick counts, but very likely over 20 ticks
       // This test may occasionally pass even with identical results due to luck
       // The key test is the same-seed one above

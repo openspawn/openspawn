@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Command, X } from "lucide-react";
-import { cn } from "../lib/utils";
 
 interface Shortcut {
   key: string;

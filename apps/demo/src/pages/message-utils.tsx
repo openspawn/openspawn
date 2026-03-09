@@ -4,13 +4,13 @@
  */
 import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
-import type { Message } from "../hooks";
+import type { Agent, Message } from "../hooks";
 
 // ─── InlineAvatar ─────────────────────────────────────────────────────────────
 
 interface InlineAvatarProps {
   agentId: string;
-  agents: any[];
+  agents: Agent[];
   className?: string;
   fontSize?: string;
 }
@@ -22,10 +22,10 @@ export function InlineAvatar({
   className = "w-5 h-5",
   fontSize = "text-xs",
 }: InlineAvatarProps) {
-  const agent = agents.find((a: any) => a.id === agentId);
-  const avatar = (agent as any)?.avatar;
-  const avatarColor = (agent as any)?.avatarColor || "#71717a";
-  const avatarUrl = (agent as any)?.avatarUrl;
+  const agent = agents.find((a) => a.id === agentId);
+  const avatar = agent?.avatar;
+  const avatarColor = agent?.avatarColor || "#71717a";
+  const avatarUrl = agent?.avatarUrl;
 
   if (avatarUrl) {
     return (
@@ -94,11 +94,11 @@ export const acpTypeRenderers: Record<string, (msg: Message) => AcpRenderResult>
   }),
   progress: (msg) => ({ label: `📊 ${msg.content}`, className: "bg-muted/30" }),
   escalation: (msg) => ({
-    label: `⚠️ Escalated: ${(msg as any).reason || "unknown"} — ${msg.content}`,
+    label: `⚠️ Escalated: ${msg.reason || "unknown"} — ${msg.content}`,
     className: "bg-red-500/10 border border-red-500/20",
   }),
   completion: (msg) => ({
-    label: `✅ Completed: ${(msg as any).summary || msg.content}`,
+    label: `✅ Completed: ${msg.summary || msg.content}`,
     className: "bg-emerald-500/10 border border-emerald-500/20",
   }),
 };

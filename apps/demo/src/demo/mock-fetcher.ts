@@ -380,7 +380,7 @@ function handleOperation(operationName: string, variables: OperationVariables): 
       messages.forEach((msg) => {
         const key = [msg.fromAgentId, msg.toAgentId].sort().join("::");
         if (!conversationMap.has(key)) conversationMap.set(key, []);
-        conversationMap.get(key)!.push(msg);
+        conversationMap.get(key)?.push(msg);
       });
 
       const conversations = Array.from(conversationMap.entries())

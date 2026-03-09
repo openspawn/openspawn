@@ -1,7 +1,7 @@
 // ── Ollama Client ────────────────────────────────────────────────────────────
 // Handles inference calls with concurrency limiting and retries
 
-import type { SandboxAgent, SandboxTask, AgentAction, SandboxConfig, ACPMessage } from "./types.js";
+import type { SandboxAgent, SandboxTask, AgentAction, SandboxConfig } from "./types.js";
 
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://localhost:11434";
 

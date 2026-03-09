@@ -14,7 +14,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { cn } from "../lib/utils";
 import { isSandboxMode } from "../graphql/fetcher";
 import { TeamFilterDropdown } from "../components/team-badge";
-import type { Message } from "../hooks";
+import type { Agent, Message } from "../hooks";
 import { InlineAvatar, formatTime, typeColors, typeIcons } from "./message-utils";
 
 // ─── FeedVirtualList ──────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ interface FeedVirtualListProps {
   filtered: Message[];
   allMessages: Message[];
   onViewThread: (convoKey: string) => void;
-  agents: any[];
+  agents: Agent[];
 }
 
 function FeedVirtualList({ filtered, onViewThread, agents }: FeedVirtualListProps) {
@@ -50,15 +50,15 @@ function FeedVirtualList({ filtered, onViewThread, agents }: FeedVirtualListProp
                   <Card
                     className={cn(
                       "flex-1 border-l-4",
-                      isSandboxMode && (msg as any).acpType === "delegation" && "border-l-blue-500",
+                      isSandboxMode && msg.acpType === "delegation" && "border-l-blue-500",
                       isSandboxMode &&
-                        (msg as any).acpType === "escalation" &&
+                        msg.acpType === "escalation" &&
                         "border-l-red-500 bg-red-500/5",
                       isSandboxMode &&
-                        (msg as any).acpType === "completion" &&
+                        msg.acpType === "completion" &&
                         "border-l-emerald-500 bg-emerald-500/5",
-                      isSandboxMode && (msg as any).acpType === "progress" && "border-l-slate-400",
-                      isSandboxMode && (msg as any).acpType === "ack" && "border-l-transparent",
+                      isSandboxMode && msg.acpType === "progress" && "border-l-slate-400",
+                      isSandboxMode && msg.acpType === "ack" && "border-l-transparent",
                       !isSandboxMode && msg.type === "TASK" && "border-l-blue-500",
                       !isSandboxMode && msg.type === "STATUS" && "border-l-green-500",
                       !isSandboxMode && msg.type === "REPORT" && "border-l-purple-500",

@@ -2,6 +2,7 @@
  * Org Chart — ReactFlow tree layout showing teams → sub-teams → agents.
  * Features: animated edge pulses, click-to-detail, presence glow on active agents.
  */
+
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useDemo } from "../demo/DemoProvider";
 import {
@@ -524,7 +525,7 @@ function OrgChartInner({
   const [isLayouted, setIsLayouted] = useState(false);
   const baseEdgesRef = useRef<Edge[]>([]);
   const previousAgentIdsRef = useRef<Set<string>>(new Set());
-  const [newAgentIds, setNewAgentIds] = useState<Set<string>>(new Set());
+  const [, setNewAgentIds] = useState<Set<string>>(new Set());
 
   // Only re-layout when agent IDs change (add/remove), not on every data update
   const agentIds = useMemo(
@@ -649,17 +650,19 @@ function OrgChartInner({
       setEdges((prev) =>
         prev.map((e) => {
           const shouldAnimate = animatedIds.has(e.id);
-          const wasAnimated = (e.data as any)?.animated;
+          const edgeData = e.data ?? {};
+          const wasAnimated = Boolean(edgeData["animated"]);
           if (shouldAnimate === wasAnimated) return e;
-          return { ...e, data: { ...((e.data as object) || {}), animated: shouldAnimate } };
+          return { ...e, data: { ...edgeData, animated: shouldAnimate } };
         }),
       );
 
       setTimeout(() => {
         setEdges((prev) =>
           prev.map((e) => {
-            if (!(e.data as any)?.animated) return e;
-            return { ...e, data: { ...((e.data as object) || {}), animated: false } };
+            const edgeData = e.data ?? {};
+            if (!edgeData["animated"]) return e;
+            return { ...e, data: { ...edgeData, animated: false } };
           }),
         );
       }, displayMs);

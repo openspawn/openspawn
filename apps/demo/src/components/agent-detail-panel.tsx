@@ -29,7 +29,6 @@ import { useCredits } from "../hooks/use-credits";
 import { AgentRole, TaskStatus } from "@openspawn/dashboard-data";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 // recharts v3 has infinite-loop bug — using custom bars instead
-import { useContainerSize } from "../hooks/use-container-size";
 // ChartTooltip removed — using custom bars
 import { Sparkline, generateSparklineData } from "./ui/sparkline";
 import { TimelineView } from "./timeline-view";
@@ -37,6 +36,23 @@ import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-co
 import { TeamBadge } from "./team-badge";
 
 type Agent = AgentFieldsFragment;
+
+interface SandboxMessage {
+  id: string;
+  from: string;
+  to: string;
+  type: string;
+  body?: string;
+  summary?: string;
+  pct?: number;
+  timestamp: string;
+}
+
+interface SandboxAgent {
+  agentId: string;
+  id: string;
+  systemPrompt?: string;
+}
 
 interface AgentDetailPanelProps {
   agentId: string | null;
@@ -71,7 +87,6 @@ function OverviewTab({ agent }: { agent: Agent }) {
     [agents, agent.parentId],
   );
 
-  const levelColor = getLevelColor(agent.level);
   const trustScore = agent.trustScore ?? 50;
   const successRate =
     agent.tasksCompleted && agent.tasksCompleted > 0
@@ -469,11 +484,11 @@ function MessagesTab({ agent }: { agent: Agent }) {
   const firstReport = reports[0];
 
   // Fetch real messages from sandbox API when in sandbox mode
-  const { data: sandboxMessages } = useQuery({
+  const { data: sandboxMessages } = useQuery<SandboxMessage[]>({
     queryKey: ["sandbox-agent-messages", agent.agentId],
     queryFn: async () => {
       const res = await fetch(`${SANDBOX_URL}/api/agent/${agent.agentId}/messages`);
-      return res.json();
+      return res.json() as Promise<SandboxMessage[]>;
     },
     enabled: isSandboxMode,
     // Refetch driven by SSE tick_complete (see use-sandbox-tick.ts)
@@ -483,7 +498,6 @@ function MessagesTab({ agent }: { agent: Agent }) {
   const generatedMessages = useMemo(() => {
     if (isSandboxMode) return [];
     const domain = agent.domain ?? "operations";
-    const parentName = parent?.name ?? "Manager";
     const reportName = firstReport?.name;
     const now = Date.now();
 
@@ -570,7 +584,7 @@ function MessagesTab({ agent }: { agent: Agent }) {
             <p>No messages yet</p>
           </div>
         ) : (
-          msgs.map((msg: any, index: number) => {
+          msgs.map((msg: SandboxMessage, index: number) => {
             const isSent = msg.from === agent.agentId;
             const style = acpTypeStyles[msg.type] || acpTypeStyles.ack;
             const fromAgent = allAgents.find((a) => a.agentId === msg.from);
@@ -655,20 +669,18 @@ function MessagesTab({ agent }: { agent: Agent }) {
 
 // Prompt Tab Content
 function PromptTab({ agent }: { agent: Agent }) {
-  const { data: sandboxAgents } = useQuery({
+  const { data: sandboxAgents } = useQuery<SandboxAgent[]>({
     queryKey: ["sandbox-agents-for-prompt"],
     queryFn: async () => {
       const res = await fetch(`${SANDBOX_URL}/api/agents`);
-      return res.json();
+      return res.json() as Promise<SandboxAgent[]>;
     },
     enabled: isSandboxMode,
   });
 
   const systemPrompt = useMemo(() => {
     if (!isSandboxMode || !sandboxAgents) return null;
-    const match = sandboxAgents.find(
-      (a: any) => a.agentId === agent.agentId || a.id === agent.agentId,
-    );
+    const match = sandboxAgents.find((a) => a.agentId === agent.agentId || a.id === agent.agentId);
     return match?.systemPrompt || null;
   }, [sandboxAgents, agent.agentId]);
 

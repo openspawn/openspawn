@@ -91,7 +91,9 @@ describe("init scaffolding", () => {
   });
 
   it("rendered template has correct team name", () => {
-    const tmpl = getTemplate("assistant-team")!;
+    const tmpl = getTemplate("assistant-team");
+    expect(tmpl).toBeDefined();
+    if (!tmpl) return;
     const rendered = renderTemplate(tmpl, "Acme Corp");
     expect(rendered).toContain("# Acme Corp");
     expect(rendered).not.toContain("{{TEAM_NAME}}");

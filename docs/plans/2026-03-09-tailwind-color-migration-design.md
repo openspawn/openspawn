@@ -35,20 +35,20 @@ Worst offenders first (8 files). `pages/live-view.tsx`, `toast.ts`, and `bb-toke
 
 ### Hex-to-Tailwind Rosetta Stone
 
-| Hardcoded | Tailwind class |
-|---|---|
-| `#4AAED9` / `rgba(74,174,217,*)` | `bb-ocean-400` |
-| `#B8E4F7` / `rgba(184,228,247,*)` | `bb-ocean-200` |
-| `#E8F8FF` | `bb-ocean-50` |
-| `#0B3D60` / `rgba(11,61,96,*)` | `bb-ocean-800` |
-| `#062A45` / `rgba(6,42,69,*)` | `bb-ocean-900` |
-| `#030E1A` / `rgba(3,14,26,*)` | `bb-ocean-abyss` |
-| `#F4C542` / `rgba(244,197,66,*)` | `bb-sandy-400` |
-| `#FF4757` / `rgba(255,71,87,*)` | `bb-coral-500` |
-| `#FF6B6B` / `rgba(255,107,107,*)` | `bb-coral-400` |
-| `#4AE88A` / `rgba(74,232,138,*)` | `bb-kelp-400` |
-| `#818CF8` / `rgba(99,102,241,*)` | `indigo-400` |
-| `#94A3B8` / `rgba(148,163,184,*)` | `slate-400` |
+| Hardcoded                         | Tailwind class   |
+| --------------------------------- | ---------------- |
+| `#4AAED9` / `rgba(74,174,217,*)`  | `bb-ocean-400`   |
+| `#B8E4F7` / `rgba(184,228,247,*)` | `bb-ocean-200`   |
+| `#E8F8FF`                         | `bb-ocean-50`    |
+| `#0B3D60` / `rgba(11,61,96,*)`    | `bb-ocean-800`   |
+| `#062A45` / `rgba(6,42,69,*)`     | `bb-ocean-900`   |
+| `#030E1A` / `rgba(3,14,26,*)`     | `bb-ocean-abyss` |
+| `#F4C542` / `rgba(244,197,66,*)`  | `bb-sandy-400`   |
+| `#FF4757` / `rgba(255,71,87,*)`   | `bb-coral-500`   |
+| `#FF6B6B` / `rgba(255,107,107,*)` | `bb-coral-400`   |
+| `#4AE88A` / `rgba(74,232,138,*)`  | `bb-kelp-400`    |
+| `#818CF8` / `rgba(99,102,241,*)`  | `indigo-400`     |
+| `#94A3B8` / `rgba(148,163,184,*)` | `slate-400`      |
 
 ## CVA Components
 

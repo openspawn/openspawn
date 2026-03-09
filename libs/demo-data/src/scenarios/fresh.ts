@@ -14,9 +14,9 @@ export const freshScenario: DemoScenario = {
 
   // Start with Agent Dennis (COO) and Tech Talent Agent
   agents: [
-    agents.find((a) => a.id === AGENT_IDS.agentDennis)!,
-    agents.find((a) => a.id === AGENT_IDS.techTalent)!,
-  ],
+    agents.find((a) => a.id === AGENT_IDS.agentDennis),
+    agents.find((a) => a.id === AGENT_IDS.techTalent),
+  ].filter((a) => a !== undefined),
 
   // No initial tasks - they'll be created during simulation
   tasks: [],

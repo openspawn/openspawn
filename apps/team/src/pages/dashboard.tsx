@@ -25,7 +25,7 @@ import {
   Shield,
   CircleDot,
 } from "lucide-react";
-import { useAgents, useTasks, useEvents } from "../hooks";
+import { useAgents, useTasks, useEvents, type Agent, type Task } from "../hooks";
 import { AgentStatus, TaskStatus } from "@openspawn/dashboard-data";
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -96,7 +96,7 @@ function AgentCard({
   taskCount,
   onClick,
 }: {
-  agent: any;
+  agent: Agent;
   taskCount: number;
   onClick?: () => void;
 }) {
@@ -175,7 +175,7 @@ function AgentCard({
 
 /* ── Task Row ───────────────────────────────────────────────────── */
 
-function TaskRow({ task, index, onClick }: { task: any; index: number; onClick?: () => void }) {
+function TaskRow({ task, index, onClick }: { task: Task; index: number; onClick?: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -8 }}

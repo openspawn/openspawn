@@ -325,7 +325,7 @@ const scenarioColorMap: Record<
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function LandingPage() {
-  const [agentCount, setAgentCount] = useState(22);
+  const [agentCount] = useState(22);
   const [stars, setStars] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   useScrollReveal();

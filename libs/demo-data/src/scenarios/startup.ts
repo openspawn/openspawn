@@ -19,36 +19,37 @@ export const startupScenario: DemoScenario = {
 
   agents: [
     // Keep only core agents
-    agents.find((a) => a.id === AGENT_IDS.agentDennis)!,
-    agents.find((a) => a.id === AGENT_IDS.techTalent)!,
-    agents.find((a) => a.id === AGENT_IDS.marketingTalent)!,
-    agents.find((a) => a.id === AGENT_IDS.codeReviewer)!,
-    agents.find((a) => a.id === AGENT_IDS.copywriter)!,
-  ],
+    agents.find((a) => a.id === AGENT_IDS.agentDennis),
+    agents.find((a) => a.id === AGENT_IDS.techTalent),
+    agents.find((a) => a.id === AGENT_IDS.marketingTalent),
+    agents.find((a) => a.id === AGENT_IDS.codeReviewer),
+    agents.find((a) => a.id === AGENT_IDS.copywriter),
+  ].filter((a) => a !== undefined),
 
   tasks: tasks.slice(0, 10),
 
-  credits: creditTransactions.filter((t) =>
-    [
+  credits: creditTransactions.filter((t) => {
+    const coreIds: string[] = [
       AGENT_IDS.agentDennis,
       AGENT_IDS.techTalent,
       AGENT_IDS.marketingTalent,
       AGENT_IDS.codeReviewer,
       AGENT_IDS.copywriter,
-    ].includes(t.agentId as any),
-  ),
+    ];
+    return coreIds.includes(t.agentId);
+  }),
 
-  events: events.filter(
-    (e) =>
-      !e.agentId ||
-      [
-        AGENT_IDS.agentDennis,
-        AGENT_IDS.techTalent,
-        AGENT_IDS.marketingTalent,
-        AGENT_IDS.codeReviewer,
-        AGENT_IDS.copywriter,
-      ].includes(e.agentId as any),
-  ),
+  events: events.filter((e) => {
+    if (!e.agentId) return true;
+    const coreIds: string[] = [
+      AGENT_IDS.agentDennis,
+      AGENT_IDS.techTalent,
+      AGENT_IDS.marketingTalent,
+      AGENT_IDS.codeReviewer,
+      AGENT_IDS.copywriter,
+    ];
+    return coreIds.includes(e.agentId);
+  }),
 
   messages: generateInitialMessages(
     [

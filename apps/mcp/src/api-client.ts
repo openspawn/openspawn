@@ -43,7 +43,8 @@ export class ApiClient {
     body: string,
   ): string {
     const message = `${method}${path}${timestamp}${nonce}${body}`;
-    return createHmac("sha256", this.secret!).update(message).digest("hex");
+    if (!this.secret) throw new Error("HMAC secret is not configured");
+    return createHmac("sha256", this.secret).update(message).digest("hex");
   }
 
   async request<T>(method: string, path: string, body?: Record<string, unknown>): Promise<T> {

@@ -8,16 +8,7 @@
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkFrontmatter from "remark-frontmatter";
-import type {
-  Root,
-  Heading,
-  Content,
-  List,
-  ListItem,
-  Paragraph,
-  Text,
-  PhrasingContent,
-} from "mdast";
+import type { Root, Heading, Content, List, Paragraph, Text, PhrasingContent } from "mdast";
 
 // ── Public types ─────────────────────────────────────────────────────────────
 
@@ -77,11 +68,19 @@ function inferLevel(nameAndRole: string): number {
   return 4;
 }
 
+interface NodeWithChildren {
+  children: PhrasingContent[];
+}
+
+function hasChildren(n: object): n is NodeWithChildren {
+  return "children" in n && Array.isArray((n as NodeWithChildren).children);
+}
+
 function phrasingToText(nodes: PhrasingContent[]): string {
   return nodes
     .map((n) => {
       if (n.type === "text") return (n as Text).value;
-      if ("children" in n) return phrasingToText((n as any).children);
+      if (hasChildren(n)) return phrasingToText(n.children);
       return "";
     })
     .join("");
@@ -89,7 +88,7 @@ function phrasingToText(nodes: PhrasingContent[]): string {
 
 function nodeToText(node: Content): string {
   if (node.type === "text") return (node as Text).value;
-  if ("children" in node) return (node as any).children.map((c: Content) => nodeToText(c)).join("");
+  if (hasChildren(node)) return node.children.map((c) => nodeToText(c)).join("");
   return "";
 }
 
@@ -103,8 +102,8 @@ function extractMeta(nodes: Content[]): Record<string, string> {
           if (child.type === "paragraph") {
             const para = child as Paragraph;
             // Bold key: value
-            if (para.children[0]?.type === "strong") {
-              const key = phrasingToText((para.children[0] as any).children)
+            if (para.children[0]?.type === "strong" && hasChildren(para.children[0])) {
+              const key = phrasingToText(para.children[0].children)
                 .replace(/:$/, "")
                 .trim()
                 .toLowerCase()

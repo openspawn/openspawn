@@ -354,7 +354,7 @@ export class LLMSimulation extends DeterministicSimulation {
   private executeHire(agent: SandboxAgent, decision: AgentDecision): void {
     // Try to use roster-based hiring from the parent class
     // Access parsedOrg through the inherited property
-    const roster = (this as any).parsedOrg?.agents || [];
+    const roster = this.parsedOrg?.agents ?? [];
     const notYetHired = roster.filter((r: SandboxAgent) => !this.agents.find((a) => a.id === r.id));
 
     const domain = decision.task.replace(/^new:\s*/i, "").trim() || agent.domain;

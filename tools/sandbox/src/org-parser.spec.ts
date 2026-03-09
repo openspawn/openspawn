@@ -185,25 +185,25 @@ describe("org-parser", () => {
     it("C-level agent has no parentId when reports_to is Human Principal", () => {
       const bob = result.agents.find((a) => a.name === "Bob");
       expect(bob).toBeDefined();
-      expect(bob!.parentId).toBe("human-principal");
+      expect(bob?.parentId).toBe("human-principal");
     });
 
     it("department lead reports to COO", () => {
       const carol = result.agents.find((a) => a.name === "Carol");
       expect(carol).toBeDefined();
-      expect(carol!.parentId).toBe("bob");
+      expect(carol?.parentId).toBe("bob");
     });
 
     it("team members report to their specified manager", () => {
       const dave = result.agents.find((a) => a.name === "Dave");
       expect(dave).toBeDefined();
-      expect(dave!.parentId).toBe("carol");
+      expect(dave?.parentId).toBe("carol");
     });
 
     it("junior reports to specified manager", () => {
       const eve = result.agents.find((a) => a.name === "Eve");
       expect(eve).toBeDefined();
-      expect(eve!.parentId).toBe("carol");
+      expect(eve?.parentId).toBe("carol");
     });
   });
 
@@ -218,21 +218,21 @@ describe("org-parser", () => {
     it("respects explicit level over inferred", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const dave = result.agents.find((a) => a.name === "Dave");
-      expect(dave!.level).toBe(6);
+      expect(dave?.level).toBe(6);
     });
 
     it("infers lead role for level 7", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const carol = result.agents.find((a) => a.name === "Carol");
-      expect(carol!.level).toBe(7);
-      expect(carol!.role).toBe("lead");
+      expect(carol?.level).toBe(7);
+      expect(carol?.role).toBe("lead");
     });
 
     it("infers intern role for level 1", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const eve = result.agents.find((a) => a.name === "Eve");
-      expect(eve!.level).toBe(1);
-      expect(eve!.role).toBe("intern");
+      expect(eve?.level).toBe(1);
+      expect(eve?.role).toBe("intern");
     });
   });
 
@@ -240,31 +240,31 @@ describe("org-parser", () => {
     it("sets event-driven trigger for L7+", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const carol = result.agents.find((a) => a.name === "Carol");
-      expect(carol!.trigger).toBe("event-driven");
+      expect(carol?.trigger).toBe("event-driven");
     });
 
     it("sets polling trigger for L6 and below", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const dave = result.agents.find((a) => a.name === "Dave");
-      expect(dave!.trigger).toBe("polling");
+      expect(dave?.trigger).toBe("polling");
     });
 
     it("L7+ systemPrompt includes DELEGATE instruction", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const carol = result.agents.find((a) => a.name === "Carol");
-      expect(carol!.systemPrompt).toContain("DELEGATE");
+      expect(carol?.systemPrompt).toContain("DELEGATE");
     });
 
     it("L7+ systemPrompt includes spawn_agent action", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const bob = result.agents.find((a) => a.name === "Bob");
-      expect(bob!.systemPrompt).toContain("spawn_agent");
+      expect(bob?.systemPrompt).toContain("spawn_agent");
     });
 
     it("low-level systemPrompt does not include spawn_agent", () => {
       const result = parseOrgMdContent(FULL_ORG);
       const eve = result.agents.find((a) => a.name === "Eve");
-      expect(eve!.systemPrompt).not.toContain("spawn_agent");
+      expect(eve?.systemPrompt).not.toContain("spawn_agent");
     });
 
     it("initializes stats to zero", () => {
@@ -380,20 +380,20 @@ describe("org-parser", () => {
     it("parses explicit event-driven trigger", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const manager = result.agents.find((a) => a.name === "Manager");
-      expect(manager!.trigger).toBe("event-driven");
+      expect(manager?.trigger).toBe("event-driven");
     });
 
     it("parses wake_on types", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const manager = result.agents.find((a) => a.name === "Manager");
-      expect(manager!.triggerOn).toContain("escalation");
-      expect(manager!.triggerOn).toContain("completion");
+      expect(manager?.triggerOn).toContain("escalation");
+      expect(manager?.triggerOn).toContain("completion");
     });
 
     it("parses explicit polling trigger", () => {
       const result = parseOrgMdContent(TRIGGER_ORG);
       const poller = result.agents.find((a) => a.name === "Poller");
-      expect(poller!.trigger).toBe("polling");
+      expect(poller?.trigger).toBe("polling");
     });
   });
 
@@ -401,25 +401,25 @@ describe("org-parser", () => {
     it("uses explicit Avatar URL when provided", () => {
       const result = parseOrgMdContent(AVATAR_ORG);
       const spongebob = result.agents.find((a) => a.name === "SpongeBob SquarePants");
-      expect(spongebob!.avatarUrl).toBe("/avatars/custom-sponge.png");
+      expect(spongebob?.avatarUrl).toBe("/avatars/custom-sponge.png");
     });
 
     it("falls back to name-based avatar lookup", () => {
       const result = parseOrgMdContent(AVATAR_ORG);
       const patrick = result.agents.find((a) => a.name === "Patrick Star");
-      expect(patrick!.avatarUrl).toBe("/avatars/patrick.png");
+      expect(patrick?.avatarUrl).toBe("/avatars/patrick.png");
     });
 
     it("extracts avatar emoji", () => {
       const result = parseOrgMdContent(AVATAR_ORG);
       const spongebob = result.agents.find((a) => a.name === "SpongeBob SquarePants");
-      expect(spongebob!.avatar).toBe("🧽");
+      expect(spongebob?.avatar).toBe("🧽");
     });
 
     it("extracts avatar color", () => {
       const result = parseOrgMdContent(AVATAR_ORG);
       const spongebob = result.agents.find((a) => a.name === "SpongeBob SquarePants");
-      expect(spongebob!.avatarColor).toBe("#eab308");
+      expect(spongebob?.avatarColor).toBe("#eab308");
     });
   });
 
@@ -446,13 +446,13 @@ describe("org-parser", () => {
     it("Mr. Krabs is level 10", () => {
       const krabs = result.agents.find((a) => a.id === "mr.-krabs" || a.name.includes("Krabs"));
       expect(krabs).toBeDefined();
-      expect(krabs!.level).toBe(10);
+      expect(krabs?.level).toBe(10);
     });
 
     it("SpongeBob reports to Mr. Krabs", () => {
       const spongebob = result.agents.find((a) => a.name === "SpongeBob SquarePants");
       expect(spongebob).toBeDefined();
-      expect(spongebob!.parentId).toBe("mr-krabs");
+      expect(spongebob?.parentId).toBe("mr-krabs");
     });
 
     it("Fred has count 3", () => {
@@ -466,7 +466,7 @@ describe("org-parser", () => {
 
     it("has department caps", () => {
       expect(result.policies.departmentCaps).toBeDefined();
-      expect(result.policies.departmentCaps!["the kitchen"]).toBe(10);
+      expect(result.policies.departmentCaps?.["the kitchen"]).toBe(10);
     });
 
     it("all agents have valid systemPrompts", () => {
@@ -486,7 +486,7 @@ describe("org-parser", () => {
       for (const name of knownChars) {
         const agent = result.agents.find((a) => a.name === name);
         expect(agent, `${name} should exist`).toBeDefined();
-        expect(agent!.avatarUrl, `${name} should have avatarUrl`).toBeTruthy();
+        expect(agent?.avatarUrl, `${name} should have avatarUrl`).toBeTruthy();
       }
     });
   });

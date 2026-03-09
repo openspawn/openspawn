@@ -5,10 +5,8 @@ import {
   type TaskStatus,
   type TaskPriority,
 } from "../../hooks/use-mcp-tasks";
-import { Badge } from "../ui/badge";
-import { Card, CardContent } from "../ui/card";
 import { cn } from "../../lib/utils";
-import { Clock, User, X, AlertTriangle, ChevronDown, ChevronUp, Wifi, WifiOff } from "lucide-react";
+import { Clock, X, ChevronDown, ChevronUp, Wifi, WifiOff } from "lucide-react";
 
 const COLUMNS: { key: TaskStatus; label: string; color: string; bg: string; border: string }[] = [
   {
@@ -196,7 +194,7 @@ function TaskDetail({ task, onClose }: { task: KanbanTask; onClose: () => void }
 }
 
 export function KanbanBoard() {
-  const { tasks, connected, error } = useMcpTasks();
+  const { tasks, connected } = useMcpTasks();
   const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
   const [collapsedCols, setCollapsedCols] = useState<Set<TaskStatus>>(new Set());
 
