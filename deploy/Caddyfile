@@ -1,16 +1,25 @@
 # ── OpenSpawn Caddy Config ────────────────────────────────────────────────────
-# Auto-HTTPS via Let's Encrypt. Place at /opt/openspawn/Caddyfile
-# Caddy runs on host, containers expose ports to localhost.
+# Source of truth for ALL subdomains. Auto-HTTPS via Let's Encrypt.
+# Caddy runs on host as systemd service, containers expose ports to localhost.
+#
+# Required env vars (set in /etc/caddy/env or systemd EnvironmentFile):
+#   TEAM_AUTH_USER — basic auth username for team dashboard
+#   TEAM_AUTH_HASH — bcrypt hash from `caddy hash-password`
 
-bikinibottom.ai {
-	reverse_proxy localhost:3333
-
+# ── Shared security headers ──────────────────────────────────────────────────
+(security_headers) {
 	header {
 		X-Content-Type-Options nosniff
 		X-Frame-Options DENY
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
 	}
+}
+
+# ── bikinibottom.ai — Demo sandbox + dashboard ──────────────────────────────
+bikinibottom.ai {
+	reverse_proxy localhost:3333
+	import security_headers
 
 	@assets path /assets/*
 	header @assets Cache-Control "public, max-age=31536000, immutable"
@@ -19,19 +28,50 @@ bikinibottom.ai {
 	header @html Cache-Control "no-cache"
 }
 
+# ── openspawn.ai — Website + API ────────────────────────────────────────────
 openspawn.ai {
-	# API at /api/ -> FastAPI container
 	handle_path /api/* {
 		reverse_proxy localhost:8000
 	}
 
-	# Everything else -> platform landing page
 	reverse_proxy localhost:3334
+	import security_headers
+}
 
-	header {
-		X-Content-Type-Options nosniff
-		X-Frame-Options DENY
-		Referrer-Policy strict-origin-when-cross-origin
-		-Server
+# ── team.openspawn.ai — Internal team dashboard (basic auth) ────────────────
+team.openspawn.ai {
+	basicauth {
+		{$TEAM_AUTH_USER} {$TEAM_AUTH_HASH}
 	}
+
+	root * /opt/team-dashboard
+	file_server
+
+	try_files {path} /index.html
+	import security_headers
+}
+
+# ── id.openspawn.ai — SSO/identity provider ─────────────────────────────────
+id.openspawn.ai {
+	reverse_proxy localhost:9000
+	import security_headers
+}
+
+# ── wiki.openspawn.ai — Internal knowledge base ─────────────────────────────
+wiki.openspawn.ai {
+	reverse_proxy localhost:3335
+	import security_headers
+}
+
+# ── status.openspawn.ai — Status page (Gatus) ───────────────────────────────
+status.openspawn.ai {
+	reverse_proxy localhost:8080
+	import security_headers
+}
+
+# ── docs.openspawn.ai — Developer docs ───────────────────────────────────────
+# TODO: Change DNS from A record to CNAME → GitHub Pages once deployed.
+# Until then, redirect to main site.
+docs.openspawn.ai {
+	redir https://openspawn.ai{uri} permanent
 }
