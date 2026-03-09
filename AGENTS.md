@@ -148,7 +148,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Formatting**: oxfmt (Rust-based)
 - **Linting**: oxlint (type-aware)
 - **Components**: shadcn/ui patterns, Tailwind
-- **TypeScript**: No `any`, no `as` casts, prefer string enums
+- **TypeScript**: No `any`, no `as` casts, no non-null assertions (`!`), prefer string enums. If a type doesn't fit, fix the type — don't cast around it. Use type guards, generics, or narrow via conditionals instead.
 - **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/docs/`) to reflect changes
 
 ---
@@ -157,7 +157,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 - **Edit `apps/dashboard/`** — deprecated, use `apps/demo/` instead
 - **Use `npm` or `yarn`** — this project uses pnpm only
-- **Use `any` or `as` casts** — find the correct type
+- **Use `any`, `as` casts, or `!` non-null assertions** — find the correct type, use type guards, or narrow via conditionals. TypeScript exists to catch type errors; casting hides them.
 - **Create barrel files** — use explicit import paths
 - **Commit generated files without running codegen** — run `pnpm run codegen` first
 - **Push directly to `main`** — all changes require a PR
