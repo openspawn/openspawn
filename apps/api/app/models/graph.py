@@ -3,12 +3,12 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pgvector.sqlalchemy import Vector
 from sqlalchemy import ForeignKey, Index, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatVector
 from app.models.memory import EMBEDDING_DIMENSIONS
 
 
@@ -25,7 +25,7 @@ class GraphEntity(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     entity_type: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, server_default="")
     embedding: Mapped[list[float] | None] = mapped_column(
-        Vector(EMBEDDING_DIMENSIONS), nullable=True
+        CompatVector(EMBEDDING_DIMENSIONS), nullable=True
     )
     mention_count: Mapped[int] = mapped_column(nullable=False, server_default="0")
     confidence: Mapped[float] = mapped_column(nullable=False, server_default="50.0")
