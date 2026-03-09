@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
+import AppDefault, { App } from "./app";
+import { router } from "../routes";
 
 // Mock recharts to avoid canvas issues in tests
 vi.mock("recharts", () => ({
@@ -44,20 +46,17 @@ vi.mock("../graphql/generated/hooks", () => ({
  * the App module exports correctly and key components render in isolation.
  */
 describe("App", () => {
-  it("exports App as default", async () => {
-    const mod = await import("./app");
-    expect(mod.default).toBeDefined();
-    expect(typeof mod.default).toBe("function");
+  it("exports App as default", () => {
+    expect(AppDefault).toBeDefined();
+    expect(typeof AppDefault).toBe("function");
   });
 
-  it("App component is named App", async () => {
-    const mod = await import("./app");
-    expect(mod.App).toBeDefined();
-    expect(mod.App.name).toBe("App");
+  it("App component is named App", () => {
+    expect(App).toBeDefined();
+    expect(App.name).toBe("App");
   });
 
-  it("router is configured with /app basepath", async () => {
-    const { router } = await import("../routes");
+  it("router is configured with /app basepath", () => {
     expect(router.basepath).toBe("/app");
   });
 });
