@@ -107,9 +107,6 @@ test.describe("Mobile nav toggle", () => {
     await page.goto("/");
     await page.waitForSelector("nav");
 
-    // Desktop nav links should be hidden on mobile
-    const desktopNav = page.locator(".md\\:flex");
-
     // The hamburger menu toggle
     const hamburger = page.getByRole("button", { name: /toggle menu/i });
     await expect(hamburger).toBeVisible();

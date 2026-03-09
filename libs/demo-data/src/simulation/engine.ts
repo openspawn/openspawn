@@ -94,15 +94,6 @@ const TASK_STATUS_FLOW: Record<TaskStatus, TaskStatus | null> = {
   cancelled: null,
 };
 
-// Helper to generate UUIDs
-function uuid(): string {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
 // Random element from array
 function randomFrom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -240,7 +231,6 @@ export class SimulationEngine {
   // Main simulation tick
   tick(emitEvents = true): SimulationEvent[] {
     const events: SimulationEvent[] = [];
-    const now = new Date();
 
     this.state.currentTick++;
     this.state.simulatedTime = new Date(

@@ -110,7 +110,6 @@ function exitOnCancel<T>(value: T | symbol): T {
 export async function runWizard(): Promise<WizardAnswers> {
   intro("openspawn init");
 
-  // eslint-disable-next-line no-constant-condition -- restart loop on rejection
   while (true) {
     const answers = await collectAnswers();
 

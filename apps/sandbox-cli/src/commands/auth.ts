@@ -53,7 +53,7 @@ ${pc.cyan("Examples:")}
         console.log(`  ${icons.arrow} Endpoint: ${pc.underline(apiUrl)}`);
         console.log(`  ${icons.check} Saved to: ${pc.dim("~/.openspawn/config.json")}`);
         console.log();
-      } catch (error) {
+      } catch {
         outputError("Failed to verify credentials", "Check your API key and try again");
         // Still save the credentials, but warn
         outputSuccess("Credentials saved (unverified)");
@@ -74,7 +74,7 @@ ${pc.cyan("Examples:")}
       }
 
       try {
-        const data = await withSpinner("Checking authentication...", async () => {
+        await withSpinner("Checking authentication...", async () => {
           const client = new OpenSpawnClient(apiKey, apiUrl);
           return client.whoami();
         });
@@ -88,7 +88,7 @@ ${pc.cyan("Examples:")}
           "API Key": `${apiKey.slice(0, 12)}...`,
           Status: pc.green("Active"),
         });
-      } catch (error) {
+      } catch {
         console.log();
         console.log(`  ${icons.error} ${pc.red("Authentication failed")}`);
         console.log();

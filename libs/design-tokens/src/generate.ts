@@ -20,13 +20,7 @@ import {
   bbSemanticColors,
   type SemanticColorSet,
 } from "./tokens/colors.js";
-import {
-  fontFamilies,
-  fontWeights,
-  fontSizes,
-  lineHeights,
-  letterSpacings,
-} from "./tokens/typography.js";
+import { fontFamilies, fontWeights, fontSizes } from "./tokens/typography.js";
 import { spacing, radii, shadows, glows, zIndex } from "./tokens/spacing.js";
 import { durations, easings } from "./tokens/animation.js";
 import { densityDefault, densityCompact } from "./tokens/density.js";
