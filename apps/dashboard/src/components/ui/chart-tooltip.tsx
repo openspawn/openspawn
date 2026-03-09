@@ -1,9 +1,16 @@
 import type { ReactNode } from "react";
-import type { Payload } from "recharts/types/component/DefaultTooltipContent";
+
+/** Minimal recharts-compatible payload entry (avoids importing all of recharts) */
+interface ChartPayloadEntry {
+  value: number;
+  name?: string;
+  dataKey?: string | number;
+  color?: string;
+}
 
 interface ChartTooltipProps {
   active?: boolean;
-  payload?: readonly Payload<number, string>[];
+  payload?: readonly ChartPayloadEntry[];
   label?: ReactNode;
   valueFormatter?: (value: number) => string;
   labelFormatter?: (label: string) => string;
@@ -29,7 +36,7 @@ export function ChartTooltip({
         </span>
       </div>
       <div className="space-y-1.5">
-        {payload.map((entry: Payload<number, string>, i: number) => (
+        {payload.map((entry, i) => (
           <div key={i} className="flex items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
@@ -38,7 +45,7 @@ export function ChartTooltip({
               </span>
             </div>
             <span className="text-sm font-semibold text-foreground">
-              {valueFormatter(entry.value as number)}
+              {valueFormatter(entry.value)}
             </span>
           </div>
         ))}

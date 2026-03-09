@@ -2,6 +2,7 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  lazyRouteComponent,
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
@@ -10,24 +11,7 @@ import { Layout } from "./components";
 import { ProtectedRoute } from "./components/protected-route";
 import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
-import {
-  TasksPage,
-  AgentsPage,
-  CreditsPage,
-  EventsPage,
-  LoginPage,
-  AuthCallbackPage,
-  SettingsPage,
-  MessagesPage,
-} from "./pages";
-import { KanbanPage } from "./pages/kanban";
-import { TaskBoardPage } from "./pages/task-board";
-import { RouterPage } from "./pages/router";
 import { DashboardPage } from "./pages/dashboard";
-import { NetworkPage } from "./pages/network";
-import { IntroPage } from "./pages/intro";
-import { MobileStatusPage } from "./pages/mobile-status";
-import { LiveViewPage } from "./pages/live-view";
 import { isSandboxMode } from "./graphql/fetcher";
 import { isBBTheme } from "./lib/dashboard-theme";
 import type { ReactNode } from "react";
@@ -103,14 +87,14 @@ const rootRoute = createRootRoute({
 const introRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/intro",
-  component: IntroPage,
+  component: lazyRouteComponent(() => import("./pages/intro"), "IntroPage"),
 });
 
 // Live view page — standalone, no layout
 const liveRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/live",
-  component: LiveViewPage,
+  component: lazyRouteComponent(() => import("./pages/live-view"), "LiveViewPage"),
 });
 
 // Layout route for all pages that use the sidebar layout
@@ -130,80 +114,80 @@ const indexRoute = createRoute({
 const tasksRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/tasks",
-  component: TasksPage,
+  component: lazyRouteComponent(() => import("./pages/tasks"), "TasksPage"),
 });
 
 const agentsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/agents",
-  component: AgentsPage,
+  component: lazyRouteComponent(() => import("./pages/agents"), "AgentsPage"),
 });
 
 const creditsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/credits",
-  component: CreditsPage,
+  component: lazyRouteComponent(() => import("./pages/credits"), "CreditsPage"),
 });
 
 const eventsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/events",
-  component: EventsPage,
+  component: lazyRouteComponent(() => import("./pages/events"), "EventsPage"),
 });
 
 const messagesRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/messages",
-  component: MessagesPage,
+  component: lazyRouteComponent(() => import("./pages/messages"), "MessagesPage"),
 });
 
 const routerPageRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/router",
-  component: RouterPage,
+  component: lazyRouteComponent(() => import("./pages/router"), "RouterPage"),
 });
 
 const networkRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/network",
-  component: NetworkPage,
+  component: lazyRouteComponent(() => import("./pages/network"), "NetworkPage"),
 });
 
 const settingsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/settings",
-  component: SettingsPage,
+  component: lazyRouteComponent(() => import("./pages/settings"), "SettingsPage"),
 });
 
 const kanbanRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/kanban",
-  component: KanbanPage,
+  component: lazyRouteComponent(() => import("./pages/kanban"), "KanbanPage"),
 });
 
 const taskBoardRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/task-board",
-  component: TaskBoardPage,
+  component: lazyRouteComponent(() => import("./pages/task-board"), "TaskBoardPage"),
 });
 
 const statusRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/status",
-  component: MobileStatusPage,
+  component: lazyRouteComponent(() => import("./pages/mobile-status"), "MobileStatusPage"),
 });
 
 // Auth routes — only in non-sandbox mode
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  component: LoginPage,
+  component: lazyRouteComponent(() => import("./pages/login"), "LoginPage"),
 });
 
 const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/auth/callback",
-  component: AuthCallbackPage,
+  component: lazyRouteComponent(() => import("./pages/auth-callback"), "AuthCallbackPage"),
 });
 
 // Build route tree
