@@ -33,21 +33,21 @@ packages/
 
 ## Tech Stack
 
-| Layer          | Technology                                                      |
-| -------------- | --------------------------------------------------------------- |
-| API Framework  | FastAPI (Python)                                                |
-| API Protocol   | REST + OpenAPI + MCP                                            |
-| Database       | PostgreSQL 16 + SQLAlchemy async (prod) / SQLite (local)        |
-| Background     | arq + Redis (prod) / asyncio scheduler (local)                  |
-| Agent Spawning | Claude Code CLI subprocesses with concurrency cap               |
-| Frontend       | React 19 + Vite                                                 |
-| Styling        | TailwindCSS v4                                                  |
-| Animations     | framer-motion                                                   |
-| Graph Viz      | @xyflow/react (ReactFlow)                                       |
-| Build System   | Nx                                                              |
-| Linting        | oxlint + oxfmt                                                  |
-| Testing        | Vitest + Playwright                                             |
-| Language       | TypeScript (strict, bundler resolution)                         |
+| Layer          | Technology                                               |
+| -------------- | -------------------------------------------------------- |
+| API Framework  | FastAPI (Python)                                         |
+| API Protocol   | REST + OpenAPI + MCP                                     |
+| Database       | PostgreSQL 16 + SQLAlchemy async (prod) / SQLite (local) |
+| Background     | arq + Redis (prod) / asyncio scheduler (local)           |
+| Agent Spawning | Claude Code CLI subprocesses with concurrency cap        |
+| Frontend       | React 19 + Vite                                          |
+| Styling        | TailwindCSS v4                                           |
+| Animations     | framer-motion                                            |
+| Graph Viz      | @xyflow/react (ReactFlow)                                |
+| Build System   | Nx                                                       |
+| Linting        | oxlint + oxfmt                                           |
+| Testing        | Vitest + Playwright                                      |
+| Language       | TypeScript (strict, bundler resolution)                  |
 
 ## Deployment Topology
 
@@ -104,12 +104,12 @@ Agents have levels (L1-L10) determining their authority. Higher-level agents can
 
 ### Two-Tier Deployment Model
 
-| Concern    | Tier 1 (Local)        | Tier 2 (Deployed)       |
-| ---------- | --------------------- | ----------------------- |
-| Database   | SQLite                | PostgreSQL 16           |
-| Background | asyncio scheduler     | arq + Redis             |
-| Docker     | Not required          | Required                |
-| Entry      | `npx openspawn start` | Docker Compose + Caddy  |
+| Concern    | Tier 1 (Local)        | Tier 2 (Deployed)      |
+| ---------- | --------------------- | ---------------------- |
+| Database   | SQLite                | PostgreSQL 16          |
+| Background | asyncio scheduler     | arq + Redis            |
+| Docker     | Not required          | Required               |
+| Entry      | `npx openspawn start` | Docker Compose + Caddy |
 
 Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQL.
 
