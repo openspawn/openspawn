@@ -7,6 +7,8 @@ import {
   EscalationBehavior,
   CulturePreset,
   OrgValue,
+  RuntimeMode,
+  BootstrapMode,
 } from "./types.js";
 
 const CONFIG_FILENAME = "openspawn.config.json";
@@ -39,6 +41,15 @@ export const defaultConfig: OpenSpawnConfig = {
     ],
   },
   culture: { preset: CulturePreset.Agency },
+  spawning: {
+    maxConcurrentAgents: 2,
+    idleTimeoutSeconds: 300,
+    bootstrapMode: BootstrapMode.Hybrid,
+  },
+  runtime: {
+    mode: RuntimeMode.Local,
+    database: ".openspawn/openspawn.db",
+  },
 };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
