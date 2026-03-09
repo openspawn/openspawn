@@ -71,6 +71,7 @@ async def start_local(project_dir: str) -> None:
     import uvicorn
 
     from app.spawner import SpawnManager, build_bootstrap_prompt
+    from app.workers.local_scheduler import LocalScheduler
 
     config = build_local_config(project_dir)
 
@@ -103,6 +104,29 @@ async def start_local(project_dir: str) -> None:
             logger.info("seeder.complete", agents=count)
         except ImportError:
             logger.warning("seeder not available, skipping ORG.md import")
+
+    # Set up background enrichment scheduler (replaces arq + Redis)
+    scheduler = LocalScheduler()
+    try:
+        from app.workers.enrichment import (
+            boost_co_retrieved,
+            extract_entities,
+            identify_stale,
+        )
+        from app.workers.expiry import expire_memories
+
+        scheduler.add_job(boost_co_retrieved, interval_seconds=6 * 3600, name="boost_co_retrieved")
+        scheduler.add_job(identify_stale, interval_seconds=24 * 3600, name="identify_stale")
+        scheduler.add_job(extract_entities, interval_seconds=3600, name="extract_entities")
+        scheduler.add_job(expire_memories, interval_seconds=3600, name="expire_memories")
+    except ImportError:
+        logger.warning("enrichment workers not available, skipping scheduler")
+    try:
+        from app.coordination.sla_monitor import monitor_sla
+
+        scheduler.add_job(monitor_sla, interval_seconds=60, name="monitor_sla")
+    except ImportError:
+        logger.warning("sla_monitor not available, skipping")
 
     # Read user config for spawning settings
     config_path = Path(project_dir) / "openspawn.config.json"
@@ -155,20 +179,33 @@ async def start_local(project_dir: str) -> None:
         await manager.drain()
 
     # Handle signals for graceful shutdown
+    _shutdown_tasks: set[asyncio.Task[None]] = set()
+
+    def _shutdown() -> None:
+        scheduler.stop()
+        t = asyncio.create_task(manager.shutdown())
+        _shutdown_tasks.add(t)
+        t.add_done_callback(_shutdown_tasks.discard)
+
     loop = asyncio.get_event_loop()
     for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(
-            sig,
-            lambda: asyncio.create_task(manager.shutdown()),
-        )
+        loop.add_signal_handler(sig, _shutdown)
 
-    # Run server and spawner concurrently
+    # Run server, spawner, and scheduler concurrently
     spawn_task: asyncio.Task[None] | None = None
     if agents:
         spawn_task = asyncio.create_task(spawn_after_ready())
 
+    scheduler_task: asyncio.Task[None] | None = None
+    if scheduler._jobs:
+        scheduler_task = asyncio.create_task(scheduler.start())
+
     await server.serve()
 
+    # Cleanup background tasks
+    scheduler.stop()
+    if scheduler_task and not scheduler_task.done():
+        scheduler_task.cancel()
     if spawn_task and not spawn_task.done():
         spawn_task.cancel()
 
