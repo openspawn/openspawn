@@ -22,11 +22,11 @@ const dotColors: Record<PresenceStatus, string> = {
   idle: "bg-muted-foreground",
 };
 
-const glowColors: Record<PresenceStatus, string> = {
-  active: "rgba(16,185,129,0.45)", // emerald
-  busy: "rgba(245,158,11,0.35)", // amber
-  error: "rgba(244,63,94,0.45)", // rose
-  idle: "rgba(100,116,139,0.18)", // slate
+const glowShadow: Record<PresenceStatus, string> = {
+  active: "shadow-[0_0_12px] shadow-emerald-500/45",
+  busy: "shadow-[0_0_12px] shadow-amber-500/35",
+  error: "shadow-[0_0_12px] shadow-rose-500/45",
+  idle: "shadow-[0_0_12px] shadow-slate-500/18",
 };
 
 const ringColors: Record<PresenceStatus, string> = {
@@ -89,7 +89,11 @@ export function PresenceGlow({ status, children, className }: PresenceGlowProps)
     <div className={cn("relative", className)}>
       {shouldPulse ? (
         <motion.div
-          className={cn("absolute inset-0 rounded-full ring-2", ringColors[status])}
+          className={cn(
+            "absolute inset-0 rounded-full ring-2",
+            ringColors[status],
+            glowShadow[status],
+          )}
           animate={{
             scale: [1, 1.08, 1],
             opacity: [0.7, 1, 0.7],
@@ -99,7 +103,6 @@ export function PresenceGlow({ status, children, className }: PresenceGlowProps)
             duration: status === "error" ? 1.2 : 2.5,
             ease: "easeInOut",
           }}
-          style={{ boxShadow: `0 0 12px ${glowColors[status]}` }}
         />
       ) : (
         <div className={cn("absolute inset-0 rounded-full ring-1", ringColors[status])} />
