@@ -70,7 +70,6 @@ The `app` container runs `tools/sandbox/src/index.ts`, which serves both the RES
 | `deploy.yml`          | Push to main | Docker build + deploy to VPS (bikinibottom.ai + API) |
 | `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai)        |
 | `deploy-docs.yml`     | Push to main | Build + deploy Starlight docs (docs.openspawn.ai)    |
-| `release-cli.yml`     | Tag push     | GoReleaser for packages/cli                        |
 
 ### Docker Build (Dockerfile)
 

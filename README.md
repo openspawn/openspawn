@@ -73,7 +73,6 @@ apps/website/            # Marketing site (openspawn.ai)
 apps/api/                # Python API (FastAPI)
 apps/api-nestjs/         # NestJS API (legacy)
 tools/sandbox/           # Node.js sandbox server (the brain)
-packages/cli/            # OpenSpawn CLI
 docs/                    # Design docs & RFCs
 ```
 

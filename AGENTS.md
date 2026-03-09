@@ -51,7 +51,6 @@ tools/
 packages/
   openspawn/       -> npm CLI package (npx openspawn init)
   coordinator/     -> Coordination server package
-  cli/             -> Go CLI (GoReleaser)
 ```
 
 ---
