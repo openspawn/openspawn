@@ -162,18 +162,20 @@ class TestVisibilityFilter:
 
 
 class TestScoringFormula:
-    """Final score = 0.6 * cosine + 0.25 * recency + 0.15 * access_freq."""
+    """Final score = 0.50*cosine + 0.20*recency + 0.15*access + 0.15*helpfulness."""
 
-    def _score(self, cosine: float, recency: float, access_freq: float) -> float:
-        return 0.6 * cosine + 0.25 * recency + 0.15 * access_freq
+    def _score(
+        self, cosine: float, recency: float, access_freq: float, helpfulness: float = 0.0
+    ) -> float:
+        return 0.50 * cosine + 0.20 * recency + 0.15 * access_freq + 0.15 * helpfulness
 
     def test_perfect_scores(self) -> None:
-        assert abs(self._score(1.0, 1.0, 1.0) - 1.0) < 0.001
+        assert abs(self._score(1.0, 1.0, 1.0, 1.0) - 1.0) < 0.001
 
     def test_cosine_dominates(self) -> None:
-        high_cosine = self._score(0.9, 0.1, 0.1)
-        high_recency = self._score(0.1, 0.9, 0.1)
+        high_cosine = self._score(0.9, 0.1, 0.1, 0.1)
+        high_recency = self._score(0.1, 0.9, 0.1, 0.1)
         assert high_cosine > high_recency
 
     def test_zero_scores(self) -> None:
-        assert self._score(0, 0, 0) == 0.0
+        assert self._score(0, 0, 0, 0) == 0.0
