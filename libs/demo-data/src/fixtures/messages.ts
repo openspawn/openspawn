@@ -1,43 +1,44 @@
-import type { DemoMessage, MessageType } from "../types";
+import { DemoMessageCategory } from "@openspawn/shared-types";
+import type { DemoMessage } from "../types";
 
 // Message templates by type
-const MESSAGE_TEMPLATES: Record<MessageType, string[]> = {
-  task: [
+const MESSAGE_TEMPLATES: Record<DemoMessageCategory, string[]> = {
+  [DemoMessageCategory.TASK]: [
     "Working on {taskRef} now. Should have it done by EOD.",
     "Just started {taskRef}. Initial analysis looks straightforward.",
     "Need your input on {taskRef} - can we sync?",
     "Completed the first phase of {taskRef}.",
     "{taskRef} is blocked - waiting on external dependencies.",
   ],
-  status: [
+  [DemoMessageCategory.STATUS]: [
     "Making good progress today. 3 tasks completed.",
     "All clear on my end. Ready for new assignments.",
     "Running behind schedule - will need to prioritize.",
     "Just wrapped up the morning batch. Taking a short break.",
     "Systems nominal. All processes running smoothly.",
   ],
-  report: [
+  [DemoMessageCategory.REPORT]: [
     "Competitor analysis complete. Key findings: they focus on enterprise.",
     "Weekly metrics: 47 tasks completed, 98% success rate.",
     "Performance report ready for review.",
     "Cost analysis shows 15% efficiency improvement.",
     "Audit complete. No critical issues found.",
   ],
-  question: [
+  [DemoMessageCategory.QUESTION]: [
     "What priority level should I assign to the new requests?",
     "Can you clarify the requirements for the API integration?",
     "Should I escalate this to the manager?",
     "Is there a deadline for the documentation update?",
     "Who should I coordinate with on the security review?",
   ],
-  escalation: [
+  [DemoMessageCategory.ESCALATION]: [
     "URGENT: Production issue detected. Need immediate attention.",
     "Escalating: Budget threshold exceeded by 20%.",
     "Critical: Agent unresponsive for 2 hours.",
     "Alert: Unusual activity pattern detected.",
     "Priority escalation: Customer-facing issue reported.",
   ],
-  general: [
+  [DemoMessageCategory.GENERAL]: [
     "Good morning team! Ready for another productive day.",
     "Thanks for the quick turnaround on that request.",
     "Great work on the release yesterday!",
@@ -67,12 +68,19 @@ export function generateMessage(
   fromAgentId: string,
   toAgentId: string,
   options?: {
-    type?: MessageType;
+    type?: DemoMessageCategory;
     taskRef?: string;
     hoursAgo?: number;
   },
 ): DemoMessage {
-  const type = options?.type || randomFrom<MessageType>(["task", "status", "general", "question"]);
+  const type =
+    options?.type ||
+    randomFrom<DemoMessageCategory>([
+      DemoMessageCategory.TASK,
+      DemoMessageCategory.STATUS,
+      DemoMessageCategory.GENERAL,
+      DemoMessageCategory.QUESTION,
+    ]);
   const templates = MESSAGE_TEMPLATES[type];
   let content = randomFrom(templates);
 
@@ -111,7 +119,12 @@ export function generateConversation(
   taskRef?: string,
 ): DemoMessage[] {
   const messages: DemoMessage[] = [];
-  const types: MessageType[] = ["task", "status", "question", "general"];
+  const types: DemoMessageCategory[] = [
+    DemoMessageCategory.TASK,
+    DemoMessageCategory.STATUS,
+    DemoMessageCategory.QUESTION,
+    DemoMessageCategory.GENERAL,
+  ];
 
   for (let i = 0; i < messageCount; i++) {
     const fromAgent = i % 2 === 0 ? agent1Id : agent2Id;

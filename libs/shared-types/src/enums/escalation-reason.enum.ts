@@ -18,12 +18,15 @@ export enum EscalationReason {
   CAPACITY_OVERFLOW = "CAPACITY_OVERFLOW",
 }
 
+import { TaskPriority } from "./task-priority.enum";
+
 /**
  * Default escalation thresholds (in hours)
  */
-export const ESCALATION_THRESHOLDS: Record<string, number> = {
-  URGENT: 2, // Escalate urgent tasks after 2 hours blocked
-  HIGH: 8, // High priority after 8 hours
-  NORMAL: 24, // Normal after 24 hours
-  LOW: 72, // Low priority after 72 hours
+export const ESCALATION_THRESHOLDS: Record<TaskPriority, number> = {
+  [TaskPriority.CRITICAL]: 1,
+  [TaskPriority.URGENT]: 2,
+  [TaskPriority.HIGH]: 8,
+  [TaskPriority.NORMAL]: 24,
+  [TaskPriority.LOW]: 72,
 };

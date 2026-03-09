@@ -1,4 +1,4 @@
 export enum CreditType {
-  CREDIT = "credit",
-  DEBIT = "debit",
+  CREDIT = "CREDIT",
+  DEBIT = "DEBIT",
 }
