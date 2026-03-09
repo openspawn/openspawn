@@ -12,18 +12,6 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ---
 
-## Domains & Deployment
-
-| Domain                | What                                   | Container        | Port       |
-| --------------------- | -------------------------------------- | ---------------- | ---------- |
-| **bikinibottom.ai**   | Live demo (sandbox + dashboard)        | `app`            | 3333       |
-| **openspawn.ai**      | API, website, landing page, MCP server | `api` `platform` | 8000, 3334 |
-| **docs.openspawn.ai** | Astro/Starlight docs                   | GitHub Pages     | —          |
-
-All containers run on a single VPS. Caddy handles HTTPS. Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
-
----
-
 ## Project Structure
 
 ```
@@ -58,60 +46,30 @@ packages/
 ## Commands
 
 ```bash
-# Install
-pnpm install
-
-# Dev (FastAPI)
-cd apps/api && uv run uvicorn app.main:app --reload
-
-# Dev (Sandbox + Dashboard together)
-pnpm run dev:sandbox
-
-# CLI — scaffold a new project
-npx openspawn init
-
-# CLI — start Python coordinator (FastAPI + SQLite) and spawn Claude Code CLI agents
-npx openspawn start
-
-# Build
-pnpm exec nx run-many -t build
-
-# Test
-pnpm exec nx test demo          # Unit tests
-pnpm exec nx e2e demo           # E2E tests
-
-# Lint & Format
-pnpm exec nx run-many -t lint
-pnpm exec oxfmt --write .
-
-# Profiling — measure coordination latency (manual, against running server)
-python scripts/latency-profile.py --base-url http://localhost:8000
-
-# Database (Alembic — production PostgreSQL)
-cd apps/api && uv run alembic upgrade head
+pnpm install                                              # Install
+cd apps/api && uv run uvicorn app.main:app --reload       # Dev (FastAPI)
+pnpm run dev:sandbox                                      # Dev (Sandbox + Dashboard)
+npx openspawn init                                        # CLI — scaffold project
+npx openspawn start                                       # CLI — start coordinator
+pnpm exec nx run-many -t build                            # Build
+pnpm exec nx test demo                                    # Unit tests
+pnpm exec nx e2e demo                                     # E2E tests
+pnpm exec nx run-many -t lint                             # Lint
+pnpm exec oxfmt --write .                                 # Format
+cd apps/api && uv run alembic upgrade head                # Database migrations
 ```
-
-> **Note:** Only two CLI commands exist: `init` (scaffold) and `start` (launch coordinator). Agents interact via MCP tools directly; humans use the REST API and dashboard.
 
 ---
 
 ## Key URLs
 
-**Production:**
-
-- Demo: https://bikinibottom.ai
-- API: https://openspawn.ai/api/
-- API docs: https://openspawn.ai/api/docs
-- Website: https://openspawn.ai
-- Docs: https://docs.openspawn.ai
-
-**Dev:**
-
-- Demo dashboard: http://localhost:4200
-- Demo mode: http://localhost:4200/?demo=true
-- Sandbox: http://localhost:3333
-- API (FastAPI): http://localhost:8000
-- API docs: http://localhost:8000/docs
+- **Demo**: https://bikinibottom.ai
+- **API**: https://openspawn.ai/api/ | docs: https://openspawn.ai/api/docs
+- **Website**: https://openspawn.ai
+- **Docs**: https://docs.openspawn.ai
+- **Dev dashboard**: http://localhost:4200 | demo mode: http://localhost:4200/?demo=true
+- **Dev sandbox**: http://localhost:3333
+- **Dev API**: http://localhost:8000 | docs: http://localhost:8000/docs
 
 ---
 
@@ -178,23 +136,6 @@ pnpm exec nx run-many -t build                                         # Build
 pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
 cd apps/api && uv run pytest tests/ -v                                 # Test (Python)
 ```
-
----
-
-## Common Tasks
-
-### Add a new dashboard page
-
-1. Create `apps/demo/src/pages/my-page.tsx`
-2. Export from `apps/demo/src/pages/index.ts`
-3. Add route in `apps/demo/src/app/app.tsx`
-4. Add nav link in `apps/demo/src/components/layout.tsx`
-
-### Add demo data
-
-1. Add fixtures to `libs/demo-data/src/fixtures/`
-2. Export from `libs/demo-data/src/fixtures/index.ts`
-3. Update scenarios in `libs/demo-data/src/scenarios/`
 
 ---
 

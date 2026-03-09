@@ -9,6 +9,33 @@ Coordination layer for AI agent organizations.
 - **Live Demo:** https://bikinibottom.ai
 - **Vision:** VISION.md
 
+## Domains & Deployment
+
+All services run on a single VPS. Caddy handles HTTPS + routing. Cloudflare proxied.
+Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
+
+**Live:**
+
+| Domain                  | What                                                             |
+| ----------------------- | ---------------------------------------------------------------- |
+| **openspawn.ai**        | Marketing website (React SPA, serves llms.txt + A2A agent.json) |
+| **api.openspawn.ai**    | Core API — GraphQL + REST (Python rewrite WIP)                  |
+| **bikinibottom.ai**     | Demo sandbox + dashboard                                        |
+| **team.openspawn.ai**   | Internal team dashboard (password-protected)                    |
+| **id.openspawn.ai**     | SSO/identity provider (OIDC)                                    |
+| **wiki.openspawn.ai**   | Internal knowledge base                                         |
+
+**Reserved (DNS exists, not deployed):**
+
+| Domain                    | Intent                                      |
+| ------------------------- | ------------------------------------------- |
+| **docs.openspawn.ai**     | Developer docs (Starlight app at `apps/docs/`) |
+| **hub.openspawn.ai**      | Agent/skill marketplace UI                  |
+| **logs.openspawn.ai**     | Centralized logging/observability dashboard |
+| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)         |
+| **registry.openspawn.ai** | Agent/package registry API                  |
+| **status.openspawn.ai**   | Public status page                          |
+
 ## How to Contribute
 
 1. **Bugs and small fixes** — Open a PR
@@ -33,6 +60,21 @@ pnpm test
 ```bash
 npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres needed
 ```
+
+## Common Tasks
+
+### Add a new dashboard page
+
+1. Create `apps/demo/src/pages/my-page.tsx`
+2. Export from `apps/demo/src/pages/index.ts`
+3. Add route in `apps/demo/src/app/app.tsx`
+4. Add nav link in `apps/demo/src/components/layout.tsx`
+
+### Add demo data
+
+1. Add fixtures to `libs/demo-data/src/fixtures/`
+2. Export from `libs/demo-data/src/fixtures/index.ts`
+3. Update scenarios in `libs/demo-data/src/scenarios/`
 
 ## Testing
 
