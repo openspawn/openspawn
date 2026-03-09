@@ -53,12 +53,12 @@ packages/
 
 All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy for HTTPS termination.
 
-| Domain            | Container  | Port | Serves                              |
-| ----------------- | ---------- | ---- | ----------------------------------- |
-| bikinibottom.ai   | `app`      | 3333 | Live demo (sandbox + dashboard)     |
-| openspawn.ai      | `platform` | 3334 | Website + landing page              |
-| openspawn.ai/api/ | `api`      | 8000 | FastAPI backend (REST + OpenAPI)    |
-| docs.openspawn.ai | —          | —    | Astro/Starlight docs (GitHub Pages) |
+| Domain            | Serves                              |
+| ----------------- | ----------------------------------- |
+| bikinibottom.ai   | Live demo (sandbox + dashboard)     |
+| openspawn.ai      | Website + landing page              |
+| openspawn.ai/api/ | FastAPI backend (REST + OpenAPI)    |
+| docs.openspawn.ai | Astro/Starlight docs (GitHub Pages) |
 
 The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
 

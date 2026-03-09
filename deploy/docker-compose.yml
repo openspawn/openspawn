@@ -1,11 +1,6 @@
 # ── OpenSpawn VPS Docker Compose ──────────────────────────────────────────────
-# Three services:
-#   - app (port 3333)      — BikiniBottom demo at bikinibottom.ai
-#   - api (port 8000)      — FastAPI backend at openspawn.ai/api/
-#   - platform (port 3334) — OpenSpawn landing at openspawn.ai
-# System Caddy handles HTTPS reverse proxy (see Caddyfile)
-#
-# Expected at /opt/openspawn/docker-compose.yml on the VPS
+# Services: app (demo), api (FastAPI), platform (landing), postgres
+# Caddy handles HTTPS reverse proxy (see Caddyfile)
 
 services:
   app:
