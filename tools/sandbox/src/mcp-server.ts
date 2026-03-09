@@ -3,7 +3,6 @@
 // No external dependencies — raw JSON-RPC handling
 
 import type { DeterministicSimulation } from "./deterministic.js";
-import type { SandboxAgent, SandboxTask } from "./types.js";
 
 // ── JSON-RPC Types ──────────────────────────────────────────────────────────
 

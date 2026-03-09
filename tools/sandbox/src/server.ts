@@ -9,7 +9,7 @@ import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Simulation } from "./simulation.js";
 import type { SandboxAgent, SandboxTask, SandboxEvent, ACPMessage } from "./types.js";
-import { loadAgentConfig, type AgentConfig } from "./config-loader.js";
+import { loadAgentConfig } from "./config-loader.js";
 import { ScenarioEngine } from "./scenario-engine.js";
 import { aiDevAgencyScenario } from "./scenarios/ai-dev-agency.js";
 import type { DeterministicSimulation } from "./deterministic.js";
@@ -54,7 +54,7 @@ function domainToTeamId(domain: string): string {
 }
 
 // Map sandbox types to demo-data types (what the dashboard expects)
-function mapAgent(agent: SandboxAgent, allAgents: SandboxAgent[]) {
+function mapAgent(agent: SandboxAgent, _allAgents: SandboxAgent[]) {
   const levelToRole: Record<string, string> = {
     coo: "MANAGER",
     talent: "MANAGER",
@@ -287,6 +287,17 @@ function json(res: ServerResponse, data: unknown) {
   res.end(JSON.stringify(data));
 }
 
+interface HttpError {
+  status?: number;
+  code?: string;
+  message?: string;
+}
+
+function toHttpError(err: unknown): HttpError {
+  if (err && typeof err === "object") return err as HttpError;
+  return { message: String(err) };
+}
+
 export function startServer(sim: Simulation): void {
   // Initialize A2A server with the simulation (cast to DeterministicSimulation)
   const a2a = new A2AServer(sim as unknown as DeterministicSimulation);
@@ -294,7 +305,10 @@ export function startServer(sim: Simulation): void {
   const router = new ModelRouter();
 
   // Attach router to simulation for tick integration
-  (sim as any)._modelRouter = router;
+  const detSim = sim as unknown as DeterministicSimulation;
+  if ("_modelRouter" in sim) {
+    detSim._modelRouter = router;
+  }
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     // CORS preflight
@@ -358,12 +372,11 @@ export function startServer(sim: Simulation): void {
           // Emit SSE event for dashboard
           const messageText =
             request.message?.parts
-              ?.filter((p: any) => p.kind === "text")
-              .map((p: any) => p.text)
+              ?.filter((p): p is import("./a2a-types.js").TextPart => p.kind === "text")
+              .map((p) => p.text)
               .join(" ") || "unknown";
           sim.events.push({
             type: "a2a_task_received",
-            agentId: null as any,
             message: `🔗 A2A: External task received — "${messageText.slice(0, 80)}"`,
             timestamp: Date.now(),
           });
@@ -373,13 +386,14 @@ export function startServer(sim: Simulation): void {
             "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
-        } catch (err: any) {
-          const status = err?.status || 500;
+        } catch (err: unknown) {
+          const e = toHttpError(err);
+          const status = e.status || 500;
           res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
           res.end(
             JSON.stringify({
-              code: err?.code || "InternalError",
-              message: err?.message || String(err),
+              code: e.code || "InternalError",
+              message: e.message || String(err),
             }),
           );
         }
@@ -400,7 +414,7 @@ export function startServer(sim: Simulation): void {
             return;
           }
           a2a.handleStreamMessage(request, res);
-        } catch (err: any) {
+        } catch (err: unknown) {
           res.writeHead(400, { "Content-Type": "application/json", "A2A-Version": "0.3" });
           res.end(JSON.stringify({ code: "InvalidRequest", message: String(err) }));
         }
@@ -414,7 +428,7 @@ export function startServer(sim: Simulation): void {
         contextId: url.searchParams.get("contextId") || undefined,
         status: url.searchParams.get("status") || undefined,
         pageSize: url.searchParams.has("pageSize")
-          ? parseInt(url.searchParams.get("pageSize")!, 10)
+          ? parseInt(url.searchParams.get("pageSize") ?? "10", 10)
           : undefined,
         pageToken: url.searchParams.get("pageToken") || undefined,
       });
@@ -437,7 +451,7 @@ export function startServer(sim: Simulation): void {
       if (!action && req.method === "GET") {
         try {
           const historyLength = url.searchParams.has("historyLength")
-            ? parseInt(url.searchParams.get("historyLength")!, 10)
+            ? parseInt(url.searchParams.get("historyLength") ?? "10", 10)
             : undefined;
           const task = a2a.handleGetTask(taskId, historyLength);
           res.writeHead(200, {
@@ -446,13 +460,14 @@ export function startServer(sim: Simulation): void {
             "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
-        } catch (err: any) {
-          const status = err?.status || 500;
+        } catch (err: unknown) {
+          const e = toHttpError(err);
+          const status = e.status || 500;
           res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
           res.end(
             JSON.stringify({
-              code: err?.code || "InternalError",
-              message: err?.message || String(err),
+              code: e.code || "InternalError",
+              message: e.message || String(err),
             }),
           );
         }
@@ -469,13 +484,14 @@ export function startServer(sim: Simulation): void {
             "A2A-Version": "0.3",
           });
           res.end(JSON.stringify(task));
-        } catch (err: any) {
-          const status = err?.status || 500;
+        } catch (err: unknown) {
+          const e = toHttpError(err);
+          const status = e.status || 500;
           res.writeHead(status, { "Content-Type": "application/json", "A2A-Version": "0.3" });
           res.end(
             JSON.stringify({
-              code: err?.code || "InternalError",
-              message: err?.message || String(err),
+              code: e.code || "InternalError",
+              message: e.message || String(err),
             }),
           );
         }
@@ -511,7 +527,9 @@ export function startServer(sim: Simulation): void {
 
           // Batch support
           if (Array.isArray(parsed)) {
-            const results = parsed.map((r: any) => mcp.handleRequest(r));
+            const results = parsed.map((r: unknown) =>
+              mcp.handleRequest(r as unknown as Parameters<typeof mcp.handleRequest>[0]),
+            );
             res.writeHead(200, {
               "Content-Type": "application/json",
               "Access-Control-Allow-Origin": "*",
@@ -525,7 +543,7 @@ export function startServer(sim: Simulation): void {
           if (parsed.method === "tools/call" && parsed.params?.name) {
             sim.events.push({
               type: "mcp_tool_call",
-              agentId: null as any,
+              agentId: undefined,
               message: `🔌 MCP: Tool "${parsed.params.name}" called`,
               timestamp: Date.now(),
             });
@@ -656,8 +674,11 @@ export function startServer(sim: Simulation): void {
           });
 
           // Deterministic mode: trigger processOrder directly
-          if ("processOrder" in sim && typeof (sim as any).processOrder === "function") {
-            (sim as any).processOrder(message);
+          if (
+            "processOrder" in sim &&
+            typeof (sim as unknown as Record<string, unknown>).processOrder === "function"
+          ) {
+            (sim as unknown as { processOrder: (msg: string) => void }).processOrder(message);
           }
 
           json(res, { ok: true, message: `Order delivered to ${coo.name}` });
@@ -738,10 +759,10 @@ export function startServer(sim: Simulation): void {
             timestamp: Date.now(),
           };
           sim.events.push(event);
-          if ("onEvent" in sim && typeof (sim as any).sseListeners !== "undefined") {
-            ((sim as any).sseListeners as Array<(e: SandboxEvent) => void>).forEach((l) =>
-              l(event),
-            );
+          if ("sseListeners" in sim) {
+            (
+              sim as unknown as { sseListeners: Array<(e: SandboxEvent) => void> }
+            ).sseListeners.forEach((l) => l(event));
           }
 
           json(res, { ok: true, agent: mapAgent(agent, sim.agents) });
@@ -887,7 +908,7 @@ export function startServer(sim: Simulation): void {
     if (path === "/api/health") {
       json(res, {
         status: "ok",
-        tick: (sim as any).tick ?? 0,
+        tick: sim.tick ?? 0,
         agents: sim.agents.length,
         tasks: sim.tasks.length,
       });
@@ -1060,13 +1081,8 @@ export function startServer(sim: Simulation): void {
         }
       }
 
-      // Also scan task activityLogs for messages not in agent recentMessages
-      for (const task of tasks) {
-        for (const msg of task.activityLog) {
-          // Only count if not already seen (activityLog may overlap with recentMessages)
-          // We use the counts above as primary; activityLog provides delegation depth info
-        }
-      }
+      // Note: task activityLogs may overlap with recentMessages.
+      // The counts above are primary; activityLog provides delegation depth info.
 
       // Avg delegation depth: count delegation hops per task
       const taskDelegationCounts = new Map<string, number>();
@@ -1448,7 +1464,7 @@ export function startServer(sim: Simulation): void {
 
     // Get current speed
     if (path === "/api/speed" && req.method === "GET") {
-      json(res, { tickIntervalMs: (sim as any).config?.tickIntervalMs ?? 5000 });
+      json(res, { tickIntervalMs: sim.config?.tickIntervalMs ?? 5000 });
       return;
     }
 
@@ -1549,7 +1565,7 @@ function handleGraphQL(
       for (const m of all) {
         const key = [m.from, m.to].sort().join("::");
         if (!pairMap.has(key)) pairMap.set(key, []);
-        pairMap.get(key)!.push(m);
+        pairMap.get(key)?.push(m);
       }
       const conversations = Array.from(pairMap.entries())
         .map(([key, msgs]) => {

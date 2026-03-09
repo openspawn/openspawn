@@ -3,15 +3,13 @@
 
 import type { ServerResponse } from "node:http";
 import type { DeterministicSimulation } from "./deterministic.js";
-import type { SandboxAgent, SandboxTask } from "./types.js";
+import type { SandboxTask } from "./types.js";
 import type {
   AgentCard,
   AgentSkill,
   Task,
   TaskState,
-  TaskStatus,
   Message,
-  Part,
   Artifact,
   SendMessageRequest,
   StreamEvent,
@@ -221,7 +219,7 @@ function domainSkills(domain: string): AgentSkill[] {
       { id: "onboarding", name: "Onboarding", description: "Help new agents get productive" },
     ],
   };
-  return skillMap[domain.toLowerCase()] || skillMap["engineering"]!;
+  return skillMap[domain.toLowerCase()] ?? skillMap["engineering"];
 }
 
 // ── Tracked A2A Task ────────────────────────────────────────────────────────
@@ -458,7 +456,7 @@ export class A2AServer {
     let task: Task;
     try {
       task = this.handleSendMessage(req);
-    } catch (err: any) {
+    } catch (err: unknown) {
       res.write(`data: ${JSON.stringify({ error: err })}\n\n`);
       res.end();
       return;

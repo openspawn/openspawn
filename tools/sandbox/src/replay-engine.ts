@@ -339,7 +339,7 @@ export class ReplaySimulation extends DeterministicSimulation {
         if (!this.queuedDecisions.has(replayTick)) {
           this.queuedDecisions.set(replayTick, []);
         }
-        this.queuedDecisions.get(replayTick)!.push(decision);
+        this.queuedDecisions.get(replayTick)?.push(decision);
       }
 
       const tickList = [...this.queuedDecisions.keys()].sort((a, b) => a - b);

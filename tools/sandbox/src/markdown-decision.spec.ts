@@ -37,10 +37,10 @@ describe("parseDecision", () => {
 - Message: Assigning Safari crash fix to engineering`;
     const d = parseDecision(input);
     expect(d).not.toBeNull();
-    expect(d!.action).toBe("delegate");
-    expect(d!.target).toBe("tech-talent");
-    expect(d!.task).toBe("TASK-0001");
-    expect(d!.message).toBe("Assigning Safari crash fix to engineering");
+    expect(d?.action).toBe("delegate");
+    expect(d?.target).toBe("tech-talent");
+    expect(d?.task).toBe("TASK-0001");
+    expect(d?.message).toBe("Assigning Safari crash fix to engineering");
   });
 
   it("returns null when no action found", () => {
@@ -64,54 +64,54 @@ describe("parseDecision", () => {
     for (const action of actions) {
       const d = parseDecision(`Action: ${action}\nTarget: none\nTask: T1\nMessage: test`);
       expect(d).not.toBeNull();
-      expect(d!.action).toBe(action);
+      expect(d?.action).toBe(action);
     }
   });
 
   it("is case-insensitive for action keyword", () => {
     const d = parseDecision("ACTION: Work\nTarget: none");
     expect(d).not.toBeNull();
-    expect(d!.action).toBe("work");
+    expect(d?.action).toBe("work");
   });
 
   it("defaults target to none when missing", () => {
     const d = parseDecision("Action: idle");
-    expect(d!.target).toBe("none");
+    expect(d?.target).toBe("none");
   });
 
   it("defaults task to empty string when missing", () => {
     const d = parseDecision("Action: idle\nTarget: none");
-    expect(d!.task).toBe("");
+    expect(d?.task).toBe("");
   });
 
   it("defaults message to empty string when missing", () => {
     const d = parseDecision("Action: idle\nTarget: none");
-    expect(d!.message).toBe("");
+    expect(d?.message).toBe("");
   });
 
   it("preserves raw response", () => {
     const raw = "Action: work\nTarget: none\nTask: T1\nMessage: did stuff";
     const d = parseDecision(raw);
-    expect(d!.raw).toBe(raw);
+    expect(d?.raw).toBe(raw);
   });
 
   it("handles extra whitespace in values", () => {
     const d = parseDecision("Action:   delegate  \nTarget:   tech-talent  ");
-    expect(d!.action).toBe("delegate");
-    expect(d!.target).toBe("tech-talent");
+    expect(d?.action).toBe("delegate");
+    expect(d?.target).toBe("tech-talent");
   });
 
   it("handles markdown bullet prefix", () => {
     const d = parseDecision(
       "- Action: work\n- Target: none\n- Task: TASK-0042\n- Message: fixing bugs",
     );
-    expect(d!.action).toBe("work");
-    expect(d!.task).toBe("TASK-0042");
+    expect(d?.action).toBe("work");
+    expect(d?.task).toBe("TASK-0042");
   });
 
   it("parses new task format", () => {
     const d = parseDecision("Action: delegate\nTarget: bob\nTask: new: Build login page");
-    expect(d!.task).toBe("new: Build login page");
+    expect(d?.task).toBe("new: Build login page");
   });
 });
 

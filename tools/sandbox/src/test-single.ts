@@ -15,7 +15,8 @@ const config: SandboxConfig = {
 
 initOllama(config);
 const agents = createAgents();
-const dennis = agents.find((a) => a.id === "dennis")!;
+const dennis = agents.find((a) => a.id === "dennis");
+if (!dennis) throw new Error("Agent dennis not found");
 
 const tasks: SandboxTask[] = [
   {

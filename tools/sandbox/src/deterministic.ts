@@ -8,13 +8,7 @@
 //   Worker receives task → simulate work over 3-5 ticks → mark done
 //   Anyone stuck → escalate to parent
 
-import type {
-  SandboxAgent,
-  SandboxTask,
-  SandboxEvent,
-  SandboxConfig,
-  ACPMessage,
-} from "./types.js";
+import type { SandboxAgent, SandboxTask, SandboxEvent, SandboxConfig } from "./types.js";
 import type { ParsedOrg } from "./org-parser.js";
 import { makeAgentPublic } from "./agents.js";
 import { createACPMessage, pushMessage } from "./acp.js";
@@ -185,15 +179,15 @@ function advanceWork(
   // Work progresses through stages: assigned → in_progress → review → done
   // Each stage takes 2-4 ticks based on priority
   const ticksPerStage = task.priority === "critical" ? 2 : task.priority === "high" ? 3 : 4;
-  const ticksInCurrentStage = (task as any)._stageTickCount || 0;
+  const ticksInCurrentStage = task._stageTickCount || 0;
 
   if (ticksInCurrentStage < ticksPerStage) {
-    (task as any)._stageTickCount = ticksInCurrentStage + 1;
+    task._stageTickCount = ticksInCurrentStage + 1;
     return { advanced: false, done: false, status: task.status };
   }
 
   // Advance to next stage
-  (task as any)._stageTickCount = 0;
+  task._stageTickCount = 0;
 
   if (task.status === "assigned") {
     task.status = "in_progress";
@@ -291,6 +285,8 @@ export class DeterministicSimulation {
 
   /** Agent IDs to skip in the deterministic tick loop (e.g. already handled by LLM) */
   protected skipAgentIds = new Set<string>();
+  /** Model router instance (set by server.ts) */
+  _modelRouter?: ModelRouter;
 
   private sseListeners: Array<(event: SandboxEvent) => void> = [];
   /** Pending hires queue: domains the COO needs to fill */
@@ -305,7 +301,7 @@ export class DeterministicSimulation {
   constructor(
     agents: SandboxAgent[],
     config: SandboxConfig,
-    skipSeedTasks = false,
+    _skipSeedTasks = false,
     parsedOrg?: ParsedOrg,
     seed?: number,
   ) {
@@ -478,7 +474,8 @@ export class DeterministicSimulation {
   private tickCOO(coo: SandboxAgent): void {
     // 1. Hire pending leads (multiple per tick — COO moves fast)
     while (this.pendingHires.length > 0) {
-      const domain = this.pendingHires.shift()!;
+      const domain = this.pendingHires.shift();
+      if (!domain) break;
       const hired = this.hireFromRoster(coo, domain, "lead");
       if (!hired) {
         // No roster match — create generic lead
@@ -508,7 +505,8 @@ export class DeterministicSimulation {
 
     // 2. Create and delegate pending tasks
     if (this.pendingTaskDefs.length > 0) {
-      const taskDef = this.pendingTaskDefs.shift()!;
+      const taskDef = this.pendingTaskDefs.shift();
+      if (!taskDef) return;
       const task: SandboxTask = {
         id: nextTaskId(),
         title: taskDef.title,
@@ -736,16 +734,16 @@ export class DeterministicSimulation {
     );
 
     for (const task of blockedTasks) {
-      const ticksBlocked = (task as any)._blockedTicks || 0;
+      const ticksBlocked = task._blockedTicks || 0;
       if (ticksBlocked >= 3) {
         // Manager "resolves" the blocker
         task.status = "in_progress";
         task.blockedReason = undefined;
-        (task as any)._blockedTicks = 0;
-        (task as any)._stageTickCount = 0;
+        task._blockedTicks = 0;
+        task._stageTickCount = 0;
         this.logAgent(manager, `🔓 Unblocked "${task.title}"`, task.id);
       } else {
-        (task as any)._blockedTicks = ticksBlocked + 1;
+        task._blockedTicks = ticksBlocked + 1;
       }
     }
   }
@@ -799,7 +797,7 @@ export class DeterministicSimulation {
     }
 
     // Model router: simulate routing decisions for active agents working on tasks
-    const modelRouter = (this as any)._modelRouter as ModelRouter | undefined;
+    const modelRouter = this._modelRouter;
     if (modelRouter) {
       const workingAgents = sortedAgents.filter((a) => {
         const activeTasks = this.tasks.filter(

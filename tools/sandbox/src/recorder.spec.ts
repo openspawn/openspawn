@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { DecisionRecorder } from "./recorder.js";
 import type { SandboxAgent } from "./types.js";
 import type { AgentDecision } from "./markdown-decision.js";
@@ -156,8 +156,8 @@ describe("DecisionRecorder – toMarkdown", () => {
 
 describe("DecisionRecorder – save", () => {
   it("creates file with correct naming", async () => {
-    const mkdirSync = vi.fn();
-    const writeFileSync = vi.fn();
+    const _mkdirSync = vi.fn();
+    const _writeFileSync = vi.fn();
     // We can't easily mock fs in this context, so just verify toMarkdown works
     const rec = new DecisionRecorder("my-scenario", "model");
     rec.record(makeAgent(), makeDecision(), 1);

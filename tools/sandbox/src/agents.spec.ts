@@ -40,8 +40,9 @@ describe("createAgents", () => {
   });
 
   it("COO has no parent", () => {
-    const coo = agents.find((a) => a.role === "coo")!;
-    expect(coo.parentId).toBeUndefined();
+    const coo = agents.find((a) => a.role === "coo");
+    expect(coo).toBeDefined();
+    expect(coo?.parentId).toBeUndefined();
   });
 
   it("all non-COO agents have a parentId", () => {
@@ -142,13 +143,17 @@ describe("getParent", () => {
   const agents = createAgents();
 
   it("returns parent agent", () => {
-    const techTalent = getAgent(agents, "tech-talent")!;
+    const techTalent = getAgent(agents, "tech-talent");
+    expect(techTalent).toBeDefined();
+    if (!techTalent) return;
     const parent = getParent(agents, techTalent);
     expect(parent?.id).toBe("mr-krabs");
   });
 
   it("returns undefined for COO", () => {
-    const coo = getAgent(agents, "mr-krabs")!;
+    const coo = getAgent(agents, "mr-krabs");
+    expect(coo).toBeDefined();
+    if (!coo) return;
     expect(getParent(agents, coo)).toBeUndefined();
   });
 });

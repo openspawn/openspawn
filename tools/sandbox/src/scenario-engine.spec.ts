@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { ScenarioEngine } from "./scenario-engine.js";
 import { DeterministicSimulation } from "./deterministic.js";
 import { makeAgentPublic } from "./agents.js";
@@ -30,7 +30,7 @@ function makeLead(
   return makeAgentPublic(id, name, "lead", 7, domain, parentId, `Lead for ${domain}`);
 }
 
-function makeWorker(
+function _makeWorker(
   id: string,
   name: string,
   parentId: string,
@@ -241,7 +241,7 @@ describe("scenario-engine", () => {
       const sim = createSim();
       engine.attach(sim);
       engine.preTick();
-      const subtasks = sim.tasks.filter((t) => (t as any).parentTaskId);
+      const subtasks = sim.tasks.filter((t) => t.parentTaskId);
       expect(subtasks.length).toBeGreaterThan(0);
     });
 
@@ -253,7 +253,7 @@ describe("scenario-engine", () => {
       // task-tpl-2 depends on task-tpl-1, so "Implement Feature X" should be blocked
       const implTask = sim.tasks.find((t) => t.title === "Implement Feature X");
       expect(implTask).toBeDefined();
-      expect(implTask!.status).toBe("blocked");
+      expect(implTask?.status).toBe("blocked");
     });
 
     it("postTick counts decisions", () => {
@@ -275,7 +275,7 @@ describe("scenario-engine", () => {
 
       // Simulate ticks to reach phase transition at tick 15
       for (let i = 0; i < 16; i++) {
-        (sim as any).tick = i;
+        sim.tick = i;
         engine.preTick();
         engine.postTick();
       }
@@ -372,7 +372,7 @@ describe("scenario-engine", () => {
       const engine = new ScenarioEngine(scenario);
       const sim = createSim();
       engine.attach(sim);
-      (sim as any).tick = 1;
+      sim.tick = 1;
       engine.preTick();
 
       const eventTasks = sim.tasks.filter((t) => t.title === "Fix Server");
@@ -401,7 +401,7 @@ describe("scenario-engine", () => {
 
       // Fire multiple ticks
       for (let i = 1; i <= 5; i++) {
-        (sim as any).tick = i;
+        sim.tick = i;
         engine.preTick();
       }
 
@@ -428,9 +428,9 @@ describe("scenario-engine", () => {
       const sim = createSim();
       engine.attach(sim);
 
-      (sim as any).tick = 1;
+      sim.tick = 1;
       engine.preTick();
-      (sim as any).tick = 2;
+      sim.tick = 2;
       engine.preTick();
 
       // Only 1 should fire due to cooldown
@@ -450,13 +450,13 @@ describe("scenario-engine", () => {
       const task = sim.tasks.find((t) => !t.title.includes("Implement"));
       if (task) task.status = "in_progress";
 
-      (sim as any).tick = 1;
+      sim.tick = 1;
       engine.preTick(); // burns resources
 
       const status = engine.getStatus();
       const hours = status.resources.find((r) => r.id === "hours");
       expect(hours).toBeDefined();
-      expect(hours!.current).toBeLessThan(hours!.initial);
+      expect(hours?.current).toBeLessThan(hours?.initial ?? 0);
     });
   });
 
@@ -519,7 +519,7 @@ describe("scenario-engine", () => {
       const sim = createSim();
       engine.attach(sim);
 
-      (sim as any).tick = 2;
+      sim.tick = 2;
       engine.preTick();
       engine.postTick();
       expect(engine.isActive).toBe(false);
@@ -538,7 +538,7 @@ describe("scenario-engine", () => {
       // Mark "Design Feature X" as done
       const designTask = sim.tasks.find((t) => t.title === "Design Feature X");
       expect(designTask).toBeDefined();
-      designTask!.status = "done";
+      if (designTask) designTask.status = "done";
 
       engine.postTick(); // process triggers
 

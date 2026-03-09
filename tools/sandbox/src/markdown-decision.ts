@@ -2,7 +2,7 @@
 // Builds lean markdown prompts for LLM agents and parses structured decisions
 // from free-form markdown responses.
 
-import type { SandboxAgent, SandboxTask, ACPMessage } from "./types.js";
+import type { SandboxAgent, SandboxTask } from "./types.js";
 import { loadAgentConfig, buildSystemPrompt } from "./config-loader.js";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,7 +40,7 @@ export interface SimulationState {
 const soulCache = new Map<string, string>();
 
 function getAgentSoul(agentId: string): string {
-  if (soulCache.has(agentId)) return soulCache.get(agentId)!;
+  if (soulCache.has(agentId)) return soulCache.get(agentId) ?? "";
   const config = loadAgentConfig(agentId, ORG_DIR);
   const soul = buildSystemPrompt(config);
   soulCache.set(agentId, soul);
