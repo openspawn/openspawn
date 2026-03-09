@@ -286,7 +286,8 @@ describe("completeTask — result storage integration", () => {
 
     const tasks = listTasks(db, { status: "done" });
     expect(tasks).toHaveLength(1);
-    const stored = JSON.parse(tasks[0].result);
+    expect(tasks[0].result).not.toBeNull();
+    const stored = JSON.parse(tasks[0].result ?? "");
     expect(stored.type).toBe("pr_merged");
     expect(stored.pr).toBe(99);
     expect(stored.branch).toBe("feat/ship");
@@ -307,7 +308,8 @@ describe("completeTask — result storage integration", () => {
     completeTask(db, taskId, "agent-1", result);
 
     const tasks = listTasks(db, { status: "done" });
-    const stored = JSON.parse(tasks[0].result);
+    expect(tasks[0].result).not.toBeNull();
+    const stored = JSON.parse(tasks[0].result ?? "");
     expect(stored.type).toBe("freeform");
     expect(stored.text).toBe("Did some stuff");
   });
