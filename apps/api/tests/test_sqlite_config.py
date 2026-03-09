@@ -1,16 +1,13 @@
 """Tests for SQLite backend configuration."""
+
 import os
 from importlib import reload
 from unittest.mock import patch
 
-import pytest
-
 
 def test_sqlite_url_not_rewritten():
     """SQLite URLs should not be rewritten to asyncpg."""
-    with patch.dict(
-        os.environ, {"DATABASE_URL": "sqlite+aiosqlite:///test.db"}, clear=False
-    ):
+    with patch.dict(os.environ, {"DATABASE_URL": "sqlite+aiosqlite:///test.db"}, clear=False):
         import app.config as cfg
 
         reload(cfg)
@@ -20,9 +17,7 @@ def test_sqlite_url_not_rewritten():
 
 def test_is_sqlite_true_for_sqlite():
     """is_sqlite should be True for SQLite URLs."""
-    with patch.dict(
-        os.environ, {"DATABASE_URL": "sqlite+aiosqlite:///test.db"}, clear=False
-    ):
+    with patch.dict(os.environ, {"DATABASE_URL": "sqlite+aiosqlite:///test.db"}, clear=False):
         import app.config as cfg
 
         reload(cfg)
@@ -31,9 +26,7 @@ def test_is_sqlite_true_for_sqlite():
 
 def test_is_sqlite_false_for_postgres():
     """is_sqlite should be False for PostgreSQL URLs."""
-    with patch.dict(
-        os.environ, {"DATABASE_URL": "postgresql://localhost/test"}, clear=False
-    ):
+    with patch.dict(os.environ, {"DATABASE_URL": "postgresql://localhost/test"}, clear=False):
         import app.config as cfg
 
         reload(cfg)
