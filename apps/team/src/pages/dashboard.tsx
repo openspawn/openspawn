@@ -26,7 +26,7 @@ import {
   CircleDot,
 } from "lucide-react";
 import { useAgents, useTasks, useEvents, type Agent, type Task } from "../hooks";
-import { AgentStatus, TaskStatus } from "@openspawn/dashboard-data";
+import { AgentStatus, TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 
 /* ── Helpers ────────────────────────────────────────────────────── */
 
@@ -51,22 +51,22 @@ function levelLabel(level: number): string {
 }
 
 function priorityVariant(p: string) {
-  switch (p) {
-    case "URGENT":
+  switch (p.toLowerCase()) {
+    case TaskPriority.URGENT:
       return "destructive" as const;
-    case "HIGH":
+    case TaskPriority.HIGH:
       return "warning" as const;
     default:
       return "secondary" as const;
   }
 }
 function statusVariant(s: string) {
-  switch (s) {
-    case "DONE":
+  switch (s.toLowerCase()) {
+    case TaskStatus.DONE:
       return "success" as const;
-    case "IN_PROGRESS":
+    case TaskStatus.IN_PROGRESS:
       return "info" as const;
-    case "CLAIMED":
+    case TaskStatus.ASSIGNED:
       return "warning" as const;
     default:
       return "secondary" as const;
@@ -83,10 +83,10 @@ function initials(name: string) {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  FOUNDER: "bg-amber-500/20 text-amber-400",
-  ADMIN: "bg-cyan-500/20 text-cyan-400",
-  WORKER: "bg-violet-500/20 text-violet-400",
-  HR: "bg-emerald-500/20 text-emerald-400",
+  founder: "bg-amber-500/20 text-amber-400",
+  admin: "bg-cyan-500/20 text-cyan-400",
+  worker: "bg-violet-500/20 text-violet-400",
+  hr: "bg-emerald-500/20 text-emerald-400",
 };
 
 /* ── Agent Card ─────────────────────────────────────────────────── */
@@ -116,12 +116,14 @@ function AgentCard({
               <StatusRing
                 completionRate={completion}
                 creditUsage={credit}
-                status={agent.status === "ACTIVE" ? "active" : "idle"}
+                status={agent.status.toLowerCase() === AgentStatus.ACTIVE ? "active" : "idle"}
                 size="sm"
               >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback
-                    className={ROLE_COLORS[agent.role] ?? "bg-slate-500/20 text-slate-400"}
+                    className={
+                      ROLE_COLORS[agent.role?.toLowerCase()] ?? "bg-slate-500/20 text-slate-400"
+                    }
                   >
                     {initials(agent.name)}
                   </AvatarFallback>
@@ -132,7 +134,9 @@ function AgentCard({
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-sm truncate">{agent.name}</span>
                   <Badge
-                    variant={agent.status === "ACTIVE" ? "success" : "secondary"}
+                    variant={
+                      agent.status.toLowerCase() === AgentStatus.ACTIVE ? "success" : "secondary"
+                    }
                     className="text-[10px] px-1.5 py-0"
                   >
                     {agent.status}
@@ -186,9 +190,9 @@ function TaskRow({ task, index, onClick }: { task: Task; index: number; onClick?
         <div className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
           <CircleDot
             className={`h-3.5 w-3.5 shrink-0 ${
-              task.status === "DONE"
+              task.status.toLowerCase() === TaskStatus.DONE
                 ? "text-emerald-400"
-                : task.status === "IN_PROGRESS"
+                : task.status.toLowerCase() === TaskStatus.IN_PROGRESS
                   ? "text-cyan-400"
                   : "text-amber-400"
             }`}
@@ -230,13 +234,14 @@ export function DashboardPage() {
   const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
 
   const stats = useMemo(() => {
-    const active = agents.filter((a) => a.status === AgentStatus.Active);
-    const done = tasks.filter((t) => t.status === TaskStatus.Done);
+    const norm = (s: string) => s.toLowerCase();
+    const active = agents.filter((a) => norm(a.status) === AgentStatus.ACTIVE);
+    const done = tasks.filter((t) => norm(t.status) === TaskStatus.DONE);
     const wip = tasks.filter(
-      (t) => t.status === TaskStatus.InProgress || t.status === TaskStatus.Review,
+      (t) => norm(t.status) === TaskStatus.IN_PROGRESS || norm(t.status) === TaskStatus.REVIEW,
     );
     const pending = tasks.filter(
-      (t) => t.status === TaskStatus.Todo || t.status === TaskStatus.Backlog,
+      (t) => norm(t.status) === TaskStatus.TODO || norm(t.status) === TaskStatus.BACKLOG,
     );
     const pct = tasks.length ? Math.round((done.length / tasks.length) * 100) : 0;
     return {
@@ -261,13 +266,13 @@ export function DashboardPage() {
     () =>
       [...tasks].sort((a, b) => {
         const o: Record<string, number> = {
-          IN_PROGRESS: 0,
-          CLAIMED: 1,
-          PENDING: 2,
-          REVIEW: 3,
-          DONE: 4,
+          [TaskStatus.IN_PROGRESS]: 0,
+          [TaskStatus.ASSIGNED]: 1,
+          [TaskStatus.PENDING]: 2,
+          [TaskStatus.REVIEW]: 3,
+          [TaskStatus.DONE]: 4,
         };
-        return (o[a.status] ?? 5) - (o[b.status] ?? 5);
+        return (o[a.status.toLowerCase()] ?? 5) - (o[b.status.toLowerCase()] ?? 5);
       }),
     [tasks],
   );

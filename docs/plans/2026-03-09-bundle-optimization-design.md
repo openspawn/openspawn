@@ -15,6 +15,7 @@ Lazy pages: `/tasks`, `/agents`, `/credits`, `/events`, `/messages`, `/network`,
 ### 2. Vendor Chunk Splitting
 
 `manualChunks` in vite `rollupOptions`:
+
 - `vendor-react`: react, react-dom, @tanstack/react-router, @tanstack/react-query
 - `vendor-motion`: motion/react
 - `vendor-xyflow`: @xyflow/react, elkjs
