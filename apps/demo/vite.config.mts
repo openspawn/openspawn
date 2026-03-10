@@ -62,6 +62,14 @@ export default defineConfig(() => ({
     __COMMIT_SHA__: JSON.stringify(commitSha),
     __BUILD_TIME__: JSON.stringify(buildTime),
   },
+  resolve: {
+    alias: {
+      // elkjs/lib/elk.bundled.js uses require('web-worker') with a try/catch
+      // fallback — Node-only, not needed in browser. Vite converts to a static
+      // ESM import that fails, so we stub it out.
+      "web-worker": resolve(import.meta.dirname, "src/stubs/web-worker.ts"),
+    },
+  },
   build: {
     outDir: "../../dist/apps/demo",
     emptyOutDir: true,
