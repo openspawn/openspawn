@@ -55,9 +55,6 @@ export { SidePanelProvider, useSidePanel } from "./contexts/side-panel-context";
 // Mode detection
 export { isDemoMode, isSandboxMode } from "./lib/mode";
 
-// GraphQL fetcher (legacy — kept for demo/sandbox mock compatibility)
-export { fetcher, graphqlClient, setDemoFetcher, setSandboxFetcher } from "./graphql/fetcher";
-
 // Enums — canonical source is @openspawn/shared-types, re-exported for convenience
 export {
   AgentMode,

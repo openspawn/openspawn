@@ -12,7 +12,7 @@ import { ProtectedRoute } from "./components/protected-route";
 import { TourProvider, TourBar, TourSpotlight } from "./components/tour";
 import { CommandPalette } from "./components/command-palette";
 import { DashboardPage } from "./pages/dashboard";
-import { isSandboxMode } from "./graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { isBBTheme } from "./lib/dashboard-theme";
 import type { ReactNode } from "react";
 

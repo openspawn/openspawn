@@ -49,7 +49,7 @@ import { useTeamStats } from "../hooks/use-teams";
 import { useAgents, type Agent } from "../hooks/use-agents";
 import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 
 // ── Icon map ────────────────────────────────────────────────────────────────

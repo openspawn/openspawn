@@ -25,17 +25,17 @@ vi.mock("recharts", () => ({
   Tooltip: () => null,
 }));
 
-// Mock TanStack Query hooks
-vi.mock("../graphql/generated/hooks", () => ({
-  useAgentsQuery: () => ({ data: { agents: [] }, isLoading: false, error: null }),
-  useTasksQuery: () => ({ data: { tasks: [] }, isLoading: false, error: null }),
-  useCreditHistoryQuery: () => ({
-    data: { creditHistory: [] },
-    isLoading: false,
-    error: null,
-  }),
-  useEventsQuery: () => ({ data: { events: [] }, isLoading: false, error: null }),
-}));
+// Mock REST hooks (used by dashboard-data)
+vi.mock("@openspawn/dashboard-data", async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return {
+    ...actual,
+    useAgents: () => ({ agents: [], loading: false, error: null, refetch: vi.fn() }),
+    useTasks: () => ({ tasks: [], loading: false, error: null, refetch: vi.fn() }),
+    useCredits: () => ({ transactions: [], loading: false, error: null, refetch: vi.fn() }),
+    useEvents: () => ({ events: [], loading: false, error: null, refetch: vi.fn() }),
+  };
+});
 
 /**
  * Light smoke tests for the App module.

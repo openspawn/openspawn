@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { OfflineIndicator } from "../components/offline-indicator";
 
 import { isBBTheme } from "../lib/dashboard-theme";

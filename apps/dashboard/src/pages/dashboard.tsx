@@ -33,7 +33,7 @@ import { EmptyState } from "../components/ui/empty-state";
 import { useDemo, PROJECT_PHASES } from "../demo/DemoProvider";
 import { useSparklines } from "../hooks/use-sandbox-metrics";
 import { useACPMetrics } from "../hooks/use-acp-metrics";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { SandboxControls } from "../components/sandbox-controls";
 // SandboxCommandBar rendered in layout.tsx (not here to avoid duplicate)
 

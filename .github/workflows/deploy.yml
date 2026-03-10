@@ -98,6 +98,13 @@ jobs:
             # Update Caddy config and reload
             cp Caddyfile /etc/caddy/Caddyfile 2>/dev/null && systemctl reload caddy 2>/dev/null || true
 
+            # Extract team dashboard from sandbox image to host for Caddy static serving
+            echo "⏳ Extracting team dashboard..."
+            docker create --name tmp-team ghcr.io/openspawn/openspawn:latest 2>/dev/null || true
+            rm -rf /opt/team-dashboard
+            docker cp tmp-team:/app/team-dist /opt/team-dashboard
+            docker rm tmp-team
+
             # Force recreate to pick up compose changes + new images
             docker compose up -d app api postgres --force-recreate --remove-orphans
 

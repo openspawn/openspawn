@@ -9,7 +9,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { cn } from "../lib/utils";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { TeamBadge } from "../components/team-badge";
 import type { Agent, Message } from "../hooks";
 import { InlineAvatar, formatTime, acpTypeRenderers } from "./message-utils";

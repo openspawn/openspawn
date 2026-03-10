@@ -24,7 +24,7 @@ import { motion, AnimatePresence } from "motion/react";
 import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 import { useDemo } from "../demo";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import { useAgents, type Agent } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";

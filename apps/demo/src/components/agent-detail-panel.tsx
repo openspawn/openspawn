@@ -15,7 +15,7 @@ import {
   Clock,
   Terminal,
 } from "lucide-react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";

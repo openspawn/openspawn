@@ -3,7 +3,7 @@ import { Bot, Layers, Wallet, Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import { useOnboarding } from "./onboarding-provider";
 import { useDemo } from "../../demo/DemoProvider";
-import { isSandboxMode } from "../../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 
 const VALUE_PROPS = [
   {
