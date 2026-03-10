@@ -2,25 +2,26 @@ import { PageHeader } from "@openspawn/dashboard-ui";
 import { useTasks, useAgents, useDashboardPanels } from "../hooks";
 import { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 
-const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
-  { id: TaskStatus.Todo, label: "To Do", color: "border-white/10      bg-white/[0.02]" },
+const COLUMNS: { id: string; label: string; color: string }[] = [
+  { id: TaskStatus.TODO, label: "To Do", color: "border-white/10      bg-white/[0.02]" },
   {
-    id: TaskStatus.InProgress,
+    id: TaskStatus.IN_PROGRESS,
     label: "In Progress",
     color: "border-cyan-500/30   bg-cyan-500/[0.04]",
   },
-  { id: TaskStatus.Review, label: "In Review", color: "border-violet-500/30 bg-violet-500/[0.04]" },
-  { id: TaskStatus.Blocked, label: "Blocked", color: "border-red-500/30    bg-red-500/[0.04]" },
-  { id: TaskStatus.Done, label: "Done", color: "border-emerald-500/30 bg-emerald-500/[0.04]" },
+  { id: TaskStatus.REVIEW, label: "In Review", color: "border-violet-500/30 bg-violet-500/[0.04]" },
+  { id: TaskStatus.BLOCKED, label: "Blocked", color: "border-red-500/30    bg-red-500/[0.04]" },
+  { id: TaskStatus.DONE, label: "Done", color: "border-emerald-500/30 bg-emerald-500/[0.04]" },
 ];
 
-function priorityColor(p: TaskPriority): string {
-  switch (p) {
-    case TaskPriority.Urgent:
+function priorityColor(p: string): string {
+  const lp = p.toLowerCase();
+  switch (lp) {
+    case TaskPriority.URGENT:
       return "bg-red-500/20 text-red-400";
-    case TaskPriority.High:
+    case TaskPriority.HIGH:
       return "bg-amber-500/20 text-amber-400";
-    case TaskPriority.Normal:
+    case TaskPriority.NORMAL:
       return "bg-blue-500/20 text-blue-400";
     default:
       return "bg-white/10 text-white/40";
@@ -38,10 +39,11 @@ export function TaskBoardPage() {
   }, {});
 
   for (const task of tasks) {
-    if (task.status in byColumn) {
-      byColumn[task.status].push(task);
+    const s = task.status.toLowerCase();
+    if (s in byColumn) {
+      byColumn[s].push(task);
     } else {
-      byColumn[TaskStatus.Todo].push(task);
+      byColumn[TaskStatus.TODO].push(task);
     }
   }
 

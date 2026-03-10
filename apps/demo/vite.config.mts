@@ -80,12 +80,7 @@ export default defineConfig(() => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          "vendor-react": [
-            "react",
-            "react-dom",
-            "@tanstack/react-router",
-            "@tanstack/react-query",
-          ],
+          "vendor-react": ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-query"],
           "vendor-motion": ["motion/react"],
           "vendor-xyflow": ["@xyflow/react", "elkjs"],
         },

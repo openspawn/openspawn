@@ -58,15 +58,48 @@ export { isDemoMode, isSandboxMode } from "./lib/mode";
 // GraphQL fetcher (legacy — kept for demo/sandbox mock compatibility)
 export { fetcher, graphqlClient, setDemoFetcher, setSandboxFetcher } from "./graphql/fetcher";
 
-// GraphQL-generated enums + types (legacy — still used by demo data layer)
+// Enums — canonical source is @openspawn/shared-types, re-exported for convenience
 export {
   AgentMode,
   AgentRole,
   AgentStatus,
+  ReputationLevel,
   TaskPriority,
   TaskStatus,
-  type AgentFieldsFragment,
-} from "./graphql/generated/hooks";
+} from "@openspawn/shared-types";
+
+// Agent type for components — mirrors the GraphQL AgentFieldsFragment shape
+export interface AgentFields {
+  id: string;
+  agentId: string;
+  name: string;
+  role: string;
+  mode: string;
+  status: string;
+  level: number;
+  model: string;
+  currentBalance: number;
+  budgetPeriodLimit?: number | null;
+  budgetPeriodSpent: number;
+  managementFeePct: number;
+  parentId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  trustScore: number;
+  reputationLevel: string;
+  tasksCompleted: number;
+  tasksSuccessful: number;
+  lastActivityAt?: string | null;
+  lastPromotionAt?: string | null;
+  lifetimeEarnings: number;
+  domain?: string | null;
+  teamId?: string | null;
+  avatar?: string | null;
+  avatarColor?: string | null;
+}
+
+/** @deprecated Use AgentFields instead */
+export type AgentFieldsFragment = AgentFields;
 
 // Lib utilities
 export * from "./lib/avatar-utils";

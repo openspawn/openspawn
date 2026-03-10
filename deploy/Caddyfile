@@ -44,6 +44,11 @@ team.openspawn.ai {
 		{$TEAM_AUTH_USER} {$TEAM_AUTH_HASH}
 	}
 
+	# Proxy /api requests to FastAPI (same pattern as openspawn.ai)
+	handle_path /api/* {
+		reverse_proxy localhost:8000
+	}
+
 	root * /opt/team-dashboard
 	file_server
 

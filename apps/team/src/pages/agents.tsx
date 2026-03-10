@@ -35,10 +35,10 @@ function initials(name: string) {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  FOUNDER: "bg-amber-500/20 text-amber-400",
-  ADMIN: "bg-cyan-500/20 text-cyan-400",
-  WORKER: "bg-violet-500/20 text-violet-400",
-  HR: "bg-emerald-500/20 text-emerald-400",
+  founder: "bg-amber-500/20 text-amber-400",
+  admin: "bg-cyan-500/20 text-cyan-400",
+  worker: "bg-violet-500/20 text-violet-400",
+  hr: "bg-emerald-500/20 text-emerald-400",
 };
 
 export function AgentsPage() {
@@ -81,7 +81,7 @@ export function AgentsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((agent) => {
-            const isActive = agent.status === AgentStatus.Active;
+            const isActive = agent.status.toLowerCase() === AgentStatus.ACTIVE;
             const taskCount = tasksByAgent[agent.id] || 0;
             const completion =
               agent.tasksCompleted > 0
@@ -100,7 +100,8 @@ export function AgentsPage() {
                   <div
                     className={cn(
                       "h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
-                      ROLE_COLORS[agent.role ?? ""] ?? "bg-slate-500/20 text-slate-400",
+                      ROLE_COLORS[agent.role?.toLowerCase() ?? ""] ??
+                        "bg-slate-500/20 text-slate-400",
                     )}
                   >
                     {initials(agent.name)}

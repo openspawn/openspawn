@@ -16,25 +16,25 @@ Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
 **Live:**
 
-| Domain                  | What                                                             |
-| ----------------------- | ---------------------------------------------------------------- |
-| **openspawn.ai**        | Marketing website (React SPA, serves llms.txt + A2A agent.json) |
-| **api.openspawn.ai**    | Core API — GraphQL + REST (Python rewrite WIP)                  |
-| **bikinibottom.ai**     | Demo sandbox + dashboard                                        |
-| **team.openspawn.ai**   | Internal team dashboard (password-protected)                    |
-| **id.openspawn.ai**     | SSO/identity provider (OIDC)                                    |
-| **wiki.openspawn.ai**   | Internal knowledge base                                         |
+| Domain                | What                                                            |
+| --------------------- | --------------------------------------------------------------- |
+| **openspawn.ai**      | Marketing website (React SPA, serves llms.txt + A2A agent.json) |
+| **api.openspawn.ai**  | Core API — GraphQL + REST (Python rewrite WIP)                  |
+| **bikinibottom.ai**   | Demo sandbox + dashboard                                        |
+| **team.openspawn.ai** | Internal team dashboard (password-protected)                    |
+| **id.openspawn.ai**   | SSO/identity provider (OIDC)                                    |
+| **wiki.openspawn.ai** | Internal knowledge base                                         |
 
 **Reserved (DNS exists, not deployed):**
 
-| Domain                    | Intent                                      |
-| ------------------------- | ------------------------------------------- |
+| Domain                    | Intent                                         |
+| ------------------------- | ---------------------------------------------- |
 | **docs.openspawn.ai**     | Developer docs (Starlight app at `apps/docs/`) |
-| **hub.openspawn.ai**      | Agent/skill marketplace UI                  |
-| **logs.openspawn.ai**     | Centralized logging/observability dashboard |
-| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)         |
-| **registry.openspawn.ai** | Agent/package registry API                  |
-| **status.openspawn.ai**   | Public status page                          |
+| **hub.openspawn.ai**      | Agent/skill marketplace UI                     |
+| **logs.openspawn.ai**     | Centralized logging/observability dashboard    |
+| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)            |
+| **registry.openspawn.ai** | Agent/package registry API                     |
+| **status.openspawn.ai**   | Public status page                             |
 
 ## How to Contribute
 

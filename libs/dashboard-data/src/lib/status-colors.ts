@@ -1,4 +1,4 @@
-import { AgentStatus, TaskStatus } from "../graphql/generated/hooks";
+import { AgentStatus, TaskStatus } from "@openspawn/shared-types";
 
 /**
  * Shared status → badge variant mapping for agent statuses.
@@ -11,15 +11,18 @@ import { AgentStatus, TaskStatus } from "../graphql/generated/hooks";
  *   default → secondary (slate)
  */
 export function getStatusVariant(
-  status: AgentStatus,
+  status: string,
 ): "success" | "warning" | "destructive" | "secondary" {
-  switch (status) {
-    case AgentStatus.Active:
+  const s = status.toLowerCase();
+  switch (s) {
+    case AgentStatus.ACTIVE:
+    case AgentStatus.BUSY:
       return "success";
-    case AgentStatus.Pending:
+    case AgentStatus.PENDING:
+    case AgentStatus.IDLE:
       return "warning";
-    case AgentStatus.Suspended:
-    case AgentStatus.Revoked:
+    case AgentStatus.SUSPENDED:
+    case AgentStatus.REVOKED:
       return "destructive";
     default:
       return "secondary";
@@ -50,16 +53,19 @@ export function getLevelColor(level: number): string {
  * Task status → badge variant mapping.
  */
 export function getTaskStatusVariant(
-  status: TaskStatus,
+  status: string,
 ): "success" | "warning" | "destructive" | "secondary" {
-  switch (status) {
-    case TaskStatus.Done:
+  const s = status.toLowerCase();
+  switch (s) {
+    case TaskStatus.DONE:
       return "success";
-    case TaskStatus.Review:
-    case TaskStatus.InProgress:
+    case TaskStatus.REVIEW:
+    case TaskStatus.IN_PROGRESS:
+    case TaskStatus.ASSIGNED:
       return "warning";
-    case TaskStatus.Cancelled:
-    case TaskStatus.Blocked:
+    case TaskStatus.CANCELLED:
+    case TaskStatus.BLOCKED:
+    case TaskStatus.REJECTED:
       return "destructive";
     default:
       return "secondary";

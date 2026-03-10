@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import { TaskStatus } from "@openspawn/shared-types";
 import { useAgents } from "./use-agents";
 import { useTasks } from "./use-tasks";
-import { AgentStatus } from "../graphql/generated/hooks";
+import { AgentStatus } from "@openspawn/shared-types";
 
 export enum PresenceStatus {
   Active = "active",
@@ -62,22 +62,26 @@ export function usePresence(): {
 
     // Pick up to 4 active agents (agents with active status + tasks)
     // Mark 1 as error for visual variety
-    const activeAgents = agents.filter((a: { status: string }) => a.status === AgentStatus.Active);
+    const norm = (s: string) => s.toLowerCase();
+    const activeAgents = agents.filter(
+      (a: { status: string }) => norm(a.status) === AgentStatus.ACTIVE,
+    );
     let activeCount = 0;
     let errorSet = false;
 
     for (const agent of agents) {
       const id = agent.id;
+      const s = norm(agent.status);
 
       // Suspended/revoked → error
-      if (agent.status === AgentStatus.Suspended || agent.status === AgentStatus.Revoked) {
+      if (s === AgentStatus.SUSPENDED || s === AgentStatus.REVOKED) {
         map.set(id, { agentId: id, status: PresenceStatus.Error });
         if (!errorSet) errorSet = true;
         continue;
       }
 
       // Has in-progress task → active
-      if (busyAgentIds.has(id) && agent.status === AgentStatus.Active) {
+      if (busyAgentIds.has(id) && s === AgentStatus.ACTIVE) {
         activeCount++;
         map.set(id, {
           agentId: id,
@@ -90,7 +94,7 @@ export function usePresence(): {
       }
 
       // Paused → busy
-      if (agent.status === AgentStatus.Pending) {
+      if (s === AgentStatus.PENDING || s === AgentStatus.PAUSED) {
         map.set(id, { agentId: id, status: PresenceStatus.Busy });
         continue;
       }
