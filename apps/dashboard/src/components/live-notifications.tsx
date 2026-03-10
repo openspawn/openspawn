@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
 import type { ReactNode } from "react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 
 export type NotificationType =

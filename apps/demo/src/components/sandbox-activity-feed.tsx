@@ -4,7 +4,7 @@
  * Use in task detail sidebar or agent detail panel.
  */
 import { useEffect, useState, useRef } from "react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 
 import { SANDBOX_URL } from "../lib/sandbox-url";
 

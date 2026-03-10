@@ -8,7 +8,7 @@ import { EmptyState } from "../components/ui/empty-state";
 import { PageHeader } from "../components/ui/page-header";
 import { StatCard } from "../components/ui/stat-card";
 import { useEvents } from "../hooks/use-events";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useState, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 

@@ -4,7 +4,7 @@ import { NotificationProvider } from "../components";
 import { ThemeProvider } from "../components/theme-provider";
 import { KeyboardShortcutsHelp, useKeyboardShortcuts } from "../components/keyboard-shortcuts";
 import { DemoProvider, DemoControls, DemoWelcome } from "../demo";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { CommandPalette } from "../components/command-palette";
 import { OfflineIndicator } from "../components/offline-indicator";
 

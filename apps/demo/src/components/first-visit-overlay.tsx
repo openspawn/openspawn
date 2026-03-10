@@ -3,7 +3,7 @@
  */
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 
 const STORAGE_KEY = "openspawn-first-visit-shown";
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "../lib/utils";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 
 interface RouterMetrics {

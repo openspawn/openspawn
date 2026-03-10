@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { Pause, Play } from "lucide-react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 
 export interface ScenarioStatus {

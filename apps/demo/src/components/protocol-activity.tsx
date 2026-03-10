@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link2, Plug } from "lucide-react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 
 export function ProtocolActivity() {

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { RotateCcw, Radio } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "./ui/button";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useQueryClient } from "@tanstack/react-query";
 import { SANDBOX_URL } from "../lib/sandbox-url";
 

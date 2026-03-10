@@ -3,8 +3,6 @@ export { setupBrowserMocks } from "./setup";
 
 // Mock factories
 export { rechartsMock } from "./mocks/recharts";
-export { graphqlHooksMock } from "./mocks/graphql-hooks";
-
 // Render helpers
 export { renderWithProviders, TestProviders } from "./render";
 

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useAgents } from "../hooks/use-agents";
 import { useCredits } from "../hooks/use-credits";
 import { useTasks } from "../hooks/use-tasks";

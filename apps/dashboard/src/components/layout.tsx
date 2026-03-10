@@ -54,7 +54,7 @@ import { usePresence } from "../hooks";
 import { ActiveAgentsBadge } from "./presence";
 import { NotificationCenter } from "./notification-center";
 import { useOnboarding } from "./onboarding/onboarding-provider";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 // SandboxCommandBar removed — ghost-typing prompt doesn't match replay demo UX
 import { ProtocolStatus } from "./protocol-status";
 import { ProtocolActivity } from "./protocol-activity";

@@ -19,7 +19,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { isSandboxMode } from "../graphql/fetcher";
+import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import type { Message } from "../hooks";
 import { InlineAvatar, formatTime } from "./message-utils";

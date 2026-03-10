@@ -1,57 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { isDemoMode, isSandboxMode } from "../lib/mode";
-import { fetcher } from "../graphql/fetcher";
 import { useRestMessages } from "../rest/hooks/use-messages";
-
-const isLiveMode = !isDemoMode && !isSandboxMode;
-
-// GraphQL queries (demo/sandbox mode)
-const MESSAGES_QUERY = `
-  query Messages($limit: Int) {
-    messages(limit: $limit) {
-      id
-      fromAgentId
-      toAgentId
-      fromAgent { id name level }
-      toAgent { id name level }
-      content
-      type
-      taskRef
-      read
-      createdAt
-    }
-  }
-`;
-
-const CONVERSATIONS_QUERY = `
-  query Conversations {
-    conversations {
-      id
-      agents { id name level }
-      messageCount
-      unreadCount
-      latestMessage { id content type createdAt }
-      createdAt
-    }
-  }
-`;
-
-const CONVERSATION_MESSAGES_QUERY = `
-  query ConversationMessages($agent1Id: ID!, $agent2Id: ID!) {
-    conversationMessages(agent1Id: $agent1Id, agent2Id: $agent2Id) {
-      id
-      fromAgentId
-      toAgentId
-      fromAgent { id name level }
-      toAgent { id name level }
-      content
-      type
-      taskRef
-      read
-      createdAt
-    }
-  }
-`;
 
 export interface Message {
   id: string;
@@ -84,22 +31,8 @@ export interface Conversation {
   createdAt: string;
 }
 
-export function useMessages(limit = 50) {
-  const rest = useRestMessages(undefined, { enabled: isLiveMode });
-  const gql = useQuery({
-    queryKey: ["messages", limit],
-    queryFn: fetcher<{ messages: Message[] }, { limit: number }>(MESSAGES_QUERY, { limit }),
-    enabled: !isLiveMode,
-  });
-
-  if (!isLiveMode) {
-    return {
-      messages: gql.data?.messages || [],
-      loading: gql.isLoading,
-      error: gql.error?.message,
-      refetch: gql.refetch,
-    };
-  }
+export function useMessages() {
+  const rest = useRestMessages();
 
   return {
     messages: Array.isArray(rest.data) ? rest.data : [],
@@ -110,37 +43,19 @@ export function useMessages(limit = 50) {
 }
 
 export function useConversations() {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["conversations"],
-    queryFn: fetcher<{ conversations: Conversation[] }, Record<string, never>>(
-      CONVERSATIONS_QUERY,
-      {},
-    ),
-    enabled: !isLiveMode,
-  });
-
   return {
-    conversations: data?.conversations || [],
-    loading: isLoading,
-    error: error?.message,
-    refetch,
+    conversations: [] as Conversation[],
+    loading: false,
+    error: undefined as string | undefined,
+    refetch: () => Promise.resolve({} as ReturnType<typeof useRestMessages>),
   };
 }
 
-export function useConversationMessages(agent1Id: string, agent2Id: string) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["conversationMessages", agent1Id, agent2Id],
-    queryFn: fetcher<{ conversationMessages: Message[] }, { agent1Id: string; agent2Id: string }>(
-      CONVERSATION_MESSAGES_QUERY,
-      { agent1Id, agent2Id },
-    ),
-    enabled: !isLiveMode && Boolean(agent1Id && agent2Id),
-  });
-
+export function useConversationMessages(_agent1Id: string, _agent2Id: string) {
   return {
-    messages: data?.conversationMessages || [],
-    loading: isLoading,
-    error: error?.message,
-    refetch,
+    messages: [] as Message[],
+    loading: false,
+    error: undefined as string | undefined,
+    refetch: () => Promise.resolve({} as ReturnType<typeof useRestMessages>),
   };
 }
