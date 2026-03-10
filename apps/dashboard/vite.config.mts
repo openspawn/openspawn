@@ -62,6 +62,11 @@ export default defineConfig(() => ({
     __COMMIT_SHA__: JSON.stringify(commitSha),
     __BUILD_TIME__: JSON.stringify(buildTime),
   },
+  resolve: {
+    alias: {
+      "web-worker": resolve(import.meta.dirname, "src/stubs/web-worker.ts"),
+    },
+  },
   build: {
     outDir: "../../dist/apps/dashboard",
     emptyOutDir: true,
