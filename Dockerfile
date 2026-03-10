@@ -22,6 +22,7 @@ COPY scripts/ ./scripts/
 ARG VITE_DASHBOARD_THEME=openspawn
 ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
+RUN pnpm nx build shared-types
 RUN pnpm nx run demo:build --configuration=production
 RUN pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
@@ -36,6 +37,8 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy deployed sandbox (includes resolved node_modules with shared-types)
 COPY --from=build /app/sandbox-deploy ./
+# Overwrite TS-only shared-types with compiled JS from build
+COPY --from=build /app/dist/libs/shared-types ./node_modules/@openspawn/shared-types
 
 # Copy built apps
 COPY --from=build /app/dist/apps/demo ./dashboard-dist
