@@ -83,11 +83,6 @@ export function AgentEfficiencyLeaderboard() {
     return results.slice(0, 8);
   }, [agents, tasks]);
 
-  const maxEfficiency = useMemo(() => {
-    const vals = efficiencyData.filter((a) => a.efficiency !== null).map((a) => a.efficiency!);
-    return vals.length > 0 ? Math.max(...vals) : 1;
-  }, [efficiencyData]);
-
   const handleRowClick = (agentId: string) => {
     openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
   };
@@ -150,9 +145,6 @@ export function AgentEfficiencyLeaderboard() {
             color: "text-muted-foreground/70",
             bg: "bg-muted/50",
           };
-          const RankIcon = rankConfig.icon;
-          const efficiencyPercent =
-            agent.efficiency !== null ? (agent.efficiency / maxEfficiency) * 100 : 0;
           const progressPercent =
             agent.totalAssigned > 0 ? (agent.tasksCompleted / agent.totalAssigned) * 100 : 0;
 

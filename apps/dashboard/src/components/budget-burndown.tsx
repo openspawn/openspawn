@@ -64,10 +64,8 @@ export function BudgetBurndown({ budget, spent, periodDays, daysElapsed }: Budge
   const dailyRate = spent / daysElapsed;
   const projectedTotal = dailyRate * periodDays;
   const projectedOver = projectedTotal > budget;
-  const percentUsed = (spent / budget) * 100;
   const daysRemaining = periodDays - daysElapsed;
   const budgetRemaining = budget - spent;
-  const dailyBudgetRemaining = budgetRemaining / daysRemaining;
 
   // Calculate runway
   const runwayDays = budgetRemaining / dailyRate;

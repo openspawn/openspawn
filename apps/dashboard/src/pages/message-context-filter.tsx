@@ -11,12 +11,12 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { cn } from "../lib/utils";
 import { useTeams } from "../hooks";
 import { TeamFilterDropdown } from "../components/team-badge";
-import type { Message } from "../hooks";
+import type { Agent, Message } from "../hooks";
 import { InlineAvatar, formatTime, typeColors, typeIcons } from "./message-utils";
 
 interface ContextLinkedMessagesProps {
   messages: Message[];
-  agents: any[];
+  agents: Agent[];
   onViewThread: (convoKey: string) => void;
 }
 
@@ -43,7 +43,7 @@ export function ContextLinkedMessages({
 
   const teamAgentIds = useMemo(() => {
     if (teamFilter === "all") return null;
-    return new Set(agents.filter((a: any) => a.teamId === teamFilter).map((a: any) => a.id));
+    return new Set(agents.filter((a) => a.teamId === teamFilter).map((a) => a.id));
   }, [agents, teamFilter]);
 
   const filteredMessages = messages.filter((msg) => {
@@ -99,7 +99,7 @@ export function ContextLinkedMessages({
                     {selectedAgentData ? (
                       <>
                         <InlineAvatar
-                          agentId={selectedAgent!}
+                          agentId={selectedAgent ?? ""}
                           agents={agents}
                           className="w-4 h-4"
                           fontSize="text-[8px]"
@@ -318,7 +318,7 @@ export function ContextLinkedMessages({
                               className="text-[9px] md:text-[10px] cursor-pointer hover:bg-muted transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedTask(msg.taskRef!);
+                                if (msg.taskRef) setSelectedTask(msg.taskRef);
                               }}
                             >
                               🔗 {msg.taskRef}

@@ -18,7 +18,7 @@ import {
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
-import { Card, CardTitle } from "./ui/card";
+import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { AgentAvatar } from "./agent-avatar";
@@ -43,10 +43,18 @@ interface TimelineEvent {
   color: string;
 }
 
+interface TimelineAgentInfo {
+  name: string;
+  level: number;
+  avatar?: string | null;
+  avatarUrl?: string | null;
+  avatarColor?: string | null;
+}
+
 function buildTimelineEvents(
   task: Task,
   messages: Message[],
-  agentMap: Map<string, { name: string; level: number }>,
+  agentMap: Map<string, TimelineAgentInfo>,
 ): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
@@ -260,7 +268,7 @@ function TaskTimelineRow({
 }: {
   task: Task;
   messages: Message[];
-  agentMap: Map<string, { name: string; level: number }>;
+  agentMap: Map<string, TimelineAgentInfo>;
   onAgentClick?: (id: string) => void;
   defaultOpen?: boolean;
 }) {
@@ -305,9 +313,9 @@ function TaskTimelineRow({
               name={agentMap.get(task.assigneeId)?.name || "?"}
               level={agentMap.get(task.assigneeId)?.level || 1}
               size="sm"
-              avatar={(agentMap.get(task.assigneeId) as any)?.avatar}
-              avatarUrl={(agentMap.get(task.assigneeId) as any)?.avatarUrl}
-              avatarColor={(agentMap.get(task.assigneeId) as any)?.avatarColor}
+              avatar={agentMap.get(task.assigneeId)?.avatar}
+              avatarUrl={agentMap.get(task.assigneeId)?.avatarUrl}
+              avatarColor={agentMap.get(task.assigneeId)?.avatarColor}
             />
           )}
         </div>
@@ -373,7 +381,10 @@ function TaskTimelineRow({
                     )}
                     {selectedEvent.agentId && onAgentClick && (
                       <button
-                        onClick={() => onAgentClick(selectedEvent.agentId!)}
+                        onClick={() => {
+                          const id = selectedEvent.agentId;
+                          if (id) onAgentClick(id);
+                        }}
                         className="mt-2 pl-8 text-xs text-primary hover:underline flex items-center gap-1"
                       >
                         View {selectedEvent.agentName || "agent"} <ArrowRight className="h-3 w-3" />
@@ -400,8 +411,16 @@ export function TaskTimeline({ onAgentClick }: { onAgentClick?: (id: string) => 
   const [limit, setLimit] = useState(10);
 
   const agentMap = useMemo(() => {
-    const map = new Map<string, { name: string; level: number }>();
-    agents.forEach((a) => map.set(a.id, { name: a.name, level: a.level }));
+    const map = new Map<string, TimelineAgentInfo>();
+    agents.forEach((a) =>
+      map.set(a.id, {
+        name: a.name,
+        level: a.level,
+        avatar: a.avatar,
+        avatarUrl: a.avatarUrl,
+        avatarColor: a.avatarColor,
+      }),
+    );
     return map;
   }, [agents]);
 

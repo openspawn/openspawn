@@ -27,7 +27,7 @@ export {
 } from "./hooks/use-sandbox-metrics";
 export { useSandboxSSE, type SandboxSSEEvent } from "./hooks/use-sandbox-sse";
 export { useSandboxTickInvalidation } from "./hooks/use-sandbox-tick";
-export { useTasks, type Task } from "./hooks/use-tasks";
+export { useTasks, type Task, type TaskRejection } from "./hooks/use-tasks";
 export { useTouchDevice } from "./hooks/use-touch-device";
 export { useMemories, useMemorySearch, useContradictions } from "./hooks/use-memory";
 export { useGraphEntities, useGraphRelationships, useGraphCytoscape } from "./hooks/use-graph";
@@ -93,6 +93,7 @@ export interface AgentFields {
   teamId?: string | null;
   avatar?: string | null;
   avatarColor?: string | null;
+  avatarUrl?: string | null;
 }
 
 /** @deprecated Use AgentFields instead */

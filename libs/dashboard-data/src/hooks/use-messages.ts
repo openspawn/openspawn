@@ -42,20 +42,37 @@ export function useMessages() {
   };
 }
 
-export function useConversations() {
+interface ConversationsResult {
+  conversations: Conversation[];
+  loading: boolean;
+  error: string | undefined;
+  refetch: () => Promise<void>;
+}
+
+export function useConversations(): ConversationsResult {
   return {
-    conversations: [] as Conversation[],
+    conversations: [],
     loading: false,
-    error: undefined as string | undefined,
-    refetch: () => Promise.resolve({} as ReturnType<typeof useRestMessages>),
+    error: undefined,
+    refetch: () => Promise.resolve(),
   };
 }
 
-export function useConversationMessages(_agent1Id: string, _agent2Id: string) {
+interface ConversationMessagesResult {
+  messages: Message[];
+  loading: boolean;
+  error: string | undefined;
+  refetch: () => Promise<void>;
+}
+
+export function useConversationMessages(
+  _agent1Id: string,
+  _agent2Id: string,
+): ConversationMessagesResult {
   return {
-    messages: [] as Message[],
+    messages: [],
     loading: false,
-    error: undefined as string | undefined,
-    refetch: () => Promise.resolve({} as ReturnType<typeof useRestMessages>),
+    error: undefined,
+    refetch: () => Promise.resolve(),
   };
 }

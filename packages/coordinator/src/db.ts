@@ -1,6 +1,6 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
-import { TaskStatus, AgentStatus } from "@openspawn/shared-types";
+import { TaskStatus } from "@openspawn/shared-types";
 
 // ─── Row types (mirror the SQLite schema) ────────────────────────────────────
 

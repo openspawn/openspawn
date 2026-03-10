@@ -21,12 +21,12 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
-import type { Message } from "../hooks";
+import type { Agent, Message } from "../hooks";
 import { InlineAvatar, formatTime } from "./message-utils";
 
 interface CommunicationGraphProps {
   messages: Message[];
-  agents: any[];
+  agents: Agent[];
 }
 
 export function CommunicationGraph({ messages, agents }: CommunicationGraphProps) {

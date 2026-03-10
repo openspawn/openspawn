@@ -21,7 +21,7 @@ import {
   Network,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
+import { generateSparklineData } from "../components/ui/sparkline";
 import { PageHeader } from "../components/ui/page-header";
 import { StatCard } from "../components/ui/stat-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -52,14 +52,6 @@ import { AgentVirtualGrid } from "./agent-virtual-grid";
 type Agent = AgentFieldsFragment;
 
 import { DialogModeValue, type DialogMode, SortDirection } from "../lib/enums";
-
-enum AgentAgentSortField {
-  Name = "name",
-  Level = "level",
-  Balance = "balance",
-  Status = "status",
-  Created = "created",
-}
 
 // Suppress unused-variable warning for usePresence (destructured but not used directly in JSX)
 void usePresence;

@@ -29,7 +29,6 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { cn } from "../../lib/utils";
 import { useNotifications } from "../live-notifications";
-import { useDemo } from "../../demo";
 
 enum TaskPriority {
   Low = "LOW",
@@ -101,7 +100,6 @@ interface CreateFormData {
 }
 
 export function InboundWebhooksSettings() {
-  const { scenario } = useDemo();
   const { addNotification } = useNotifications();
   const [webhookKeys, setWebhookKeys] = useState<InboundWebhookKeyData[]>(MOCK_WEBHOOK_KEYS);
   const [agents] = useState<AgentData[]>(MOCK_AGENTS);

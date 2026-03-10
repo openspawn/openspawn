@@ -1,5 +1,12 @@
 import { useTasks as useRestTasks } from "../rest/hooks/use-tasks";
 
+export type TaskRejection = {
+  feedback: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionCount: number;
+};
+
 export type Task = {
   id: string;
   identifier: string;
@@ -12,6 +19,10 @@ export type Task = {
   creatorId?: string | null;
   createdAt: string;
   updatedAt: string;
+  dueDate?: string | null;
+  completedAt?: string | null;
+  source?: string | null;
+  rejection?: TaskRejection | null;
 };
 
 export function useTasks() {

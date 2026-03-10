@@ -524,7 +524,6 @@ function OrgChartInner({
   const [isLayouted, setIsLayouted] = useState(false);
   const baseEdgesRef = useRef<Edge[]>([]);
   const previousAgentIdsRef = useRef<Set<string>>(new Set());
-  const [newAgentIds, setNewAgentIds] = useState<Set<string>>(new Set());
 
   // Only re-layout when agent IDs change (add/remove), not on every data update
   const agentIds = useMemo(
@@ -539,20 +538,7 @@ function OrgChartInner({
   useEffect(() => {
     if (loading) return;
 
-    // Detect new agents
     const currentIds = new Set(agents.map((a) => a.id));
-    const prevIds = previousAgentIdsRef.current;
-    if (prevIds.size > 0) {
-      const freshIds = new Set<string>();
-      currentIds.forEach((id) => {
-        if (!prevIds.has(id)) freshIds.add(id);
-      });
-      if (freshIds.size > 0) {
-        setNewAgentIds(freshIds);
-        // Clear highlight after 2.5s
-        setTimeout(() => setNewAgentIds(new Set()), 2500);
-      }
-    }
     previousAgentIdsRef.current = currentIds;
 
     const { nodes: rawNodes, edges: rawEdges } = buildOrgGraph(teams, agents);
@@ -649,7 +635,7 @@ function OrgChartInner({
       setEdges((prev) =>
         prev.map((e) => {
           const shouldAnimate = animatedIds.has(e.id);
-          const wasAnimated = (e.data as any)?.animated;
+          const wasAnimated = e.data?.animated;
           if (shouldAnimate === wasAnimated) return e;
           return { ...e, data: { ...((e.data as object) || {}), animated: shouldAnimate } };
         }),
@@ -658,7 +644,7 @@ function OrgChartInner({
       setTimeout(() => {
         setEdges((prev) =>
           prev.map((e) => {
-            if (!(e.data as any)?.animated) return e;
+            if (!e.data?.animated) return e;
             return { ...e, data: { ...((e.data as object) || {}), animated: false } };
           }),
         );

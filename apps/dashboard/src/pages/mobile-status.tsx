@@ -30,7 +30,6 @@ import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { getLevelLabel, getLevelColor } from "../lib/status-colors";
-import { AgentStatus } from "@openspawn/shared-types";
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 /* ------------------------------------------------------------------ */
@@ -321,8 +320,12 @@ export function MobileStatusPage() {
 
     for (const agent of agents) {
       const presence = presenceMap.get(agent.id)?.status ?? "idle";
-      if (!groups.has(presence)) groups.set(presence, []);
-      groups.get(presence)!.push(agent);
+      const existing = groups.get(presence);
+      if (existing) {
+        existing.push(agent);
+      } else {
+        groups.set(presence, [agent]);
+      }
     }
 
     // Sort groups by STATUS_ORDER, then agents within each by balance descending
@@ -338,9 +341,7 @@ export function MobileStatusPage() {
 
   // Compute summary stats
   const inProgressTasks = useMemo(
-    () =>
-      (tasks ?? []).filter((t: any) => t.status === "in_progress" || t.status === "assigned")
-        .length,
+    () => (tasks ?? []).filter((t) => t.status === "in_progress" || t.status === "assigned").length,
     [tasks],
   );
 
