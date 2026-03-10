@@ -16,8 +16,8 @@ interface AgentHeartbeatProps {
 }
 
 export function AgentHeartbeat({
-  agentId,
-  level,
+  agentId: _agentId,
+  level: _level,
   status,
   size = "md",
   showPulse = true,

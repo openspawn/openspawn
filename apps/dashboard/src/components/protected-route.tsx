@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "@tanstack/react-router";
+import { Navigate } from "@tanstack/react-router";
 
 import { useAuth } from "../contexts";
 
@@ -9,7 +9,6 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const location = useLocation();
 
   // Show loading state while checking auth
   if (isLoading) {

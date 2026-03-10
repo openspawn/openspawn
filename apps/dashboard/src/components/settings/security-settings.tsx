@@ -103,7 +103,7 @@ export function SecuritySettings() {
           throw new Error(error.message || "Failed to setup 2FA");
         }
 
-        const data = await response.json();
+        const _data = await response.json();
         // In a real implementation, show the QR code and recovery codes
         setTwoFaStatus({
           type: "success",

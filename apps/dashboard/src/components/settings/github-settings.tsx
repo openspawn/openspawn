@@ -29,7 +29,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { cn } from "../../lib/utils";
 import { useNotifications } from "../live-notifications";
-import { useDemo } from "../../demo";
 
 interface GitHubConnectionData {
   id: string;
@@ -163,7 +162,6 @@ const MOCK_LINKS: IntegrationLinkData[] = [
 ];
 
 export function GitHubSettings() {
-  const { scenario } = useDemo();
   const { addNotification } = useNotifications();
   const [connections, setConnections] = useState<GitHubConnectionData[]>(MOCK_CONNECTIONS);
   const [links] = useState<IntegrationLinkData[]>(MOCK_LINKS);

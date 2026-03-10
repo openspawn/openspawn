@@ -60,8 +60,6 @@ export function ModelUsageBreakdown() {
 
   const totalCalls = modelUsage.reduce((sum, m) => sum + m.calls, 0);
   const totalCost = modelUsage.reduce((sum, m) => sum + m.cost, 0);
-  const totalTokens = modelUsage.reduce((sum, m) => sum + m.tokens, 0);
-
   const sortedByUsage = [...modelUsage].sort((a, b) => b.calls - a.calls);
 
   let startAngle = 0;

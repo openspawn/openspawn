@@ -13,7 +13,6 @@ import {
   Clock,
   AlertTriangle,
   Activity,
-  User,
   Calendar,
   ArrowRight,
   Flag,

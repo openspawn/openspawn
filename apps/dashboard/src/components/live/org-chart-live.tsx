@@ -395,7 +395,6 @@ function buildGraph(
   // Add edge from SpongeBob to pool node (aggregates all spawn animations)
   if (spawnedAgents.length > 0) {
     const poolParent = "spongebob-squarepants";
-    const poolKey = `${poolParent}-grill-station-pool`;
 
     // Aggregate all spawn animations to show on the pool edge
     const poolAnimations: EdgeAnimation[] = [];

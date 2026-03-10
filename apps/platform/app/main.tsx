@@ -3,7 +3,9 @@ import { createRoot } from "react-dom/client";
 import { LandingPage } from "./landing-page";
 import "./styles/globals.css";
 
-createRoot(document.getElementById("root")!).render(
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error("Missing #root element");
+createRoot(rootEl).render(
   <StrictMode>
     <LandingPage />
   </StrictMode>,

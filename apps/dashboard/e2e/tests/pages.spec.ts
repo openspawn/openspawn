@@ -29,7 +29,9 @@ test.describe("Page Tests", () => {
       expect(first).toBeTruthy();
       expect(second).toBeTruthy();
       // Rows should be stacked vertically, not overlapping
-      expect(second!.y).toBeGreaterThan(first!.y);
+      if (first && second) {
+        expect(second.y).toBeGreaterThan(first.y);
+      }
     }
   });
 

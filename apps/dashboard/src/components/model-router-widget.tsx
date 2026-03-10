@@ -35,12 +35,6 @@ const PROVIDER_COLORS: Record<string, string> = {
   anthropic: "text-orange-400",
 };
 
-const PROVIDER_BG: Record<string, string> = {
-  ollama: "bg-emerald-500/20",
-  groq: "bg-amber-500/20",
-  openrouter: "bg-violet-500/20",
-};
-
 const PROVIDER_BAR: Record<string, string> = {
   ollama: "bg-emerald-500",
   groq: "bg-amber-500",

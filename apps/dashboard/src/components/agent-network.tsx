@@ -27,8 +27,13 @@ import { useDemo } from "../demo";
 import { isSandboxMode } from "@openspawn/dashboard-data";
 import { useSandboxSSE, type SandboxSSEEvent } from "../hooks/use-sandbox-sse";
 import { useAgents, type Agent } from "../hooks/use-agents";
-import { useTasks } from "../hooks/use-tasks";
-import { useMessages, useConversations } from "../hooks/use-messages";
+import { useTasks, type Task } from "../hooks/use-tasks";
+import {
+  useMessages,
+  useConversations,
+  type Message,
+  type Conversation,
+} from "../hooks/use-messages";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 import { useAgentHealth } from "../hooks/use-agent-health";
 import { useTouchDevice } from "../hooks/use-touch-device";
@@ -96,16 +101,16 @@ async function getLayoutedElements(
 
 function calculateAgentActivity(
   agents: Agent[],
-  tasks: any[],
-  messages: any[],
-  conversations: any[],
+  tasks: Task[],
+  messages: Message[],
+  conversations: Conversation[],
 ): Map<string, AgentActivity> {
   const activityMap = new Map<string, AgentActivity>();
 
   const taskCounts = new Map<string, number>();
   tasks.forEach((task) => {
-    if (task.assignedToId)
-      taskCounts.set(task.assignedToId, (taskCounts.get(task.assignedToId) || 0) + 1);
+    if (task.assigneeId)
+      taskCounts.set(task.assigneeId, (taskCounts.get(task.assigneeId) || 0) + 1);
   });
 
   const messageCounts = new Map<string, number>();
@@ -134,8 +139,8 @@ function calculateAgentActivity(
 }
 
 function calculateEdgeMessages(
-  messages: any[],
-  conversations: any[],
+  messages: Message[],
+  conversations: Conversation[],
 ): Map<string, EdgeMessageData> {
   const edgeMap = new Map<string, EdgeMessageData>();
 
@@ -306,7 +311,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const { tasks, loading: tasksLoading } = useTasks();
   const { messages } = useMessages(100);
   const { conversations } = useConversations();
-  const { fitView, zoomIn, setCenter } = useReactFlow();
+  const { fitView, setCenter } = useReactFlow();
   const { isMobileOrTouch, isMobile } = useTouchDevice();
 
   const [selectedEdge, setSelectedEdge] = useState<{
@@ -455,7 +460,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     if (node.id !== "human") onAgentClick?.(node.id);
   }
 
-  function handleNodeMouseDown(_event: React.MouseEvent, node: Node) {
+  function handleNodeMouseDown(_event: React.MouseEvent, node: Node, _nodes: Node[]) {
     if (!isMobileOrTouch) return;
     longPressNodeRef.current = node.id;
     longPressTimerRef.current = setTimeout(() => {
@@ -463,12 +468,20 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
     }, 500);
   }
 
-  function handleNodeMouseUp() {
+  function clearLongPress() {
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
     }
     longPressNodeRef.current = null;
+  }
+
+  function handleNodeMouseUp(_event: React.MouseEvent, _node: Node, _nodes: Node[]) {
+    clearLongPress();
+  }
+
+  function handleNodeMouseLeave(_event: React.MouseEvent, _node: Node) {
+    clearLongPress();
   }
 
   function handleEdgeClick(_event: React.MouseEvent, edge: Edge) {
@@ -523,7 +536,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={undefined}
-          onNodeMouseLeave={handleNodeMouseUp}
+          onNodeMouseLeave={handleNodeMouseLeave}
           onEdgeClick={handleEdgeClick}
           edgeTypes={edgeTypes}
           nodeTypes={nodeTypes}
@@ -544,8 +557,8 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
             markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
             style: { stroke: "#6366f1", strokeWidth: 2 },
           }}
-          onNodeDragStart={handleNodeMouseDown as any}
-          onNodeDragStop={handleNodeMouseUp as any}
+          onNodeDragStart={handleNodeMouseDown}
+          onNodeDragStop={handleNodeMouseUp}
         >
           <Background
             variant={BackgroundVariant.Dots}

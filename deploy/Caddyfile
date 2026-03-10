@@ -49,10 +49,18 @@ team.openspawn.ai {
 		reverse_proxy localhost:8000
 	}
 
-	root * /opt/team-dashboard
-	file_server
+	# Redirect bare / to /app/
+	handle / {
+		redir /app/ permanent
+	}
 
-	try_files {path} /index.html
+	# Serve team SPA — Vite builds with base="/app/" so assets live under /app/assets/
+	handle_path /app/* {
+		root * /opt/team-dashboard
+		try_files {path} /index.html
+		file_server
+	}
+
 	import security_headers
 }
 

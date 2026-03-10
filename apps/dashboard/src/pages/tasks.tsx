@@ -20,7 +20,6 @@ import {
   Link2,
   Plug,
 } from "lucide-react";
-import { HoverLiftCard } from "../components/motion-primitives";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -41,13 +40,6 @@ import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 
 import { SortDirection } from "../lib/enums";
-
-enum TaskTaskSortField {
-  Created = "created",
-  Priority = "priority",
-  Status = "status",
-  Title = "title",
-}
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },
@@ -70,40 +62,6 @@ function getPriorityVariant(priority: string) {
       return "outline";
     default:
       return "secondary";
-  }
-}
-
-function getPriorityColor(priority: string) {
-  switch (priority?.toUpperCase()) {
-    case "URGENT":
-      return "text-rose-500";
-    case "HIGH":
-      return "text-violet-500";
-    case "NORMAL":
-      return "text-blue-500";
-    case "LOW":
-      return "text-muted-foreground";
-    default:
-      return "text-muted-foreground";
-  }
-}
-
-function getStatusColor(status: string) {
-  switch (status?.toUpperCase()) {
-    case "DONE":
-      return "text-emerald-500";
-    case "IN_PROGRESS":
-      return "text-cyan-500";
-    case "REVIEW":
-      return "text-violet-500";
-    case "TODO":
-      return "text-amber-500";
-    case "BACKLOG":
-      return "text-muted-foreground";
-    case "BLOCKED":
-      return "text-rose-500";
-    default:
-      return "text-muted-foreground";
   }
 }
 
@@ -179,7 +137,7 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                     webhook
                   </Badge>
                 )}
-                {(task as any).source === "a2a" && (
+                {task.source === "a2a" && (
                   <Badge
                     variant="outline"
                     className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
@@ -188,7 +146,7 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                     A2A
                   </Badge>
                 )}
-                {(task as any).source === "mcp" && (
+                {task.source === "mcp" && (
                   <Badge
                     variant="outline"
                     className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10"
@@ -226,7 +184,7 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
                 {task.assignee ? (
                   <div className="flex items-center gap-1">
                     {(() => {
-                      const a = agentMap.get(task.assigneeId!);
+                      const a = agentMap.get(task.assigneeId ?? "");
                       return (
                         <div
                           className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
@@ -401,7 +359,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               {task.assignee ? (
                 <div className="flex items-center gap-2">
                   {(() => {
-                    const a = agentMap.get(task.assigneeId!);
+                    const a = agentMap.get(task.assigneeId ?? "");
                     return (
                       <div
                         className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
@@ -611,7 +569,7 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                   {task.assignee ? (
                     <div className="flex items-center gap-1 sm:w-28 flex-shrink-0 sm:order-5">
                       {(() => {
-                        const a = agentMap.get(task.assigneeId!);
+                        const a = agentMap.get(task.assigneeId ?? "");
                         return (
                           <div
                             className="w-5 h-5 rounded-full flex items-center justify-center text-xs"
@@ -693,7 +651,7 @@ export function TasksPage() {
       string,
       { avatar?: string | null; avatarColor?: string | null; avatarUrl?: string | null }
     >();
-    agents.forEach((a: any) =>
+    agents.forEach((a) =>
       m.set(a.id, { avatar: a.avatar, avatarColor: a.avatarColor, avatarUrl: a.avatarUrl }),
     );
     return m;

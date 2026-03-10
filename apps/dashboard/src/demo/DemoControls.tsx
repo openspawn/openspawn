@@ -329,61 +329,68 @@ export function DemoControls({ compact = false, header = false }: DemoControlsPr
   );
 }
 
-function EventLabel({ event }: { event: { type: string; payload: any } }) {
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null;
+}
+
+function EventLabel({ event }: { event: { type: string; payload: unknown } }) {
+  const p = isRecord(event.payload) ? event.payload : {};
+  const agent = isRecord(p.agent) ? p.agent : {};
+  const task = isRecord(p.task) ? p.task : {};
   switch (event.type) {
     case "agent_created":
       return (
         <span className="text-green-500">
-          🤖 <strong>{event.payload.name}</strong> spawned
+          🤖 <strong>{String(p.name ?? "")}</strong> spawned
         </span>
       );
     case "agent_promoted":
       return (
         <span className="text-blue-500">
-          ⬆️ <strong>{event.payload.agent.name}</strong> promoted to L{event.payload.newLevel}
+          ⬆️ <strong>{String(agent.name ?? "")}</strong> promoted to L{String(p.newLevel ?? "")}
         </span>
       );
     case "agent_terminated":
       return (
         <span className="text-orange-500">
-          ⏸️ <strong>{event.payload.agent.name}</strong> → {event.payload.newStatus}
+          ⏸️ <strong>{String(agent.name ?? "")}</strong> → {String(p.newStatus ?? "")}
         </span>
       );
     case "task_created":
       return (
         <span className="text-purple-500">
-          📋 Task created: <strong>{event.payload.title}</strong>
+          📋 Task created: <strong>{String(p.title ?? "")}</strong>
         </span>
       );
     case "task_completed":
       return (
         <span className="text-emerald-500">
-          ✅ Task done: <strong>{event.payload.task.title}</strong>
+          ✅ Task done: <strong>{String(task.title ?? "")}</strong>
         </span>
       );
     case "credit_earned":
       return (
         <span className="text-yellow-500">
-          💰 <strong>{event.payload.agent.name}</strong> earned {event.payload.amount} credits
+          💰 <strong>{String(agent.name ?? "")}</strong> earned {String(p.amount ?? "")} credits
         </span>
       );
     case "credit_spent":
       return (
         <span className="text-red-400">
-          💸 <strong>{event.payload.agent.name}</strong> spent {event.payload.amount} credits
+          💸 <strong>{String(agent.name ?? "")}</strong> spent {String(p.amount ?? "")} credits
         </span>
       );
     case "prehook_blocked":
       return (
         <span className="text-amber-500">
-          🛡️ <strong>{event.payload.webhookName}</strong> blocked:{" "}
-          {event.payload.reason || event.payload.eventType}
+          🛡️ <strong>{String(p.webhookName ?? "")}</strong> blocked:{" "}
+          {String(p.reason || p.eventType || "")}
         </span>
       );
     case "prehook_allowed":
       return (
         <span className="text-green-400">
-          ✓ <strong>{event.payload.webhookName}</strong> approved {event.payload.eventType}
+          ✓ <strong>{String(p.webhookName ?? "")}</strong> approved {String(p.eventType ?? "")}
         </span>
       );
     default:
