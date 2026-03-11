@@ -20,7 +20,7 @@ dependencies = [
   "fastmcp>=3.1.0",
   "instructor>=1.7",
   "litellm>=1.55",
-  "voyageai>=0.3",
+  # "voyageai>=0.3.0rc0",  # Disabled for Python 3.14 compatibility
   "openai>=1.60",
   "tenacity>=9.0",
   "logfire[fastapi,sqlalchemy]>=4.27.0",
@@ -29,6 +29,9 @@ dependencies = [
   "arq>=0.27.0",
   "redis>=5.3.1",
   "aiosqlite>=0.20.0",
+  "passlib[bcrypt]>=1.7",
+  "pyjwt>=2.10",
+  "pyotp>=2.9",
 ]
 
 [project.scripts]
