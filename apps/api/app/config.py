@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import lru_cache
 
 from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -13,7 +14,12 @@ class AuthMode(str, Enum):
 
 
 class AuthSettings(BaseSettings):
-    """Auth-specific settings."""
+    """Auth-specific settings.
+
+    Env vars are prefixed with AUTH_ (e.g. AUTH_MODE=local, AUTH_JWT_SECRET=...).
+    """
+
+    model_config = SettingsConfigDict(env_prefix="AUTH_")
 
     mode: AuthMode = AuthMode.NONE
     jwt_secret: str | None = None
@@ -79,3 +85,12 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Return the global settings instance.
+
+    Using a function instead of direct import makes testing easier
+    (can be patched or overridden).
+    """
+    return settings

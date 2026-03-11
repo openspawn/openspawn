@@ -14,22 +14,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.hmac import decrypt_secret, get_encryption_key
 from app.auth.middleware import (
+    LocalTokenStore,
     create_access_token,
     create_refresh_token,
     get_auth_context,
+    hash_password,
     revoke_refresh_token,
     verify_password,
     verify_refresh_token,
 )
 from app.auth.schemas import AuthenticatedUser
-from app.config import AuthMode, settings
+from app.config import AuthMode, get_settings
 from app.database import get_db
 from app.models.auth import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-# Request/Response Models
+# ---------------------------------------------------------------------------
+# Request / Response Models
+# ---------------------------------------------------------------------------
 
 
 class LoginRequest(BaseModel):
@@ -67,7 +71,9 @@ class UserInfoResponse(BaseModel):
     totp_enabled: bool = False
 
 
+# ---------------------------------------------------------------------------
 # Endpoints
+# ---------------------------------------------------------------------------
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -80,13 +86,14 @@ async def login(
     Authenticate user and return access + refresh tokens.
 
     Behavior varies by auth mode:
-    - mode=none: returns static owner token
-    - mode=local: validates password against config hash
-    - mode=full: validates credentials against User DB, checks TOTP if enabled
+    - mode=none: returns static owner token, any credentials accepted
+    - mode=local: validates password against config hash, returns bearer token
+    - mode=full: validates credentials against User DB, optional TOTP, returns JWT
     """
-    auth_mode = settings.auth.mode
+    cfg = get_settings()
+    auth_mode = cfg.auth.mode
 
-    # Mode: none - return static owner token
+    # Mode: none — accept anything, return static token
     if auth_mode == AuthMode.NONE:
         static_token = "owner-static-token-local-dev"
         return LoginResponse(
@@ -94,35 +101,32 @@ async def login(
             refresh_token=static_token,
         )
 
-    # Mode: local - single password validation
+    # Mode: local — single password, bearer token
     if auth_mode == AuthMode.LOCAL:
-        if not settings.auth.local_password_hash:
+        if not cfg.auth.local_password_hash:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Local auth not configured",
+                detail="Local auth not configured — set AUTH_LOCAL_PASSWORD_HASH",
             )
 
-        # Verify password
-        if not verify_password(body.password, settings.auth.local_password_hash):
+        if not verify_password(body.password, cfg.auth.local_password_hash):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
             )
 
-        # Generate a static bearer token for local mode
-        local_token = secrets.token_urlsafe(32)
-        token_hash = hashlib.sha256(local_token.encode("utf-8")).hexdigest()
+        # Generate a bearer token and store its hash for verification
+        bearer_token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(bearer_token.encode("utf-8")).hexdigest()
+        LocalTokenStore.add(token_hash)
 
-        # Store hash in-memory for this session (in production, store in config/DB)
-        # For now, just return the token
         return LoginResponse(
-            access_token=local_token,
-            refresh_token=local_token,
+            access_token=bearer_token,
+            refresh_token=bearer_token,
         )
 
-    # Mode: full - full JWT flow
+    # Mode: full — JWT flow
     if auth_mode == AuthMode.FULL:
-        # Look up user by email
         result = await db.execute(select(User).where(User.email == body.email))
         user = result.scalar_one_or_none()
 
@@ -132,14 +136,13 @@ async def login(
                 detail="Invalid credentials",
             )
 
-        # Verify password
         if not verify_password(body.password, user.password_hash):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
             )
 
-        # Check TOTP if enabled
+        # TOTP check
         if user.totp_enabled:
             if not body.totp_code:
                 raise HTTPException(
@@ -147,7 +150,6 @@ async def login(
                     detail="TOTP code required",
                 )
 
-            # Decrypt TOTP secret and verify code
             if not user.totp_secret_enc:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -164,7 +166,7 @@ async def login(
                     detail="Invalid TOTP code",
                 )
 
-        # Generate tokens
+        # Issue tokens
         access_token = create_access_token(user.id, user.org_id, user.email, user.role)
 
         user_agent = request.headers.get("user-agent")
@@ -193,11 +195,11 @@ async def refresh(
     """
     Exchange refresh token for new access + refresh tokens.
 
-    Implements token rotation - old refresh token is revoked, new one issued.
+    In full mode, implements token rotation (old refresh token revoked).
     """
-    auth_mode = settings.auth.mode
+    cfg = get_settings()
+    auth_mode = cfg.auth.mode
 
-    # Mode: none - return static token
     if auth_mode == AuthMode.NONE:
         static_token = "owner-static-token-local-dev"
         return RefreshResponse(
@@ -205,27 +207,24 @@ async def refresh(
             refresh_token=static_token,
         )
 
-    # Mode: local - return same token (no rotation in local mode)
     if auth_mode == AuthMode.LOCAL:
+        # In local mode, refresh just returns the same token (no rotation)
         return RefreshResponse(
             access_token=body.refresh_token,
             refresh_token=body.refresh_token,
         )
 
-    # Mode: full - verify refresh token and issue new tokens
     if auth_mode == AuthMode.FULL:
         user = await verify_refresh_token(body.refresh_token, db)
 
-        # Generate new tokens
         access_token = create_access_token(user.id, user.org_id, user.email, user.role)
 
         user_agent = request.headers.get("user-agent")
         client_ip = request.client.host if request.client else None
         new_refresh_token = await create_refresh_token(user.id, db, user_agent, client_ip)
 
-        # Revoke old refresh token (token rotation)
+        # Token rotation — revoke old
         await revoke_refresh_token(body.refresh_token, db)
-
         await db.commit()
 
         return RefreshResponse(
@@ -245,13 +244,18 @@ async def logout(
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Revoke refresh token (logout)."""
-    auth_mode = settings.auth.mode
+    cfg = get_settings()
+    auth_mode = cfg.auth.mode
 
-    # Mode: none or local - no-op
-    if auth_mode in (AuthMode.NONE, AuthMode.LOCAL):
+    if auth_mode == AuthMode.NONE:
         return
 
-    # Mode: full - revoke refresh token
+    if auth_mode == AuthMode.LOCAL:
+        # Remove local bearer token from store
+        token_hash = hashlib.sha256(body.refresh_token.encode("utf-8")).hexdigest()
+        LocalTokenStore.remove(token_hash)
+        return
+
     if auth_mode == AuthMode.FULL:
         await revoke_refresh_token(body.refresh_token, db)
         await db.commit()
@@ -269,9 +273,9 @@ async def get_current_user_info(
     db: AsyncSession = Depends(get_db),
 ) -> UserInfoResponse:
     """Return current user profile from bearer token."""
-    auth_mode = settings.auth.mode
+    cfg = get_settings()
+    auth_mode = cfg.auth.mode
 
-    # Mode: none or local - return owner profile
     if auth_mode in (AuthMode.NONE, AuthMode.LOCAL):
         return UserInfoResponse(
             id=auth.id,
@@ -282,7 +286,6 @@ async def get_current_user_info(
             totp_enabled=False,
         )
 
-    # Mode: full - load user from DB to get full profile
     if auth_mode == AuthMode.FULL:
         result = await db.execute(select(User).where(User.id == auth.id))
         user = result.scalar_one_or_none()
@@ -310,9 +313,5 @@ async def get_current_user_info(
 
 @router.get("/google", status_code=status.HTTP_501_NOT_IMPLEMENTED)
 async def google_oauth() -> dict[str, str]:
-    """
-    Google OAuth login - stub for Phase 2.
-
-    Returns 501 Not Implemented.
-    """
+    """Google OAuth login — stub for Phase 2."""
     return {"detail": "Google OAuth not implemented yet (Phase 2)"}

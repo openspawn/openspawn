@@ -3,63 +3,98 @@
 from __future__ import annotations
 
 import hashlib
+import secrets
 import uuid
-from datetime import datetime, timedelta
+from typing import ClassVar
 
+import bcrypt
 import jwt
 import pendulum
 from fastapi import Depends, HTTPException, Request, status
-from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import AuthenticatedUser
-from app.config import AuthMode, settings
+from app.config import AuthMode, get_settings
 from app.database import get_db
 from app.models.auth import RefreshToken, User
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class LocalTokenStore:
+    """In-memory store for local mode bearer tokens.
+
+    In local mode, we issue a bearer token on login and need to verify it
+    on subsequent requests. This simple store keeps active tokens in memory.
+    Tokens are lost on restart (user must re-login), which is acceptable
+    for the single-user local mode.
+    """
+
+    _tokens: ClassVar[set[str]] = set()
+
+    @classmethod
+    def add(cls, token_hash: str) -> None:
+        cls._tokens.add(token_hash)
+
+    @classmethod
+    def verify(cls, token_hash: str) -> bool:
+        return token_hash in cls._tokens
+
+    @classmethod
+    def remove(cls, token_hash: str) -> None:
+        cls._tokens.discard(token_hash)
+
+    @classmethod
+    def clear(cls) -> None:
+        cls._tokens.clear()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against a hash."""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify a password against a bcrypt hash."""
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+    )
 
 
 def hash_password(password: str) -> str:
-    """Hash a password."""
-    return pwd_context.hash(password)
+    """Hash a password with bcrypt."""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
 
-def create_access_token(user_id: uuid.UUID, org_id: uuid.UUID, email: str, role: str) -> str:
+def create_access_token(
+    user_id: uuid.UUID, org_id: uuid.UUID, email: str, role: str
+) -> str:
     """Create a JWT access token."""
-    if not settings.auth.jwt_secret:
+    cfg = get_settings()
+    if not cfg.auth.jwt_secret:
         raise RuntimeError("JWT_SECRET not configured")
 
-    now = datetime.utcnow()
-    expire = now + timedelta(minutes=settings.auth.access_token_ttl_minutes)
+    now = pendulum.now("UTC")
+    expire = now.add(minutes=cfg.auth.access_token_ttl_minutes)
 
     payload = {
         "sub": str(user_id),
         "org_id": str(org_id),
         "email": email,
         "role": role,
-        "iat": now,
-        "exp": expire,
+        "iat": int(now.timestamp()),
+        "exp": int(expire.timestamp()),
     }
 
-    return jwt.encode(payload, settings.auth.jwt_secret, algorithm=settings.auth.jwt_algorithm)
+    return jwt.encode(payload, cfg.auth.jwt_secret, algorithm=cfg.auth.jwt_algorithm)
 
 
-def decode_access_token(token: str) -> dict:
+def decode_access_token(token: str) -> dict[str, str | int]:
     """Decode and validate a JWT access token."""
-    if not settings.auth.jwt_secret:
+    cfg = get_settings()
+    if not cfg.auth.jwt_secret:
         raise RuntimeError("JWT_SECRET not configured")
 
     try:
-        return jwt.decode(
-            token, settings.auth.jwt_secret, algorithms=[settings.auth.jwt_algorithm]
+        payload: dict[str, str | int] = jwt.decode(
+            token, cfg.auth.jwt_secret, algorithms=[cfg.auth.jwt_algorithm]
         )
+        return payload
     except jwt.ExpiredSignatureError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token expired"
@@ -77,12 +112,11 @@ async def create_refresh_token(
     ip_address: str | None = None,
 ) -> str:
     """Create a refresh token and store it in the database."""
-    import secrets
-
     token = secrets.token_urlsafe(32)
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 
-    expires_at = pendulum.now("UTC").add(days=settings.auth.refresh_token_ttl_days)
+    cfg = get_settings()
+    expires_at = pendulum.now("UTC").add(days=cfg.auth.refresh_token_ttl_days)
 
     refresh_token = RefreshToken(
         user_id=user_id,
@@ -104,7 +138,8 @@ async def verify_refresh_token(token: str, db: AsyncSession) -> User:
 
     result = await db.execute(
         select(RefreshToken).where(
-            RefreshToken.token_hash == token_hash, RefreshToken.revoked_at.is_(None)
+            RefreshToken.token_hash == token_hash,
+            RefreshToken.revoked_at.is_(None),
         )
     )
     refresh_token = result.scalar_one_or_none()
@@ -119,7 +154,6 @@ async def verify_refresh_token(token: str, db: AsyncSession) -> User:
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired"
         )
 
-    # Load the user
     result = await db.execute(select(User).where(User.id == refresh_token.user_id))
     user = result.scalar_one_or_none()
 
@@ -137,7 +171,8 @@ async def revoke_refresh_token(token: str, db: AsyncSession) -> None:
 
     result = await db.execute(
         select(RefreshToken).where(
-            RefreshToken.token_hash == token_hash, RefreshToken.revoked_at.is_(None)
+            RefreshToken.token_hash == token_hash,
+            RefreshToken.revoked_at.is_(None),
         )
     )
     refresh_token = result.scalar_one_or_none()
@@ -147,11 +182,15 @@ async def revoke_refresh_token(token: str, db: AsyncSession) -> None:
         await db.flush()
 
 
+_OWNER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
+_OWNER_ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
+
+
 def _get_owner_auth_context() -> AuthenticatedUser:
     """Return a synthetic owner AuthContext for auth.mode=none."""
     return AuthenticatedUser(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
-        org_id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
+        id=_OWNER_ID,
+        org_id=_OWNER_ORG_ID,
         email="owner@local",
         name="Owner",
         role="owner",
@@ -161,18 +200,10 @@ def _get_owner_auth_context() -> AuthenticatedUser:
 
 
 async def _authenticate_local(token: str) -> AuthenticatedUser:
-    """Authenticate using local mode (single password + bearer token)."""
-    if not settings.auth.local_password_hash:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Local auth not configured",
-        )
-
-    # In local mode, the "token" is just a static bearer token
-    # We verify it matches the hash stored in config
+    """Authenticate using local mode bearer token."""
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 
-    if token_hash != settings.auth.local_password_hash:
+    if not LocalTokenStore.verify(token_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
@@ -184,10 +215,9 @@ async def _authenticate_full(token: str, db: AsyncSession) -> AuthenticatedUser:
     """Authenticate using full JWT mode."""
     payload = decode_access_token(token)
 
-    user_id = uuid.UUID(payload["sub"])
-    org_id = uuid.UUID(payload["org_id"])
+    user_id = uuid.UUID(str(payload["sub"]))
+    org_id = uuid.UUID(str(payload["org_id"]))
 
-    # Optionally verify user still exists in DB
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
 
@@ -199,9 +229,9 @@ async def _authenticate_full(token: str, db: AsyncSession) -> AuthenticatedUser:
     return AuthenticatedUser(
         id=user_id,
         org_id=org_id,
-        email=payload["email"],
+        email=str(payload["email"]),
         name=user.name,
-        role=payload["role"],
+        role=str(payload["role"]),
         scopes=[],
         is_api_key=False,
     )
@@ -215,16 +245,19 @@ async def get_auth_context(
     Main auth dependency. Returns AuthenticatedUser based on auth mode.
 
     - mode=none: returns synthetic owner, no checks
-    - mode=local: verifies bearer token against local password hash
+    - mode=local: verifies bearer token against in-memory store
     - mode=full: verifies JWT access token
-    """
-    auth_mode = settings.auth.mode
 
-    # Mode: none - always return owner
+    Note: Agent HMAC auth and API key auth are handled separately by
+    require_auth() in app/auth/dependencies.py. This dependency is for
+    user-facing endpoints (dashboard login flow).
+    """
+    cfg = get_settings()
+    auth_mode = cfg.auth.mode
+
     if auth_mode == AuthMode.NONE:
         return _get_owner_auth_context()
 
-    # Extract token from Authorization header
     auth_header = request.headers.get("authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
@@ -232,13 +265,11 @@ async def get_auth_context(
             detail="Missing or invalid Authorization header",
         )
 
-    token = auth_header[7:]  # Remove "Bearer " prefix
+    token = auth_header[7:]  # Strip "Bearer " prefix
 
-    # Mode: local
     if auth_mode == AuthMode.LOCAL:
         return await _authenticate_local(token)
 
-    # Mode: full
     if auth_mode == AuthMode.FULL:
         return await _authenticate_full(token, db)
 
