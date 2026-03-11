@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import secrets
-import uuid
+import uuid  # noqa: TC003 — Pydantic needs uuid.UUID at runtime for model fields
+from typing import TYPE_CHECKING
 
 import pyotp
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.hmac import decrypt_secret, get_encryption_key
 from app.auth.middleware import (
@@ -18,15 +18,18 @@ from app.auth.middleware import (
     create_access_token,
     create_refresh_token,
     get_auth_context,
-    hash_password,
     revoke_refresh_token,
     verify_password,
     verify_refresh_token,
 )
-from app.auth.schemas import AuthenticatedUser
 from app.config import AuthMode, get_settings
 from app.database import get_db
 from app.models.auth import User
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from app.auth.schemas import AuthenticatedUser
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
