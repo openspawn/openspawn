@@ -2,7 +2,6 @@
 title: Values Framework
 ---
 
-# Values Framework
 
 **What you'll learn:** How alignment values work in OpenSpawn — what each value does to agent behavior, where they come from, which ones conflict, and how to choose the right set for your org.
 
