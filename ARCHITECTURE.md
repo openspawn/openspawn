@@ -113,6 +113,24 @@ Agents have levels (L1-L10) determining their authority. Higher-level agents can
 
 Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQL.
 
+## Authentication
+
+Auth enforcement is configurable via `AUTH_MODE` env var (or `openspawn.config.json`):
+
+| Mode   | Default for           | Dashboard | API endpoints                          |
+| ------ | --------------------- | --------- | -------------------------------------- |
+| `none` | `openspawn start`     | Open      | All requests pass (synthetic owner)    |
+| `local`| opt-in                | Password  | Bearer token from login                |
+| `full` | `--deployed`          | JWT login | JWT + HMAC agent auth + API keys       |
+
+In all modes, HMAC agent auth and `osp_` API keys still work when credentials are provided. The mode only controls what happens when *no* credentials are sent.
+
+Auth is enforced by two FastAPI dependencies:
+- `require_auth()` — used by all resource routers (agents, tasks, memory, etc.)
+- `get_auth_context()` — used by `/auth/*` endpoints (login flow)
+
+Both respect `AUTH_MODE`.
+
 ## API Endpoints
 
 All integration endpoints use the `/integrations/` prefix:

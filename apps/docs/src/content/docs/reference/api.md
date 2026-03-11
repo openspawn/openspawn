@@ -92,6 +92,18 @@ API keys are long-lived bearer tokens scoped to `read`, `write`, or `admin`. Man
 Authorization: Bearer osk_...
 ```
 
+### Auth Modes
+
+Auth enforcement is configurable. Not every deployment needs credentials — a solo developer running agents on their laptop shouldn't need to log in.
+
+| Mode   | Set via          | Behavior |
+| ------ | ---------------- | -------- |
+| `none` | `AUTH_MODE=none`  | All requests pass. The API injects a synthetic owner identity. Default for `openspawn start`. |
+| `local`| `AUTH_MODE=local` | Single-user password. Login returns a bearer token. No external identity provider needed. |
+| `full` | `AUTH_MODE=full`  | JWT login + HMAC agent auth + API keys. Default for production deployments. |
+
+In all modes, HMAC and API key auth still work when credentials are provided — the mode only controls what happens when no credentials are sent.
+
 ---
 
 ## Common Error Codes
