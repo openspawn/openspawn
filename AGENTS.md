@@ -108,7 +108,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Commits**: Scoped conventional commits (`feat(scope):`, `fix(scope):`)
 - **Imports**: No barrel files, explicit paths
 - **Formatting**: oxfmt (Rust-based)
-- **Linting**: oxlint (type-aware)
+- **Linting**: oxlint (type-aware) — fix all warnings, not just errors. Zero warnings policy.
 - **Components**: shadcn/ui patterns, Tailwind
 - **TypeScript**: No `any`, no `as` casts, no non-null assertions (`!`), prefer string enums. If a type doesn't fit, fix the type — don't cast around it. Use type guards, generics, or narrow via conditionals instead.
 - **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/docs/`) to reflect changes
@@ -131,7 +131,7 @@ Always run before finishing and before opening a PR:
 
 ```bash
 pnpm exec oxfmt --write .                                              # Format
-pnpm exec nx run-many -t lint                                          # Lint (must pass with 0 errors)
+pnpm exec nx run-many -t lint                                          # Lint (must pass with 0 errors AND 0 warnings)
 pnpm exec nx run-many -t build                                         # Build
 pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
 cd apps/api && uv run pytest tests/ -v                                 # Test (Python)

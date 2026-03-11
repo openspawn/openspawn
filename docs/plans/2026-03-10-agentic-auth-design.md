@@ -76,21 +76,91 @@ spawn → task-scoped (active) → idle → task-scoped (active) → ... → rev
 
 No parallel/deprecation period needed — existing HMAC/API key auth has no external consumers yet. Replace entirely with Casdoor JWT auth.
 
+## Auth Modes — Configurable Enforcement
+
+Not every deployment needs a login screen. Auth enforcement is configurable via `openspawn.config.json`:
+
+```json
+{
+  "auth": {
+    "mode": "none" | "local" | "full"
+  }
+}
+```
+
+### `none` (default for `openspawn start`)
+
+- Dashboard is open, no login screen
+- API accepts all requests — middleware injects a synthetic "owner" identity
+- Agent HMAC/API key auth still works but is not required
+- Perfect for: solo dev on laptop, local experimentation, demos
+- This is the CLI wizard default — zero friction out of the box
+
+### `local` (opt-in, single-user protection)
+
+- Single-user password set during `openspawn init` or on first boot
+- Simple session cookie for dashboard, bearer token for API
+- Token generated at setup, stored in `openspawn.config.json` (or `.openspawn/secrets.json`)
+- No external identity provider needed
+- Perfect for: solo user on VPS, shared home network, basic protection
+
+### `full` (default for `openspawn start --deployed`)
+
+- Casdoor/OIDC with agent JWT tokens, delegation chains, task-scoped claims
+- Dashboard has real login flow (OAuth or username/password)
+- Agent tokens are scoped per task with the intersection model described above
+- Perfect for: teams, production, multi-agent orgs with trust boundaries
+
+### Implementation
+
+Auth middleware checks `config.auth.mode` and enforces accordingly:
+
+```python
+async def auth_dependency(request: Request) -> AuthContext:
+    mode = get_config().auth.mode
+    if mode == "none":
+        return AuthContext.owner()  # synthetic owner, full access
+    elif mode == "local":
+        return verify_local_token(request)  # bearer or session cookie
+    else:
+        return verify_jwt(request)  # full Casdoor JWT validation
+```
+
+The auth router endpoints exist in all modes — they just return different responses:
+- `none`: login/register endpoints return 200 with a static owner token
+- `local`: login validates password, returns session token
+- `full`: login redirects to OAuth or validates credentials against Casdoor
+
+### CLI Integration
+
+The wizard includes auth mode selection:
+
+```
+$ npx openspawn init
+...
+? Authentication mode
+  ● None — open dashboard, no login (default)
+  ○ Local password — simple protection
+  ○ Full auth — teams and production
+```
+
+The `--deployed` flag defaults to `full` instead of `none`.
+
 ## Phased Rollout
 
-### Phase 1 (now) — Ship basic auth
+### Phase 1 (now) — Ship auth with configurable modes
 
-Wire up the auth router endpoints the dashboard already expects. Models, UI, and dependency injection exist — only the router is missing. API key auth covers agents. Unblocks the hosted product.
+Wire up the auth router endpoints with three-mode support. Default to `none` for local, `full` for deployed. Models, UI, and dependency injection exist — only the router + middleware are missing. API key auth covers agents. Unblocks the hosted product without forcing auth on solo users.
 
-**No Casdoor deployment needed.**
+**No Casdoor deployment needed for `none` or `local` modes.**
 
 ### Phase 2 (when users exist) — Add OAuth
 
-Google OAuth for human login. Still no Casdoor — just a FastAPI OAuth flow.
+Google OAuth for human login in `full` mode. Still no Casdoor — just a FastAPI OAuth flow.
 
 ### Phase 3 (when orgs need delegation/audit) — Deploy Casdoor
 
-Full Casdoor deployment at `id.openspawn.ai:9000`. Unified identity, task-scoped tokens, delegation chains, provenance tracking. This is when the design above gets implemented.
+Full Casdoor deployment at `id.openspawn.ai:9000`. Unified identity, task-scoped tokens, delegation chains, provenance tracking. This is when the full design above gets implemented.
 
 ## Current State (as of 2026-03-10)
 

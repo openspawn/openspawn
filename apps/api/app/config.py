@@ -1,5 +1,32 @@
+from enum import Enum
+from functools import lru_cache
+
 from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class AuthMode(str, Enum):
+    """Authentication mode for the API."""
+
+    NONE = "none"
+    LOCAL = "local"
+    FULL = "full"
+
+
+class AuthSettings(BaseSettings):
+    """Auth-specific settings.
+
+    Env vars are prefixed with AUTH_ (e.g. AUTH_MODE=local, AUTH_JWT_SECRET=...).
+    """
+
+    model_config = SettingsConfigDict(env_prefix="AUTH_")
+
+    mode: AuthMode = AuthMode.NONE
+    jwt_secret: str | None = None
+    jwt_algorithm: str = "HS256"
+    access_token_ttl_minutes: int = 15
+    refresh_token_ttl_days: int = 7
+    local_password_hash: str | None = None
 
 
 class Settings(BaseSettings):
@@ -48,6 +75,9 @@ class Settings(BaseSettings):
     sla_warning_pct: int = 80
     sla_breach_pct: int = 100
 
+    # Auth configuration
+    auth: AuthSettings = AuthSettings()
+
     # Observability (all optional)
     logfire_token: str | None = None
     langfuse_public_key: str | None = None
@@ -55,3 +85,12 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Return the global settings instance.
+
+    Using a function instead of direct import makes testing easier
+    (can be patched or overridden).
+    """
+    return settings

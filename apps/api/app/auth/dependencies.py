@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import uuid
+
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,10 +13,12 @@ from app.auth.hmac import (
     secure_compare,
     validate_timestamp,
 )
+from app.auth.middleware import _get_owner_auth_context, decode_access_token
 from app.auth.schemas import AuthenticatedAgent, AuthenticatedUser
+from app.config import AuthMode, get_settings
 from app.database import get_db
 from app.models.agent import Agent
-from app.models.auth import ApiKey, Nonce
+from app.models.auth import ApiKey, Nonce, User
 from app.models.enums import AgentStatus
 
 type AuthContext = AuthenticatedAgent | AuthenticatedUser
@@ -124,12 +128,55 @@ async def _authenticate_api_key(
     )
 
 
+async def _authenticate_jwt(
+    token: str,
+    db: AsyncSession,
+) -> AuthenticatedUser:
+    """Authenticate a JWT bearer token (full auth mode)."""
+    payload = decode_access_token(token)
+
+    user_id = uuid.UUID(str(payload["sub"]))
+    org_id = uuid.UUID(str(payload["org_id"]))
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
+
+    return AuthenticatedUser(
+        id=user_id,
+        org_id=org_id,
+        email=str(payload["email"]),
+        name=user.name,
+        role=str(payload["role"]),
+        scopes=[],
+        is_api_key=False,
+    )
+
+
 async def require_auth(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> AuthContext:
-    # API key auth (Bearer osp_...)
+    """
+    Main auth dependency used by all resource routers.
+
+    Respects auth.mode:
+    - mode=none: returns synthetic owner, no checks
+    - mode=local/full: checks HMAC, API key, or JWT bearer token
+    """
+    cfg = get_settings()
+
+    # mode=none — skip all auth, return owner context
+    if cfg.auth.mode == AuthMode.NONE:
+        return _get_owner_auth_context()
+
     auth_header = request.headers.get("authorization")
+
+    # API key auth (Bearer osp_...)
     if auth_header and auth_header.startswith("Bearer osp_"):
         key = auth_header[7:]
         return await _authenticate_api_key(key, db)
@@ -138,10 +185,20 @@ async def require_auth(
     if request.headers.get("x-agent-id") or request.headers.get("x-signature"):
         return await _authenticate_hmac(request, db)
 
+    # JWT bearer token (full mode user auth from dashboard)
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+        if cfg.auth.mode == AuthMode.FULL:
+            return await _authenticate_jwt(token, db)
+        # local mode — accept any valid local token via middleware
+        from app.auth.middleware import _authenticate_local
+
+        return await _authenticate_local(token)
+
     # No valid auth
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Auth required. Provide Bearer osp_... API key or HMAC agent headers.",
+        detail="Auth required. Provide Bearer osp_... API key, HMAC agent headers, or Bearer JWT.",
     )
 
 

@@ -182,7 +182,7 @@ This prints the agent hierarchy and a sample task routing to stdout.
 npx openspawn start
 ```
 
-This boots the Python API server (FastAPI) with SQLite locally — no Docker required. The server provides:
+This boots the Python API server (FastAPI) with SQLite locally — no Docker required. The dashboard opens with **no login** by default (`AUTH_MODE=none`). The server provides:
 
 - **Dashboard** — real-time view of agents, tasks, and events at `http://localhost:8787`
 - **MCP server** — tool interface for agents at `POST /mcp`
@@ -190,6 +190,10 @@ This boots the Python API server (FastAPI) with SQLite locally — no Docker req
 - **Background jobs** — asyncio scheduler for SLA monitoring, escalation, and status sync
 
 Under the hood, `openspawn start` invokes `uv run uvicorn` to launch the FastAPI app. SQLite is used for local persistence — zero external dependencies.
+
+> **Q: Do I need to set up authentication?**
+>
+> Not for local use. By default, `openspawn start` runs with `AUTH_MODE=none` — the dashboard is open and the API accepts all requests. When you're ready to add protection, set `AUTH_MODE=local` for a simple password or `AUTH_MODE=full` for JWT-based auth. See the [API reference](/reference/api/#auth-modes) for details.
 
 > **Q: Port 8787 is in use?**
 >
