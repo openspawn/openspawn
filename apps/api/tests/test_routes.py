@@ -1,7 +1,31 @@
-"""Smoke tests for all CRUD endpoint routes — verifies routing and auth gates."""
+"""Smoke tests for all CRUD endpoint routes — verifies routing and auth gates.
+
+Auth gate tests run with AUTH_MODE=full so require_auth() demands credentials.
+With AUTH_MODE=none (the default for local dev), all requests pass — which is
+intentional but not what we're testing here.
+"""
+
+import os
+from unittest.mock import patch
 
 import pytest
 from httpx import AsyncClient
+
+# Force AUTH_MODE=full for all auth gate tests in this module
+pytestmark = pytest.mark.usefixtures("_auth_mode_full")
+
+
+@pytest.fixture(autouse=True)
+def _auth_mode_full():
+    """Set AUTH_MODE=full so require_auth() enforces credentials."""
+    with patch.dict(os.environ, {"AUTH_MODE": "full"}):
+        from importlib import reload
+
+        import app.config
+
+        reload(app.config)
+        yield
+        reload(app.config)
 
 
 @pytest.fixture
