@@ -1,0 +1,22 @@
+{
+  "name": "demo-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/demo-e2e/src",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/demo-e2e",
+        "command": "npx playwright test"
+      },
+      "configurations": {
+        "ci": {
+          "command": "npx playwright test --reporter=github"
+        }
+      }
+    }
+  },
+  "implicitDependencies": ["demo"],
+  "tags": ["scope:e2e"]
+}
