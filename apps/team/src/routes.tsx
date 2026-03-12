@@ -85,7 +85,11 @@ const routeTree = rootRoute.addChildren([
   ]),
 ]);
 
-export const router = createRouter({ routeTree, basepath: "/app" });
+// VITE_BASE_PATH controls both Vite's `base` and the router basepath.
+// team.openspawn.ai sets "/" while bikinibottom.ai embeds at "/app/".
+const basepath = (import.meta.env.BASE_URL || "/app/").replace(/\/$/, "") || "/";
+
+export const router = createRouter({ routeTree, basepath });
 
 declare module "@tanstack/react-router" {
   interface Register {
