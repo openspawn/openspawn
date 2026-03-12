@@ -16,7 +16,6 @@ def sqlite_env(tmp_path):
     env = {
         "DATABASE_URL": f"sqlite+aiosqlite:///{db_path}",
         "REDIS_URL": "",
-        "AUTH_MODE": "full",
     }
     with patch.dict(os.environ, env, clear=False):
         from importlib import reload
