@@ -24,7 +24,7 @@ ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
 RUN pnpm nx build shared-types
 RUN pnpm nx run demo:build --configuration=production
-RUN pnpm nx run team:build --configuration=production
+RUN VITE_BASE_PATH="/" pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
 
 # Create standalone sandbox package with resolved workspace deps
