@@ -1,6 +1,4 @@
 import { useState, useMemo } from "react";
-import { Nav } from "../components/nav";
-import { Footer } from "../components/footer";
 
 /* ─── Plugin Data ──────────────────────────────────────────────────────────── */
 
@@ -233,9 +231,7 @@ export function PluginsPage() {
   }, [search, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-navy-950 text-white">
-      <Nav />
-
+    <>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/5 py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_70%)]" />
@@ -316,7 +312,6 @@ export function PluginsPage() {
         </div>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 }
