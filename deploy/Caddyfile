@@ -41,21 +41,16 @@ openspawn.ai {
 # ── team.openspawn.ai — Internal team dashboard (basic auth) ────────────────
 team.openspawn.ai {
 	basicauth {
-		{$TEAM_AUTH_USER} {$TEAM_AUTH_HASH}
+		adam $2a$14$ux.qbYaln9O8q0c97r0tie7TOb4BL.51Y5atyByJGhBt7vXC.4ay6
 	}
 
-	# Proxy /api requests to FastAPI (same pattern as openspawn.ai)
+	# Proxy /api requests to FastAPI
 	handle_path /api/* {
 		reverse_proxy localhost:8000
 	}
 
-	# Redirect bare / to /app/
-	handle / {
-		redir /app/ permanent
-	}
-
-	# Serve team SPA — Vite builds with base="/app/" so assets live under /app/assets/
-	handle_path /app/* {
+	# Serve team SPA at root — built with VITE_BASE_PATH=/
+	handle {
 		root * /opt/team-dashboard
 		try_files {path} /index.html
 		file_server
