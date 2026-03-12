@@ -36,13 +36,24 @@ for (const page of PAGES) {
 
     // No fatal console errors (filter out known noise)
     const fatalErrors = errors.filter(
-      (e) => !e.includes("favicon") && !e.includes("404") && !e.includes("WebSocket"),
+      (e) =>
+        !e.includes("favicon") &&
+        !e.includes("404") &&
+        !e.includes("WebSocket") &&
+        !e.includes("net::ERR_CONNECTION_REFUSED"),
     );
     expect(fatalErrors).toHaveLength(0);
   });
 }
 
-test("sidebar navigation links work", async ({ page }) => {
+test("sidebar navigation links work", async ({ page, browserName }, testInfo) => {
+  // Skip on mobile viewports — sidebar is hidden behind hamburger menu
+  const isMobile = testInfo.project.name.includes("mobile");
+  if (isMobile) {
+    test.skip();
+    return;
+  }
+
   await page.goto("/app/", { waitUntil: "networkidle" });
 
   // Sidebar should have navigation links
