@@ -52,7 +52,7 @@ import { AgentVirtualGrid } from "./agent-virtual-grid";
 
 type Agent = AgentFieldsFragment;
 
-import { DialogModeValue, type DialogMode, SortDirection } from "../lib/enums";
+import { AgentSortField, DialogModeValue, type DialogMode, SortDirection } from "../lib/enums";
 
 // Suppress unused-variable warning for usePresence (destructured but not used directly in JSX)
 void usePresence;
