@@ -67,9 +67,8 @@ jobs:
           fi
           echo "✅ Codegen files are up to date"
 
-      - name: Lint
-        run: pnpm exec nx run-many -t lint --parallel=3
-        continue-on-error: true # Don't fail on lint for now
+      - name: Lint (zero warnings policy)
+        run: pnpm exec nx run-many -t lint --parallel=3 -- --max-warnings 0
 
       - name: Build
         run: pnpm exec nx run-many -t build --parallel=3
