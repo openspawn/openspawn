@@ -10,8 +10,6 @@ test.describe("Agents page", () => {
   });
 
   test("renders agent cards or list", async ({ page }) => {
-    // Should have at least one agent visible (demo data)
-    const agentElements = page.locator("[data-testid=agent-card], [data-agent-id], .agent-row");
     // If demo data is loaded, we expect agents. If not, at least no crash.
     const body = await page.textContent("body");
     expect(body).toBeTruthy();

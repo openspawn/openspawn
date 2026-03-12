@@ -46,7 +46,7 @@ for (const page of PAGES) {
   });
 }
 
-test("sidebar navigation links work", async ({ page, browserName }, testInfo) => {
+test("sidebar navigation links work", async ({ page }, testInfo) => {
   // Skip on mobile viewports — sidebar is hidden behind hamburger menu
   const isMobile = testInfo.project.name.includes("mobile");
   if (isMobile) {
