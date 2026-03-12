@@ -50,9 +50,7 @@ class LocalTokenStore:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against a bcrypt hash."""
-    return bcrypt.checkpw(
-        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
+    return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
 def hash_password(password: str) -> str:
@@ -61,9 +59,7 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
 
-def create_access_token(
-    user_id: uuid.UUID, org_id: uuid.UUID, email: str, role: str
-) -> str:
+def create_access_token(user_id: uuid.UUID, org_id: uuid.UUID, email: str, role: str) -> str:
     """Create a JWT access token."""
     cfg = get_settings()
     if not cfg.auth.jwt_secret:
@@ -158,9 +154,7 @@ async def verify_refresh_token(token: str, db: AsyncSession) -> User:
     user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     return user
 
@@ -204,9 +198,7 @@ async def _authenticate_local(token: str) -> AuthenticatedUser:
     token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
 
     if not LocalTokenStore.verify(token_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     return _get_owner_auth_context()
 
@@ -222,9 +214,7 @@ async def _authenticate_full(token: str, db: AsyncSession) -> AuthenticatedUser:
     user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     return AuthenticatedUser(
         id=user_id,
