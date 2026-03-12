@@ -39,7 +39,7 @@ import { AgentDetailPanel } from "../components/agent-detail-panel";
 import { darkenForBackground } from "../lib/avatar-utils";
 import { resolveAvatarUrl } from "../lib/resolve-avatar-url";
 
-import { SortDirection } from "../lib/enums";
+import { SortDirection, TaskSortField } from "../lib/enums";
 
 const statusColumns = [
   { id: "BACKLOG", label: "Backlog", color: "bg-slate-500" },

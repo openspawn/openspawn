@@ -5,6 +5,21 @@ export enum SortDirection {
   Desc = "desc",
 }
 
+export enum AgentSortField {
+  Name = "name",
+  Level = "level",
+  Balance = "balance",
+  Status = "status",
+  Created = "created",
+}
+
+export enum TaskSortField {
+  Title = "title",
+  Priority = "priority",
+  Status = "status",
+  Created = "created",
+}
+
 export enum DialogModeValue {
   View = "view",
   Edit = "edit",
