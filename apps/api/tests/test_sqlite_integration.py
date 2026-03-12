@@ -11,7 +11,7 @@ from httpx import ASGITransport, AsyncClient
 
 @pytest.fixture(autouse=True)
 def sqlite_env(tmp_path):
-    """Point DATABASE_URL at a temp SQLite file and disable Redis."""
+    """Point DATABASE_URL at a temp SQLite file, disable Redis, force auth mode full."""
     db_path = tmp_path / "test.db"
     env = {
         "DATABASE_URL": f"sqlite+aiosqlite:///{db_path}",

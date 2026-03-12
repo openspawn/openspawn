@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import secrets
 import uuid
 from unittest.mock import patch
 
@@ -17,7 +15,7 @@ from app.auth.middleware import (
     LocalTokenStore,
     hash_password,
 )
-from app.config import AuthMode, AuthSettings, Settings, settings
+from app.config import AuthMode, AuthSettings, Settings
 from app.routers.auth import router
 
 
@@ -269,7 +267,7 @@ class TestAuthModeLocal:
 class TestAuthModeFull:
     """Full mode: JWT access tokens, refresh rotation, TOTP."""
 
-    JWT_SECRET = "test-jwt-secret-for-unit-tests-must-be-32-bytes-long!"  # noqa: S105
+    JWT_SECRET = "test-jwt-secret-for-unit-tests-must-be-32-bytes-long!"
 
     def _full_settings(self) -> Settings:
         return _make_settings(mode=AuthMode.FULL, jwt_secret=self.JWT_SECRET)

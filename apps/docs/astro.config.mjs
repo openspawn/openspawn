@@ -22,6 +22,7 @@ export default defineConfig({
         {
           label: "Reference",
           items: [
+            { label: "REST API", link: "/reference/api/" },
             { label: "Org.md Spec", link: "/reference/org-md-spec/" },
             { label: "Communication Protocol", link: "/reference/communication-protocol/" },
             { label: "Agent Communication", link: "/reference/agent-communication-protocol/" },

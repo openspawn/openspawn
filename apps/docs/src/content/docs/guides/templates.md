@@ -2,7 +2,6 @@
 title: Templates Guide
 ---
 
-# Templates Guide
 
 **What you'll learn:** The seven OpenSpawn industry org templates — what they include, when to use each, how to customize them, and how to combine roles from multiple templates.
 

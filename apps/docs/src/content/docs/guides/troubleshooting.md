@@ -3,7 +3,6 @@ title: Troubleshooting
 description: Solutions to common issues when installing and using OpenSpawn — from CLI errors and ORG.md parsing to auth failures, Docker, and task state machines.
 ---
 
-# Troubleshooting
 
 **Quick diagnostic:** When something breaks, start here:
 

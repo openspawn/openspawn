@@ -1,11 +1,10 @@
-from enum import Enum
-from functools import lru_cache
+from enum import StrEnum
 
 from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class AuthMode(str, Enum):
+class AuthMode(StrEnum):
     """Authentication mode for the API."""
 
     NONE = "none"

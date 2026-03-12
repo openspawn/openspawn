@@ -2,7 +2,6 @@
 title: CEO Agent Architecture
 ---
 
-# CEO Agent Architecture
 
 > A real agent organization running on real infrastructure — the bridge between OpenSpawn's simulation and production multi-agent systems.
 

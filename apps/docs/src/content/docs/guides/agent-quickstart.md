@@ -2,7 +2,6 @@
 title: Agent Quickstart
 ---
 
-# Agent Quickstart
 
 **What you'll learn:** How to go from zero to a running multi-agent org in 3 commands — templates, ORG.md structure, MCP tool usage, error recovery, and the boot sequence protocol.
 

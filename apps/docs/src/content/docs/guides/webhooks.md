@@ -3,7 +3,6 @@ title: Webhooks Integration Guide
 description: Connect OpenSpawn to any external system using inbound webhooks, outbound event hooks, and built-in Discord and GitHub integrations.
 ---
 
-# Webhooks Integration Guide
 
 OpenSpawn has two complementary webhook directions:
 
