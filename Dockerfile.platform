@@ -9,6 +9,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json .npmrc ./
 COPY apps/website/ ./apps/website/
+COPY libs/docs-ui/ ./libs/docs-ui/
+COPY libs/dashboard-ui/ ./libs/dashboard-ui/
+COPY libs/design-tokens/ ./libs/design-tokens/
 COPY apps/platform/server.ts ./apps/platform/server.ts
 
 RUN pnpm install --frozen-lockfile

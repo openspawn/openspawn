@@ -1,0 +1,252 @@
+---
+title: Values Framework
+---
+
+**What you'll learn:** How alignment values work in OpenSpawn — what each value does to agent behavior, where they come from, which ones conflict, and how to choose the right set for your org.
+
+Every agent in an OpenSpawn org gets a SOUL.md — its identity, constraints, and operating principles. During `openspawn init`, the wizard asks which alignment values to include. Each selected value becomes a ~50-token directive injected into every agent's SOUL.md, shaping how it handles ambiguity, prioritizes work, and communicates.
+
+Patrick Lencioni draws a useful distinction between _core_ values (non-negotiable behaviors the org already exhibits) and _aspirational_ values (behaviors the org wants but doesn't yet have) (_The Advantage_, 2012). OpenSpawn ships five core values enabled by default. Three additional aspirational values are available for orgs that need them — but they introduce tradeoffs.
+
+---
+
+## Quick reference
+
+| Value                                             | Default | Source                    | What it does                                                   |
+| ------------------------------------------------- | ------- | ------------------------- | -------------------------------------------------------------- |
+| [Ownership](#ownership)                           | Yes     | Katzenbach & Smith (1993) | Single-threaded task ownership — every task ships or escalates |
+| [Transparency](#transparency)                     | Yes     | Edmondson (1999)          | Agents surface problems early instead of guessing              |
+| [Measurement](#measurement)                       | Yes     | Drucker (1954)            | Agents report outcomes with evidence, not activity summaries   |
+| [Subsidiarity](#subsidiarity)                     | Yes     | Rogers & Blenko (2006)    | Decisions made at the lowest competent level                   |
+| [Continuous Improvement](#continuous-improvement) | Yes     | Senge (1990)              | Mistakes documented, processes updated, never repeated         |
+| [Speed](#speed)                                   | No      | —                         | Bias toward action; ship small, iterate fast                   |
+| [Rigor](#rigor)                                   | No      | —                         | Depth over speed; verify before asserting                      |
+| [Frugality](#frugality)                           | No      | —                         | Cheap models for mechanical tasks, expensive for reasoning     |
+
+---
+
+## How values work
+
+Values are stored in `openspawn.config.json` under the `alignment` key:
+
+```json
+{
+  "alignment": {
+    "values": ["ownership", "transparency", "measurement", "subsidiarity", "continuous-improvement"]
+  }
+}
+```
+
+During org boot, each value is expanded into a short directive (~50 tokens) and injected into every agent's SOUL.md. The directives are deliberately terse — they set behavioral defaults without consuming significant context window.
+
+To change values: edit `openspawn.config.json` directly, or re-run `openspawn init` and select different values in the wizard.
+
+---
+
+## Core values (default)
+
+### Ownership
+
+> Every task has exactly one owner. It ships or it escalates — never drifts.
+
+**Source:** Katzenbach & Smith (1993). The Discipline of Teams. _Harvard Business Review_, 71(2), 111-120. The key finding: teams with clear individual accountability outperform teams with diffuse responsibility. "Mutual accountability" doesn't mean shared ownership — it means each person owns a specific deliverable.
+
+**Agent behavior:** When an agent receives a task via `task_create`, it becomes the single-threaded owner. It doesn't wait for consensus or share the work. If blocked, it calls `escalate` immediately rather than stalling. If the task is outside its capability, it uses `delegate` to transfer ownership — not add a collaborator.
+
+**When to include:** Almost always. Without ownership, tasks accumulate in "in progress" without resolution.
+
+**When to skip:** Only in experimental setups where you want agents to freely collaborate on shared artifacts without clear task boundaries.
+
+---
+
+### Transparency
+
+> Surface problems early. Silent failure is the worst outcome.
+
+**Source:** Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2), 350-383. Edmondson's research at Harvard showed that teams with psychological safety report errors faster — and counterintuitively, higher-performing teams report _more_ errors because they catch them earlier.
+
+**Agent behavior:** When an agent encounters ambiguity or a potential failure, it calls `escalate` with a clear description rather than guessing. When completing a task via `report`, it includes what went wrong alongside what succeeded. Agents never suppress errors or uncertainties to appear competent.
+
+**When to include:** Almost always. This is the single most important value for preventing cascading failures in multi-agent systems.
+
+**When to skip:** Rarely. Even in speed-focused orgs, transparency prevents the kind of silent failures that waste far more time than an escalation.
+
+---
+
+### Measurement
+
+> Track outcomes, not activity. Evidence over assertion.
+
+**Source:** Drucker, P. (1954). _The Practice of Management_. Harper & Brothers. Drucker's central insight: "What gets measured gets managed." But the emphasis is on measuring the _right_ things — outcomes and results, not hours worked or tasks touched.
+
+**Agent behavior:** When an agent calls `report`, it includes measurable outcomes: row counts, pass/fail rates, error counts, duration. It never reports "worked on migration" — it reports "migrated 1.2M rows, 3 schema conflicts resolved, checksum verified." Status updates reference concrete artifacts.
+
+**When to include:** Any org where you need to evaluate agent performance or justify resource allocation.
+
+**When to skip:** Highly exploratory research where premature measurement constrains creative exploration.
+
+---
+
+### Subsidiarity
+
+> Decisions at the lowest competent level. Solve before escalating.
+
+**Source:** Rogers, P. & Blenko, M. (2006). Who Has the D? _Harvard Business Review_, 84(1), 52-61. Their research at Bain found that decision bottlenecks — not lack of information — are the primary cause of organizational slowness. Pushing decisions downward eliminates round trips.
+
+**Agent behavior:** Before calling `escalate`, the agent first attempts to resolve the issue using its own capabilities. An L5 agent that encounters a data format mismatch fixes it and documents the fix, rather than escalating to the L7 lead for a decision. Agents only escalate when the problem genuinely exceeds their capability or authority level.
+
+**When to include:** Orgs with 3+ levels of hierarchy where you want to avoid bottlenecking the lead agent.
+
+**When to skip:** High-stakes domains (compliance, incident response) where you want every decision visible to senior agents regardless of difficulty.
+
+---
+
+### Continuous Improvement
+
+> Document every mistake. Update the process. Never repeat.
+
+**Source:** Senge, P. (1990). _The Fifth Discipline_. Doubleday. Senge's concept of the "learning organization" — systems that improve through feedback loops rather than static procedures. The key mechanism: structured reflection after every cycle.
+
+**Agent behavior:** After completing or failing a task, the agent documents what happened and what should change. When an agent calls `report` on a failed task, it includes a root-cause analysis and a process update recommendation. Over time, this builds an institutional memory that prevents repeated mistakes.
+
+**When to include:** Long-running orgs that process similar tasks repeatedly (onboarding pipelines, compliance monitoring, catalog management).
+
+**When to skip:** One-shot orgs that boot, execute a single mission, and shut down.
+
+---
+
+## Aspirational values (opt-in)
+
+These values address specific operational needs. They are not enabled by default because they introduce tradeoffs — particularly against each other.
+
+### Speed
+
+> Bias toward action. Ship small, iterate fast.
+
+**Source:** Operational heuristic. No single academic source — draws from lean manufacturing, agile methodology, and startup culture.
+
+**Agent behavior:** Agents prefer shipping a partial result and iterating over waiting for perfect information. When faced with two approaches, they choose the faster one. Task decomposition favors many small tasks over fewer large ones. Agents call `report` with intermediate results rather than waiting for completion.
+
+**When to include:** Incident response, time-sensitive operations, rapid prototyping.
+
+**When to skip:** Compliance, legal review, clinical trials — anywhere a wrong fast answer is worse than a slow correct one.
+
+> **Conflicts with Rigor.** Speed tells agents to ship fast; Rigor tells them to verify first. Including both creates contradictory directives. Pick one.
+
+---
+
+### Rigor
+
+> Depth over speed. Verify before asserting.
+
+**Source:** Operational heuristic. Reflects practices from peer review, audit methodology, and safety-critical engineering.
+
+**Agent behavior:** Agents verify claims before including them in `report` output. When delegating via `delegate`, they include explicit acceptance criteria. Agents prefer thoroughness over speed — a task that takes longer but produces verified results is preferable to fast but unverified output.
+
+**When to include:** Compliance monitoring, contract review, research, clinical trials — anywhere accuracy matters more than velocity.
+
+**When to skip:** Incident response, live ops, any domain where speed of response directly impacts outcomes.
+
+> **Conflicts with Speed.** Rigor tells agents to verify; Speed tells them to ship. Including both creates contradictory directives. Pick one.
+
+---
+
+### Frugality
+
+> Cheap models for mechanical tasks, expensive models for reasoning.
+
+**Source:** Operational heuristic. Reflects cost-optimization practices in production ML systems.
+
+**Agent behavior:** Agents consider model cost when decomposing work. Mechanical subtasks (data formatting, template population, schema validation) are flagged for cheaper model tiers. Reasoning-heavy subtasks (risk assessment, strategy, ambiguous judgment calls) are flagged for more capable models. This manifests in task metadata and delegation patterns.
+
+**When to include:** Cost-conscious orgs running at scale, especially those processing high volumes of mixed-complexity tasks.
+
+**When to skip:** Small orgs where token cost is negligible, or orgs where uniform model quality matters more than cost optimization.
+
+---
+
+## Tradeoffs
+
+### Conflicting pairs
+
+| Pair                        | Conflict                               | Resolution                                                                                                                                                                                                        |
+| --------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Speed + Rigor               | Ship fast vs. verify first             | Pick one based on domain. Incident response needs Speed. Compliance needs Rigor.                                                                                                                                  |
+| Subsidiarity + Transparency | Solve locally vs. surface everything   | These actually complement: solve locally _and_ report what you solved. But in high-stakes domains, drop Subsidiarity so every decision is visible.                                                                |
+| Frugality + Rigor           | Cheap models vs. thorough verification | Frugality routes mechanical tasks to cheap models. Rigor ensures verification on all tasks. Together, they work — but only if your task decomposition is clean enough to separate mechanical from reasoning work. |
+
+### Token cost
+
+Each value adds ~50 tokens to every agent's SOUL.md. With 5 values and 4 agents, that's ~1,000 tokens of overhead per session. At 8 values and 10 agents, it's ~4,000.
+
+**Recommendation:** 3-5 values. The five defaults cover most orgs well. Add Speed, Rigor, or Frugality only when the domain specifically calls for it.
+
+---
+
+## Template defaults
+
+Each template ships with values tuned to its domain:
+
+| Template                | Values                                                                     | Rationale                                                |
+| ----------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `assistant-team`        | Ownership, Transparency, Measurement, Subsidiarity, Continuous Improvement | General-purpose — all five core values                   |
+| `dev-shop`              | Ownership, Transparency, Measurement, Rigor                                | Engineering work needs verification over speed           |
+| `incident-response`     | Ownership, Transparency, Speed                                             | Incidents need fast action with clear ownership          |
+| `compliance-monitoring` | Ownership, Transparency, Measurement, Rigor                                | Regulatory work requires thorough, evidence-based output |
+| `research-lab`          | Measurement, Subsidiarity, Rigor                                           | Research agents need autonomy and depth                  |
+
+> **Q: Why doesn't every template include all five core values?**
+>
+> Because defaults should reflect the domain's actual needs, not a generic ideal. An incident-response org that includes Continuous Improvement adds 50 tokens of "document every mistake" directives to agents whose primary job is to fix things fast. Post-mortems happen after the incident, not during.
+
+> **Q: Can I override template defaults?**
+>
+> Yes. Edit the `alignment.values` array in `openspawn.config.json`. The template just sets the initial selection.
+
+---
+
+## Customization
+
+### Edit values directly
+
+Open `openspawn.config.json` and modify the `alignment.values` array:
+
+```json
+{
+  "alignment": {
+    "values": ["ownership", "transparency", "rigor"]
+  }
+}
+```
+
+### Re-run the wizard
+
+```bash
+openspawn init --reconfigure
+```
+
+This walks through the 8-step wizard again, including value selection, without overwriting your ORG.md.
+
+### Valid value identifiers
+
+| Identifier               | Value                  |
+| ------------------------ | ---------------------- |
+| `ownership`              | Ownership              |
+| `transparency`           | Transparency           |
+| `measurement`            | Measurement            |
+| `subsidiarity`           | Subsidiarity           |
+| `continuous-improvement` | Continuous Improvement |
+| `speed`                  | Speed                  |
+| `rigor`                  | Rigor                  |
+| `frugality`              | Frugality              |
+
+---
+
+## References
+
+- Drucker, P. (1954). _The Practice of Management_. Harper & Brothers.
+- Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. _Administrative Science Quarterly_, 44(2), 350-383.
+- Katzenbach, J. & Smith, D. (1993). The Discipline of Teams. _Harvard Business Review_, 71(2), 111-120.
+- Lencioni, P. (2012). _The Advantage_. Jossey-Bass.
+- Rogers, P. & Blenko, M. (2006). Who Has the D? _Harvard Business Review_, 84(1), 52-61.
+- Senge, P. (1990). _The Fifth Discipline_. Doubleday.

@@ -1,15 +1,15 @@
 ---
 source: https://openspawn.ai/docs/comparison
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
-OpenSpawn vs CrewAI vs LangGraph A detailed, honest comparison of the three most popular multi-agent frameworks in 2026 — feature tables, tradeoffs, and migration guides.
+# OpenSpawn vs CrewAI vs LangGraph
 
-Bottom line up front: CrewAI and LangGraph are excellent
+A detailed, honest comparison of the three most popular multi-agent frameworks in 2026 — feature tables, tradeoffs, and migration guides.
 
 ## Feature Comparison
 
-execution frameworks. OpenSpawn is coordination infrastructure. They solve different problems — and they're designed to work together.
+Bottom line up front: CrewAI and LangGraph are excellent execution frameworks. OpenSpawn is coordination infrastructure. They solve different problems — and they're designed to work together.
 
 Feature
 
@@ -19,27 +19,13 @@ CrewAI
 
 ## Where Each Framework Shines
 
-### CrewAI: Role-Based Task Crews
+LangGraph "Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration", ["Languages", "TypeScript + Python SDKs", "Python", "Python"], "Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes", ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"], "Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools", ["Real Device Support", "✅ Via OpenClaw", "❌", "❌"], "Real-time Dashboard", "✅ React, network graph, live SSE", "❌ (CLI/LangSmith)", "❌ (LangSmith)", ["Self-hosted", "✅ MIT open source", "✅ Open source", "✅ Open source"], ["Budget / Credits", "✅ Built-in economic layer", "❌", "❌"], "Approval Gates", "✅ Pre-hooks before irreversible actions", "❌", "Conditional edges", ["Trust / Reputation", "✅ Per-agent trust scores", "❌", "❌"], ["Escalation System", "✅ Typed escalation with chain of command", "❌", "❌"], ["Framework Agnostic", "✅ Works with any A2A/MCP agent", "❌", "❌"], "Pricing", "Free, self-hosted", "Free + Enterprise (paid)", "Free + LangSmith (paid)", "Production Maturity", "Early-stage, actively developed", "Production-ready", "Production-ready", ].map(([feature, os, crewai, langgraph]) => ( CrewAI: Role-Based Task Crews CrewAI excels at defining small, focused agent teams ("crews") that work together on a shared task. Its Python-first API is clean, the role system is intuitive, and the LangChain ecosystem means you can connect to almost anything out of the box. CrewAI is the right choice when:
 
-LangGraph ["Primary Model", "Coordination / control plane", "Agent execution framework", "Graph-based orchestration"], ["Languages", "TypeScript + Python SDKs", "Python", "Python"], ["Agent Hierarchy", "10-level hierarchy, roles, trust scores", "Flat crews", "Flat nodes"], ["Org Definition", "ORG.md (markdown)", "Python code", "Python code"], ["Protocol Support", "MCP (native), A2A, REST, GraphQL", "Plugins", "LangChain tools"], ["Real Device Support", "✅ Via OpenClaw", "❌", "❌"], ["Real-time Dashboard", "✅ React, network graph, live SSE", "❌ (CLI/LangSmith)", "❌ (LangSmith)"], ["Self-hosted", "✅ MIT open source", "✅ Open source", "✅ Open source"], ["Budget / Credits", "✅ Built-in economic layer", "❌", "❌"], ["Approval Gates", "✅ Pre-hooks before irreversible actions", "❌", "Conditional edges"], ["Trust / Reputation", "✅ Per-agent trust scores", "❌", "❌"], ["Escalation System", "✅ Typed escalation with chain of command", "❌", "❌"], ["Framework Agnostic", "✅ Works with any A2A/MCP agent", "❌", "❌"], ["Pricing", "Free, self-hosted", "Free + Enterprise (paid)", "Free + LangSmith (paid)"], ["Production Maturity", "Early-stage, actively developed", "Production-ready", "Production-ready"], ].map(([feature, os, crewai, langgraph]) => ( CrewAI excels at defining small, focused agent teams ("crews") that work together on a shared task. Its Python-first API is clean, the role system is intuitive, and the LangChain ecosystem means you can connect to almost anything out of the box.
+The gap: CrewAI doesn't provide organizational structure. Multiple crews, running simultaneously, across a real product, have no shared governance. There's no budget system, no trust scores, no approval gates before irreversible actions. LangGraph: Stateful Agent Graphs LangGraph gives you precise, explicit control over agent flow as a directed graph. Each node is an agent or function. Edges define transitions. State is typed and checkpointed. For complex, multi-step reasoning workflows — especially ones that need to branch, loop, or resume — LangGraph is the most expressive option available. LangGraph is the right choice when:
 
-CrewAI is the right choice when:
-
-### LangGraph: Stateful Agent Graphs
-
-The gap: CrewAI doesn't provide organizational structure. Multiple crews, running simultaneously, across a real product, have no shared governance. There's no budget system, no trust scores, no approval gates before irreversible actions. LangGraph gives you precise, explicit control over agent flow as a directed graph. Each node is an agent or function. Edges define transitions. State is typed and checkpointed. For complex, multi-step reasoning workflows — especially ones that need to branch, loop, or resume — LangGraph is the most expressive option available.
-
-LangGraph is the right choice when:
-
-### OpenSpawn: Agent Coordination Infrastructure
-
-The gap: LangGraph models agents as graph nodes — it's a powerful execution primitive. It doesn't model your organization. Who owns a node? Who approves its output? What happens when it goes over budget? LangGraph has no answer for these questions. OpenSpawn is not a framework you write agents in. It's the company infrastructure that your agents (built in CrewAI, LangGraph, or anything else) operate within. The mental model: agent frameworks are your employees' skills. OpenSpawn is the company — org chart, task management, budget, governance, communications.
+The gap: LangGraph models agents as graph nodes — it's a powerful execution primitive. It doesn't model your organization. Who owns a node? Who approves its output? What happens when it goes over budget? LangGraph has no answer for these questions. OpenSpawn: Agent Coordination Infrastructure OpenSpawn is not a framework you write agents in. It's the company infrastructure that your agents (built in CrewAI, LangGraph, or anything else) operate within. The mental model: agent frameworks are your employees' skills. OpenSpawn is the company — org chart, task management, budget, governance, communications. OpenSpawn is the right choice when: • You want your org structure defined as code (
 
 ## Where OpenSpawn Wins
-
-### 1. Real-World Device Support
-
-### 2. ORG.md — Organizations as Code
 
 ```
 > Mission: Onboard new enterprise customers end-to-end
@@ -64,15 +50,9 @@ Schedules check-ins, collects health scores, flags churn risk early.
 - **Level:** 4
 ```
 
-OpenSpawn is the right choice when: Via deep integration with OpenClaw , OpenSpawn agents can operate on real computers — browsing the web, running code, interacting with applications, managing files. No other coordination platform offers this. Human-readable, version-controllable, and deployable:
+ORG.md) and reviewable in git • You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org 1. Real-World Device Support Via deep integration with href="https://openclaw.ai" target="_blank" rel="noopener" OpenClaw , OpenSpawn agents can operate on real computers — browsing the web, running code, interacting with applications, managing files. No other coordination platform offers this. 2. ORG.md — Organizations as Code Human-readable, version-controllable, and deployable:
 
-npx openspawn deploy ORG.md. The prose
-
-is the system prompt. See all
-
-### 3. Protocol-Native from Day One
-
-industry templates →
+npx openspawn deploy ORG.md. The prose is the system prompt. See all industry templates → 3. Protocol-Native from Day One
 
 OpenSpawn is built on open protocols:
 
@@ -92,15 +72,11 @@ Community & Ecosystem CrewAI has tens of thousands of stars. LangGraph has the f
 
 Production Maturity CrewAI and LangGraph are running in production at scale. OpenSpawn is in rapid development — the core is solid, but some enterprise features are on the roadmap.
 
-## Switching From CrewAI to OpenSpawn
-
-Python Ecosystem Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first with a Python SDK: pip install openspawn. If your team is all-Python, they'll feel more native today. OpenSpawn doesn't replace your CrewAI agents — it governs them. The migration is additive.
-
 ```
 cd openspawn && pnpm install
 ```
 
-Step 1: Deploy OpenSpawn alongside your existing setup
+Python Ecosystem Both CrewAI and LangGraph are Python-first. OpenSpawn is TypeScript-first with a Python SDK on the roadmap. In the meantime, any language can integrate via REST API or MCP tools. If your team is all-Python, CrewAI/LangGraph will feel more native today. Switching From CrewAI to OpenSpawn OpenSpawn doesn't replace your CrewAI agents — it governs them. The migration is additive. Step 1: Deploy OpenSpawn alongside your existing setup
 
 ```
 > Mission: Detect, diagnose, and remediate production incidents
@@ -116,17 +92,11 @@ Reads logs, traces, metrics. Runs your existing CrewAI pipeline via MCP.
 - **Model:** claude-sonnet
 ```
 
-Step 2: Map your crew structure to ORG.md
-
 ```
 openspawn_tools = MCPServerAdapter(
 server_url="http://localhost:3333/mcp"
 )
 ```
-
-## Switching From LangGraph to OpenSpawn
-
-Step 3: Connect your CrewAI agents via MCP
 
 ```
 from langgraph.graph import StateGraph
@@ -138,7 +108,7 @@ domain="research",
 capabilities=["web-search", "summarization"]
 ```
 
-Step 1: Expose your LangGraph workflow as an MCP tool
+Step 2: Map your crew structure to ORG.md Step 3: Connect your CrewAI agents via MCP Switching From LangGraph to OpenSpawn Step 1: Expose your LangGraph workflow as an MCP tool
 
 ```
 result = app.invoke({"task": "Research quantum computing trends"})
@@ -173,20 +143,16 @@ You should use…
 
 ## Further Reading
 
-When… ["CrewAI", "You want the easiest Python framework, the largest community, and a clean role-based API for small-to-medium crews"], ["LangGraph", "You need precise control over complex, stateful, multi-step agent flows with excellent observability"], ["OpenSpawn", "You're coordinating multiple agent teams, need governance / budget / approval gates, or want your org in version control"], ["OpenSpawn + CrewAI", "You want CrewAI's execution simplicity with organizational governance on top"], ["OpenSpawn + LangGraph", "You want LangGraph's graph power with budget enforcement, trust scores, and a real-time dashboard"], ].map(([use, when]) => ( to="/docs/reference/org-md-reference"
+When… "CrewAI", "You want the easiest Python framework, the largest community, and a clean role-based API for small-to-medium crews", "LangGraph", "You need precise control over complex, stateful, multi-step agent flows with excellent observability", "OpenSpawn", "You're coordinating multiple agent teams, need governance / budget / approval gates, or want your org in version control", "OpenSpawn + CrewAI", "You want CrewAI's execution simplicity with organizational governance on top", "OpenSpawn + LangGraph", "You want LangGraph's graph power with budget enforcement, trust scores, and a real-time dashboard", ].map(([use, when]) => ( to="/docs/reference/org-md-reference"
 
 ORG.md Reference →
 
-Define your agent organization in markdown to="/docs/protocols/mcp-reference"
+Define your agent organization in markdown to="/docs/protocols/mcp-reference" MCP Tools & Integrations →
 
-MCP Tools & Integrations →
-
-Connect any MCP-capable agent to OpenSpawn to="/docs/concepts/acp-vs-a2a"
-
-Agent Communication Protocol →
+Connect any MCP-capable agent to OpenSpawn to="/docs/concepts/acp-vs-a2a" Agent Communication Protocol →
 
 How agents coordinate inside an org to="/docs/getting-started"
 
 Getting Started →
 
-Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="\_blank" rel="noopener" GitHub repo for the latest.
+Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="_blank" rel="noopener" GitHub repo for the latest.

@@ -127,6 +127,7 @@ async def auth_dependency(request: Request) -> AuthContext:
 ```
 
 The auth router endpoints exist in all modes — they just return different responses:
+
 - `none`: login/register endpoints return 200 with a static owner token
 - `local`: login validates password, returns session token
 - `full`: login redirects to OAuth or validates credentials against Casdoor

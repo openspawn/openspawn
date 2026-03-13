@@ -1,13 +1,11 @@
 ---
 source: https://openspawn.ai/docs/tutorials/your-first-org-md
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # Your First ORG.md
 
 ## The Big Idea
-
-## Part 1 — The Minimal Org (3 Agents)
 
 ```
 ## Structure
@@ -41,17 +39,13 @@ What you'll build: a working ORG.md from scratch — starting with three agents,
 
 ### What's Happening Here
 
-It works. Three agents, no configuration beyond what you just wrote, and you have a functioning delegation chain.
-
-Let's break down what OpenSpawn is reading from those three roles.
+It works. Three agents, no configuration beyond what you just wrote, and you have a functioning delegation chain. Let's break down what OpenSpawn is reading from those three roles.
 
 The COO role —
 
 ### COO is an H3 heading. OpenSpawn recognizes "COO" as a C-level keyword and assigns level L10 — this agent can delegate and has authority over the whole org. The prose "Routes work to the right person." becomes the COO's system prompt context — the LLM reads this and uses it to decide how to behave.
 
 Hierarchy inference: When the COO delegates, it matches the task domain against available agents. "Write a README" matches
-
-domain: content, so it goes to the Writer. "Fix the auth bug" would match
 
 ## Part 2 — Adding Departments
 
@@ -90,6 +84,8 @@ Writes docs, blog posts, landing pages, and release notes.
 - **Domain:** copywriting
 ```
 
+domain: content, so it goes to the Writer. "Fix the auth bug" would match domain: engineering and go to the Developer. No explicit routing rules needed. Three agents is fine for a personal project. But when you have more than ~5 agents, flat structures get messy. The COO ends up managing too many direct reports, and tasks take too long to route. The answer is departments. Apply this change to your running org —
+
 ```
 New: Engineering Lead → spawning
 New: Backend Developer 1 → spawning
@@ -104,7 +100,7 @@ Modified: Writer → removed (was replaced by Content structure)
 
 ### Reading the New Structure
 
-domain: engineering and go to the Developer. No explicit routing rules needed. Three agents is fine for a personal project. But when you have more than ~5 agents, flat structures get messy. The COO ends up managing too many direct reports, and tasks take too long to route. The answer is departments. Apply this change to your running org — no restart needed: Your org just grew from 3 to 8 agents, live, without restarting. The COO is still running. Any in-flight tasks continue uninterrupted.
+no restart needed: Your org just grew from 3 to 8 agents, live, without restarting. The COO is still running. Any in-flight tasks continue uninterrupted.
 
 Departments are H3 headings without role keywords — "Engineering" isn't a role keyword, so it's read as a container for the roles nested beneath it. The prose becomes context all agents in the department share.
 
@@ -140,13 +136,13 @@ Preset
 preset: startup
 ```
 
-### What Culture Actually Changes
-
-Best for ["startup", "Small teams, fast iteration, direct communication"], ["enterprise", "Large orgs, batched escalations, formal process"], ["agency", "Client-facing work, high visibility, deadline-driven"], ["research", "Long-running exploratory tasks, high autonomy"], ["remote-async", "Distributed teams, high trust, async-first"], ].map(([preset, desc]) => ( You can use a preset and override individual settings: Culture maps directly to the Agent Communication Protocol (ACP) — the message-passing system that governs how agents talk to each other. When you set
+Best for ["startup", "Small teams, fast iteration, direct communication"], ["enterprise", "Large orgs, batched escalations, formal process"], ["agency", "Client-facing work, high visibility, deadline-driven"], ["research", "Long-running exploratory tasks, high autonomy"], ["remote-async", "Distributed teams, high trust, async-first"], ].map(([preset, desc]) => ( You can use a preset and override individual settings: What Culture Actually Changes Culture maps directly to the Agent Communication Protocol (ACP) — the message-passing system that governs how agents talk to each other. When you set
 
 Ack required: yes, every delegation automatically triggers an acknowledgment. When you set
 
 ## Part 4 — Adding Identity
+
+Escalation: immediate, a blocked agent escalates in the same tick it gets stuck. These aren't suggestions — they're ACP configuration. The protocol enforces them. Identity is ambient context for the entire org. Every agent has access to it. It answers:
 
 ```
 ## Identity
@@ -189,7 +185,7 @@ If no domain match is found, the task goes to the COO for manual delegation.
 - **Off-hours:** queue tasks, don't process
 ```
 
-Escalation: immediate, a blocked agent escalates in the same tick it gets stuck. These aren't suggestions — they're ACP configuration. The protocol enforces them. Identity is ambient context for the entire org. Every agent has access to it. It answers: why do we exist, what are we building, what do we value? Identity influences agent behavior in subtle but meaningful ways. A marketing agent writing copy knows they're writing for a developer tools audience. An engineering agent prioritizing work knows that "document everything" is a value, not a suggestion. Write Identity like you'd write the first page of a company handbook — terse, clear, honest about who you are. Policies are guardrails. They're not suggestions — OpenSpawn enforces them.
+why do we exist, what are we building, what do we value? Identity influences agent behavior in subtle but meaningful ways. A marketing agent writing copy knows they're writing for a developer tools audience. An engineering agent prioritizing work knows that "document everything" is a value, not a suggestion. Write Identity like you'd write the first page of a company handbook — terse, clear, honest about who you are. Policies are guardrails. They're not suggestions — OpenSpawn enforces them.
 
 Budget limits are per-agent, not per-org. If Backend Developer 1 hits 500 credits, it pauses. Backend Developer 2 keeps running. Override per-agent by adding
 
@@ -316,13 +312,11 @@ npx openspawn deploy ORG.md
 # Or apply to a running org
 ```
 
-## What Happens When You Run This
-
 ```
 -H 'Content-Type: application/json' \\
 ```
 
-Here's everything together: Open the dashboard at http://localhost:3333/app/ . You'll see a COO at the top, Engineering and Content departments branching down, with leads and workers beneath each. Send a task:
+Here's everything together: What Happens When You Run This Open the dashboard at href="http://localhost:3333/app/" target="_blank" rel="noopener" http://localhost:3333/app/ . You'll see a COO at the top, Engineering and Content departments branching down, with leads and workers beneath each. Send a task:
 
 ## Iterating on Your Org
 
@@ -339,8 +333,6 @@ Builds and maintains APIs, databases, and server infrastructure.
 - **Model:** ollama/qwen2.5
 - **Domain:** backend
 ```
-
-## A Real-World Example — Marketing Agency
 
 ```
 ## Identity
@@ -429,9 +421,7 @@ All client-deliverable tasks must complete within:
 3. If reassignment needed, Account Director is looped in
 ```
 
-## Tips for Writing Good ORG.md Files
-
-Engineering is always at capacity? Add a backend developer: This org runs 11 agents across 3 departments. Every brief that comes in gets strategy, creative, and analytics work done in sequence. The SLA policy ensures nothing sits idle.
+Engineering is always at capacity? Add a backend developer: This org runs 11 agents across 3 departments. Every brief that comes in gets strategy, creative, and analytics work done in sequence. The SLA policy ensures nothing sits idle. Tips for Writing Good ORG.md Files
 
 Be specific in role descriptions. "Does engineering work" is a bad description. "Builds and maintains the REST API, database schemas, and authentication layer" is a good one. Specific descriptions lead to accurate task routing.
 
@@ -445,12 +435,10 @@ ack required: yes and
 
 escalation: immediate from the start.
 
-Commit your ORG.md to git. Every change to your org is a git commit. git log ORG.md becomes your org history.
+Commit your ORG.md to git. Every change to your org is a git commit. git log ORG.md becomes your org history. git revert undoes a structural decision that didn't work out.
 
-git revert undoes a structural decision that didn't work out.
+Export regularly. When leads spawn new agents dynamically, the running org diverges from your file. Run
 
 ## What to Read Next
 
-Export regularly. When leads spawn new agents dynamically, the running org diverges from your file. Run npx openspawn export > ORG.md to sync them. title: "ORG.md Tutorial", desc: "Revisit any section: departments, culture, policies, playbooks", to: "/docs/tutorials/your-first-org-md", title: "Dashboard Walkthrough", desc: "Health scores, trust scores, escalation chains", to: "/docs/features/dashboard", title: "A2A Protocol", desc: "External agent discovery and task routing", to: "/docs/protocols/a2a", title: "OpenClaw Integration", desc: "Already running OpenClaw agents? Add org structure", to: "/docs/openclaw", ].map((item) => ( key={item.to} to={item.to} Your ORG.md is a living document. The best ones aren't designed upfront — they're evolved over dozens of
-
-npx openspawn apply calls, each one a lesson learned about how your agents actually work.
+npx openspawn export > ORG.md to sync them. title: "ORG.md Tutorial", desc: "Revisit any section: departments, culture, policies, playbooks", to: "/docs/tutorials/your-first-org-md", title: "Dashboard Walkthrough", desc: "Health scores, trust scores, escalation chains", to: "/docs/features/dashboard", title: "A2A Protocol", desc: "External agent discovery and task routing", to: "/docs/protocols/a2a", title: "OpenClaw Integration", desc: "Already running OpenClaw agents? Add org structure", to: "/docs/openclaw", ].map((item) => ( key={item.to} to={item.to} Your ORG.md is a living document. The best ones aren't designed upfront — they're evolved over dozens of npx openspawn apply calls, each one a lesson learned about how your agents actually work.

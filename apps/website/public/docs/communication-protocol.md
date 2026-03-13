@@ -1,13 +1,23 @@
 ---
 source: https://openspawn.ai/docs/communication-protocol
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
-Communication Protocol v1 Every message costs money. This protocol eliminates the 40–60% of tokens agents waste on coordination overhead. The Problem In multi-agent organizations, agents default to human-like conversation patterns: acknowledgments, echoing, courtesy, clarification loops. This wastes 40–60% of total token spend on zero-value coordination overhead. Core Principles 1. Silence = Success If an agent receives a task and can do it, it does it—silently. No acknowledgment. No "on it!" The absence of a message is the confirmation.
+# Communication Protocol v1
 
-Q: How do I know an agent received my task? A: You don't need to. Silence means working.
+## The Problem
 
-ESCALATION means something's wrong. 2. Files Over Chat Agents share status by writing to shared workspace files, not by chatting about it. This creates a persistent, scannable record instead of a transient conversation.
+Every message costs money. This protocol eliminates the 40–60% of tokens agents waste on coordination overhead. In multi-agent organizations, agents default to human-like conversation patterns: acknowledgments, echoing, courtesy, clarification loops. This wastes
+
+## Core Principles
+
+### 1. Silence = Success
+
+40–60% of total token spend on zero-value coordination overhead. If an agent receives a task and can do it, it does it—silently. No acknowledgment. No "on it!" The absence of a message is the confirmation.
+
+### 2. Files Over Chat
+
+Q: How do I know an agent received my task? A: You don't need to. Silence means working. ESCALATION means something's wrong. Agents share status by writing to shared workspace files, not by chatting about it. This creates a persistent, scannable record instead of a transient conversation.
 
 Instead of…
 
@@ -29,15 +39,19 @@ HANDOFF.md
 
 REVIEW.md
 
-Q: How should agents share status? A: Write to shared workspace files. Never narrate status in chat. 3. Deterministic Routing
+### 3. Deterministic Routing
+
+Q: How should agents share status? A: Write to shared workspace files. Never narrate status in chat.
 
 ORG.md defines who handles what. No LLM decides routing at runtime. Tasks go to the agent whose role matches the work.
 
-Q: How does a message reach the right agent? A: ORG.md defines who handles what. No LLM decides routing at runtime. 4. Mention-Only Activation In group channels, agents respond only when explicitly mentioned. No volunteering. No "I can help with that!"
+### 4. Mention-Only Activation
+
+## Message Types
 
 ### TASK
 
-Q: When should an agent respond in a group channel? A: Only when explicitly mentioned. Never volunteer. Message Types Exactly 4 message types. No ACK type. No CHAT type. If it doesn't fit one of these, it probably shouldn't be sent. Work assignment from lead to worker. Must include
+Q: How does a message reach the right agent? A: ORG.md defines who handles what. No LLM decides routing at runtime. In group channels, agents respond only when explicitly mentioned. No volunteering. No "I can help with that!" Q: When should an agent respond in a group channel? A: Only when explicitly mentioned. Never volunteer. Exactly 4 message types. No ACK type. No CHAT type. If it doesn't fit one of these, it probably shouldn't be sent. Work assignment from lead to worker. Must include
 
 assignee,
 
@@ -84,11 +98,7 @@ what's needed. Goes to nearest authority. If unresolved in 2 turns, escalate up.
 
 ### DECISION
 
-Q: What counts as an escalation? A: Anything preventing task completion. NOT "just checking in." Resolution from lead. Must be
-
-definitive and must
-
-unblock. Recipient does
+Q: What counts as an escalation? A: Anything preventing task completion. NOT "just checking in." Resolution from lead. Must be definitive and must unblock. Recipient does
 
 ```
 @frontend-dev
@@ -97,7 +107,9 @@ Use mock data from /fixtures/preferences.json
 Proceed with settings page
 ```
 
-NOT acknowledge. The 3-Turn Rule If two agents need to discuss something, they get
+## The 3-Turn Rule
+
+NOT acknowledge. If two agents need to discuss something, they get
 
 ```
 Turn 1: Agent A states position / question
@@ -109,6 +121,10 @@ If unresolved after Turn 3 → ESCALATION to lead
 3 turns max:
 
 Q: What if two agents need to discuss? A: 3 turns max. If unresolved, escalate.
+
+## Decision Trees
+
+### "Should I send a message?"
 
 ```
 START: I have something to communicate
@@ -148,7 +164,9 @@ RECEIVED a message
 └─ Something else → Ignore.
 ```
 
-Q: What if 3 turns isn't enough? A: Write context to a shared file, then escalate with a pointer to that file. Decision Trees "Should I send a message?" "Someone sent me a message — should I respond?" Shared Files Reference
+## Shared Files Reference
+
+Q: What if 3 turns isn't enough? A: Write context to a shared file, then escalate with a pointer to that file. "Someone sent me a message — should I respond?"
 
 Purpose
 
@@ -197,6 +215,10 @@ Output: /apps/website/app/routes/settings.tsx
 Notes: All validation passing, ready for review
 ```
 
+### ❌ The Echo Chamber
+
+Q: What format? A: Whatever is most scannable. Timestamped entries work well: Anti-Patterns (What NOT to Do) Cost:
+
 ```
 Lead: "Build the settings page"
 Worker: "Got it, I'll build the settings page"
@@ -212,6 +234,8 @@ Deliverable: /apps/website/app/routes/settings.tsx
 // Worker does the work silently. 1 message total.
 ```
 
+### ❌ The Courtesy Loop
+
 ```
 Worker: "Thanks for the clarification!"
 Lead: "No problem, happy to help!"
@@ -222,6 +246,8 @@ Lead: "No problem, happy to help!"
 // Worker receives DECISION, acts on it silently.
 // No reply needed.
 ```
+
+### ❌ The Democracy Loop
 
 ```
 Agent A: "Who should handle the API integration?"
@@ -238,9 +264,17 @@ Lead: @agent-b TASK: Build API integration
 // 1 message. Deterministic routing.
 ```
 
+## Implementation Checklist
+
+5 messages, 0 work done, ~2,000 tokens wasted Cost: 2 wasted messages Cost: 5 messages for a routing decision Add protocol rules to SOUL.md — every agent must internalize the 4 principles Use role-specific AGENTS.md templates — include message type examples Create shared files — PLAN.md,
+
+RESULT.md,
+
+HANDOFF.md,
+
 ## FAQ
 
-Q: What format? A: Whatever is most scannable. Timestamped entries work well: Anti-Patterns (What NOT to Do) ❌ The Echo Chamber Cost: 5 messages, 0 work done, ~2,000 tokens wasted ❌ The Courtesy Loop Cost: 2 wasted messages ❌ The Democracy Loop Cost: 5 messages for a routing decision Implementation Checklist Add protocol rules to SOUL.md — every agent must internalize the 4 principles Use role-specific AGENTS.md templates — include message type examples Create shared files — PLAN.md, RESULT.md, HANDOFF.md, REVIEW.md Define routing in ORG.md — who owns what, who reports to whom Monitor for violations — watch for ACK messages, courtesy loops, echo chambers
+REVIEW.md Define routing in ORG.md — who owns what, who reports to whom
 
 Q: Isn't this rude? A: Politeness is a human social need. Agents don't have feelings. Every "thanks!" costs tokens and delivers zero value.
 

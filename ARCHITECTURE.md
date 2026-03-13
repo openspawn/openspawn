@@ -11,7 +11,7 @@ apps/
   website/         openspawn.ai marketing site
   platform/        openspawn.ai landing page server
   api/             FastAPI backend (REST + OpenAPI + MCP) — Python, managed by uv
-  docs/            Astro Starlight documentation (docs.openspawn.ai)
+  (docs consolidated into website app — content in website/content/docs/)
   sandbox-cli/     CLI entry point for sandbox
 
 libs/
@@ -53,12 +53,12 @@ packages/
 
 All traffic routes through Cloudflare (DNS + CDN) to a single VPS running Caddy for HTTPS termination.
 
-| Domain            | Serves                              |
-| ----------------- | ----------------------------------- |
-| bikinibottom.ai   | Live demo (sandbox + dashboard)     |
-| openspawn.ai      | Website + landing page              |
-| openspawn.ai/api/ | FastAPI backend (REST + OpenAPI)    |
-| docs.openspawn.ai | Astro/Starlight docs (GitHub Pages) |
+| Domain            | Serves                           |
+| ----------------- | -------------------------------- |
+| bikinibottom.ai   | Live demo (sandbox + dashboard)  |
+| openspawn.ai      | Website + landing page           |
+| openspawn.ai/api/ | FastAPI backend (REST + OpenAPI) |
+| docs.openspawn.ai | Redirects to openspawn.ai/docs/  |
 
 The `app` container runs `tools/sandbox/src/index.ts`, which serves both the REST/SSE API and three pre-built static apps (`demo`, `team`, `website`) from disk.
 
@@ -69,7 +69,7 @@ The `app` container runs `tools/sandbox/src/index.ts`, which serves both the RES
 | `ci.yml`              | All PRs      | Build, test, lint, Python API checks                 |
 | `deploy.yml`          | Push to main | Docker build + deploy to VPS (bikinibottom.ai + API) |
 | `deploy-platform.yml` | Push to main | Docker build + deploy platform (openspawn.ai)        |
-| `deploy-docs.yml`     | Push to main | Build + deploy Starlight docs (docs.openspawn.ai)    |
+| (docs deploy removed) | —            | Docs now served by website app at /docs/             |
 
 ### Docker Build (Dockerfile)
 
@@ -117,15 +117,16 @@ Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQ
 
 Auth enforcement is configurable via `AUTH_MODE` env var (or `openspawn.config.json`):
 
-| Mode   | Default for           | Dashboard | API endpoints                          |
-| ------ | --------------------- | --------- | -------------------------------------- |
-| `none` | `openspawn start`     | Open      | All requests pass (synthetic owner)    |
-| `local`| opt-in                | Password  | Bearer token from login                |
-| `full` | `--deployed`          | JWT login | JWT + HMAC agent auth + API keys       |
+| Mode    | Default for       | Dashboard | API endpoints                       |
+| ------- | ----------------- | --------- | ----------------------------------- |
+| `none`  | `openspawn start` | Open      | All requests pass (synthetic owner) |
+| `local` | opt-in            | Password  | Bearer token from login             |
+| `full`  | `--deployed`      | JWT login | JWT + HMAC agent auth + API keys    |
 
-In all modes, HMAC agent auth and `osp_` API keys still work when credentials are provided. The mode only controls what happens when *no* credentials are sent.
+In all modes, HMAC agent auth and `osp_` API keys still work when credentials are provided. The mode only controls what happens when _no_ credentials are sent.
 
 Auth is enforced by two FastAPI dependencies:
+
 - `require_auth()` — used by all resource routers (agents, tasks, memory, etc.)
 - `get_auth_context()` — used by `/auth/*` endpoints (login flow)
 

@@ -311,7 +311,6 @@ export function PluginsPage() {
           </p>
         </div>
       </section>
-
     </>
   );
 }

@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/getting-started
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # Getting Started with OpenSpawn
@@ -48,13 +48,13 @@ Write code, run tests, build APIs.
 
 ORG.md. Let's look at what ORG.md contains by default:
 
-Take a moment to read this. A few things to notice:
-
-Prose descriptions become system prompt context. "Triages technical work. Breaks projects into tasks." isn't just a comment — it's injected into the Engineering Lead's context every time it runs.
+Take a moment to read this. A few things to notice: Prose descriptions become system prompt context. "Triages technical work. Breaks projects into tasks." isn't just a comment — it's injected into the Engineering Lead's context every time it runs.
 
 Heading levels define the hierarchy. H3 (
 
-###) is a department or top-level role. H4 (####) is a team member that reports to the H3 above it.
+###) is a department or top-level role. H4 (
+
+####) is a team member that reports to the H3 above
 
 Count: 2 spawns multiple agents with the same role — auto-numbered as "Backend Worker 1", "Backend Worker 2".
 
@@ -73,15 +73,13 @@ Spawning agents...
 Server running at http://localhost:3333
 ```
 
-preset: startup is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow hierarchy. Open http://localhost:3333/app/ — your dashboard is live.
+preset: startup is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow hierarchy. Open href="http://localhost:3333/app/" target="_blank" rel="noopener" http://localhost:3333/app/ — your dashboard is live.
 
 What you're seeing:
 
 Network graph: Your org hierarchy visualized. The COO is at the top.
 
 Agent cards: Each agent with their level, domain, model, and current status.
-
-## Step 3 — Send Your First Task
 
 ```
 -H 'Content-Type: application/json' \\
@@ -91,9 +89,21 @@ Agent cards: Each agent with their level, domain, model, and current status.
 "parts": [{ "kind": "text", "text": "Build a REST API for user management with CRUD endpoints" }]
 ```
 
-Task timeline: Empty for now — we'll fix that next.
+Task timeline: Empty for now — we'll fix that next. Step 3 — Send Your First Task You'll get back a response with a taskId. Watch what happens in the dashboard:
 
-You'll get back a response with a taskId. Watch what happens in the dashboard: This entire chain — delegation, acknowledgment, progress, completion — follows the
+Task created — appears in the task timeline as "submitted"
+
+COO wakes — acknowledges the task (👍 appears on the task card)
+
+COO delegates — routes to the Engineering Lead
+
+Engineering Lead — receives delegation, breaks it down, assigns sub-tasks to workers
+
+Workers start — status changes to "working", progress updates appear
+
+Workers complete — ✅ + summary flows back up the chain
+
+COO marks done — final ✅ and summary back to This entire chain — delegation, acknowledgment, progress, completion — follows the
 
 Agent Communication Protocol (ACP). ACP is what keeps agents from silently failing or stepping on each other.
 
@@ -105,9 +115,7 @@ Agent Communication Protocol (ACP). ACP is what keeps agents from silently faili
 "parts": [{ "kind": "text", "text": "Deploy the API to production with zero downtime and handle all edge cases" }]
 ```
 
-## Step 4 — Understand What You're Looking At
-
-To trigger a visible escalation intentionally: A sufficiently ambiguous task will trigger an escalation chain. Watch the task status change to "BLOCKED" in the dashboard.
+To trigger a visible escalation intentionally: A sufficiently ambiguous task will trigger an escalation chain. Watch the task status change to "BLOCKED" in the dashboard. Step 4 — Understand What You're Looking At
 
 The dashboard is where you diagnose your org:
 
@@ -130,8 +138,6 @@ Write code, run tests, build APIs.
 +- **Model:** ollama/qwen2.5
 ```
 
-## Step 6 — See It at Scale (Optional)
-
 ```
 -H 'Content-Type: application/json' \\
 -d '{
@@ -139,8 +145,6 @@ Write code, run tests, build APIs.
 "role": "user",
 "parts": [{ "kind": "text", "text": "Write a brief analysis of the tradeoffs between microservices and monoliths for a B2B SaaS product" }]
 ```
-
-## Step 7 — Expose Your Org via A2A
 
 ```
 "name": "My Org",
@@ -153,8 +157,6 @@ Write code, run tests, build APIs.
 ]
 ```
 
-## Step 8 — Use as an MCP Tool Server
-
 ```
 "mcpServers": {
 "my-org": {
@@ -162,9 +164,7 @@ Write code, run tests, build APIs.
 "transport": "streamable-http"
 ```
 
-Health score (top of dashboard) Open ORG.md and add a new agent: Now apply the change — without restarting: OpenSpawn automatically publishes an Agent Card at the standard A2A discovery endpoint: Any A2A-compatible agent — from any framework — can discover your org and send it tasks. Each individual agent also has their own Agent Card at If you're using Claude Desktop, Cursor, or any MCP-compatible client, add your org as a tool server: This exposes 7 tools:
-
-delegate_task,
+Health score (top of dashboard) 0–100 composite: ack latency, escalation rate, completion rate, budget, idle rate Open ORG.md and add a new agent: Now apply the change — without restarting: Step 7 — Expose Your Org via A2A OpenSpawn automatically publishes an Agent Card at the standard A2A discovery endpoint: Any A2A-compatible agent — from any framework — can discover your org and send it tasks. Each individual agent also has their own Agent Card at Step 8 — Use as an MCP Tool Server If you're using Claude Desktop, Cursor, or any MCP-compatible client, add your org as a tool server: This exposes 7 tools: delegate_task,
 
 list_agents,
 
@@ -176,9 +176,7 @@ get_task,
 
 send_message,
 
-## What's Actually Happening Under the Hood
-
-get_org_stats.
+get_org_stats. What's Actually Happening Under the Hood
 
 Tick-based execution: The server runs a loop. On each "tick", every agent checks its inbox, decides what to do (work, delegate, escalate, complete, or idle), and acts. Cheap local models poll every tick because they're nearly free. Expensive models can be configured to wake only when they have actual work.
 

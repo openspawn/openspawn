@@ -1,7 +1,9 @@
 ---
 source: https://openspawn.ai/docs/agent-quickstart
-generated: 2026-03-03
+generated: 2026-03-13
 ---
+
+# Agent Quickstart
 
 ```
 openspawn init my-org --template=assistant-team --yes
@@ -10,7 +12,7 @@ openspawn start
 openspawn status
 ```
 
-Agent Quickstart You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file. Three commands to a running org That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — with OpenClaw gateway configs ready to apply.
+You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file. Three commands to a running org That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — with OpenClaw gateway configs ready to apply.
 
 Q: Do I need API keys? A: No. Demo/simulation mode works out of the box with zero configuration.
 
@@ -20,19 +22,21 @@ ORG.md (your org definition) and
 
 openclaw-agents.json.
 
-start read the agents config and generated openclaw-patch.json with OpenClaw gateway entries.
+start read the agents config and generated
 
-status displayed a table of all agents with their name, level, model, workspace, and reports-to. Q: What is openclaw-patch.json? A: A ready-to-apply patch for your OpenClaw gateway's
+openclaw-patch.json with OpenClaw gateway entries.
+
+status displayed a table of all agents with their name, level, model, workspace, and reports-to.
+
+Q: What is openclaw-patch.json? A: A ready-to-apply patch for your OpenClaw gateway's
 
 agents.list. Each entry has:
 
-model (opus for L7+, sonnet for L6-), workspace,
+id, model (opus for L7+, sonnet for L6-), workspace,
 
-tools.profile: "full". Manager agents (L7+ with direct reports) also get
+tools.profile: "full". Manager agents (L7+ with direct reports) also get subagents.allowAgents. The highest-level agent gets default: true.
 
-subagents.allowAgents. The highest-level agent gets
-
-default: true. Q: How do I apply the patch to my gateway? A: Copy the entries from
+## Pick a template
 
 ```
 # Personal AI team (chief of staff + specialists)
@@ -45,6 +49,8 @@ openspawn init my-org --template=dev-shop
 openspawn init my-org --template=research-lab
 ```
 
+Q: How do I apply the patch to my gateway? A: Copy the entries from openclaw-patch.json into your OpenClaw agents.list configuration, then restart the gateway. Four templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize.
+
 ```
 What's your primary output?
 ├── Code/software → dev-shop
@@ -53,7 +59,13 @@ What's your primary output?
 └── Mix of everything → assistant-team
 ```
 
-openclaw-patch.json into your OpenClaw agents.list configuration, then restart the gateway. Pick a template Four templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize. Q: Which template should I use? Q: Can I combine templates? A: Yes. Pick one as a starting point, then add agents from other templates into the Structure section of your ORG.md. Q: Can I create agents not in any template? A: Absolutely. Templates are starting points. Add any agent to the
+Q: Which template should I use?
+
+Q: Can I combine templates? A: Yes. Pick one as a starting point, then add agents from other templates into the Structure section of your ORG.md.
+
+Q: Can I create agents not in any template? A: Absolutely. Templates are starting points. Add any agent to the
+
+## Understanding ORG.md
 
 ```
 # My Organization
@@ -79,6 +91,8 @@ refill: daily
 - Escalate security issues immediately
 ```
 
+## Structure section with a name, level, domain, and reporting line. Your entire org lives in one file. Five sections, all optional except Structure.
+
 ```
 # My Org
 ## Structure
@@ -87,13 +101,11 @@ refill: daily
 - Domain: all tasks
 ```
 
-## Structure section with a name, level, domain, and reporting line. Understanding ORG.md Your entire org lives in one file. Five sections, all optional except Structure. Q: What's the minimum viable ORG.md?
+Q: What's the minimum viable ORG.md?
 
 Q: What do levels mean? A: L1–L5: Workers. L6: Can review. L7–L9: Can create tasks/spawn agents. L10: Executive.
 
-```
-openspawn validate ORG.md
-```
+## Validate your org
 
 ```
 ✔ Structure: 6 agents found
@@ -104,13 +116,21 @@ openspawn validate ORG.md
 Result: ORG.md is valid ✅
 ```
 
-Q: What's "Reports to"? A: Defines the escalation chain. When an agent is blocked, it escalates to whoever it reports to. Validate your org Q: If I see "validation failed", what do I do? A: Common fixes: "Agent X reports to unknown agent" — check the spelling of the Reports-to name
+Q: What's "Reports to"? A: Defines the escalation chain. When an agent is blocked, it escalates to whoever it reports to.
+
+Q: If I see "validation failed", what do I do? A: Common fixes:
+
+"Agent X reports to unknown agent" — check the spelling of the Reports-to name
 
 "Circular hierarchy" — make sure no agent chain loops back on itself
 
-"Missing Structure section" — add a ## Structure heading
+"Missing Structure section" — add a
 
-"Budget exceeds pool" — increase the pool or reduce agent budgets Culture presets Culture presets configure escalation speed, update frequency, and autonomy defaults.
+## Structure heading
+
+## Culture presets
+
+"Budget exceeds pool" — increase the pool or reduce agent budgets Culture presets configure escalation speed, update frequency, and autonomy defaults.
 
 Preset
 
@@ -166,12 +186,16 @@ Distributed async teams
 
 Patient (batch escalations)
 
+Daily digest
+
 ```
 ## Culture
 preset: startup
 escalation: relaxed # override just this one
 values: [speed, autonomy]
 ```
+
+## Interacting via MCP
 
 ```
 # Delegate a task
@@ -195,11 +219,15 @@ voters: ["engineer", "security-auditor", "ceo"]
 })
 ```
 
-Daily digest Q: Can I override specific settings in a preset? A: Yes. Set the preset, then override individual values: Interacting via MCP OpenSpawn exposes an MCP (Model Context Protocol) server for programmatic interaction.
+Q: Can I override specific settings in a preset? A: Yes. Set the preset, then override individual values: OpenSpawn exposes an MCP (Model Context Protocol) server for programmatic interaction.
 
-Q: How do I authenticate? A: HMAC authentication with
+Q: How do I authenticate? A: HMAC authentication with AGENT_ID and
 
-AGENT_ID and
+AGENT_SECRET environment variables.
+
+## Common workflows
+
+### Delegate a task
 
 ```
 # 1. Choose the right agent based on domain
@@ -213,6 +241,8 @@ openspawn status --agent engineer # check progress
 openspawn logs --agent engineer --tail # stream logs
 ```
 
+### Handle an escalation
+
 ```
 # 1. An agent escalates to you
 # → You receive: "engineer is blocked: needs DB credentials"
@@ -224,6 +254,8 @@ openspawn delegate --to security-auditor \\
 openspawn notify --agent engineer \\
 --message "Security auditor is provisioning your credentials"
 ```
+
+### Request consensus
 
 ```
 # 1. Pose a question to multiple agents
@@ -240,7 +272,9 @@ openspawn consensus --results
 # → Decision: unanimous yes
 ```
 
-AGENT_SECRET environment variables. Q: What's the full tool list? A: See docs/llms.txt Common workflows Delegate a task Handle an escalation Request consensus Error recovery
+## Error recovery
+
+Q: What's the full tool list? A: See docs/llms.txt
 
 You see
 
@@ -254,7 +288,9 @@ ERR_INVALID_STRUCTURE
 
 openspawn validate ORG.md — fix the reported issues
 
-ERR_CIRCULAR_HIERARCHY Check "Reports to" chains for loops
+ERR_CIRCULAR_HIERARCHY
+
+Check "Reports to" chains for loops
 
 ERR_BUDGET_EXCEEDED
 
@@ -266,4 +302,6 @@ openspawn status — verify agent name spelling
 
 ERR_GATEWAY_UNREACHABLE
 
-openclaw gateway status — ensure gateway is running Next steps to="/docs/templates" Customize ORG.md → Full reference for every section, field, and option in your org definition. to="/docs/comparison" Connect real models → Configure API keys and model providers for production deployments. to="/getting-started" Full CLI reference → Every command, flag, and option for the OpenSpawn CLI. to="/app/live" See live demo → Watch a multi-agent org handle tasks, escalations, and consensus in real time.
+## Next steps
+
+openclaw gateway status — ensure gateway is running to="/docs/templates" Customize ORG.md → Full reference for every section, field, and option in your org definition. to="/docs/comparison" Connect real models → Configure API keys and model providers for production deployments. to="/getting-started" Full CLI reference → Every command, flag, and option for the OpenSpawn CLI. to="/app/live" See live demo → Watch a multi-agent org handle tasks, escalations, and consensus in real time.

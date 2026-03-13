@@ -12,6 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["vite/client"]
   },
-  "include": ["app/**/*"],
+  "include": ["app/**/*", "content/**/*.mdx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

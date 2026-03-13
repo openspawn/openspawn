@@ -1,9 +1,13 @@
 ---
 source: https://openspawn.ai/docs/templates
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
-Templates Guide OpenSpawn ships four org templates. Each produces a complete, ready-to-run
+# Templates Guide
+
+OpenSpawn ships four org templates. Each produces a complete, ready-to-run
+
+## Which template should I use?
 
 ```
 What's your primary output?
@@ -14,13 +18,15 @@ What's your primary output?
 └── None of these fit → Start with assistant-team, then customize
 ```
 
-ORG.md with roles, hierarchy, culture, policies, and playbooks. Which template should I use?
+ORG.md with roles, hierarchy, culture, policies, and playbooks.
 
 Q: Can I switch templates later? A: Yes, re-run init or edit
 
 ORG.md directly.
 
-Q: Can I combine roles from multiple templates? A: Yes, copy agent definitions between Structure sections. Comparison table
+## Comparison table
+
+Q: Can I combine roles from multiple templates? A: Yes, copy agent definitions between Structure sections.
 
 assistant-team
 
@@ -100,13 +106,15 @@ Medium
 
 Medium
 
+## assistant-team
+
 ```
 openspawn init my-org --template=assistant-team
 ```
 
 ### Roles
 
-High assistant-team Personal AI team for a solo operator. Chief of staff coordinates specialists.
+High Personal AI team for a solo operator. Chief of staff coordinates specialists.
 
 Domain
 
@@ -148,9 +156,9 @@ escalation: immediate
 autonomy: medium
 ```
 
-When to use: solo person needing a full team, work spans multiple domains, want a single coordinator.
+When to use: solo person needing a full team, work spans multiple domains, want a single coordinator. Q: What if I don't need security or quality roles? A: Delete them from the Structure section, then validate with
 
-Q: What if I don't need security or quality roles? A: Delete them from the Structure section, then validate with
+## content-agency
 
 ```
 openspawn init my-org --template=content-agency
@@ -158,7 +166,7 @@ openspawn init my-org --template=content-agency
 
 ### Roles
 
-openspawn validate. content-agency Content production pipeline. Research feeds strategy, strategy directs writing and design.
+openspawn validate. Content production pipeline. Research feeds strategy, strategy directs writing and design.
 
 Domain
 
@@ -200,7 +208,7 @@ Director
 
 When to use: primary output is content, want a clear pipeline, quality over speed.
 
-Q: What about SEO? A: Add an SEO agent under Strategist, L4, domain
+## dev-shop
 
 ```
 openspawn init my-org --template=dev-shop
@@ -208,7 +216,7 @@ openspawn init my-org --template=dev-shop
 
 ### Roles
 
-"SEO". dev-shop Software development team. Tech lead coordinates frontend, backend, QA.
+Q: What about SEO? A: Add an SEO agent under Strategist, L4, domain "SEO". Software development team. Tech lead coordinates frontend, backend, QA.
 
 Domain
 
@@ -228,7 +236,7 @@ DevOps
 
 Infrastructure
 
-Q: What about design? A: Add a Designer agent or combine with
+## research-lab
 
 ```
 openspawn init my-org --template=research-lab
@@ -236,7 +244,7 @@ openspawn init my-org --template=research-lab
 
 ### Roles
 
-assistant-team. research-lab Research and analysis team. High autonomy, delayed escalation.
+Q: What about design? A: Add a Designer agent or combine with assistant-team. Research and analysis team. High autonomy, delayed escalation.
 
 Domain
 
@@ -258,6 +266,8 @@ Synthesis
 
 When to use: exploratory or open-ended work, high autonomy needed, long-running tasks.
 
+## Customizing a template
+
 ### Add an agent
 
 ```
@@ -273,15 +283,13 @@ When to use: exploratory or open-ended work, high autonomy needed, long-running 
 
 ### Change culture
 
-Q: What's the exploration budget? A: Higher per-agent credit limit and delayed escalation allow deeper exploration. Customizing a template Delete the agent's line from the Structure section. Re-assign or remove any agents that reported to it. Run openspawn validate to confirm. Move agent lines to different indentation levels or under different parents. Validate after changes. Edit the preset value in the Culture section. Valid presets: agency,
-
-startup,
+Q: What's the exploration budget? A: Higher per-agent credit limit and delayed escalation allow deeper exploration. Delete the agent's line from the Structure section. Re-assign or remove any agents that reported to it. Run openspawn validate to confirm. Move agent lines to different indentation levels or under different parents. Validate after changes. Edit the preset value in the Culture section. Valid presets: agency,
 
 ### Add a playbook
 
-research. Add a new section under Playbooks in your
+## Error recovery
 
-ORG.md with step-by-step instructions for recurring workflows. Error recovery
+startup, research. Add a new section under Playbooks in your ORG.md with step-by-step instructions for recurring workflows.
 
 Unknown template Use one of: assistant-team,
 
@@ -297,6 +305,4 @@ Check spelling of parent agent name in Structure
 
 Validation failed Run openspawn validate for detailed errors
 
-Circular reporting chain
-
-Check hierarchy for loops — agents cannot report to their own descendants
+Circular reporting chain Check hierarchy for loops — agents cannot report to their own descendants

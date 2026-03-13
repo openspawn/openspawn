@@ -73,6 +73,3 @@ apps/sandbox-cli/publish/*.cjs
 
 # Backup files
 *.bak
-
-# Astro build output
-apps/docs/.astro/

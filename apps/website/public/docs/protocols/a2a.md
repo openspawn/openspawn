@@ -1,13 +1,11 @@
 ---
 source: https://openspawn.ai/docs/protocols/a2a
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # A2A Protocol
 
 ## Agent Discovery
-
-OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming. 💡 Try it live: curl https://bikinibottom.ai/.well-known/agent.json
 
 ```
 "name": "OpenSpawn HQ",
@@ -24,8 +22,6 @@ OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, 
 
 ### Per-agent cards
 
-Every OpenSpawn instance publishes an Agent Card at /.well-known/agent.json:
-
 ## Sending Tasks
 
 ```
@@ -38,12 +34,10 @@ Every OpenSpawn instance publishes an Agent Card at /.well-known/agent.json:
 
 ## Streaming
 
-Each agent has its own card at /a2a/agents/:id/agent.json.
-
 ```
 -H 'Content-Type: application/json' \\
 ```
 
 ## Task Management
 
-Use /a2a/message/stream for SSE streaming of task progress and results. Query task status, cancel running tasks, and retrieve artifacts via the A2A task endpoints. See the A2A protocol specification for full details.
+OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming. 💡 Try it live: curl https://bikinibottom.ai/.well-known/agent.json Every OpenSpawn instance publishes an Agent Card at Each agent has its own card at Use /a2a/message/stream for SSE streaming of task progress and results. Query task status, cancel running tasks, and retrieve artifacts via the A2A task endpoints. See the href="https://a2a-protocol.org" target="_blank" rel="noopener" A2A protocol specification for full details.

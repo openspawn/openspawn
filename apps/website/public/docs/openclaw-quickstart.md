@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/openclaw-quickstart
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # OpenSpawn for OpenClaw Agents
@@ -47,16 +47,10 @@ You have agents. Give them an organization. 5-minute guide. 🦞 Already running
 
 ## Step by step
 
-### 1. Add ORG.md to each agent's workspace
-
 ```
 cp ORG.md ~/.openclaw/workspace-sandy/
 cp ORG.md ~/.openclaw/workspace-spongebob/
 ```
-
-### 2. Tell agents to read ORG.md
-
-ORG.md defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies.
 
 ```
 Read \`ORG.md\` at the start of every session. It defines:
@@ -66,10 +60,18 @@ Read \`ORG.md\` at the start of every session. It defines:
 - Communication protocols (escalation, delegation)
 ```
 
-### 3. Launch the OpenSpawn dashboard (optional)
-
 ## What changes for your agents
+
+ORG.md defines the structure that sits on top of your OpenClaw agents. Same agents, now with context about their role, team, hierarchy, and policies. 1. Add ORG.md to each agent's workspace 2. Tell agents to read ORG.md Add to each agent's AGENTS.md: 3. Launch the OpenSpawn dashboard (optional) The dashboard gives you real-time visibility into your agent org — network graph, task flow, credit usage, escalation chains.
+
+Sandy now knows she's L9 Science lead — she delegates research to Patrick, not SpongeBob
+
+SpongeBob knows to escalate architecture questions to Sandy, not try to solve them himself
+
+Squidward knows his role is code quality — he reviews, not builds
+
+All agents follow the same policies — peer review, escalation timelines, communication protocols
 
 ## Going further
 
-Add to each agent's AGENTS.md: The dashboard gives you real-time visibility into your agent org — network graph, task flow, credit usage, escalation chains. OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. OpenSpawn adds the organizational layer that makes multi-agent coordination actually work.
+Credits are tracked per-department, so you know which team is burning through budget Organization as Code — Deep dive into ORG.md Dashboard — Real-time agent visualization A2A Protocol — External agent discovery MCP Tools — Connect to other platforms href="https://openclaw.ai" target="_blank" rel="noopener noreferrer" OpenClaw Documentation — OpenClaw docs & guides OpenSpawn doesn't replace OpenClaw — it extends it. OpenClaw handles routing, isolation, and communication. OpenSpawn adds the organizational layer that makes multi-agent coordination actually work.

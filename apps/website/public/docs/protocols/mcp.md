@@ -1,9 +1,11 @@
 ---
 source: https://openspawn.ai/docs/protocols/mcp
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # MCP Tools
+
+OpenSpawn exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at
 
 ## Quick Start
 
@@ -17,7 +19,7 @@ generated: 2026-03-03
 
 ## Available Tools
 
-OpenSpawn exposes 7 tools via the Model Context Protocol using Streamable HTTP transport at POST /mcp.
+POST /mcp.
 
 Description
 

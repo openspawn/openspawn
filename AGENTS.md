@@ -19,14 +19,14 @@ apps/
   dashboard/       -> User-facing dashboard (openspawn.ai)
   demo/            -> React dashboard (bikinibottom.ai)
   team/            -> Internal team dashboard
-  website/         -> openspawn.ai marketing site
+  website/         -> openspawn.ai marketing site + docs (MDX)
   platform/        -> openspawn.ai landing page
   api/             -> FastAPI backend (REST + OpenAPI + MCP) — Python, uv
-  docs/            -> Astro Starlight documentation
   sandbox-cli/     -> CLI entry point for sandbox
 libs/
   dashboard-data/  -> Shared hooks, auth, utilities
   dashboard-ui/    -> Shared React UI components
+  docs-ui/         -> Shared doc components (layout, callout, MDX, search)
   design-tokens/   -> Design system (colors, spacing, typography)
   database/        -> TypeORM entities
   demo-data/       -> Simulation engine, scenarios, fixtures
@@ -66,7 +66,7 @@ cd apps/api && uv run alembic upgrade head                # Database migrations
 - **Demo**: https://bikinibottom.ai
 - **API**: https://openspawn.ai/api/ | docs: https://openspawn.ai/api/docs
 - **Website**: https://openspawn.ai
-- **Docs**: https://docs.openspawn.ai
+- **Docs**: https://openspawn.ai/docs/ (docs.openspawn.ai redirects here)
 - **Dev dashboard**: http://localhost:4200 | demo mode: http://localhost:4200/?demo=true
 - **Dev sandbox**: http://localhost:3333
 - **Dev API**: http://localhost:8000 | docs: http://localhost:8000/docs
@@ -111,7 +111,7 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Linting**: oxlint (type-aware) — fix all warnings, not just errors. Zero warnings policy.
 - **Components**: shadcn/ui patterns, Tailwind
 - **TypeScript**: No `any`, no `as` casts, no non-null assertions (`!`), prefer string enums. If a type doesn't fit, fix the type — don't cast around it. Use type guards, generics, or narrow via conditionals instead.
-- **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/docs/`) to reflect changes
+- **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/website/content/docs/`) to reflect changes
 
 ---
 
