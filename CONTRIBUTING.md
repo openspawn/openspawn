@@ -27,14 +27,14 @@ Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 
 **Reserved (DNS exists, not deployed):**
 
-| Domain                    | Intent                                         |
-| ------------------------- | ---------------------------------------------- |
-| **docs.openspawn.ai**     | Developer docs (Starlight app at `apps/docs/`) |
-| **hub.openspawn.ai**      | Agent/skill marketplace UI                     |
-| **logs.openspawn.ai**     | Centralized logging/observability dashboard    |
-| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)            |
-| **registry.openspawn.ai** | Agent/package registry API                     |
-| **status.openspawn.ai**   | Public status page                             |
+| Domain                    | Intent                                                      |
+| ------------------------- | ----------------------------------------------------------- |
+| **docs.openspawn.ai**     | Redirects to openspawn.ai/docs/ (consolidated into website) |
+| **hub.openspawn.ai**      | Agent/skill marketplace UI                                  |
+| **logs.openspawn.ai**     | Centralized logging/observability dashboard                 |
+| **mcp.openspawn.ai**      | Dedicated MCP endpoint (standalone)                         |
+| **registry.openspawn.ai** | Agent/package registry API                                  |
+| **status.openspawn.ai**   | Public status page                                          |
 
 ## How to Contribute
 

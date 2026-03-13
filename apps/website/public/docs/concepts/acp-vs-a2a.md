@@ -1,31 +1,39 @@
 ---
 source: https://openspawn.ai/docs/concepts/acp-vs-a2a
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # ACP vs A2A
 
 ## The Short Version
 
-## ACP: Communication Inside Your Org
+When to use OpenSpawn's Agent Communication Protocol versus Google's Agent-to-Agent protocol — and how they work together. Two protocols, two jobs. One for inside your org, one for talking to the outside world. If you've read about multi-agent systems, you've probably encountered Google's A2A (Agent-to-Agent) protocol. OpenSpawn uses a different protocol internally — ACP (Agent Communication Protocol). They're not competitors. They're designed for different problems and work together. ["Stands for", "Agent Communication Protocol", "Agent-to-Agent Protocol"], ["Created by", "OpenSpawn", "Google (open standard)"], ["Scope", "Inside your org", "Between orgs / external agents"], ["Trust model", "Known agents, shared state", "Zero-trust, opaque agents"], ["Analogy", "Slack (team chat)", "Email (cross-company)"], ["Best for", "Manager ↔ worker communication", "Your org ↔ external AI service"], ].map(([label, acp, a2a]) => ( ACP: Communication Inside Your Org ACP governs how agents within a single OpenSpawn org communicate with each other. It's built around a core insight:
 
 ### What ACP Defines
 
-When to use OpenSpawn's Agent Communication Protocol versus Google's Agent-to-Agent protocol — and how they work together. Two protocols, two jobs. One for inside your org, one for talking to the outside world. If you've read about multi-agent systems, you've probably encountered Google's A2A (Agent-to-Agent) protocol. OpenSpawn uses a different protocol internally — ACP (Agent Communication Protocol). They're not competitors. They're designed for different problems and work together. ["Stands for", "Agent Communication Protocol", "Agent-to-Agent Protocol"], ["Created by", "OpenSpawn", "Google (open standard)"], ["Scope", "Inside your org", "Between orgs / external agents"], ["Trust model", "Known agents, shared state", "Zero-trust, opaque agents"], ["Analogy", "Slack (team chat)", "Email (cross-company)"], ["Best for", "Manager ↔ worker communication", "Your org ↔ external AI service"], ].map(([label, acp, a2a]) => ( ACP governs how agents within a single OpenSpawn org communicate with each other. It's built around a core insight: agents in the same org already know each other, share context, and exist in a trust hierarchy. You shouldn't need to treat your own backend worker like an opaque third-party service. ACP specifies four message types, each with a specific purpose:
+agents in the same org already know each other, share context, and exist in a trust hierarchy. You shouldn't need to treat your own backend worker like an opaque third-party service. ACP specifies four message types, each with a specific purpose:
 
 1. Acknowledgment (ACK) Pull-based log entry written to the task as work progresses. The manager checks when they want to.
 
-2. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
+3. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
 
 ### Why This Matters
 
+4. Completion Task done signal with a brief summary. Manager can proceed with dependent work. Most multi-agent frameworks have no communication model at all — tasks go in, results come out, and the delegator just waits. ACP gives you:
+
+Visibility without noise — progress is pull-based; completions and escalations are push
+
+Automatic accountability — the 👍 ack confirms delivery instantly
+
+Organizational metrics — escalation rates, ack latency, completion rates emerge from the protocol
+
 ### What ACP Doesn't Do
 
-## A2A: Communication Between Orgs
+Debugging information — every decision an agent makes is logged with context
 
 ### What A2A Defines
 
-4. Completion Task done signal with a brief summary. Manager can proceed with dependent work. Most multi-agent frameworks have no communication model at all — tasks go in, results come out, and the delegator just waits. ACP gives you: ACP is not for talking to external systems. It assumes: When you need to communicate outside your org — to another company's agent, a third-party AI service, or an external agent built on a different framework — you need A2A. Google's A2A protocol is an open standard for inter-agent communication across organizational and vendor boundaries. It answers the question: "How does my LangGraph agent talk to your CrewAI agent, when we can't assume shared infrastructure?"
+ACP is not for talking to external systems. It assumes: When you need to communicate outside your org — to another company's agent, a third-party AI service, or an external agent built on a different framework — you need A2A. A2A: Communication Between Orgs Google's A2A protocol is an open standard for inter-agent communication across organizational and vendor boundaries. It answers the question: "How does my LangGraph agent talk to your CrewAI agent, when we can't assume shared infrastructure?"
 
 Agent Cards
 
@@ -43,17 +51,15 @@ Agent Cards
 ]
 ```
 
-Discovery metadata that describes what an agent can do:
-
 ```
 ↓
 ```
 
-Tasks — stateful work units with a lifecycle:
+Discovery metadata that describes what an agent can do: Tasks — stateful work units with a lifecycle:
 
 Transport — JSON-RPC 2.0 over HTTPS, with optional gRPC and SSE for streaming.
 
-Message format
+Message format Generic Message objects containing typed
 
 ```
 "role": "agent",
@@ -67,11 +73,9 @@ Message format
 
 ## Side-by-Side Comparison
 
-Generic Message objects containing typed Parts: A2A is deliberately opaque — it doesn't assume you know anything about the internal structure of the agent you're talking to. There's no concept of trust scores, hierarchy, delegation depth, or escalation chains. Two agents can exchange tasks over A2A without either knowing whether the other is a single model, a multi-agent team, or a human pretending to be a bot. This opacity is a feature, not a limitation. You don't want to expose your internal org structure to a third-party service.
+Parts: A2A is deliberately opaque — it doesn't assume you know anything about the internal structure of the agent you're talking to. There's no concept of trust scores, hierarchy, delegation depth, or escalation chains. Two agents can exchange tasks over A2A without either knowing whether the other is a single model, a multi-agent team, or a human pretending to be a bot. This opacity is a feature, not a limitation. You don't want to expose your internal org structure to a third-party service.
 
-### The Key Philosophical Difference
-
-Dimension ["Scope", "Intra-org", "Inter-org"], ["Trust model", "Known agents, trust scores", "Zero-trust"], ["Agent discovery", "Org chart / hierarchy", "Agent Cards (JSON metadata)"], ["Transport", "Internal events, SSE", "JSON-RPC 2.0, gRPC, REST"], ["Task lifecycle", "Stateful (same as A2A)", "Stateful"], ["Streaming", "SSE", "SSE (similar)"], ["Message types", "Typed: ack, progress, escalation, completion", "Generic: Message with Parts"], ["Hierarchy", "First-class (parent, level, chain of command)", "Flat (peer-to-peer)"], ["Organizational metrics", "Built-in (escalation rate, ack latency, etc.)", "Not defined"], ["Delegation chain", "Tracked and surfaced", "Not defined"], ].map(([dim, acp, a2a]) => (
+Dimension ["Scope", "Intra-org", "Inter-org"], ["Trust model", "Known agents, trust scores", "Zero-trust"], ["Agent discovery", "Org chart / hierarchy", "Agent Cards (JSON metadata)"], ["Transport", "Internal events, SSE", "JSON-RPC 2.0, gRPC, REST"], ["Task lifecycle", "Stateful (same as A2A)", "Stateful"], ["Streaming", "SSE", "SSE (similar)"], "Message types", "Typed: ack, progress, escalation, completion", "Generic: Message with Parts", ["Hierarchy", "First-class (parent, level, chain of command)", "Flat (peer-to-peer)"], "Organizational metrics", "Built-in (escalation rate, ack latency, etc.)", "Not defined", ["Delegation chain", "Tracked and surfaced", "Not defined"], ].map(([dim, acp, a2a]) => ( The Key Philosophical Difference
 
 ACP assumes transparency. Within your org, shared context improves outcomes. Your backend worker should know the org is a startup that moves fast. Your engineering lead should know which workers have the highest trust scores for hard tasks. Opacity within your own org creates the same dysfunctions as opacity in human organizations.
 
@@ -84,6 +88,8 @@ Together they cover the full spectrum: transparent internally (ACP), opaque exte
 Use ACP when:
 
 ### In Practice: Both at Once
+
+Use A2A when:
 
 ```
 │ Your OpenSpawn Org │
@@ -108,17 +114,13 @@ Use ACP when:
 │ (vendor API) │ │ another OpenSpawn org) │
 ```
 
-Use A2A when: Most real OpenSpawn deployments use both: The A2A Gateway sits at the org boundary and translates between the two protocols:
+Most real OpenSpawn deployments use both: The A2A Gateway sits at the org boundary and translates between the two protocols:
 
 Inbound (A2A → ACP): External agent sends an A2A task → Gateway creates an internal ACP delegation to the right agent based on skill/domain matching.
 
-Outbound (ACP → A2A): Internal agent escalates with
-
-OUT_OF_DOMAIN → Gateway discovers external agents via Agent Cards and sends an A2A request.
+Outbound (ACP → A2A): Internal agent escalates with OUT_OF_DOMAIN → Gateway discovers external agents via Agent Cards and sends an A2A request.
 
 ## Code Examples
-
-### ACP: Handling an Escalation
 
 ```
 id: "msg-789",
@@ -135,8 +137,6 @@ timestamp: "2024-01-15T10:30:00Z"
 // - Reassign to a different agent
 // - Escalate further up the chain
 ```
-
-### A2A: Sending a Task to an External Agent
 
 ```
 jsonrpc: "2.0",
@@ -169,8 +169,6 @@ body: JSON.stringify(request)
 // { id, status: "working", ... }
 ```
 
-### A2A + ACP: A Task That Crosses the Boundary
-
 ```
 // ACP delegation: COO → Data Lead → Data Worker (internal, via ACP)
 // Step 2: Data Worker determines this needs external specialist
@@ -185,11 +183,7 @@ body: JSON.stringify(request)
 // Step 6: ACP completion flows up to COO
 ```
 
-## How They Complement Each Other
-
-Status mapping: ACP completion/escalation → A2A task status updates. When an agent in your org escalates, you see this in the ACP message stream: When your org delegates to an external service, it goes via A2A: ACP and A2A are designed to be used together, and they share some structural similarities that make integration natural:
-
-### Future: ACP as an A2A Extension
+Status mapping: ACP completion/escalation → A2A task status updates. ACP: Handling an Escalation When an agent in your org escalates, you see this in the ACP message stream: A2A: Sending a Task to an External Agent When your org delegates to an external service, it goes via A2A: A2A + ACP: A Task That Crosses the Boundary How They Complement Each Other ACP and A2A are designed to be used together, and they share some structural similarities that make integration natural:
 
 ```
 "name": "openspawn-org-agent",
@@ -207,17 +201,19 @@ Status mapping: ACP completion/escalation → A2A task status updates. When an a
 
 ## Summary
 
-Similarity ["Stateful tasks", "✅ Full lifecycle", "✅ Full lifecycle"], ["Streaming updates", "✅ SSE-based", "✅ SSE-based"], ["Task history", "✅ Activity log", "✅ Task messages list"], ].map(([sim, acp, a2a]) => ( The main difference is in the communication model: ACP is typed and hierarchical; A2A is generic and flat. A2A supports an extension mechanism for additional capabilities. ACP message semantics — typed acks, escalations, and completions — could be formalized as an A2A extension, allowing A2A-compatible agents to opt into richer intra-org communication: This would let any A2A-compatible framework gradually adopt ACP semantics — getting richer organizational communication without abandoning A2A compatibility. You don't have to choose between ACP and A2A. They solve different problems:
+Similarity ["Stateful tasks", "✅ Full lifecycle", "✅ Full lifecycle"], ["Streaming updates", "✅ SSE-based", "✅ SSE-based"], ["Task history", "✅ Activity log", "✅ Task messages list"], ].map(([sim, acp, a2a]) => ( The main difference is in the communication model: ACP is typed and hierarchical; A2A is generic and flat. Future: ACP as an A2A Extension A2A supports an extension mechanism for additional capabilities. ACP message semantics — typed acks, escalations, and completions — could be formalized as an A2A extension, allowing A2A-compatible agents to opt into richer intra-org communication: This would let any A2A-compatible framework gradually adopt ACP semantics — getting richer organizational communication without abandoning A2A compatibility. You don't have to choose between ACP and A2A. They solve different problems:
 
 ACP makes your org's internal communication structured, visible, and debuggable. It's the reason you can look at an escalation rate dashboard and know your engineering team is struggling.
 
+A2A makes your org interoperable with the broader agent ecosystem. It's the reason your OpenSpawn org can call a LangGraph agent or accept tasks from a CrewAI pipeline without either side knowing the other's internals. Think of it this way:
+
 ## Further Reading
 
-A2A makes your org interoperable with the broader agent ecosystem. It's the reason your OpenSpawn org can call a LangGraph agent or accept tasks from a CrewAI pipeline without either side knowing the other's internals. Think of it this way: ACP is how your team works. A2A is how your team works with everyone else. to="/docs/guides/connecting-agents"
+ACP is how your team works. A2A is how your team works with everyone else. to="/docs/guides/connecting-agents"
 
 Connecting Real Agents →
 
-How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="\_blank" rel="noopener"
+How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="_blank" rel="noopener"
 
 A2A Protocol Docs →
 

@@ -24,6 +24,18 @@ import { CommunicationProtocol } from "./routes/docs/communication-protocol";
 import { GettingStartedPage } from "./routes/getting-started";
 import { NotFoundPage } from "./routes/not-found";
 import { PluginsPage } from "./routes/plugins";
+import { Faq } from "./routes/docs/faq";
+import { CeoAgent } from "./routes/docs/architecture/ceo-agent";
+import { Integrations } from "./routes/docs/architecture/integrations";
+import { WorktreeIsolation } from "./routes/docs/architecture/worktree-isolation";
+import { Troubleshooting } from "./routes/docs/guides/troubleshooting";
+import { Webhooks } from "./routes/docs/guides/webhooks";
+import { ValuesFramework } from "./routes/docs/guides/values-framework";
+import { ApiReference } from "./routes/docs/reference/api";
+import { AcpSpec } from "./routes/docs/reference/acp";
+import { ScenarioEngine } from "./routes/docs/reference/scenario-engine";
+import { EventDrivenAgents } from "./routes/docs/reference/event-driven-agents";
+import { AgentConfigCompat } from "./routes/docs/reference/agent-config-compat";
 
 // ─── Shared OG image ──────────────────────────────────────────────────────────
 const OG_IMAGE = "https://openspawn.dev/og-image.jpg";
@@ -544,6 +556,223 @@ const communicationProtocolRoute = createRoute({
     }),
 });
 
+// ─── New MDX doc routes (migrated from Starlight) ────────────────────────────
+
+const faqRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/faq",
+  component: Faq,
+  meta: () =>
+    buildMeta({
+      title: "FAQ — OpenSpawn",
+      description:
+        "Frequently asked questions about OpenSpawn: setup, ORG.md, templates, agent communication, pricing, and troubleshooting.",
+      path: "/docs/faq",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "FAQ", href: "/docs/faq" },
+      ]),
+    }),
+});
+
+const ceoAgentRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/architecture/ceo-agent",
+  component: CeoAgent,
+  meta: () =>
+    buildMeta({
+      title: "CEO Agent Architecture — OpenSpawn",
+      description:
+        "A real agent organization running on real infrastructure — the bridge between OpenSpawn's simulation and production multi-agent systems.",
+      path: "/docs/architecture/ceo-agent",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Architecture", href: "/docs/architecture/ceo-agent" },
+        { name: "CEO Agent", href: "/docs/architecture/ceo-agent" },
+      ]),
+    }),
+});
+
+const integrationsRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/architecture/integrations",
+  component: Integrations,
+  meta: () =>
+    buildMeta({
+      title: "Integrations & Growth Roadmap — OpenSpawn",
+      description:
+        "Integration strategy for agent runtimes, work source integrations, observability, and developer experience tooling.",
+      path: "/docs/architecture/integrations",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Architecture", href: "/docs/architecture/integrations" },
+        { name: "Integrations", href: "/docs/architecture/integrations" },
+      ]),
+    }),
+});
+
+const worktreeIsolationRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/architecture/worktree-isolation",
+  component: WorktreeIsolation,
+  meta: () =>
+    buildMeta({
+      title: "Worktree Isolation — OpenSpawn",
+      description:
+        "Per-agent git worktree isolation spec for concurrent agent work without merge conflicts.",
+      path: "/docs/architecture/worktree-isolation",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Architecture", href: "/docs/architecture/worktree-isolation" },
+        { name: "Worktree Isolation", href: "/docs/architecture/worktree-isolation" },
+      ]),
+    }),
+});
+
+const troubleshootingRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/guides/troubleshooting",
+  component: Troubleshooting,
+  meta: () =>
+    buildMeta({
+      title: "Troubleshooting — OpenSpawn",
+      description:
+        "Solutions to common issues: CLI errors, ORG.md parsing, MCP auth failures, Docker, task state machines, and budget management.",
+      path: "/docs/guides/troubleshooting",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Guides", href: "/docs/guides/troubleshooting" },
+        { name: "Troubleshooting", href: "/docs/guides/troubleshooting" },
+      ]),
+    }),
+});
+
+const webhooksRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/guides/webhooks",
+  component: Webhooks,
+  meta: () =>
+    buildMeta({
+      title: "Webhooks Integration Guide — OpenSpawn",
+      description:
+        "Connect OpenSpawn to external systems using inbound webhooks, outbound event hooks, and built-in Discord and GitHub integrations.",
+      path: "/docs/guides/webhooks",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Guides", href: "/docs/guides/webhooks" },
+        { name: "Webhooks", href: "/docs/guides/webhooks" },
+      ]),
+    }),
+});
+
+const valuesFrameworkRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/guides/values-framework",
+  component: ValuesFramework,
+  meta: () =>
+    buildMeta({
+      title: "Values Framework — OpenSpawn",
+      description:
+        "How alignment values work in OpenSpawn — what each value does to agent behavior, which ones conflict, and how to choose the right set for your org.",
+      path: "/docs/guides/values-framework",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Guides", href: "/docs/guides/values-framework" },
+        { name: "Values Framework", href: "/docs/guides/values-framework" },
+      ]),
+    }),
+});
+
+const apiReferenceRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/api",
+  component: ApiReference,
+  meta: () =>
+    buildMeta({
+      title: "REST API Reference — OpenSpawn",
+      description:
+        "Complete REST API reference for OpenSpawn: tasks, agents, events, authentication, API keys, and HMAC signing.",
+      path: "/docs/reference/api",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/api" },
+        { name: "REST API", href: "/docs/reference/api" },
+      ]),
+    }),
+});
+
+const acpSpecRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/acp",
+  component: AcpSpec,
+  meta: () =>
+    buildMeta({
+      title: "Agent Communication Protocol (ACP) Spec — OpenSpawn",
+      description:
+        "Formal ACP specification: message types (ack, progress, escalation, completion), organizational intelligence, and A2A relationship.",
+      path: "/docs/reference/acp",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/acp" },
+        { name: "ACP Spec", href: "/docs/reference/acp" },
+      ]),
+    }),
+});
+
+const scenarioEngineRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/scenario-engine",
+  component: ScenarioEngine,
+  meta: () =>
+    buildMeta({
+      title: "Scenario Engine Reference — OpenSpawn",
+      description:
+        "Complete reference for OpenSpawn's scenario engine: emergent complexity, event triggers, simulation modes, and scenario authoring.",
+      path: "/docs/reference/scenario-engine",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/scenario-engine" },
+        { name: "Scenario Engine", href: "/docs/reference/scenario-engine" },
+      ]),
+    }),
+});
+
+const eventDrivenAgentsRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/event-driven-agents",
+  component: EventDrivenAgents,
+  meta: () =>
+    buildMeta({
+      title: "Event-Driven Agent Architecture — OpenSpawn",
+      description:
+        "Event-driven vs polling execution modes, cost optimization, trigger types, and implementation design for OpenSpawn agents.",
+      path: "/docs/reference/event-driven-agents",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/event-driven-agents" },
+        { name: "Event-Driven Agents", href: "/docs/reference/event-driven-agents" },
+      ]),
+    }),
+});
+
+const agentConfigCompatRoute = createRoute({
+  getParentRoute: () => docsRoute,
+  path: "/reference/agent-config-compat",
+  component: AgentConfigCompat,
+  meta: () =>
+    buildMeta({
+      title: "Agent Config Compatibility — OpenSpawn",
+      description:
+        "OpenClaw-compatible agent configuration: file inheritance, self-modification, snapshots, and cross-platform portability.",
+      path: "/docs/reference/agent-config-compat",
+      schemaLd: docBreadcrumb([
+        { name: "Docs", href: "/docs" },
+        { name: "Reference", href: "/docs/reference/agent-config-compat" },
+        { name: "Agent Config", href: "/docs/reference/agent-config-compat" },
+      ]),
+    }),
+});
+
 const docsRouteTree = docsRoute.addChildren([
   docsIndexRoute,
   gettingStartedRoute,
@@ -563,6 +792,18 @@ const docsRouteTree = docsRoute.addChildren([
   agentQuickstartRoute,
   templatesGuideRoute,
   communicationProtocolRoute,
+  faqRoute,
+  ceoAgentRoute,
+  integrationsRoute,
+  worktreeIsolationRoute,
+  troubleshootingRoute,
+  webhooksRoute,
+  valuesFrameworkRoute,
+  apiReferenceRoute,
+  acpSpecRoute,
+  scenarioEngineRoute,
+  eventDrivenAgentsRoute,
+  agentConfigCompatRoute,
 ]);
 
 const orgMdRoute = createRoute({

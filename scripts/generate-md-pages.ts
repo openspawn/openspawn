@@ -1,8 +1,9 @@
 /**
  * Generate .md versions of every docs page for AI discoverability.
  *
- * Strategy: Parse TSX files and extract ALL visible text content,
- * preserving structure (headings, paragraphs, lists, code blocks).
+ * Handles two content sources:
+ * - TSX pages in apps/website/app/routes/docs/ (existing JSX doc pages)
+ * - MDX pages in apps/website/content/docs/ (migrated from Starlight)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from "fs";
@@ -10,6 +11,7 @@ import { join, relative, dirname } from "path";
 
 const WEBSITE_DIR = join(__dirname, "..", "apps", "website");
 const ROUTES_DIR = join(WEBSITE_DIR, "app", "routes", "docs");
+const CONTENT_DIR = join(WEBSITE_DIR, "content", "docs");
 const OUTPUT_DIR = join(WEBSITE_DIR, "public", "docs");
 
 interface Block {
@@ -18,14 +20,14 @@ interface Block {
   content: string;
 }
 
+// ─── TSX extraction (existing logic) ─────────────────────────────────────────
+
 function extractBlocks(tsx: string): Block[] {
   const blocks: Block[] = [];
 
-  // Remove imports and component boilerplate
   const jsxMatch = tsx.match(/return\s*\(([\s\S]*)\);\s*\}/);
   const jsx = jsxMatch ? jsxMatch[1] : tsx;
 
-  // Process line by line through the JSX
   const lines = jsx.split("\n");
   let inCodeBlock = false;
   let codeBuffer = "";
@@ -34,7 +36,6 @@ function extractBlocks(tsx: string): Block[] {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Skip JSX-only lines
     if (
       trimmed.startsWith("import ") ||
       trimmed.startsWith("export ") ||
@@ -48,14 +49,12 @@ function extractBlocks(tsx: string): Block[] {
     )
       continue;
 
-    // Headings
     const hMatch = trimmed.match(/<h([1-6])[^>]*>(.*)/);
     if (hMatch) {
       const level = parseInt(hMatch[1]);
       let text = hMatch[2];
-      // Handle multi-line headings
       if (!text.includes("</h")) {
-        continue; // partial, skip for now
+        continue;
       }
       text = text.replace(/<\/h\d>.*/, "");
       text = stripTags(text);
@@ -65,7 +64,6 @@ function extractBlocks(tsx: string): Block[] {
       continue;
     }
 
-    // Code blocks (pre tags or template literal code)
     if (trimmed.includes("<pre") || trimmed.includes("<CodeBlock") || trimmed.includes("```")) {
       inCodeBlock = true;
       codeBuffer = "";
@@ -86,7 +84,6 @@ function extractBlocks(tsx: string): Block[] {
       continue;
     }
 
-    // List items
     const liMatch = trimmed.match(/<li[^>]*>(.*?)(<\/li>)?/);
     if (liMatch) {
       let text = liMatch[1];
@@ -98,7 +95,6 @@ function extractBlocks(tsx: string): Block[] {
       continue;
     }
 
-    // Paragraph text (anything with visible text after stripping tags)
     const text = stripTags(trimmed);
     if (
       text.length > 3 &&
@@ -109,7 +105,6 @@ function extractBlocks(tsx: string): Block[] {
       !text.includes("useState") &&
       !text.includes("motion.")
     ) {
-      // Accumulate paragraph text
       if (currentText && !trimmed.startsWith("<")) {
         currentText += " " + text;
       } else {
@@ -173,32 +168,74 @@ function blocksToMarkdown(blocks: Block[], routePath: string): string {
   return lines.join("\n");
 }
 
-function walkDir(dir: string): string[] {
+// ─── MDX extraction ──────────────────────────────────────────────────────────
+
+function mdxToMarkdown(content: string, routePath: string): string {
+  let md = content
+    // Strip YAML frontmatter
+    .replace(/^---\n[\s\S]*?---\n/, "")
+    // Strip JSX/ESM imports
+    .replace(/^import\s+.*$/gm, "")
+    // Strip JSX/ESM exports (but not export default)
+    .replace(/^export\s+(?!default).*$/gm, "")
+    // Strip JSX components (self-closing and opening/closing)
+    .replace(/<[A-Z][a-zA-Z]*\s[^>]*\/>/g, "")
+    .replace(/<[A-Z][a-zA-Z]*[^>]*>[\s\S]*?<\/[A-Z][a-zA-Z]*>/g, "")
+    // Clean up excessive blank lines
+    .replace(/\n{4,}/g, "\n\n\n")
+    .trim();
+
+  const header = [
+    "---",
+    `source: https://openspawn.ai/${routePath}`,
+    `generated: ${new Date().toISOString().split("T")[0]}`,
+    "---",
+    "",
+  ].join("\n");
+
+  return header + md + "\n";
+}
+
+// ─── File walking ────────────────────────────────────────────────────────────
+
+function walkDir(dir: string, ext: string): string[] {
   const files: string[] = [];
-  for (const entry of readdirSync(dir)) {
-    const full = join(dir, entry);
-    if (statSync(full).isDirectory()) {
-      files.push(...walkDir(full));
-    } else if (entry.endsWith(".tsx")) {
-      files.push(full);
+  try {
+    for (const entry of readdirSync(dir)) {
+      const full = join(dir, entry);
+      if (statSync(full).isDirectory()) {
+        files.push(...walkDir(full, ext));
+      } else if (entry.endsWith(ext)) {
+        files.push(full);
+      }
     }
+  } catch {
+    // Directory may not exist yet
   }
   return files;
 }
 
-// Main
+// ─── Main ────────────────────────────────────────────────────────────────────
+
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const routes = walkDir(ROUTES_DIR);
 let generated = 0;
 
-for (const route of routes) {
+// Process TSX doc pages
+const tsxRoutes = walkDir(ROUTES_DIR, ".tsx");
+for (const route of tsxRoutes) {
   const rel = relative(ROUTES_DIR, route).replace(/\.tsx$/, "");
   const routePath = `docs/${rel === "index" ? "" : rel}`;
   const outFile = rel === "index" ? "index.md" : `${rel}.md`;
   const outPath = join(OUTPUT_DIR, outFile);
 
   const content = readFileSync(route, "utf-8");
+
+  // Skip thin MDX wrappers (they just import from content/docs/)
+  if (content.includes("MdxDocPage") || content.includes("mdx-provider")) {
+    continue;
+  }
+
   const blocks = extractBlocks(content);
   const md = blocksToMarkdown(blocks, routePath);
 
@@ -208,7 +245,26 @@ for (const route of routes) {
 
   const blockCount = blocks.length;
   const charCount = md.length;
-  console.log(`  ${routePath}.md (${blockCount} blocks, ${charCount} chars)`);
+  console.log(`  ${routePath}.md (${blockCount} blocks, ${charCount} chars) [tsx]`);
 }
 
-console.log(`\n✅ Generated ${generated} .md files in ${OUTPUT_DIR}`);
+// Process MDX content pages
+const mdxFiles = walkDir(CONTENT_DIR, ".mdx");
+for (const file of mdxFiles) {
+  const rel = relative(CONTENT_DIR, file).replace(/\.mdx$/, "");
+  const routePath = `docs/${rel}`;
+  const outFile = `${rel}.md`;
+  const outPath = join(OUTPUT_DIR, outFile);
+
+  const content = readFileSync(file, "utf-8");
+  const md = mdxToMarkdown(content, routePath);
+
+  mkdirSync(dirname(outPath), { recursive: true });
+  writeFileSync(outPath, md);
+  generated++;
+
+  const charCount = md.length;
+  console.log(`  ${routePath}.md (${charCount} chars) [mdx]`);
+}
+
+console.log(`\nGenerated ${generated} .md files in ${OUTPUT_DIR}`);

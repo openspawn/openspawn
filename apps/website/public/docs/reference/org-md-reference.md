@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/reference/org-md-reference
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # ORG.md Reference
@@ -14,9 +14,7 @@ generated: 2026-03-03
 ## Policies
 ```
 
-Complete reference for ORG.md — the OpenSpawn organization definition format. Every field, section, value, and example.
-
-The file is parsed by OpenSpawn's org parser, which extracts:
+Complete reference for ORG.md — the OpenSpawn organization definition format. Every field, section, value, and example. The file is parsed by OpenSpawn's org parser, which extracts:
 
 Structured data from bullet lists:
 
@@ -57,7 +55,7 @@ string
 
 ### Using a Preset
 
-Core values; influences agent decision-making Write the Identity section as if onboarding a new employee — that's exactly how agents use it. Controls how agents communicate — escalation speed, progress update frequency, acknowledgment requirements, and hierarchy depth. Maps directly to Agent Communication Protocol (ACP) parameters.
+Core values; influences agent decision-making Write the Identity section as if onboarding a new employee — that's exactly how agents use Controls how agents communicate — escalation speed, progress update frequency, acknowledgment requirements, and hierarchy depth. Maps directly to to="/docs/concepts/acp-vs-a2a" Agent Communication Protocol (ACP) parameters.
 
 Preset
 
@@ -76,7 +74,7 @@ preset: startup
 
 ### All Culture Fields
 
-Vibe ["startup", "Immediate", "Frequent", "2–3 levels", "Fast, scrappy, everyone does everything"], ["enterprise", "Batched (hourly)", "On phase change", "5–8 levels", "Process-driven, governance"], ["agency", "Immediate", "Every tick", "3–4 levels", "Client-facing, deadline-driven"], ["research", "Delayed", "On request", "2–3 levels", "Exploratory, high autonomy"], ["military", "Immediate", "Every tick", "Strict chain", "Zero ambiguity, mandatory acks"], ["remote-async", "Delayed", "On request", "Flat", "High trust, timezone-distributed"], ].map(([preset, esc, prog, hier, vibe]) => (
+Vibe "startup", "Immediate", "Frequent", "2–3 levels", "Fast, scrappy, everyone does everything", "enterprise", "Batched (hourly)", "On phase change", "5–8 levels", "Process-driven, governance", ["agency", "Immediate", "Every tick", "3–4 levels", "Client-facing, deadline-driven"], ["research", "Delayed", "On request", "2–3 levels", "Exploratory, high autonomy"], "military", "Immediate", "Every tick", "Strict chain", "Zero ambiguity, mandatory acks", ["remote-async", "Delayed", "On request", "Flat", "High trust, timezone-distributed"], ].map(([preset, esc, prog, hier, vibe]) => (
 
 Valid Values
 
@@ -84,9 +82,7 @@ Default
 
 ## Section: Structure
 
-### Heading Levels and Hierarchy
-
-Description ["preset", "startup, enterprise, agency, research, military, remote-async", "None", "Baseline communication profile"], ["Communication", "async-first, sync-preferred, mixed", "async-first", "Default communication mode"], ["Escalation", "immediate, batched, delayed", "immediate", "How quickly blockers propagate upward"], ["Progress updates", "every tick, on phase change, on request", "on phase change", "How often agents report progress"], ["Ack required", "yes, no", "yes", "Whether agents must acknowledge task assignments"], ["Hierarchy depth", "Any descriptive string", "Inferred from Structure", "Maximum org depth hint"], ].map(([field, vals, def_, desc]) => ( The org chart. Defines departments, roles, agent counts, and hierarchy. This is the most important section for most use cases.
+Description "preset", "startup, enterprise, agency, research, military, remote-async", "None", "Baseline communication profile", "Communication", "async-first, sync-preferred, mixed", "async-first", "Default communication mode", "Escalation", "immediate, batched, delayed", "immediate", "How quickly blockers propagate upward", "Progress updates", "every tick, on phase change, on request", "on phase change", "How often agents report progress", "Ack required", "yes, no", "yes", "Whether agents must acknowledge task assignments", "Hierarchy depth", "Any descriptive string", "Inferred from Structure", "Maximum org depth hint", ].map(([field, vals, def_, desc]) => ( The org chart. Defines departments, roles, agent counts, and hierarchy. This is the most important section for most use cases. Heading Levels and Hierarchy
 
 Heading Level
 
@@ -120,7 +116,7 @@ Required
 
 ### Model Values
 
-Description ["Model", "❌", "LLM to use for this role"], ["Domain", "❌", "Expertise domain for task routing"], ["Reports to", "❌", "Override inferred parent (role name or \"Human Principal\")"], ["Count", "❌", "Spawn N identical agents with this role (auto-numbered)"], ["Level", "❌", "Explicit level override (1–10)"], ["Tools", "❌", "Comma-separated tool capabilities"], ].map(([field, req, desc]) => (
+Description ["Model", "❌", "LLM to use for this role"], ["Domain", "❌", "Expertise domain for task routing"], ["Reports to", "❌", 'Override inferred parent (role name or "Human Principal")'], ["Count", "❌", "Spawn N identical agents with this role (auto-numbered)"], ["Level", "❌", "Explicit level override (1–10)"], ["Tools", "❌", "Comma-separated tool capabilities"], ].map(([field, req, desc]) => (
 
 ### Role Level Keywords
 
@@ -177,7 +173,7 @@ Default
 - **L6+ can review** — seniors and above can approve/reject work
 ```
 
-Description ["Per-agent limit", "Unlimited", "Credit limit per agent per period"], ["Alert threshold", "80%", "Trigger alert at this % of budget consumed"], ["Overage behavior", "pause and escalate", "pause and escalate | hard stop | allow with alert"], ["Period", "weekly", "daily | weekly | monthly | per-task"], ].map(([field, def_, desc]) => ( ].map(({ val, desc }) => (
+Description ["Per-agent limit", "Unlimited", "Credit limit per agent per period"], ["Alert threshold", "80%", "Trigger alert at this % of budget consumed"], "Overage behavior", "pause and escalate", "pause and escalate | hard stop | allow with alert", ["Period", "weekly", "daily | weekly | monthly | per-task"], ].map(([field, def_, desc]) => ( val: "pause and escalate", desc: "Agent pauses, manager is alerted and decides next action (recommended)", val: "allow with alert", desc: "Agent continues but an alert is sent — use with caution", ].map(({ val, desc }) => (
 
 Permission
 
@@ -228,14 +224,12 @@ Trigger
 
 ### Structured Data Extraction
 
-When It's Used ["New Task Arrives", "A task is created and assigned"], ["Escalation: BLOCKED", "An agent escalates with reason BLOCKED"], ["Escalation: OUT_OF_DOMAIN", "An agent receives a task outside their domain"], ["New Agent Onboarding", "An agent is spawned for the first time"], ["Weekly Review", "Automated weekly org health check"], ["Agent Promoted", "An agent's trust score crosses a level threshold"], ].map(([trigger, when]) => ( Any bullet in the format
-
 ```
 - **Count:** 3 → { count: 3 }
 - **Per-agent limit:** 1000 → { per_agent_limit: 1000 }
 ```
 
-- **Key:** Value is extracted as a structured field:
+When It's Used ["New Task Arrives", "A task is created and assigned"], ["Escalation: BLOCKED", "An agent escalates with reason BLOCKED"], ["Escalation: OUT_OF_DOMAIN", "An agent receives a task outside their domain"], ["New Agent Onboarding", "An agent is spawned for the first time"], ["Weekly Review", "Automated weekly org health check"], ["Agent Promoted", "An agent's trust score crosses a level threshold"], ].map(([trigger, when]) => ( Any bullet in the format - **Key:** Value is extracted as a structured field:
 
 ## CLI Commands
 
@@ -252,11 +246,21 @@ npx openspawn deploy ORG.md --dry-run
 
 Lenient parsing: ORG.md parsing is intentionally forgiving — missing sections use sensible defaults, unknown fields are ignored (future-proofing), malformed structured data falls back to prose, and a 3-line file is valid.
 
+apply diffs the current state against the new file:
+
+New roles → spawn agents
+
+Removed roles → gracefully wind down (finish current tasks, then deactivate)
+
+Changed policies → apply immediately
+
+Changed culture → update ACP parameters live
+
 ### Export
 
 ## Version Control Workflow
 
-apply diffs the current state against the new file: Export captures dynamically spawned agents (created at runtime by leads), making them permanent in the file. The exported file becomes the new source of truth.
+Changed descriptions → update system prompts on next tick Export captures dynamically spawned agents (created at runtime by leads), making them permanent in the file. The exported file becomes the new source of truth.
 
 ```
 git diff ORG.md
@@ -266,8 +270,6 @@ git log ORG.md
 ```
 
 ## Complete Examples
-
-### Solo Developer + Agent Team
 
 ```
 ## Culture
@@ -287,8 +289,6 @@ Reviews PRs, checks for bugs and style issues.
 Keeps documentation in sync with code changes.
 - **Model:** claude-haiku
 ```
-
-### Engineering Organization (Startup)
 
 ```
 ## Identity
@@ -351,9 +351,7 @@ Sets research direction. Reviews findings.
 - **Overage behavior:** allow with alert
 ```
 
-## Org Health & Self-Healing
-
-ORG.md is a text file — it's designed to live in git. PR reviews for org changes let teams discuss: "Do we need a full team or just one analyst?" — the same way you'd review infrastructure-as-code. Running orgs are monitored automatically. The health score (0–100) is computed from:
+ORG.md is a text file — it's designed to live in git. PR reviews for org changes let teams discuss: "Do we need a full team or just one analyst?" — the same way you'd review infrastructure-as-code. Solo Developer + Agent Team Engineering Organization (Startup) Org Health & Self-Healing Running orgs are monitored automatically. The health score (0–100) is computed from:
 
 Component
 
@@ -369,27 +367,21 @@ Healthy
 🟢 Optimization: Agent "Backend Senior 2" has 98% success rate over 50 tasks
 ```
 
-Unhealthy ["Ack latency", "15%", " 3 cycles"], ["Escalation rate", "20%", " 30%"], ["Completion rate", "25%", "> 90%", "< 70%"], ["Budget utilization", "15%", "40–80%", " 95%"], ["Agent idle rate", "10%", " 60%"], ["Time-to-completion", "15%", "Trending down", "Trending up"], ].map(([component, weight, healthy, unhealthy]) => ( ].map(({ score, label, desc, color }) => ( Recommendations are suggestions. A human approves via the dashboard or by modifying
+Unhealthy ["Ack latency", "15%", " 3 cycles"], ["Escalation rate", "20%", " 30%"], ["Completion rate", "25%", "> 90%", "< 70%"], ["Budget utilization", "15%", "40–80%", " 95%"], ["Agent idle rate", "10%", " 60%"], ["Time-to-completion", "15%", "Trending down", "Trending up"], ].map(([component, weight, healthy, unhealthy]) => ( score: "90–100", label: "Elite", desc: "Highly efficient, minimal waste", color: "border-emerald-500/20 bg-emerald-500/5 text-emerald-400", score: "70–89", label: "Healthy", desc: "Normal operations, minor inefficiencies", color: "border-cyan-500/20 bg-cyan-500/5 text-cyan-400", score: "50–69", label: "Needs attention", desc: "Bottlenecks or misrouting", color: "border-amber-500/20 bg-amber-500/5 text-amber-400", score: "< 50", label: "Restructure recommended", desc: "Systemic issues", color: "border-red-500/20 bg-red-500/5 text-red-400", ].map(({ score, label, desc, color }) => ( Recommendations are suggestions. A human approves via the dashboard or by modifying
 
-## Relationship to Other Standards
-
-ORG.md.
+ORG.md. Relationship to Other Standards
 
 Standard
 
 ## Further Reading
 
-Relationship to ORG.md ["CLAUDE.md", "One agent's behavior", "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md"], ["AGENTS.md", "Workspace rules", "ORG.md is the superset — workspace rules + org structure + policies"], ["ACP", "Communication protocol", "ORG.md's Culture section configures ACP parameters"], ["A2A", "Inter-org communication", "ORG.md defines one org; A2A connects multiple orgs"], ["Terraform / Pulumi", "Infrastructure as code", "ORG.md is the same pattern applied to agent organizations"], ].map(([std, scope, rel]) => ( to="/docs/tutorials/your-first-org-md"
+Relationship to ORG.md "CLAUDE.md", "One agent's behavior", "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md", "AGENTS.md", "Workspace rules", "ORG.md is the superset — workspace rules + org structure + policies", "ACP", "Communication protocol", "ORG.md's Culture section configures ACP parameters", "A2A", "Inter-org communication", "ORG.md defines one org; A2A connects multiple orgs", "Terraform / Pulumi", "Infrastructure as code", "ORG.md is the same pattern applied to agent organizations", ].map(([std, scope, rel]) => ( to="/docs/tutorials/your-first-org-md"
 
 Your First ORG.md →
 
-Step-by-step tutorial to="/docs/protocols/mcp-reference"
+Step-by-step tutorial to="/docs/protocols/mcp-reference" MCP Tools & Integrations →
 
-MCP Tools & Integrations →
-
-Connect agents to your org via MCP to="/docs/concepts/acp-vs-a2a"
-
-Agent Communication Protocol →
+Connect agents to your org via MCP to="/docs/concepts/acp-vs-a2a" Agent Communication Protocol →
 
 How agents communicate within an org to="/docs/comparison"
 

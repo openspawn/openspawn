@@ -206,7 +206,6 @@ export function AgentDetailPanel({
             icon={<Shield className="w-4 h-4 text-cyan-400" />}
             label="Trust"
             value={`${agent.trustScore}%`}
-            
           />
           <StatBox
             icon={<Zap className="w-4 h-4 text-amber-400" />}
@@ -218,7 +217,6 @@ export function AgentDetailPanel({
             icon={<Coins className="w-4 h-4 text-emerald-400" />}
             label="Balance"
             value={`${agent.currentBalance.toLocaleString()}c`}
-            
           />
         </div>
 

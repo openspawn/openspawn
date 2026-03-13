@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/protocols/mcp-reference
-generated: 2026-03-03
+generated: 2026-03-13
 ---
 
 # MCP Tools & Integrations
@@ -19,9 +19,13 @@ Protocol
 
 ## What Is MCP?
 
-## Quick Start
+JSON-RPC 2.0 The Model Context Protocol is an open standard (published by Anthropic, adopted broadly) that defines how AI agents and LLM clients communicate with external tools and data sources. Think of it as USB-C for AI: a single connector spec that works across models, frameworks, and platforms. MCP replaces a fragmented landscape of proprietary plugin systems with one standard:
 
-### 1. Start Your OpenSpawn Instance
+Tools — functions the agent can call
+
+Resources — data sources the agent can read
+
+## Quick Start
 
 ```
 cd openspawn && pnpm install
@@ -29,7 +33,7 @@ pnpm exec nx serve sandbox
 # → Server running at http://localhost:3333
 ```
 
-JSON-RPC 2.0 The Model Context Protocol is an open standard (published by Anthropic, adopted broadly) that defines how AI agents and LLM clients communicate with external tools and data sources. Think of it as USB-C for AI: a single connector spec that works across models, frameworks, and platforms. MCP replaces a fragmented landscape of proprietary plugin systems with one standard: OpenSpawn implements the Tools capability. Your entire org — its agents, tasks, messages, and statistics — is accessible as structured tool calls over a single HTTP endpoint. MCP is OpenSpawn's native protocol. It's not an afterthought — the MCP server ships with every OpenSpawn instance. Or use the live demo instance at
+Prompts — reusable prompt templates OpenSpawn implements the Tools capability. Your entire org — its agents, tasks, messages, and statistics — is accessible as structured tool calls over a single HTTP endpoint. MCP is OpenSpawn's native protocol. It's not an afterthought — the MCP server ships with every OpenSpawn instance. 1. Start Your OpenSpawn Instance Or use the live demo instance at
 
 ### 2. Verify the MCP Server
 
@@ -55,8 +59,6 @@ curl -X POST https://bikinibottom.ai/mcp \\
 "params": {}
 ```
 
-### 3. Connect Claude Desktop or Cursor
-
 ```
 "mcpServers": {
 "openspawn": {
@@ -64,7 +66,7 @@ curl -X POST https://bikinibottom.ai/mcp \\
 "transport": "streamable-http"
 ```
 
-https://bikinibottom.ai/mcp.
+https://bikinibottom.ai/mcp. 3. Connect Claude Desktop or Cursor
 
 Claude Desktop:
 
@@ -92,8 +94,6 @@ Task description in natural language
 
 priority
 
-"low" | "medium" | "high" | "critical"
-
 ```
 "jsonrpc": "2.0",
 "id": 1,
@@ -113,7 +113,7 @@ priority
 "isError": false
 ```
 
-Task priority (default: "medium")
+"low" | "medium" | "high" | "critical" Task priority (default: "medium")
 
 ```
 "jsonrpc": "2.0",
@@ -172,11 +172,11 @@ recentMessages (last 5)
 "limit": 10
 ```
 
-list_tasks List tasks in the org, with filtering by status, assignee, and result limit. Valid status values:
+list_tasks List tasks in the org, with filtering by status, assignee, and result limit. Valid status values: todo,
 
 in_progress,
 
-review,
+review, done,
 
 blocked
 
@@ -215,8 +215,6 @@ Response:
 ```
 
 ## Connecting Agent Frameworks
-
-### Claude Desktop & Cursor
 
 ### CrewAI
 
@@ -334,7 +332,7 @@ priority: "critical",
 
 ## Error Handling
 
-get_org_stats Get a summary of organization-wide statistics: total agents, active agents, total tasks, and completion rates. No parameters required. After adding OpenSpawn to your config and restarting, you'll see OpenSpawn tools in the tools panel. Claude can now delegate tasks, check blocked tasks, get task status, and send messages directly from conversation. OpenSpawn MCP follows the JSON-RPC 2.0 error spec. All tool responses include an
+get_org_stats Get a summary of organization-wide statistics: total agents, active agents, total tasks, and completion rates. No parameters required. Claude Desktop & Cursor After adding OpenSpawn to your config and restarting, you'll see OpenSpawn tools in the tools panel. Claude can now delegate tasks, check blocked tasks, get task status, and send messages directly from conversation. OpenSpawn MCP follows the JSON-RPC 2.0 error spec. All tool responses include an
 
 isError boolean. Always check
 
@@ -367,13 +365,25 @@ Message
 "protocolVersion": "2025-03-26"
 ```
 
-Cause ["-32600", "Invalid Request", "jsonrpc field is not \"2.0\""], ["-32601", "Method not found", "Unknown method"], ["-32602", "Invalid params", "Missing required parameter, or wrong type"], ["Tool error", "Returned in content with isError: true", "Agent not found, task not found, etc."], ].map(([code, msg, cause]) => ( OpenSpawn uses MCP's Streamable HTTP transport (spec version 2025-03-26). This transport:
+Cause ["-32600", "Invalid Request", 'jsonrpc field is not "2.0"'], ["-32601", "Method not found", "Unknown method"], ["-32602", "Invalid params", "Missing required parameter, or wrong type"], "Tool error", "Returned in content with isError: true", "Agent not found, task not found, etc.", ].map(([code, msg, cause]) => ( OpenSpawn uses MCP's Streamable HTTP transport (spec version 2025-03-26). This transport:
 
 ## What's Coming
 
+listChanged: false means the tool list is static — no need to re-fetch tools after initialization. OpenSpawn's MCP server is actively expanding. Planned additions:
+
+approve_task — Approve a task through a pre-hook gate
+
+get_org_health — Retrieve the org health score and recommendations
+
+list_escalations — See all active escalations and their chains
+
+spawn_agent — Dynamically create a new agent in the
+
+Resource support — Expose org state as MCP Resources
+
 ## Further Reading
 
-listChanged: false means the tool list is static — no need to re-fetch tools after initialization. OpenSpawn's MCP server is actively expanding. Planned additions: to="/docs/reference/org-md-reference"
+Authentication — API key support for multi-tenant deployments to="/docs/reference/org-md-reference"
 
 ORG.md Reference →
 
@@ -389,7 +399,7 @@ How ACP and A2A work together to="/docs/comparison"
 
 Framework Comparison →
 
-OpenSpawn vs CrewAI vs LangGraph href="https://spec.modelcontextprotocol.io" target="\_blank" rel="noopener"
+OpenSpawn vs CrewAI vs LangGraph href="https://spec.modelcontextprotocol.io" target="_blank" rel="noopener"
 
 MCP Specification →
 
