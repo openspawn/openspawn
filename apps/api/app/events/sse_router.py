@@ -42,11 +42,7 @@ _REPLAY_MAX_AGE_SECONDS = 3600  # 1 hour
 async def create_sse_token(
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[SSETokenResponse]:
-    """Issue a short-lived JWT for SSE stream authentication.
-
-    EventSource API cannot set custom headers, so agents use this token
-    as a query parameter on GET /events/stream.
-    """
+    """Issue short-lived JWT for SSE auth (EventSource can't set headers)."""
     cfg = get_settings()
     secret = cfg.auth.jwt_secret
     if not secret:
@@ -68,13 +64,9 @@ async def create_sse_token(
 
 
 def _validate_sse_token(token: str) -> tuple[uuid.UUID, uuid.UUID]:
-    """Validate an SSE JWT and return (user/agent id, org_id).
-
-    Raises HTTPException on invalid/expired token.
-    """
+    """Validate SSE JWT, return (subject_id, org_id)."""
     cfg = get_settings()
 
-    # auth.mode=none — accept any token value, return owner context
     if cfg.auth.mode == AuthMode.NONE:
         owner_id = uuid.UUID("00000000-0000-0000-0000-000000000001")
         return owner_id, owner_id
@@ -86,7 +78,6 @@ def _validate_sse_token(token: str) -> tuple[uuid.UUID, uuid.UUID]:
             detail="JWT_SECRET not configured",
         )
 
-    # API key auth not yet supported for SSE — use POST /events/token instead
     if token.startswith("osp_"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -123,38 +114,28 @@ async def event_stream(
     last_event_id: int | None = Header(None, alias="Last-Event-ID"),
     db: AsyncSession = Depends(get_db),
 ) -> AsyncIterable[ServerSentEvent]:
-    """Server-Sent Events stream.
-
-    Authenticate via query param `token` (short-lived JWT from POST /events/token).
-    Supports reconnection via Last-Event-ID header — replays missed events from DB.
-    """
+    """SSE stream. Auth via query param token. Supports Last-Event-ID replay."""
     subscriber_id, org_id = _validate_sse_token(token)
     sub_key = str(subscriber_id)
 
     await logger.ainfo("sse_connected", subscriber=sub_key, org_id=str(org_id))
 
-    async def _generate() -> AsyncIterable[ServerSentEvent]:
-        try:
-            # Replay missed events on reconnection
-            if last_event_id is not None:
-                async for sse in _replay_missed(db, org_id, last_event_id):
-                    yield sse
+    try:
+        if last_event_id is not None:
+            async for sse in _replay_missed(db, org_id, last_event_id):
+                yield sse
 
-            # Stream live events
-            async for event in event_bus.subscribe(sub_key):
-                # Filter to subscriber's org
-                if event.org_id != org_id:
-                    continue
-                yield ServerSentEvent(
-                    data=event.model_dump_json(),
-                    event=event.type,
-                    id=str(event.sequence),
-                )
-        finally:
-            await event_bus.disconnect(sub_key)
-            await logger.ainfo("sse_disconnected", subscriber=sub_key)
-
-    return EventSourceResponse(_generate())  # type: ignore[return-value]
+        async for event in event_bus.subscribe(sub_key):
+            if event.org_id != org_id:
+                continue
+            yield ServerSentEvent(
+                data=event.model_dump_json(),
+                event=event.type,
+                id=str(event.sequence),
+            )
+    finally:
+        await event_bus.disconnect(sub_key)
+        await logger.ainfo("sse_disconnected", subscriber=sub_key)
 
 
 async def _replay_missed(
@@ -162,11 +143,7 @@ async def _replay_missed(
     org_id: uuid.UUID,
     last_sequence: int,
 ) -> AsyncIterable[ServerSentEvent]:
-    """Replay events from DB that the client missed during disconnection.
-
-    Uses created_at ordering since sequence is in-memory and resets on restart.
-    Falls back to replaying recent events within the replay window.
-    """
+    """Replay recent events from DB within the replay window."""
     cutoff = pendulum.now("UTC").subtract(seconds=_REPLAY_MAX_AGE_SECONDS)
 
     result = await db.execute(

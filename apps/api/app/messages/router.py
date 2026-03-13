@@ -114,7 +114,6 @@ async def send_message(
     db.add(msg)
     await db.flush()
 
-    # Emit SSE event
     from app.events.emit import emit
     from app.models.enums import SSEEventType
 

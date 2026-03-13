@@ -1,9 +1,6 @@
 """In-process event bus for SSE real-time push.
 
-Singleton EventBus backed by a BusBackend protocol. The default InMemoryBackend
-uses asyncio.Queue per subscriber — zero external dependencies, suitable for
-single-worker uvicorn. Swap to PgNotifyBackend or RedisPubSubBackend later
-for multi-worker deployments.
+BusBackend protocol allows swapping InMemoryBackend for PgNotify or Redis later.
 """
 
 from __future__ import annotations
@@ -69,20 +66,15 @@ class EventBus:
         self._backend: BusBackend = backend or InMemoryBackend()
 
     async def publish(self, event: SSEEvent, target_ids: list[str] | None = None) -> None:
-        """Broadcast event to all subscribers, or to specific targets."""
         payload = event.model_dump_json()
 
         if target_ids is not None:
             for target in target_ids:
                 await self._backend.publish(target, payload)
         else:
-            # Broadcast — publish to the global channel, picked up by all
             await self._backend.publish("__broadcast__", payload)
 
     async def subscribe(self, subscriber_id: str) -> AsyncGenerator[SSEEvent, None]:
-        """Yield SSEEvents for a subscriber. Merges broadcast + targeted channels."""
-        # For InMemoryBackend, each subscriber gets its own queue via the channel name.
-        # Broadcast events are published to ALL queues in publish().
         async for payload in self._backend.subscribe(subscriber_id):
             yield SSEEvent.model_validate_json(payload)
 

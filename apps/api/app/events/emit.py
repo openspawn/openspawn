@@ -42,23 +42,9 @@ async def emit(
     reasoning: str | None = None,
     target_agents: list[str] | None = None,
 ) -> None:
-    """Insert an Event row and publish to the SSE bus in one call.
-
-    Args:
-        db: Active database session (caller must commit).
-        type: SSE event type.
-        org_id: Organization scope.
-        actor_id: Agent or user who triggered the event.
-        entity_type: Kind of entity (e.g. "task", "message", "agent").
-        entity_id: ID of the entity.
-        data: Arbitrary JSON payload.
-        severity: Log severity for the audit trail.
-        reasoning: Optional human-readable reason.
-        target_agents: If set, only push SSE to these subscriber IDs. None = broadcast.
-    """
+    """Insert Event row + publish to SSE bus. Caller must commit."""
     now = pendulum.now("UTC")
 
-    # 1. Persist to Event table (audit log)
     event = Event(
         org_id=org_id,
         type=type.value,
@@ -71,9 +57,8 @@ async def emit(
         created_at=now,
     )
     db.add(event)
-    await db.flush()  # Get event.id assigned
+    await db.flush()
 
-    # 2. Publish to SSE bus (real-time push)
     seq = _next_sequence()
     sse_event = SSEEvent(
         sequence=seq,

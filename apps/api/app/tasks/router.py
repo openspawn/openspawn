@@ -189,7 +189,6 @@ async def transition_task(
 
         await sync_parent_status(db, task, auth.id)
 
-    # Emit SSE event
     from app.events.emit import emit
     from app.models.enums import SSEEventType
 
