@@ -13,7 +13,6 @@ import {
   StatusRing,
   Avatar,
   AvatarFallback,
-  generateSparklineData,
 } from "@openspawn/dashboard-ui";
 import {
   Users,
@@ -277,8 +276,7 @@ export function DashboardPage() {
     [tasks],
   );
 
-  const sparkA = useMemo(() => generateSparklineData(12, "up"), []);
-  const sparkT = useMemo(() => generateSparklineData(12, "stable"), []);
+  // No fake sparklines — only show real data. Time-series tracking TBD.
 
   return (
     <div className="space-y-6">
@@ -292,8 +290,6 @@ export function DashboardPage() {
             value={stats.agents}
             icon={Users}
             description={`${stats.active} active`}
-            sparklineData={sparkA}
-            sparklineColor="#06b6d4"
           />
         </Link>
         <Link to="/tasks">
@@ -302,8 +298,6 @@ export function DashboardPage() {
             value={stats.total}
             icon={CheckSquare}
             description={`${stats.done} done · ${stats.wip} active`}
-            sparklineData={sparkT}
-            sparklineColor="#10b981"
           />
         </Link>
         <StatCard

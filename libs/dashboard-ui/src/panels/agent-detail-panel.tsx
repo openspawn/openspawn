@@ -8,7 +8,7 @@
  *
  * No data-fetching — consumers pass agent + related data as props.
  */
-import { useMemo } from "react";
+
 import {
   Shield,
   Zap,
@@ -25,7 +25,7 @@ import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
-import { Sparkline, generateSparklineData } from "../ui/sparkline";
+
 import { cn } from "../lib/utils";
 
 /* ── Types ─────────────────────────────────────────────────────── */
@@ -143,14 +143,7 @@ export function AgentDetailPanel({
 }: AgentDetailPanelProps) {
   const successRate =
     agent.tasksCompleted > 0 ? Math.round((agent.tasksSuccessful / agent.tasksCompleted) * 100) : 0;
-  const trustData = useMemo(
-    () => generateSparklineData(12, agent.trustScore > 50 ? "up" : "down"),
-    [agent.trustScore],
-  );
-  const earningsData = useMemo(
-    () => generateSparklineData(12, agent.lifetimeEarnings > 5000 ? "up" : "stable"),
-    [agent.lifetimeEarnings],
-  );
+  // No fake sparklines — only show real time-series data when available
   const activeTasks = tasks.filter((t) => !["DONE", "CANCELLED"].includes(t.status.toUpperCase()));
   const completedTasks = tasks.filter((t) => t.status.toUpperCase() === "DONE");
 
@@ -213,7 +206,7 @@ export function AgentDetailPanel({
             icon={<Shield className="w-4 h-4 text-cyan-400" />}
             label="Trust"
             value={`${agent.trustScore}%`}
-            sparkline={<Sparkline data={trustData} color="#06b6d4" height={24} />}
+            
           />
           <StatBox
             icon={<Zap className="w-4 h-4 text-amber-400" />}
@@ -225,7 +218,7 @@ export function AgentDetailPanel({
             icon={<Coins className="w-4 h-4 text-emerald-400" />}
             label="Balance"
             value={`${agent.currentBalance.toLocaleString()}c`}
-            sparkline={<Sparkline data={earningsData} color="#10b981" height={24} />}
+            
           />
         </div>
 
