@@ -2026,7 +2026,7 @@ requires-dist = [
     { name = "bcrypt", specifier = ">=4.0" },
     { name = "cryptography", specifier = ">=46.0.5" },
     { name = "factory-boy", marker = "extra == 'dev'", specifier = ">=3.3" },
-    { name = "fastapi", specifier = ">=0.115" },
+    { name = "fastapi", specifier = ">=0.135" },
     { name = "fastmcp", specifier = ">=3.1.0" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.0" },

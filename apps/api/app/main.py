@@ -10,6 +10,7 @@ from app.config import settings
 from app.credits.router import router as credits_router
 from app.database import engine
 from app.events.router import router as events_router
+from app.events.sse_router import router as sse_router
 from app.integrations.router import router as integrations_router
 from app.logging import setup_logging
 from app.memory.graph.router import router as graph_router
@@ -53,6 +54,7 @@ app.include_router(tasks_router)
 app.include_router(credits_router)
 app.include_router(messages_router)
 app.include_router(events_router)
+app.include_router(sse_router)
 app.include_router(integrations_router)
 app.include_router(memory_router)
 app.include_router(graph_router)

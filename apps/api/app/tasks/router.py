@@ -177,6 +177,7 @@ async def transition_task(
             detail="Task requires approval before completion",
         )
 
+    old_status = task.status
     task.status = dto.status.value
 
     if dto.status == TaskStatus.DONE:
@@ -187,6 +188,25 @@ async def transition_task(
         from app.coordination.status_sync import sync_parent_status
 
         await sync_parent_status(db, task, auth.id)
+
+    # Emit SSE event
+    from app.events.emit import emit
+    from app.models.enums import SSEEventType
+
+    sse_type = (
+        SSEEventType.TASK_COMPLETED
+        if dto.status == TaskStatus.DONE
+        else SSEEventType.TASK_TRANSITIONED
+    )
+    await emit(
+        db=db,
+        type=sse_type,
+        org_id=auth.org_id,
+        actor_id=auth.id,
+        entity_type="task",
+        entity_id=task.id,
+        data={"from_status": old_status, "to_status": dto.status.value, "title": task.title},
+    )
 
     await db.commit()
     await db.refresh(task)

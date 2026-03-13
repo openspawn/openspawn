@@ -21,3 +21,25 @@ class EventResponse(BaseModel):
     severity: EventSeverity
     reasoning: str | None
     created_at: datetime
+
+
+class SSEEvent(BaseModel):
+    """Payload published to the EventBus and yielded as SSE.
+
+    type is str (not SSEEventType) to support replay of legacy/unknown event types
+    from the DB. The emit() helper accepts SSEEventType for type safety on new events.
+    """
+
+    sequence: int
+    type: str
+    org_id: uuid.UUID
+    actor_id: uuid.UUID
+    entity_type: str
+    entity_id: uuid.UUID
+    data: dict
+    created_at: datetime
+
+
+class SSETokenResponse(BaseModel):
+    token: str
+    expires_in: int

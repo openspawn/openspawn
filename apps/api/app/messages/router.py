@@ -112,6 +112,22 @@ async def send_message(
         metadata_=dto.metadata,
     )
     db.add(msg)
+    await db.flush()
+
+    # Emit SSE event
+    from app.events.emit import emit
+    from app.models.enums import SSEEventType
+
+    await emit(
+        db=db,
+        type=SSEEventType.MESSAGE_SENT,
+        org_id=auth.org_id,
+        actor_id=auth.id,
+        entity_type="message",
+        entity_id=msg.id,
+        data={"channel_id": str(dto.channel_id), "type": dto.type.value},
+    )
+
     await db.commit()
     await db.refresh(msg)
     return DataResponse(data=MessageResponse.model_validate(msg))
