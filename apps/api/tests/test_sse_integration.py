@@ -5,12 +5,15 @@ from __future__ import annotations
 import asyncio
 import os
 import uuid
-from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
 import pendulum
 import pytest
 from httpx import ASGITransport, AsyncClient
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 @pytest.fixture(autouse=True)
@@ -73,9 +76,7 @@ class TestSSEToken:
         r = await client.post("/events/token")
         token = r.json()["data"]["token"]
 
-        decoded = jwt.decode(
-            token, "test-secret-32-chars-long-enough!", algorithms=["HS256"]
-        )
+        decoded = jwt.decode(token, "test-secret-32-chars-long-enough!", algorithms=["HS256"])
         assert decoded["purpose"] == "sse"
         assert "sub" in decoded
         assert "org_id" in decoded
@@ -88,9 +89,7 @@ class TestSSEToken:
         r = await client.post("/events/token")
         token = r.json()["data"]["token"]
 
-        decoded = jwt.decode(
-            token, "test-secret-32-chars-long-enough!", algorithms=["HS256"]
-        )
+        decoded = jwt.decode(token, "test-secret-32-chars-long-enough!", algorithms=["HS256"])
         assert decoded["exp"] > decoded["iat"]
         assert decoded["exp"] - decoded["iat"] == 300
 

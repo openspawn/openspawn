@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pendulum
 import pytest
 
-from app.events.bus import EventBus, InMemoryBackend, _MAX_QUEUE_SIZE
+from app.events.bus import _MAX_QUEUE_SIZE, EventBus, InMemoryBackend
 from app.events.schemas import SSEEvent
 from app.models.enums import EventSeverity, SSEEventType
 
@@ -154,10 +155,8 @@ class TestEventBus:
         assert "sub-1" not in backend._queues
 
         task.cancel()
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task
-        except asyncio.CancelledError:
-            pass
 
 
 # ---------------------------------------------------------------------------
