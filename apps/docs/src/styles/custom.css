@@ -2,3 +2,106 @@
 .content-panel h1#_top {
   display: none;
 }
+
+/* ── OpenSpawn Theme ─────────────────────────────────────────────────────── */
+/* Match openspawn.ai brand: dark navy bg, cyan accent, clean typography     */
+
+:root {
+  /* Accent (cyan) */
+  --sl-color-accent-low: #0a2a3a;
+  --sl-color-accent: #06b6d4;
+  --sl-color-accent-high: #a5f3fc;
+
+  /* Text */
+  --sl-color-white: #e2e8f0;
+  --sl-color-gray-1: #cbd5e1;
+  --sl-color-gray-2: #94a3b8;
+  --sl-color-gray-3: #64748b;
+  --sl-color-gray-4: #334155;
+  --sl-color-gray-5: #1e293b;
+  --sl-color-gray-6: #0f172a;
+  --sl-color-black: #0a1929;
+
+  /* Font */
+  --sl-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sl-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+}
+
+/* Sidebar */
+nav.sidebar a[aria-current="page"] {
+  color: var(--sl-color-accent);
+  font-weight: 600;
+}
+
+/* Links */
+.sl-markdown-content a {
+  color: var(--sl-color-accent);
+  text-decoration-color: var(--sl-color-accent-low);
+}
+
+.sl-markdown-content a:hover {
+  color: var(--sl-color-accent-high);
+  text-decoration-color: var(--sl-color-accent);
+}
+
+/* Code blocks */
+.sl-markdown-content pre {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+}
+
+/* Inline code */
+.sl-markdown-content :not(pre) > code {
+  background: var(--sl-color-gray-5);
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.35em;
+  color: var(--sl-color-accent-high);
+}
+
+/* Table styling */
+.sl-markdown-content table {
+  border-collapse: collapse;
+}
+
+.sl-markdown-content th {
+  background: var(--sl-color-gray-6);
+  border-bottom: 2px solid var(--sl-color-accent-low);
+}
+
+.sl-markdown-content td,
+.sl-markdown-content th {
+  border: 1px solid var(--sl-color-gray-5);
+  padding: 0.5rem 0.75rem;
+}
+
+/* Headings */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3 {
+  color: var(--sl-color-white);
+}
+
+.sl-markdown-content h2 {
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  padding-bottom: 0.3em;
+}
+
+/* Scrollbar (Chromium) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sl-color-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sl-color-gray-4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sl-color-gray-3);
+}
