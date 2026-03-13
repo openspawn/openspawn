@@ -1,0 +1,4 @@
+/* Hide Starlight's auto-generated page title — we use # headings in markdown instead */
+.content-panel h1#_top {
+  display: none;
+}
