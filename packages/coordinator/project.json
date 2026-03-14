@@ -17,7 +17,7 @@
       }
     },
     "lint": {
-      "command": "oxlint ."
+      "command": "oxlint packages/coordinator/"
     }
   },
   "tags": []

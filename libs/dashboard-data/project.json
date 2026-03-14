@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "lint": {
-      "command": "oxlint ."
+      "command": "oxlint libs/dashboard-data/"
     }
   },
   "tags": []
