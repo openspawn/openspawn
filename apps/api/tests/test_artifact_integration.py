@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import uuid
 from typing import TYPE_CHECKING
@@ -36,12 +37,10 @@ def sqlite_env():
 
 @pytest.fixture
 async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
-    from collections.abc import AsyncGenerator as AG
-
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
     from sqlalchemy.pool import StaticPool
 
-    import app.models.artifact  # noqa: F401
+    import app.models.artifact  # register Artifact tables with Base.metadata
     from app.database import get_db
     from app.models.base import Base
 
@@ -63,7 +62,7 @@ async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    async def _override_get_db() -> AG[AsyncSession]:
+    async def _override_get_db():  # type: ignore[no-untyped-def]
         async with session_factory() as session:
             yield session
 
@@ -132,11 +131,8 @@ async def seeded_client(client: AsyncClient) -> AsyncClient:
     db.add(task)
     await db.commit()
 
-    # Close the generator
-    try:
+    with contextlib.suppress(StopAsyncIteration):
         await db_gen.__anext__()
-    except StopAsyncIteration:
-        pass
 
     return client
 
