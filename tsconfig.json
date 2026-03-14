@@ -7,13 +7,13 @@
   "files": [],
   "references": [
     {
-      "path": "./tools/sandbox"
-    },
-    {
       "path": "./libs/dashboard-data"
     },
     {
       "path": "./libs/dashboard-ui"
+    },
+    {
+      "path": "./libs/docs-ui"
     }
   ]
 }

@@ -13,5 +13,12 @@
     "types": ["vite/client"]
   },
   "include": ["app/**/*", "content/**/*.mdx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [
+    {
+      "path": "../../libs/docs-ui"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
