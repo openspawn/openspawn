@@ -533,3 +533,61 @@ async def coordination_project(
         "/coordination/project", params={"task_id": task_id, "projection_type": projection_type}
     )
     return _format(result)
+
+
+# ═══════════════════════════════════════════════
+# Autonomy Dial Tools
+# ═══════════════════════════════════════════════
+
+
+@mcp.tool
+async def approval_request(
+    action_type: str,
+    entity_type: str,
+    entity_id: str,
+    risk_level: int,
+    payload_json: str,
+) -> str:
+    """Create an approval request when an action exceeds autonomy level."""
+    body: dict[str, object] = {
+        "action_type": action_type,
+        "entity_type": entity_type,
+        "entity_id": entity_id,
+        "risk_level": risk_level,
+        "payload": json.loads(payload_json),
+    }
+    result = await _get_client().post("/approvals", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def approval_respond(
+    approval_id: str,
+    decision: str,
+    notes: str | None = None,
+) -> str:
+    """Approve or reject a pending approval request. Decision must be 'approve' or 'reject'."""
+    if decision not in ("approve", "reject"):
+        return json.dumps({"error": "decision must be 'approve' or 'reject'"})
+    body: dict[str, str] = {}
+    if notes:
+        body["notes"] = notes
+    result = await _get_client().post(
+        f"/approvals/{approval_id}/{decision}", json=body or None
+    )
+    return _format(result)
+
+
+@mcp.tool
+async def approval_list(
+    status: str | None = None,
+    action_type: str | None = None,
+) -> str:
+    """List approval requests. Filter by status (pending/approved/rejected) or action_type."""
+    params: dict[str, str] = {}
+    if status:
+        params["status"] = status
+    if action_type:
+        params["action_type"] = action_type
+    result = await _get_client().get("/approvals", params=params or None)
+    return _format(result)
