@@ -386,6 +386,156 @@ Agent A:  "Sounds good!"
 // 1 message. Deterministic routing.`}
       </CodeBlock>
 
+      {/* ── Escalation Reasons ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Escalation Reasons</h2>
+      <p className="mb-4 text-slate-400">
+        Every ESCALATION message must include a typed reason. This enables routing and automated
+        responses.
+      </p>
+      <div className="mb-6 overflow-x-auto">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-6 text-slate-400 font-medium">Reason</th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">When to use</th>
+              <th className="py-2 text-slate-400 font-medium">Routes to</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-400">
+            {[
+              ["BLOCKED", "Missing resource, dependency, or permission", "Direct manager"],
+              ["OUT_OF_DOMAIN", "Task outside agent's expertise", "Manager for re-routing"],
+              ["BUDGET_EXCEEDED", "Agent hit credit limit", "Manager + human principal"],
+              ["AMBIGUOUS_TASK", "Task requirements unclear after 1 clarification", "Task creator"],
+              ["CONFLICT", "Two agents making contradictory changes", "Nearest shared manager"],
+              [
+                "QUALITY_CONCERN",
+                "Output doesn't meet standards after 2 attempts",
+                "Reviewer (L6+)",
+              ],
+              ["TIMEOUT", "Upstream dependency not responding", "Manager"],
+            ].map(([reason, when, routes]) => (
+              <tr key={reason} className="border-b border-white/5">
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{reason}</code>
+                </td>
+                <td className="py-2 pr-6">{when}</td>
+                <td className="py-2">{routes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── ACP Data Model ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">ACP Data Model</h2>
+      <p className="mb-4 text-slate-400">
+        The Agent Communication Protocol (ACP) defines typed interfaces for all messages and events
+        in the system.
+      </p>
+      <CodeBlock title="ACP interfaces (TypeScript)">
+        {`interface AcpMessage {
+  id: string;
+  type: "TASK" | "RESULT" | "ESCALATION" | "DECISION";
+  from: string;       // agent ID
+  to: string;         // agent ID or channel
+  timestamp: string;  // ISO 8601
+  payload: AcpPayload;
+}
+
+interface TaskPayload {
+  title: string;
+  deliverable: string;     // file path or description
+  priority: "low" | "medium" | "high" | "urgent";
+  requirements?: string;
+}
+
+interface ResultPayload {
+  taskId: string;
+  location: string;        // where the output lives
+  summary: string;
+}
+
+interface EscalationPayload {
+  taskId: string;
+  reason: EscalationReason;
+  blocked: string;         // what's blocked
+  need: string;            // what's needed to unblock
+}
+
+interface DecisionPayload {
+  escalationId: string;
+  resolution: string;      // definitive action to take
+  unblocks: string[];      // task IDs being unblocked
+}
+
+type AcpPayload =
+  | TaskPayload
+  | ResultPayload
+  | EscalationPayload
+  | DecisionPayload;
+
+type EscalationReason =
+  | "BLOCKED"
+  | "OUT_OF_DOMAIN"
+  | "BUDGET_EXCEEDED"
+  | "AMBIGUOUS_TASK"
+  | "CONFLICT"
+  | "QUALITY_CONCERN"
+  | "TIMEOUT";`}
+      </CodeBlock>
+
+      {/* ── Agent Decision Model ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Agent Decision Model</h2>
+      <p className="mb-4 text-slate-400">
+        On each tick, every agent evaluates its state and decides one of 5 actions:
+      </p>
+      <CodeBlock title="Agent decision loop">
+        {`function decide(agent: Agent): Action {
+  // 1. Check inbox for new messages
+  if (hasEscalation())  → return resolveOrReEscalate()
+  if (hasNewTask())     → return beginWork()
+  if (hasResult())      → return reviewResult()
+
+  // 2. Check in-progress work
+  if (isBlocked())      → return escalate()
+  if (workComplete())   → return submitResult()
+  if (workInProgress()) → return continueWork()
+
+  // 3. Nothing to do
+  return idle()
+}`}
+      </CodeBlock>
+      <div className="mb-6 overflow-x-auto">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-6 text-slate-400 font-medium">Action</th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">Messages sent</th>
+              <th className="py-2 text-slate-400 font-medium">Cost</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-400">
+            {[
+              ["beginWork()", "0 — silence is success", "1 LLM call"],
+              ["continueWork()", "0", "1 LLM call"],
+              ["submitResult()", "0 or 1 RESULT", "0"],
+              ["escalate()", "1 ESCALATION", "0"],
+              ["resolveOrReEscalate()", "1 DECISION or 1 ESCALATION", "0-1 LLM calls"],
+              ["idle()", "0", "0 (cheap models only)"],
+            ].map(([action, msgs, cost]) => (
+              <tr key={action} className="border-b border-white/5">
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{action}</code>
+                </td>
+                <td className="py-2 pr-6">{msgs}</td>
+                <td className="py-2">{cost}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {/* ── Implementation Checklist ── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Implementation Checklist</h2>
       <ol className="mb-6 list-decimal list-inside space-y-2 text-slate-400">

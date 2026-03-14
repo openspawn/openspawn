@@ -82,18 +82,18 @@ class ArtifactStatus(StrEnum):
 
 ## REST API
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| POST | /artifacts | Publish single artifact |
-| POST | /artifacts/batch | Publish multiple, grouped SSE |
-| GET | /artifacts | List with filters: type, name, task_id, status, producer_agent_id |
-| GET | /artifacts/latest | Latest published version by name |
-| GET | /artifacts/{id} | Get single artifact |
-| GET | /artifacts/{id}/history | All versions by name |
-| PUT | /artifacts/{id}/status | Transition status |
-| POST | /artifacts/subscribe | Create subscription |
-| GET | /artifacts/subscriptions | List agent's subscriptions |
-| DELETE | /artifacts/subscriptions/{id} | Remove subscription |
+| Method | Path                          | Purpose                                                           |
+| ------ | ----------------------------- | ----------------------------------------------------------------- |
+| POST   | /artifacts                    | Publish single artifact                                           |
+| POST   | /artifacts/batch              | Publish multiple, grouped SSE                                     |
+| GET    | /artifacts                    | List with filters: type, name, task_id, status, producer_agent_id |
+| GET    | /artifacts/latest             | Latest published version by name                                  |
+| GET    | /artifacts/{id}               | Get single artifact                                               |
+| GET    | /artifacts/{id}/history       | All versions by name                                              |
+| PUT    | /artifacts/{id}/status        | Transition status                                                 |
+| POST   | /artifacts/subscribe          | Create subscription                                               |
+| GET    | /artifacts/subscriptions      | List agent's subscriptions                                        |
+| DELETE | /artifacts/subscriptions/{id} | Remove subscription                                               |
 
 ### Publish Flow
 
@@ -123,13 +123,13 @@ class UpdateStatusDto(BaseModel):
 
 ## MCP Tools
 
-| Tool | Params | Maps to |
-|------|--------|---------|
-| artifact_publish | type, name, content_json, task_id, source_artifact_ids?, metadata_json? | POST /artifacts |
-| artifact_get | artifact_id?, name? | GET /artifacts/{id} or /latest |
-| artifact_list | task_id?, type?, status?, producer_agent_id? | GET /artifacts |
-| artifact_subscribe | artifact_type, task_id? | POST /artifacts/subscribe |
-| artifact_history | name | GET /artifacts/{id}/history |
+| Tool               | Params                                                                  | Maps to                        |
+| ------------------ | ----------------------------------------------------------------------- | ------------------------------ |
+| artifact_publish   | type, name, content_json, task_id, source_artifact_ids?, metadata_json? | POST /artifacts                |
+| artifact_get       | artifact_id?, name?                                                     | GET /artifacts/{id} or /latest |
+| artifact_list      | task_id?, type?, status?, producer_agent_id?                            | GET /artifacts                 |
+| artifact_subscribe | artifact_type, task_id?                                                 | POST /artifacts/subscribe      |
+| artifact_history   | name                                                                    | GET /artifacts/{id}/history    |
 
 `content_json` accepted as string, parsed + validated server-side. One tool for publish and update (auto-versions on existing name).
 

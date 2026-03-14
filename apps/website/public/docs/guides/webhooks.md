@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/guides/webhooks
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 OpenSpawn has two complementary webhook directions:
 

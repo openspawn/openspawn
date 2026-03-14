@@ -469,6 +469,162 @@ autonomy: medium`}
         A: Higher per-agent credit limit and delayed escalation allow deeper exploration.
       </div>
 
+      {/* ── Industry Templates ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Industry templates</h2>
+      <p className="mb-4 text-slate-400">
+        7 industry-specific templates for common operational patterns. Each includes specialized
+        roles, domain-tuned policies, and ready-to-use playbooks.
+      </p>
+
+      <div className="mb-8 overflow-x-auto">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-6 text-slate-400 font-medium">Template</th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">Roles</th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">Culture</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-400">
+            {[
+              [
+                "saas-onboarding",
+                "Onboarding Lead, Data Migration, Integration Engineer, Success Agent",
+                "agency",
+              ],
+              [
+                "incident-response",
+                "Incident Commander, Diagnostics, Remediator, Comms Agent",
+                "military",
+              ],
+              [
+                "contract-review",
+                "Legal Lead, Clause Analyzer, Risk Assessor, Summary Writer",
+                "enterprise",
+              ],
+              [
+                "compliance-monitoring",
+                "Compliance Officer, Auditor, Policy Checker, Report Generator",
+                "enterprise",
+              ],
+              [
+                "game-live-ops",
+                "Live Ops Director, Event Manager, Balance Analyst, QA Tester",
+                "startup",
+              ],
+              [
+                "catalog-management",
+                "Catalog Manager, Data Entry, Image Processor, Price Optimizer",
+                "agency",
+              ],
+              [
+                "clinical-trials",
+                "Trial Coordinator, Data Monitor, Adverse Event Tracker, Regulatory Agent",
+                "enterprise",
+              ],
+            ].map(([template, roles, culture]) => (
+              <tr key={template} className="border-b border-white/5">
+                <td className="py-2 pr-6">
+                  <code className="inline-code">{template}</code>
+                </td>
+                <td className="py-2 pr-6">{roles}</td>
+                <td className="py-2 pr-6">{culture}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="mt-8 mb-3 text-xl font-bold text-slate-100">
+        Example: incident-response ORG.md
+      </h3>
+      <CodeBlock title="ORG.md — incident-response">
+        {`# Incident Response Team
+
+## Identity
+- **Industry:** SaaS / Infrastructure
+- **Stage:** Production operations
+
+## Culture
+preset: military
+- **Escalation:** immediate — production incidents can't wait
+
+## Structure
+
+### Incident Commander
+Coordinates all agents, owns runbook execution, drives MTTR down.
+- **Model:** claude-opus
+- **Domain:** incident-management
+- **Level:** 8
+
+#### Diagnostics Agent
+Reads logs, traces, metrics. Identifies root cause.
+- **Model:** claude-sonnet
+- **Domain:** observability
+
+#### Remediator
+Applies fixes, rolls back deployments, validates recovery.
+- **Model:** claude-sonnet
+- **Domain:** infrastructure
+
+#### Comms Agent
+Posts status updates, notifies stakeholders, writes postmortems.
+- **Model:** claude-haiku
+- **Domain:** communications
+
+## Policies
+- All production changes require Incident Commander approval
+- Comms Agent posts update every 5 minutes during active incident`}
+      </CodeBlock>
+
+      {/* ── Boot Sequence Templates ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Boot sequence templates</h2>
+      <p className="mb-4 text-slate-400">
+        Every template includes boot sequence instructions in its generated{" "}
+        <code className="inline-code">SOUL.md</code>. Agents read these files at startup to
+        understand the org before they begin work.
+      </p>
+      <CodeBlock title="Default boot sequence (all templates)">
+        {`1. Read ORG.md — understand your role, hierarchy, and reporting chain
+2. Read SOUL.md — internalize org values and communication norms
+3. Read AGENTS.md — understand workspace rules and tool access
+4. Write PLAN.md — plan your approach before executing
+5. Execute — follow plan, write RESULT.md when done`}
+      </CodeBlock>
+
+      {/* ── Policy Guardrails ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Policy guardrails</h2>
+      <p className="mb-4 text-slate-400">
+        Templates include sensible default policies. Override any of these in the{" "}
+        <code className="inline-code">## Policies</code> section of your ORG.md.
+      </p>
+      <div className="mb-8 overflow-x-auto">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-6 text-slate-400 font-medium">Guardrail</th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">Default</th>
+              <th className="py-2 text-slate-400 font-medium">Override with</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-400">
+            {[
+              ["Budget per agent", "500 credits/day", "Per-agent limit in Policies > Budget"],
+              ["Department cap", "10 agents max", "Department Caps in Policies"],
+              ["Spawn permissions", "L7+ only", "Permissions section"],
+              ["Overage behavior", "pause and escalate", "Overage behavior in Budget"],
+              ["Review required", "L6+ for code changes", "Permissions section"],
+            ].map(([guardrail, def_, override]) => (
+              <tr key={guardrail} className="border-b border-white/5">
+                <td className="py-2 pr-6 text-slate-300">{guardrail}</td>
+                <td className="py-2 pr-6">{def_}</td>
+                <td className="py-2">{override}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {/* Customizing a template */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Customizing a template</h2>
 

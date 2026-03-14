@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/comparison
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # OpenSpawn vs CrewAI vs LangGraph

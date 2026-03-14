@@ -95,13 +95,13 @@ completion arrives → wake → process result ($0.12)
 
 The decision is straightforward:
 
-| Factor            | Use Polling                    | Use Event-Driven                 |
-| ----------------- | ------------------------------ | -------------------------------- |
+| Factor            | Use Polling                       | Use Event-Driven                    |
+| ----------------- | --------------------------------- | ----------------------------------- |
 | Model cost        | Cheap (&lt;$0.01/call)            | Expensive (&gt;$0.05/call)          |
 | Activity level    | Busy (&gt;50% of ticks have work) | Sparse (&lt;20% of ticks have work) |
-| Role type         | Worker (always has tasks)      | Manager (waits for reports)      |
-| Latency tolerance | Needs sub-second response      | Can wait for next tick check     |
-| Budget priority   | Predictable spend              | Minimized spend                  |
+| Role type         | Worker (always has tasks)         | Manager (waits for reports)         |
+| Latency tolerance | Needs sub-second response         | Can wait for next tick check        |
+| Budget priority   | Predictable spend                 | Minimized spend                     |
 
 Most orgs will use both. That's the point.
 

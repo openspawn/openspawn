@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/agent-quickstart
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Agent Quickstart
@@ -36,20 +36,65 @@ id, model (opus for L7+, sonnet for L6-), workspace,
 
 tools.profile: "full". Manager agents (L7+ with direct reports) also get subagents.allowAgents. The highest-level agent gets default: true.
 
+## Boot sequence protocol
+
+```
+1. Read ORG.md → understand org structure, your role, who you report to
+2. Read SOUL.md → internalize shared values and behavioral norms
+3. Read AGENTS.md → understand workspace rules and tool access
+4. Write PLAN.md → plan your approach before touching any code
+5. Begin execution → follow plan, write RESULT.md when done
+```
+
+Q: How do I apply the patch to my gateway? A: Copy the entries from openclaw-patch.json into your OpenClaw agents.list configuration, then restart the gateway. Every agent follows a planning-first startup protocol before executing work:
+
+## Task lifecycle via MCP
+
+Q: Why planning-first? A: Agents that plan before executing produce higher-quality output and escalate blockers earlier. The plan is also reviewable by leads before work begins.
+
+```
+# Create a task (leads only, L7+)
+mcp.call("openspawn/task_create", {
+title: "Implement rate limiting",
+assignee: "backend-senior",
+priority: "high"
+})
+# Claim an available task (workers)
+mcp.call("openspawn/task_claim", { agent_id: "backend-senior-1" })
+# List tasks for an agent
+mcp.call("openspawn/task_list", {
+agent_id: "backend-senior-1",
+status: "in_progress"
+})
+# Complete a task with results
+mcp.call("openspawn/task_complete", {
+task_id: "task-123",
+result: "Rate limiting implemented — 100 req/min per API key"
+})
+```
+
+## Init + deploy in one step
+
 ## Pick a template
 
 ```
-# Personal AI team (chief of staff + specialists)
-openspawn init my-org --template=assistant-team
-# Content production pipeline
-openspawn init my-org --template=content-agency
-# Software development team
-openspawn init my-org --template=dev-shop
-# Research & analysis team
-openspawn init my-org --template=research-lab
+openspawn init my-org --template=assistant-team # Personal AI team
+openspawn init my-org --template=content-agency # Content production pipeline
+openspawn init my-org --template=dev-shop # Software development team
+openspawn init my-org --template=research-lab # Research & analysis team
 ```
 
-Q: How do I apply the patch to my gateway? A: Copy the entries from openclaw-patch.json into your OpenClaw agents.list configuration, then restart the gateway. Four templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately or customize.
+```
+openspawn init my-org --template=saas-onboarding # Customer onboarding pipeline
+openspawn init my-org --template=incident-response # Production incident management
+openspawn init my-org --template=contract-review # Legal contract analysis
+openspawn init my-org --template=compliance-monitoring # Regulatory compliance
+openspawn init my-org --template=game-live-ops # Game operations (events, patches)
+openspawn init my-org --template=catalog-management # Product catalog maintenance
+openspawn init my-org --template=clinical-trials # Clinical trial coordination
+```
+
+Agents manage their task queue through MCP tools:
 
 ```
 What's your primary output?
@@ -302,6 +347,12 @@ openspawn status — verify agent name spelling
 
 ERR_GATEWAY_UNREACHABLE
 
+openclaw gateway status — ensure gateway is running
+
+ERR_HMAC_INVALID Check AGENT_SECRET env var matches the value in
+
+openspawn.config.json. Regenerate with
+
 ## Next steps
 
-openclaw gateway status — ensure gateway is running to="/docs/templates" Customize ORG.md → Full reference for every section, field, and option in your org definition. to="/docs/comparison" Connect real models → Configure API keys and model providers for production deployments. to="/getting-started" Full CLI reference → Every command, flag, and option for the OpenSpawn CLI. to="/app/live" See live demo → Watch a multi-agent org handle tasks, escalations, and consensus in real time.
+openspawn secrets rotate to="/docs/templates" Customize ORG.md → Full reference for every section, field, and option in your org definition. to="/docs/comparison" Connect real models → Configure API keys and model providers for production deployments. to="/getting-started" Full CLI reference → Every command, flag, and option for the OpenSpawn CLI. to="/app/live" See live demo → Watch a multi-agent org handle tasks, escalations, and consensus in real time.

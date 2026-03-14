@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/tutorials/your-first-org-md
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Your First ORG.md

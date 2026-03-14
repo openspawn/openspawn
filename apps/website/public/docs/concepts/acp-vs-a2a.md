@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/concepts/acp-vs-a2a
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # ACP vs A2A

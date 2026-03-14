@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/architecture/integrations
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 # BikiniBottom — Integration Strategy & Growth Roadmap
 

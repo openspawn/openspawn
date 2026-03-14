@@ -1,6 +1,6 @@
 name: "[Deprecated] Deploy to GitHub Pages"
 
-# Replaced by deploy-docs.yml (Astro Starlight).
+# Docs are now served from the website app (openspawn.ai/docs/).
 # Kept as workflow_dispatch stub so existing links don't 404.
 on:
   workflow_dispatch:
@@ -10,5 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "This workflow is deprecated. Use deploy-docs.yml instead."
-          echo "See: https://github.com/openspawn/openspawn/actions/workflows/deploy-docs.yml"
+          echo "This workflow is deprecated. Docs are part of the website app."
+          echo "See: apps/website/ (openspawn.ai/docs/)"

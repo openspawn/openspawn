@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/reference/agent-config-compat
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 # OpenClaw-Compatible Agent Configuration
 

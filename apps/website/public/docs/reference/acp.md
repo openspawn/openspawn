@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/reference/acp
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 # Agent Communication Protocol (ACP)
 

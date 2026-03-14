@@ -28,6 +28,38 @@ export function OrgMdReference() {
 
       <hr className="my-8 border-white/10" />
 
+      {/* ── Why Markdown? ──────────────────────────────────────────────────── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Why Markdown?</h2>
+      <p className="mb-4 text-slate-400">
+        ORG.md uses plain markdown instead of YAML, JSON, or a DSL. This is a deliberate design
+        decision:
+      </p>
+      <ul className="mb-6 list-disc pl-6 text-slate-400 space-y-2">
+        <li>
+          <strong className="text-slate-200">Human-readable:</strong> Non-technical stakeholders can
+          read and review org changes in a PR — no need to learn a schema
+        </li>
+        <li>
+          <strong className="text-slate-200">AI-native:</strong> Every LLM can read and write
+          markdown. Agents can parse their own org definition without a custom parser
+        </li>
+        <li>
+          <strong className="text-slate-200">Prose is config:</strong> Free-text descriptions become
+          system prompt context. There's no separate "config" vs "docs" — the documentation{" "}
+          <em>is</em> the configuration
+        </li>
+        <li>
+          <strong className="text-slate-200">Git-friendly:</strong> Diffs are meaningful, blame
+          shows who changed what, PRs let teams discuss org changes the same way they discuss code
+        </li>
+        <li>
+          <strong className="text-slate-200">Lenient:</strong> Missing sections use defaults.
+          Unknown fields are ignored. A 3-line file is valid. No schema validation errors to fight
+        </li>
+      </ul>
+
+      <hr className="my-8 border-white/10" />
+
       {/* ── Overview ──────────────────────────────────────────────────────── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Overview</h2>
       <p className="mb-4 text-slate-400">
@@ -983,6 +1015,147 @@ Sets research direction. Reviews findings.
           </tbody>
         </table>
       </div>
+
+      <hr className="my-8 border-white/10" />
+
+      {/* ── SDLC Presets ──────────────────────────────────────────────────── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">SDLC Presets</h2>
+      <p className="mb-4 text-slate-400">
+        SDLC presets configure development lifecycle rules — review requirements, testing mandates,
+        and deployment gates. Set via <code className="inline-code">sdlc: preset-name</code> in the
+        Culture section.
+      </p>
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-4 text-left font-medium text-slate-400">Preset</th>
+              <th className="py-2 pr-4 text-left font-medium text-slate-400">Review</th>
+              <th className="py-2 pr-4 text-left font-medium text-slate-400">Tests</th>
+              <th className="py-2 text-left font-medium text-slate-400">Deploy Gate</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-slate-400">
+            {[
+              ["standard", "L6+ required", "Required before merge", "CI pass + approval"],
+              [
+                "strict",
+                "2 reviewers (L7+)",
+                "Coverage threshold 80%",
+                "CI + security scan + approval",
+              ],
+              ["solo", "Self-review OK", "Optional", "CI pass"],
+              ["research", "No review", "None", "None — exploratory"],
+            ].map(([preset, review, tests, deploy]) => (
+              <tr key={preset}>
+                <td className="py-2 pr-4">
+                  <code className="inline-code">{preset}</code>
+                </td>
+                <td className="py-2 pr-4">{review}</td>
+                <td className="py-2 pr-4">{tests}</td>
+                <td className="py-2">{deploy}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <CodeBlock title="ORG.md">{`## Culture
+preset: startup
+sdlc: strict`}</CodeBlock>
+
+      <hr className="my-8 border-white/10" />
+
+      {/* ── Workspace Strategy ─────────────────────────────────────────────── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Workspace Strategy</h2>
+      <p className="mb-4 text-slate-400">
+        Each agent operates in an isolated workspace to prevent conflicts. The default strategy is{" "}
+        <strong className="text-slate-200">worktree-per-agent</strong> — each agent gets a git
+        worktree branched from main.
+      </p>
+      <CodeBlock title="Workspace isolation">{`Agent: Backend Senior 1
+  Worktree: .worktrees/backend-senior-1/
+  Branch:   agent/backend-senior-1
+  Base:     main
+
+Agent: Backend Senior 2
+  Worktree: .worktrees/backend-senior-2/
+  Branch:   agent/backend-senior-2
+  Base:     main`}</CodeBlock>
+      <p className="mb-4 text-slate-400">
+        When an agent completes a task, its changes are merged back to main via PR. Conflicts are
+        escalated to the agent's lead.
+      </p>
+
+      <hr className="my-8 border-white/10" />
+
+      {/* ── Lifecycle ──────────────────────────────────────────────────────── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Org Lifecycle</h2>
+
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Deployment</h3>
+      <CodeBlock title="bash">{`npx openspawn deploy ORG.md           # Create org from scratch
+npx openspawn deploy ORG.md --dry-run  # Preview without creating`}</CodeBlock>
+
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Upgrading</h3>
+      <CodeBlock title="bash">{`npx openspawn apply ORG.md    # Diff current state → apply changes
+# New roles → spawn | Removed roles → graceful wind-down
+# Changed policies → immediate | Changed prose → next tick`}</CodeBlock>
+
+      <h3 className="mt-6 mb-3 text-xl font-semibold text-slate-200">Teardown</h3>
+      <CodeBlock title="bash">{`npx openspawn destroy          # Graceful shutdown
+# 1. All agents finish in-flight tasks
+# 2. Results written to RESULT.md
+# 3. State exported to ORG.md.bak
+# 4. Server stops`}</CodeBlock>
+
+      <hr className="my-8 border-white/10" />
+
+      {/* ── Relationship to CONTRIBUTING.md ─────────────────────────────────── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">
+        Relationship to CONTRIBUTING.md
+      </h2>
+      <p className="mb-4 text-slate-400">
+        ORG.md and CONTRIBUTING.md serve different but complementary purposes:
+      </p>
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-4 text-left font-medium text-slate-400"></th>
+              <th className="py-2 pr-4 text-left font-medium text-slate-400">ORG.md</th>
+              <th className="py-2 text-left font-medium text-slate-400">CONTRIBUTING.md</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-slate-400">
+            {[
+              ["Audience", "AI agents", "Human contributors"],
+              [
+                "Scope",
+                "Org structure, roles, policies, culture",
+                "Dev setup, PR conventions, testing",
+              ],
+              ["Parsed by", "OpenSpawn org parser", "Read by humans"],
+              ["Changes", "openspawn apply ORG.md", "Manual process"],
+              [
+                "Enforced",
+                "Programmatically (budget, permissions, routing)",
+                "By review (code review, CI)",
+              ],
+            ].map(([dim, org, contrib]) => (
+              <tr key={dim}>
+                <td className="py-2 pr-4 font-medium text-slate-300">{dim}</td>
+                <td className="py-2 pr-4">{org}</td>
+                <td className="py-2">{contrib}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mb-6 text-slate-400">
+        In practice, ORG.md is the superset for agent teams. Human contributors still use
+        CONTRIBUTING.md. When agents create PRs, they follow both: ORG.md for org-level policies
+        (budget, escalation) and CONTRIBUTING.md for repo-level conventions (commit format, test
+        requirements).
+      </p>
 
       <hr className="my-8 border-white/10" />
 

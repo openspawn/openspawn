@@ -69,26 +69,84 @@ openspawn status`}
         gateway.
       </div>
 
+      {/* ── Boot Sequence ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Boot sequence protocol</h2>
+      <p className="mb-4 text-slate-400">
+        Every agent follows a planning-first startup protocol before executing work:
+      </p>
+      <CodeBlock title="Boot sequence">
+        {`1. Read ORG.md           → understand org structure, your role, who you report to
+2. Read SOUL.md          → internalize shared values and behavioral norms
+3. Read AGENTS.md        → understand workspace rules and tool access
+4. Write PLAN.md         → plan your approach before touching any code
+5. Begin execution       → follow plan, write RESULT.md when done`}
+      </CodeBlock>
+      <div className="mb-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
+        <strong className="text-slate-200">Q: Why planning-first?</strong>
+        <br />
+        A: Agents that plan before executing produce higher-quality output and escalate blockers
+        earlier. The plan is also reviewable by leads before work begins.
+      </div>
+
+      {/* ── Task Lifecycle via MCP ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Task lifecycle via MCP</h2>
+      <p className="mb-4 text-slate-400">Agents manage their task queue through MCP tools:</p>
+      <CodeBlock title="Task lifecycle MCP calls">
+        {`# Create a task (leads only, L7+)
+mcp.call("openspawn/task_create", {
+  title: "Implement rate limiting",
+  assignee: "backend-senior",
+  priority: "high"
+})
+
+# Claim an available task (workers)
+mcp.call("openspawn/task_claim", { agent_id: "backend-senior-1" })
+
+# List tasks for an agent
+mcp.call("openspawn/task_list", {
+  agent_id: "backend-senior-1",
+  status: "in_progress"
+})
+
+# Complete a task with results
+mcp.call("openspawn/task_complete", {
+  task_id: "task-123",
+  result: "Rate limiting implemented — 100 req/min per API key"
+})`}
+      </CodeBlock>
+
+      {/* ── Deploy shortcut ── */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Init + deploy in one step</h2>
+      <CodeBlock title="Terminal">{`openspawn init my-org --template=dev-shop --deploy`}</CodeBlock>
+      <p className="mb-4 text-slate-400">
+        The <code className="inline-code">--deploy</code> flag scaffolds and immediately starts the
+        server. Equivalent to <code className="inline-code">init</code> +{" "}
+        <code className="inline-code">cd</code> + <code className="inline-code">start</code>.
+      </p>
+
       {/* ── Pick a template ── */}
       <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">Pick a template</h2>
 
       <p className="mb-4 text-slate-400">
-        Four templates ship with OpenSpawn. Each produces a complete ORG.md you can use immediately
-        or customize.
+        4 general-purpose templates + 7 industry-specific templates ship with OpenSpawn. Each
+        produces a complete ORG.md you can use immediately or customize.
       </p>
 
-      <CodeBlock title="Templates">
-        {`# Personal AI team (chief of staff + specialists)
-openspawn init my-org --template=assistant-team
+      <CodeBlock title="General-purpose templates">
+        {`openspawn init my-org --template=assistant-team    # Personal AI team
+openspawn init my-org --template=content-agency    # Content production pipeline
+openspawn init my-org --template=dev-shop          # Software development team
+openspawn init my-org --template=research-lab      # Research & analysis team`}
+      </CodeBlock>
 
-# Content production pipeline
-openspawn init my-org --template=content-agency
-
-# Software development team
-openspawn init my-org --template=dev-shop
-
-# Research & analysis team
-openspawn init my-org --template=research-lab`}
+      <CodeBlock title="Industry templates">
+        {`openspawn init my-org --template=saas-onboarding         # Customer onboarding pipeline
+openspawn init my-org --template=incident-response        # Production incident management
+openspawn init my-org --template=contract-review          # Legal contract analysis
+openspawn init my-org --template=compliance-monitoring    # Regulatory compliance
+openspawn init my-org --template=game-live-ops            # Game operations (events, patches)
+openspawn init my-org --template=catalog-management       # Product catalog maintenance
+openspawn init my-org --template=clinical-trials          # Clinical trial coordination`}
       </CodeBlock>
 
       <div className="mb-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-300">
@@ -449,6 +507,16 @@ openspawn consensus --results
               <td className="px-3 py-2">
                 <code className="inline-code">openclaw gateway status</code> — ensure gateway is
                 running
+              </td>
+            </tr>
+            <tr className="border-b border-slate-800">
+              <td className="px-3 py-2">
+                <code className="inline-code">ERR_HMAC_INVALID</code>
+              </td>
+              <td className="px-3 py-2">
+                Check <code className="inline-code">AGENT_SECRET</code> env var matches the value in{" "}
+                <code className="inline-code">openspawn.config.json</code>. Regenerate with{" "}
+                <code className="inline-code">openspawn secrets rotate</code>
               </td>
             </tr>
           </tbody>

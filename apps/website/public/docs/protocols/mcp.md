@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/protocols/mcp
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # MCP Tools

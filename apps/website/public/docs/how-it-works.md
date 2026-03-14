@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/how-it-works
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # How It Works
