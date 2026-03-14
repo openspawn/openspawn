@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.router import router as agents_router
+from app.artifacts.router import router as artifacts_router
 from app.config import settings
 from app.credits.router import router as credits_router
 from app.database import engine
@@ -53,6 +54,7 @@ app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(credits_router)
 app.include_router(messages_router)
+app.include_router(artifacts_router)
 app.include_router(sse_router)  # before events_router so /stream matches before /{event_id}
 app.include_router(events_router)
 app.include_router(integrations_router)
