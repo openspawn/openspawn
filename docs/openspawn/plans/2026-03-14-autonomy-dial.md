@@ -16,11 +16,6 @@
 - `_publish_one()` hardcodes `status=PUBLISHED` — we'll conditionally set DRAFT when gated
 - `update_artifact_status()` validates `DRAFT → PUBLISHED` but doesn't set `approved_by`/`approved_at` — we'll add that
 
-**Design decisions:**
-- Approved `ApprovalRequest` records are **audit-only** — they do NOT grant the agent a bypass token to retry the gated action autonomously. The human/manager who approves the intent should perform the action directly (e.g., transition the task themselves). This avoids callback/replay complexity.
-- `resolved_by` stores a raw UUID with no FK constraint — it's polymorphic (can be an agent UUID from `agents.id` or a user UUID from `users.id`)
-- Authority check for agent approvers uses `requester.level + 2` (org hierarchy), not `autonomy_level + 2` (task config)
-
 ---
 
 ## File Structure
@@ -167,15 +162,13 @@ git commit -m "feat(api): add autonomy_level to Task and default_autonomy_level 
 
 - [ ] **Step 1: Write the model**
 
-Note: `resolved_by` has no FK — it's polymorphic (agent UUID or user UUID).
-
 ```python
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, SmallInteger, String, Text, func
+from sqlalchemy import CheckConstraint, ForeignKey, Index, SmallInteger, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKeyMixin
@@ -208,22 +201,21 @@ class ApprovalRequest(UUIDPrimaryKeyMixin, Base):
     entity_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), nullable=False)
     risk_level: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     autonomy_level: Mapped[int] = mapped_column(SmallInteger, nullable=False)
-    payload: Mapped[dict[str, object]] = mapped_column(CompatJSONB(), nullable=False)
+    payload: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="pending")
     resolved_by: Mapped[uuid.UUID | None] = mapped_column(
-        CompatUUID(), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     resolved_at: Mapped[datetime | None] = mapped_column(nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+    metadata_: Mapped[dict] = mapped_column(
+        "metadata", CompatJSONB(), nullable=False, server_default="{}"
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
     requester = relationship("Agent", foreign_keys=[requested_by], lazy="selectin")
+    resolver = relationship("Agent", foreign_keys=[resolved_by], lazy="selectin")
 ```
 
 - [ ] **Step 2: Register in `__init__.py`**
@@ -244,8 +236,6 @@ git commit -m "feat(api): add ApprovalRequest model"
 
 - [ ] **Step 1: Write migration**
 
-Note: No `op.create_check_constraint()` as ALTER TABLE — SQLite doesn't support it. Pydantic validates at API layer. Check constraints are inline in `create_table` only.
-
 ```python
 """add approval_requests table and autonomy columns
 
@@ -265,7 +255,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add autonomy columns to existing tables (no check constraints — SQLite compat)
+    # Add autonomy columns to existing tables
     op.add_column(
         "agents",
         sa.Column(
@@ -274,6 +264,11 @@ def upgrade() -> None:
             nullable=False,
             server_default="5",
         ),
+    )
+    op.create_check_constraint(
+        "chk_agents_default_autonomy_level",
+        "agents",
+        "default_autonomy_level >= 0 AND default_autonomy_level <= 10",
     )
 
     op.add_column(
@@ -298,15 +293,15 @@ def upgrade() -> None:
         sa.Column("autonomy_level", sa.SmallInteger(), nullable=False),
         sa.Column("payload", sa.JSON(), nullable=False),
         sa.Column("status", sa.String(20), nullable=False, server_default="pending"),
-        sa.Column("resolved_by", sa.Text(), nullable=True),
+        sa.Column(
+            "resolved_by", sa.Text(), sa.ForeignKey("agents.id"), nullable=True
+        ),
         sa.Column("resolved_at", sa.DateTime(), nullable=True),
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("expires_at", sa.DateTime(), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=False, server_default="{}"),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
-        ),
-        sa.Column(
-            "updated_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
         ),
         sa.CheckConstraint(
             "risk_level >= 0 AND risk_level <= 10", name="chk_approval_risk_level"
@@ -336,6 +331,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("approval_requests")
     op.drop_column("tasks", "autonomy_level")
+    op.drop_constraint("chk_agents_default_autonomy_level", "agents")
     op.drop_column("agents", "default_autonomy_level")
 ```
 
@@ -361,6 +357,11 @@ git commit -m "feat(api): add approvals + autonomy migration"
 ```python
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.enums import ActionType
+
 # Risk levels (0-10) per (action_type, subtype) pair.
 # Higher = riskier = needs higher autonomy to proceed without approval.
 RISK_REGISTRY: dict[tuple[str, str], int] = {
@@ -383,7 +384,7 @@ RISK_REGISTRY: dict[tuple[str, str], int] = {
     ("artifact_publish", "migration"): 9,
 }
 
-DEFAULT_RISK = 5  # unknown actions default to medium risk (fail closed)
+DEFAULT_RISK = 5  # unknown actions default to medium risk
 
 
 def get_risk_level(action_type: str, subtype: str) -> int:
@@ -423,8 +424,6 @@ git commit -m "feat(api): add autonomy gate function + risk registry"
 
 - [ ] **Step 1: Write schemas**
 
-Note: `metadata` uses `Field(alias="metadata_")` to match codebase convention (see `AgentResponse`).
-
 ```python
 from __future__ import annotations
 
@@ -441,7 +440,7 @@ class CreateApprovalDto(BaseModel):
     entity_type: str
     entity_id: uuid.UUID
     risk_level: int = Field(ge=0, le=10)
-    payload: dict[str, object]
+    payload: dict
 
 
 class RespondApprovalDto(BaseModel):
@@ -459,13 +458,13 @@ class ApprovalResponse(BaseModel):
     entity_id: uuid.UUID
     risk_level: int
     autonomy_level: int
-    payload: dict[str, object]
+    payload: dict
     status: ApprovalStatus
     resolved_by: uuid.UUID | None
     resolved_at: datetime | None
     notes: str | None
     expires_at: datetime | None
-    metadata: dict[str, object] = Field(alias="metadata_")
+    metadata_: dict
     created_at: datetime
 
 
@@ -491,8 +490,6 @@ git commit -m "feat(api): add approval schemas"
 - Create: `apps/api/app/approvals/service.py`
 
 - [ ] **Step 1: Write service**
-
-Note: authority check uses `requester.level + 2` (org hierarchy), not `autonomy_level + 2`. `list_pending` filters expired records. Idempotency handles IntegrityError for TOCTOU race.
 
 ```python
 from __future__ import annotations
@@ -523,7 +520,7 @@ async def create_approval(
     entity_id: uuid.UUID,
     risk_level: int,
     autonomy_level: int,
-    payload: dict[str, object],
+    payload: dict,
 ) -> ApprovalRequest:
     # Idempotency: check for existing pending request
     existing = await db.execute(
@@ -551,23 +548,7 @@ async def create_approval(
         expires_at=pendulum.now("UTC").add(hours=24),
     )
     db.add(approval)
-    try:
-        await db.flush()
-    except Exception:
-        # TOCTOU race — concurrent request created the same approval
-        await db.rollback()
-        existing = await db.execute(
-            select(ApprovalRequest).where(
-                ApprovalRequest.org_id == org_id,
-                ApprovalRequest.requested_by == agent_id,
-                ApprovalRequest.action_type == action_type,
-                ApprovalRequest.entity_id == entity_id,
-                ApprovalRequest.status == ApprovalStatus.PENDING.value,
-            )
-        )
-        if found := existing.scalar_one_or_none():
-            return found
-        raise
+    await db.flush()
     await db.refresh(approval)
 
     await emit(
@@ -602,14 +583,6 @@ async def list_approvals(
         q = q.where(ApprovalRequest.status == approval_status)
     if action_type:
         q = q.where(ApprovalRequest.action_type == action_type)
-
-    # Filter out expired pending approvals
-    now = pendulum.now("UTC")
-    q = q.where(
-        (ApprovalRequest.status != ApprovalStatus.PENDING.value)
-        | (ApprovalRequest.expires_at.is_(None))
-        | (ApprovalRequest.expires_at > now)
-    )
 
     total = await db.scalar(select(func.count()).select_from(q.subquery())) or 0
     offset = (page - 1) * limit
@@ -656,18 +629,20 @@ async def respond_to_approval(
             detail="Cannot approve your own request",
         )
 
-    # Agent authority check: level >= requester.level + 2, or parent
+    # Agent authority check: level >= requester autonomy + 2, or parent
     if isinstance(auth, AuthenticatedAgent):
+        from sqlalchemy import select as sa_select
+
         from app.models.agent import Agent
 
         requester = await db.get(Agent, approval.requested_by)
         is_parent = requester and requester.parent_id == auth.id
-        requester_level = requester.level if requester else 0
-        has_level = auth.level >= requester_level + 2
+        has_level = auth.level >= approval.autonomy_level + 2
         if not (is_parent or has_level):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient level to approve (need level >= {requester_level + 2} or be parent agent)",
+                detail="Insufficient level to approve (need level >= "
+                f"{approval.autonomy_level + 2} or be parent agent)",
             )
 
     now = pendulum.now("UTC")
@@ -713,7 +688,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.approvals.service as service
@@ -793,6 +768,8 @@ async def reject(
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[ApprovalResponse]:
     if not dto.notes:
+        from fastapi import HTTPException, status
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Rejection reason is required",
@@ -841,7 +818,6 @@ After the state machine validation (line ~157) and before the existing approval_
 
     if isinstance(auth, _AuthAgent):
         from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
-        from app.models.agent import Agent
 
         agent = await db.get(Agent, auth.id)
         effective_autonomy = resolve_effective_autonomy(
@@ -880,7 +856,7 @@ After the state machine validation (line ~157) and before the existing approval_
             )
 ```
 
-Note: the `db.commit()` before the raise is intentional — it persists the `ApprovalRequest` before the 403 unwinds the request. This deviates from the single-commit-at-end pattern but is required because the HTTPException would otherwise roll back the approval row.
+Add `Agent` import at the top with the other model imports.
 
 - [ ] **Step 2: Add SSE event to `approve_task()`**
 
@@ -913,9 +889,9 @@ git commit -m "feat(api): add autonomy gate to task transitions"
 **Files:**
 - Modify: `apps/api/app/artifacts/router.py`
 
-- [ ] **Step 1: Rewrite `_publish_one()` with gate logic**
+- [ ] **Step 1: Modify `_publish_one()` to conditionally set DRAFT**
 
-Complete replacement handling all 3 code paths (cache hit, gated, ungated):
+Change the function signature to accept `auth: AuthContext`:
 
 ```python
 async def _publish_one(
@@ -924,41 +900,16 @@ async def _publish_one(
     org_id: uuid.UUID,
     producer_id: uuid.UUID,
     auth: AuthContext,
-) -> tuple[Artifact, bool, uuid.UUID | None]:
-    """Publish a single artifact. Returns (artifact, is_new, approval_id).
+) -> tuple[Artifact, bool, ApprovalRequest | None]:
+```
 
-    If content_hash matches latest version, returns existing (is_new=False).
-    If gated by autonomy dial, artifact is stored as DRAFT (approval_id set).
-    """
+After creating the artifact object (before `db.add(artifact)`), add gate check:
+
+```python
+    approval: ApprovalRequest | None = None
+
+    # Autonomy gate — skip for human operators
     from app.auth.schemas import AuthenticatedAgent as _AuthAgent
-
-    content_hash = compute_content_hash(dto.content)
-
-    latest = await db.execute(
-        select(Artifact)
-        .where(
-            Artifact.org_id == org_id,
-            Artifact.name == dto.name,
-            Artifact.status != ArtifactStatus.SUPERSEDED.value,
-        )
-        .order_by(Artifact.version.desc())
-        .limit(1)
-    )
-    existing = latest.scalar_one_or_none()
-
-    if existing and existing.content_hash == content_hash:
-        return existing, False, None
-
-    max_ver = await db.scalar(
-        select(func.max(Artifact.version)).where(
-            Artifact.org_id == org_id, Artifact.name == dto.name
-        )
-    )
-    new_version = (max_ver or 0) + 1
-
-    # Determine status: DRAFT if gated, PUBLISHED otherwise
-    artifact_status = ArtifactStatus.PUBLISHED.value
-    approval_id: uuid.UUID | None = None
 
     if isinstance(auth, _AuthAgent):
         from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
@@ -974,137 +925,64 @@ async def _publish_one(
         risk = get_risk_level("artifact_publish", dto.artifact_type.value)
 
         if is_gated(effective_autonomy, risk):
-            artifact_status = ArtifactStatus.DRAFT.value
+            from app.approvals.service import create_approval
 
-    now = pendulum.now("UTC")
-    artifact = Artifact(
-        org_id=org_id,
-        task_id=dto.task_id,
-        producer_agent_id=producer_id,
-        artifact_type=dto.artifact_type.value,
-        name=dto.name,
-        version=new_version,
-        status=artifact_status,
-        content=dto.content,
-        content_hash=content_hash,
-        metadata_=dto.metadata,
-        source_artifact_ids=[str(sid) for sid in dto.source_artifact_ids],
-        created_at=now,
-        updated_at=now,
-    )
-    db.add(artifact)
-    await db.flush()
+            artifact.status = ArtifactStatus.DRAFT.value
+            db.add(artifact)
+            await db.flush()
 
-    if existing:
-        existing.superseded_by_id = artifact.id
-        existing.status = ArtifactStatus.SUPERSEDED.value
+            approval = await create_approval(
+                db=db,
+                org_id=org_id,
+                agent_id=auth.id,
+                action_type="artifact_publish",
+                entity_type="artifact",
+                entity_id=artifact.id,
+                risk_level=risk,
+                autonomy_level=effective_autonomy,
+                payload={
+                    "artifact_type": dto.artifact_type.value,
+                    "name": dto.name,
+                    "version": new_version,
+                },
+            )
+            if existing:
+                existing.superseded_by_id = artifact.id
+                existing.status = ArtifactStatus.SUPERSEDED.value
 
-    # Create approval request if gated
-    if artifact_status == ArtifactStatus.DRAFT.value and isinstance(auth, _AuthAgent):
-        from app.approvals.service import create_approval
+            return artifact, True, approval
+    else:
+        db.add(artifact)
+        await db.flush()
 
-        approval = await create_approval(
-            db=db,
-            org_id=org_id,
-            agent_id=auth.id,
-            action_type="artifact_publish",
-            entity_type="artifact",
-            entity_id=artifact.id,
-            risk_level=risk,
-            autonomy_level=effective_autonomy,
-            payload={
-                "artifact_type": dto.artifact_type.value,
-                "name": dto.name,
-                "version": new_version,
-            },
-        )
-        approval_id = approval.id
+        if existing:
+            existing.superseded_by_id = artifact.id
+            existing.status = ArtifactStatus.SUPERSEDED.value
 
-    return artifact, True, approval_id
+    return artifact, True, None
 ```
 
-- [ ] **Step 2: Update `publish_artifact()` to handle approval case**
+Update `publish_artifact()` to handle the approval case — when `approval` is not None, skip the `ARTIFACT_PUBLISHED` emit and include approval info in response.
 
-When `approval_id` is not None, skip `ARTIFACT_PUBLISHED` emit (subscribers shouldn't see DRAFT artifacts):
+Update all callers of `_publish_one()` to handle the new return signature.
 
-```python
-@router.post("", status_code=status.HTTP_201_CREATED)
-async def publish_artifact(
-    dto: PublishArtifactDto,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(require_auth),
-) -> DataResponse[ArtifactResponse]:
-    artifact, is_new, approval_id = await _publish_one(db, dto, auth.org_id, auth.id, auth)
+- [ ] **Step 2: Update `update_artifact_status()` to set approval fields on DRAFT→PUBLISHED**
 
-    if is_new and approval_id is None:
-        # Only emit ARTIFACT_PUBLISHED for non-gated artifacts
-        targets = await _resolve_subscribers(db, auth.org_id, dto.artifact_type.value, dto.task_id)
-        content_data = artifact.content
-        content_truncated = False
-        if len(str(content_data)) > _CONTENT_TRUNCATE_BYTES:
-            content_data = {}
-            content_truncated = True
-
-        await emit(
-            db=db,
-            type=SSEEventType.ARTIFACT_PUBLISHED,
-            org_id=auth.org_id,
-            actor_id=auth.id,
-            entity_type="artifact",
-            entity_id=artifact.id,
-            data={
-                "artifact_type": artifact.artifact_type,
-                "name": artifact.name,
-                "version": artifact.version,
-                "content": content_data,
-                "content_hash": artifact.content_hash,
-                "content_truncated": content_truncated,
-                "producer_agent_id": str(artifact.producer_agent_id),
-            },
-            target_agents=targets if targets else None,
-        )
-
-    await db.commit()
-    return DataResponse(data=ArtifactResponse.model_validate(artifact))
-```
-
-- [ ] **Step 3: Update `publish_batch()` to handle new signature**
-
-Update the unpacking in the batch loop:
-```python
-    for dto in dtos:
-        artifact, is_new, _approval_id = await _publish_one(db, dto, auth.org_id, auth.id, auth)
-```
-
-Only include non-gated new artifacts in the batch event data.
-
-- [ ] **Step 4: Update `update_artifact_status()` for DRAFT→PUBLISHED approval**
-
-In the `update_artifact_status` endpoint, after `artifact.status = dto.status.value`:
+In the `update_artifact_status` endpoint, after setting `artifact.status`, add:
 
 ```python
-    old_status = artifact.status
-    artifact.status = dto.status.value
-    artifact.updated_at = pendulum.now("UTC")
-
     # Set approval fields on DRAFT → PUBLISHED
-    if old_status == ArtifactStatus.DRAFT.value and dto.status == ArtifactStatus.PUBLISHED:
+    if artifact.status == ArtifactStatus.PUBLISHED.value:
         from app.auth.schemas import AuthenticatedAgent as _AuthAgent
 
         approver_name = auth.agent_id if isinstance(auth, _AuthAgent) else auth.name
         artifact.approved_by = approver_name
         artifact.approved_at = pendulum.now("UTC")
-
-    # Emit ARTIFACT_PUBLISHED (not just UPDATED) for DRAFT → PUBLISHED
-    sse_type = SSEEventType.ARTIFACT_PUBLISHED if (
-        old_status == ArtifactStatus.DRAFT.value
-        and dto.status == ArtifactStatus.PUBLISHED
-    ) else SSEEventType.ARTIFACT_UPDATED
 ```
 
-Use `sse_type` in the existing `emit()` call.
+Also change the emitted event type from `ARTIFACT_UPDATED` to `ARTIFACT_PUBLISHED` when the transition is `DRAFT → PUBLISHED`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
 git add apps/api/app/artifacts/router.py
@@ -1121,8 +999,6 @@ git commit -m "feat(api): add autonomy gate to artifact publishing"
 - Modify: `apps/api/app/mcp_server/server.py`
 
 - [ ] **Step 1: Add tools**
-
-Note: `approval_respond` validates `decision` parameter before constructing URL.
 
 ```python
 # ═══════════════════════════════════════════════
@@ -1156,15 +1032,11 @@ async def approval_respond(
     decision: str,
     notes: str | None = None,
 ) -> str:
-    """Approve or reject a pending approval request. Decision must be 'approve' or 'reject'."""
-    if decision not in ("approve", "reject"):
-        return json.dumps({"error": "decision must be 'approve' or 'reject'"})
+    """Approve or reject a pending approval request. Decision: 'approve' or 'reject'."""
     body: dict[str, str] = {}
     if notes:
         body["notes"] = notes
-    result = await _get_client().post(
-        f"/approvals/{approval_id}/{decision}", json=body or None
-    )
+    result = await _get_client().post(f"/approvals/{approval_id}/{decision}", json=body or None)
     return _format(result)
 
 
@@ -1244,54 +1116,31 @@ git commit -m "test(api): add autonomy gate unit tests"
 
 - [ ] **Step 1: Write E2E test**
 
-**CRITICAL: Must override `require_auth` to return `AuthenticatedAgent`.** The `AUTH_MODE=none` fixture returns `AuthenticatedUser`, which bypasses the gate (`isinstance(auth, AuthenticatedAgent)` is False). Override `require_auth` dependency per-step using a context manager:
-
-```python
-import contextlib
-from app.auth.dependencies import require_auth
-from app.auth.schemas import AuthenticatedAgent
-
-@contextlib.contextmanager
-def as_agent(app, agent_id, org_id, name, level, agent_id_str="test-agent"):
-    """Override require_auth to return an AuthenticatedAgent."""
-    original = app.dependency_overrides.get(require_auth)
-    app.dependency_overrides[require_auth] = lambda: AuthenticatedAgent(
-        id=agent_id,
-        org_id=org_id,
-        agent_id=agent_id_str,
-        name=name,
-        role="worker",
-        mode="worker",
-        level=level,
-    )
-    try:
-        yield
-    finally:
-        if original:
-            app.dependency_overrides[require_auth] = original
-        else:
-            app.dependency_overrides.pop(require_auth, None)
-```
+Use same fixture pattern as `test_event_mesh_e2e.py` (SQLite, AUTH_MODE=none, CompatUUID column patch).
 
 Scenario:
-1. Create org, 2 agents (worker: level=3, default_autonomy_level=3; manager: level=8), task
-2. **As worker**: attempt `task_transition` to `done` (risk=3, autonomy=3) → 200 (3 is not > 3)
+1. Create org, agent (default_autonomy_level=3), task
+2. Agent attempts `task_transition` to `done` (risk=3, autonomy=3) → 200 (3 is not > 3)
 3. Reset task to `in_progress`
-4. **As worker**: attempt `task_transition` to `cancelled` (risk=5, autonomy=3) → 403 with approval_id
-5. **As worker**: retry same transition → 403 with SAME approval_id (idempotency)
-6. `GET /approvals/pending` → 1 pending
-7. `GET /approvals/{id}` → correct fields (risk_level=5, autonomy_level=3, action_type=task_transition)
-8. **As worker**: try to self-approve → 403 (self-approval blocked)
-9. **As manager**: approve → 200
-10. `GET /approvals/{id}` → status=approved, resolved_by=manager
-11. **As manager**: duplicate approval attempt → 400 (already resolved)
-12. **As worker**: publish `migration` artifact → 201 with `status=draft` (risk=9, autonomy=3)
-13. Verify corresponding approval request exists
-14. **As manager (human-like)**: `PUT /artifacts/{id}/status` → `PUBLISHED`, verify `approved_by` set
-15. Invalid approval_id → 404
-16. **As worker**: reject without notes → 400
-17. `GET /approvals?status=approved` → returns the resolved approval
-18. `GET /approvals?status=pending` → returns only the artifact approval (if still pending)
+4. Agent attempts `task_transition` to `cancelled` (risk=5, autonomy=3) → 403 with approval_id
+5. `GET /approvals/pending` → 1 pending approval
+6. `GET /approvals/{id}` → correct fields
+7. `POST /approvals/{id}/approve` → approved
+8. Agent retries `task_transition` to `cancelled` → 200 (no longer gated because approval exists... wait, the agent still has autonomy=3 and risk=5)
+
+Actually — the approval resolves the *request*, not the gate. The gate will fire again on retry. This is by design: the approval is per-request, not a blanket override. The agent needs to check the approval status and the caller (human) should directly transition the task if they approved the intent.
+
+Revised scenario:
+1. Create org, 2 agents (worker at level 3, manager at level 8), task
+2. Worker attempts `task_transition` to `cancelled` → 403 with approval_id
+3. `GET /approvals/pending` → 1 pending
+4. Worker tries to self-approve → 403 (self-approval blocked)
+5. Manager approves → 200
+6. `GET /approvals/{id}` → status=approved, resolved_by=manager
+7. Duplicate approval attempt → 400 (already resolved)
+8. Artifact publish: worker publishes `migration` artifact → 201 with status=draft
+9. Manager transitions artifact `DRAFT → PUBLISHED` → approved_by set
+10. Invalid approval_id → 404
 
 - [ ] **Step 2: Run test**
 
@@ -1342,7 +1191,7 @@ Run: `pnpm run codegen`
 
 ```bash
 git add apps/api/openapi.json libs/dashboard-data/src/rest/generated/
-git commit -m "chore(api): regenerate OpenAPI spec + TS types for approval endpoints"
+git commit -m "chore: regenerate OpenAPI spec + TS types for approval endpoints"
 ```
 
 ---
@@ -1356,8 +1205,9 @@ git commit -m "chore(api): regenerate OpenAPI spec + TS types for approval endpo
 - **Escalation gating** — only task transitions + artifact publish for now
 - **Credit/agent spawn gating** — extensible via `ActionType` enum later
 - **Per-artifact-type risk overrides** — risk registry is code-only for now
-- **Approval bypass tokens** — approved ApprovalRequest is audit-only, does not auto-bypass gate on retry
+- **Approval replay** — agent must manually retry after approval, no server-side replay
 
 ## Unresolved Questions
 
+- After approval, should the approval service mark the original ApprovalRequest but leave the retry to the agent? (current design: yes)
 - Should `approval_request` MCP tool exist separately or is it only created internally by gates? (current: both paths — internal gate + explicit MCP tool for agent-initiated requests)
