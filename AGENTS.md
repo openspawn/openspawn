@@ -80,7 +80,7 @@ cd apps/api && uv run alembic upgrade head                # Database migrations
 4. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
 5. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
 6. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
-7. **Docker** builds demo + team + website, serves all via sandbox server on VPS (Tier 2 only)
+7. **Docker** builds dashboard + team + website, serves all via sandbox server on VPS (Tier 2 only)
 
 Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
