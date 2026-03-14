@@ -381,4 +381,4 @@ class TestSSEEventTypes:
     def test_event_type_count(self):
         from app.models.enums import SSEEventType
 
-        assert len(SSEEventType) == 12
+        assert len(SSEEventType) == 13

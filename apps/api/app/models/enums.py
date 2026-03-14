@@ -271,10 +271,27 @@ class SSEEventType(enum.StrEnum):
     # Agent status
     AGENT_STATUS_CHANGED = "agent.status_changed"
 
-    # Future: Artifact Bus (#665)
+    # Artifact Bus (#665)
     ARTIFACT_PUBLISHED = "artifact.published"
     ARTIFACT_UPDATED = "artifact.updated"
+    ARTIFACTS_BATCH_PUBLISHED = "artifact.batch_published"
 
-    # Future: Autonomy Dial (#668)
+    # Autonomy Dial (#668)
     APPROVAL_REQUESTED = "approval.requested"
     APPROVAL_RESOLVED = "approval.resolved"
+
+
+class ArtifactType(enum.StrEnum):
+    COMPONENT = "component"
+    TEST_PLAN = "test_plan"
+    SCREENSHOT = "screenshot"
+    API_CONTRACT = "api_contract"
+    MIGRATION = "migration"
+    SCHEMA = "schema"
+    DOC_SECTION = "doc_section"
+
+
+class ArtifactStatus(enum.StrEnum):
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    SUPERSEDED = "superseded"

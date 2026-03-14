@@ -30,6 +30,7 @@ async def get_db() -> AsyncGenerator[AsyncSession]:
 
 async def create_tables() -> None:
     """Create all tables from SQLAlchemy metadata (used for SQLite/local mode)."""
+    import app.models.artifact  # noqa: F401 — register Artifact tables
     from app.models.base import Base
 
     if settings.is_sqlite:

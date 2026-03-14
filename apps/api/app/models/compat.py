@@ -69,6 +69,49 @@ class CompatArray(TypeDecorator[list[object]]):
         return dialect.type_descriptor(JSON())  # type: ignore[union-attr]
 
 
+try:
+    from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+except ImportError:
+    PG_UUID = None
+
+
+class CompatUUID(TypeDecorator[str]):
+    """UUID on Postgres (native), String(36) on SQLite.
+
+    SQLite doesn't support native UUIDs — UUID(as_uuid=True) stores them
+    as integers which breaks on read-back. This stores as hex strings on
+    SQLite and uses native UUID on Postgres.
+    """
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect: object) -> TypeEngine[str]:
+        if dialect.name == "postgresql" and PG_UUID:  # type: ignore[union-attr]
+            return dialect.type_descriptor(PG_UUID(as_uuid=True))  # type: ignore[union-attr]
+        return dialect.type_descriptor(Text())  # type: ignore[union-attr]
+
+    def process_bind_param(self, value: object, dialect: object) -> str | None:  # type: ignore[override]
+        if value is None:
+            return None
+        import uuid as _uuid
+
+        if isinstance(value, _uuid.UUID):
+            return str(value)
+        return str(value)
+
+    def process_result_value(self, value: object, dialect: object) -> object:  # type: ignore[override]
+        if value is None:
+            return None
+        import uuid as _uuid
+
+        if isinstance(value, _uuid.UUID):
+            return value
+        if isinstance(value, int):
+            return _uuid.UUID(int=value)
+        return _uuid.UUID(str(value))
+
+
 class CompatTSVector(TypeDecorator[str]):
     """TSVector on Postgres, Text on SQLite (FTS5 handled separately)."""
 

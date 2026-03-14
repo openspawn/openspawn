@@ -381,3 +381,92 @@ async def memory_graph_gaps() -> str:
     """Find knowledge gaps -- entities known by only one agent."""
     result = await _get_client().get("/memory/graph/gaps")
     return _format(result)
+
+
+# ═══════════════════════════════════════════════
+# Artifact Tools
+# ═══════════════════════════════════════════════
+
+
+@mcp.tool
+async def artifact_publish(
+    artifact_type: str,
+    name: str,
+    content_json: str,
+    task_id: str,
+    source_artifact_ids: str | None = None,
+    metadata_json: str | None = None,
+) -> str:
+    """Publish an artifact. Auto-versions if name already exists."""
+    body: dict[str, object] = {
+        "artifact_type": artifact_type,
+        "name": name,
+        "content": json.loads(content_json),
+        "task_id": task_id,
+    }
+    if source_artifact_ids:
+        body["source_artifact_ids"] = json.loads(source_artifact_ids)
+    if metadata_json:
+        body["metadata"] = json.loads(metadata_json)
+    result = await _get_client().post("/artifacts", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def artifact_get(
+    artifact_id: str | None = None,
+    name: str | None = None,
+) -> str:
+    """Get artifact by ID, or latest published version by name."""
+    if artifact_id:
+        result = await _get_client().get(f"/artifacts/{artifact_id}")
+    elif name:
+        result = await _get_client().get("/artifacts/latest", params={"name": name})
+    else:
+        return '{"error": "Provide artifact_id or name"}'
+    return _format(result)
+
+
+@mcp.tool
+async def artifact_list(
+    task_id: str | None = None,
+    artifact_type: str | None = None,
+    status: str | None = None,
+    producer_agent_id: str | None = None,
+) -> str:
+    """List artifacts with optional filters."""
+    params: dict[str, str] = {}
+    if task_id:
+        params["task_id"] = task_id
+    if artifact_type:
+        params["artifact_type"] = artifact_type
+    if status:
+        params["status"] = status
+    if producer_agent_id:
+        params["producer_agent_id"] = producer_agent_id
+    result = await _get_client().get("/artifacts", params=params or None)
+    return _format(result)
+
+
+@mcp.tool
+async def artifact_subscribe(
+    artifact_type: str,
+    task_id: str | None = None,
+) -> str:
+    """Subscribe to artifact type notifications. Use '*' for all types."""
+    body: dict[str, object] = {"artifact_type": artifact_type}
+    if task_id:
+        body["task_id"] = task_id
+    result = await _get_client().post("/artifacts/subscribe", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def artifact_history(name: str) -> str:
+    """Get all versions of an artifact by name."""
+    latest = await _get_client().get("/artifacts/latest", params={"name": name})
+    if "data" in latest and "id" in latest["data"]:
+        artifact_id = latest["data"]["id"]
+        result = await _get_client().get(f"/artifacts/{artifact_id}/history")
+        return _format(result)
+    return _format(latest)

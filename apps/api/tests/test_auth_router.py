@@ -16,6 +16,7 @@ from app.auth.middleware import (
     hash_password,
 )
 from app.config import AuthMode, AuthSettings, Settings
+from app.database import get_db
 from app.routers.auth import router
 
 
@@ -295,8 +296,6 @@ class TestAuthModeFull:
         mock_db.commit = AsyncMock()
         mock_db.add = MagicMock()  # add() is sync, not async
 
-        from app.database import get_db
-
         app.dependency_overrides[get_db] = lambda: mock_db
 
         test_settings = self._full_settings()
@@ -338,8 +337,6 @@ class TestAuthModeFull:
         mock_result.scalar_one_or_none.return_value = user
         mock_db.execute.return_value = mock_result
 
-        from app.database import get_db
-
         app.dependency_overrides[get_db] = lambda: mock_db
 
         test_settings = self._full_settings()
@@ -362,8 +359,6 @@ class TestAuthModeFull:
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
         mock_db.execute.return_value = mock_result
-
-        from app.database import get_db
 
         app.dependency_overrides[get_db] = lambda: mock_db
 
@@ -398,8 +393,6 @@ class TestAuthModeFull:
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = user
         mock_db.execute.return_value = mock_result
-
-        from app.database import get_db
 
         app.dependency_overrides[get_db] = lambda: mock_db
 
