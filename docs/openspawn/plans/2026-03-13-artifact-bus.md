@@ -14,24 +14,25 @@
 
 ## File Map
 
-| File | Action | Responsibility |
-|------|--------|---------------|
-| `apps/api/app/models/enums.py` | Modify | Add ArtifactType, ArtifactStatus, ARTIFACTS_BATCH_PUBLISHED |
-| `apps/api/app/models/artifact.py` | Create | Artifact + ArtifactSubscription SQLAlchemy models |
-| `apps/api/app/artifacts/__init__.py` | Create | Package init |
-| `apps/api/app/artifacts/schemas.py` | Create | Pydantic DTOs + response schemas |
-| `apps/api/app/artifacts/router.py` | Create | REST endpoints (10 routes) |
-| `apps/api/app/main.py` | Modify | Register artifacts_router |
-| `apps/api/app/mcp_server/server.py` | Modify | Add 5 artifact MCP tools |
-| `apps/api/alembic/versions/0005_add_artifacts_tables.py` | Create | Migration for artifacts + artifact_subscriptions |
-| `apps/api/tests/test_artifact_unit.py` | Create | Unit tests for publish logic, hashing, versioning |
-| `apps/api/tests/test_artifact_integration.py` | Create | Integration tests on SQLite |
+| File                                                     | Action | Responsibility                                              |
+| -------------------------------------------------------- | ------ | ----------------------------------------------------------- |
+| `apps/api/app/models/enums.py`                           | Modify | Add ArtifactType, ArtifactStatus, ARTIFACTS_BATCH_PUBLISHED |
+| `apps/api/app/models/artifact.py`                        | Create | Artifact + ArtifactSubscription SQLAlchemy models           |
+| `apps/api/app/artifacts/__init__.py`                     | Create | Package init                                                |
+| `apps/api/app/artifacts/schemas.py`                      | Create | Pydantic DTOs + response schemas                            |
+| `apps/api/app/artifacts/router.py`                       | Create | REST endpoints (10 routes)                                  |
+| `apps/api/app/main.py`                                   | Modify | Register artifacts_router                                   |
+| `apps/api/app/mcp_server/server.py`                      | Modify | Add 5 artifact MCP tools                                    |
+| `apps/api/alembic/versions/0005_add_artifacts_tables.py` | Create | Migration for artifacts + artifact_subscriptions            |
+| `apps/api/tests/test_artifact_unit.py`                   | Create | Unit tests for publish logic, hashing, versioning           |
+| `apps/api/tests/test_artifact_integration.py`            | Create | Integration tests on SQLite                                 |
 
 ---
 
 ## Task 1: Enums + Model
 
 **Files:**
+
 - Modify: `apps/api/app/models/enums.py`
 - Create: `apps/api/app/models/artifact.py`
 
@@ -172,6 +173,7 @@ git commit -m "feat(api): add Artifact + ArtifactSubscription models (#665)"
 ## Task 2: Schemas + Publish Helpers
 
 **Files:**
+
 - Create: `apps/api/app/artifacts/__init__.py`
 - Create: `apps/api/app/artifacts/schemas.py`
 
@@ -271,6 +273,7 @@ git commit -m "feat(api): add artifact schemas + content hash helper (#665)"
 ## Task 3: Router — CRUD + Publish + Subscribe
 
 **Files:**
+
 - Create: `apps/api/app/artifacts/router.py`
 - Modify: `apps/api/app/main.py`
 
@@ -684,11 +687,13 @@ async def delete_subscription(
 - [ ] **Step 2: Register router in `app/main.py`**
 
 Add import:
+
 ```python
 from app.artifacts.router import router as artifacts_router
 ```
 
 Add registration (before `sse_router` to avoid path conflicts):
+
 ```python
 app.include_router(artifacts_router)
 ```
@@ -714,6 +719,7 @@ git commit -m "feat(api): add artifact REST endpoints + subscription routing (#6
 ## Task 4: MCP Tools
 
 **Files:**
+
 - Modify: `apps/api/app/mcp_server/server.py`
 
 - [ ] **Step 1: Add artifact tools section**
@@ -831,6 +837,7 @@ git commit -m "feat(api): add 5 artifact MCP tools (#665)"
 ## Task 5: Alembic Migration
 
 **Files:**
+
 - Create: `apps/api/alembic/versions/0005_add_artifacts_tables.py`
 
 - [ ] **Step 1: Create migration file**
@@ -908,6 +915,7 @@ git commit -m "feat(api): add alembic migration for artifacts tables (#665)"
 ## Task 6: Unit Tests
 
 **Files:**
+
 - Create: `apps/api/tests/test_artifact_unit.py`
 
 - [ ] **Step 1: Write unit tests**
@@ -915,6 +923,7 @@ git commit -m "feat(api): add alembic migration for artifacts tables (#665)"
 Tests for: content hashing, publish logic (version increment, dedup, supersede), status transitions, subscription filtering. Use mocked DB (AsyncMock) following `test_sse_bus.py` pattern.
 
 Key tests:
+
 - `test_content_hash_deterministic` — same dict regardless of key order
 - `test_content_hash_differs` — different content → different hash
 - `test_valid_status_transitions` — draft→published, published→superseded
@@ -940,6 +949,7 @@ git commit -m "test(api): add artifact unit tests (#665)"
 ## Task 7: Integration Tests
 
 **Files:**
+
 - Create: `apps/api/tests/test_artifact_integration.py`
 
 - [ ] **Step 1: Write integration tests**
@@ -947,6 +957,7 @@ git commit -m "test(api): add artifact unit tests (#665)"
 Use SQLite fixture pattern from `test_sse_integration.py` (sqlite_env + client fixtures, AUTH_MODE=none).
 
 Key tests:
+
 - `test_publish_creates_v1` — POST /artifacts returns artifact with version=1
 - `test_publish_existing_name_increments_version` — second publish → version=2
 - `test_publish_supersedes_previous` — v1 gets superseded_by_id set

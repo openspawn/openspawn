@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/architecture/worktree-isolation
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 # Worktree Isolation Spec
 

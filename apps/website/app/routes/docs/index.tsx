@@ -62,6 +62,41 @@ export function DocsIndex() {
           </Link>
         ))}
       </div>
+
+      {/* Key Concepts */}
+      <h2 className="mt-14 mb-6 text-2xl font-bold text-slate-100">Key Concepts</h2>
+      <div className="space-y-4">
+        {[
+          {
+            name: "ORG.md",
+            desc: "A single markdown file that defines your entire agent organization — roles, hierarchy, culture, policies, and playbooks. It's infrastructure-as-code for agent teams.",
+          },
+          {
+            name: "Hierarchy",
+            desc: "Agents have levels (L1–L10) and report-to relationships. Heading depth in ORG.md determines hierarchy. Tasks flow down, escalations flow up.",
+          },
+          {
+            name: "Communication Protocol",
+            desc: "4 message types (TASK, RESULT, ESCALATION, DECISION), silence-as-success, files-over-chat. Eliminates 40–60% of wasted coordination tokens.",
+          },
+          {
+            name: "Dashboard",
+            desc: "Real-time React UI showing network graph, task timelines, agent cards, trust scores, and org health. Powered by SSE streaming.",
+          },
+          {
+            name: "MCP & A2A",
+            desc: "Every org exposes 7 MCP tools and A2A agent cards. Any MCP-compatible client or A2A-capable agent can discover and interact with your org.",
+          },
+        ].map((concept) => (
+          <div
+            key={concept.name}
+            className="rounded-lg border border-white/5 bg-white/[0.02] px-5 py-4"
+          >
+            <p className="mb-1 font-semibold text-slate-200">{concept.name}</p>
+            <p className="text-sm text-slate-400">{concept.desc}</p>
+          </div>
+        ))}
+      </div>
     </DocsLayout>
   );
 }

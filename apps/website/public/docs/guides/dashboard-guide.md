@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/guides/dashboard-guide
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Dashboard Guide

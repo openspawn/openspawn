@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/faq
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 # OpenSpawn FAQ
 
@@ -292,7 +292,7 @@ Instead of sending messages, agents write to shared workspace files:
 | `RESULT.md`     | Workers    | Completed deliverables                    |
 | `HANDOFF.md`    | Any agent  | Work ready for next stage                 |
 | `REVIEW.md`     | Reviewers  | Feedback and approvals                    |
-| `ESCALATION.md` | Any agent  | Complex issues needing &gt;3 turns           |
+| `ESCALATION.md` | Any agent  | Complex issues needing &gt;3 turns        |
 
 ---
 

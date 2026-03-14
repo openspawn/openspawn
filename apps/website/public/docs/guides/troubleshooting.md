@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/guides/troubleshooting
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 **Quick diagnostic:** When something breaks, start here:
 

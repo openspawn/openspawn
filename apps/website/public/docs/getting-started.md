@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/getting-started
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Getting Started with OpenSpawn
@@ -15,6 +15,8 @@ What you'll have in ~10 minutes: a local org of AI agents, coordinated by a mark
 
 ```
 ├── ORG.md # Your org definition — this is the important one
+├── SOUL.md # Shared behavior/values for all agents
+├── AGENTS.md # Workspace rules for agent tooling
 ```
 
 ```
@@ -182,11 +184,17 @@ Tick-based execution: The server runs a loop. On each "tick", every agent checks
 
 The model router: OpenSpawn automatically routes to the right model based on agent level. L9–L10 executives get top-tier models. L7–L8 leads get mid-tier. L1–L6 workers get local Ollama — free. A 25-agent org with naive polling on the best model could cost $36/hour. With tiered routing, it's closer to $8.
 
+## SQLite vs PostgreSQL
+
+ACP is the nervous system: Every meaningful agent action generates a structured message. Delegations, acknowledgments, progress updates, escalations, completions — all flow through the Agent Communication Protocol. The dashboard reads ACP message streams in real-time via SSE. OpenSpawn supports two database tiers. Start with SQLite — upgrade when you need to.
+
+SQLite (Tier 1)
+
 ## Next Steps
 
 ## Quick Reference
 
-ACP is the nervous system: Every meaningful agent action generates a structured message. Delegations, acknowledgments, progress updates, escalations, completions — all flow through the Agent Communication Protocol. The dashboard reads ACP message streams in real-time via SSE. title: "Your First ORG.md", desc: "Full tutorial — all five sections, from scratch", to: "/docs/tutorials/your-first-org-md", title: "Dashboard Walkthrough", desc: "Reading health scores, diagnosing escalation chains", to: "/docs/features/dashboard", title: "A2A Protocol", desc: "External agent discovery and task routing", to: "/docs/protocols/a2a", title: "MCP Tools", desc: "All 7 tools with examples", to: "/docs/protocols/mcp", ].map((item) => ( key={item.to} to={item.to}
+PostgreSQL (Tier 2) ["Setup", "Zero config — works out of the box", "Requires PostgreSQL 16+ and Redis"], "Best for", "Local dev, prototyping, small orgs", "Production, multi-user, large orgs", "Concurrency", "Single-writer, good for 1–5 agents", "Full concurrent access, 50+ agents", ["Background jobs", "asyncio scheduler (in-process)", "arq + Redis (distributed)"], ["Docker required?", "No", "Yes (recommended)"], ["Data persistence", "Local file (test.db)", "Durable with backups"], ["pgvector / search", "Not available", "Vector similarity search for memory"], ].map(([feature, sqlite, pg]) => ( title: "Your First ORG.md", desc: "Full tutorial — all five sections, from scratch", to: "/docs/tutorials/your-first-org-md", title: "Dashboard Walkthrough", desc: "Reading health scores, diagnosing escalation chains", to: "/docs/features/dashboard", title: "A2A Protocol", desc: "External agent discovery and task routing", to: "/docs/protocols/a2a", title: "MCP Tools", desc: "All 7 tools with examples", to: "/docs/protocols/mcp", ].map((item) => ( key={item.to} to={item.to}
 
 Command
 

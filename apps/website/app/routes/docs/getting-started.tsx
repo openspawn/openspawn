@@ -51,6 +51,18 @@ export function GettingStarted() {
         <li>
           Node.js 18 or newer (<code className="inline-code">node --version</code> to check)
         </li>
+        <li>
+          Python 3.12+ and{" "}
+          <a
+            href="https://docs.astral.sh/uv/"
+            target="_blank"
+            rel="noopener"
+            className="text-cyan-400 underline"
+          >
+            uv
+          </a>{" "}
+          (for the FastAPI backend — <code className="inline-code">uv --version</code> to check)
+        </li>
       </ul>
       <p className="mb-3 text-slate-400">
         <strong className="text-slate-200">Optional but recommended:</strong>
@@ -104,6 +116,8 @@ export function GettingStarted() {
       <p className="mb-4 text-slate-400">This creates two files:</p>
       <CodeBlock title="structure">{`my-org/
 ├── ORG.md                  # Your org definition — this is the important one
+├── SOUL.md                 # Shared behavior/values for all agents
+├── AGENTS.md               # Workspace rules for agent tooling
 └── openspawn.config.json   # Server config (port, model providers, etc.)`}</CodeBlock>
       <p className="mb-4 text-slate-400">
         Let's look at what <code className="inline-code">ORG.md</code> contains by default:
@@ -468,6 +482,48 @@ Write code, run tests, build APIs.
           updates, escalations, completions — all flow through the Agent Communication Protocol. The
           dashboard reads ACP message streams in real-time via SSE.
         </p>
+      </div>
+
+      {/* SQLite vs PostgreSQL */}
+      <h2 className="mt-10 mb-4 text-2xl font-bold text-slate-100">SQLite vs PostgreSQL</h2>
+      <p className="mb-4 text-slate-400">
+        OpenSpawn supports two database tiers. Start with SQLite — upgrade when you need to.
+      </p>
+      <div className="overflow-x-auto mb-8">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-2 pr-6 text-slate-400 font-medium"></th>
+              <th className="py-2 pr-6 text-slate-400 font-medium">SQLite (Tier 1)</th>
+              <th className="py-2 text-slate-400 font-medium">PostgreSQL (Tier 2)</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-400">
+            {[
+              ["Setup", "Zero config — works out of the box", "Requires PostgreSQL 16+ and Redis"],
+              [
+                "Best for",
+                "Local dev, prototyping, small orgs",
+                "Production, multi-user, large orgs",
+              ],
+              [
+                "Concurrency",
+                "Single-writer, good for 1–5 agents",
+                "Full concurrent access, 50+ agents",
+              ],
+              ["Background jobs", "asyncio scheduler (in-process)", "arq + Redis (distributed)"],
+              ["Docker required?", "No", "Yes (recommended)"],
+              ["Data persistence", "Local file (test.db)", "Durable with backups"],
+              ["pgvector / search", "Not available", "Vector similarity search for memory"],
+            ].map(([feature, sqlite, pg]) => (
+              <tr key={feature} className="border-b border-white/5">
+                <td className="py-2 pr-6 font-medium text-slate-300">{feature}</td>
+                <td className="py-2 pr-6">{sqlite}</td>
+                <td className="py-2">{pg}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Next Steps */}

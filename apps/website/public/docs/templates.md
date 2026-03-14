@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/templates
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Templates Guide
@@ -266,6 +266,65 @@ Synthesis
 
 When to use: exploratory or open-ended work, high autonomy needed, long-running tasks.
 
+## Industry templates
+
+Q: What's the exploration budget? A: Higher per-agent credit limit and delayed escalation allow deeper exploration. 7 industry-specific templates for common operational patterns. Each includes specialized roles, domain-tuned policies, and ready-to-use playbooks.
+
+Template
+
+```
+# Incident Response Team
+## Identity
+- **Industry:** SaaS / Infrastructure
+- **Stage:** Production operations
+## Culture
+preset: military
+- **Escalation:** immediate — production incidents can't wait
+## Structure
+### Incident Commander
+Coordinates all agents, owns runbook execution, drives MTTR down.
+- **Model:** claude-opus
+- **Domain:** incident-management
+- **Level:** 8
+#### Diagnostics Agent
+Reads logs, traces, metrics. Identifies root cause.
+- **Model:** claude-sonnet
+- **Domain:** observability
+#### Remediator
+Applies fixes, rolls back deployments, validates recovery.
+- **Model:** claude-sonnet
+- **Domain:** infrastructure
+#### Comms Agent
+Posts status updates, notifies stakeholders, writes postmortems.
+- **Model:** claude-haiku
+- **Domain:** communications
+## Policies
+- All production changes require Incident Commander approval
+- Comms Agent posts update every 5 minutes during active incident
+```
+
+## Boot sequence templates
+
+Culture "saas-onboarding", "Onboarding Lead, Data Migration, Integration Engineer, Success Agent", "agency", "incident-response", "Incident Commander, Diagnostics, Remediator, Comms Agent", "military", "contract-review", "Legal Lead, Clause Analyzer, Risk Assessor, Summary Writer", "enterprise", "compliance-monitoring", "Compliance Officer, Auditor, Policy Checker, Report Generator", "enterprise", "game-live-ops", "Live Ops Director, Event Manager, Balance Analyst, QA Tester", "startup", "catalog-management", "Catalog Manager, Data Entry, Image Processor, Price Optimizer", "agency", "clinical-trials", "Trial Coordinator, Data Monitor, Adverse Event Tracker, Regulatory Agent", "enterprise", ].map(([template, roles, culture]) => ( Example: incident-response ORG.md Every template includes boot sequence instructions in its generated
+
+```
+1. Read ORG.md — understand your role, hierarchy, and reporting chain
+2. Read SOUL.md — internalize org values and communication norms
+3. Read AGENTS.md — understand workspace rules and tool access
+4. Write PLAN.md — plan your approach before executing
+5. Execute — follow plan, write RESULT.md when done
+```
+
+## Policy guardrails
+
+SOUL.md. Agents read these files at startup to understand the org before they begin work. Templates include sensible default policies. Override any of these in the
+
+## Policies section of your ORG.md.
+
+Guardrail
+
+Default
+
 ## Customizing a template
 
 ### Add an agent
@@ -283,7 +342,7 @@ When to use: exploratory or open-ended work, high autonomy needed, long-running 
 
 ### Change culture
 
-Q: What's the exploration budget? A: Higher per-agent credit limit and delayed escalation allow deeper exploration. Delete the agent's line from the Structure section. Re-assign or remove any agents that reported to it. Run openspawn validate to confirm. Move agent lines to different indentation levels or under different parents. Validate after changes. Edit the preset value in the Culture section. Valid presets: agency,
+Override with ["Budget per agent", "500 credits/day", "Per-agent limit in Policies > Budget"], ["Department cap", "10 agents max", "Department Caps in Policies"], ["Spawn permissions", "L7+ only", "Permissions section"], ["Overage behavior", "pause and escalate", "Overage behavior in Budget"], ["Review required", "L6+ for code changes", "Permissions section"], ].map(([guardrail, def_, override]) => ( Delete the agent's line from the Structure section. Re-assign or remove any agents that reported to it. Run openspawn validate to confirm. Move agent lines to different indentation levels or under different parents. Validate after changes. Edit the preset value in the Culture section. Valid presets: agency,
 
 ### Add a playbook
 

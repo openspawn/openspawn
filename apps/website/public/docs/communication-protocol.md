@@ -1,6 +1,6 @@
 ---
 source: https://openspawn.ai/docs/communication-protocol
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # Communication Protocol v1
@@ -264,9 +264,83 @@ Lead: @agent-b TASK: Build API integration
 // 1 message. Deterministic routing.
 ```
 
+## Escalation Reasons
+
+5 messages, 0 work done, ~2,000 tokens wasted Cost: 2 wasted messages Cost: 5 messages for a routing decision Every ESCALATION message must include a typed reason. This enables routing and automated responses.
+
+Reason
+
+When to use
+
+## ACP Data Model
+
+```
+interface AcpMessage {
+id: string;
+type: "TASK" | "RESULT" | "ESCALATION" | "DECISION";
+from: string; // agent ID
+to: string; // agent ID or channel
+timestamp: string; // ISO 8601
+payload: AcpPayload;
+interface TaskPayload {
+title: string;
+deliverable: string; // file path or description
+priority: "low" | "medium" | "high" | "urgent";
+requirements?: string;
+interface ResultPayload {
+taskId: string;
+location: string; // where the output lives
+summary: string;
+interface EscalationPayload {
+taskId: string;
+reason: EscalationReason;
+blocked: string; // what's blocked
+need: string; // what's needed to unblock
+interface DecisionPayload {
+escalationId: string;
+resolution: string; // definitive action to take
+unblocks: string[]; // task IDs being unblocked
+type AcpPayload =
+| TaskPayload
+| ResultPayload
+| EscalationPayload
+| DecisionPayload;
+type EscalationReason =
+| "BLOCKED"
+| "OUT_OF_DOMAIN"
+| "BUDGET_EXCEEDED"
+| "AMBIGUOUS_TASK"
+| "CONFLICT"
+| "QUALITY_CONCERN"
+| "TIMEOUT";
+```
+
+## Agent Decision Model
+
+```
+function decide(agent: Agent): Action {
+// 1. Check inbox for new messages
+if (hasEscalation()) → return resolveOrReEscalate()
+if (hasNewTask()) → return beginWork()
+if (hasResult()) → return reviewResult()
+// 2. Check in-progress work
+if (isBlocked()) → return escalate()
+if (workComplete()) → return submitResult()
+if (workInProgress()) → return continueWork()
+// 3. Nothing to do
+return idle()
+}
+```
+
+Routes to ["BLOCKED", "Missing resource, dependency, or permission", "Direct manager"], ["OUT_OF_DOMAIN", "Task outside agent's expertise", "Manager for re-routing"], ["BUDGET_EXCEEDED", "Agent hit credit limit", "Manager + human principal"], ["AMBIGUOUS_TASK", "Task requirements unclear after 1 clarification", "Task creator"], ["CONFLICT", "Two agents making contradictory changes", "Nearest shared manager"], "QUALITY_CONCERN", "Output doesn't meet standards after 2 attempts", "Reviewer (L6+)", ["TIMEOUT", "Upstream dependency not responding", "Manager"], ].map(([reason, when, routes]) => ( The Agent Communication Protocol (ACP) defines typed interfaces for all messages and events in the system. On each tick, every agent evaluates its state and decides one of 5 actions:
+
+Action
+
+Messages sent
+
 ## Implementation Checklist
 
-5 messages, 0 work done, ~2,000 tokens wasted Cost: 2 wasted messages Cost: 5 messages for a routing decision Add protocol rules to SOUL.md — every agent must internalize the 4 principles Use role-specific AGENTS.md templates — include message type examples Create shared files — PLAN.md,
+Cost ["beginWork()", "0 — silence is success", "1 LLM call"], ["continueWork()", "0", "1 LLM call"], ["submitResult()", "0 or 1 RESULT", "0"], ["escalate()", "1 ESCALATION", "0"], ["resolveOrReEscalate()", "1 DECISION or 1 ESCALATION", "0-1 LLM calls"], ["idle()", "0", "0 (cheap models only)"], ].map(([action, msgs, cost]) => ( Add protocol rules to SOUL.md — every agent must internalize the 4 principles Use role-specific AGENTS.md templates — include message type examples Create shared files — PLAN.md,
 
 RESULT.md,
 

@@ -1,9 +1,11 @@
 ---
 source: https://openspawn.ai/docs/reference/org-md-reference
-generated: 2026-03-13
+generated: 2026-03-14
 ---
 
 # ORG.md Reference
+
+## Why Markdown?
 
 ## Overview
 
@@ -373,9 +375,56 @@ ORG.md. Relationship to Other Standards
 
 Standard
 
+## SDLC Presets
+
+Relationship to ORG.md "CLAUDE.md", "One agent's behavior", "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md", "AGENTS.md", "Workspace rules", "ORG.md is the superset — workspace rules + org structure + policies", "ACP", "Communication protocol", "ORG.md's Culture section configures ACP parameters", "A2A", "Inter-org communication", "ORG.md defines one org; A2A connects multiple orgs", "Terraform / Pulumi", "Infrastructure as code", "ORG.md is the same pattern applied to agent organizations", ].map(([std, scope, rel]) => ( SDLC presets configure development lifecycle rules — review requirements, testing mandates, and deployment gates. Set via sdlc: preset-name in the Culture section.
+
+Preset
+
+Review
+
+```
+preset: startup
+```
+
+## Workspace Strategy
+
+Deploy Gate ["standard", "L6+ required", "Required before merge", "CI pass + approval"], "strict", "2 reviewers (L7+)", "Coverage threshold 80%", "CI + security scan + approval", ["solo", "Self-review OK", "Optional", "CI pass"], ["research", "No review", "None", "None — exploratory"], ].map(([preset, review, tests, deploy]) => ( Each agent operates in an isolated workspace to prevent conflicts. The default strategy is
+
+```
+Worktree: .worktrees/backend-senior-1/
+Branch: agent/backend-senior-1
+Base: main
+Agent: Backend Senior 2
+Worktree: .worktrees/backend-senior-2/
+Branch: agent/backend-senior-2
+```
+
+## Org Lifecycle
+
+### Deployment
+
+### Upgrading
+
+```
+# New roles → spawn | Removed roles → graceful wind-down
+```
+
+### Teardown
+
+```
+# 1. All agents finish in-flight tasks
+# 2. Results written to RESULT.md
+# 3. State exported to ORG.md.bak
+```
+
+worktree-per-agent — each agent gets a git worktree branched from main. When an agent completes a task, its changes are merged back to main via PR. Conflicts are escalated to the agent's lead. Relationship to CONTRIBUTING.md ORG.md and CONTRIBUTING.md serve different but complementary purposes:
+
+ORG.md
+
 ## Further Reading
 
-Relationship to ORG.md "CLAUDE.md", "One agent's behavior", "ORG.md wraps multiple agents; each role description is that agent's implicit CLAUDE.md", "AGENTS.md", "Workspace rules", "ORG.md is the superset — workspace rules + org structure + policies", "ACP", "Communication protocol", "ORG.md's Culture section configures ACP parameters", "A2A", "Inter-org communication", "ORG.md defines one org; A2A connects multiple orgs", "Terraform / Pulumi", "Infrastructure as code", "ORG.md is the same pattern applied to agent organizations", ].map(([std, scope, rel]) => ( to="/docs/tutorials/your-first-org-md"
+CONTRIBUTING.md ["Audience", "AI agents", "Human contributors"], "Scope", "Org structure, roles, policies, culture", "Dev setup, PR conventions, testing", ["Parsed by", "OpenSpawn org parser", "Read by humans"], ["Changes", "openspawn apply ORG.md", "Manual process"], "Enforced", "Programmatically (budget, permissions, routing)", "By review (code review, CI)", ].map(([dim, org, contrib]) => ( In practice, ORG.md is the superset for agent teams. Human contributors still use CONTRIBUTING.md. When agents create PRs, they follow both: ORG.md for org-level policies (budget, escalation) and CONTRIBUTING.md for repo-level conventions (commit format, test requirements). to="/docs/tutorials/your-first-org-md"
 
 Your First ORG.md →
 
