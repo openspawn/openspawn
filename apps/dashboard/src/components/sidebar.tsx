@@ -61,20 +61,21 @@ export const navigation: {
   href: string;
   icon: typeof LayoutDashboard;
   tourId?: string;
+  shortcut?: string;
 }[] = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard" },
-  { name: "Network", href: "/network", icon: Network, tourId: "network" },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks" },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, tourId: "dashboard", shortcut: "g d" },
+  { name: "Network", href: "/network", icon: Network, tourId: "network", shortcut: "g n" },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare, tourId: "tasks", shortcut: "g t" },
   { name: "Kanban", href: "/kanban", icon: Layers },
   { name: "Task Board", href: "/task-board", icon: ClipboardList },
-  { name: "Agents", href: "/agents", icon: Users, tourId: "agents" },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
+  { name: "Agents", href: "/agents", icon: Users, tourId: "agents", shortcut: "g a" },
+  { name: "Messages", href: "/messages", icon: MessageSquare, shortcut: "g m" },
   { name: "Model Router", href: "/router", icon: GitBranch },
-  { name: "Credits", href: "/credits", icon: Coins },
-  { name: "Events", href: "/events", icon: Activity },
+  { name: "Credits", href: "/credits", icon: Coins, shortcut: "g c" },
+  { name: "Events", href: "/events", icon: Activity, shortcut: "g e" },
   { name: "Memory", href: "/memory", icon: Brain },
   { name: "Graph", href: "/graph", icon: Share2 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/settings", icon: Settings, shortcut: "g s" },
 ];
 
 export const bottomNavItems: { name: string; href: string; icon: typeof LayoutDashboard }[] = [
@@ -219,15 +220,22 @@ export function Sidebar({
                   >
                     <item.icon className="h-4 w-4 flex-shrink-0" />
                     {!collapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden whitespace-nowrap"
-                      >
-                        {item.name}
-                      </motion.span>
+                      <>
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden whitespace-nowrap flex-1 text-left"
+                        >
+                          {item.name}
+                        </motion.span>
+                        {item.shortcut && (
+                          <kbd className="ml-auto text-[10px] font-mono text-muted-foreground/50 tracking-wider">
+                            {item.shortcut}
+                          </kbd>
+                        )}
+                      </>
                     )}
                   </Button>
                 </Link>
@@ -239,6 +247,11 @@ export function Sidebar({
                     <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
                     <TooltipContent side="right" sideOffset={8}>
                       {item.name}
+                      {item.shortcut && (
+                        <kbd className="ml-2 text-[10px] font-mono text-muted-foreground/70">
+                          {item.shortcut}
+                        </kbd>
+                      )}
                     </TooltipContent>
                   </Tooltip>
                 );
@@ -320,6 +333,16 @@ export function Sidebar({
                 GitHub
                 <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
               </a>
+              <button
+                onClick={() =>
+                  window.dispatchEvent(new KeyboardEvent("keydown", { key: "?", bubbles: true }))
+                }
+                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
+              >
+                <HelpCircle className="h-4 w-4" />
+                Keyboard Shortcuts
+                <kbd className="ml-auto text-[10px] font-mono text-muted-foreground/50">?</kbd>
+              </button>
               {hasCompletedOnboarding && (
                 <button
                   onClick={resetOnboarding}
