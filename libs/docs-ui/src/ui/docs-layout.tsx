@@ -31,7 +31,7 @@ export function DocsLayout({ children, sidebar, flatPages }: DocsLayoutProps) {
       </div>
       <div className="flex gap-10">
         <DocsSidebar items={sidebar} open={open} />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 md:border-l md:border-white/5 md:pl-10">
           {children}
           <DocsPagination prev={prevPage} next={nextPage} />
         </div>
