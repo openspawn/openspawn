@@ -50,11 +50,15 @@ async def _publish_one(
     dto: PublishArtifactDto,
     org_id: uuid.UUID,
     producer_id: uuid.UUID,
-) -> tuple[Artifact, bool]:
-    """Publish a single artifact. Returns (artifact, is_new).
+    auth: AuthContext,
+) -> tuple[Artifact, bool, uuid.UUID | None]:
+    """Publish a single artifact. Returns (artifact, is_new, approval_id).
 
     If content_hash matches latest version, returns existing (is_new=False).
+    If gated by autonomy dial, artifact is stored as DRAFT (approval_id set).
     """
+    from app.auth.schemas import AuthenticatedAgent as _AuthAgent
+
     content_hash = compute_content_hash(dto.content)
 
     latest = await db.execute(
@@ -70,7 +74,7 @@ async def _publish_one(
     existing = latest.scalar_one_or_none()
 
     if existing and existing.content_hash == content_hash:
-        return existing, False
+        return existing, False, None
 
     max_ver = await db.scalar(
         select(func.max(Artifact.version)).where(
@@ -78,6 +82,27 @@ async def _publish_one(
         )
     )
     new_version = (max_ver or 0) + 1
+
+    # Determine status: DRAFT if gated, PUBLISHED otherwise
+    artifact_status = ArtifactStatus.PUBLISHED.value
+    risk = 0
+    effective_autonomy = 10
+
+    if isinstance(auth, _AuthAgent):
+        from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
+        from app.models.agent import Agent
+        from app.models.task import Task
+
+        agent = await db.get(Agent, auth.id)
+        task = await db.get(Task, dto.task_id)
+        effective_autonomy = resolve_effective_autonomy(
+            task.autonomy_level if task else None,
+            agent.default_autonomy_level if agent else 5,
+        )
+        risk = get_risk_level("artifact_publish", dto.artifact_type.value)
+
+        if is_gated(effective_autonomy, risk):
+            artifact_status = ArtifactStatus.DRAFT.value
 
     now = pendulum.now("UTC")
     artifact = Artifact(
@@ -87,7 +112,7 @@ async def _publish_one(
         artifact_type=dto.artifact_type.value,
         name=dto.name,
         version=new_version,
-        status=ArtifactStatus.PUBLISHED.value,
+        status=artifact_status,
         content=dto.content,
         content_hash=content_hash,
         metadata_=dto.metadata,
@@ -102,7 +127,29 @@ async def _publish_one(
         existing.superseded_by_id = artifact.id
         existing.status = ArtifactStatus.SUPERSEDED.value
 
-    return artifact, True
+    # Create approval request if gated
+    approval_id: uuid.UUID | None = None
+    if artifact_status == ArtifactStatus.DRAFT.value:
+        from app.approvals.service import create_approval
+
+        approval = await create_approval(
+            db=db,
+            org_id=org_id,
+            agent_id=producer_id,
+            action_type="artifact_publish",
+            entity_type="artifact",
+            entity_id=artifact.id,
+            risk_level=risk,
+            autonomy_level=effective_autonomy,
+            payload={
+                "artifact_type": dto.artifact_type.value,
+                "name": dto.name,
+                "version": new_version,
+            },
+        )
+        approval_id = approval.id
+
+    return artifact, True, approval_id
 
 
 # --- Publish ---
@@ -114,9 +161,9 @@ async def publish_artifact(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[ArtifactResponse]:
-    artifact, is_new = await _publish_one(db, dto, auth.org_id, auth.id)
+    artifact, is_new, approval_id = await _publish_one(db, dto, auth.org_id, auth.id, auth)
 
-    if is_new:
+    if is_new and approval_id is None:
         targets = await _resolve_subscribers(db, auth.org_id, dto.artifact_type.value, dto.task_id)
         content_data = artifact.content
         content_truncated = False
@@ -157,9 +204,9 @@ async def publish_batch(
     new_artifacts: list[dict[str, object]] = []
 
     for dto in dtos:
-        artifact, is_new = await _publish_one(db, dto, auth.org_id, auth.id)
+        artifact, is_new, _approval_id = await _publish_one(db, dto, auth.org_id, auth.id, auth)
         results.append(artifact)
-        if is_new:
+        if is_new and _approval_id is None:
             new_artifacts.append(
                 {
                     "artifact_id": str(artifact.id),
@@ -376,13 +423,26 @@ async def update_artifact_status(
             detail=f"Cannot transition from {artifact.status} to {dto.status.value}",
         )
 
+    old_status = artifact.status
     artifact.status = dto.status.value
     artifact.updated_at = pendulum.now("UTC")
+
+    # Set approval fields on DRAFT → PUBLISHED
+    is_approval = old_status == ArtifactStatus.DRAFT.value and dto.status == ArtifactStatus.PUBLISHED
+    if is_approval:
+        from app.auth.schemas import AuthenticatedAgent as _AuthAgent
+
+        approver_name = auth.agent_id if isinstance(auth, _AuthAgent) else auth.name
+        artifact.approved_by = approver_name
+        artifact.approved_at = pendulum.now("UTC")
+
+    # Emit ARTIFACT_PUBLISHED for DRAFT → PUBLISHED, ARTIFACT_UPDATED otherwise
+    sse_type = SSEEventType.ARTIFACT_PUBLISHED if is_approval else SSEEventType.ARTIFACT_UPDATED
 
     targets = await _resolve_subscribers(db, auth.org_id, artifact.artifact_type, artifact.task_id)
     await emit(
         db=db,
-        type=SSEEventType.ARTIFACT_UPDATED,
+        type=sse_type,
         org_id=auth.org_id,
         actor_id=auth.id,
         entity_type="artifact",
