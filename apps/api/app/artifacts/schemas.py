@@ -5,7 +5,7 @@ import json
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.enums import ArtifactStatus, ArtifactType
 
@@ -15,7 +15,7 @@ class PublishArtifactDto(BaseModel):
     name: str = Field(max_length=200)
     content: dict
     task_id: uuid.UUID
-    source_artifact_ids: list[uuid.UUID] = Field(default_factory=list)
+    source_artifact_ids: list[str] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
 
 
@@ -41,13 +41,23 @@ class ArtifactResponse(BaseModel):
     status: ArtifactStatus
     content: dict
     content_hash: str
-    metadata_: dict = Field(alias="metadata")
-    source_artifact_ids: list[uuid.UUID]
+    metadata_: dict
+    source_artifact_ids: list[str]
     superseded_by_id: uuid.UUID | None
     approved_by: str | None
     approved_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+    @field_validator(
+        "id", "org_id", "task_id", "producer_agent_id", "superseded_by_id", mode="before"
+    )
+    @classmethod
+    def _coerce_uuid(cls, v: object) -> object:
+        """SQLite returns UUIDs as integers — coerce to uuid.UUID."""
+        if isinstance(v, int):
+            return uuid.UUID(int=v)
+        return v
 
 
 class SubscriptionResponse(BaseModel):
@@ -59,6 +69,13 @@ class SubscriptionResponse(BaseModel):
     artifact_type: str
     task_id: uuid.UUID | None
     created_at: datetime
+
+    @field_validator("id", "org_id", "agent_id", "task_id", mode="before")
+    @classmethod
+    def _coerce_uuid(cls, v: object) -> object:
+        if isinstance(v, int):
+            return uuid.UUID(int=v)
+        return v
 
 
 def compute_content_hash(content: dict) -> str:

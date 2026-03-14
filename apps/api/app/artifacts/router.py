@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 
+import pendulum
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -78,6 +79,7 @@ async def _publish_one(
     )
     new_version = (max_ver or 0) + 1
 
+    now = pendulum.now("UTC")
     artifact = Artifact(
         org_id=org_id,
         task_id=dto.task_id,
@@ -90,6 +92,8 @@ async def _publish_one(
         content_hash=content_hash,
         metadata_=dto.metadata,
         source_artifact_ids=[str(sid) for sid in dto.source_artifact_ids],
+        created_at=now,
+        updated_at=now,
     )
     db.add(artifact)
     await db.flush()
@@ -140,7 +144,6 @@ async def publish_artifact(
         )
 
     await db.commit()
-    await db.refresh(artifact)
     return DataResponse(data=ArtifactResponse.model_validate(artifact))
 
 
@@ -188,8 +191,6 @@ async def publish_batch(
         )
 
     await db.commit()
-    for a in results:
-        await db.refresh(a)
     return DataResponse(data=[ArtifactResponse.model_validate(a) for a in results])
 
 
@@ -251,86 +252,7 @@ async def get_latest_artifact(
     return DataResponse(data=ArtifactResponse.model_validate(artifact))
 
 
-@router.get("/{artifact_id}")
-async def get_artifact(
-    artifact_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(require_auth),
-) -> DataResponse[ArtifactResponse]:
-    result = await db.execute(
-        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
-    )
-    artifact = result.scalar_one_or_none()
-    if not artifact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
-    return DataResponse(data=ArtifactResponse.model_validate(artifact))
-
-
-@router.get("/{artifact_id}/history")
-async def get_artifact_history(
-    artifact_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(require_auth),
-) -> DataResponse[list[ArtifactResponse]]:
-    result = await db.execute(
-        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
-    )
-    artifact = result.scalar_one_or_none()
-    if not artifact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
-
-    result = await db.execute(
-        select(Artifact)
-        .where(Artifact.org_id == auth.org_id, Artifact.name == artifact.name)
-        .order_by(Artifact.version.desc())
-    )
-    return DataResponse(data=[ArtifactResponse.model_validate(a) for a in result.scalars().all()])
-
-
-# --- Status ---
-
-
-@router.put("/{artifact_id}/status")
-async def update_artifact_status(
-    artifact_id: uuid.UUID,
-    dto: UpdateStatusDto,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(require_auth),
-) -> DataResponse[ArtifactResponse]:
-    result = await db.execute(
-        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
-    )
-    artifact = result.scalar_one_or_none()
-    if not artifact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
-
-    valid = VALID_STATUS_TRANSITIONS.get(artifact.status, [])
-    if dto.status.value not in valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Cannot transition from {artifact.status} to {dto.status.value}",
-        )
-
-    artifact.status = dto.status.value
-
-    targets = await _resolve_subscribers(db, auth.org_id, artifact.artifact_type, artifact.task_id)
-    await emit(
-        db=db,
-        type=SSEEventType.ARTIFACT_UPDATED,
-        org_id=auth.org_id,
-        actor_id=auth.id,
-        entity_type="artifact",
-        entity_id=artifact.id,
-        data={"name": artifact.name, "version": artifact.version, "status": dto.status.value},
-        target_agents=targets if targets else None,
-    )
-
-    await db.commit()
-    await db.refresh(artifact)
-    return DataResponse(data=ArtifactResponse.model_validate(artifact))
-
-
-# --- Subscriptions ---
+# --- Subscriptions (before /{artifact_id} to avoid route conflict) ---
 
 
 @router.post("/subscribe", status_code=status.HTTP_201_CREATED)
@@ -344,6 +266,7 @@ async def create_subscription(
         agent_id=auth.id,
         artifact_type=dto.artifact_type,
         task_id=dto.task_id,
+        created_at=pendulum.now("UTC"),
     )
     db.add(sub)
     try:
@@ -353,7 +276,6 @@ async def create_subscription(
             status_code=status.HTTP_409_CONFLICT, detail="Subscription already exists"
         ) from exc
     await db.commit()
-    await db.refresh(sub)
     return DataResponse(data=SubscriptionResponse.model_validate(sub))
 
 
@@ -392,3 +314,82 @@ async def delete_subscription(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
     await db.delete(sub)
     await db.commit()
+
+
+# --- Single artifact + history (after /subscriptions, /subscribe, /latest) ---
+
+
+@router.get("/{artifact_id}")
+async def get_artifact(
+    artifact_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataResponse[ArtifactResponse]:
+    result = await db.execute(
+        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
+    )
+    artifact = result.scalar_one_or_none()
+    if not artifact:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
+    return DataResponse(data=ArtifactResponse.model_validate(artifact))
+
+
+@router.get("/{artifact_id}/history")
+async def get_artifact_history(
+    artifact_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataResponse[list[ArtifactResponse]]:
+    result = await db.execute(
+        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
+    )
+    artifact = result.scalar_one_or_none()
+    if not artifact:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
+
+    result = await db.execute(
+        select(Artifact)
+        .where(Artifact.org_id == auth.org_id, Artifact.name == artifact.name)
+        .order_by(Artifact.version.desc())
+    )
+    return DataResponse(data=[ArtifactResponse.model_validate(a) for a in result.scalars().all()])
+
+
+@router.put("/{artifact_id}/status")
+async def update_artifact_status(
+    artifact_id: uuid.UUID,
+    dto: UpdateStatusDto,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataResponse[ArtifactResponse]:
+    result = await db.execute(
+        select(Artifact).where(Artifact.id == artifact_id, Artifact.org_id == auth.org_id)
+    )
+    artifact = result.scalar_one_or_none()
+    if not artifact:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Artifact not found")
+
+    valid = VALID_STATUS_TRANSITIONS.get(artifact.status, [])
+    if dto.status.value not in valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot transition from {artifact.status} to {dto.status.value}",
+        )
+
+    artifact.status = dto.status.value
+    artifact.updated_at = pendulum.now("UTC")
+
+    targets = await _resolve_subscribers(db, auth.org_id, artifact.artifact_type, artifact.task_id)
+    await emit(
+        db=db,
+        type=SSEEventType.ARTIFACT_UPDATED,
+        org_id=auth.org_id,
+        actor_id=auth.id,
+        entity_type="artifact",
+        entity_id=artifact.id,
+        data={"name": artifact.name, "version": artifact.version, "status": dto.status.value},
+        target_agents=targets if targets else None,
+    )
+
+    await db.commit()
+    return DataResponse(data=ArtifactResponse.model_validate(artifact))

@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatArray, CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 
 
 class Artifact(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -20,13 +19,11 @@ class Artifact(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False
-    )
+    task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     producer_agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     artifact_type: Mapped[str] = mapped_column(String(50), nullable=False)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -38,10 +35,10 @@ class Artifact(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
     )
     source_artifact_ids: Mapped[list[object]] = mapped_column(
-        CompatArray(UUID(as_uuid=True)), nullable=False, server_default="[]"
+        CompatJSONB(), nullable=False, server_default="[]"
     )
     superseded_by_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("artifacts.id"), nullable=True
+        CompatUUID(), ForeignKey("artifacts.id"), nullable=True
     )
     approved_by: Mapped[str | None] = mapped_column(String(200), nullable=True)
     approved_at: Mapped[datetime | None] = mapped_column(nullable=True)
@@ -59,14 +56,14 @@ class ArtifactSubscription(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     artifact_type: Mapped[str] = mapped_column(String(50), nullable=False)
     task_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
+        CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
