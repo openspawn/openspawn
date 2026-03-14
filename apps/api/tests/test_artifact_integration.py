@@ -19,11 +19,8 @@ _OWNER_ORG_ID = "00000000-0000-0000-0000-000000000001"
 
 
 @pytest.fixture(autouse=True)
-def sqlite_env(tmp_path):
-    db_path = tmp_path / "test.db"
+def sqlite_env():
     env = {
-        "DATABASE_URL": f"sqlite+aiosqlite:///{db_path}",
-        "REDIS_URL": "",
         "AUTH_MODE": "none",
         "AUTH_JWT_SECRET": "test-secret-32-chars-long-enough!",
     }
@@ -31,22 +28,48 @@ def sqlite_env(tmp_path):
         from importlib import reload
 
         import app.config
-        import app.database
 
         reload(app.config)
-        reload(app.database)
         yield
         reload(app.config)
-        reload(app.database)
 
 
 @pytest.fixture
-async def client() -> AsyncGenerator[AsyncClient]:
-    from app.database import create_tables
+async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
+    from collections.abc import AsyncGenerator as AG
 
-    await create_tables()
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+    from sqlalchemy.pool import StaticPool
+
+    import app.models.artifact  # noqa: F401
+    from app.database import get_db
+    from app.models.base import Base
+
+    db_path = tmp_path / "test.db"
+    engine = create_async_engine(
+        f"sqlite+aiosqlite:///{db_path}",
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False},
+    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    # Strip PG-only computed columns for SQLite
+    for table in Base.metadata.tables.values():
+        for col in table.columns:
+            if col.computed is not None:
+                col.computed = None  # type: ignore[assignment]
+                col.server_default = None
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async def _override_get_db() -> AG[AsyncSession]:
+        async with session_factory() as session:
+            yield session
 
     from app.main import app
+
+    app.dependency_overrides[get_db] = _override_get_db
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -54,52 +77,66 @@ async def client() -> AsyncGenerator[AsyncClient]:
     ) as c:
         yield c
 
+    app.dependency_overrides.pop(get_db, None)
+    await engine.dispose()
+
 
 @pytest.fixture
 async def seeded_client(client: AsyncClient) -> AsyncClient:
     """Client with org + agent + task seeded for artifact operations."""
-    from app.database import async_session
+    from app.database import get_db
+    from app.main import app
     from app.models.agent import Agent
     from app.models.organization import Organization
     from app.models.task import Task
 
-    async with async_session() as db:
-        org = Organization(
-            id=uuid.UUID(_OWNER_ORG_ID),
-            name="TestOrg",
-            slug="test",
-            task_prefix="T",
-            next_task_number=1,
-        )
-        db.add(org)
-        await db.flush()
+    # Get a session from the overridden get_db dependency
+    override_fn = app.dependency_overrides[get_db]
+    db_gen = override_fn()
+    db = await db_gen.__anext__()
 
-        agent = Agent(
-            id=uuid.UUID(_OWNER_ID),
-            org_id=org.id,
-            agent_id="test-agent",
-            name="Test Agent",
-            level=5,
-            model="sonnet",
-            status="active",
-            role="worker",
-            mode="worker",
-            hmac_secret_enc=b"\x00" * 32,
-        )
-        db.add(agent)
-        await db.flush()
+    org = Organization(
+        id=uuid.UUID(_OWNER_ORG_ID),
+        name="TestOrg",
+        slug="test",
+        task_prefix="T",
+        next_task_number=1,
+    )
+    db.add(org)
+    await db.flush()
 
-        task = Task(
-            id=uuid.UUID("00000000-0000-0000-0000-000000000002"),
-            org_id=org.id,
-            identifier="T-1",
-            title="Test Task",
-            status="in_progress",
-            priority="normal",
-            creator_id=agent.id,
-        )
-        db.add(task)
-        await db.commit()
+    agent = Agent(
+        id=uuid.UUID(_OWNER_ID),
+        org_id=org.id,
+        agent_id="test-agent",
+        name="Test Agent",
+        level=5,
+        model="sonnet",
+        status="active",
+        role="worker",
+        mode="worker",
+        hmac_secret_enc=b"\x00" * 32,
+    )
+    db.add(agent)
+    await db.flush()
+
+    task = Task(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000002"),
+        org_id=org.id,
+        identifier="T-1",
+        title="Test Task",
+        status="in_progress",
+        priority="normal",
+        creator_id=agent.id,
+    )
+    db.add(task)
+    await db.commit()
+
+    # Close the generator
+    try:
+        await db_gen.__anext__()
+    except StopAsyncIteration:
+        pass
 
     return client
 
