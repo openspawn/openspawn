@@ -9,7 +9,7 @@
       "entry": ["app/main.tsx", "app/routes/**/*.tsx"],
       "ignore": ["**/dist/**"]
     },
-    "apps/demo": {
+    "apps/dashboard": {
       "entry": ["src/main.tsx", "src/routes/**/*.tsx"],
       "ignore": ["**/dist/**"]
     },

@@ -177,6 +177,18 @@ const statusRoute = createRoute({
   component: lazyRouteComponent(() => import("./pages/mobile-status"), "MobileStatusPage"),
 });
 
+const memoryRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/memory",
+  component: lazyRouteComponent(() => import("./pages/memory"), "MemoryPage"),
+});
+
+const graphRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/graph",
+  component: lazyRouteComponent(() => import("./pages/graph"), "GraphPage"),
+});
+
 // Auth routes — only in non-sandbox mode
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -204,6 +216,8 @@ const layoutChildren = [
   statusRoute,
   kanbanRoute,
   taskBoardRoute,
+  memoryRoute,
+  graphRoute,
 ];
 
 const rootChildren = [

@@ -29,6 +29,8 @@ import {
   Star,
   Layers,
   ClipboardList,
+  Brain,
+  Share2,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
@@ -88,6 +90,8 @@ const navigation: { name: string; href: string; icon: typeof LayoutDashboard; to
     { name: "Model Router", href: "/router", icon: GitBranch },
     { name: "Credits", href: "/credits", icon: Coins },
     { name: "Events", href: "/events", icon: Activity },
+    { name: "Memory", href: "/memory", icon: Brain },
+    { name: "Graph", href: "/graph", icon: Share2 },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 

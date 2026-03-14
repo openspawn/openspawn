@@ -6,7 +6,7 @@ OpenSpawn is an Nx monorepo — multi-agent coordination platform with React das
 
 ```
 apps/
-  demo/            React dashboard (bikinibottom.ai)
+  dashboard/       React dashboard (openspawn.ai + bikinibottom.ai via env vars)
   team/            Internal team dashboard
   website/         openspawn.ai marketing site
   platform/        openspawn.ai landing page server
@@ -75,7 +75,7 @@ The `app` container runs `tools/sandbox/src/index.ts`, which serves both the RES
 
 The main Dockerfile builds three apps in a multi-stage build:
 
-1. `pnpm nx run demo:build` -> `dashboard-dist`
+1. `pnpm nx run dashboard:build` -> `dashboard-dist`
 2. `pnpm nx run team:build` -> `team-dist`
 3. `pnpm nx run website:build` -> `website-dist`
 
@@ -85,9 +85,20 @@ The API Dockerfile (`apps/api/Dockerfile`) builds the FastAPI backend as a separ
 
 ## Key Patterns
 
-### Demo Mode
+### Dashboard Modes
 
-The dashboard runs entirely client-side in demo mode using a simulation engine (`libs/demo-data/`). No backend needed — the engine generates realistic agent/task data.
+A single dashboard app (`apps/dashboard/`) serves all deployment contexts via env vars:
+
+| Env Var                  | Values                         | Effect                                              |
+| ------------------------ | ------------------------------ | --------------------------------------------------- |
+| `VITE_DASHBOARD_THEME`   | `openspawn` (default), `bikinibottom` | Brand, colors, wave animations, BB hero page |
+| `VITE_DEMO_MODE`         | `true` / unset                 | Skips auth, uses client-side simulation engine       |
+
+**bikinibottom.ai** uses both: `VITE_DASHBOARD_THEME=bikinibottom` + `VITE_DEMO_MODE=true`.
+**openspawn.ai dashboard** uses neither (defaults to OpenSpawn theme + real auth).
+Demo mode can also be toggled at runtime via `?demo=true` URL param.
+
+In demo mode, the dashboard runs entirely client-side using a simulation engine (`libs/demo-data/`). No backend needed — the engine generates realistic agent/task data.
 
 ### Agent Hierarchy
 

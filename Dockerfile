@@ -1,5 +1,5 @@
 # ── OpenSpawn Platform ────────────────────────────────────────────────────────
-# Builds: demo dashboard, team dashboard, website, sandbox server
+# Builds: dashboard, team dashboard, website, sandbox server
 
 # Stage 1: Build all apps
 FROM node:24-alpine AS build
@@ -23,7 +23,7 @@ ARG VITE_DASHBOARD_THEME=openspawn
 ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
 RUN pnpm nx build shared-types
-RUN pnpm nx run demo:build --configuration=production
+RUN pnpm nx run dashboard:build --configuration=production
 RUN VITE_BASE_PATH="/" pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
 
@@ -41,7 +41,7 @@ COPY --from=build /app/sandbox-deploy ./
 COPY --from=build /app/dist/libs/shared-types ./node_modules/@openspawn/shared-types
 
 # Copy built apps
-COPY --from=build /app/dist/apps/demo ./dashboard-dist
+COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
 COPY --from=build /app/dist/apps/team ./team-dist
 COPY --from=build /app/dist/apps/website ./website-dist
 

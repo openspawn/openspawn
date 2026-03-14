@@ -16,8 +16,7 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ```
 apps/
-  dashboard/       -> User-facing dashboard (openspawn.ai)
-  demo/            -> React dashboard (bikinibottom.ai)
+  dashboard/       -> React dashboard (openspawn.ai + bikinibottom.ai via env vars)
   team/            -> Internal team dashboard
   website/         -> openspawn.ai marketing site + docs (MDX)
   platform/        -> openspawn.ai landing page
@@ -52,8 +51,8 @@ pnpm run dev:sandbox                                      # Dev (Sandbox + Dashb
 npx openspawn init                                        # CLI — scaffold project
 npx openspawn start                                       # CLI — start coordinator
 pnpm exec nx run-many -t build                            # Build
-pnpm exec nx test demo                                    # Unit tests
-pnpm exec nx e2e demo                                     # E2E tests
+pnpm exec nx test dashboard                                # Unit tests
+pnpm exec nx e2e demo-e2e                                  # E2E tests
 pnpm exec nx run-many -t lint                             # Lint
 pnpm exec oxfmt --write .                                 # Format
 cd apps/api && uv run alembic upgrade head                # Database migrations
@@ -76,7 +75,7 @@ cd apps/api && uv run alembic upgrade head                # Database migrations
 ## Architecture (1-minute version)
 
 1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
-2. **Demo app** (`apps/demo/`) is the React dashboard for bikinibottom.ai
+2. **Dashboard** (`apps/dashboard/`) serves both openspawn.ai and bikinibottom.ai (via `VITE_DASHBOARD_THEME` + `VITE_SANDBOX_MODE` env vars)
 3. **API** (`apps/api/`) manages tasks, credits, messages, MCP tools, and agent spawning (FastAPI + SQLAlchemy)
 4. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
 5. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
