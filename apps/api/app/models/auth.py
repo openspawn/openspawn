@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, LargeBinary, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 from app.models.enums import UserRole
 
 
@@ -17,7 +16,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (Index("ix_users_org_id_email", "org_id", "email", unique=True),)
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -44,7 +43,7 @@ class RefreshToken(UUIDPrimaryKeyMixin, Base):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+        CompatUUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     token_hash: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
@@ -64,11 +63,9 @@ class ApiKey(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("users.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     key_prefix: Mapped[str] = mapped_column(String(12), nullable=False)
     key_hash: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
@@ -87,7 +84,7 @@ class Nonce(Base):
     __table_args__ = (Index("ix_nonces_expires_at", "expires_at"),)
 
     nonce: Mapped[str] = mapped_column(String(64), primary_key=True)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    agent_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
@@ -96,12 +93,12 @@ class IdempotencyKey(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "idempotency_keys"
     __table_args__ = (Index("ix_idempotency_keys_expires_at", "expires_at"),)
 
-    key: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, unique=True)
+    key: Mapped[uuid.UUID] = mapped_column(CompatUUID(), nullable=False, unique=True)
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     method: Mapped[str] = mapped_column(String(10), nullable=False)
     path: Mapped[str] = mapped_column(String(500), nullable=False)

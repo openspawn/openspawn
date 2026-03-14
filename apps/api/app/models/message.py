@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 from app.models.enums import MessageType
 
 
@@ -21,12 +20,12 @@ class Channel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     type: Mapped[str] = mapped_column(String(20), nullable=False)
     task_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
+        CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     metadata_: Mapped[dict] = mapped_column(
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
@@ -47,23 +46,23 @@ class Message(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     channel_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("channels.id"), nullable=False
+        CompatUUID(), ForeignKey("channels.id"), nullable=False
     )
     sender_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     recipient_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     type: Mapped[str] = mapped_column(
         String(20), nullable=False, server_default=MessageType.TEXT.value
     )
     body: Mapped[str] = mapped_column(Text, nullable=False)
     parent_message_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("messages.id"), nullable=True
+        CompatUUID(), ForeignKey("messages.id"), nullable=True
     )
     metadata_: Mapped[dict] = mapped_column(
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
