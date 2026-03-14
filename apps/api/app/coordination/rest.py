@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.coordination.service as service
 from app.auth.dependencies import AuthContext, require_auth
@@ -15,6 +15,9 @@ from app.coordination.schemas import (
 )
 from app.database import get_db
 from app.schemas import DataMessageResponse, DataResponse
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/coordination", tags=["coordination"])
 

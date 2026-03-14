@@ -43,8 +43,8 @@ async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
     from sqlalchemy.pool import StaticPool
 
-    import app.models.artifact  # noqa: F401
-    import app.models.event_subscription  # noqa: F401
+    import app.models.artifact
+    import app.models.event_subscription
     from app.database import get_db
     from app.models.base import Base
 
@@ -168,53 +168,68 @@ async def test_full_dod_scenario(seeded_client: AsyncClient):
     c = seeded_client
 
     # 1. Test agent subscribes to component.*
-    r = await c.post("/coordination/subscribe", json={
-        "event_pattern": "component.*",
-        "task_id": _TASK_ID,
-    })
+    r = await c.post(
+        "/coordination/subscribe",
+        json={
+            "event_pattern": "component.*",
+            "task_id": _TASK_ID,
+        },
+    )
     assert r.status_code == 201
 
     # 2. Docs agent subscribes to *
-    r = await c.post("/coordination/subscribe", json={
-        "event_pattern": "*",
-    })
+    r = await c.post(
+        "/coordination/subscribe",
+        json={
+            "event_pattern": "*",
+        },
+    )
     assert r.status_code == 201
 
     # 3. Dev agent emits component.created for SubmitButton
-    r = await c.post("/coordination/emit", json={
-        "event_type": "component.created",
-        "payload": {
-            "name": "SubmitButton",
-            "file_path": "src/SubmitButton.tsx",
-            "test_ids": ["submit-btn"],
-            "props": [{"name": "onClick", "type": "() => void"}],
-            "route": "/checkout",
+    r = await c.post(
+        "/coordination/emit",
+        json={
+            "event_type": "component.created",
+            "payload": {
+                "name": "SubmitButton",
+                "file_path": "src/SubmitButton.tsx",
+                "test_ids": ["submit-btn"],
+                "props": [{"name": "onClick", "type": "() => void"}],
+                "route": "/checkout",
+            },
+            "task_id": _TASK_ID,
+            "entity_name": "SubmitButton",
         },
-        "task_id": _TASK_ID,
-        "entity_name": "SubmitButton",
-    })
+    )
     assert r.status_code == 200
     assert r.json()["message"] == "Event emitted"
 
     # 4. Dev agent emits component.created for CheckoutForm
-    r = await c.post("/coordination/emit", json={
-        "event_type": "component.created",
-        "payload": {
-            "name": "CheckoutForm",
-            "file_path": "src/CheckoutForm.tsx",
-            "test_ids": ["checkout-form"],
-            "props": [{"name": "onSubmit", "type": "() => void"}],
-            "route": "/checkout",
+    r = await c.post(
+        "/coordination/emit",
+        json={
+            "event_type": "component.created",
+            "payload": {
+                "name": "CheckoutForm",
+                "file_path": "src/CheckoutForm.tsx",
+                "test_ids": ["checkout-form"],
+                "props": [{"name": "onSubmit", "type": "() => void"}],
+                "route": "/checkout",
+            },
+            "task_id": _TASK_ID,
+            "entity_name": "CheckoutForm",
         },
-        "task_id": _TASK_ID,
-        "entity_name": "CheckoutForm",
-    })
+    )
     assert r.status_code == 200
 
     # 5. Replay events — should get both in order
-    r = await c.post("/coordination/replay", json={
-        "task_id": _TASK_ID,
-    })
+    r = await c.post(
+        "/coordination/replay",
+        json={
+            "task_id": _TASK_ID,
+        },
+    )
     assert r.status_code == 200
     events = r.json()["data"]
     assert len(events) == 2
@@ -222,36 +237,45 @@ async def test_full_dod_scenario(seeded_client: AsyncClient):
     assert events[1]["type"] == "component.created"
 
     # 6. Test agent emits test.written for SubmitButton
-    r = await c.post("/coordination/emit", json={
-        "event_type": "test.written",
-        "payload": {
-            "covers_component": "SubmitButton",
-            "test_file": "SubmitButton.spec.tsx",
-            "test_ids_used": ["submit-btn"],
-            "scenarios": ["renders", "handles click"],
+    r = await c.post(
+        "/coordination/emit",
+        json={
+            "event_type": "test.written",
+            "payload": {
+                "covers_component": "SubmitButton",
+                "test_file": "SubmitButton.spec.tsx",
+                "test_ids_used": ["submit-btn"],
+                "scenarios": ["renders", "handles click"],
+            },
+            "task_id": _TASK_ID,
+            "entity_name": "submit-btn-test",
         },
-        "task_id": _TASK_ID,
-        "entity_name": "submit-btn-test",
-    })
+    )
     assert r.status_code == 200
 
     # 7. Docs agent emits screenshot.captured for SubmitButton
-    r = await c.post("/coordination/emit", json={
-        "event_type": "screenshot.captured",
-        "payload": {
-            "name": "SubmitButton",
-            "url": "screenshots/submit-btn.png",
+    r = await c.post(
+        "/coordination/emit",
+        json={
+            "event_type": "screenshot.captured",
+            "payload": {
+                "name": "SubmitButton",
+                "url": "screenshots/submit-btn.png",
+            },
+            "task_id": _TASK_ID,
+            "entity_name": "SubmitButton",
         },
-        "task_id": _TASK_ID,
-        "entity_name": "SubmitButton",
-    })
+    )
     assert r.status_code == 200
 
     # 8. component_registry projection
-    r = await c.get("/coordination/project", params={
-        "task_id": _TASK_ID,
-        "projection_type": "component_registry",
-    })
+    r = await c.get(
+        "/coordination/project",
+        params={
+            "task_id": _TASK_ID,
+            "projection_type": "component_registry",
+        },
+    )
     assert r.status_code == 200
     data = r.json()["data"]
     assert data["count"] == 2
@@ -259,10 +283,13 @@ async def test_full_dod_scenario(seeded_client: AsyncClient):
     assert "CheckoutForm" in data["components"]
 
     # 9. test_coverage projection
-    r = await c.get("/coordination/project", params={
-        "task_id": _TASK_ID,
-        "projection_type": "test_coverage",
-    })
+    r = await c.get(
+        "/coordination/project",
+        params={
+            "task_id": _TASK_ID,
+            "projection_type": "test_coverage",
+        },
+    )
     assert r.status_code == 200
     data = r.json()["data"]
     assert data["coverage_ratio"] == 0.5
@@ -270,10 +297,13 @@ async def test_full_dod_scenario(seeded_client: AsyncClient):
     assert data["total_components"] == 2
 
     # 10. artifact_view projection (hypothesis test)
-    r = await c.get("/coordination/project", params={
-        "task_id": _TASK_ID,
-        "projection_type": "artifact_view",
-    })
+    r = await c.get(
+        "/coordination/project",
+        params={
+            "task_id": _TASK_ID,
+            "projection_type": "artifact_view",
+        },
+    )
     assert r.status_code == 200
     data = r.json()["data"]
     assert data["count"] == 4  # 2 components + 1 test_plan + 1 screenshot
@@ -281,30 +311,42 @@ async def test_full_dod_scenario(seeded_client: AsyncClient):
     assert types == {"component", "test_plan", "screenshot"}
 
     # 11. New agent replays all events — catches up
-    r = await c.post("/coordination/replay", json={
-        "task_id": _TASK_ID,
-    })
+    r = await c.post(
+        "/coordination/replay",
+        json={
+            "task_id": _TASK_ID,
+        },
+    )
     assert r.status_code == 200
     assert len(r.json()["data"]) == 4
 
     # 12. Duplicate subscription → 409
-    r = await c.post("/coordination/subscribe", json={
-        "event_pattern": "component.*",
-        "task_id": _TASK_ID,
-    })
+    r = await c.post(
+        "/coordination/subscribe",
+        json={
+            "event_pattern": "component.*",
+            "task_id": _TASK_ID,
+        },
+    )
     assert r.status_code == 409
 
     # 13. Invalid event type → 400
-    r = await c.post("/coordination/emit", json={
-        "event_type": "nonexistent.event",
-        "payload": {},
-        "task_id": _TASK_ID,
-    })
+    r = await c.post(
+        "/coordination/emit",
+        json={
+            "event_type": "nonexistent.event",
+            "payload": {},
+            "task_id": _TASK_ID,
+        },
+    )
     assert r.status_code == 400
 
     # 14. Unknown projection → 400
-    r = await c.get("/coordination/project", params={
-        "task_id": _TASK_ID,
-        "projection_type": "nonexistent",
-    })
+    r = await c.get(
+        "/coordination/project",
+        params={
+            "task_id": _TASK_ID,
+            "projection_type": "nonexistent",
+        },
+    )
     assert r.status_code == 400

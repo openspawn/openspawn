@@ -1,21 +1,26 @@
 from __future__ import annotations
 
-import uuid
+from typing import TYPE_CHECKING
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.coordination.projections import (
     project_artifact_view,
     project_component_registry,
     project_test_coverage,
 )
-from app.coordination.schemas import EmitEventDto, ReplayDto, SubscribeDto
 from app.events.emit import emit
 from app.models.enums import SSEEventType
 from app.models.event import Event
 from app.models.event_subscription import EventSubscription
+
+if TYPE_CHECKING:
+    import uuid
+
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from app.coordination.schemas import EmitEventDto, ReplayDto, SubscribeDto
 
 PROJECTION_REGISTRY = {
     "component_registry": project_component_registry,
@@ -29,11 +34,11 @@ async def emit_coordination_event(
 ) -> None:
     try:
         event_type = SSEEventType(dto.event_type)
-    except ValueError:
+    except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown event type: {dto.event_type}",
-        )
+        ) from exc
 
     targets = await _resolve_event_subscribers(db, org_id, dto.event_type, dto.task_id)
 
@@ -81,9 +86,7 @@ async def subscribe_to_events(
     return sub
 
 
-async def replay_events(
-    db: AsyncSession, org_id: uuid.UUID, dto: ReplayDto
-) -> list[Event]:
+async def replay_events(db: AsyncSession, org_id: uuid.UUID, dto: ReplayDto) -> list[Event]:
     # entity_id = task_id for coordination events — works on SQLite + PostgreSQL
     q = select(Event).where(
         Event.org_id == org_id,

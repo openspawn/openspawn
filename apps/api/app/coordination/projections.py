@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from app.models.event import Event
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.event import Event
 
 
 def project_component_registry(events: list[Event]) -> dict:

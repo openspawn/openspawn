@@ -6,8 +6,6 @@ import uuid
 from datetime import datetime
 from types import SimpleNamespace
 
-import pytest
-
 from app.coordination.projections import (
     project_artifact_view,
     project_component_registry,
