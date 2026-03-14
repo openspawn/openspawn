@@ -102,8 +102,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Get Playwright version
+        id: pw-version
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ steps.pw-version.outputs.version }}
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Install Playwright system deps
+        run: npx playwright install-deps chromium
 
       - name: Run E2E tests
         run: pnpm exec nx e2e demo-e2e --configuration=ci
