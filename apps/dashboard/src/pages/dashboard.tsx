@@ -226,6 +226,8 @@ export function DashboardPage() {
                   }
                   sparklineData={sparklines.agents}
                   sparklineColor="#06b6d4"
+                  valueClassName="text-cyan-500"
+                  onClick={() => navigate({ to: "/agents" })}
                 />
               </StaggerItem>
               <StaggerItem>
@@ -235,7 +237,9 @@ export function DashboardPage() {
                   icon={CheckSquare}
                   description={`${reviewTasks} in review`}
                   sparklineData={sparklines.tasks}
-                  sparklineColor="#06b6d4"
+                  sparklineColor="#f59e0b"
+                  valueClassName="text-amber-500"
+                  onClick={() => navigate({ to: "/tasks" })}
                 />
               </StaggerItem>
               <StaggerItem>
@@ -246,6 +250,8 @@ export function DashboardPage() {
                   description={`${tasks.length} total tasks`}
                   sparklineData={sparklines.completed}
                   sparklineColor="#10b981"
+                  valueClassName="text-emerald-500"
+                  onClick={() => navigate({ to: "/tasks" })}
                 />
               </StaggerItem>
               <StaggerItem>
@@ -256,6 +262,7 @@ export function DashboardPage() {
                   description={`-${totalCreditsSpent.toLocaleString()} spent`}
                   sparklineData={sparklines.credits}
                   sparklineColor="#f59e0b"
+                  onClick={() => navigate({ to: "/credits" })}
                 />
               </StaggerItem>
             </StaggerContainer>
@@ -325,7 +332,9 @@ export function DashboardPage() {
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            Recent Activity
+          </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               <Zap className="h-3 w-3 mr-1" />
@@ -354,7 +363,8 @@ export function DashboardPage() {
                       ? { duration: 0.15 }
                       : { type: "spring", stiffness: 400, damping: 30, delay: index * 0.03 }
                   }
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-h-[44px]"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-h-[44px] cursor-pointer"
+                  onClick={() => navigate({ to: "/events" })}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="shrink-0">{getEventIcon(event.type)}</div>
