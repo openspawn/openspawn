@@ -43,6 +43,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-lint-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nx-lint-${{ hashFiles('pnpm-lock.yaml') }}-
+
       - name: Verify OpenAPI codegen is up to date
         run: |
           pnpm run codegen
@@ -77,6 +84,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-build-test-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nx-build-test-${{ hashFiles('pnpm-lock.yaml') }}-
 
       - name: Build
         run: pnpm exec nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} -t build
