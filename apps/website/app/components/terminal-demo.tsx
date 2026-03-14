@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 const lines = [
   { text: "$ npx openspawn init my-org", color: "text-slate-300", delay: 0 },
-  { text: "🪸 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
+  { text: "🐙 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
   { text: "", color: "", delay: 1300 },
   { text: "$ npx openspawn start", color: "text-slate-300", delay: 1500 },
   { text: "🌐 Server running at http://localhost:3333", color: "text-cyan-400", delay: 2400 },

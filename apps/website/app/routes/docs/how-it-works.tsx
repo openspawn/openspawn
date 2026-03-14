@@ -73,7 +73,7 @@ export function HowItWorks() {
           caps per agent
         </li>
       </ul>
-      <CodeBlock title="ORG.md example">{`# 🪸 Acme Corp
+      <CodeBlock title="ORG.md example">{`# 🐙 Acme Corp
 
 > Mission: Ship great software faster
 

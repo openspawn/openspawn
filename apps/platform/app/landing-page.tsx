@@ -45,7 +45,7 @@ function FeatureCard({
 function TerminalDemo() {
   const lines = [
     { text: "$ npx openspawn init my-reef", color: "text-slate-300", delay: 0 },
-    { text: "🪸 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
+    { text: "🐙 Created ORG.md, config, .gitignore", color: "text-emerald-400", delay: 900 },
     { text: "", color: "", delay: 1300 },
     { text: "$ npx openspawn start", color: "text-slate-300", delay: 1500 },
     { text: "🌐 Server running at http://localhost:3333", color: "text-cyan-400", delay: 2400 },
@@ -145,7 +145,7 @@ const openclawJsonSnippet = `{
   }
 }`;
 
-const orgMdSnippet = `# 🪸 My Agent Org
+const orgMdSnippet = `# 🐙 My Agent Org
 
 ## Structure
 - 🔬 Research (lead: Alice, model: opus)
@@ -197,7 +197,7 @@ export function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-navy-950/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
           <a href="/" className="flex items-center gap-2 text-lg font-bold">
-            <span className="text-2xl">🪸</span>
+            <span className="text-2xl">🐙</span>
             <span className="gradient-text">OpenSpawn</span>
           </a>
           <div className="hidden items-center gap-8 md:flex">
@@ -240,7 +240,7 @@ export function LandingPage() {
             <div className="absolute right-1/4 top-20 h-[400px] w-[400px] rounded-full bg-violet-500/5 blur-[100px]" />
           </div>
           <div className="relative mx-auto max-w-4xl text-center">
-            <div className="animate-fade-in-up mb-6 text-6xl md:text-8xl">🪸</div>
+            <div className="animate-fade-in-up mb-6 text-6xl md:text-8xl">🐙</div>
             <h1 className="animate-fade-in-up animate-delay-100 mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
               <span className="gradient-text">OpenSpawn</span>
             </h1>
@@ -452,7 +452,7 @@ export function LandingPage() {
                 <span className="ml-2 text-xs text-slate-500">terminal</span>
               </div>
               <pre className="p-4 text-left text-sm leading-relaxed text-slate-300">
-                <code>{`$ openclaw skill add openspawn\n🪸 OpenSpawn skill installed\n\n$ echo "# My Org" > ORG.md\n✨ Agents now coordinate automatically`}</code>
+                <code>{`$ openclaw skill add openspawn\n🐙 OpenSpawn skill installed\n\n$ echo "# My Org" > ORG.md\n✨ Agents now coordinate automatically`}</code>
               </pre>
             </div>
           </div>
@@ -486,7 +486,7 @@ export function LandingPage() {
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <div className="mb-3 text-lg font-bold">
-                <span className="mr-2">🪸</span>
+                <span className="mr-2">🐙</span>
                 <span className="gradient-text">OpenSpawn</span>
               </div>
               <p className="text-sm text-slate-500">The coordination layer for AI agent teams.</p>

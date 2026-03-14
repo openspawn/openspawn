@@ -66,7 +66,7 @@ export function OgGettingStarted() {
           fontWeight: 600,
         }}
       >
-        <span style={{ color: "var(--os-accent-light, #22d3ee)" }}>🪸 OpenSpawn</span>
+        <span style={{ color: "var(--os-accent-light, #22d3ee)" }}>🐙 OpenSpawn</span>
         <span style={{ opacity: 0.4 }}>›</span>
         <span>Docs</span>
         <span style={{ opacity: 0.4 }}>›</span>

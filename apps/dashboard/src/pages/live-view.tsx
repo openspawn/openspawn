@@ -515,7 +515,7 @@ function AnnotationBubble({ annotation }: { annotation: Annotation | null }) {
           className="text-[10px]"
           style={{ color: "rgba(74,174,217,0.4)", fontFamily: "Nunito, sans-serif" }}
         >
-          🪸 OpenSpawn feature
+          🐙 OpenSpawn feature
         </span>
       </div>
     </div>
@@ -657,7 +657,7 @@ function CompletionOverlay({
             }}
           >
             <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="text-2xl">🪸</span>
+              <span className="text-2xl">🐙</span>
               <span
                 className="text-lg font-black"
                 style={{ color: "#4AAED9", fontFamily: '"Baloo 2", cursive' }}

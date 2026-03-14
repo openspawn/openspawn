@@ -1,5 +1,13 @@
 export { useAgents } from "./use-agents";
 export { useTasks, useTask } from "./use-tasks";
+export {
+  useCreateTask,
+  useTransitionTask,
+  useAssignTask,
+  useApproveTask,
+  useAddComment,
+  useEscalateTask,
+} from "./use-task-mutations";
 export { useCreditHistory, useRestCredits } from "./use-credits";
 export { useEvents } from "./use-events";
 export { useChannels } from "./use-channels";
@@ -11,3 +19,11 @@ export {
   useRestGraphCytoscape,
 } from "./use-graph";
 export { useWebhooks, useWebhook, useCreateWebhook, useDeleteWebhook } from "./use-webhooks";
+export {
+  useUpdateAgent,
+  useActivateAgent,
+  useRevokeAgent,
+  useSpawnAgent,
+  useTransferCredits,
+  useSetBudget,
+} from "./use-agent-mutations";

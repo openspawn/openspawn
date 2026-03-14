@@ -77,3 +77,4 @@ apps/sandbox-cli/publish/*.cjs
 # SQLite databases (except database lib reference files)
 *.db
 !libs/database/**/*.db
+.superpowers/

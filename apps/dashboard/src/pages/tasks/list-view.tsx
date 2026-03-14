@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Badge } from "../../components/ui/badge";
 import { Card } from "../../components/ui/card";
+import { TaskActions } from "../../components/task-actions";
 import type { Task } from "../../hooks";
 import { darkenForBackground } from "../../lib/avatar-utils";
 import { resolveAvatarUrl } from "../../lib/resolve-avatar-url";
@@ -96,6 +97,14 @@ function ListView({ tasks, onTaskClick, selectedTaskId, agentMap }: ListViewProp
                       {dueDate}
                     </span>
                   )}
+                </div>
+                <div className="flex-shrink-0 sm:order-7">
+                  <TaskActions
+                    taskId={task.id}
+                    taskStatus={task.status}
+                    taskTitle={task.title}
+                    approvalRequired={Boolean(task.approvalRequired)}
+                  />
                 </div>
               </motion.div>
             );

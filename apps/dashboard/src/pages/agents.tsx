@@ -160,11 +160,6 @@ export function AgentsPage() {
     }
   }
 
-  function handleAction(agent: Agent, mode: DialogMode) {
-    setSelectedAgent(agent);
-    setDialogMode(mode);
-  }
-
   function handleCloseDialog() {
     setSelectedAgent(null);
     setDialogMode(null);
@@ -365,11 +360,7 @@ export function AgentsPage() {
               Showing {filteredAgents.length} of {agents.length} agents
             </div>
 
-            <AgentVirtualGrid
-              filteredAgents={filteredAgents}
-              onCardClick={openAgentDetail}
-              onAction={handleAction}
-            />
+            <AgentVirtualGrid filteredAgents={filteredAgents} onCardClick={openAgentDetail} />
 
             {filteredAgents.length === 0 && agents.length > 0 && (
               <div className="flex flex-col items-center justify-center py-12 rounded-lg border border-dashed border-border">

@@ -146,7 +146,7 @@ export function IntroCard({ onStart }: IntroCardProps) {
               </span>
             </div>
             <div className="mt-3" style={{ color: "rgba(184,228,247,0.5)" }}>
-              <div>🪸 OpenSpawn v0.1.0</div>
+              <div>🐙 OpenSpawn v0.1.0</div>
               <div className="mt-1">
                 <span style={{ color: "#4AE88A" }}>✓</span> Parsed ORG.md — 22 agents, 5 departments
               </div>

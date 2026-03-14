@@ -17,7 +17,7 @@ export function NotFoundPage() {
       </div>
 
       <div className="relative">
-        <div className="mb-6 text-7xl md:text-8xl">{tick % 2 === 0 ? "🪸" : "🐠"}</div>
+        <div className="mb-6 text-7xl md:text-8xl">{tick % 2 === 0 ? "🐙" : "🐠"}</div>
 
         <div className="mb-2 font-mono text-xs font-semibold uppercase tracking-widest text-cyan-500">
           404 — Page Not Found

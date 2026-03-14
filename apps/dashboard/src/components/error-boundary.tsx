@@ -1,5 +1,6 @@
 import { Component } from "react";
 import type { ReactNode, ErrorInfo } from "react";
+import { isBBTheme } from "../lib/dashboard-theme";
 
 interface Props {
   children: ReactNode;
@@ -67,13 +68,8 @@ export class AppErrorBoundary extends Component<Props, State> {
             textAlign: "center",
           }}
         >
-          {/* Pineapple + title */}
-          <span
-            style={{ fontSize: "4rem", marginBottom: "1rem" }}
-            role="img"
-            aria-label="pineapple"
-          >
-            🍍
+          <span style={{ fontSize: "4rem", marginBottom: "1rem" }} role="img" aria-label="logo">
+            {isBBTheme ? "🍍" : "🐙"}
           </span>
           <h1
             style={{

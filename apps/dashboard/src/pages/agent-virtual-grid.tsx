@@ -5,19 +5,11 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion, AnimatePresence } from "motion/react";
-import { MoreVertical, Coins, Edit, Eye, Ban } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
 import { AgentAvatar } from "../components/agent-avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "../components/ui/dropdown-menu";
+import { AgentActions } from "../components/agent-actions";
 import { AgentModeBadge } from "../components/agent-mode-selector";
 import { usePresence, useAgentHealth } from "../hooks";
 import { getStatusVariant, getLevelColor, getLevelLabel } from "../lib/status-colors";
@@ -27,15 +19,12 @@ import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 
 type Agent = AgentFieldsFragment;
 
-import { DialogModeValue, type DialogMode } from "../lib/enums";
-
 interface AgentVirtualGridProps {
   filteredAgents: Agent[];
   onCardClick: (id: string) => void;
-  onAction: (agent: Agent, mode: DialogMode) => void;
 }
 
-export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: AgentVirtualGridProps) {
+export function AgentVirtualGrid({ filteredAgents, onCardClick }: AgentVirtualGridProps) {
   const { presenceMap } = usePresence();
   const healthMap = useAgentHealth();
   const parentRef = useRef<HTMLDivElement>(null);
@@ -143,39 +132,11 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick, onAction }: Agen
                             </div>
                           </div>
 
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => onAction(agent, DialogModeValue.View)}
-                              >
-                                <Eye className="mr-2 h-4 w-4" /> View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => onAction(agent, DialogModeValue.Edit)}
-                              >
-                                <Edit className="mr-2 h-4 w-4" /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => onAction(agent, DialogModeValue.Credits)}
-                              >
-                                <Coins className="mr-2 h-4 w-4" /> Adjust Credits
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-destructive">
-                                <Ban className="mr-2 h-4 w-4" /> Revoke Access
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <AgentActions
+                            agentId={agent.agentId}
+                            agentStatus={agent.status}
+                            agentName={agent.name}
+                          />
                         </CardHeader>
 
                         <CardContent>
