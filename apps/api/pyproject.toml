@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "OpenSpawn API — FastAPI backend for multi-agent coordination"
 requires-python = ">=3.12"
 dependencies = [
-  "fastapi>=0.115",
+  "fastapi>=0.135",
   "uvicorn[standard]>=0.34",
   "pydantic>=2.10",
   "pydantic-settings>=2.7",
@@ -85,6 +85,7 @@ ignore = [
 "app/auth/*.py" = ["TCH002"] # FastAPI dependencies need runtime type annotations
 "app/*/schemas.py" = ["TCH001", "TCH002", "TCH003"] # Pydantic needs runtime type imports
 "app/*/router.py" = ["TCH002", "TCH003"] # FastAPI routes need runtime type imports
+"app/events/bus.py" = ["TCH003"] # Protocol + AsyncGenerator need runtime imports
 "app/schemas/*.py" = ["TCH003"] # Pydantic needs runtime type imports
 "app/mcp_server/*.py" = ["TCH002", "TCH003"] # MCP tools need runtime type imports
 "app/memory/*.py" = ["TCH003"] # Pydantic models need runtime type imports

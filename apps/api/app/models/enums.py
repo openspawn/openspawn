@@ -250,3 +250,31 @@ class TriggerMode(enum.StrEnum):
 class WebhookHookType(enum.StrEnum):
     PRE = "pre"
     POST = "post"
+
+
+class SSEEventType(enum.StrEnum):
+    """Event types pushed via Server-Sent Events."""
+
+    # Task lifecycle
+    TASK_CREATED = "task.created"
+    TASK_TRANSITIONED = "task.transitioned"
+    TASK_ASSIGNED = "task.assigned"
+    TASK_COMPLETED = "task.completed"
+
+    # Messages
+    MESSAGE_SENT = "message.sent"
+
+    # Escalations
+    ESCALATION_CREATED = "escalation.created"
+    ESCALATION_RESOLVED = "escalation.resolved"
+
+    # Agent status
+    AGENT_STATUS_CHANGED = "agent.status_changed"
+
+    # Future: Artifact Bus (#665)
+    ARTIFACT_PUBLISHED = "artifact.published"
+    ARTIFACT_UPDATED = "artifact.updated"
+
+    # Future: Autonomy Dial (#668)
+    APPROVAL_REQUESTED = "approval.requested"
+    APPROVAL_RESOLVED = "approval.resolved"
