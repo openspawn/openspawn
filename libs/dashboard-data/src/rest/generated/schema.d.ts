@@ -4,6 +4,113 @@
  */
 
 export interface paths {
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Login
+         * @description Authenticate user and return access + refresh tokens.
+         *
+         *     Behavior varies by auth mode:
+         *     - mode=none: returns static owner token, any credentials accepted
+         *     - mode=local: validates password against config hash, returns bearer token
+         *     - mode=full: validates credentials against User DB, optional TOTP, returns JWT
+         */
+        post: operations["login_auth_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh
+         * @description Exchange refresh token for new access + refresh tokens.
+         *
+         *     In full mode, implements token rotation (old refresh token revoked).
+         */
+        post: operations["refresh_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Revoke refresh token (logout).
+         */
+        post: operations["logout_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Current User Info
+         * @description Return current user profile from bearer token.
+         */
+        get: operations["get_current_user_info_auth_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Google Oauth
+         * @description Google OAuth login — stub for Phase 2.
+         */
+        get: operations["google_oauth_auth_google_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/agents/register": {
         parameters: {
             query?: never;
@@ -948,6 +1055,200 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Artifacts */
+        get: operations["list_artifacts_artifacts_get"];
+        put?: never;
+        /** Publish Artifact */
+        post: operations["publish_artifact_artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish Batch */
+        post: operations["publish_batch_artifacts_batch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Latest Artifact */
+        get: operations["get_latest_artifact_artifacts_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Subscription */
+        post: operations["create_subscription_artifacts_subscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Subscriptions */
+        get: operations["list_subscriptions_artifacts_subscriptions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/subscriptions/{subscription_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Subscription */
+        delete: operations["delete_subscription_artifacts_subscriptions__subscription_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/{artifact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Artifact */
+        get: operations["get_artifact_artifacts__artifact_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/{artifact_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Artifact History */
+        get: operations["get_artifact_history_artifacts__artifact_id__history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/artifacts/{artifact_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Artifact Status */
+        put: operations["update_artifact_status_artifacts__artifact_id__status_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Sse Token
+         * @description Issue short-lived JWT for SSE auth (EventSource can't set headers).
+         */
+        post: operations["create_sse_token_events_token_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Event Stream
+         * @description SSE stream. Auth via query param token. Supports Last-Event-ID replay.
+         */
+        get: operations["event_stream_events_stream_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/events": {
         parameters: {
             query?: never;
@@ -1465,6 +1766,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/coordination/emit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Emit Event */
+        post: operations["emit_event_coordination_emit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coordination/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Subscribe */
+        post: operations["subscribe_coordination_subscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coordination/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Replay */
+        post: operations["replay_coordination_replay_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/coordination/project": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Project */
+        get: operations["project_coordination_project_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1628,7 +1997,7 @@ export interface components {
          * AgentRole
          * @enum {string}
          */
-        AgentRole: "worker" | "hr" | "founder" | "admin";
+        AgentRole: "worker" | "hr" | "founder" | "admin" | "coo" | "talent" | "lead" | "senior" | "manager" | "intern";
         /** AgentSpendingResponse */
         AgentSpendingResponse: {
             /** Agent Id */
@@ -1644,7 +2013,74 @@ export interface components {
          * AgentStatus
          * @enum {string}
          */
-        AgentStatus: "pending" | "active" | "suspended" | "revoked";
+        AgentStatus: "pending" | "active" | "idle" | "busy" | "paused" | "suspended" | "revoked";
+        /** ArtifactResponse */
+        ArtifactResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /**
+             * Producer Agent Id
+             * Format: uuid
+             */
+            producer_agent_id: string;
+            artifact_type: components["schemas"]["ArtifactType"];
+            /** Name */
+            name: string;
+            /** Version */
+            version: number;
+            status: components["schemas"]["ArtifactStatus"];
+            /** Content */
+            content: {
+                [key: string]: unknown;
+            };
+            /** Content Hash */
+            content_hash: string;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /** Source Artifact Ids */
+            source_artifact_ids: string[];
+            /** Superseded By Id */
+            superseded_by_id: string | null;
+            /** Approved By */
+            approved_by: string | null;
+            /** Approved At */
+            approved_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * ArtifactStatus
+         * @enum {string}
+         */
+        ArtifactStatus: "draft" | "published" | "superseded";
+        /**
+         * ArtifactType
+         * @enum {string}
+         */
+        ArtifactType: "component" | "test_plan" | "screenshot" | "api_contract" | "migration" | "schema" | "doc_section";
         /** AssignTaskDto */
         AssignTaskDto: {
             /**
@@ -2107,6 +2543,10 @@ export interface components {
         DataResponse_AgentResponse_: {
             data: components["schemas"]["AgentResponse"];
         };
+        /** DataResponse[ArtifactResponse] */
+        DataResponse_ArtifactResponse_: {
+            data: components["schemas"]["ArtifactResponse"];
+        };
         /** DataResponse[BalanceResponse] */
         DataResponse_BalanceResponse_: {
             data: components["schemas"]["BalanceResponse"];
@@ -2143,6 +2583,10 @@ export interface components {
         DataResponse_EventResponse_: {
             data: components["schemas"]["EventResponse"];
         };
+        /** DataResponse[EventSubscriptionResponse] */
+        DataResponse_EventSubscriptionResponse_: {
+            data: components["schemas"]["EventSubscriptionResponse"];
+        };
         /** DataResponse[GitHubConnectionResponse] */
         DataResponse_GitHubConnectionResponse_: {
             data: components["schemas"]["GitHubConnectionResponse"];
@@ -2175,9 +2619,17 @@ export interface components {
         DataResponse_ReputationSummary_: {
             data: components["schemas"]["ReputationSummary"];
         };
+        /** DataResponse[SSETokenResponse] */
+        DataResponse_SSETokenResponse_: {
+            data: components["schemas"]["SSETokenResponse"];
+        };
         /** DataResponse[SubGraph] */
         DataResponse_SubGraph_: {
             data: components["schemas"]["SubGraph"];
+        };
+        /** DataResponse[SubscriptionResponse] */
+        DataResponse_SubscriptionResponse_: {
+            data: components["schemas"]["SubscriptionResponse"];
         };
         /** DataResponse[TaskCommentResponse] */
         DataResponse_TaskCommentResponse_: {
@@ -2207,6 +2659,11 @@ export interface components {
         DataResponse_list_AgentSpendingResponse__: {
             /** Data */
             data: components["schemas"]["AgentSpendingResponse"][];
+        };
+        /** DataResponse[list[ArtifactResponse]] */
+        DataResponse_list_ArtifactResponse__: {
+            /** Data */
+            data: components["schemas"]["ArtifactResponse"][];
         };
         /** DataResponse[list[CapabilityResponse]] */
         DataResponse_list_CapabilityResponse__: {
@@ -2288,6 +2745,11 @@ export interface components {
             /** Data */
             data: components["schemas"]["SpendingTrendPoint"][];
         };
+        /** DataResponse[list[SubscriptionResponse]] */
+        DataResponse_list_SubscriptionResponse__: {
+            /** Data */
+            data: components["schemas"]["SubscriptionResponse"][];
+        };
         /** DataResponse[list[TaskCommentResponse]] */
         DataResponse_list_TaskCommentResponse__: {
             /** Data */
@@ -2309,6 +2771,22 @@ export interface components {
         DataResponse_list_str__: {
             /** Data */
             data: string[];
+        };
+        /** EmitEventDto */
+        EmitEventDto: {
+            /** Event Type */
+            event_type: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /** Entity Name */
+            entity_name?: string | null;
         };
         /** EscalateTaskDto */
         EscalateTaskDto: {
@@ -2406,7 +2884,29 @@ export interface components {
          * EventSeverity
          * @enum {string}
          */
-        EventSeverity: "info" | "warning" | "error";
+        EventSeverity: "debug" | "info" | "success" | "warning" | "error" | "critical";
+        /** EventSubscriptionResponse */
+        EventSubscriptionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Event Pattern */
+            event_pattern: string;
+            /** Task Id */
+            task_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** GapResult */
         GapResult: {
             /** Entity Name */
@@ -2654,6 +3154,35 @@ export interface components {
              */
             updated_at: string;
         };
+        /** LoginRequest */
+        LoginRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+            /** Totp Code */
+            totp_code?: string | null;
+        };
+        /** LoginResponse */
+        LoginResponse: {
+            /** Access Token */
+            access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+        };
+        /** LogoutRequest */
+        LogoutRequest: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
         /** MemoryFeedbackDto */
         MemoryFeedbackDto: {
             /** Helpful */
@@ -2791,6 +3320,12 @@ export interface components {
             /** Shared Entities */
             shared_entities: components["schemas"]["GraphEntityResponse"][];
         };
+        /** PaginatedResponse[ArtifactResponse] */
+        PaginatedResponse_ArtifactResponse_: {
+            /** Data */
+            data: components["schemas"]["ArtifactResponse"][];
+            meta: components["schemas"]["PaginationMeta"];
+        };
         /** PaginatedResponse[CreditTransactionResponse] */
         PaginatedResponse_CreditTransactionResponse_: {
             /** Data */
@@ -2835,6 +3370,61 @@ export interface components {
          * @enum {string}
          */
         Proficiency: "basic" | "standard" | "expert";
+        /** PublishArtifactDto */
+        PublishArtifactDto: {
+            artifact_type: components["schemas"]["ArtifactType"];
+            /** Name */
+            name: string;
+            /** Content */
+            content: {
+                [key: string]: unknown;
+            };
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /** Source Artifact Ids */
+            source_artifact_ids?: string[];
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** RefreshRequest */
+        RefreshRequest: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
+        /** RefreshResponse */
+        RefreshResponse: {
+            /** Access Token */
+            access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+        };
+        /** ReplayDto */
+        ReplayDto: {
+            /**
+             * Task Id
+             * Format: uuid
+             */
+            task_id: string;
+            /** Since */
+            since?: string | null;
+            /** Event Types */
+            event_types?: string[] | null;
+            /**
+             * Limit
+             * @default 500
+             */
+            limit: number;
+        };
         /** ReputationBonusPenaltyDto */
         ReputationBonusPenaltyDto: {
             /** Reason */
@@ -2894,6 +3484,13 @@ export interface components {
         ResolveEscalationDto: {
             /** Notes */
             notes?: string | null;
+        };
+        /** SSETokenResponse */
+        SSETokenResponse: {
+            /** Token */
+            token: string;
+            /** Expires In */
+            expires_in: number;
         };
         /** SearchResultResponse */
         SearchResultResponse: {
@@ -3075,6 +3672,33 @@ export interface components {
             /** Relationships */
             relationships: components["schemas"]["GraphRelationshipResponse"][];
         };
+        /** SubscriptionResponse */
+        SubscriptionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Artifact Type */
+            artifact_type: string;
+            /** Task Id */
+            task_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** TaskCommentResponse */
         TaskCommentResponse: {
             /**
@@ -3136,7 +3760,7 @@ export interface components {
          * TaskPriority
          * @enum {string}
          */
-        TaskPriority: "urgent" | "high" | "normal" | "low";
+        TaskPriority: "critical" | "urgent" | "high" | "normal" | "low";
         /** TaskResponse */
         TaskResponse: {
             /**
@@ -3201,7 +3825,7 @@ export interface components {
          * TaskStatus
          * @enum {string}
          */
-        TaskStatus: "backlog" | "todo" | "in_progress" | "review" | "done" | "blocked" | "cancelled";
+        TaskStatus: "backlog" | "todo" | "pending" | "assigned" | "in_progress" | "review" | "done" | "blocked" | "cancelled" | "rejected";
         /** TransferCreditsDto */
         TransferCreditsDto: {
             /**
@@ -3270,6 +3894,34 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** UpdateStatusDto */
+        UpdateStatusDto: {
+            status: components["schemas"]["ArtifactStatus"];
+        };
+        /** UserInfoResponse */
+        UserInfoResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string;
+            /** Role */
+            role: string;
+            /**
+             * Totp Enabled
+             * @default false
+             */
+            totp_enabled: boolean;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -3288,6 +3940,23 @@ export interface components {
          * @enum {string}
          */
         VoteValue: "APPROVE" | "REJECT" | "ABSTAIN";
+        /** SubscribeDto */
+        app__artifacts__schemas__SubscribeDto: {
+            /**
+             * Artifact Type
+             * @description ArtifactType value or '*' for all
+             */
+            artifact_type: string;
+            /** Task Id */
+            task_id?: string | null;
+        };
+        /** SubscribeDto */
+        app__coordination__schemas__SubscribeDto: {
+            /** Event Pattern */
+            event_pattern: string;
+            /** Task Id */
+            task_id?: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -3297,6 +3966,145 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    login_auth_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefreshResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_current_user_info_auth_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserInfoResponse"];
+                };
+            };
+        };
+    };
+    google_oauth_auth_google_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
     register_agent_agents_register_post: {
         parameters: {
             query?: never;
@@ -5263,6 +6071,373 @@ export interface operations {
             };
         };
     };
+    list_artifacts_artifacts_get: {
+        parameters: {
+            query?: {
+                artifact_type?: components["schemas"]["ArtifactType"] | null;
+                name?: string | null;
+                task_id?: string | null;
+                status?: components["schemas"]["ArtifactStatus"] | null;
+                producer_agent_id?: string | null;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_ArtifactResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_artifact_artifacts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishArtifactDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ArtifactResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_batch_artifacts_batch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishArtifactDto"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_ArtifactResponse__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_latest_artifact_artifacts_latest_get: {
+        parameters: {
+            query: {
+                name: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ArtifactResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_subscription_artifacts_subscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__artifacts__schemas__SubscribeDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_SubscriptionResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_subscriptions_artifacts_subscriptions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_SubscriptionResponse__"];
+                };
+            };
+        };
+    };
+    delete_subscription_artifacts_subscriptions__subscription_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_artifact_artifacts__artifact_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ArtifactResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_artifact_history_artifacts__artifact_id__history_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_ArtifactResponse__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_artifact_status_artifacts__artifact_id__status_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ArtifactResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_sse_token_events_token_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_SSETokenResponse_"];
+                };
+            };
+        };
+    };
+    event_stream_events_stream_get: {
+        parameters: {
+            query: {
+                /** @description SSE JWT from POST /events/token */
+                token: string;
+            };
+            header?: {
+                "Last-Event-ID"?: number | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_events_events_get: {
         parameters: {
             query?: {
@@ -6369,6 +7544,137 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    emit_event_coordination_emit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmitEventDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataMessageResponse_dict_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subscribe_coordination_subscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__coordination__schemas__SubscribeDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_EventSubscriptionResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    replay_coordination_replay_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplayDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_list_dict__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_coordination_project_get: {
+        parameters: {
+            query: {
+                task_id: string;
+                projection_type: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_dict_"];
                 };
             };
             /** @description Validation Error */
