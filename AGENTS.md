@@ -27,7 +27,6 @@ libs/
   dashboard-ui/    -> Shared React UI components
   docs-ui/         -> Shared doc components (layout, callout, MDX, search)
   design-tokens/   -> Design system (colors, spacing, typography)
-  database/        -> TypeORM entities
   demo-data/       -> Simulation engine, scenarios, fixtures
   shared-types/    -> Shared TypeScript types and enums
   test-utils/      -> Shared test utilities

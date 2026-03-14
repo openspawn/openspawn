@@ -18,7 +18,6 @@ libs/
   dashboard-data/  Shared hooks, auth, utilities
   dashboard-ui/    Shared React UI components (shadcn/ui)
   design-tokens/   Design system tokens (colors, spacing, typography)
-  database/        TypeORM entities, migrations, data source
   demo-data/       Simulation engine, scenarios, fixtures
   shared-types/    Shared TypeScript types and enums
   test-utils/      Shared test utilities
@@ -89,10 +88,10 @@ The API Dockerfile (`apps/api/Dockerfile`) builds the FastAPI backend as a separ
 
 A single dashboard app (`apps/dashboard/`) serves all deployment contexts via env vars:
 
-| Env Var                  | Values                         | Effect                                              |
-| ------------------------ | ------------------------------ | --------------------------------------------------- |
-| `VITE_DASHBOARD_THEME`   | `openspawn` (default), `bikinibottom` | Brand, colors, wave animations, BB hero page |
-| `VITE_DEMO_MODE`         | `true` / unset                 | Skips auth, uses client-side simulation engine       |
+| Env Var                | Values                                | Effect                                         |
+| ---------------------- | ------------------------------------- | ---------------------------------------------- |
+| `VITE_DASHBOARD_THEME` | `openspawn` (default), `bikinibottom` | Brand, colors, wave animations, BB hero page   |
+| `VITE_DEMO_MODE`       | `true` / unset                        | Skips auth, uses client-side simulation engine |
 
 **bikinibottom.ai** uses both: `VITE_DASHBOARD_THEME=bikinibottom` + `VITE_DEMO_MODE=true`.
 **openspawn.ai dashboard** uses neither (defaults to OpenSpawn theme + real auth).
@@ -154,6 +153,6 @@ All integration endpoints use the `/integrations/` prefix:
 
 ## Database
 
-FastAPI models live in `apps/api/app/models/`. Alembic migrations in `apps/api/alembic/`. TypeORM entities (legacy) in `libs/database/src/entities/`.
+FastAPI models live in `apps/api/app/models/`. Alembic migrations in `apps/api/alembic/`.
 
 Key entities: `Agent`, `Task`, `Message`, `CreditTransaction`, `Memory`, `Organization`.

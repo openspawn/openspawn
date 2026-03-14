@@ -80,14 +80,14 @@ npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres neede
 
 **What to write when:**
 
-| Layer     | Tool            | When                                | Location                       |
-| --------- | --------------- | ----------------------------------- | ------------------------------ |
+| Layer     | Tool            | When                                | Location                            |
+| --------- | --------------- | ----------------------------------- | ----------------------------------- |
 | Unit      | Vitest          | Pure functions, utils, transforms   | `apps/dashboard/src/lib/__tests__/` |
-| Component | Vitest + RTL    | React components in isolation       | `*.spec.tsx` next to component |
-| API       | pytest          | API endpoints, agent spawning       | `apps/api/tests/`              |
+| Component | Vitest + RTL    | React components in isolation       | `*.spec.tsx` next to component      |
+| API       | pytest          | API endpoints, agent spawning       | `apps/api/tests/`                   |
 | E2E       | Playwright      | User flows, page loads, regressions | `apps/dashboard/e2e/tests/`         |
-| Smoke     | curl/Playwright | Post-deploy verification            | Against production URL         |
-| Profiling | pytest + script | Latency benchmarks, perf regression | `apps/api/tests/`, `scripts/`  |
+| Smoke     | curl/Playwright | Post-deploy verification            | Against production URL              |
+| Profiling | pytest + script | Latency benchmarks, perf regression | `apps/api/tests/`, `scripts/`       |
 
 **PR requirements:**
 
