@@ -14,7 +14,7 @@ def test_mcp_server_name() -> None:
 
 
 async def test_all_tools_registered() -> None:
-    """Verify all 38 tools are registered."""
+    """Verify all 42 tools are registered."""
     expected_tools = {
         # Tasks (6)
         "task_list",
@@ -63,6 +63,11 @@ async def test_all_tools_registered() -> None:
         "artifact_list",
         "artifact_subscribe",
         "artifact_history",
+        # Coordination (4)
+        "coordination_emit",
+        "coordination_subscribe",
+        "coordination_replay",
+        "coordination_project",
     }
     tools = await mcp.list_tools()
     registered = {tool.name for tool in tools}
