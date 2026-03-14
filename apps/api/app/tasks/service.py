@@ -156,7 +156,47 @@ async def transition_task(
             detail=f"Cannot transition from {task.status} to {dto.status.value}",
         )
 
-    # Check approval requirement
+    # Autonomy dial gate — skip for human operators
+    if isinstance(auth, AuthenticatedAgent):
+        from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
+
+        agent = await db.get(Agent, auth.id)
+        effective_autonomy = resolve_effective_autonomy(
+            task.autonomy_level, agent.default_autonomy_level if agent else 5
+        )
+        risk = get_risk_level("task_transition", dto.status.value)
+
+        if is_gated(effective_autonomy, risk):
+            from app.approvals.schemas import GatedResponse
+            from app.approvals.service import create_approval
+
+            approval = await create_approval(
+                db=db,
+                org_id=auth.org_id,
+                agent_id=auth.id,
+                action_type="task_transition",
+                entity_type="task",
+                entity_id=task.id,
+                risk_level=risk,
+                autonomy_level=effective_autonomy,
+                payload={
+                    "from_status": task.status,
+                    "to_status": dto.status.value,
+                    "reason": dto.reason,
+                },
+            )
+            await db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=GatedResponse(
+                    approval_id=approval.id,
+                    risk_level=risk,
+                    autonomy_level=effective_autonomy,
+                    message=f"Action gated — autonomy {effective_autonomy} < risk {risk}",
+                ).model_dump(mode="json"),
+            )
+
+    # Check approval requirement (manual override, independent of autonomy dial)
     if dto.status == TaskStatus.DONE and task.approval_required and not task.approved_at:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -210,6 +250,20 @@ async def approve_task(db: AsyncSession, auth: AuthContext, task_id: uuid.UUID) 
     approver_name = auth.agent_id if isinstance(auth, AuthenticatedAgent) else auth.name
     task.approved_by = approver_name
     task.approved_at = pendulum.now("UTC")
+
+    from app.events.emit import emit
+    from app.models.enums import SSEEventType
+
+    await emit(
+        db=db,
+        type=SSEEventType.APPROVAL_RESOLVED,
+        org_id=auth.org_id,
+        actor_id=auth.id,
+        entity_type="task",
+        entity_id=task.id,
+        data={"approved_by": approver_name, "task_title": task.title},
+    )
+
     await db.commit()
     await db.refresh(task)
     return task
