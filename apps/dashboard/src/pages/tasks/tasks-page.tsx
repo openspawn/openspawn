@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Plus, Search, ArrowUpDown, History } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -159,29 +160,25 @@ export function TasksPage() {
     );
   }
 
+  const navigate = useNavigate();
+  const hasAgents = agents.length > 0;
+
   if (tasks.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
-            <p className="text-muted-foreground">Manage and track agent tasks</p>
-          </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Task
-          </Button>
-        </div>
+        <PageHeader title="Tasks" description="Manage and track agent tasks" />
         <Card>
           <CardContent>
             <EmptyState
               variant="tasks"
-              title="No tasks in the queue"
-              description="Create your first task to start assigning work to your agents."
-              ctaLabel="Create your first task →"
-              onCta={() => {
-                /* TODO: open create task modal */
-              }}
+              title="No tasks yet"
+              description={
+                hasAgents
+                  ? "Tasks are created by agents or through the API."
+                  : "Tasks are created by agents or through the API. Start by creating an agent."
+              }
+              ctaLabel={hasAgents ? undefined : "Go to Agents"}
+              onCta={hasAgents ? undefined : () => navigate({ to: "/agents" })}
             />
           </CardContent>
         </Card>

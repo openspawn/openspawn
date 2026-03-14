@@ -41,7 +41,6 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { DemoControls } from "../demo/DemoControls";
-import { useOnboarding } from "./onboarding/onboarding-provider";
 import { isSandboxMode } from "@openspawn/dashboard-data";
 import { ProtocolStatus } from "./protocol-status";
 import { ProtocolActivity } from "./protocol-activity";
@@ -136,7 +135,6 @@ export function Sidebar({
   activeCount,
 }: SidebarProps) {
   const location = useLocation();
-  const { resetOnboarding, hasCompletedOnboarding } = useOnboarding();
 
   const getInitials = (name: string) => {
     return name
@@ -343,15 +341,6 @@ export function Sidebar({
                 Keyboard Shortcuts
                 <kbd className="ml-auto text-[10px] font-mono text-muted-foreground/50">?</kbd>
               </button>
-              {hasCompletedOnboarding && (
-                <button
-                  onClick={resetOnboarding}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                  Restart Tour
-                </button>
-              )}
             </div>
           </div>
         ) : (
@@ -618,18 +607,6 @@ export function Sidebar({
               GitHub
               <ExternalLink className="h-3 w-3 ml-auto opacity-50" />
             </a>
-            {hasCompletedOnboarding && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  resetOnboarding();
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors w-full text-left"
-              >
-                <HelpCircle className="h-4 w-4" />
-                Restart Tour
-              </button>
-            )}
           </div>
         </div>
 

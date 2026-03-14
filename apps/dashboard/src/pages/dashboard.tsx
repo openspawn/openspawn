@@ -14,8 +14,10 @@ import {
   AlertTriangle,
   Layers,
   CheckCircle,
+  Rocket,
 } from "lucide-react";
 import { StaggerContainer, StaggerItem } from "../components/stagger";
+import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { generateSparklineData } from "../components/ui/sparkline";
@@ -214,6 +216,25 @@ export function DashboardPage() {
     (id: string) => {
       switch (id) {
         case "stats-overview":
+          if (agents.length === 0 && tasks.length === 0) {
+            return (
+              <Card className="border-dashed">
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                  <Rocket className="h-10 w-10 text-cyan-500 mb-4" />
+                  <h3 className="text-lg font-semibold">Welcome to OpenSpawn</h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mt-1">
+                    Get started by creating your first agent.
+                  </p>
+                  <Button
+                    className="mt-4 bg-cyan-600 hover:bg-cyan-700"
+                    onClick={() => navigate({ to: "/agents" })}
+                  >
+                    Create Agent &rarr;
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          }
           return (
             <StaggerContainer className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               <StaggerItem>
@@ -295,6 +316,7 @@ export function DashboardPage() {
       }
     },
     [
+      agents.length,
       activeAgents,
       pendingAgents,
       inProgressTasks,

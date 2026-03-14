@@ -21,13 +21,6 @@ console.log(
   "color: #10b981; background: #0a1628; padding: 2px 6px; border-radius: 4px; font-family: monospace",
   "color: #64748b",
 );
-import {
-  OnboardingProvider,
-  WelcomeScreen,
-  FeatureTour,
-  CompletionCelebration,
-} from "../components/onboarding";
-// Tour components moved inside RouterProvider (routes.tsx) — they need router context
 import { AuthProvider, SidePanelProvider } from "../contexts";
 import { router } from "../routes";
 import type { ReactNode } from "react";
@@ -71,17 +64,12 @@ export function App() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
-            <OnboardingProvider>
-              <SidePanelProvider>
-                <DemoWrapper>
-                  <OfflineIndicator />
-                  <WelcomeScreen />
-                  <FeatureTour />
-                  <CompletionCelebration />
-                  <RouterProvider router={router} />
-                </DemoWrapper>
-              </SidePanelProvider>
-            </OnboardingProvider>
+            <SidePanelProvider>
+              <DemoWrapper>
+                <OfflineIndicator />
+                <RouterProvider router={router} />
+              </DemoWrapper>
+            </SidePanelProvider>
           </NotificationProvider>
         </QueryClientProvider>
       </AuthProvider>

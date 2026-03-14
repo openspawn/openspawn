@@ -21,7 +21,6 @@ import { NotificationCenter } from "./notification-center";
 import { ScenarioContextBanner, useScenarioStatus } from "./sandbox-scenario-banner";
 import { PhaseTransitionOverlay } from "./phase-transition-overlay";
 import { ScenarioEventToasts } from "./scenario-event-toasts";
-import { FirstVisitOverlay } from "./first-visit-overlay";
 import { Toaster } from "sonner";
 import { isBBTheme } from "../lib/dashboard-theme";
 import {
@@ -324,7 +323,6 @@ export function Layout({ children }: LayoutProps) {
         onDismiss={() => setPhaseTransition(null)}
       />
       <ScenarioEventToasts />
-      <FirstVisitOverlay />
       <Toaster
         theme="dark"
         position="bottom-right"

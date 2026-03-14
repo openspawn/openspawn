@@ -386,12 +386,10 @@ export function AgentsPage() {
             {agents.length === 0 && (
               <EmptyState
                 variant="agents"
-                title="No agents registered yet"
-                description="Register your first agent to get started with the multi-agent system."
-                ctaLabel="Register your first agent →"
-                onCta={() => {
-                  /* noop */
-                }}
+                title="No agents yet"
+                description="Create your first agent to start coordinating work."
+                ctaLabel="Create Agent"
+                onCta={() => setSpawnModalOpen(true)}
               />
             )}
 

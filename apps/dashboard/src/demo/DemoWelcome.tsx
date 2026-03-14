@@ -11,12 +11,10 @@ import {
   Layers,
   Wallet,
   Eye,
-  Compass,
 } from "lucide-react";
 import { Logo } from "../components/ui/logo";
 import { Button } from "../components/ui/button";
 import { useDemo, ScenarioName } from "./DemoProvider";
-import { useOnboarding } from "../components/onboarding/onboarding-provider";
 
 const SCENARIOS: {
   id: ScenarioName;
@@ -79,7 +77,6 @@ const VALUE_PROPS = [
 
 export function DemoWelcome() {
   const { setScenario } = useDemo();
-  const { skipOnboarding, startOnboarding } = useOnboarding();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<"welcome" | "scenarios">("welcome");
   const [selectedScenario, setSelectedScenario] = useState<ScenarioName>(ScenarioName.Acmetech);
@@ -91,7 +88,7 @@ export function DemoWelcome() {
     }
   }, []);
 
-  const handleStart = (withTour: boolean) => {
+  const handleStart = () => {
     const validScenarios: ScenarioName[] = [
       ScenarioName.Acmetech,
       ScenarioName.Startup,
@@ -107,17 +104,10 @@ export function DemoWelcome() {
     localStorage.setItem(STORAGE_KEY, "true");
     setScenario(scenarioToStart, true);
     setIsOpen(false);
-
-    if (withTour) {
-      startOnboarding();
-    } else {
-      skipOnboarding();
-    }
   };
 
   const handleSkip = () => {
     localStorage.setItem(STORAGE_KEY, "true");
-    skipOnboarding();
     setIsOpen(false);
   };
 
@@ -318,23 +308,13 @@ export function DemoWelcome() {
 
                   {/* Footer */}
                   <div className="p-4 border-t border-border bg-card/50">
-                    <div className="flex items-center gap-3">
-                      <Button
-                        onClick={() => handleStart(true)}
-                        variant="outline"
-                        className="flex items-center gap-2"
-                      >
-                        <Compass className="w-4 h-4" />
-                        Start with Tour
-                      </Button>
-                      <Button
-                        onClick={() => handleStart(false)}
-                        className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
-                      >
-                        <Play className="w-4 h-4 mr-2" />
-                        Start Demo
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={handleStart}
+                      className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Demo
+                    </Button>
                   </div>
                 </motion.div>
               )}
