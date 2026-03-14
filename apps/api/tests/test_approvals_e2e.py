@@ -38,14 +38,13 @@ def sqlite_env():
 
 @pytest.fixture
 async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
+    from sqlalchemy.dialects.postgresql import UUID as PG_UUID
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
     from sqlalchemy.pool import StaticPool
 
-    from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-
-    import app.models.approval  # noqa: F401
-    import app.models.artifact  # noqa: F401
-    import app.models.event_subscription  # noqa: F401
+    import app.models.approval
+    import app.models.artifact
+    import app.models.event_subscription
     from app.database import get_db
     from app.models.base import Base
     from app.models.compat import CompatUUID

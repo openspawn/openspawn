@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import uuid
 from typing import TYPE_CHECKING
 
 import pendulum
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import AuthenticatedAgent
 from app.events.emit import emit
@@ -14,6 +12,10 @@ from app.models.approval import ApprovalRequest
 from app.models.enums import ApprovalStatus, SSEEventType
 
 if TYPE_CHECKING:
+    import uuid
+
+    from sqlalchemy.ext.asyncio import AsyncSession
+
     from app.auth.dependencies import AuthContext
 
 
@@ -133,9 +135,7 @@ async def get_approval(
     )
     approval = result.scalar_one_or_none()
     if not approval:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Approval not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Approval not found")
     return approval
 
 

@@ -572,9 +572,7 @@ async def approval_respond(
     body: dict[str, str] = {}
     if notes:
         body["notes"] = notes
-    result = await _get_client().post(
-        f"/approvals/{approval_id}/{decision}", json=body or None
-    )
+    result = await _get_client().post(f"/approvals/{approval_id}/{decision}", json=body or None)
     return _format(result)
 
 

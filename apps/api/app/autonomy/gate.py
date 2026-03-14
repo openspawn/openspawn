@@ -38,9 +38,7 @@ def is_gated(effective_autonomy: int, risk_level: int) -> bool:
     return risk_level > effective_autonomy
 
 
-def resolve_effective_autonomy(
-    task_autonomy: int | None, agent_autonomy: int
-) -> int:
+def resolve_effective_autonomy(task_autonomy: int | None, agent_autonomy: int) -> int:
     """Task-level override takes precedence over agent default."""
     if task_autonomy is not None:
         return task_autonomy

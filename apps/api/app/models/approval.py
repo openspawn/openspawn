@@ -13,9 +13,7 @@ from app.models.compat import CompatJSONB, CompatUUID
 class ApprovalRequest(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "approval_requests"
     __table_args__ = (
-        CheckConstraint(
-            "risk_level >= 0 AND risk_level <= 10", name="chk_approval_risk_level"
-        ),
+        CheckConstraint("risk_level >= 0 AND risk_level <= 10", name="chk_approval_risk_level"),
         CheckConstraint(
             "autonomy_level >= 0 AND autonomy_level <= 10",
             name="chk_approval_autonomy_level",
@@ -42,9 +40,7 @@ class ApprovalRequest(UUIDPrimaryKeyMixin, Base):
     resolved_at: Mapped[datetime | None] = mapped_column(nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now(), nullable=False
     )

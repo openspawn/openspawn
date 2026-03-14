@@ -428,7 +428,9 @@ async def update_artifact_status(
     artifact.updated_at = pendulum.now("UTC")
 
     # Set approval fields on DRAFT → PUBLISHED
-    is_approval = old_status == ArtifactStatus.DRAFT.value and dto.status == ArtifactStatus.PUBLISHED
+    is_approval = (
+        old_status == ArtifactStatus.DRAFT.value and dto.status == ArtifactStatus.PUBLISHED
+    )
     if is_approval:
         from app.auth.schemas import AuthenticatedAgent as _AuthAgent
 
