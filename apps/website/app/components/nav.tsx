@@ -8,7 +8,7 @@ export function Nav() {
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-navy-950/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
         <Link to="/" className="flex items-center gap-2 text-lg font-bold">
-          <span className="text-2xl">🪸</span>
+          <span className="text-2xl">🐙</span>
           <span className="gradient-text">OpenSpawn</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">

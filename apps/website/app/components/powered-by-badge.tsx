@@ -66,7 +66,7 @@ interface PoweredByBadgeProps {
 }
 
 // ─── Coral SVG icon ──────────────────────────────────────────────────────────
-// Geometric interpretation of the 🪸 coral emoji. Two-tone orange coral
+// Geometric interpretation of the 🐙 coral emoji. Two-tone orange coral
 // branches with rounded tips. aria-hidden — decorative when next to text.
 
 function CoralIcon({ className, ...props }: SVGProps<SVGSVGElement>) {

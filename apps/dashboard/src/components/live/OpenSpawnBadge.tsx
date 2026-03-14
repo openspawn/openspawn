@@ -43,7 +43,7 @@ export function OpenSpawnBadge({
         zIndex: 20,
       }}
     >
-      <span className="text-sm">🪸</span>
+      <span className="text-sm">🐙</span>
       <span
         className="text-xs font-bold"
         style={{ color: "#4AAED9", fontFamily: "Nunito, sans-serif" }}

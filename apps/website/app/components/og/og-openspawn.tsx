@@ -74,7 +74,7 @@ export function OgOpenspawn() {
             marginBottom: 28,
           }}
         >
-          <span style={{ fontSize: 20 }}>🪸</span>
+          <span style={{ fontSize: 20 }}>🐙</span>
           <span
             style={{
               fontSize: 13,

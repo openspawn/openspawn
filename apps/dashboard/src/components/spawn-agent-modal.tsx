@@ -39,7 +39,7 @@ const DOMAINS = [
   "Backend",
   "Infrastructure",
 ];
-const EMOJIS = ["🐡", "🦈", "🐬", "🐢", "🦑", "🐠", "🪸", "🦞", "🐚", "🦭"];
+const EMOJIS = ["🐡", "🦈", "🐬", "🐢", "🦑", "🐠", "🐙", "🦞", "🐚", "🦭"];
 const COLORS = [
   "#dc2626",
   "#f97316",

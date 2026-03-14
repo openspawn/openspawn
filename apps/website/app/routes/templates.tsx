@@ -844,7 +844,7 @@ export function TemplatesPage() {
       <section className="py-16 pb-24">
         <div className="mx-auto max-w-2xl text-center">
           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-8 md:p-12">
-            <div className="mb-4 text-4xl">🪸</div>
+            <div className="mb-4 text-4xl">🐙</div>
             <h2 className="mb-4 text-2xl font-bold text-slate-100 md:text-3xl">
               Ready to spawn your org?
             </h2>

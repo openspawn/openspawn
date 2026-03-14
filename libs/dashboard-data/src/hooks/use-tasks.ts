@@ -22,6 +22,7 @@ export type Task = {
   dueDate?: string | null;
   completedAt?: string | null;
   source?: string | null;
+  approvalRequired?: boolean;
   rejection?: TaskRejection | null;
 };
 

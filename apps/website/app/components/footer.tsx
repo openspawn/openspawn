@@ -5,7 +5,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2 text-lg font-bold">
-              <span>🪸</span>
+              <span>🐙</span>
               <span className="gradient-text">OpenSpawn</span>
             </div>
             <p className="text-sm text-slate-500">

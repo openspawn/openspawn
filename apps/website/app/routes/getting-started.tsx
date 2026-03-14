@@ -157,7 +157,7 @@ openspawn v0.3.0`}
           <Terminal title="terminal">
             {`$ openspawn init my-org
 
-🪸 OpenSpawn — Create a new org
+🐙 OpenSpawn — Create a new org
 
 ? What kind of org? (Use arrow keys)
 ❯ SaaS Onboarding — data migration, integrations, success check-in

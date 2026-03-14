@@ -209,7 +209,7 @@ Configures API connectors and runs integration tests.
 Schedules check-ins, collects feedback, flags churn risk.
 - Model: ollama/qwen2.5`;
 
-const orgMdPivotSnippet = `# 🪸 MyOrg
+const orgMdPivotSnippet = `# 🐙 MyOrg
 
 ## Structure
 - 🔬 Research (lead: Analyst, model: opus)
@@ -409,7 +409,7 @@ export function LandingPage() {
           {/* Icon — floats gently */}
           <div className="animate-fade-in-up mb-6">
             <span className="coral-float text-6xl md:text-8xl" role="img" aria-label="coral">
-              🪸
+              🐙
             </span>
           </div>
 
@@ -865,7 +865,7 @@ export function LandingPage() {
             {/* OpenSpawn column */}
             <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-6 ring-1 ring-cyan-500/10">
               <div className="mb-3 flex items-center gap-2">
-                <span className="text-2xl">🪸</span>
+                <span className="text-2xl">🐙</span>
                 <h3 className="font-semibold text-cyan-300">OpenSpawn org</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-400">

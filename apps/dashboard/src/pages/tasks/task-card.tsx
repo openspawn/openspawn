@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { TaskActions } from "../../components/task-actions";
 import type { Task } from "../../hooks";
 import { darkenForBackground } from "../../lib/avatar-utils";
 import { resolveAvatarUrl } from "../../lib/resolve-avatar-url";
@@ -47,50 +48,58 @@ function TaskCard({ task, onClick, compact, agentMap }: TaskCardProps) {
           <div className="flex items-start gap-2">
             <GripVertical className="h-4 w-4 mt-0.5 text-muted-foreground/50 flex-shrink-0" />
             <div className="flex-1 min-w-0 space-y-2">
-              {/* Header: ID + Priority */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-mono text-muted-foreground">{task.identifier}</span>
-                <Badge variant={getPriorityVariant(task.priority)} className="text-xs">
-                  {task.priority?.toLowerCase()}
-                </Badge>
-                {task.approvalRequired && (
-                  <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">
-                    approval
+              {/* Header: ID + Priority + Actions */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
+                  <span className="text-xs font-mono text-muted-foreground">{task.identifier}</span>
+                  <Badge variant={getPriorityVariant(task.priority)} className="text-xs">
+                    {task.priority?.toLowerCase()}
                   </Badge>
-                )}
-                {createdViaWebhook && (
-                  <Badge variant="outline" className="text-xs text-cyan-500 border-cyan-500/30">
-                    <Webhook className="w-3 h-3 mr-1" />
-                    webhook
-                  </Badge>
-                )}
-                {task.source === "a2a" && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
-                  >
-                    <Link2 className="w-3 h-3 mr-1" />
-                    A2A
-                  </Badge>
-                )}
-                {task.source === "mcp" && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10"
-                  >
-                    <Plug className="w-3 h-3 mr-1" />
-                    MCP
-                  </Badge>
-                )}
-                {hasRejection && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs text-amber-600 border-amber-500/50 bg-amber-500/10 animate-pulse"
-                  >
-                    <AlertTriangle className="w-3 h-3 mr-1" />
-                    needs fixes
-                  </Badge>
-                )}
+                  {task.approvalRequired && (
+                    <Badge variant="outline" className="text-xs text-amber-500 border-amber-500/30">
+                      approval
+                    </Badge>
+                  )}
+                  {createdViaWebhook && (
+                    <Badge variant="outline" className="text-xs text-cyan-500 border-cyan-500/30">
+                      <Webhook className="w-3 h-3 mr-1" />
+                      webhook
+                    </Badge>
+                  )}
+                  {task.source === "a2a" && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
+                    >
+                      <Link2 className="w-3 h-3 mr-1" />
+                      A2A
+                    </Badge>
+                  )}
+                  {task.source === "mcp" && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs text-violet-400 border-violet-500/30 bg-violet-500/10"
+                    >
+                      <Plug className="w-3 h-3 mr-1" />
+                      MCP
+                    </Badge>
+                  )}
+                  {hasRejection && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs text-amber-600 border-amber-500/50 bg-amber-500/10 animate-pulse"
+                    >
+                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      needs fixes
+                    </Badge>
+                  )}
+                </div>
+                <TaskActions
+                  taskId={task.id}
+                  taskStatus={task.status}
+                  taskTitle={task.title}
+                  approvalRequired={Boolean(task.approvalRequired)}
+                />
               </div>
 
               {/* Title */}
