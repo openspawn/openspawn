@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.router import router as agents_router
+from app.approvals.router import router as approvals_router
 from app.artifacts.router import router as artifacts_router
 from app.config import settings
 from app.coordination.rest import router as coordination_router
@@ -62,6 +63,7 @@ app.include_router(integrations_router)
 app.include_router(memory_router)
 app.include_router(graph_router)
 app.include_router(coordination_router)
+app.include_router(approvals_router)
 
 
 @app.get("/health")
