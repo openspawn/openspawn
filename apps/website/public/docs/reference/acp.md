@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/reference/acp
 generated: 2026-03-14
 ---
+
 # Agent Communication Protocol (ACP)
 
 > How agents in a hierarchy communicate — modeled after how effective human organizations actually work.

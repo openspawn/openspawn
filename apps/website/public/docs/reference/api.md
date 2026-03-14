@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/reference/api
 generated: 2026-03-14
 ---
+
 # OpenSpawn REST API Reference
 
 Base URL: `https://api.openspawn.ai`

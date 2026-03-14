@@ -15,7 +15,7 @@ agents in the same org already know each other, share context, and exist in a tr
 
 1. Acknowledgment (ACK) Pull-based log entry written to the task as work progresses. The manager checks when they want to.
 
-3. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
+2. Escalation Push notification when an agent is blocked. Goes directly to the manager. Actionable.
 
 ### Why This Matters
 
@@ -213,7 +213,7 @@ ACP is how your team works. A2A is how your team works with everyone else. to="/
 
 Connecting Real Agents →
 
-How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="_blank" rel="noopener"
+How to configure ACP behavior in your ORG.md href="https://a2a-protocol.org" target="\_blank" rel="noopener"
 
 A2A Protocol Docs →
 

@@ -1,0 +1,12 @@
+{
+  "name": "@openspawn/test-utils",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/test-utils/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "command": "oxlint ."
+    }
+  },
+  "tags": []
+}

@@ -73,3 +73,7 @@ apps/sandbox-cli/publish/*.cjs
 
 # Backup files
 *.bak
+
+# SQLite databases (except database lib reference files)
+*.db
+!libs/database/**/*.db

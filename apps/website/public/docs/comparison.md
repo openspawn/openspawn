@@ -50,7 +50,7 @@ Schedules check-ins, collects health scores, flags churn risk early.
 - **Level:** 4
 ```
 
-ORG.md) and reviewable in git • You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org 1. Real-World Device Support Via deep integration with href="https://openclaw.ai" target="_blank" rel="noopener" OpenClaw , OpenSpawn agents can operate on real computers — browsing the web, running code, interacting with applications, managing files. No other coordination platform offers this. 2. ORG.md — Organizations as Code Human-readable, version-controllable, and deployable:
+ORG.md) and reviewable in git • You need framework-agnostic coordination — mix CrewAI + LangGraph + custom agents in one org 1. Real-World Device Support Via deep integration with href="https://openclaw.ai" target="\_blank" rel="noopener" OpenClaw , OpenSpawn agents can operate on real computers — browsing the web, running code, interacting with applications, managing files. No other coordination platform offers this. 2. ORG.md — Organizations as Code Human-readable, version-controllable, and deployable:
 
 npx openspawn deploy ORG.md. The prose is the system prompt. See all industry templates → 3. Protocol-Native from Day One
 
@@ -155,4 +155,4 @@ How agents coordinate inside an org to="/docs/getting-started"
 
 Getting Started →
 
-Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="_blank" rel="noopener" GitHub repo for the latest.
+Deploy your first org in minutes Last updated: February 2026. OpenSpawn is in rapid development — features and integrations ship frequently. See the href="https://github.com/openspawn/openspawn" target="\_blank" rel="noopener" GitHub repo for the latest.

@@ -316,7 +316,7 @@ npx openspawn deploy ORG.md
 -H 'Content-Type: application/json' \\
 ```
 
-Here's everything together: What Happens When You Run This Open the dashboard at href="http://localhost:3333/app/" target="_blank" rel="noopener" http://localhost:3333/app/ . You'll see a COO at the top, Engineering and Content departments branching down, with leads and workers beneath each. Send a task:
+Here's everything together: What Happens When You Run This Open the dashboard at href="http://localhost:3333/app/" target="\_blank" rel="noopener" http://localhost:3333/app/ . You'll see a COO at the top, Engineering and Content departments branching down, with leads and workers beneath each. Send a task:
 
 ## Iterating on Your Org
 

@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/guides/values-framework
 generated: 2026-03-14
 ---
+
 **What you'll learn:** How alignment values work in OpenSpawn — what each value does to agent behavior, where they come from, which ones conflict, and how to choose the right set for your org.
 
 Every agent in an OpenSpawn org gets a SOUL.md — its identity, constraints, and operating principles. During `openspawn init`, the wizard asks which alignment values to include. Each selected value becomes a ~50-token directive injected into every agent's SOUL.md, shaping how it handles ambiguity, prioritizes work, and communicates.

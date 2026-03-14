@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/reference/agent-config-compat
 generated: 2026-03-14
 ---
+
 # OpenClaw-Compatible Agent Configuration
 
 > Don't invent a new agent config format. OpenClaw already defined one. BikiniBottom adds the org layer on top — not a replacement underneath.
