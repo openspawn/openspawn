@@ -108,7 +108,7 @@ def _validate_sse_token(token: str) -> tuple[uuid.UUID, uuid.UUID]:
     return uuid.UUID(str(decoded["sub"])), uuid.UUID(str(decoded["org_id"]))
 
 
-@router.get("/stream", response_class=EventSourceResponse)
+@router.get("/stream", response_class=EventSourceResponse, response_model=None)
 async def event_stream(
     token: str = Query(..., description="SSE JWT from POST /events/token"),
     last_event_id: int | None = Header(None, alias="Last-Event-ID"),
