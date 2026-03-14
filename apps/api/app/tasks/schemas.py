@@ -24,6 +24,7 @@ class CreateTaskDto(BaseModel):
     assignee_id: uuid.UUID | None = None
     parent_task_id: uuid.UUID | None = None
     approval_required: bool = False
+    autonomy_level: int | None = Field(default=None, ge=0, le=10)
     due_at: datetime | None = None
     tags: list[str] = Field(default_factory=list)
     metadata: dict = Field(default_factory=dict)
@@ -91,6 +92,7 @@ class TaskResponse(BaseModel):
     creator_id: uuid.UUID
     parent_task_id: uuid.UUID | None
     approval_required: bool
+    autonomy_level: int | None
     approved_by: str | None
     approved_at: datetime | None
     due_date: datetime | None

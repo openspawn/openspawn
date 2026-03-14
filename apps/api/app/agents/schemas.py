@@ -18,6 +18,7 @@ class CreateAgentDto(BaseModel):
     role: AgentRole = AgentRole.WORKER
     mode: AgentMode = AgentMode.WORKER
     management_fee_pct: int = Field(default=0, ge=0, le=50)
+    default_autonomy_level: int = Field(default=5, ge=0, le=10)
     budget_period_limit: int | None = None
     capabilities: list[AddCapabilityDto] | None = None
     metadata: dict = Field(default_factory=dict)
@@ -29,6 +30,7 @@ class UpdateAgentDto(BaseModel):
     model: str | None = Field(default=None, max_length=100)
     mode: AgentMode | None = None
     management_fee_pct: int | None = Field(default=None, ge=0, le=50)
+    default_autonomy_level: int | None = Field(default=None, ge=0, le=10)
     budget_period_limit: int | None = None
     metadata: dict | None = None
 
@@ -91,6 +93,7 @@ class AgentResponse(BaseModel):
     max_children: int
     metadata: dict = Field(alias="metadata_")
     trust_score: int
+    default_autonomy_level: int
     tasks_completed: int
     tasks_successful: int
     last_activity_at: datetime | None

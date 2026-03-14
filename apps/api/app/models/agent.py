@@ -61,6 +61,9 @@ class Agent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
     )
     trust_score: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="50")
+    default_autonomy_level: Mapped[int] = mapped_column(
+        SmallInteger, nullable=False, server_default="5"
+    )
     tasks_completed: Mapped[int] = mapped_column(nullable=False, server_default="0")
     tasks_successful: Mapped[int] = mapped_column(nullable=False, server_default="0")
     last_activity_at: Mapped[datetime | None] = mapped_column(nullable=True)

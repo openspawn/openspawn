@@ -1834,6 +1834,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Approvals */
+        get: operations["list_approvals_approvals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approvals/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Pending */
+        get: operations["list_pending_approvals_pending_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approvals/{approval_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Approval */
+        get: operations["get_approval_approvals__approval_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approvals/{approval_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve */
+        post: operations["approve_approvals__approval_id__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/approvals/{approval_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject */
+        post: operations["reject_approvals__approval_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1966,6 +2051,8 @@ export interface components {
             };
             /** Trust Score */
             trust_score: number;
+            /** Default Autonomy Level */
+            default_autonomy_level: number;
             /** Tasks Completed */
             tasks_completed: number;
             /** Tasks Successful */
@@ -2014,6 +2101,60 @@ export interface components {
          * @enum {string}
          */
         AgentStatus: "pending" | "active" | "idle" | "busy" | "paused" | "suspended" | "revoked";
+        /** ApprovalResponse */
+        ApprovalResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+            /**
+             * Requested By
+             * Format: uuid
+             */
+            requested_by: string;
+            /** Action Type */
+            action_type: string;
+            /** Entity Type */
+            entity_type: string;
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /** Risk Level */
+            risk_level: number;
+            /** Autonomy Level */
+            autonomy_level: number;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            status: components["schemas"]["ApprovalStatus"];
+            /** Resolved By */
+            resolved_by: string | null;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Expires At */
+            expires_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * ApprovalStatus
+         * @enum {string}
+         */
+        ApprovalStatus: "pending" | "approved" | "rejected" | "expired" | "cancelled";
         /** ArtifactResponse */
         ArtifactResponse: {
             /**
@@ -2362,6 +2503,8 @@ export interface components {
              * @default false
              */
             approval_required: boolean;
+            /** Autonomy Level */
+            autonomy_level?: number | null;
             /** Due At */
             due_at?: string | null;
             /** Tags */
@@ -2542,6 +2685,10 @@ export interface components {
         /** DataResponse[AgentResponse] */
         DataResponse_AgentResponse_: {
             data: components["schemas"]["AgentResponse"];
+        };
+        /** DataResponse[ApprovalResponse] */
+        DataResponse_ApprovalResponse_: {
+            data: components["schemas"]["ApprovalResponse"];
         };
         /** DataResponse[ArtifactResponse] */
         DataResponse_ArtifactResponse_: {
@@ -3320,6 +3467,12 @@ export interface components {
             /** Shared Entities */
             shared_entities: components["schemas"]["GraphEntityResponse"][];
         };
+        /** PaginatedResponse[ApprovalResponse] */
+        PaginatedResponse_ApprovalResponse_: {
+            /** Data */
+            data: components["schemas"]["ApprovalResponse"][];
+            meta: components["schemas"]["PaginationMeta"];
+        };
         /** PaginatedResponse[ArtifactResponse] */
         PaginatedResponse_ArtifactResponse_: {
             /** Data */
@@ -3482,6 +3635,11 @@ export interface components {
         };
         /** ResolveEscalationDto */
         ResolveEscalationDto: {
+            /** Notes */
+            notes?: string | null;
+        };
+        /** RespondApprovalDto */
+        RespondApprovalDto: {
             /** Notes */
             notes?: string | null;
         };
@@ -3792,6 +3950,8 @@ export interface components {
             parent_task_id: string | null;
             /** Approval Required */
             approval_required: boolean;
+            /** Autonomy Level */
+            autonomy_level: number | null;
             /** Approved By */
             approved_by: string | null;
             /** Approved At */
@@ -3855,6 +4015,8 @@ export interface components {
             mode?: components["schemas"]["AgentMode"] | null;
             /** Management Fee Pct */
             management_fee_pct?: number | null;
+            /** Default Autonomy Level */
+            default_autonomy_level?: number | null;
             /** Budget Period Limit */
             budget_period_limit?: number | null;
             /** Metadata */
@@ -7675,6 +7837,174 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DataResponse_dict_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_approvals_approvals_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+                action_type?: string | null;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_ApprovalResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pending_approvals_pending_get: {
+        parameters: {
+            query?: {
+                action_type?: string | null;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_ApprovalResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_approval_approvals__approval_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ApprovalResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_approvals__approval_id__approve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RespondApprovalDto"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ApprovalResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_approvals__approval_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                approval_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RespondApprovalDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_ApprovalResponse_"];
                 };
             };
             /** @description Validation Error */

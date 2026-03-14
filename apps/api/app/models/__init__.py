@@ -1,14 +1,17 @@
 from app.models.agent import Agent, AgentCapability
+from app.models.approval import ApprovalRequest
 from app.models.auth import ApiKey, IdempotencyKey, Nonce, RefreshToken, User
 from app.models.base import Base
 from app.models.consensus import ConsensusRequest, ConsensusVote
 from app.models.credit import CreditRateConfig, CreditTransaction
 from app.models.enums import (
+    ActionType,
     AgentMode,
     AgentRole,
     AgentStatus,
     AmountMode,
     ApiKeyScope,
+    ApprovalStatus,
     ChannelType,
     ConsensusStatus,
     ConsensusType,
@@ -42,6 +45,7 @@ from app.models.task import Task, TaskComment, TaskDependency, TaskTag
 from app.models.webhook import InboundWebhookKey, Webhook
 
 __all__ = [
+    "ActionType",
     "Agent",
     "AgentCapability",
     "AgentMode",
@@ -50,6 +54,8 @@ __all__ = [
     "AmountMode",
     "ApiKey",
     "ApiKeyScope",
+    "ApprovalRequest",
+    "ApprovalStatus",
     "Base",
     "Channel",
     "ChannelType",

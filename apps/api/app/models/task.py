@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy import ForeignKey, Index, SmallInteger, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -44,6 +44,7 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     approval_required: Mapped[bool] = mapped_column(nullable=False, server_default="false")
+    autonomy_level: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     approved_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     approved_at: Mapped[datetime | None] = mapped_column(nullable=True)
     due_date: Mapped[datetime | None] = mapped_column(nullable=True)

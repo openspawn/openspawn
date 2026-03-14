@@ -252,6 +252,19 @@ class WebhookHookType(enum.StrEnum):
     POST = "post"
 
 
+class ApprovalStatus(enum.StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
+    CANCELLED = "cancelled"
+
+
+class ActionType(enum.StrEnum):
+    TASK_TRANSITION = "task_transition"
+    ARTIFACT_PUBLISH = "artifact_publish"
+
+
 class SSEEventType(enum.StrEnum):
     """Event types pushed via Server-Sent Events."""
 

@@ -19,7 +19,7 @@ Deploy via `deploy.yml`, `deploy-platform.yml`, and `deploy-docs.yml` workflows.
 | Domain                | What                                                            |
 | --------------------- | --------------------------------------------------------------- |
 | **openspawn.ai**      | Marketing website (React SPA, serves llms.txt + A2A agent.json) |
-| **api.openspawn.ai**  | Core API — GraphQL + REST (Python rewrite WIP)                  |
+| **api.openspawn.ai**  | Core API — FastAPI REST + OpenAPI + MCP                         |
 | **bikinibottom.ai**   | Demo sandbox + dashboard                                        |
 | **team.openspawn.ai** | Internal team dashboard (password-protected)                    |
 | **id.openspawn.ai**   | SSO/identity provider (OIDC)                                    |
