@@ -36,6 +36,8 @@ def sqlite_env(tmp_path):
         reload(app.config)
         reload(app.database)
         yield
+        reload(app.config)
+        reload(app.database)
 
 
 @pytest.fixture
