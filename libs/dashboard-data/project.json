@@ -1,0 +1,12 @@
+{
+  "name": "@openspawn/dashboard-data",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/dashboard-data/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "command": "oxlint libs/dashboard-data/"
+    }
+  },
+  "tags": []
+}

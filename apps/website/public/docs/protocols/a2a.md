@@ -40,4 +40,4 @@ generated: 2026-03-14
 
 ## Task Management
 
-OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming. 💡 Try it live: curl https://bikinibottom.ai/.well-known/agent.json Every OpenSpawn instance publishes an Agent Card at Each agent has its own card at Use /a2a/message/stream for SSE streaming of task progress and results. Query task status, cancel running tasks, and retrieve artifacts via the A2A task endpoints. See the href="https://a2a-protocol.org" target="_blank" rel="noopener" A2A protocol specification for full details.
+OpenSpawn implements Google's Agent-to-Agent protocol v0.3 for agent discovery, task sending, and streaming. 💡 Try it live: curl https://bikinibottom.ai/.well-known/agent.json Every OpenSpawn instance publishes an Agent Card at Each agent has its own card at Use /a2a/message/stream for SSE streaming of task progress and results. Query task status, cancel running tasks, and retrieve artifacts via the A2A task endpoints. See the href="https://a2a-protocol.org" target="\_blank" rel="noopener" A2A protocol specification for full details.

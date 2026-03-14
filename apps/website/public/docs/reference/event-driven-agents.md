@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/reference/event-driven-agents
 generated: 2026-03-14
 ---
+
 # Event-Driven Agent Architecture
 
 > Sleep until there's work. Wake, think, act, sleep again. Premium models become affordable when they only fire on real events.

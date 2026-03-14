@@ -75,7 +75,7 @@ Spawning agents...
 Server running at http://localhost:3333
 ```
 
-preset: startup is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow hierarchy. Open href="http://localhost:3333/app/" target="_blank" rel="noopener" http://localhost:3333/app/ — your dashboard is live.
+preset: startup is shorthand for a set of communication defaults — immediate escalation, frequent progress updates, shallow hierarchy. Open href="http://localhost:3333/app/" target="\_blank" rel="noopener" http://localhost:3333/app/ — your dashboard is live.
 
 What you're seeing:
 

@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/faq
 generated: 2026-03-14
 ---
+
 # OpenSpawn FAQ
 
 **What you'll learn:** Answers to the most common questions about OpenSpawn — what it is, how to use it, how it applies to real industry scenarios, and how agents interact with it.

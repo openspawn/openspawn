@@ -1,0 +1,24 @@
+{
+  "name": "coordinator",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/coordinator/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "tsc",
+      "options": {
+        "cwd": "packages/coordinator"
+      }
+    },
+    "test": {
+      "command": "vitest run",
+      "options": {
+        "cwd": "packages/coordinator"
+      }
+    },
+    "lint": {
+      "command": "oxlint packages/coordinator/"
+    }
+  },
+  "tags": []
+}

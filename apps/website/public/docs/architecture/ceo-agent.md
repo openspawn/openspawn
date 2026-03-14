@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/architecture/ceo-agent
 generated: 2026-03-14
 ---
+
 > A real agent organization running on real infrastructure — the bridge between OpenSpawn's simulation and production multi-agent systems.
 
 ## 1. Vision

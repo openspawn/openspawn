@@ -1,0 +1,12 @@
+{
+  "name": "@openspawn/docs-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/docs-ui/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "command": "oxlint libs/docs-ui/"
+    }
+  },
+  "tags": []
+}

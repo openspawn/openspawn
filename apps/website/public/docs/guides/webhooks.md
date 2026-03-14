@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/guides/webhooks
 generated: 2026-03-14
 ---
+
 OpenSpawn has two complementary webhook directions:
 
 | Direction             | What it does                                            |
@@ -239,8 +240,6 @@ Signing is **optional** by default. If you provide the header and it doesn't mat
 ### Computing the signature — Node.js
 
 ```javascript
-
-
 function signWebhookPayload(secret, bodyString) {
   return crypto.createHmac("sha256", secret).update(bodyString).digest("hex");
 }
@@ -273,8 +272,6 @@ When OpenSpawn calls your server it sends:
 Verify in Node.js:
 
 ```javascript
-
-
 function verifyOutboundSignature(secret, rawBody, signatureHeader) {
   const expected = "sha256=" + crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
 
@@ -433,8 +430,6 @@ Bot messages are ignored unless the bot's Discord ID is in the map.
 A minimal Node.js forwarder:
 
 ```javascript
-
-
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,

@@ -2,6 +2,7 @@
 source: https://openspawn.ai/docs/reference/scenario-engine
 generated: 2026-03-14
 ---
+
 # BikiniBottom Scenario Engine
 
 > Turn "11 decisions and done" into 2000+ decision epics that make people screenshot the dashboard and share it on Twitter.
@@ -1865,7 +1866,6 @@ The Scenario Engine wraps the existing `DeterministicSimulation` class. No rewri
 
 ```typescript
 // New file: tools/sandbox/src/scenario-engine.ts
-
 
 interface ScenarioDefinition {
   meta: ScenarioMeta;

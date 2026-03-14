@@ -399,7 +399,7 @@ How ACP and A2A work together to="/docs/comparison"
 
 Framework Comparison →
 
-OpenSpawn vs CrewAI vs LangGraph href="https://spec.modelcontextprotocol.io" target="_blank" rel="noopener"
+OpenSpawn vs CrewAI vs LangGraph href="https://spec.modelcontextprotocol.io" target="\_blank" rel="noopener"
 
 MCP Specification →
 
