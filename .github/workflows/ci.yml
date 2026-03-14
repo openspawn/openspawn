@@ -22,28 +22,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  lint:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: openspawn
-          POSTGRES_PASSWORD: openspawn
-          POSTGRES_DB: openspawn
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -56,6 +42,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-lint-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nx-lint-${{ hashFiles('pnpm-lock.yaml') }}-
 
       - name: Verify OpenAPI codegen is up to date
         run: |
@@ -68,19 +61,46 @@ jobs:
           echo "✅ Codegen files are up to date"
 
       - name: Lint (zero warnings policy)
-        run: pnpm exec nx run-many -t lint --parallel=3 -- --max-warnings 0
+        run: pnpm exec nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} -t lint -- --max-warnings 0
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-build-test-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nx-build-test-${{ hashFiles('pnpm-lock.yaml') }}-
 
       - name: Build
-        run: pnpm exec nx run-many -t build --parallel=3
+        run: pnpm exec nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} -t build
 
       - name: Test
-        run: pnpm exec nx run-many -t test --parallel=3 --exclude=openspawn
-        env:
-          DATABASE_URL: postgres://openspawn:openspawn@localhost:5432/openspawn
+        run: pnpm exec nx ${{ github.event_name == 'pull_request' && 'affected' || 'run-many' }} -t test --exclude=openspawn
 
   e2e:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: lint
     steps:
       - uses: actions/checkout@v4
 
@@ -96,8 +116,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build demo for preview
+        run: pnpm exec nx build demo
+
+      - name: Get Playwright version
+        id: pw-version
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ steps.pw-version.outputs.version }}
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Install Playwright system deps
+        run: npx playwright install-deps chromium
 
       - name: Run E2E tests
         run: pnpm exec nx e2e demo-e2e --configuration=ci
@@ -114,6 +152,7 @@ jobs:
 
   python-api:
     runs-on: ubuntu-latest
+    needs: lint
     defaults:
       run:
         working-directory: apps/api
@@ -122,6 +161,9 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
 
       - name: Setup Python
         run: uv python install
