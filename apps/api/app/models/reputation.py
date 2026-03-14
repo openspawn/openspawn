@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, SmallInteger, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 
 
 class ReputationEvent(UUIDPrimaryKeyMixin, Base):
@@ -20,20 +19,20 @@ class ReputationEvent(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     type: Mapped[str] = mapped_column(String(50), nullable=False)
     impact: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     previous_score: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     new_score: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     task_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
+        CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     triggered_by: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
     metadata_: Mapped[dict] = mapped_column(

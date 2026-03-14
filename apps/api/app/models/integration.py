@@ -3,11 +3,10 @@ from __future__ import annotations
 import uuid
 
 from sqlalchemy import ForeignKey, Index, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 
 
 class GitHubConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -15,7 +14,7 @@ class GitHubConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (Index("ix_github_connections_org_id_enabled", "org_id", "enabled"),)
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     installation_id: Mapped[int] = mapped_column(nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -35,7 +34,7 @@ class LinearConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (Index("ix_linear_connections_org_id_enabled", "org_id", "enabled"),)
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     team_id: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -70,13 +69,13 @@ class IntegrationLink(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     provider: Mapped[str] = mapped_column(String(50), nullable=False, server_default="github")
     source_type: Mapped[str] = mapped_column(String(50), nullable=False)
     source_id: Mapped[str] = mapped_column(String(255), nullable=False)
     target_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    target_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    target_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), nullable=False)
     metadata_: Mapped[dict] = mapped_column(
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
     )

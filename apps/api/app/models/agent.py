@@ -5,11 +5,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, LargeBinary, SmallInteger, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 from app.models.enums import AgentMode, AgentRole, AgentStatus, Proficiency
 
 if TYPE_CHECKING:
@@ -31,7 +30,7 @@ class Agent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[str] = mapped_column(String(100), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -55,7 +54,7 @@ class Agent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     budget_period_start: Mapped[datetime | None] = mapped_column(nullable=True)
     hmac_secret_enc: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     parent_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     max_children: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="0")
     metadata_: Mapped[dict] = mapped_column(
@@ -96,10 +95,10 @@ class AgentCapability(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     capability: Mapped[str] = mapped_column(String(100), nullable=False)
     proficiency: Mapped[str] = mapped_column(

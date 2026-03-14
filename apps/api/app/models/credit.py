@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, Numeric, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 from app.models.enums import AmountMode
 
 
@@ -25,10 +24,10 @@ class CreditTransaction(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     agent_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     type: Mapped[str] = mapped_column(String(10), nullable=False)
     amount: Mapped[int] = mapped_column(nullable=False)
@@ -36,17 +35,17 @@ class CreditTransaction(UUIDPrimaryKeyMixin, Base):
     reason: Mapped[str] = mapped_column(String(500), nullable=False)
     trigger_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     trigger_event_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("events.id"), nullable=True
+        CompatUUID(), ForeignKey("events.id"), nullable=True
     )
     source_task_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
+        CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     source_agent_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     litellm_cost_usd: Mapped[float | None] = mapped_column(Numeric(10, 6), nullable=True)
     idempotency_key: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True, unique=True
+        CompatUUID(), nullable=True, unique=True
     )
     metadata_: Mapped[dict] = mapped_column(
         "metadata", CompatJSONB(), nullable=False, server_default="{}"
@@ -74,7 +73,7 @@ class CreditRateConfig(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     trigger_type: Mapped[str] = mapped_column(String(100), nullable=False)
     direction: Mapped[str] = mapped_column(String(10), nullable=False)

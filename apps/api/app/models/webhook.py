@@ -4,10 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.compat import CompatUUID
 
 
 class Webhook(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -17,7 +17,7 @@ class Webhook(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
@@ -39,13 +39,13 @@ class InboundWebhookKey(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (Index("ix_inbound_webhook_keys_org_id_enabled", "org_id", "enabled"),)
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     key: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     secret: Mapped[str] = mapped_column(String(64), nullable=False)
     default_agent_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     default_priority: Mapped[str | None] = mapped_column(String(10), nullable=True)
     default_tags: Mapped[str] = mapped_column(Text, nullable=False, server_default="")

@@ -4,11 +4,10 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.compat import CompatJSONB
+from app.models.compat import CompatJSONB, CompatUUID
 from app.models.enums import TaskPriority, TaskStatus
 
 
@@ -24,7 +23,7 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
     identifier: Mapped[str] = mapped_column(String(20), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
@@ -36,13 +35,13 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         String(10), nullable=False, server_default=TaskPriority.NORMAL.value
     )
     assignee_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=True
+        CompatUUID(), ForeignKey("agents.id"), nullable=True
     )
     creator_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     parent_task_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=True
+        CompatUUID(), ForeignKey("tasks.id"), nullable=True
     )
     approval_required: Mapped[bool] = mapped_column(nullable=False, server_default="false")
     approved_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -91,13 +90,11 @@ class TaskDependency(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False
-    )
+    task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     depends_on_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False
+        CompatUUID(), ForeignKey("tasks.id"), nullable=False
     )
     blocking: Mapped[bool] = mapped_column(nullable=False, server_default="true")
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
@@ -117,11 +114,9 @@ class TaskTag(UUIDPrimaryKeyMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False
-    )
+    task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     tag: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
 
@@ -137,17 +132,15 @@ class TaskComment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     org_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("tasks.id"), nullable=False
-    )
+    task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     author_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False
+        CompatUUID(), ForeignKey("agents.id"), nullable=False
     )
     body: Mapped[str] = mapped_column(Text, nullable=False)
     parent_comment_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("task_comments.id"), nullable=True
+        CompatUUID(), ForeignKey("task_comments.id"), nullable=True
     )
 
     organization: Mapped[Organization] = relationship("Organization")
