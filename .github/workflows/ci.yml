@@ -116,6 +116,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build demo for preview
+        run: pnpm exec nx build demo
+
       - name: Get Playwright version
         id: pw-version
         run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
