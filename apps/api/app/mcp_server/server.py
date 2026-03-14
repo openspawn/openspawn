@@ -470,3 +470,66 @@ async def artifact_history(name: str) -> str:
         result = await _get_client().get(f"/artifacts/{artifact_id}/history")
         return _format(result)
     return _format(latest)
+
+
+# ═══════════════════════════════════════════════
+# Coordination Event Mesh Tools
+# ═══════════════════════════════════════════════
+
+
+@mcp.tool
+async def coordination_emit(
+    event_type: str,
+    payload_json: str,
+    task_id: str,
+    entity_name: str | None = None,
+) -> str:
+    """Emit a typed coordination event (e.g., component.created, test.written)."""
+    body: dict[str, object] = {
+        "event_type": event_type,
+        "payload": json.loads(payload_json),
+        "task_id": task_id,
+    }
+    if entity_name:
+        body["entity_name"] = entity_name
+    result = await _get_client().post("/coordination/emit", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def coordination_subscribe(
+    event_pattern: str,
+    task_id: str | None = None,
+) -> str:
+    """Subscribe to coordination events. Pattern: exact (component.created), wildcard (component.*), or all (*)."""
+    body: dict[str, object] = {"event_pattern": event_pattern}
+    if task_id:
+        body["task_id"] = task_id
+    result = await _get_client().post("/coordination/subscribe", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def coordination_replay(
+    task_id: str,
+    event_types: str | None = None,
+    limit: int = 500,
+) -> str:
+    """Replay coordination events for a task. Catch up to current state after joining mid-stream."""
+    body: dict[str, object] = {"task_id": task_id, "limit": limit}
+    if event_types:
+        body["event_types"] = [t.strip() for t in event_types.split(",")]
+    result = await _get_client().post("/coordination/replay", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def coordination_project(
+    task_id: str,
+    projection_type: str,
+) -> str:
+    """Get derived state from coordination events. Types: component_registry, test_coverage, artifact_view."""
+    result = await _get_client().get(
+        "/coordination/project", params={"task_id": task_id, "projection_type": projection_type}
+    )
+    return _format(result)

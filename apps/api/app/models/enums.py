@@ -280,6 +280,21 @@ class SSEEventType(enum.StrEnum):
     APPROVAL_REQUESTED = "approval.requested"
     APPROVAL_RESOLVED = "approval.resolved"
 
+    # Coordination Event Mesh (#666)
+    COMPONENT_CREATED = "component.created"
+    COMPONENT_UPDATED = "component.updated"
+    TEST_WRITTEN = "test.written"
+    TEST_PASSED = "test.passed"
+    TEST_FAILED = "test.failed"
+    SCREENSHOT_CAPTURED = "screenshot.captured"
+    API_CONTRACT_DEFINED = "api_contract.defined"
+    API_CONTRACT_CHANGED = "api_contract.changed"
+    MIGRATION_CREATED = "migration.created"
+    DOC_SECTION_WRITTEN = "doc.section.written"
+    DEPENDENCY_ADDED = "dependency.added"
+    BUILD_SUCCEEDED = "build.succeeded"
+    BUILD_FAILED = "build.failed"
+
 
 class ArtifactType(enum.StrEnum):
     COMPONENT = "component"
