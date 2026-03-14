@@ -87,16 +87,19 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Database Entities
 
-| Entity              | Purpose                                                   |
-| ------------------- | --------------------------------------------------------- |
-| `Agent`             | AI agents with levels (L1-L10), parent hierarchy, balance |
-| `AgentCapability`   | Skills per agent with proficiency level                   |
-| `Task`              | Work items with Kanban status flow                        |
-| `TaskDependency`    | Blocking relationships between tasks                      |
-| `CreditTransaction` | Debits/credits with audit trail                           |
-| `Channel`           | Communication channels (task, DM, broadcast)              |
-| `Message`           | Messages in channels                                      |
-| `Event`             | Append-only system audit log                              |
+| Entity              | Purpose                                                                      |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `Agent`             | AI agents with levels (L1-L10), parent hierarchy, balance, autonomy level    |
+| `AgentCapability`   | Skills per agent with proficiency level                                      |
+| `Task`              | Work items with Kanban status flow, optional per-task autonomy override      |
+| `TaskDependency`    | Blocking relationships between tasks                                         |
+| `CreditTransaction` | Debits/credits with audit trail                                              |
+| `Channel`           | Communication channels (task, DM, broadcast)                                 |
+| `Message`           | Messages in channels                                                         |
+| `Event`             | Append-only system audit log                                                 |
+| `EventSubscription` | Agent subscriptions to typed coordination events (wildcard pattern matching)  |
+| `ApprovalRequest`   | Gated actions awaiting human/manager approval (risk vs autonomy)             |
+| `Artifact`          | Versioned work products (components, tests, schemas) with approval workflow  |
 
 ---
 
@@ -144,5 +147,6 @@ cd apps/api && uv run pytest tests/ -v                                 # Test (P
 | Architecture & deployment     | [ARCHITECTURE.md](ARCHITECTURE.md)                   |
 | Testing, PRs, dev guide       | [CONTRIBUTING.md](CONTRIBUTING.md)                   |
 | Product requirements          | [docs/openspawn/PRD.md](docs/openspawn/PRD.md)       |
-| API reference (50+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md)       |
+| API reference (100+ endpoints)| [docs/openspawn/API.md](docs/openspawn/API.md)       |
 | Database schema               | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md) |
+| Event mesh spike findings     | [docs/openspawn/spikes/2026-03-14-event-mesh-findings.md](docs/openspawn/spikes/2026-03-14-event-mesh-findings.md) |

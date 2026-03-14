@@ -142,17 +142,59 @@ Auth is enforced by two FastAPI dependencies:
 
 Both respect `AUTH_MODE`.
 
+## Event Mesh & Coordination (#666)
+
+Typed coordination events allow agents to emit structured updates and subscribe to event streams with pattern matching.
+
+- **SSEEventType** extended with 13 coordination event types (`component.created`, `test.written`, `screenshot.captured`, etc.)
+- **EventSubscription** model — agents subscribe to event patterns: exact (`component.created`), wildcard prefix (`component.*`), or global (`*`)
+- **Projections** — 3 server-side projections derive application state from raw events on-demand:
+  - `component_registry` — tracks components, versions, file paths
+  - `test_coverage` — tracks which components have test coverage
+  - `artifact_view` — proves Artifact Bus can be reimplemented as a projection over events
+- **REST endpoints**: `/coordination/{emit,subscribe,replay,project}` — MCP tools call these via ApiClient
+- **SQLite compatible**: all coordination events use `entity_id = task_id` (indexed, no JSONB path queries)
+
+## Autonomy Dial & Approval Gating (#668)
+
+Per-task autonomy level (0-10) controls how much human oversight agents receive. Risk-based gating creates approval requests when an action's risk exceeds the effective autonomy.
+
+- **Agent.default_autonomy_level** (0-10, default 5) — agent's baseline autonomy
+- **Task.autonomy_level** (nullable) — per-task override, takes precedence over agent default
+- **Risk registry** — each (action_type, subtype) pair has a risk level (0-10). `migration=9`, `api_contract=7`, `component=4`, `done=3`, `screenshot=1`. Unknown actions default to 5 (fail closed).
+- **Gate logic**: `risk > effective_autonomy → gated`. Equal values are allowed. Humans are never gated.
+- **Task transitions**: return 403 with `approval_id` when gated; creates `ApprovalRequest` + emits `APPROVAL_REQUESTED`
+- **Artifact publish**: writes artifact as `DRAFT` when gated; `DRAFT → PUBLISHED` transition sets `approved_by`/`approved_at`
+- **Authority**: humans always approve; agents need `level >= requester.level + 2` or be parent agent
+- **REST endpoints**: `/approvals/{list,pending,get,approve,reject}`
+
 ## API Endpoints
 
-All integration endpoints use the `/integrations/` prefix:
+107+ REST endpoints organized by domain:
 
-- `POST /integrations/github/webhook` — GitHub webhooks
-- `GET/POST /integrations/github/connections` — GitHub connection management
-- `POST /integrations/linear/webhook` — Linear webhooks
-- `GET/POST /integrations/linear/connections` — Linear connection management
+| Prefix           | Domain                          | Count |
+| ---------------- | ------------------------------- | ----- |
+| `/auth/*`        | Login, register, tokens         | 8     |
+| `/agents/*`      | Agent CRUD, hierarchy, trust    | 15    |
+| `/tasks/*`       | Task CRUD, transitions, deps    | 15    |
+| `/credits/*`     | Balance, spend, history, rates  | 8     |
+| `/messages/*`    | Channels, send, read            | 5     |
+| `/artifacts/*`   | Publish, subscribe, status      | 8     |
+| `/events/*`      | Event log, SSE stream           | 4     |
+| `/integrations/*`| GitHub, Linear webhooks         | 6     |
+| `/memory/*`      | Store, search, graph            | 10    |
+| `/coordination/*`| Emit, subscribe, replay, project| 4     |
+| `/approvals/*`   | List, approve, reject           | 5     |
+| `/health*`       | Health checks                   | 2     |
+
+MCP tools (45 total) call these REST endpoints via `ApiClient` — not direct DB access.
+
+Full reference: [docs/openspawn/API.md](docs/openspawn/API.md)
 
 ## Database
 
-FastAPI models live in `apps/api/app/models/`. Alembic migrations in `apps/api/alembic/`.
+FastAPI models live in `apps/api/app/models/`. Alembic migrations in `apps/api/alembic/` (7 migrations).
 
-Key entities: `Agent`, `Task`, `Message`, `CreditTransaction`, `Memory`, `Organization`.
+All models use `CompatUUID()` for UUID columns (native UUID on PostgreSQL, Text on SQLite).
+
+Key entities: `Agent`, `Task`, `Message`, `CreditTransaction`, `Memory`, `Organization`, `Artifact`, `EventSubscription`, `ApprovalRequest`.
