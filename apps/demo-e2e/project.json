@@ -17,6 +17,6 @@
       }
     }
   },
-  "implicitDependencies": ["demo"],
+  "implicitDependencies": ["dashboard"],
   "tags": ["scope:e2e"]
 }

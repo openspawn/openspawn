@@ -35,7 +35,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: isCI ? "pnpm exec nx preview demo" : "pnpm exec nx serve demo",
+    command: isCI ? "pnpm exec nx preview dashboard" : "pnpm exec nx serve dashboard",
     url: baseURL,
     reuseExistingServer: !isCI,
     cwd: "../..",

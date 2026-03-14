@@ -65,10 +65,10 @@ npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres neede
 
 ### Add a new dashboard page
 
-1. Create `apps/demo/src/pages/my-page.tsx`
-2. Export from `apps/demo/src/pages/index.ts`
-3. Add route in `apps/demo/src/app/app.tsx`
-4. Add nav link in `apps/demo/src/components/layout.tsx`
+1. Create `apps/dashboard/src/pages/my-page.tsx`
+2. Export from `apps/dashboard/src/pages/index.ts`
+3. Add route in `apps/dashboard/src/app/app.tsx`
+4. Add nav link in `apps/dashboard/src/components/layout.tsx`
 
 ### Add demo data
 
@@ -82,10 +82,10 @@ npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres neede
 
 | Layer     | Tool            | When                                | Location                       |
 | --------- | --------------- | ----------------------------------- | ------------------------------ |
-| Unit      | Vitest          | Pure functions, utils, transforms   | `apps/demo/src/lib/__tests__/` |
+| Unit      | Vitest          | Pure functions, utils, transforms   | `apps/dashboard/src/lib/__tests__/` |
 | Component | Vitest + RTL    | React components in isolation       | `*.spec.tsx` next to component |
 | API       | pytest          | API endpoints, agent spawning       | `apps/api/tests/`              |
-| E2E       | Playwright      | User flows, page loads, regressions | `apps/demo/e2e/tests/`         |
+| E2E       | Playwright      | User flows, page loads, regressions | `apps/dashboard/e2e/tests/`         |
 | Smoke     | curl/Playwright | Post-deploy verification            | Against production URL         |
 | Profiling | pytest + script | Latency benchmarks, perf regression | `apps/api/tests/`, `scripts/`  |
 
@@ -98,9 +98,9 @@ npx openspawn start   # starts FastAPI on SQLite — no Docker or Postgres neede
 **Running tests:**
 
 ```bash
-pnpm exec nx test demo           # Unit + component
-pnpm exec nx typecheck demo      # Type check
-pnpm exec nx e2e demo            # E2E (builds + starts sandbox)
+pnpm exec nx test dashboard           # Unit + component
+pnpm exec nx typecheck dashboard      # Type check
+pnpm exec nx e2e demo-e2e            # E2E (builds + starts sandbox)
 cd apps/api && uv run pytest     # Python API tests
 ```
 
@@ -131,9 +131,9 @@ The manual script profiles health checks, agent/task CRUD, routing, transitions,
 
 ## Deploy Checklist
 
-1. `pnpm exec nx typecheck demo` passes
-2. `pnpm exec nx test demo` passes
-3. `pnpm exec nx build demo` succeeds
+1. `pnpm exec nx typecheck dashboard` passes
+2. `pnpm exec nx test dashboard` passes
+3. `pnpm exec nx build dashboard` succeeds
 4. E2E smoke tests pass against sandbox
 5. No `localhost` URLs in network requests (checked by E2E)
 6. PR approved and squash-merged

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "apps/demo/**"
+      - "apps/dashboard/**"
       - "apps/team/**"
       - "apps/website/**"
       - "apps/api/**"
@@ -116,7 +116,7 @@ jobs:
             echo "⏳ Waiting for app to start..."
             for i in $(seq 1 12); do
               if curl -sf http://localhost:3333/api/state > /dev/null 2>&1; then
-                echo "✅ Demo app healthy!"
+                echo "✅ Dashboard healthy!"
                 break
               fi
               echo "  Attempt $i/12 — waiting 5s..."

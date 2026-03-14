@@ -116,8 +116,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build demo for preview
-        run: pnpm exec nx build demo
+      - name: Build dashboard for preview
+        run: pnpm exec nx build dashboard
 
       - name: Get Playwright version
         id: pw-version
