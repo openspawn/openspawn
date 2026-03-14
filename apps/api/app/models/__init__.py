@@ -31,6 +31,7 @@ from app.models.enums import (
 )
 from app.models.escalation import Escalation
 from app.models.event import Event
+from app.models.event_subscription import EventSubscription
 from app.models.graph import GraphEntity, GraphRelationship, MemoryEntityLink
 from app.models.integration import GitHubConnection, IntegrationLink, LinearConnection
 from app.models.memory import Memory
@@ -63,6 +64,7 @@ __all__ = [
     "Escalation",
     "EscalationReason",
     "Event",
+    "EventSubscription",
     "EventSeverity",
     "GitHubConnection",
     "GraphEntity",
