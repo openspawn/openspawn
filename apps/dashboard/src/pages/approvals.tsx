@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, Clock, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
