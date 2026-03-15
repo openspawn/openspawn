@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import {
   X,
@@ -9,15 +10,18 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
+  Shield,
   ShieldAlert,
   History,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { ScrollArea } from "../../components/ui/scroll-area";
+import { Slider } from "../../components/ui/slider";
 import { SandboxActivityFeed } from "../../components/sandbox-activity-feed";
 import { TaskCascade } from "../../components/task-cascade";
 import type { Task } from "../../hooks";
+import { useUpdateTaskAutonomy } from "@openspawn/dashboard-data";
 import { darkenForBackground } from "../../lib/avatar-utils";
 import { resolveAvatarUrl } from "../../lib/resolve-avatar-url";
 import {
@@ -213,6 +217,23 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
             )}
           </div>
 
+          {/* Autonomy Level */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Shield className="w-4 h-4" />
+                Autonomy Level
+              </div>
+              <span className="text-sm font-mono font-medium">
+                {task.autonomyLevel ?? "inherited"}
+              </span>
+            </div>
+            <AutonomySlider taskId={task.id} currentLevel={task.autonomyLevel ?? null} />
+            <p className="text-xs text-muted-foreground">
+              0 = full oversight · 10 = full autonomy
+            </p>
+          </div>
+
           {/* Live Activity Stream (sandbox mode) */}
           <SandboxActivityFeed taskId={task.identifier ?? task.id} />
 
@@ -252,6 +273,25 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function AutonomySlider({ taskId, currentLevel }: { taskId: string; currentLevel: number | null }) {
+  const [value, setValue] = useState(currentLevel ?? 5);
+  const updateAutonomy = useUpdateTaskAutonomy(taskId);
+
+  function handleValueChange(newValue: number) {
+    setValue(newValue);
+  }
+
+  function handlePointerUp() {
+    updateAutonomy.mutate(value);
+  }
+
+  return (
+    <div onPointerUp={handlePointerUp}>
+      <Slider value={value} onValueChange={handleValueChange} min={0} max={10} step={1} />
     </div>
   );
 }
