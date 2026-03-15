@@ -1,4 +1,10 @@
 export { useAgents } from "./use-agents";
+export {
+  useApprovals,
+  useApproveApproval,
+  useRejectApproval,
+  useUpdateTaskAutonomy,
+} from "./use-approvals";
 export { useTasks, useTask } from "./use-tasks";
 export {
   useCreateTask,
