@@ -30,6 +30,7 @@ if TYPE_CHECKING:
         EscalateTaskDto,
         ResolveEscalationDto,
         TransitionTaskDto,
+        UpdateAutonomyDto,
     )
 
 VALID_TRANSITIONS: dict[str, list[str]] = {
@@ -264,6 +265,16 @@ async def approve_task(db: AsyncSession, auth: AuthContext, task_id: uuid.UUID) 
         data={"approved_by": approver_name, "task_title": task.title},
     )
 
+    await db.commit()
+    await db.refresh(task)
+    return task
+
+
+async def update_task_autonomy(
+    db: AsyncSession, auth: AuthContext, task_id: uuid.UUID, dto: UpdateAutonomyDto
+) -> Task:
+    task = await _get_task_or_404(db, task_id, auth.org_id)
+    task.autonomy_level = dto.autonomy_level
     await db.commit()
     await db.refresh(task)
     return task

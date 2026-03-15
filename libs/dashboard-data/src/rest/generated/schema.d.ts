@@ -592,6 +592,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tasks/{task_id}/autonomy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Autonomy */
+        patch: operations["update_autonomy_tasks__task_id__autonomy_patch"];
+        trace?: never;
+    };
     "/tasks/{task_id}/assign": {
         parameters: {
             query?: never;
@@ -4024,6 +4041,11 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** UpdateAutonomyDto */
+        UpdateAutonomyDto: {
+            /** Autonomy Level */
+            autonomy_level: number | null;
+        };
         /** UpdateCapabilityDto */
         UpdateCapabilityDto: {
             proficiency: components["schemas"]["Proficiency"];
@@ -5285,6 +5307,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DataMessageResponse_TaskResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_autonomy_tasks__task_id__autonomy_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAutonomyDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataResponse_TaskResponse_"];
                 };
             };
             /** @description Validation Error */

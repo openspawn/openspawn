@@ -26,6 +26,7 @@ from app.tasks.schemas import (
     TaskDependencyResponse,
     TaskResponse,
     TransitionTaskDto,
+    UpdateAutonomyDto,
 )
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -96,6 +97,17 @@ async def approve_task(
 ) -> DataMessageResponse[TaskResponse]:
     task = await service.approve_task(db, auth, task_id)
     return DataMessageResponse(data=TaskResponse.model_validate(task), message="Task approved")
+
+
+@router.patch("/{task_id}/autonomy")
+async def update_autonomy(
+    task_id: uuid.UUID,
+    dto: UpdateAutonomyDto,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> DataResponse[TaskResponse]:
+    task = await service.update_task_autonomy(db, auth, task_id, dto)
+    return DataResponse(data=TaskResponse.model_validate(task))
 
 
 @router.post("/{task_id}/assign")

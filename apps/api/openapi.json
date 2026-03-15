@@ -1716,6 +1716,59 @@
         }
       }
     },
+    "/tasks/{task_id}/autonomy": {
+      "patch": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Update Autonomy",
+        "operationId": "update_autonomy_tasks__task_id__autonomy_patch",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAutonomyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_TaskResponse_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tasks/{task_id}/assign": {
       "post": {
         "tags": [
@@ -10997,6 +11050,28 @@
         },
         "type": "object",
         "title": "UpdateAgentDto"
+      },
+      "UpdateAutonomyDto": {
+        "properties": {
+          "autonomy_level": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Autonomy Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "autonomy_level"
+        ],
+        "title": "UpdateAutonomyDto"
       },
       "UpdateCapabilityDto": {
         "properties": {
