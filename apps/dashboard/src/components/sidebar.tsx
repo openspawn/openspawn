@@ -25,6 +25,7 @@ import {
   Share2,
   Layers,
   ClipboardList,
+  ShieldCheck,
   Signal,
 } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -71,6 +72,7 @@ export const navigation: {
   { name: "Messages", href: "/messages", icon: MessageSquare, shortcut: "g m" },
   { name: "Model Router", href: "/router", icon: GitBranch },
   { name: "Credits", href: "/credits", icon: Coins, shortcut: "g c" },
+  { name: "Approvals", href: "/approvals", icon: ShieldCheck, shortcut: "g p" },
   { name: "Events", href: "/events", icon: Activity, shortcut: "g e" },
   { name: "Memory", href: "/memory", icon: Brain },
   { name: "Graph", href: "/graph", icon: Share2 },

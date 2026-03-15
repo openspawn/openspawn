@@ -189,6 +189,12 @@ const graphRoute = createRoute({
   component: lazyRouteComponent(() => import("./pages/graph"), "GraphPage"),
 });
 
+const approvalsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/approvals",
+  component: lazyRouteComponent(() => import("./pages/approvals"), "ApprovalsPage"),
+});
+
 // Auth routes — only in non-sandbox mode
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -218,6 +224,7 @@ const layoutChildren = [
   taskBoardRoute,
   memoryRoute,
   graphRoute,
+  approvalsRoute,
 ];
 
 const rootChildren = [
