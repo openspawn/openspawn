@@ -26,13 +26,13 @@ Versioning works — `component.created` + `component.updated` for the same name
 
 ## Trade-offs
 
-| Aspect | Events as substrate | Direct artifact storage |
-|--------|-------------------|----------------------|
-| Auditability | Full history by default | Requires separate versioning |
-| Query cost | O(n) per projection rebuild | O(1) for latest state |
-| Schema evolution | Add new event types freely | Migration per schema change |
-| Consistency | Eventual (projection rebuild) | Immediate |
-| Storage | Append-only, grows | Mutable, bounded |
+| Aspect           | Events as substrate           | Direct artifact storage      |
+| ---------------- | ----------------------------- | ---------------------------- |
+| Auditability     | Full history by default       | Requires separate versioning |
+| Query cost       | O(n) per projection rebuild   | O(1) for latest state        |
+| Schema evolution | Add new event types freely    | Migration per schema change  |
+| Consistency      | Eventual (projection rebuild) | Immediate                    |
+| Storage          | Append-only, grows            | Mutable, bounded             |
 
 ## Performance Notes
 

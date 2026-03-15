@@ -14,17 +14,17 @@
 
 ## File Structure
 
-| File | Responsibility |
-|------|----------------|
-| `apps/api/app/tasks/router.py` | Add PATCH endpoint for task autonomy_level |
-| `apps/api/app/tasks/service.py` | Add update_task_autonomy service function |
-| `apps/dashboard/src/components/ui/slider.tsx` | Slider component wrapping @base-ui/react/slider |
-| `libs/dashboard-data/src/rest/hooks/use-approvals.ts` | Query + mutation hooks for approvals |
-| `libs/dashboard-data/src/rest/hooks/index.ts` | Re-export new hooks |
-| `apps/dashboard/src/pages/tasks/task-detail-sidebar.tsx` | Add autonomy slider to task detail |
-| `apps/dashboard/src/pages/approvals.tsx` | Approvals queue page |
-| `apps/dashboard/src/routes.tsx` | Add /approvals route |
-| `apps/dashboard/src/components/sidebar.tsx` | Add Approvals nav item |
+| File                                                     | Responsibility                                  |
+| -------------------------------------------------------- | ----------------------------------------------- |
+| `apps/api/app/tasks/router.py`                           | Add PATCH endpoint for task autonomy_level      |
+| `apps/api/app/tasks/service.py`                          | Add update_task_autonomy service function       |
+| `apps/dashboard/src/components/ui/slider.tsx`            | Slider component wrapping @base-ui/react/slider |
+| `libs/dashboard-data/src/rest/hooks/use-approvals.ts`    | Query + mutation hooks for approvals            |
+| `libs/dashboard-data/src/rest/hooks/index.ts`            | Re-export new hooks                             |
+| `apps/dashboard/src/pages/tasks/task-detail-sidebar.tsx` | Add autonomy slider to task detail              |
+| `apps/dashboard/src/pages/approvals.tsx`                 | Approvals queue page                            |
+| `apps/dashboard/src/routes.tsx`                          | Add /approvals route                            |
+| `apps/dashboard/src/components/sidebar.tsx`              | Add Approvals nav item                          |
 
 ---
 
@@ -33,6 +33,7 @@
 ### Task 1: Add PATCH /tasks/{id}/autonomy endpoint
 
 **Files:**
+
 - Modify: `apps/api/app/tasks/schemas.py`
 - Modify: `apps/api/app/tasks/service.py`
 - Modify: `apps/api/app/tasks/router.py`
@@ -84,6 +85,7 @@ Import `UpdateAutonomyDto` from schemas.
 - [ ] **Step 4: Regenerate OpenAPI + codegen**
 
 Run:
+
 ```bash
 cd apps/api && uv run python -c "import json; from app.main import app; open('openapi.json','w').write(json.dumps(app.openapi(), indent=2))"
 cd ../.. && pnpm run codegen
@@ -107,6 +109,7 @@ git commit -m "feat(api): add PATCH /tasks/{id}/autonomy endpoint"
 ### Task 2: Create Slider UI component
 
 **Files:**
+
 - Create: `apps/dashboard/src/components/ui/slider.tsx`
 
 - [ ] **Step 1: Write component**
@@ -128,7 +131,15 @@ interface SliderProps {
   className?: string;
 }
 
-function Slider({ value, onValueChange, min = 0, max = 10, step = 1, disabled, className }: SliderProps) {
+function Slider({
+  value,
+  onValueChange,
+  min = 0,
+  max = 10,
+  step = 1,
+  disabled,
+  className,
+}: SliderProps) {
   function handleValueChange(newValue: number | number[]) {
     const v = Array.isArray(newValue) ? newValue[0] : newValue;
     onValueChange(v);
@@ -174,6 +185,7 @@ git commit -m "feat(dashboard): add Slider UI component wrapping @base-ui/react"
 ### Task 3: Create approval hooks
 
 **Files:**
+
 - Create: `libs/dashboard-data/src/rest/hooks/use-approvals.ts`
 - Modify: `libs/dashboard-data/src/rest/hooks/index.ts`
 
@@ -277,11 +289,13 @@ git commit -m "feat(dashboard): add approval + autonomy REST hooks"
 ### Task 4: Add autonomy slider to task detail sidebar
 
 **Files:**
+
 - Modify: `apps/dashboard/src/pages/tasks/task-detail-sidebar.tsx`
 
 - [ ] **Step 1: Add slider after the details grid**
 
 Import the Slider and hook at top:
+
 ```tsx
 import { Slider } from "../../components/ui/slider";
 import { useUpdateTaskAutonomy } from "@openspawn/dashboard-data";
@@ -292,22 +306,20 @@ Import `Shield` icon from lucide-react.
 After the details grid section (after the closing `</div>` of `grid grid-cols-2 gap-4`), add:
 
 ```tsx
-          {/* Autonomy Level */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Shield className="w-4 h-4" />
-                Autonomy Level
-              </div>
-              <span className="text-sm font-mono font-medium">
-                {task.autonomyLevel ?? "inherited"}
-              </span>
-            </div>
-            <AutonomySlider taskId={task.id} currentLevel={task.autonomyLevel ?? null} />
-            <p className="text-xs text-muted-foreground">
-              0 = full oversight · 10 = full autonomy
-            </p>
-          </div>
+{
+  /* Autonomy Level */
+}
+<div className="space-y-3">
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+      <Shield className="w-4 h-4" />
+      Autonomy Level
+    </div>
+    <span className="text-sm font-mono font-medium">{task.autonomyLevel ?? "inherited"}</span>
+  </div>
+  <AutonomySlider taskId={task.id} currentLevel={task.autonomyLevel ?? null} />
+  <p className="text-xs text-muted-foreground">0 = full oversight · 10 = full autonomy</p>
+</div>;
 ```
 
 Add the `AutonomySlider` component in the same file (above the main export):
@@ -327,13 +339,7 @@ function AutonomySlider({ taskId, currentLevel }: { taskId: string; currentLevel
 
   return (
     <div onPointerUp={handlePointerUp}>
-      <Slider
-        value={value}
-        onValueChange={handleValueChange}
-        min={0}
-        max={10}
-        step={1}
-      />
+      <Slider value={value} onValueChange={handleValueChange} min={0} max={10} step={1} />
     </div>
   );
 }
@@ -359,6 +365,7 @@ git commit -m "feat(dashboard): add autonomy slider to task detail sidebar"
 ### Task 5: Create approvals page
 
 **Files:**
+
 - Create: `apps/dashboard/src/pages/approvals.tsx`
 
 - [ ] **Step 1: Write page**
@@ -441,7 +448,10 @@ function ApprovalRow({ approval }: { approval: Record<string, unknown> }) {
         </div>
         <p className="text-sm">
           <span className="font-medium">{approval.entity_type as string}</span>
-          <span className="text-muted-foreground"> · autonomy {approval.autonomy_level as number}</span>
+          <span className="text-muted-foreground">
+            {" "}
+            · autonomy {approval.autonomy_level as number}
+          </span>
         </p>
       </div>
 
@@ -466,11 +476,7 @@ function ApprovalRow({ approval }: { approval: Record<string, unknown> }) {
               <XCircle className="w-3 h-3 mr-1" />
               Reject
             </Button>
-            <Button
-              size="sm"
-              onClick={handleApprove}
-              disabled={approveAction.isPending}
-            >
+            <Button size="sm" onClick={handleApprove} disabled={approveAction.isPending}>
               <CheckCircle2 className="w-3 h-3 mr-1" />
               Approve
             </Button>
@@ -511,10 +517,7 @@ export function ApprovalsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Approvals"
-        description="Review and approve gated agent actions"
-      />
+      <PageHeader title="Approvals" description="Review and approve gated agent actions" />
 
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard title="Pending" value={total} icon={Clock} />
@@ -565,6 +568,7 @@ git commit -m "feat(dashboard): add approvals queue page"
 ### Task 6: Add route + sidebar nav
 
 **Files:**
+
 - Modify: `apps/dashboard/src/routes.tsx`
 - Modify: `apps/dashboard/src/components/sidebar.tsx`
 

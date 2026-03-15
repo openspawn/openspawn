@@ -7,9 +7,7 @@
   "paths": {
     "/auth/login": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login",
         "description": "Authenticate user and return access + refresh tokens.\n\nBehavior varies by auth mode:\n- mode=none: returns static owner token, any credentials accepted\n- mode=local: validates password against config hash, returns bearer token\n- mode=full: validates credentials against User DB, optional TOTP, returns JWT",
         "operationId": "login_auth_login_post",
@@ -49,9 +47,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Refresh",
         "description": "Exchange refresh token for new access + refresh tokens.\n\nIn full mode, implements token rotation (old refresh token revoked).",
         "operationId": "refresh_auth_refresh_post",
@@ -91,9 +87,7 @@
     },
     "/auth/logout": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Logout",
         "description": "Revoke refresh token (logout).",
         "operationId": "logout_auth_logout_post",
@@ -126,9 +120,7 @@
     },
     "/auth/me": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Get Current User Info",
         "description": "Return current user profile from bearer token.",
         "operationId": "get_current_user_info_auth_me_get",
@@ -148,9 +140,7 @@
     },
     "/auth/google": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Google Oauth",
         "description": "Google OAuth login \u2014 stub for Phase 2.",
         "operationId": "google_oauth_auth_google_get",
@@ -174,9 +164,7 @@
     },
     "/agents/register": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Register Agent",
         "operationId": "register_agent_agents_register_post",
         "requestBody": {
@@ -217,9 +205,7 @@
     },
     "/agents": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "List Agents",
         "operationId": "list_agents_agents_get",
         "parameters": [
@@ -282,9 +268,7 @@
     },
     "/agents/{agent_id}": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Agent",
         "operationId": "get_agent_agents__agent_id__get",
         "parameters": [
@@ -323,9 +307,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Update Agent",
         "operationId": "update_agent_agents__agent_id__patch",
         "parameters": [
@@ -376,9 +358,7 @@
     },
     "/agents/{agent_id}/revoke": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Revoke Agent",
         "operationId": "revoke_agent_agents__agent_id__revoke_post",
         "parameters": [
@@ -419,9 +399,7 @@
     },
     "/agents/spawn": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Spawn Agent",
         "operationId": "spawn_agent_agents_spawn_post",
         "requestBody": {
@@ -460,9 +438,7 @@
     },
     "/agents/capacity": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Capacity",
         "operationId": "get_capacity_agents_capacity_get",
         "responses": {
@@ -481,9 +457,7 @@
     },
     "/agents/pending": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Pending Agents",
         "operationId": "get_pending_agents_agents_pending_get",
         "responses": {
@@ -502,9 +476,7 @@
     },
     "/agents/{agent_id}/activate": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Activate Agent",
         "operationId": "activate_agent_agents__agent_id__activate_post",
         "parameters": [
@@ -545,9 +517,7 @@
     },
     "/agents/{agent_id}/reject": {
       "delete": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Reject Agent",
         "operationId": "reject_agent_agents__agent_id__reject_delete",
         "parameters": [
@@ -588,9 +558,7 @@
     },
     "/agents/{agent_id}/hierarchy": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Hierarchy",
         "operationId": "get_hierarchy_agents__agent_id__hierarchy_get",
         "parameters": [
@@ -643,9 +611,7 @@
     },
     "/agents/{agent_id}/credits/balance": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Balance",
         "operationId": "get_balance_agents__agent_id__credits_balance_get",
         "parameters": [
@@ -686,9 +652,7 @@
     },
     "/agents/{agent_id}/budget": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Budget",
         "operationId": "get_budget_agents__agent_id__budget_get",
         "parameters": [
@@ -727,9 +691,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Set Budget",
         "operationId": "set_budget_agents__agent_id__budget_patch",
         "parameters": [
@@ -780,9 +742,7 @@
     },
     "/agents/credits/transfer": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Transfer Credits",
         "operationId": "transfer_credits_agents_credits_transfer_post",
         "requestBody": {
@@ -821,9 +781,7 @@
     },
     "/agents/{agent_id}/budget/can-spend": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Can Spend",
         "operationId": "can_spend_agents__agent_id__budget_can_spend_get",
         "parameters": [
@@ -874,9 +832,7 @@
     },
     "/agents/budget/alerts": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Budget Alerts",
         "operationId": "budget_alerts_agents_budget_alerts_get",
         "responses": {
@@ -895,9 +851,7 @@
     },
     "/agents/capabilities": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "List Org Capabilities",
         "operationId": "list_org_capabilities_agents_capabilities_get",
         "responses": {
@@ -916,9 +870,7 @@
     },
     "/agents/capabilities/match": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Match Capabilities",
         "operationId": "match_capabilities_agents_capabilities_match_get",
         "parameters": [
@@ -979,9 +931,7 @@
     },
     "/agents/{agent_id}/capabilities": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Agent Capabilities",
         "operationId": "get_agent_capabilities_agents__agent_id__capabilities_get",
         "parameters": [
@@ -1020,9 +970,7 @@
         }
       },
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Add Capability",
         "operationId": "add_capability_agents__agent_id__capabilities_post",
         "parameters": [
@@ -1073,9 +1021,7 @@
     },
     "/agents/capabilities/{capability_id}": {
       "patch": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Update Capability",
         "operationId": "update_capability_agents_capabilities__capability_id__patch",
         "parameters": [
@@ -1124,9 +1070,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Delete Capability",
         "operationId": "delete_capability_agents_capabilities__capability_id__delete",
         "parameters": [
@@ -1160,9 +1104,7 @@
     },
     "/agents/{agent_id}/reputation": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Reputation",
         "operationId": "get_reputation_agents__agent_id__reputation_get",
         "parameters": [
@@ -1203,9 +1145,7 @@
     },
     "/agents/{agent_id}/reputation/history": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Get Reputation History",
         "operationId": "get_reputation_history_agents__agent_id__reputation_history_get",
         "parameters": [
@@ -1268,9 +1208,7 @@
     },
     "/agents/{agent_id}/reputation/bonus": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Award Bonus",
         "operationId": "award_bonus_agents__agent_id__reputation_bonus_post",
         "parameters": [
@@ -1321,9 +1259,7 @@
     },
     "/agents/{agent_id}/reputation/penalty": {
       "post": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Apply Penalty",
         "operationId": "apply_penalty_agents__agent_id__reputation_penalty_post",
         "parameters": [
@@ -1374,9 +1310,7 @@
     },
     "/agents/leaderboard/trust": {
       "get": {
-        "tags": [
-          "agents"
-        ],
+        "tags": ["agents"],
         "summary": "Trust Leaderboard",
         "operationId": "trust_leaderboard_agents_leaderboard_trust_get",
         "parameters": [
@@ -1418,9 +1352,7 @@
     },
     "/tasks": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Create Task",
         "operationId": "create_task_tasks_post",
         "requestBody": {
@@ -1457,9 +1389,7 @@
         }
       },
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "List Tasks",
         "operationId": "list_tasks_tasks_get",
         "parameters": [
@@ -1579,9 +1509,7 @@
     },
     "/tasks/{task_id}": {
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Get Task",
         "operationId": "get_task_tasks__task_id__get",
         "parameters": [
@@ -1622,9 +1550,7 @@
     },
     "/tasks/{task_id}/transition": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Transition Task",
         "operationId": "transition_task_tasks__task_id__transition_post",
         "parameters": [
@@ -1675,9 +1601,7 @@
     },
     "/tasks/{task_id}/approve": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Approve Task",
         "operationId": "approve_task_tasks__task_id__approve_post",
         "parameters": [
@@ -1718,9 +1642,7 @@
     },
     "/tasks/{task_id}/autonomy": {
       "patch": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Update Autonomy",
         "operationId": "update_autonomy_tasks__task_id__autonomy_patch",
         "parameters": [
@@ -1771,9 +1693,7 @@
     },
     "/tasks/{task_id}/assign": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Assign Task",
         "operationId": "assign_task_tasks__task_id__assign_post",
         "parameters": [
@@ -1824,9 +1744,7 @@
     },
     "/tasks/{task_id}/dependencies": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Add Dependency",
         "operationId": "add_dependency_tasks__task_id__dependencies_post",
         "parameters": [
@@ -1877,9 +1795,7 @@
     },
     "/tasks/{task_id}/dependencies/{dep_id}": {
       "delete": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Remove Dependency",
         "operationId": "remove_dependency_tasks__task_id__dependencies__dep_id__delete",
         "parameters": [
@@ -1923,9 +1839,7 @@
     },
     "/tasks/{task_id}/comments": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Add Comment",
         "operationId": "add_comment_tasks__task_id__comments_post",
         "parameters": [
@@ -1974,9 +1888,7 @@
         }
       },
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "List Comments",
         "operationId": "list_comments_tasks__task_id__comments_get",
         "parameters": [
@@ -2017,9 +1929,7 @@
     },
     "/tasks/{task_id}/escalate": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Escalate Task",
         "operationId": "escalate_task_tasks__task_id__escalate_post",
         "parameters": [
@@ -2070,9 +1980,7 @@
     },
     "/tasks/{task_id}/escalations": {
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Get Task Escalations",
         "operationId": "get_task_escalations_tasks__task_id__escalations_get",
         "parameters": [
@@ -2113,9 +2021,7 @@
     },
     "/tasks/escalations/open": {
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "List Open Escalations",
         "operationId": "list_open_escalations_tasks_escalations_open_get",
         "responses": {
@@ -2134,9 +2040,7 @@
     },
     "/tasks/escalations/{escalation_id}/resolve": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Resolve Escalation",
         "operationId": "resolve_escalation_tasks_escalations__escalation_id__resolve_post",
         "parameters": [
@@ -2187,9 +2091,7 @@
     },
     "/tasks/consensus": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Create Consensus",
         "operationId": "create_consensus_tasks_consensus_post",
         "requestBody": {
@@ -2228,9 +2130,7 @@
     },
     "/tasks/consensus/pending": {
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Get Pending Consensus",
         "operationId": "get_pending_consensus_tasks_consensus_pending_get",
         "responses": {
@@ -2249,9 +2149,7 @@
     },
     "/tasks/consensus/{request_id}": {
       "get": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Get Consensus",
         "operationId": "get_consensus_tasks_consensus__request_id__get",
         "parameters": [
@@ -2290,9 +2188,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Cancel Consensus",
         "operationId": "cancel_consensus_tasks_consensus__request_id__delete",
         "parameters": [
@@ -2326,9 +2222,7 @@
     },
     "/tasks/consensus/{request_id}/vote": {
       "post": {
-        "tags": [
-          "tasks"
-        ],
+        "tags": ["tasks"],
         "summary": "Cast Vote",
         "operationId": "cast_vote_tasks_consensus__request_id__vote_post",
         "parameters": [
@@ -2379,9 +2273,7 @@
     },
     "/credits/balance": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get Balance",
         "operationId": "get_balance_credits_balance_get",
         "responses": {
@@ -2400,9 +2292,7 @@
     },
     "/credits/spend": {
       "post": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Spend Credits",
         "operationId": "spend_credits_credits_spend_post",
         "requestBody": {
@@ -2441,9 +2331,7 @@
     },
     "/credits/history": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get History",
         "operationId": "get_history_credits_history_get",
         "parameters": [
@@ -2496,9 +2384,7 @@
     },
     "/credits/adjust": {
       "post": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Adjust Credits",
         "operationId": "adjust_credits_credits_adjust_post",
         "requestBody": {
@@ -2537,9 +2423,7 @@
     },
     "/credits/analytics/stats": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get Stats",
         "operationId": "get_stats_credits_analytics_stats_get",
         "responses": {
@@ -2558,9 +2442,7 @@
     },
     "/credits/analytics/trends": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get Trends",
         "operationId": "get_trends_credits_analytics_trends_get",
         "parameters": [
@@ -2620,9 +2502,7 @@
     },
     "/credits/analytics/agents": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get Spending By Agent",
         "operationId": "get_spending_by_agent_credits_analytics_agents_get",
         "responses": {
@@ -2641,9 +2521,7 @@
     },
     "/credits/analytics/top-spenders": {
       "get": {
-        "tags": [
-          "credits"
-        ],
+        "tags": ["credits"],
         "summary": "Get Top Spenders",
         "operationId": "get_top_spenders_credits_analytics_top_spenders_get",
         "parameters": [
@@ -2697,9 +2575,7 @@
     },
     "/channels": {
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "List Channels",
         "operationId": "list_channels_channels_get",
         "responses": {
@@ -2716,9 +2592,7 @@
         }
       },
       "post": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Create Channel",
         "operationId": "create_channel_channels_post",
         "requestBody": {
@@ -2757,9 +2631,7 @@
     },
     "/channels/{channel_id}": {
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Get Channel",
         "operationId": "get_channel_channels__channel_id__get",
         "parameters": [
@@ -2800,9 +2672,7 @@
     },
     "/messages": {
       "post": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Send Message",
         "operationId": "send_message_messages_post",
         "requestBody": {
@@ -2839,9 +2709,7 @@
         }
       },
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "List Messages",
         "operationId": "list_messages_messages_get",
         "parameters": [
@@ -2910,9 +2778,7 @@
     },
     "/messages/{message_id}": {
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Get Message",
         "operationId": "get_message_messages__message_id__get",
         "parameters": [
@@ -2953,9 +2819,7 @@
     },
     "/messages/{message_id}/thread": {
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Get Thread",
         "operationId": "get_thread_messages__message_id__thread_get",
         "parameters": [
@@ -2996,9 +2860,7 @@
     },
     "/dm": {
       "post": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Send Dm",
         "operationId": "send_dm_dm_post",
         "requestBody": {
@@ -3037,9 +2899,7 @@
     },
     "/dm/{agent_id}": {
       "get": {
-        "tags": [
-          "messages"
-        ],
+        "tags": ["messages"],
         "summary": "Get Dm History",
         "operationId": "get_dm_history_dm__agent_id__get",
         "parameters": [
@@ -3091,9 +2951,7 @@
     },
     "/artifacts": {
       "post": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Publish Artifact",
         "operationId": "publish_artifact_artifacts_post",
         "requestBody": {
@@ -3130,9 +2988,7 @@
         }
       },
       "get": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "List Artifacts",
         "operationId": "list_artifacts_artifacts_get",
         "parameters": [
@@ -3267,9 +3123,7 @@
     },
     "/artifacts/batch": {
       "post": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Publish Batch",
         "operationId": "publish_batch_artifacts_batch_post",
         "requestBody": {
@@ -3312,9 +3166,7 @@
     },
     "/artifacts/latest": {
       "get": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Get Latest Artifact",
         "operationId": "get_latest_artifact_artifacts_latest_get",
         "parameters": [
@@ -3354,9 +3206,7 @@
     },
     "/artifacts/subscribe": {
       "post": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Create Subscription",
         "operationId": "create_subscription_artifacts_subscribe_post",
         "requestBody": {
@@ -3395,9 +3245,7 @@
     },
     "/artifacts/subscriptions": {
       "get": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "List Subscriptions",
         "operationId": "list_subscriptions_artifacts_subscriptions_get",
         "responses": {
@@ -3416,9 +3264,7 @@
     },
     "/artifacts/subscriptions/{subscription_id}": {
       "delete": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Delete Subscription",
         "operationId": "delete_subscription_artifacts_subscriptions__subscription_id__delete",
         "parameters": [
@@ -3452,9 +3298,7 @@
     },
     "/artifacts/{artifact_id}": {
       "get": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Get Artifact",
         "operationId": "get_artifact_artifacts__artifact_id__get",
         "parameters": [
@@ -3495,9 +3339,7 @@
     },
     "/artifacts/{artifact_id}/history": {
       "get": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Get Artifact History",
         "operationId": "get_artifact_history_artifacts__artifact_id__history_get",
         "parameters": [
@@ -3538,9 +3380,7 @@
     },
     "/artifacts/{artifact_id}/status": {
       "put": {
-        "tags": [
-          "artifacts"
-        ],
+        "tags": ["artifacts"],
         "summary": "Update Artifact Status",
         "operationId": "update_artifact_status_artifacts__artifact_id__status_put",
         "parameters": [
@@ -3591,9 +3431,7 @@
     },
     "/events/token": {
       "post": {
-        "tags": [
-          "events-sse"
-        ],
+        "tags": ["events-sse"],
         "summary": "Create Sse Token",
         "description": "Issue short-lived JWT for SSE auth (EventSource can't set headers).",
         "operationId": "create_sse_token_events_token_post",
@@ -3613,9 +3451,7 @@
     },
     "/events/stream": {
       "get": {
-        "tags": [
-          "events-sse"
-        ],
+        "tags": ["events-sse"],
         "summary": "Event Stream",
         "description": "SSE stream. Auth via query param token. Supports Last-Event-ID replay.",
         "operationId": "event_stream_events_stream_get",
@@ -3689,9 +3525,7 @@
     },
     "/events": {
       "get": {
-        "tags": [
-          "events"
-        ],
+        "tags": ["events"],
         "summary": "List Events",
         "operationId": "list_events_events_get",
         "parameters": [
@@ -3860,9 +3694,7 @@
     },
     "/events/{event_id}": {
       "get": {
-        "tags": [
-          "events"
-        ],
+        "tags": ["events"],
         "summary": "Get Event",
         "operationId": "get_event_events__event_id__get",
         "parameters": [
@@ -3903,9 +3735,7 @@
     },
     "/integrations/github/connections": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "List Github Connections",
         "operationId": "list_github_connections_integrations_github_connections_get",
         "responses": {
@@ -3922,9 +3752,7 @@
         }
       },
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Create Github Connection",
         "operationId": "create_github_connection_integrations_github_connections_post",
         "requestBody": {
@@ -3963,9 +3791,7 @@
     },
     "/integrations/github/connections/{conn_id}": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Get Github Connection",
         "operationId": "get_github_connection_integrations_github_connections__conn_id__get",
         "parameters": [
@@ -4004,9 +3830,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Update Github Connection",
         "operationId": "update_github_connection_integrations_github_connections__conn_id__patch",
         "parameters": [
@@ -4055,9 +3879,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Delete Github Connection",
         "operationId": "delete_github_connection_integrations_github_connections__conn_id__delete",
         "parameters": [
@@ -4091,9 +3913,7 @@
     },
     "/integrations/github/connections/{conn_id}/test": {
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Test Github Connection",
         "operationId": "test_github_connection_integrations_github_connections__conn_id__test_post",
         "parameters": [
@@ -4134,9 +3954,7 @@
     },
     "/integrations/github/connections/{conn_id}/links": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Get Github Links",
         "operationId": "get_github_links_integrations_github_connections__conn_id__links_get",
         "parameters": [
@@ -4177,9 +3995,7 @@
     },
     "/integrations/github/webhook": {
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Github Webhook",
         "operationId": "github_webhook_integrations_github_webhook_post",
         "responses": {
@@ -4198,9 +4014,7 @@
     },
     "/integrations/linear/connections": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "List Linear Connections",
         "operationId": "list_linear_connections_integrations_linear_connections_get",
         "responses": {
@@ -4217,9 +4031,7 @@
         }
       },
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Create Linear Connection",
         "operationId": "create_linear_connection_integrations_linear_connections_post",
         "requestBody": {
@@ -4258,9 +4070,7 @@
     },
     "/integrations/linear/connections/{conn_id}": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Get Linear Connection",
         "operationId": "get_linear_connection_integrations_linear_connections__conn_id__get",
         "parameters": [
@@ -4299,9 +4109,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Update Linear Connection",
         "operationId": "update_linear_connection_integrations_linear_connections__conn_id__patch",
         "parameters": [
@@ -4350,9 +4158,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Delete Linear Connection",
         "operationId": "delete_linear_connection_integrations_linear_connections__conn_id__delete",
         "parameters": [
@@ -4386,9 +4192,7 @@
     },
     "/integrations/linear/connections/{conn_id}/test": {
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Test Linear Connection",
         "operationId": "test_linear_connection_integrations_linear_connections__conn_id__test_post",
         "parameters": [
@@ -4429,9 +4233,7 @@
     },
     "/integrations/linear/connections/{conn_id}/links": {
       "get": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Get Linear Links",
         "operationId": "get_linear_links_integrations_linear_connections__conn_id__links_get",
         "parameters": [
@@ -4472,9 +4274,7 @@
     },
     "/integrations/linear/webhook": {
       "post": {
-        "tags": [
-          "integrations"
-        ],
+        "tags": ["integrations"],
         "summary": "Linear Webhook",
         "operationId": "linear_webhook_integrations_linear_webhook_post",
         "responses": {
@@ -4493,9 +4293,7 @@
     },
     "/memory": {
       "post": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "Store",
         "operationId": "store_memory_post",
         "requestBody": {
@@ -4532,9 +4330,7 @@
         }
       },
       "get": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "List All",
         "operationId": "list_all_memory_get",
         "parameters": [
@@ -4637,9 +4433,7 @@
     },
     "/memory/search": {
       "get": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "Search",
         "operationId": "search_memory_search_get",
         "parameters": [
@@ -4720,9 +4514,7 @@
     },
     "/memory/contradictions": {
       "get": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "List Contradiction Pairs",
         "operationId": "list_contradiction_pairs_memory_contradictions_get",
         "responses": {
@@ -4741,9 +4533,7 @@
     },
     "/memory/contradictions/{memory_id}/resolve": {
       "post": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "Resolve Contradiction Endpoint",
         "operationId": "resolve_contradiction_endpoint_memory_contradictions__memory_id__resolve_post",
         "parameters": [
@@ -4794,9 +4584,7 @@
     },
     "/memory/{memory_id}": {
       "get": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "Get One",
         "operationId": "get_one_memory__memory_id__get",
         "parameters": [
@@ -4837,9 +4625,7 @@
     },
     "/memory/{memory_id}/feedback": {
       "post": {
-        "tags": [
-          "memory"
-        ],
+        "tags": ["memory"],
         "summary": "Feedback",
         "operationId": "feedback_memory__memory_id__feedback_post",
         "parameters": [
@@ -4890,9 +4676,7 @@
     },
     "/memory/graph/entities": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "List Entities",
         "operationId": "list_entities_memory_graph_entities_get",
         "parameters": [
@@ -4951,9 +4735,7 @@
     },
     "/memory/graph/entities/{entity_id}": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Get Entity",
         "operationId": "get_entity_memory_graph_entities__entity_id__get",
         "parameters": [
@@ -4994,9 +4776,7 @@
     },
     "/memory/graph/entities/{entity_id}/memories": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "List Entity Memories",
         "operationId": "list_entity_memories_memory_graph_entities__entity_id__memories_get",
         "parameters": [
@@ -5049,9 +4829,7 @@
     },
     "/memory/graph/entities/{entity_id}/agents": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "List Entity Agents",
         "operationId": "list_entity_agents_memory_graph_entities__entity_id__agents_get",
         "parameters": [
@@ -5092,9 +4870,7 @@
     },
     "/memory/graph/entities/{entity_id}/neighbors": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Get Neighbors",
         "operationId": "get_neighbors_memory_graph_entities__entity_id__neighbors_get",
         "parameters": [
@@ -5147,9 +4923,7 @@
     },
     "/memory/graph/relationships": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Get Relationships",
         "operationId": "get_relationships_memory_graph_relationships_get",
         "parameters": [
@@ -5200,9 +4974,7 @@
     },
     "/memory/graph/overlap": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Compute Overlap",
         "operationId": "compute_overlap_memory_graph_overlap_get",
         "parameters": [
@@ -5253,9 +5025,7 @@
     },
     "/memory/graph/overlap/matrix": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Overlap Matrix",
         "operationId": "overlap_matrix_memory_graph_overlap_matrix_get",
         "responses": {
@@ -5274,9 +5044,7 @@
     },
     "/memory/graph/gaps": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Find Gaps",
         "operationId": "find_gaps_memory_graph_gaps_get",
         "responses": {
@@ -5295,9 +5063,7 @@
     },
     "/memory/graph/cytoscape": {
       "get": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Cytoscape Graph",
         "operationId": "cytoscape_graph_memory_graph_cytoscape_get",
         "parameters": [
@@ -5356,9 +5122,7 @@
     },
     "/memory/graph/agent-file/export/{agent_id}": {
       "post": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Export Agent",
         "operationId": "export_agent_memory_graph_agent_file_export__agent_id__post",
         "parameters": [
@@ -5401,9 +5165,7 @@
     },
     "/memory/graph/agent-file/import": {
       "post": {
-        "tags": [
-          "graph"
-        ],
+        "tags": ["graph"],
         "summary": "Import Agent",
         "operationId": "import_agent_memory_graph_agent_file_import_post",
         "requestBody": {
@@ -5446,9 +5208,7 @@
     },
     "/coordination/emit": {
       "post": {
-        "tags": [
-          "coordination"
-        ],
+        "tags": ["coordination"],
         "summary": "Emit Event",
         "operationId": "emit_event_coordination_emit_post",
         "requestBody": {
@@ -5487,9 +5247,7 @@
     },
     "/coordination/subscribe": {
       "post": {
-        "tags": [
-          "coordination"
-        ],
+        "tags": ["coordination"],
         "summary": "Subscribe",
         "operationId": "subscribe_coordination_subscribe_post",
         "requestBody": {
@@ -5528,9 +5286,7 @@
     },
     "/coordination/replay": {
       "post": {
-        "tags": [
-          "coordination"
-        ],
+        "tags": ["coordination"],
         "summary": "Replay",
         "operationId": "replay_coordination_replay_post",
         "requestBody": {
@@ -5569,9 +5325,7 @@
     },
     "/coordination/project": {
       "get": {
-        "tags": [
-          "coordination"
-        ],
+        "tags": ["coordination"],
         "summary": "Project",
         "operationId": "project_coordination_project_get",
         "parameters": [
@@ -5620,9 +5374,7 @@
     },
     "/approvals": {
       "get": {
-        "tags": [
-          "approvals"
-        ],
+        "tags": ["approvals"],
         "summary": "List Approvals",
         "operationId": "list_approvals_approvals_get",
         "parameters": [
@@ -5707,9 +5459,7 @@
     },
     "/approvals/pending": {
       "get": {
-        "tags": [
-          "approvals"
-        ],
+        "tags": ["approvals"],
         "summary": "List Pending",
         "operationId": "list_pending_approvals_pending_get",
         "parameters": [
@@ -5778,9 +5528,7 @@
     },
     "/approvals/{approval_id}": {
       "get": {
-        "tags": [
-          "approvals"
-        ],
+        "tags": ["approvals"],
         "summary": "Get Approval",
         "operationId": "get_approval_approvals__approval_id__get",
         "parameters": [
@@ -5821,9 +5569,7 @@
     },
     "/approvals/{approval_id}/approve": {
       "post": {
-        "tags": [
-          "approvals"
-        ],
+        "tags": ["approvals"],
         "summary": "Approve",
         "operationId": "approve_approvals__approval_id__approve_post",
         "parameters": [
@@ -5881,9 +5627,7 @@
     },
     "/approvals/{approval_id}/reject": {
       "post": {
-        "tags": [
-          "approvals"
-        ],
+        "tags": ["approvals"],
         "summary": "Reject",
         "operationId": "reject_approvals__approval_id__reject_post",
         "parameters": [
@@ -5992,9 +5736,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "capability"
-        ],
+        "required": ["capability"],
         "title": "AddCapabilityDto"
       },
       "AddCommentDto": {
@@ -6017,9 +5759,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "body"
-        ],
+        "required": ["body"],
         "title": "AddCommentDto"
       },
       "AddDependencyDto": {
@@ -6036,9 +5776,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "depends_on_id"
-        ],
+        "required": ["depends_on_id"],
         "title": "AddDependencyDto"
       },
       "AdjustCreditsDto": {
@@ -6063,21 +5801,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "agent_id",
-          "amount",
-          "type",
-          "reason"
-        ],
+        "required": ["agent_id", "amount", "type", "reason"],
         "title": "AdjustCreditsDto"
       },
       "AgentMode": {
         "type": "string",
-        "enum": [
-          "worker",
-          "orchestrator",
-          "observer"
-        ],
+        "enum": ["worker", "orchestrator", "observer"],
         "title": "AgentMode"
       },
       "AgentRegistrationResponse": {
@@ -6091,10 +5820,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "agent",
-          "hmac_secret"
-        ],
+        "required": ["agent", "hmac_secret"],
         "title": "AgentRegistrationResponse"
       },
       "AgentResponse": {
@@ -6348,25 +6074,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "agent_id",
-          "name",
-          "total_spent",
-          "transaction_count"
-        ],
+        "required": ["agent_id", "name", "total_spent", "transaction_count"],
         "title": "AgentSpendingResponse"
       },
       "AgentStatus": {
         "type": "string",
-        "enum": [
-          "pending",
-          "active",
-          "idle",
-          "busy",
-          "paused",
-          "suspended",
-          "revoked"
-        ],
+        "enum": ["pending", "active", "idle", "busy", "paused", "suspended", "revoked"],
         "title": "AgentStatus"
       },
       "ApprovalResponse": {
@@ -6490,13 +6203,7 @@
       },
       "ApprovalStatus": {
         "type": "string",
-        "enum": [
-          "pending",
-          "approved",
-          "rejected",
-          "expired",
-          "cancelled"
-        ],
+        "enum": ["pending", "approved", "rejected", "expired", "cancelled"],
         "title": "ApprovalStatus"
       },
       "ArtifactResponse": {
@@ -6626,11 +6333,7 @@
       },
       "ArtifactStatus": {
         "type": "string",
-        "enum": [
-          "draft",
-          "published",
-          "superseded"
-        ],
+        "enum": ["draft", "published", "superseded"],
         "title": "ArtifactStatus"
       },
       "ArtifactType": {
@@ -6655,9 +6358,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "assignee_id"
-        ],
+        "required": ["assignee_id"],
         "title": "AssignTaskDto"
       },
       "BalanceResponse": {
@@ -6668,9 +6369,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "balance"
-        ],
+        "required": ["balance"],
         "title": "BalanceResponse"
       },
       "BudgetResponse": {
@@ -6759,14 +6458,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "org_id",
-          "agent_id",
-          "capability",
-          "proficiency",
-          "created_at"
-        ],
+        "required": ["id", "org_id", "agent_id", "capability", "proficiency", "created_at"],
         "title": "CapabilityResponse"
       },
       "CastVoteDto": {
@@ -6787,9 +6479,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "vote"
-        ],
+        "required": ["vote"],
         "title": "CastVoteDto"
       },
       "ChannelResponse": {
@@ -6854,12 +6544,7 @@
       },
       "ChannelType": {
         "type": "string",
-        "enum": [
-          "task",
-          "agent",
-          "broadcast",
-          "general"
-        ],
+        "enum": ["task", "agent", "broadcast", "general"],
         "title": "ChannelType"
       },
       "ConsensusRequestResponse": {
@@ -6996,13 +6681,7 @@
       },
       "ConsensusStatus": {
         "type": "string",
-        "enum": [
-          "PENDING",
-          "APPROVED",
-          "REJECTED",
-          "EXPIRED",
-          "CANCELLED"
-        ],
+        "enum": ["PENDING", "APPROVED", "REJECTED", "EXPIRED", "CANCELLED"],
         "title": "ConsensusStatus"
       },
       "ConsensusType": {
@@ -7060,15 +6739,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "request_id",
-          "voter_id",
-          "vote",
-          "reason",
-          "voter_level",
-          "created_at"
-        ],
+        "required": ["id", "request_id", "voter_id", "vote", "reason", "voter_level", "created_at"],
         "title": "ConsensusVoteResponse"
       },
       "ContradictionPairResponse": {
@@ -7081,10 +6752,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "older_memory",
-          "newer_memory"
-        ],
+        "required": ["older_memory", "newer_memory"],
         "title": "ContradictionPairResponse"
       },
       "CreateChannelDto": {
@@ -7116,10 +6784,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "type"
-        ],
+        "required": ["name", "type"],
         "title": "CreateChannelDto"
       },
       "CreateConsensusDto": {
@@ -7187,10 +6852,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "title"
-        ],
+        "required": ["type", "title"],
         "title": "CreateConsensusDto"
       },
       "CreateGitHubConnectionDto": {
@@ -7223,11 +6885,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "installation_id",
-          "name",
-          "webhook_secret"
-        ],
+        "required": ["installation_id", "name", "webhook_secret"],
         "title": "CreateGitHubConnectionDto"
       },
       "CreateLinearConnectionDto": {
@@ -7273,11 +6931,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "team_id",
-          "name",
-          "webhook_secret"
-        ],
+        "required": ["team_id", "name", "webhook_secret"],
         "title": "CreateLinearConnectionDto"
       },
       "CreateTaskDto": {
@@ -7377,9 +7031,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "title"
-        ],
+        "required": ["title"],
         "title": "CreateTaskDto"
       },
       "CreditStatsResponse": {
@@ -7402,12 +7054,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "total_credits",
-          "total_debits",
-          "net",
-          "transaction_count"
-        ],
+        "required": ["total_credits", "total_debits", "net", "transaction_count"],
         "title": "CreditStatsResponse"
       },
       "CreditTransactionResponse": {
@@ -7513,10 +7160,7 @@
       },
       "CreditType": {
         "type": "string",
-        "enum": [
-          "credit",
-          "debit"
-        ],
+        "enum": ["credit", "debit"],
         "title": "CreditType"
       },
       "CytoscapeEdge": {
@@ -7528,9 +7172,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "CytoscapeEdge"
       },
       "CytoscapeGraph": {
@@ -7551,10 +7193,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "nodes",
-          "edges"
-        ],
+        "required": ["nodes", "edges"],
         "title": "CytoscapeGraph"
       },
       "CytoscapeNode": {
@@ -7566,9 +7205,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "CytoscapeNode"
       },
       "DataMessageResponse_AgentRegistrationResponse_": {
@@ -7587,10 +7224,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[AgentRegistrationResponse]"
       },
       "DataMessageResponse_AgentResponse_": {
@@ -7609,10 +7243,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[AgentResponse]"
       },
       "DataMessageResponse_ConsensusVoteResponse_": {
@@ -7631,10 +7262,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[ConsensusVoteResponse]"
       },
       "DataMessageResponse_CreditTransactionResponse_": {
@@ -7653,10 +7281,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[CreditTransactionResponse]"
       },
       "DataMessageResponse_EscalationResponse_": {
@@ -7675,10 +7300,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[EscalationResponse]"
       },
       "DataMessageResponse_ReputationSummary_": {
@@ -7697,10 +7319,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[ReputationSummary]"
       },
       "DataMessageResponse_TaskResponse_": {
@@ -7719,10 +7338,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[TaskResponse]"
       },
       "DataMessageResponse_dict_": {
@@ -7743,10 +7359,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "message"
-        ],
+        "required": ["data", "message"],
         "title": "DataMessageResponse[dict]"
       },
       "DataResponse_AgentResponse_": {
@@ -7756,9 +7369,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[AgentResponse]"
       },
       "DataResponse_ApprovalResponse_": {
@@ -7768,9 +7379,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[ApprovalResponse]"
       },
       "DataResponse_ArtifactResponse_": {
@@ -7780,9 +7389,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[ArtifactResponse]"
       },
       "DataResponse_BalanceResponse_": {
@@ -7792,9 +7399,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[BalanceResponse]"
       },
       "DataResponse_BudgetResponse_": {
@@ -7804,9 +7409,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[BudgetResponse]"
       },
       "DataResponse_CapabilityResponse_": {
@@ -7816,9 +7419,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[CapabilityResponse]"
       },
       "DataResponse_ChannelResponse_": {
@@ -7828,9 +7429,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[ChannelResponse]"
       },
       "DataResponse_ConsensusRequestResponse_": {
@@ -7840,9 +7439,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[ConsensusRequestResponse]"
       },
       "DataResponse_CreditStatsResponse_": {
@@ -7852,9 +7449,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[CreditStatsResponse]"
       },
       "DataResponse_CytoscapeGraph_": {
@@ -7864,9 +7459,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[CytoscapeGraph]"
       },
       "DataResponse_EscalationResponse_": {
@@ -7876,9 +7469,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[EscalationResponse]"
       },
       "DataResponse_EventResponse_": {
@@ -7888,9 +7479,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[EventResponse]"
       },
       "DataResponse_EventSubscriptionResponse_": {
@@ -7900,9 +7489,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[EventSubscriptionResponse]"
       },
       "DataResponse_GitHubConnectionResponse_": {
@@ -7912,9 +7499,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[GitHubConnectionResponse]"
       },
       "DataResponse_GraphEntityResponse_": {
@@ -7924,9 +7509,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[GraphEntityResponse]"
       },
       "DataResponse_HierarchyNode_": {
@@ -7936,9 +7519,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[HierarchyNode]"
       },
       "DataResponse_LinearConnectionResponse_": {
@@ -7948,9 +7529,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[LinearConnectionResponse]"
       },
       "DataResponse_MemoryResponse_": {
@@ -7960,9 +7539,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[MemoryResponse]"
       },
       "DataResponse_MessageResponse_": {
@@ -7972,9 +7549,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[MessageResponse]"
       },
       "DataResponse_OverlapResult_": {
@@ -7984,9 +7559,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[OverlapResult]"
       },
       "DataResponse_ReputationSummary_": {
@@ -7996,9 +7569,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[ReputationSummary]"
       },
       "DataResponse_SSETokenResponse_": {
@@ -8008,9 +7579,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[SSETokenResponse]"
       },
       "DataResponse_SubGraph_": {
@@ -8020,9 +7589,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[SubGraph]"
       },
       "DataResponse_SubscriptionResponse_": {
@@ -8032,9 +7599,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[SubscriptionResponse]"
       },
       "DataResponse_TaskCommentResponse_": {
@@ -8044,9 +7609,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[TaskCommentResponse]"
       },
       "DataResponse_TaskDependencyResponse_": {
@@ -8056,9 +7619,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[TaskDependencyResponse]"
       },
       "DataResponse_TaskResponse_": {
@@ -8068,9 +7629,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[TaskResponse]"
       },
       "DataResponse_dict_": {
@@ -8082,9 +7641,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[dict]"
       },
       "DataResponse_list_AgentResponse__": {
@@ -8098,9 +7655,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[AgentResponse]]"
       },
       "DataResponse_list_AgentSpendingResponse__": {
@@ -8114,9 +7669,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[AgentSpendingResponse]]"
       },
       "DataResponse_list_ArtifactResponse__": {
@@ -8130,9 +7683,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[ArtifactResponse]]"
       },
       "DataResponse_list_CapabilityResponse__": {
@@ -8146,9 +7697,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[CapabilityResponse]]"
       },
       "DataResponse_list_ChannelResponse__": {
@@ -8162,9 +7711,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[ChannelResponse]]"
       },
       "DataResponse_list_ConsensusRequestResponse__": {
@@ -8178,9 +7725,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[ConsensusRequestResponse]]"
       },
       "DataResponse_list_ContradictionPairResponse__": {
@@ -8194,9 +7739,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[ContradictionPairResponse]]"
       },
       "DataResponse_list_EscalationResponse__": {
@@ -8210,9 +7753,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[EscalationResponse]]"
       },
       "DataResponse_list_GapResult__": {
@@ -8226,9 +7767,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[GapResult]]"
       },
       "DataResponse_list_GitHubConnectionResponse__": {
@@ -8242,9 +7781,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[GitHubConnectionResponse]]"
       },
       "DataResponse_list_GraphEntityResponse__": {
@@ -8258,9 +7795,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[GraphEntityResponse]]"
       },
       "DataResponse_list_GraphRelationshipResponse__": {
@@ -8274,9 +7809,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[GraphRelationshipResponse]]"
       },
       "DataResponse_list_IntegrationLinkResponse__": {
@@ -8290,9 +7823,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[IntegrationLinkResponse]]"
       },
       "DataResponse_list_LeaderboardEntry__": {
@@ -8306,9 +7837,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[LeaderboardEntry]]"
       },
       "DataResponse_list_LinearConnectionResponse__": {
@@ -8322,9 +7851,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[LinearConnectionResponse]]"
       },
       "DataResponse_list_MessageResponse__": {
@@ -8338,9 +7865,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[MessageResponse]]"
       },
       "DataResponse_list_OverlapResult__": {
@@ -8354,9 +7879,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[OverlapResult]]"
       },
       "DataResponse_list_SearchResultResponse__": {
@@ -8370,9 +7893,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[SearchResultResponse]]"
       },
       "DataResponse_list_SpendingTrendPoint__": {
@@ -8386,9 +7907,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[SpendingTrendPoint]]"
       },
       "DataResponse_list_SubscriptionResponse__": {
@@ -8402,9 +7921,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[SubscriptionResponse]]"
       },
       "DataResponse_list_TaskCommentResponse__": {
@@ -8418,9 +7935,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[TaskCommentResponse]]"
       },
       "DataResponse_list_UUID__": {
@@ -8435,9 +7950,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[UUID]]"
       },
       "DataResponse_list_dict__": {
@@ -8452,9 +7965,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[dict]]"
       },
       "DataResponse_list_str__": {
@@ -8468,9 +7979,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "title": "DataResponse[list[str]]"
       },
       "EmitEventDto": {
@@ -8502,11 +8011,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "event_type",
-          "payload",
-          "task_id"
-        ],
+        "required": ["event_type", "payload", "task_id"],
         "title": "EmitEventDto"
       },
       "EscalateTaskDto": {
@@ -8527,9 +8032,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "reason"
-        ],
+        "required": ["reason"],
         "title": "EscalateTaskDto"
       },
       "EscalationReason": {
@@ -8700,14 +8203,7 @@
       },
       "EventSeverity": {
         "type": "string",
-        "enum": [
-          "debug",
-          "info",
-          "success",
-          "warning",
-          "error",
-          "critical"
-        ],
+        "enum": ["debug", "info", "success", "warning", "error", "critical"],
         "title": "EventSeverity"
       },
       "EventSubscriptionResponse": {
@@ -8745,13 +8241,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "agent_id",
-          "event_pattern",
-          "task_id",
-          "created_at"
-        ],
+        "required": ["id", "agent_id", "event_pattern", "task_id", "created_at"],
         "title": "EventSubscriptionResponse"
       },
       "GapResult": {
@@ -8774,12 +8264,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "entity_name",
-          "entity_type",
-          "agent_count",
-          "risk"
-        ],
+        "required": ["entity_name", "entity_type", "agent_count", "risk"],
         "title": "GapResult"
       },
       "GitHubConnectionResponse": {
@@ -9040,14 +8525,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "agent_id",
-          "name",
-          "level",
-          "status",
-          "role"
-        ],
+        "required": ["id", "agent_id", "name", "level", "status", "role"],
         "title": "HierarchyNode"
       },
       "IntegrationLinkResponse": {
@@ -9138,13 +8616,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "agent_id",
-          "name",
-          "trust_score",
-          "tasks_completed",
-          "success_rate"
-        ],
+        "required": ["agent_id", "name", "trust_score", "tasks_completed", "success_rate"],
         "title": "LeaderboardEntry"
       },
       "LinearConnectionResponse": {
@@ -9259,10 +8731,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "title": "LoginRequest"
       },
       "LoginResponse": {
@@ -9282,10 +8751,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "access_token",
-          "refresh_token"
-        ],
+        "required": ["access_token", "refresh_token"],
         "title": "LoginResponse"
       },
       "LogoutRequest": {
@@ -9296,9 +8762,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "refresh_token"
-        ],
+        "required": ["refresh_token"],
         "title": "LogoutRequest"
       },
       "MemoryFeedbackDto": {
@@ -9309,9 +8773,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "helpful"
-        ],
+        "required": ["helpful"],
         "title": "MemoryFeedbackDto"
       },
       "MemoryResponse": {
@@ -9549,12 +9011,7 @@
       },
       "MessageType": {
         "type": "string",
-        "enum": [
-          "text",
-          "handoff",
-          "status_update",
-          "request"
-        ],
+        "enum": ["text", "handoff", "status_update", "request"],
         "title": "MessageType"
       },
       "OverlapResult": {
@@ -9614,10 +9071,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[ApprovalResponse]"
       },
       "PaginatedResponse_ArtifactResponse_": {
@@ -9634,10 +9088,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[ArtifactResponse]"
       },
       "PaginatedResponse_CreditTransactionResponse_": {
@@ -9654,10 +9105,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[CreditTransactionResponse]"
       },
       "PaginatedResponse_EventResponse_": {
@@ -9674,10 +9122,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[EventResponse]"
       },
       "PaginatedResponse_MemoryResponse_": {
@@ -9694,10 +9139,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[MemoryResponse]"
       },
       "PaginatedResponse_ReputationEventResponse_": {
@@ -9714,10 +9156,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[ReputationEventResponse]"
       },
       "PaginatedResponse_TaskResponse_": {
@@ -9734,10 +9173,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "data",
-          "meta"
-        ],
+        "required": ["data", "meta"],
         "title": "PaginatedResponse[TaskResponse]"
       },
       "PaginationMeta": {
@@ -9756,20 +9192,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "total",
-          "page",
-          "limit"
-        ],
+        "required": ["total", "page", "limit"],
         "title": "PaginationMeta"
       },
       "Proficiency": {
         "type": "string",
-        "enum": [
-          "basic",
-          "standard",
-          "expert"
-        ],
+        "enum": ["basic", "standard", "expert"],
         "title": "Proficiency"
       },
       "PublishArtifactDto": {
@@ -9806,12 +9234,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "artifact_type",
-          "name",
-          "content",
-          "task_id"
-        ],
+        "required": ["artifact_type", "name", "content", "task_id"],
         "title": "PublishArtifactDto"
       },
       "RefreshRequest": {
@@ -9822,9 +9245,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "refresh_token"
-        ],
+        "required": ["refresh_token"],
         "title": "RefreshRequest"
       },
       "RefreshResponse": {
@@ -9844,10 +9265,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "access_token",
-          "refresh_token"
-        ],
+        "required": ["access_token", "refresh_token"],
         "title": "RefreshResponse"
       },
       "ReplayDto": {
@@ -9890,9 +9308,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "task_id"
-        ],
+        "required": ["task_id"],
         "title": "ReplayDto"
       },
       "ReputationBonusPenaltyDto": {
@@ -9910,10 +9326,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "reason",
-          "impact"
-        ],
+        "required": ["reason", "impact"],
         "title": "ReputationBonusPenaltyDto"
       },
       "ReputationEventResponse": {
@@ -10018,13 +9431,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "trust_score",
-          "tasks_completed",
-          "tasks_successful",
-          "success_rate",
-          "level"
-        ],
+        "required": ["trust_score", "tasks_completed", "tasks_successful", "success_rate", "level"],
         "title": "ReputationSummary"
       },
       "ResolveContradictionDto": {
@@ -10036,9 +9443,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "strategy"
-        ],
+        "required": ["strategy"],
         "title": "ResolveContradictionDto"
       },
       "ResolveEscalationDto": {
@@ -10087,10 +9492,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "token",
-          "expires_in"
-        ],
+        "required": ["token", "expires_in"],
         "title": "SSETokenResponse"
       },
       "SearchResultResponse": {
@@ -10224,10 +9626,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "recipient_id",
-          "body"
-        ],
+        "required": ["recipient_id", "body"],
         "title": "SendDirectMessageDto"
       },
       "SendMessageDto": {
@@ -10264,10 +9663,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "channel_id",
-          "body"
-        ],
+        "required": ["channel_id", "body"],
         "title": "SendMessageDto"
       },
       "SetBudgetDto": {
@@ -10344,10 +9740,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "agent_id",
-          "name"
-        ],
+        "required": ["agent_id", "name"],
         "title": "SpawnAgentDto"
       },
       "SpendCreditsDto": {
@@ -10399,10 +9792,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "amount",
-          "reason"
-        ],
+        "required": ["amount", "reason"],
         "title": "SpendCreditsDto"
       },
       "SpendingTrendPoint": {
@@ -10417,10 +9807,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "date",
-          "amount"
-        ],
+        "required": ["date", "amount"],
         "title": "SpendingTrendPoint"
       },
       "StoreMemoryDto": {
@@ -10507,9 +9894,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "content"
-        ],
+        "required": ["content"],
         "title": "StoreMemoryDto"
       },
       "SubGraph": {
@@ -10530,10 +9915,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "entities",
-          "relationships"
-        ],
+        "required": ["entities", "relationships"],
         "title": "SubGraph"
       },
       "SubscriptionResponse": {
@@ -10576,14 +9958,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "org_id",
-          "agent_id",
-          "artifact_type",
-          "task_id",
-          "created_at"
-        ],
+        "required": ["id", "org_id", "agent_id", "artifact_type", "task_id", "created_at"],
         "title": "SubscriptionResponse"
       },
       "TaskCommentResponse": {
@@ -10670,24 +10045,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "task_id",
-          "depends_on_id",
-          "blocking",
-          "created_at"
-        ],
+        "required": ["id", "task_id", "depends_on_id", "blocking", "created_at"],
         "title": "TaskDependencyResponse"
       },
       "TaskPriority": {
         "type": "string",
-        "enum": [
-          "critical",
-          "urgent",
-          "high",
-          "normal",
-          "low"
-        ],
+        "enum": ["critical", "urgent", "high", "normal", "low"],
         "title": "TaskPriority"
       },
       "TaskResponse": {
@@ -10919,11 +10282,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "to_agent_id",
-          "amount",
-          "reason"
-        ],
+        "required": ["to_agent_id", "amount", "reason"],
         "title": "TransferCreditsDto"
       },
       "TransitionTaskDto": {
@@ -10944,9 +10303,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "status"
-        ],
+        "required": ["status"],
         "title": "TransitionTaskDto"
       },
       "UpdateAgentDto": {
@@ -11068,9 +10425,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "autonomy_level"
-        ],
+        "required": ["autonomy_level"],
         "title": "UpdateAutonomyDto"
       },
       "UpdateCapabilityDto": {
@@ -11080,9 +10435,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "proficiency"
-        ],
+        "required": ["proficiency"],
         "title": "UpdateCapabilityDto"
       },
       "UpdateGitHubConnectionDto": {
@@ -11214,9 +10567,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "status"
-        ],
+        "required": ["status"],
         "title": "UpdateStatusDto"
       },
       "UserInfoResponse": {
@@ -11250,13 +10601,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "org_id",
-          "email",
-          "name",
-          "role"
-        ],
+        "required": ["id", "org_id", "email", "name", "role"],
         "title": "UserInfoResponse"
       },
       "ValidationError": {
@@ -11292,20 +10637,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       },
       "VoteValue": {
         "type": "string",
-        "enum": [
-          "APPROVE",
-          "REJECT",
-          "ABSTAIN"
-        ],
+        "enum": ["APPROVE", "REJECT", "ABSTAIN"],
         "title": "VoteValue"
       },
       "app__artifacts__schemas__SubscribeDto": {
@@ -11329,9 +10666,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "artifact_type"
-        ],
+        "required": ["artifact_type"],
         "title": "SubscribeDto"
       },
       "app__coordination__schemas__SubscribeDto": {
@@ -11354,9 +10689,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "event_pattern"
-        ],
+        "required": ["event_pattern"],
         "title": "SubscribeDto"
       }
     }

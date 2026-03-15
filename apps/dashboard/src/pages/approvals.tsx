@@ -149,11 +149,7 @@ export function ApprovalsPage() {
 
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total" value={total} icon={ShieldCheck} />
-        <StatCard
-          title="Pending"
-          value={tab === "pending" ? total : "—"}
-          icon={Clock}
-        />
+        <StatCard title="Pending" value={tab === "pending" ? total : "—"} icon={Clock} />
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>

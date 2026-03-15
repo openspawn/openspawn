@@ -9,6 +9,7 @@
 **Tech Stack:** FastAPI, SQLAlchemy async, Alembic, existing emit()/SSE infrastructure
 
 **Verified against codebase:**
+
 - `Task` already has `approval_required`, `approved_by`, `approved_at` — autonomy gate layers on top (both can trigger)
 - `Artifact` has `approved_by`, `approved_at`, `ArtifactStatus.DRAFT`, and `DRAFT → PUBLISHED` in `VALID_STATUS_TRANSITIONS` — all scaffolded but unused
 - `SSEEventType.APPROVAL_REQUESTED` and `APPROVAL_RESOLVED` are declared but unused
@@ -17,6 +18,7 @@
 - `update_artifact_status()` validates `DRAFT → PUBLISHED` but doesn't set `approved_by`/`approved_at` — we'll add that
 
 **Design decisions:**
+
 - Approved `ApprovalRequest` records are **audit-only** — they do NOT grant the agent a bypass token to retry the gated action autonomously. The human/manager who approves the intent should perform the action directly (e.g., transition the task themselves). This avoids callback/replay complexity.
 - `resolved_by` stores a raw UUID with no FK constraint — it's polymorphic (can be an agent UUID from `agents.id` or a user UUID from `users.id`)
 - Authority check for agent approvers uses `requester.level + 2` (org hierarchy), not `autonomy_level + 2` (task config)
@@ -25,28 +27,28 @@
 
 ## File Structure
 
-| File | Responsibility |
-|------|----------------|
-| `app/models/enums.py` | Add `ApprovalStatus`, `ActionType` enums |
-| `app/models/approval.py` | `ApprovalRequest` SQLAlchemy model |
-| `app/models/agent.py` | Add `default_autonomy_level` column |
-| `app/models/task.py` | Add `autonomy_level` column |
-| `app/models/__init__.py` | Register new model + enum exports |
-| `app/autonomy/__init__.py` | Package init |
-| `app/autonomy/gate.py` | Pure gate function + risk registry |
-| `app/approvals/__init__.py` | Package init |
-| `app/approvals/schemas.py` | Pydantic DTOs for approval endpoints |
-| `app/approvals/service.py` | Business logic: create, list, respond |
-| `app/approvals/router.py` | REST endpoints |
-| `app/tasks/service.py` | Add autonomy gate to `transition_task()`, emit event in `approve_task()` |
-| `app/tasks/schemas.py` | Add `autonomy_level` to `CreateTaskDto` + `TaskResponse` |
-| `app/agents/schemas.py` | Add `default_autonomy_level` to DTOs + response |
-| `app/artifacts/router.py` | Conditional DRAFT status in `_publish_one()`, approval fields in `update_artifact_status()` |
-| `app/main.py` | Register approvals router |
-| `app/mcp_server/server.py` | 3 MCP tools |
-| `alembic/versions/0007_add_approvals_autonomy.py` | Migration |
-| `tests/test_autonomy_gate.py` | Gate logic unit tests |
-| `tests/test_approvals_e2e.py` | Full flow E2E test |
+| File                                              | Responsibility                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `app/models/enums.py`                             | Add `ApprovalStatus`, `ActionType` enums                                                    |
+| `app/models/approval.py`                          | `ApprovalRequest` SQLAlchemy model                                                          |
+| `app/models/agent.py`                             | Add `default_autonomy_level` column                                                         |
+| `app/models/task.py`                              | Add `autonomy_level` column                                                                 |
+| `app/models/__init__.py`                          | Register new model + enum exports                                                           |
+| `app/autonomy/__init__.py`                        | Package init                                                                                |
+| `app/autonomy/gate.py`                            | Pure gate function + risk registry                                                          |
+| `app/approvals/__init__.py`                       | Package init                                                                                |
+| `app/approvals/schemas.py`                        | Pydantic DTOs for approval endpoints                                                        |
+| `app/approvals/service.py`                        | Business logic: create, list, respond                                                       |
+| `app/approvals/router.py`                         | REST endpoints                                                                              |
+| `app/tasks/service.py`                            | Add autonomy gate to `transition_task()`, emit event in `approve_task()`                    |
+| `app/tasks/schemas.py`                            | Add `autonomy_level` to `CreateTaskDto` + `TaskResponse`                                    |
+| `app/agents/schemas.py`                           | Add `default_autonomy_level` to DTOs + response                                             |
+| `app/artifacts/router.py`                         | Conditional DRAFT status in `_publish_one()`, approval fields in `update_artifact_status()` |
+| `app/main.py`                                     | Register approvals router                                                                   |
+| `app/mcp_server/server.py`                        | 3 MCP tools                                                                                 |
+| `alembic/versions/0007_add_approvals_autonomy.py` | Migration                                                                                   |
+| `tests/test_autonomy_gate.py`                     | Gate logic unit tests                                                                       |
+| `tests/test_approvals_e2e.py`                     | Full flow E2E test                                                                          |
 
 ---
 
@@ -55,6 +57,7 @@
 ### Task 1: ApprovalStatus and ActionType enums
 
 **Files:**
+
 - Modify: `apps/api/app/models/enums.py`
 
 - [ ] **Step 1: Add enums**
@@ -90,6 +93,7 @@ git commit -m "feat(api): add ApprovalStatus and ActionType enums"
 ### Task 2: Add columns to Agent and Task models
 
 **Files:**
+
 - Modify: `apps/api/app/models/agent.py`
 - Modify: `apps/api/app/models/task.py`
 - Modify: `apps/api/app/agents/schemas.py`
@@ -118,16 +122,19 @@ In `apps/api/app/models/task.py`, after the `approval_required` field:
 In `apps/api/app/agents/schemas.py`:
 
 Add to `CreateAgentDto`:
+
 ```python
     default_autonomy_level: int = Field(default=5, ge=0, le=10)
 ```
 
 Add to `UpdateAgentDto`:
+
 ```python
     default_autonomy_level: int | None = Field(default=None, ge=0, le=10)
 ```
 
 Add to `AgentResponse`:
+
 ```python
     default_autonomy_level: int
 ```
@@ -137,11 +144,13 @@ Add to `AgentResponse`:
 In `apps/api/app/tasks/schemas.py`:
 
 Add to `CreateTaskDto`:
+
 ```python
     autonomy_level: int | None = Field(default=None, ge=0, le=10)
 ```
 
 Add to `TaskResponse`:
+
 ```python
     autonomy_level: int | None
 ```
@@ -162,6 +171,7 @@ git commit -m "feat(api): add autonomy_level to Task and default_autonomy_level 
 ### Task 3: ApprovalRequest model
 
 **Files:**
+
 - Create: `apps/api/app/models/approval.py`
 - Modify: `apps/api/app/models/__init__.py`
 
@@ -240,6 +250,7 @@ git commit -m "feat(api): add ApprovalRequest model"
 ### Task 4: Alembic migration
 
 **Files:**
+
 - Create: `apps/api/alembic/versions/0007_add_approvals_autonomy.py`
 
 - [ ] **Step 1: Write migration**
@@ -353,6 +364,7 @@ git commit -m "feat(api): add approvals + autonomy migration"
 ### Task 5: Pure gate function + risk registry
 
 **Files:**
+
 - Create: `apps/api/app/autonomy/__init__.py` (empty)
 - Create: `apps/api/app/autonomy/gate.py`
 
@@ -418,6 +430,7 @@ git commit -m "feat(api): add autonomy gate function + risk registry"
 ### Task 6: Approval schemas
 
 **Files:**
+
 - Create: `apps/api/app/approvals/__init__.py` (empty)
 - Create: `apps/api/app/approvals/schemas.py`
 
@@ -488,6 +501,7 @@ git commit -m "feat(api): add approval schemas"
 ### Task 7: Approval service
 
 **Files:**
+
 - Create: `apps/api/app/approvals/service.py`
 
 - [ ] **Step 1: Write service**
@@ -703,6 +717,7 @@ git commit -m "feat(api): add approval service with authority checks"
 ### Task 8: Approval REST router
 
 **Files:**
+
 - Create: `apps/api/app/approvals/router.py`
 - Modify: `apps/api/app/main.py`
 
@@ -807,10 +822,13 @@ async def reject(
 - [ ] **Step 2: Register in main.py**
 
 Add after existing router imports:
+
 ```python
 from app.approvals.router import router as approvals_router
 ```
+
 Add after existing `app.include_router` calls:
+
 ```python
 app.include_router(approvals_router)
 ```
@@ -829,6 +847,7 @@ git commit -m "feat(api): add approval REST endpoints"
 ### Task 9: Integrate gate into task transitions
 
 **Files:**
+
 - Modify: `apps/api/app/tasks/service.py`
 
 - [ ] **Step 1: Add autonomy gate to `transition_task()`**
@@ -911,6 +930,7 @@ git commit -m "feat(api): add autonomy gate to task transitions"
 ### Task 10: Integrate gate into artifact publishing
 
 **Files:**
+
 - Modify: `apps/api/app/artifacts/router.py`
 
 - [ ] **Step 1: Rewrite `_publish_one()` with gate logic**
@@ -1071,6 +1091,7 @@ async def publish_artifact(
 - [ ] **Step 3: Update `publish_batch()` to handle new signature**
 
 Update the unpacking in the batch loop:
+
 ```python
     for dto in dtos:
         artifact, is_new, _approval_id = await _publish_one(db, dto, auth.org_id, auth.id, auth)
@@ -1118,6 +1139,7 @@ git commit -m "feat(api): add autonomy gate to artifact publishing"
 ### Task 11: Add 3 MCP tools
 
 **Files:**
+
 - Modify: `apps/api/app/mcp_server/server.py`
 
 - [ ] **Step 1: Add tools**
@@ -1205,11 +1227,13 @@ git commit -m "feat(api): add 3 autonomy dial MCP tools"
 ### Task 12: Gate logic unit tests
 
 **Files:**
+
 - Create: `apps/api/tests/test_autonomy_gate.py`
 
 - [ ] **Step 1: Write tests**
 
 Test `is_gated()`:
+
 - `autonomy=5, risk=3` → not gated
 - `autonomy=5, risk=5` → not gated (equal = allowed)
 - `autonomy=5, risk=6` → gated
@@ -1217,11 +1241,13 @@ Test `is_gated()`:
 - `autonomy=10, risk=10` → not gated (nothing gated)
 
 Test `resolve_effective_autonomy()`:
+
 - `task=None, agent=5` → 5 (inherit)
 - `task=3, agent=5` → 3 (task override)
 - `task=8, agent=5` → 8 (task can raise too)
 
 Test `get_risk_level()`:
+
 - `("task_transition", "done")` → 3
 - `("artifact_publish", "migration")` → 9
 - `("unknown", "action")` → 5 (default)
@@ -1240,6 +1266,7 @@ git commit -m "test(api): add autonomy gate unit tests"
 ### Task 13: End-to-end approval test
 
 **Files:**
+
 - Create: `apps/api/tests/test_approvals_e2e.py`
 
 - [ ] **Step 1: Write E2E test**
@@ -1274,6 +1301,7 @@ def as_agent(app, agent_id, org_id, name, level, agent_id_str="test-agent"):
 ```
 
 Scenario:
+
 1. Create org, 2 agents (worker: level=3, default_autonomy_level=3; manager: level=8), task
 2. **As worker**: attempt `task_transition` to `done` (risk=3, autonomy=3) → 200 (3 is not > 3)
 3. Reset task to `in_progress`

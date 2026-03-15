@@ -229,9 +229,7 @@ function TaskDetailSidebar({ task, onClose, agentMap }: TaskDetailSidebarProps) 
               </span>
             </div>
             <AutonomySlider taskId={task.id} currentLevel={task.autonomyLevel ?? null} />
-            <p className="text-xs text-muted-foreground">
-              0 = full oversight · 10 = full autonomy
-            </p>
+            <p className="text-xs text-muted-foreground">0 = full oversight · 10 = full autonomy</p>
           </div>
 
           {/* Live Activity Stream (sandbox mode) */}

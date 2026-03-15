@@ -11,6 +11,7 @@
 **Core hypothesis:** Can the Artifact Bus (#665) be reimplemented as a projection over coordination events? The `artifact_view` projection answers this.
 
 **Verified against codebase:**
+
 - Column types: `CompatUUID()` for FKs, `UUIDPrimaryKeyMixin` + `TimestampMixin` for models
 - emit() returns `None` — service queries by entity_id after emit
 - MCP tools call REST via `ApiClient` (not direct DB) — REST endpoints are required
@@ -22,21 +23,21 @@
 
 ## File Structure
 
-| File | Responsibility |
-|------|----------------|
-| `app/models/enums.py` | Extended SSEEventType with coordination event types |
-| `app/models/event_subscription.py` | EventSubscription SQLAlchemy model |
-| `app/models/__init__.py` | Register new model |
-| `app/coordination/__init__.py` | Package init |
-| `app/coordination/schemas.py` | Pydantic DTOs |
-| `app/coordination/projections.py` | 3 projections: component_registry, test_coverage, artifact_view |
-| `app/coordination/service.py` | Business logic: emit, subscribe, replay, project |
-| `app/coordination/router.py` | REST endpoints (required for MCP ApiClient) |
-| `app/main.py` | Register coordination router |
-| `app/mcp_server/server.py` | 4 MCP tools calling REST via ApiClient |
-| `alembic/versions/0006_add_event_subscriptions.py` | Migration |
-| `tests/test_projections.py` | Projection unit tests (mock Events, no DB) |
-| `tests/test_event_mesh_e2e.py` | Full DoD scenario test |
+| File                                               | Responsibility                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| `app/models/enums.py`                              | Extended SSEEventType with coordination event types             |
+| `app/models/event_subscription.py`                 | EventSubscription SQLAlchemy model                              |
+| `app/models/__init__.py`                           | Register new model                                              |
+| `app/coordination/__init__.py`                     | Package init                                                    |
+| `app/coordination/schemas.py`                      | Pydantic DTOs                                                   |
+| `app/coordination/projections.py`                  | 3 projections: component_registry, test_coverage, artifact_view |
+| `app/coordination/service.py`                      | Business logic: emit, subscribe, replay, project                |
+| `app/coordination/router.py`                       | REST endpoints (required for MCP ApiClient)                     |
+| `app/main.py`                                      | Register coordination router                                    |
+| `app/mcp_server/server.py`                         | 4 MCP tools calling REST via ApiClient                          |
+| `alembic/versions/0006_add_event_subscriptions.py` | Migration                                                       |
+| `tests/test_projections.py`                        | Projection unit tests (mock Events, no DB)                      |
+| `tests/test_event_mesh_e2e.py`                     | Full DoD scenario test                                          |
 
 ---
 
@@ -45,6 +46,7 @@
 ### Task 1: CoordinationEventType enum
 
 **Files:**
+
 - Modify: `apps/api/app/models/enums.py`
 
 - [ ] **Step 1: Add coordination event types to SSEEventType**
@@ -81,6 +83,7 @@ git commit -m "feat(api): add coordination event types to SSEEventType enum"
 ### Task 2: EventSubscription model
 
 **Files:**
+
 - Create: `apps/api/app/models/event_subscription.py`
 - Modify: `apps/api/app/models/__init__.py`
 
@@ -136,6 +139,7 @@ git commit -m "feat(api): add EventSubscription model"
 ### Task 3: Alembic migration
 
 **Files:**
+
 - Create: `apps/api/alembic/versions/0006_add_event_subscriptions.py`
 
 - [ ] **Step 1: Generate migration**
@@ -164,6 +168,7 @@ git commit -m "feat(api): add event_subscriptions migration"
 ### Task 4: Schemas + package init
 
 **Files:**
+
 - Create: `apps/api/app/coordination/__init__.py` (empty)
 - Create: `apps/api/app/coordination/schemas.py`
 
@@ -217,6 +222,7 @@ git commit -m "feat(api): add coordination schemas"
 ### Task 5: Projections (3 functions including artifact_view)
 
 **Files:**
+
 - Create: `apps/api/app/coordination/projections.py`
 
 - [ ] **Step 1: Write 3 projection functions**
@@ -368,6 +374,7 @@ git commit -m "feat(api): add 3 projections including artifact_view hypothesis t
 ### Task 6: Service layer
 
 **Files:**
+
 - Create: `apps/api/app/coordination/service.py`
 
 Key design: uses `entity_id = task_id` for all coordination events (SQLite compatible). emit() returns None, so we don't try to return the Event object — just return success.
@@ -539,6 +546,7 @@ git commit -m "feat(api): add coordination service (SQLite compatible, entity_id
 ### Task 7: REST router + registration
 
 **Files:**
+
 - Create: `apps/api/app/coordination/router.py`
 - Modify: `apps/api/app/main.py`
 
@@ -629,6 +637,7 @@ async def project(
 - [ ] **Step 2: Register in main.py**
 
 Add after existing routers:
+
 ```python
 from app.coordination.router import router as coordination_router
 # ... in router registration section:
@@ -649,6 +658,7 @@ git commit -m "feat(api): add coordination REST endpoints"
 ### Task 8: Add 4 MCP tools
 
 **Files:**
+
 - Modify: `apps/api/app/mcp_server/server.py`
 
 MCP tools call REST endpoints via `_get_client()` — matching the `artifact_*` tool pattern exactly.
@@ -732,6 +742,7 @@ git commit -m "feat(api): add 4 coordination MCP tools via ApiClient"
 ### Task 9: Projection unit tests
 
 **Files:**
+
 - Create: `apps/api/tests/test_projections.py`
 
 - [ ] **Step 1: Write tests**
@@ -739,17 +750,20 @@ git commit -m "feat(api): add 4 coordination MCP tools via ApiClient"
 Test all 3 projections with mock Event objects (no DB needed). Create simple Event-like objects with `type`, `data`, `actor_id`, `created_at` attributes.
 
 **component_registry tests:**
+
 - Empty events → `count: 0`
 - Single `component.created` → component appears, `version: 1`
 - `component.created` + `component.updated` same name → `version: 2`, fields merged
 - Non-component events ignored
 
 **test_coverage tests:**
+
 - `component.created` alone → `has_tests: False`, `coverage_ratio: 0`
 - `component.created` + `test.written` referencing it → `has_tests: True`, `coverage_ratio: 1.0`
 - 2 components, 1 tested → `coverage_ratio: 0.5`
 
 **artifact_view tests (hypothesis):**
+
 - `component.created` → artifact with `artifact_type: "component"`, `version: 1`, `status: "published"`
 - `component.created` + `component.updated` → `version: 2`, content updated
 - `test.written` → `artifact_type: "test_plan"`
@@ -771,6 +785,7 @@ git commit -m "test(api): add projection unit tests including artifact_view hypo
 ### Task 10: End-to-end spike test
 
 **Files:**
+
 - Create: `apps/api/tests/test_event_mesh_e2e.py`
 
 Uses the same fixture pattern as `test_artifact_integration.py`: create org+agents+task via direct DB, `AUTH_MODE=none`.
@@ -856,6 +871,7 @@ Document whether the hypothesis held: can artifacts be derived as projections ov
 - [ ] **Step 1: Write findings**
 
 Create `docs/openspawn/spikes/2026-03-14-event-mesh-findings.md` with:
+
 - Hypothesis: artifacts as projections over events
 - Result: artifact_view projection output vs Artifact Bus output
 - Trade-offs: event sourcing vs direct artifact storage
