@@ -172,20 +172,20 @@ Per-task autonomy level (0-10) controls how much human oversight agents receive.
 
 107+ REST endpoints organized by domain:
 
-| Prefix           | Domain                          | Count |
-| ---------------- | ------------------------------- | ----- |
-| `/auth/*`        | Login, register, tokens         | 8     |
-| `/agents/*`      | Agent CRUD, hierarchy, trust    | 15    |
-| `/tasks/*`       | Task CRUD, transitions, deps    | 15    |
-| `/credits/*`     | Balance, spend, history, rates  | 8     |
-| `/messages/*`    | Channels, send, read            | 5     |
-| `/artifacts/*`   | Publish, subscribe, status      | 8     |
-| `/events/*`      | Event log, SSE stream           | 4     |
-| `/integrations/*`| GitHub, Linear webhooks         | 6     |
-| `/memory/*`      | Store, search, graph            | 10    |
-| `/coordination/*`| Emit, subscribe, replay, project| 4     |
-| `/approvals/*`   | List, approve, reject           | 5     |
-| `/health*`       | Health checks                   | 2     |
+| Prefix            | Domain                           | Count |
+| ----------------- | -------------------------------- | ----- |
+| `/auth/*`         | Login, register, tokens          | 8     |
+| `/agents/*`       | Agent CRUD, hierarchy, trust     | 15    |
+| `/tasks/*`        | Task CRUD, transitions, deps     | 15    |
+| `/credits/*`      | Balance, spend, history, rates   | 8     |
+| `/messages/*`     | Channels, send, read             | 5     |
+| `/artifacts/*`    | Publish, subscribe, status       | 8     |
+| `/events/*`       | Event log, SSE stream            | 4     |
+| `/integrations/*` | GitHub, Linear webhooks          | 6     |
+| `/memory/*`       | Store, search, graph             | 10    |
+| `/coordination/*` | Emit, subscribe, replay, project | 4     |
+| `/approvals/*`    | List, approve, reject            | 5     |
+| `/health*`        | Health checks                    | 2     |
 
 MCP tools (45 total) call these REST endpoints via `ApiClient` — not direct DB access.
 

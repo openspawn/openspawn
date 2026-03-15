@@ -23,6 +23,7 @@ export type Task = {
   completedAt?: string | null;
   source?: string | null;
   approvalRequired?: boolean;
+  autonomyLevel?: number | null;
   rejection?: TaskRejection | null;
 };
 

@@ -36,6 +36,10 @@ class TransitionTaskDto(BaseModel):
     reason: str | None = None
 
 
+class UpdateAutonomyDto(BaseModel):
+    autonomy_level: int | None = Field(ge=0, le=10)
+
+
 class AssignTaskDto(BaseModel):
     assignee_id: uuid.UUID
 
