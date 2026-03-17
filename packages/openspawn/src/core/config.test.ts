@@ -35,7 +35,7 @@ describe("parseConfig", () => {
       },
       budget: { perAgentLimit: 50 },
     };
-    writeFileSync(join(dir, "openspawn.config.json"), JSON.stringify(partial), "utf-8");
+    writeFileSync(join(dir, "openspawn.json"), JSON.stringify(partial), "utf-8");
 
     const config = parseConfig(dir);
 
@@ -60,7 +60,7 @@ describe("parseConfig", () => {
         values: [OrgValue.Speed, OrgValue.Rigor],
       },
     };
-    writeFileSync(join(dir, "openspawn.config.json"), JSON.stringify(partial), "utf-8");
+    writeFileSync(join(dir, "openspawn.json"), JSON.stringify(partial), "utf-8");
 
     const config = parseConfig(dir);
     expect(config.alignment.values).toEqual([OrgValue.Speed, OrgValue.Rigor]);
@@ -71,7 +71,7 @@ describe("writeConfig", () => {
   it("writes config to file correctly", () => {
     writeConfig(dir, defaultConfig);
 
-    const raw = readFileSync(join(dir, "openspawn.config.json"), "utf-8");
+    const raw = readFileSync(join(dir, "openspawn.json"), "utf-8");
     const parsed: unknown = JSON.parse(raw);
     expect(parsed).toEqual(defaultConfig);
   });

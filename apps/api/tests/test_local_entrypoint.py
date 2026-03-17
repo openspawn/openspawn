@@ -14,14 +14,14 @@ def test_build_local_config_defaults(tmp_path: Path) -> None:
 
 
 def test_build_local_config_custom_port(tmp_path: Path) -> None:
-    config_file = tmp_path / "openspawn.config.json"
+    config_file = tmp_path / "openspawn.json"
     config_file.write_text(json.dumps({"coordinator": {"port": 9999}}))
     config = build_local_config(str(tmp_path))
     assert config["port"] == 9999
 
 
 def test_build_local_config_custom_org_file(tmp_path: Path) -> None:
-    config_file = tmp_path / "openspawn.config.json"
+    config_file = tmp_path / "openspawn.json"
     config_file.write_text(json.dumps({"orgFile": "team/AGENTS.md"}))
     config = build_local_config(str(tmp_path))
     assert str(config["org_file"]).endswith("team/AGENTS.md")

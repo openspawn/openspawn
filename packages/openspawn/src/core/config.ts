@@ -11,7 +11,7 @@ import {
   BootstrapMode,
 } from "./types.js";
 
-const CONFIG_FILENAME = "openspawn.config.json";
+const CONFIG_FILENAME = "openspawn.json";
 
 export const defaultConfig: OpenSpawnConfig = {
   orgFile: "ORG.md",

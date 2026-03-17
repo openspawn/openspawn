@@ -16,11 +16,11 @@ describe("init scaffold", () => {
     expect(org).toContain("# My Agent Team");
   });
 
-  it("creates openspawn.config.json", () => {
+  it("creates openspawn.json", () => {
     const dir = mkdtempSync(join(tmpdir(), "os-init-"));
     scaffold(dir, defaultAnswers());
-    expect(existsSync(join(dir, "openspawn.config.json"))).toBe(true);
-    const raw = JSON.parse(readFileSync(join(dir, "openspawn.config.json"), "utf-8"));
+    expect(existsSync(join(dir, "openspawn.json"))).toBe(true);
+    const raw = JSON.parse(readFileSync(join(dir, "openspawn.json"), "utf-8"));
     expect(raw.coordinator.port).toBe(8787);
   });
 
