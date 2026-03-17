@@ -41,6 +41,7 @@ export interface WizardAnswers {
   escalationBehavior: EscalationBehavior;
   port: number;
   deploy: boolean;
+  customizedAlignment: boolean;
 }
 
 export interface InitFlags {
@@ -68,6 +69,7 @@ export function defaultAnswers(): WizardAnswers {
     escalationBehavior: EscalationBehavior.Immediate,
     port: 8787,
     deploy: false,
+    customizedAlignment: false,
   };
 }
 
@@ -113,19 +115,32 @@ export async function runWizard(): Promise<WizardAnswers> {
   while (true) {
     const answers = await collectAnswers();
 
-    // Confirmation summary
-    const summary = [
-      `Template:    ${answers.templateName}`,
-      `Org name:    ${answers.orgName}`,
-      `Culture:     ${answers.culturePreset}`,
-      `LLM:         ${answers.llmProvider} (${answers.defaultModel})`,
-      `Budget:      $${answers.budgetLimit}/period, alert at ${answers.alertThreshold * 100}%`,
-      `Escalation:  ${answers.escalationBehavior}`,
-      `Port:        ${answers.port}`,
-      `Docker:      ${answers.deploy ? "yes" : "no"}`,
-    ].join("\n");
+    const tpl = getTemplate(answers.templateName);
+    const templateDisplay = tpl ? `${tpl.emoji} ${tpl.label}` : answers.templateName;
 
-    note(summary, "Configuration Summary");
+    const lines = [
+      `Template:  ${templateDisplay}`,
+      `Org name:  ${answers.orgName}`,
+      `LLM:       ${answers.llmProvider}`,
+      `  Default: ${answers.defaultModel} (L1\u2013L6)`,
+      `  Senior:  ${answers.seniorModel} (L7+)`,
+      `Budget:    ${answers.budgetLimit} credits/week`,
+      `Port:      ${answers.port}`,
+      `Docker:    ${answers.deploy ? "yes" : "no"}`,
+    ];
+
+    if (answers.customizedAlignment) {
+      const missionPreview =
+        answers.mission.length > 60 ? `${answers.mission.slice(0, 60)}\u2026` : answers.mission;
+      lines.splice(
+        2,
+        0,
+        `Mission:   ${missionPreview}`,
+        `Values:    ${answers.values.length} selected`,
+      );
+    }
+
+    note(lines.join("\n"), "Configuration Summary");
 
     const ok = exitOnCancel(await confirm({ message: "Proceed with this configuration?" }));
 
@@ -138,29 +153,42 @@ export async function runWizard(): Promise<WizardAnswers> {
   }
 }
 
+// ── Prompt collection ────────────────────────────────────────────────────────
+
 async function collectAnswers(): Promise<WizardAnswers> {
   const defaults = defaultAnswers();
   const templates = listTemplates();
 
-  // ── Step 1: Template ─────────────────────────────────────────────────────
-  const generalOptions = templates
-    .filter((t) => t.category === "general")
-    .map((t) => ({ value: t.name, label: `${t.emoji} ${t.label}`, hint: t.description }));
+  // ── Step 1 of 3: Organization ─────────────────────────────────────────────
 
-  const industryOptions = templates
-    .filter((t) => t.category === "industry")
-    .map((t) => ({ value: t.name, label: `${t.emoji} ${t.label}`, hint: t.description }));
+  note(
+    "Pick a starting template for your agent team. Each template\n" +
+      "defines agent roles, hierarchy, and coordination policies.\n" +
+      "You can customize everything in ORG.md later.",
+    "Step 1 of 3 \u00B7 Organization",
+  );
 
-  // Use groupMultiselect-style by showing all in one select
-  const allOptions = [
-    ...generalOptions.map((o) => ({ ...o, hint: `General — ${o.hint}` })),
-    ...industryOptions.map((o) => ({ ...o, hint: `Industry — ${o.hint}` })),
+  const templateOptions = [
+    ...templates
+      .filter((t) => t.category === "general")
+      .map((t) => ({
+        value: t.name,
+        label: `${t.emoji} ${t.label}`,
+        hint: `General \u00B7 ${t.description}`,
+      })),
+    ...templates
+      .filter((t) => t.category === "industry")
+      .map((t) => ({
+        value: t.name,
+        label: `${t.emoji} ${t.label}`,
+        hint: `Industry \u00B7 ${t.description}`,
+      })),
   ];
 
   const templateName = exitOnCancel(
     await select({
-      message: "Choose an org template",
-      options: allOptions,
+      message: "Choose a starting template",
+      options: templateOptions,
       initialValue: defaults.templateName,
     }),
   );
@@ -168,7 +196,6 @@ async function collectAnswers(): Promise<WizardAnswers> {
   const selectedTemplate = getTemplate(templateName);
   const templateCulture = selectedTemplate?.culturePreset ?? CulturePreset.Agency;
 
-  // ── Step 2: Org name ─────────────────────────────────────────────────────
   const orgName = exitOnCancel(
     await text({
       message: "Organization name",
@@ -177,70 +204,36 @@ async function collectAnswers(): Promise<WizardAnswers> {
     }),
   );
 
-  // ── Step 3: Alignment ────────────────────────────────────────────────────
-  const mission = exitOnCancel(
-    await text({
-      message: "Mission statement",
-      defaultValue: defaults.mission,
-      placeholder: defaults.mission,
-    }),
+  // ── Step 2 of 3: AI Models ────────────────────────────────────────────────
+
+  note(
+    "Which LLM powers your agents. Lower-level agents (L1\u2013L6)\n" +
+      "use the default model. Leads and execs (L7+) use a more\n" +
+      "capable model for reasoning and delegation.",
+    "Step 2 of 3 \u00B7 AI Models",
   );
 
-  const vision = exitOnCancel(
-    await text({
-      message: "Vision statement",
-      defaultValue: defaults.vision,
-      placeholder: defaults.vision,
-    }),
-  );
-
-  const valueOptions = VALUE_DEFINITIONS.map((v) => ({
-    value: v.value,
-    label: v.label,
-    hint: v.description,
-  }));
-
-  const selectedValues = exitOnCancel(
-    await multiselect({
-      message: "Select organizational values",
-      options: valueOptions,
-      initialValues: defaults.values,
-      required: true,
-    }),
-  );
-
-  // Show conflict warnings
-  const conflicts = getConflicts(selectedValues);
-  for (const conflict of conflicts) {
-    log.warn(conflict);
-  }
-
-  const countWarning = formatValueWarning(selectedValues.length);
-  if (countWarning) {
-    log.warn(countWarning);
-  }
-
-  // ── Step 4: Culture ──────────────────────────────────────────────────────
-  const culturePreset = exitOnCancel(
-    await select({
-      message: "Culture preset",
-      options: Object.values(CulturePreset).map((p) => ({ value: p, label: p })),
-      initialValue: templateCulture,
-    }),
-  );
-
-  // ── Step 5: LLM ──────────────────────────────────────────────────────────
   const llmProvider = exitOnCancel(
     await select({
       message: "LLM provider",
-      options: Object.values(LlmProvider).map((p) => ({ value: p, label: p })),
+      options: [
+        { value: LlmProvider.Anthropic, label: "Anthropic", hint: "Claude models via API" },
+        { value: LlmProvider.OpenAI, label: "OpenAI", hint: "GPT models via API" },
+        { value: LlmProvider.Ollama, label: "Ollama", hint: "Local models, free, no API key" },
+        { value: LlmProvider.Groq, label: "Groq", hint: "Fast inference, Llama / Mixtral" },
+        {
+          value: LlmProvider.OpenRouter,
+          label: "OpenRouter",
+          hint: "Multi-provider gateway",
+        },
+      ],
       initialValue: defaults.llmProvider,
     }),
   );
 
   const defaultModel = exitOnCancel(
     await text({
-      message: "Default model",
+      message: "Default model (L1\u2013L6 agents)",
       defaultValue: defaults.defaultModel,
       placeholder: defaults.defaultModel,
     }),
@@ -248,57 +241,19 @@ async function collectAnswers(): Promise<WizardAnswers> {
 
   const seniorModel = exitOnCancel(
     await text({
-      message: "Senior model (complex reasoning)",
+      message: "Senior model (L7+ leads & execs)",
       defaultValue: defaults.seniorModel,
       placeholder: defaults.seniorModel,
     }),
   );
 
-  // ── Step 6: Budget ───────────────────────────────────────────────────────
-  const budgetLimitStr = exitOnCancel(
-    await text({
-      message: "Per-agent budget limit (credits/period)",
-      defaultValue: String(defaults.budgetLimit),
-      placeholder: "500",
-      validate: (v) => {
-        const n = Number(v);
-        if (Number.isNaN(n) || n <= 0) return "Must be a positive number";
-        return undefined;
-      },
-    }),
+  // ── Step 3 of 3: Infrastructure ───────────────────────────────────────────
+
+  note(
+    "Local coordinator settings. You can change these\n" + "anytime in openspawn.json.",
+    "Step 3 of 3 \u00B7 Infrastructure",
   );
 
-  const alertThresholdStr = exitOnCancel(
-    await text({
-      message: "Alert threshold (0.0 - 1.0)",
-      defaultValue: String(defaults.alertThreshold),
-      placeholder: "0.8",
-      validate: (v) => {
-        const n = Number(v);
-        if (Number.isNaN(n) || n < 0 || n > 1) return "Must be between 0 and 1";
-        return undefined;
-      },
-    }),
-  );
-
-  const overageBehavior = exitOnCancel(
-    await select({
-      message: "Overage behavior",
-      options: Object.values(OverageBehavior).map((b) => ({ value: b, label: b })),
-      initialValue: defaults.overageBehavior,
-    }),
-  );
-
-  // ── Step 7: Escalation ───────────────────────────────────────────────────
-  const escalationBehavior = exitOnCancel(
-    await select({
-      message: "Escalation behavior",
-      options: Object.values(EscalationBehavior).map((b) => ({ value: b, label: b })),
-      initialValue: defaults.escalationBehavior,
-    }),
-  );
-
-  // ── Step 8: Infrastructure ───────────────────────────────────────────────
   const portStr = exitOnCancel(
     await text({
       message: "Coordinator port",
@@ -306,7 +261,8 @@ async function collectAnswers(): Promise<WizardAnswers> {
       placeholder: "8787",
       validate: (v) => {
         const n = Number(v);
-        if (!Number.isInteger(n) || n < 1 || n > 65535) return "Must be a valid port (1-65535)";
+        if (!Number.isInteger(n) || n < 1 || n > 65535)
+          return "Must be a valid port (1\u201365535)";
         return undefined;
       },
     }),
@@ -319,21 +275,114 @@ async function collectAnswers(): Promise<WizardAnswers> {
     }),
   );
 
+  // ── Optional: Customize alignment & budget ────────────────────────────────
+
+  const customize = exitOnCancel(
+    await confirm({
+      message: "Customize alignment & budget? (template defaults are good to start)",
+      initialValue: false,
+    }),
+  );
+
+  let mission = defaults.mission;
+  let vision = defaults.vision;
+  let selectedValues = [...defaults.values];
+  let budgetLimit = defaults.budgetLimit;
+  let customizedAlignment = false;
+
+  if (customize) {
+    customizedAlignment = true;
+
+    // ── Optional · Alignment ──────────────────────────────────────────────
+
+    note(
+      "Alignment shapes how agents decide when unsupervised.\n" +
+        "Mission and vision are injected into every agent's system\n" +
+        "prompt \u2014 keep them short and actionable.",
+      "Optional \u00B7 Alignment",
+    );
+
+    mission = exitOnCancel(
+      await text({
+        message: "Mission \u2014 what should your agents optimize for?",
+        defaultValue: defaults.mission,
+        placeholder: defaults.mission,
+      }),
+    );
+
+    vision = exitOnCancel(
+      await text({
+        message: "Vision \u2014 what does success look like?",
+        defaultValue: defaults.vision,
+        placeholder: defaults.vision,
+      }),
+    );
+
+    const valueOptions = VALUE_DEFINITIONS.map((v) => ({
+      value: v.value,
+      label: v.label,
+      hint: v.description,
+    }));
+
+    selectedValues = exitOnCancel(
+      await multiselect({
+        message: "Organizational values (injected into agent prompts)",
+        options: valueOptions,
+        initialValues: defaults.values,
+        required: true,
+      }),
+    );
+
+    const conflicts = getConflicts(selectedValues);
+    for (const conflict of conflicts) {
+      log.warn(conflict);
+    }
+
+    const countWarning = formatValueWarning(selectedValues.length);
+    if (countWarning) {
+      log.warn(countWarning);
+    }
+
+    // ── Optional · Budget ─────────────────────────────────────────────────
+
+    note(
+      "Each agent gets a credit limit per billing period. When\n" +
+        "an agent hits the limit, work pauses until approved.",
+      "Optional \u00B7 Budget",
+    );
+
+    const budgetLimitStr = exitOnCancel(
+      await text({
+        message: "Per-agent budget limit (credits/week)",
+        defaultValue: String(defaults.budgetLimit),
+        placeholder: "500",
+        validate: (v) => {
+          const n = Number(v);
+          if (Number.isNaN(n) || n <= 0) return "Must be a positive number";
+          return undefined;
+        },
+      }),
+    );
+
+    budgetLimit = Number(budgetLimitStr);
+  }
+
   return {
     templateName,
     orgName,
     mission,
     vision,
     values: selectedValues,
-    culturePreset,
+    culturePreset: templateCulture,
     llmProvider,
     defaultModel,
     seniorModel,
-    budgetLimit: Number(budgetLimitStr),
-    alertThreshold: Number(alertThresholdStr),
-    overageBehavior,
-    escalationBehavior,
+    budgetLimit,
+    alertThreshold: defaults.alertThreshold,
+    overageBehavior: defaults.overageBehavior,
+    escalationBehavior: defaults.escalationBehavior,
     port: Number(portStr),
     deploy,
+    customizedAlignment,
   };
 }

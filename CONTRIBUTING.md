@@ -55,6 +55,12 @@ cd apps/api && uv sync && cd ../..        # Python API dependencies
 pnpm test
 ```
 
+**Preview your org (simulation, no API keys needed):**
+
+```bash
+npx openspawn preview # launches sandbox + dashboard at localhost:3333
+```
+
 **Running the coordinator locally:**
 
 ```bash

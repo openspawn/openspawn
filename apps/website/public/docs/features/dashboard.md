@@ -9,7 +9,7 @@ generated: 2026-03-14
 
 Real-time React dashboard with network graph, task timeline, cost charts, and agent monitoring. 💡 See it live at bikinibottom.ai The dashboard starts automatically when you run
 
-npx openspawn start. It provides:
+npx openspawn preview (simulation) or npx openspawn start (real coordinator). It provides:
 
 Agent network graph — Visualize the org hierarchy and active connections
 

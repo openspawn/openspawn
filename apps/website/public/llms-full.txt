@@ -772,7 +772,7 @@ See `templates/boot-sequence.md` for the full protocol, `templates/SOUL-lead.md`
 ## Next steps
 
 - **Customize your ORG.md:** add agents, change levels, write playbooks — see [`docs/org-md-reference.md`](./org-md-reference.md)
-- **Connect real models:** set Ollama/Groq/OpenRouter keys in `openspawn.config.json`
+- **Connect real models:** set Ollama/Groq/OpenRouter keys in `openspawn.json`
 - **All MCP tools:** [`docs/mcp-reference.md`](./mcp-reference.md) — full parameter reference
 - **Communication rules:** [`docs/communication-protocol.md`](./communication-protocol.md) — save 50-70% on coordination tokens
 - **Template deep dive:** [`docs/templates-guide.md`](./templates-guide.md) — all 7 industry templates
@@ -918,7 +918,7 @@ This creates:
 ```
 my-org/
 ├── ORG.md                  # Your org definition (the important one)
-├── openspawn.config.json   # Server config (port, model providers)
+├── openspawn.json   # Server config (port, model providers)
 └── .gitignore
 ```
 
@@ -1050,7 +1050,7 @@ Opens the dashboard at http://localhost:3333. You'll see:
 > lsof -i :3333
 > kill <PID>
 >
-> # Option 2: Change port in openspawn.config.json
+> # Option 2: Change port in openspawn.json
 > { "port": 3334 }
 > ```
 
@@ -1113,7 +1113,7 @@ Reviews completed onboarding configurations for errors before go-live.
 
 ## Step 8 — Connect real models (optional)
 
-Edit `openspawn.config.json`:
+Edit `openspawn.json`:
 
 ```json
 {
@@ -3203,7 +3203,7 @@ openspawn preview       # Try again
 
 **Fix option 2 — Change the port:**
 ```json
-// openspawn.config.json
+// openspawn.json
 {
   "port": 3334
 }
@@ -3345,7 +3345,7 @@ openspawn preview                    # Start it if not
 
 **Common causes:**
 - Server isn't running — run `openspawn preview`
-- Wrong port — check `openspawn.config.json`
+- Wrong port — check `openspawn.json`
 - Firewall blocking — check network rules if running remotely
 
 ---

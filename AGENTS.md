@@ -48,6 +48,7 @@ pnpm install                                              # Install
 cd apps/api && uv run uvicorn app.main:app --reload       # Dev (FastAPI)
 pnpm run dev:sandbox                                      # Dev (Sandbox + Dashboard)
 npx openspawn init                                        # CLI — scaffold project
+npx openspawn preview                                     # CLI — preview org in local sandbox
 npx openspawn start                                       # CLI — start coordinator
 pnpm exec nx run-many -t build                            # Build
 pnpm exec nx test dashboard                                # Unit tests
@@ -76,10 +77,11 @@ cd apps/api && uv run alembic upgrade head                # Database migrations
 1. **Sandbox server** (`tools/sandbox/`) hosts the REST/SSE API and serves pre-built dashboards
 2. **Dashboard** (`apps/dashboard/`) serves both openspawn.ai and bikinibottom.ai (via `VITE_DASHBOARD_THEME` + `VITE_SANDBOX_MODE` env vars)
 3. **API** (`apps/api/`) manages tasks, credits, messages, MCP tools, and agent spawning (FastAPI + SQLAlchemy)
-4. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
-5. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
-6. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
-7. **Docker** builds dashboard + team + website, serves all via sandbox server on VPS (Tier 2 only)
+4. **Preview mode** — `openspawn preview` launches the sandbox simulation + dashboard at `localhost:3333` (deterministic, zero LLM calls)
+5. **Agent spawning** — `openspawn start` launches the Python coordinator which spawns Claude Code CLI subprocesses with a configurable concurrency cap
+6. **Two-tier model** — Tier 1 (local): SQLite + asyncio scheduler, no Docker needed. Tier 2 (deployed): PostgreSQL + arq/Redis + Docker
+7. **Demo mode** simulates everything client-side (no backend needed) via `libs/demo-data/`
+8. **Docker** builds dashboard + team + website, serves all via sandbox server on VPS (Tier 2 only)
 
 Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 

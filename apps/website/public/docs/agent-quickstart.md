@@ -8,8 +8,8 @@ generated: 2026-03-14
 ```
 openspawn init my-org --template=assistant-team --yes
 cd my-org
+openspawn preview
 openspawn start
-openspawn status
 ```
 
 You are an AI agent that needs to coordinate other agents. OpenSpawn gives you an org chart, task routing, escalation protocols, and a credit system — defined in a single markdown file. Three commands to a running org That's it. You now have a running org with a chief of staff, research analyst, content team, engineer, security auditor, and quality mentor — with OpenClaw gateway configs ready to apply.
@@ -351,7 +351,7 @@ openclaw gateway status — ensure gateway is running
 
 ERR_HMAC_INVALID Check AGENT_SECRET env var matches the value in
 
-openspawn.config.json. Regenerate with
+openspawn.json. Regenerate with
 
 ## Next steps
 

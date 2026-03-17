@@ -27,7 +27,7 @@ Patrick Lencioni draws a useful distinction between _core_ values (non-negotiabl
 
 ## How values work
 
-Values are stored in `openspawn.config.json` under the `alignment` key:
+Values are stored in `openspawn.json` under the `alignment` key:
 
 ```json
 {
@@ -39,7 +39,7 @@ Values are stored in `openspawn.config.json` under the `alignment` key:
 
 During org boot, each value is expanded into a short directive (~50 tokens) and injected into every agent's SOUL.md. The directives are deliberately terse — they set behavioral defaults without consuming significant context window.
 
-To change values: edit `openspawn.config.json` directly, or re-run `openspawn init` and select different values in the wizard.
+To change values: edit `openspawn.json` directly, or re-run `openspawn init` and select different values in the wizard.
 
 ---
 
@@ -201,7 +201,7 @@ Each template ships with values tuned to its domain:
 
 > **Q: Can I override template defaults?**
 >
-> Yes. Edit the `alignment.values` array in `openspawn.config.json`. The template just sets the initial selection.
+> Yes. Edit the `alignment.values` array in `openspawn.json`. The template just sets the initial selection.
 
 ---
 
@@ -209,7 +209,7 @@ Each template ships with values tuned to its domain:
 
 ### Edit values directly
 
-Open `openspawn.config.json` and modify the `alignment.values` array:
+Open `openspawn.json` and modify the `alignment.values` array:
 
 ```json
 {

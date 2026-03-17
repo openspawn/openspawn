@@ -25,7 +25,7 @@ OpenSpawn is an open-source multi-agent coordination platform — the control pl
 - **MCP Server** — 7 tools via Streamable HTTP at `POST /mcp`
 - **Model Router** — intelligent routing across Ollama, Groq, and OpenRouter
 - **Live Dashboard** — real-time network graph, task timeline, agent details, credits
-- **CLI** — `npx openspawn init` to scaffold, `npx openspawn start` to run the coordinator
+- **CLI** — `npx openspawn init` to scaffold, `npx openspawn preview` to see it run, `npx openspawn start` for the real coordinator
 - **SQLite Local Mode** — no Docker or Postgres needed for local development
 - **SSE Updates** — real-time event streaming, no polling
 
@@ -36,7 +36,8 @@ OpenSpawn is an open-source multi-agent coordination platform — the control pl
 ```bash
 npx openspawn init my-org     # scaffold a new org
 cd my-org
-npx openspawn start           # starts FastAPI coordinator (SQLite, no Docker needed)
+npx openspawn preview         # see your org in action (simulation, no API keys needed)
+npx openspawn start           # start real coordinator (FastAPI, SQLite, no Docker needed)
 ```
 
 Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API.
@@ -76,7 +77,7 @@ apps/team/               # Team dashboard (team.openspawn.ai)
 apps/website/            # Marketing site (openspawn.ai)
 apps/api/                # Python API — FastAPI coordinator + agent spawning
 tools/sandbox/           # Node.js sandbox server (the brain)
-packages/openspawn/      # npm CLI (npx openspawn init / start)
+packages/openspawn/      # npm CLI (npx openspawn init / preview / start)
 packages/coordinator/    # Coordination server package
 docs/                    # Design docs & RFCs
 ```

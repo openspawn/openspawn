@@ -78,7 +78,7 @@ export async function initCommand(args: string[], ctx: { dir: string }) {
   console.log("\n\u{1faa8} OpenSpawn initialized!\n");
   console.log("Created:");
   console.log("  ORG.md                  \u2014 Your agent organization");
-  console.log("  openspawn.config.json   \u2014 Configuration");
+  console.log("  openspawn.json          \u2014 Configuration");
   console.log("  .gitignore");
   console.log("  openclaw-agents.json    \u2014 Agent configs");
   console.log(`  workspaces/             \u2014 Agent workspaces (${agentLabel})`);
@@ -90,8 +90,12 @@ export async function initCommand(args: string[], ctx: { dir: string }) {
   }
 
   console.log("\nNext steps:");
-  console.log("  1. Review and customize ORG.md");
-  console.log("  2. Run: npx openspawn start");
+  console.log("  1. Review ORG.md \u2014 your agent org chart");
+  console.log("  2. Run: npx openspawn preview     \u2190 see your org in action");
+  console.log("  3. Run: npx openspawn start       \u2190 start real coordinator");
+  console.log("\nCustomize later:");
+  console.log("  Alignment:  Edit \xA7 Identity in ORG.md");
+  console.log("  Config:     Edit openspawn.json");
   console.log(`\nTemplate: ${answers.templateName}`);
   console.log(`Team: ${answers.orgName}`);
 
@@ -131,8 +135,10 @@ export function scaffold(dir: string, answers: WizardAnswers): ScaffoldResult {
     }
     orgContent = renderTemplate(template, answers.orgName);
 
-    // Inject alignment into rendered ORG.md
-    orgContent = injectAlignment(orgContent, answers);
+    // Inject alignment only when user customized it; otherwise keep template defaults
+    if (answers.customizedAlignment) {
+      orgContent = injectAlignment(orgContent, answers);
+    }
 
     writeFileSync(orgPath, orgContent, "utf-8");
     createdFiles.push("ORG.md");
@@ -141,7 +147,7 @@ export function scaffold(dir: string, answers: WizardAnswers): ScaffoldResult {
   // 2. Config
   const config = buildConfig(answers);
   writeConfig(dir, config);
-  createdFiles.push("openspawn.config.json");
+  createdFiles.push("openspawn.json");
 
   // 3. .gitignore
   const gitignorePath = join(dir, ".gitignore");

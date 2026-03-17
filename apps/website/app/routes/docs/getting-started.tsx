@@ -118,7 +118,7 @@ export function GettingStarted() {
 ├── ORG.md                  # Your org definition — this is the important one
 ├── SOUL.md                 # Shared behavior/values for all agents
 ├── AGENTS.md               # Workspace rules for agent tooling
-└── openspawn.config.json   # Server config (port, model providers, etc.)`}</CodeBlock>
+└── openspawn.json   # Server config (port, model providers, etc.)`}</CodeBlock>
       <p className="mb-4 text-slate-400">
         Let's look at what <code className="inline-code">ORG.md</code> contains by default:
       </p>

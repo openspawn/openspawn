@@ -20,9 +20,9 @@ logger = structlog.get_logger()
 
 
 def build_local_config(project_dir: str) -> dict[str, str | int]:
-    """Build configuration for local mode from openspawn.config.json."""
+    """Build configuration for local mode from openspawn.json."""
     project = Path(project_dir)
-    config_path = project / "openspawn.config.json"
+    config_path = project / "openspawn.json"
     db_dir = project / ".openspawn"
     db_dir.mkdir(parents=True, exist_ok=True)
     db_path = db_dir / "openspawn.db"
@@ -129,7 +129,7 @@ async def start_local(project_dir: str) -> None:
         logger.warning("sla_monitor not available, skipping")
 
     # Read user config for spawning settings
-    config_path = Path(project_dir) / "openspawn.config.json"
+    config_path = Path(project_dir) / "openspawn.json"
     user_config: dict[str, object] = {}
     if config_path.exists():
         user_config = json.loads(config_path.read_text())
@@ -216,7 +216,7 @@ def main() -> None:
     parser.add_argument(
         "--project-dir",
         default=os.getcwd(),
-        help="Project directory containing ORG.md and openspawn.config.json",
+        help="Project directory containing ORG.md and openspawn.json",
     )
     args = parser.parse_args()
     asyncio.run(start_local(args.project_dir))

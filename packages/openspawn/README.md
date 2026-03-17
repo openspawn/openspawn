@@ -97,7 +97,8 @@ Your Claude Code agents can now:
 ## CLI Commands
 
 ```
-openspawn init [name]          Scaffold ORG.md + .openspawn/
+openspawn init [name]          Scaffold ORG.md + openspawn.json
+openspawn preview              Preview org in local sandbox (localhost:3333)
 openspawn org                  Show org tree
 openspawn start                Start MCP server (HTTP, port 3456)
 openspawn start --stdio        Start MCP server (stdio, for Claude Code)

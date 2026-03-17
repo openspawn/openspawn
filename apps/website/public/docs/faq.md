@@ -19,7 +19,7 @@ These are the questions people ask most often. Longer answers are in the section
 | --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | 1   | **What is OpenSpawn?**                         | An open-source coordination layer for AI agent orgs — defined in one markdown file (`ORG.md`).                           |
 | 2   | **Do I need to rewrite my agents?**            | No. OpenSpawn connects to existing agents via MCP, A2A, or REST.                                                         |
-| 3   | **Do I need API keys to try it?**              | No. `npx openspawn init my-org && openspawn start` works offline with simulated agents.                                  |
+| 3   | **Do I need API keys to try it?**              | No. `npx openspawn init my-org && openspawn preview` runs a deterministic simulation with zero API keys.                 |
 | 4   | **What do I need installed?**                  | Node 18+, Python 3.12+, and [uv](https://docs.astral.sh/uv/). Docker optional (production only).                         |
 | 5   | **My ORG.md agents aren't showing up — why?**  | Check heading depths (H3 for departments, H4 for roles) and use bold-key metadata: `- **Level:** 6`. Check startup logs. |
 | 6   | **I get `Invalid credentials` from the API.**  | Clock skew or wrong signature message format. See [Auth Errors](./guides/troubleshooting#5-api-auth-errors).             |
@@ -67,11 +67,11 @@ Your agents keep running as-is. OpenSpawn adds the coordination layer on top.
 ```bash
 npx openspawn init my-org --template=saas-onboarding --non-interactive
 cd my-org
-openspawn start
-# Open http://localhost:8787
+openspawn preview
+# Opens http://localhost:3333/app automatically
 ```
 
-You'll see the full coordination flow with simulated agents, no API keys needed.
+You'll see the full coordination flow with deterministic simulation, no API keys needed.
 
 ### Q5: Is OpenSpawn free?
 
@@ -97,13 +97,13 @@ Optional: paid hosted tier (in development) for teams that don't want to self-ho
 ```bash
 openspawn init my-org --template=saas-onboarding --yes
 cd my-org
-openspawn start
+openspawn preview     # simulation — see it run instantly, no API keys
+openspawn start       # real coordinator — spawns Claude Code agents
 ```
 
 - `init` — scaffolds `ORG.md`, agent workspaces, and config
+- `preview` — launches sandbox simulation + dashboard at `http://localhost:3333/app` (deterministic, zero cost)
 - `start` — boots the Python API (FastAPI + SQLite), seeds agents, spawns Claude Code subprocesses, starts the asyncio scheduler
-
-Agent status, tasks, and org health are visible in the dashboard at `http://localhost:8787`.
 
 ### Q8: Which template should I use?
 
