@@ -78,7 +78,7 @@ export async function initCommand(args: string[], ctx: { dir: string }) {
   console.log("\n\u{1faa8} OpenSpawn initialized!\n");
   console.log("Created:");
   console.log("  ORG.md                  \u2014 Your agent organization");
-  console.log("  openspawn.json   \u2014 Configuration");
+  console.log("  openspawn.json          \u2014 Configuration");
   console.log("  .gitignore");
   console.log("  openclaw-agents.json    \u2014 Agent configs");
   console.log(`  workspaces/             \u2014 Agent workspaces (${agentLabel})`);
