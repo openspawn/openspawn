@@ -198,7 +198,7 @@ PostgreSQL (Tier 2) ["Setup", "Zero config — works out of the box", "Requires 
 
 Command
 
-What it does ["npx openspawn init ", "Scaffold a new org"], ["npx openspawn start", "Start the server + dashboard"], ["npx openspawn apply ORG.md", "Apply changes without restart"], ["npx openspawn deploy ORG.md", "Deploy from scratch"], ["npx openspawn export > ORG.md", "Export current state to file"], ["npx openspawn snapshot", "Create a versioned config snapshot"], ["npx openspawn demo", "Run the demo org (no config needed)"], ].map(([cmd, desc]) => (
+What it does ["npx openspawn init ", "Scaffold a new org"], ["npx openspawn preview", "Preview org in local sandbox"], ["npx openspawn start", "Start the server + dashboard"], ["npx openspawn apply ORG.md", "Apply changes without restart"], ["npx openspawn deploy ORG.md", "Deploy from scratch"], ["npx openspawn export > ORG.md", "Export current state to file"], ["npx openspawn snapshot", "Create a versioned config snapshot"], ["npx openspawn demo", "Run the demo org (no config needed)"], ].map(([cmd, desc]) => (
 
 Endpoint
 

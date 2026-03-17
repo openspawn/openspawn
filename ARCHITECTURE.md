@@ -125,7 +125,7 @@ Local mode needs only Python (uv) and Node — no Docker, no Redis, no PostgreSQ
 
 ## Authentication
 
-Auth enforcement is configurable via `AUTH_MODE` env var (or `openspawn.config.json`):
+Auth enforcement is configurable via `AUTH_MODE` env var (or `openspawn.json`):
 
 | Mode    | Default for       | Dashboard | API endpoints                       |
 | ------- | ----------------- | --------- | ----------------------------------- |
