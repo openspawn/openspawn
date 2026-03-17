@@ -515,7 +515,7 @@ openspawn consensus --results
               </td>
               <td className="px-3 py-2">
                 Check <code className="inline-code">AGENT_SECRET</code> env var matches the value in{" "}
-                <code className="inline-code">openspawn.config.json</code>. Regenerate with{" "}
+                <code className="inline-code">openspawn.json</code>. Regenerate with{" "}
                 <code className="inline-code">openspawn secrets rotate</code>
               </td>
             </tr>

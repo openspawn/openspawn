@@ -159,7 +159,7 @@ const gettingStartedHowToSchema = {
     {
       "@type": "HowToStep",
       name: "Configure Model Providers",
-      text: "Add Ollama, Groq, or OpenRouter API keys to openspawn.config.json for real LLM inference.",
+      text: "Add Ollama, Groq, or OpenRouter API keys to openspawn.json for real LLM inference.",
       url: `${BASE_URL}/docs/getting-started#step-7`,
     },
     {

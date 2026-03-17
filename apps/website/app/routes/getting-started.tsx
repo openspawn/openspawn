@@ -172,7 +172,7 @@ openspawn v0.3.0`}
 ? Primary model provider: OpenRouter
 
 ✓ Created my-org/ORG.md
-✓ Created my-org/openspawn.config.json
+✓ Created my-org/openspawn.json
 
   cd my-org && openspawn start`}
           </Terminal>
@@ -181,9 +181,8 @@ openspawn v0.3.0`}
               <code className="inline-code">openspawn init</code> creates two files:
               <strong className="text-slate-200"> ORG.md</strong> (your org definition — agents,
               hierarchy, culture, policies) and{" "}
-              <strong className="text-slate-200">openspawn.config.json</strong> (server settings,
-              API keys, port). The template pre-fills sensible defaults — you can edit everything
-              later.
+              <strong className="text-slate-200">openspawn.json</strong> (server settings, API keys,
+              port). The template pre-fills sensible defaults — you can edit everything later.
             </p>
           </Expandable>
           <div className="mt-3">
