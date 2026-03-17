@@ -2,6 +2,7 @@
 // ── OpenSpawn CLI ────────────────────────────────────────────────────────────
 
 import { initCommand } from "./commands/init.js";
+import { previewCommand } from "./commands/preview.js";
 import { startCommand } from "./commands/start.js";
 
 const HELP = `
@@ -17,6 +18,12 @@ Commands:
     --dry-run                    Simulate after scaffold
     --deploy                     Generate Docker infra
     -p, --port <n>               Coordinator port (default: 8787)
+  preview                        Preview org in local sandbox
+    --port <n>                   Dashboard port (default: 3333)
+    --no-open                    Don't auto-open browser
+    --mode <mode>                Simulation: deterministic|hybrid|llm
+    --scenario <id>              Override scenario
+    --verbose                    Show agent decisions in terminal
   start                          Start local coordinator
 
 Options:
@@ -66,6 +73,8 @@ async function main() {
   switch (command) {
     case "init":
       return initCommand(rest, ctx);
+    case "preview":
+      return previewCommand(rest, ctx);
     case "start":
       return startCommand(rest, ctx);
     default:
