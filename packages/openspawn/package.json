@@ -1,6 +1,6 @@
 {
   "name": "openspawn",
-  "version": "2026.3.3",
+  "version": "2026.3.18",
   "description": "Standalone MCP server and CLI for OpenSpawn multi-agent organizations",
   "keywords": [
     "a2a",
