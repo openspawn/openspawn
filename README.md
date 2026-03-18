@@ -36,11 +36,10 @@ OpenSpawn is an open-source multi-agent coordination platform — the control pl
 ```bash
 npx openspawn init my-org     # scaffold a new org
 cd my-org
-npx openspawn preview         # see your org in action (simulation, no API keys needed)
-npx openspawn start           # start real coordinator (FastAPI, SQLite, no Docker needed)
+npx openspawn preview         # simulation + dashboard at localhost:3333 (no API keys needed)
 ```
 
-Open [http://localhost:8000/docs](http://localhost:8000/docs) for the API.
+Ready for real agents? `npx openspawn start` launches the FastAPI coordinator with SQLite (no Docker needed).
 
 Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](https://bikinibottom.ai/app/)**
 
@@ -72,14 +71,15 @@ Or try the live demo with 22 agents across 5 departments: **[bikinibottom.ai](ht
 ## 📦 Project Structure
 
 ```
-apps/demo/               # BikiniBottom demo dashboard (bikinibottom.ai)
-apps/team/               # Team dashboard (team.openspawn.ai)
-apps/website/            # Marketing site (openspawn.ai)
+apps/dashboard/          # React dashboard (openspawn.ai + bikinibottom.ai)
 apps/api/                # Python API — FastAPI coordinator + agent spawning
-tools/sandbox/           # Node.js sandbox server (the brain)
+apps/website/            # Marketing site (openspawn.ai)
+apps/team/               # Internal team dashboard (team.openspawn.ai)
+apps/platform/           # Landing page (openspawn.ai)
+tools/sandbox/           # Node.js sandbox server (simulation engine)
 packages/openspawn/      # npm CLI (npx openspawn init / preview / start)
 packages/coordinator/    # Coordination server package
-docs/                    # Design docs & RFCs
+docs/                    # Design docs & spikes
 ```
 
 ## 🔗 Protocols
