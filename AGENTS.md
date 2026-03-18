@@ -35,7 +35,7 @@ tools/
   sandbox/         -> Coordination sandbox server (SSE + MCP + A2A)
 
 packages/
-  openspawn/       -> npm CLI package — scaffolding (init) + coordinator launcher (start)
+  openspawn/       -> npm CLI package (init + preview + start), published to npmjs.com
   coordinator/     -> Coordination server package
 ```
 
@@ -139,6 +139,29 @@ pnpm exec nx run-many -t build                                         # Build
 pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
 cd apps/api && uv run pytest tests/ -v                                 # Test (Python)
 ```
+
+---
+
+## Publishing the CLI to npm
+
+The `openspawn` package is published to npm via GitHub Actions (`publish-cli.yml`).
+
+**Two triggers:**
+
+```bash
+# Option 1: Tag push (automatic)
+git tag openspawn@2026.3.18
+git push --tags
+
+# Option 2: Manual dispatch (Actions → "Publish CLI" → Run workflow)
+# Supports dry-run and version override
+```
+
+**Workflow steps:** install → lint → test → build → verify CLI runs → publish with provenance.
+
+**Requirements:** `NPM_TOKEN` secret must be set in repo settings. Version in `packages/openspawn/package.json` must be bumped before tagging.
+
+**Version scheme:** `YYYY.M.D` (e.g. `2026.3.18`). Bump the version in `packages/openspawn/package.json` as part of any PR that changes CLI behavior.
 
 ---
 
