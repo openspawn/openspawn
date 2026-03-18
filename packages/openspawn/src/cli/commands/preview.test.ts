@@ -10,7 +10,7 @@ function defaultFlags(overrides: Partial<PreviewFlags> = {}): PreviewFlags {
     port: 3333,
     open: true,
     mode: "deterministic",
-    scenario: "none",
+    scenario: "warm-up",
     verbose: false,
     ...overrides,
   };
@@ -33,7 +33,7 @@ describe("buildPreviewEnv", () => {
     expect(env.SANDBOX_MODEL).toBe(defaultConfig.llm.models.default);
     expect(env.SERVE_DASHBOARD).toBe("1");
     expect(env.SIMULATION_MODE).toBe("deterministic");
-    expect(env.SCENARIO).toBe("none");
+    expect(env.SCENARIO).toBe("warm-up");
     expect(env.CLEAN).toBe("1");
   });
 

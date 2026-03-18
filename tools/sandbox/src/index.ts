@@ -188,8 +188,10 @@ if (scenarioId !== "none" && !useLLM) {
   const { ScenarioEngine } = await import("./scenario-engine.js");
   const { aiDevAgencyScenario } = await import("./scenarios/ai-dev-agency.js");
   const { krabbyPattiesScenario } = await import("./scenarios/krabby-patties.js");
+  const { buildWarmUpScenario } = await import("./scenarios/warm-up.js");
 
   const scenarioMap: Record<string, import("./scenario-types.js").ScenarioDefinition> = {
+    "warm-up": buildWarmUpScenario(agents),
     "ai-dev-agency": aiDevAgencyScenario,
     "krabby-patties": krabbyPattiesScenario,
   };

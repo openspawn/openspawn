@@ -28,7 +28,7 @@ function parsePreviewFlags(args: string[]): PreviewFlags {
     port: 3333,
     open: true,
     mode: "deterministic",
-    scenario: "none",
+    scenario: "warm-up",
     verbose: false,
   };
 
