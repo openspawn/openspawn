@@ -2,7 +2,7 @@
 
 **Persistent governed organizations for AI agents.**
 
-OpenSpawn adds organizational structure to your AI agents — persistent memory, hierarchy, budgets, and governance that compound across sessions. Works with any agent framework.
+OpenSpawn adds organizational structure to your AI agents — hierarchy, budgets, coordination, and governance defined in a single markdown file. Works with any agent framework.
 
 [![npm](https://img.shields.io/npm/v/openspawn)](https://www.npmjs.com/package/openspawn)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/openspawn/openspawn/blob/main/LICENSE)
@@ -12,9 +12,19 @@ OpenSpawn adds organizational structure to your AI agents — persistent memory,
 ```bash
 npx openspawn init my-org
 cd my-org
+npx openspawn preview
 ```
 
-This creates an `ORG.md` file — **your entire agent organization defined in markdown**.
+This scaffolds an agent organization and launches a local simulation with dashboard at [localhost:3333/app](http://localhost:3333/app). No API keys needed — the preview runs deterministic simulation at zero cost.
+
+## What You Get
+
+`openspawn init` creates:
+
+- **ORG.md** — your agent org chart in markdown (hierarchy, culture, policies)
+- **openspawn.json** — configuration (LLM provider, models, budget, port)
+- **workspaces/** — per-agent directories with SOUL.md identity files
+- **.openspawn/tasks.json** — task store
 
 ## Define Your Org
 
@@ -57,88 +67,37 @@ Edit `ORG.md` to define your team:
 - **Count:** 2
 ```
 
-View your org tree:
-
-```bash
-openspawn org
-```
-
-```
-My Agent Org
-└── CEO (executive, L10)
-    └── Lead (L7)
-        ├── Builder-1 (L4)
-        └── Builder-2 (L4)
-```
-
-## Connect to Claude Code
-
-Add OpenSpawn as an MCP server in your Claude Code config:
-
-```json
-{
-  "mcpServers": {
-    "openspawn": {
-      "command": "npx",
-      "args": ["openspawn", "start", "--stdio"]
-    }
-  }
-}
-```
-
-Your Claude Code agents can now:
-
-- Read your org structure (`org_read`)
-- Create and claim tasks (`task_create`, `task_claim`)
-- Delegate work down the hierarchy (`delegate`)
-- Escalate blockers up the chain (`escalate`)
-- Track budgets (`budget_check`, `budget_spend`)
-
 ## CLI Commands
 
 ```
 openspawn init [name]          Scaffold ORG.md + openspawn.json
-openspawn preview              Preview org in local sandbox (localhost:3333)
-openspawn org                  Show org tree
-openspawn start                Start MCP server (HTTP, port 3456)
-openspawn start --stdio        Start MCP server (stdio, for Claude Code)
-openspawn status               Show org status
+  -t, --template <name>       Template (assistant-team, dev-shop, etc.)
+  -y, --yes                   Skip wizard, use defaults
+  --deploy                    Generate Docker infrastructure
 
-openspawn hire <name>          Add agent to org
-openspawn fire <name>          Remove agent from org
+openspawn preview              Preview org in local sandbox
+  --port <n>                  Dashboard port (default: 3333)
+  --no-open                   Don't auto-open browser
+  --mode <mode>               deterministic | hybrid | llm
+  --verbose                   Show agent decisions in terminal
 
-openspawn task list            List all tasks
-openspawn task create <desc>   Create a task
-openspawn task next            Claim next available task
-openspawn task done <id>       Mark task complete
-
-openspawn delegate             Delegate task to a report
-openspawn escalate             Escalate task to manager
-openspawn report               Report status/completion
-openspawn budget [agent]       Show budget status
+openspawn start                Start real coordinator (FastAPI + SQLite)
 ```
 
-## MCP Tools
+## Templates
 
-When running as an MCP server, OpenSpawn exposes 13 tools:
+```bash
+openspawn init my-org -t assistant-team    # Chief of staff + specialists
+openspawn init my-org -t dev-shop          # Engineering team
+openspawn init my-org -t content-agency    # Content production pipeline
+openspawn init my-org -t research-lab      # Research & analysis
+openspawn init my-org -t saas-onboarding   # Customer onboarding
+openspawn init my-org -t incident-response # Incident management
+```
 
-| Tool           | Description                         |
-| -------------- | ----------------------------------- |
-| `org_read`     | Parse ORG.md, return structured org |
-| `org_update`   | Modify ORG.md                       |
-| `task_list`    | List tasks (filterable)             |
-| `task_create`  | Create a new task                   |
-| `task_claim`   | Claim an available task             |
-| `task_update`  | Update task status                  |
-| `delegate`     | Delegate task down hierarchy        |
-| `escalate`     | Escalate task up hierarchy          |
-| `hire`         | Add agent to org                    |
-| `fire`         | Remove agent from org               |
-| `budget_check` | Check remaining budget              |
-| `budget_spend` | Record spend                        |
-| `report`       | Report status/completion            |
+Run `openspawn init` (no flags) for the interactive wizard.
 
-## ORG.md Format Reference
+## ORG.md Reference
 
 - **`# Org Name`** — Top-level heading is the org name
 - **`## Culture`** — Preset, escalation speed, ack requirements
@@ -146,25 +105,17 @@ When running as an MCP server, OpenSpawn exposes 13 tools:
 - **`## Structure`** — Agent hierarchy (required)
   - **`### Name — Role`** — Top-level agent or department
   - **`#### Name — Role`** — Agent under a department
-- **`- **Reports To:** parent-name`** — Override structural hierarchy (for cross-department reporting)
-- **`- **Count:** N`** — Spawn N copies of an agent (e.g. worker pool)
 - **`- **Level:** N`** — Authority level (1-10, higher = more authority)
 - **`- **Domain:** name`** — Functional area
-- **`- **Model:** model-name`** — LLM model assignment
-
-## How It Works
-
-1. **ORG.md** — Your org chart in markdown. Agents, hierarchy, policies, culture. Version-controlled, diffable.
-2. **`.openspawn/tasks.json`** — Task state on disk. No database. Just files.
-3. **MCP Server** — Any MCP-compatible agent connects and participates in the org.
-4. **CLI** — Human operators manage the org from the terminal.
+- **`- **Reports To:** parent-name`** — Override structural hierarchy
+- **`- **Count:** N`** — Spawn N copies of an agent (e.g. worker pool)
+- **`- **Model:** model-name`** — LLM model override for this agent
 
 ## What OpenSpawn Adds
 
 |                    | With OpenSpawn              | Without              |
 | ------------------ | --------------------------- | -------------------- |
-| **Memory**         | Persistent across sessions  | Session-scoped       |
-| **Hierarchy**      | 10-level (L1–L10)           | Flat (lead/teammate) |
+| **Hierarchy**      | 10-level (L1-L10)           | Flat (lead/teammate) |
 | **Budget control** | Per-agent limits + tracking | None                 |
 | **Escalation**     | Typed chain of command      | Ad-hoc               |
 | **Governance**     | Policies, approval gates    | None                 |
@@ -172,9 +123,8 @@ When running as an MCP server, OpenSpawn exposes 13 tools:
 
 ## Works With
 
-- **Claude Code** — via MCP (stdio)
+- **Claude Code** — via MCP
 - **Cursor** — via MCP
-- **OpenClaw** — native integration
 - **Any MCP client** — Streamable HTTP or stdio
 - **Any agent with shell access** — via CLI
 
