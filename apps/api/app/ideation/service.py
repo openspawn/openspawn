@@ -56,7 +56,7 @@ async def start_ideation(
             select(Agent.id).where(
                 Agent.org_id == auth.org_id,
                 Agent.status == "active",
-            ).limit(5)
+            ).order_by(Agent.level.desc(), Agent.name).limit(5)
         )
         agent_ids = list(result.scalars().all())
         if not agent_ids:
@@ -179,7 +179,7 @@ async def submit_brief(
     )
     submitted_count = len(list(round_briefs.scalars().all()))
 
-    if submitted_count >= len(session.participants):
+    if submitted_count == len(session.participants):
         await _advance_round(db, auth, session)
 
     await logger.ainfo(

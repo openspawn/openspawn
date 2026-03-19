@@ -28,7 +28,7 @@ class IdeationSession(UUIDPrimaryKeyMixin, Base):
     participants: Mapped[list[str]] = mapped_column(CompatJSONB(), nullable=False, default=list)
     current_round: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=1)
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="pending"
+        String(30), nullable=False, server_default="pending"
     )
     autonomy_level: Mapped[int] = mapped_column(
         SmallInteger, nullable=False, server_default="5"
