@@ -54,6 +54,10 @@ The coordinator broadcasts this to all agents in the same task tree via SSE. No 
 
 **Recommendation:** SSE broadcast. The `EventBus` already supports a `BusBackend` protocol abstraction (`apps/api/app/events/bus.py`). Adding a non-persisted `status.update` SSE event type is ~50 lines of code. The architecture is already designed for this.
 
+### What about "Layer 1.5" — structured gossip?
+
+Issue #667 asked whether there's a useful middle ground between ambient gossip and full A2A structured messages. The answer: **not really, as a distinct layer.** The SSE broadcast recommendation already covers this — a `status.update` event with structured fields (state, progress, blocked_on) is both ambient AND structured. It's gossip with schema. Treating it as a separate layer adds conceptual overhead without adding capability. The `BusBackend` abstraction handles the spectrum from fire-and-forget status pings to persistent coordination events — no need for a separate protocol.
+
 ### Verdict
 
 Gossip is **purely additive** — it requires no architectural changes. The `InMemoryBackend` → `BusBackend` protocol in `bus.py` was designed for exactly this kind of extension. Build it when the dashboard needs real-time progress indicators, or when agents start needing to reason about each other's state. Not before.
