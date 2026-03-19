@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, SmallInteger, String, func
+from sqlalchemy import ForeignKey, Index, SmallInteger, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKeyMixin
@@ -46,6 +46,7 @@ class IdeationSession(UUIDPrimaryKeyMixin, Base):
 class IdeationBrief(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "ideation_briefs"
     __table_args__ = (
+        UniqueConstraint("session_id", "agent_id", "round", name="uq_brief_session_agent_round"),
         Index("ix_ideation_briefs_session_round", "session_id", "round"),
         Index("ix_ideation_briefs_agent_id", "agent_id"),
     )

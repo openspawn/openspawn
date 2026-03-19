@@ -564,7 +564,7 @@ async def ideation_propose(
     session_id: str,
     content_json: str,
 ) -> str:
-    """Submit a proposal/brief for the current ideation round."""
+    """Submit a proposal brief (round 1). Content should include proposed_approach, estimated_scope, risks, dependencies, parallel_streams, and artifacts_produced."""
     body = {"content": json.loads(content_json)}
     result = await _get_client().post(f"/ideation/sessions/{session_id}/briefs", json=body)
     return _format(result)
@@ -573,10 +573,11 @@ async def ideation_propose(
 @mcp.tool
 async def ideation_review(
     session_id: str,
+    reviewing_agent: str,
     content_json: str,
 ) -> str:
-    """Submit a review brief for the current ideation round (round 2)."""
-    body = {"content": json.loads(content_json)}
+    """Submit a review of another agent's proposal (round 2). Content should include concerns, suggestions, missing_streams, and dependencies_missed."""
+    body = {"content": {**json.loads(content_json), "reviewing": reviewing_agent}}
     result = await _get_client().post(f"/ideation/sessions/{session_id}/briefs", json=body)
     return _format(result)
 

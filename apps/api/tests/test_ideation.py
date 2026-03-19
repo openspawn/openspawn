@@ -306,7 +306,7 @@ async def test_round_advancement(seeded_client: AsyncClient):
     with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
         r = await c.get(f"/ideation/sessions/{session_id}")
         assert r.json()["data"]["current_round"] == 3
-        assert r.json()["data"]["status"] == "synthesis"
+        assert r.json()["data"]["status"] == "awaiting_synthesis"
 
 
 @pytest.mark.asyncio
@@ -341,8 +341,8 @@ async def test_synthesis(seeded_client: AsyncClient):
                 json={"content": {"review": f"Review from {name}"}},
             )
 
-    # Synthesize
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    # Synthesize (requires level >= 7)
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(
             f"/ideation/sessions/{session_id}/synthesize",
             json={"content": {"unified_plan": "Combined approach: microservices with shared DB"}},
@@ -353,7 +353,7 @@ async def test_synthesis(seeded_client: AsyncClient):
         assert data["round"] == 3
 
     # Duplicate synthesis → 409
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(
             f"/ideation/sessions/{session_id}/synthesize",
             json={"content": {"unified_plan": "Duplicate"}},
@@ -406,10 +406,10 @@ async def test_full_3_round_flow(seeded_client: AsyncClient):
     # Verify moved to synthesis
     with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
         r = await c.get(f"/ideation/sessions/{session_id}")
-        assert r.json()["data"]["status"] == "synthesis"
+        assert r.json()["data"]["status"] == "synthesized"
 
     # 4. Synthesize
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(
             f"/ideation/sessions/{session_id}/synthesize",
             json={
@@ -422,7 +422,7 @@ async def test_full_3_round_flow(seeded_client: AsyncClient):
         assert r.status_code == 201
 
     # 5. Approve
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(f"/ideation/sessions/{session_id}/approve")
         assert r.status_code == 200
         data = r.json()["data"]
@@ -442,7 +442,7 @@ async def test_full_3_round_flow(seeded_client: AsyncClient):
         assert len(r.json()["data"]) == 2
 
     # 8. Approve again → 400
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(f"/ideation/sessions/{session_id}/approve")
         assert r.status_code == 400
 
@@ -497,7 +497,7 @@ async def test_cannot_synthesize_in_round1(seeded_client: AsyncClient):
         )
         session_id = r.json()["data"]["id"]
 
-    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
+    with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):
         r = await c.post(
             f"/ideation/sessions/{session_id}/synthesize",
             json={"content": {"plan": "Too early"}},

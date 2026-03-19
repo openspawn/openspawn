@@ -256,7 +256,8 @@ class IdeationStatus(enum.StrEnum):
     PENDING = "pending"
     ROUND1 = "round1"
     ROUND2 = "round2"
-    SYNTHESIS = "synthesis"
+    AWAITING_SYNTHESIS = "awaiting_synthesis"
+    SYNTHESIZED = "synthesized"
     APPROVED = "approved"
     CANCELLED = "cancelled"
 

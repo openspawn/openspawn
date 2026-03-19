@@ -25,7 +25,7 @@ logger = structlog.stdlib.get_logger()
 _ROUND_STATUS = {
     1: IdeationStatus.ROUND1.value,
     2: IdeationStatus.ROUND2.value,
-    3: IdeationStatus.SYNTHESIS.value,
+    3: IdeationStatus.AWAITING_SYNTHESIS.value,
 }
 
 # Default roles per round
@@ -114,7 +114,7 @@ async def submit_brief(
     active_statuses = {
         IdeationStatus.ROUND1.value,
         IdeationStatus.ROUND2.value,
-        IdeationStatus.SYNTHESIS.value,
+        IdeationStatus.AWAITING_SYNTHESIS.value,
     }
     if session.status not in active_statuses:
         raise HTTPException(
@@ -245,10 +245,17 @@ async def synthesize(
     """Coordinator produces unified plan from all briefs (Round 3 / synthesis)."""
     session = await _get_session(db, auth.org_id, session_id)
 
-    # Allow synthesis when we're in round2 (all submitted) or synthesis status
+    # Only the session owner / manager (level >= 7) can synthesize
+    if auth.level < 7:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only manager agents (level >= 7) can synthesize ideation plans",
+        )
+
+    # Allow synthesis when all round 2 reviews are in
     if session.status not in (
         IdeationStatus.ROUND2.value,
-        IdeationStatus.SYNTHESIS.value,
+        IdeationStatus.AWAITING_SYNTHESIS.value,
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -277,7 +284,7 @@ async def synthesize(
     )
     db.add(brief)
 
-    session.status = IdeationStatus.SYNTHESIS.value
+    session.status = IdeationStatus.SYNTHESIZED.value
     session.current_round = 3
 
     await db.flush()
@@ -312,10 +319,17 @@ async def approve_plan(
     """Human approves the synthesized plan."""
     session = await _get_session(db, auth.org_id, session_id)
 
-    if session.status != IdeationStatus.SYNTHESIS.value:
+    # Only manager agents (level >= 7) can approve plans
+    if auth.level < 7:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only manager agents (level >= 7) can approve ideation plans",
+        )
+
+    if session.status != IdeationStatus.SYNTHESIZED.value:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Session is {session.status}, cannot approve (must be in synthesis)",
+            detail=f"Session is {session.status}, cannot approve (must be synthesized)",
         )
 
     # Verify synthesis brief exists
