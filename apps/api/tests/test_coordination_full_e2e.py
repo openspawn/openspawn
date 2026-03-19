@@ -40,6 +40,35 @@ _DOCS_AGENT_ID = "00000000-0000-0000-0000-000000000104"
 _TASK_ID = "00000000-0000-0000-0000-000000000200"
 
 
+# ── Agent identity helper ─────────────────────────────────────────────────
+
+
+@contextlib.contextmanager
+def as_agent(agent_id: str, org_id: str, name: str, level: int = 5):
+    """Override require_auth to return an AuthenticatedAgent for a specific agent."""
+    from app.auth.dependencies import require_auth
+    from app.auth.schemas import AuthenticatedAgent
+    from app.main import app
+
+    original = app.dependency_overrides.get(require_auth)
+    app.dependency_overrides[require_auth] = lambda: AuthenticatedAgent(
+        id=uuid.UUID(agent_id),
+        org_id=uuid.UUID(org_id),
+        agent_id=f"agent-{name.lower().replace(' ', '-')}",
+        name=name,
+        role="worker",
+        mode="worker",
+        level=level,
+    )
+    try:
+        yield
+    finally:
+        if original:
+            app.dependency_overrides[require_auth] = original
+        else:
+            app.dependency_overrides.pop(require_auth, None)
+
+
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
 
@@ -202,178 +231,185 @@ async def test_e2e_coordination_three_agents(seeded: AsyncClient):
     c = seeded
 
     # ── Step 1: Test agent subscribes to component.* events ───────────
-    r = await c.post(
-        "/coordination/subscribe",
-        json={"event_pattern": "component.*", "task_id": _TASK_ID},
-    )
-    assert r.status_code == 201, f"Test agent subscribe failed: {r.text}"
+    with as_agent(_TEST_AGENT_ID, _ORG_ID, "Test Agent", level=5):
+        r = await c.post(
+            "/coordination/subscribe",
+            json={"event_pattern": "component.*", "task_id": _TASK_ID},
+        )
+        assert r.status_code == 201, f"Test agent subscribe failed: {r.text}"
 
     # ── Step 2: Docs agent subscribes to all events (wildcard) ──────────
-    # Note: In AUTH_MODE=none all requests share the synthetic owner identity,
-    # so we use a different pattern to avoid duplicate-subscription conflict.
-    r = await c.post(
-        "/coordination/subscribe",
-        json={"event_pattern": "*"},
-    )
-    assert r.status_code == 201, f"Docs agent subscribe failed: {r.text}"
+    with as_agent(_DOCS_AGENT_ID, _ORG_ID, "Docs Agent", level=5):
+        r = await c.post(
+            "/coordination/subscribe",
+            json={"event_pattern": "*"},
+        )
+        assert r.status_code == 201, f"Docs agent subscribe failed: {r.text}"
 
     # ── Step 3: Dev agent emits ComponentCreated with testids ─────────
-    r = await c.post(
-        "/coordination/emit",
-        json={
-            "event_type": "component.created",
-            "payload": {
-                "name": "CheckoutForm",
-                "file_path": "src/components/CheckoutForm.tsx",
-                "test_ids": ["checkout-form", "checkout-submit-btn", "checkout-total"],
-                "props": [
-                    {"name": "onSubmit", "type": "(data: FormData) => Promise<void>"},
-                    {"name": "cartItems", "type": "CartItem[]"},
-                ],
-                "route": "/checkout",
+    with as_agent(_DEV_AGENT_ID, _ORG_ID, "Dev Agent", level=7):
+        r = await c.post(
+            "/coordination/emit",
+            json={
+                "event_type": "component.created",
+                "payload": {
+                    "name": "CheckoutForm",
+                    "file_path": "src/components/CheckoutForm.tsx",
+                    "test_ids": ["checkout-form", "checkout-submit-btn", "checkout-total"],
+                    "props": [
+                        {"name": "onSubmit", "type": "(data: FormData) => Promise<void>"},
+                        {"name": "cartItems", "type": "CartItem[]"},
+                    ],
+                    "route": "/checkout",
+                },
+                "task_id": _TASK_ID,
+                "entity_name": "CheckoutForm",
             },
-            "task_id": _TASK_ID,
-            "entity_name": "CheckoutForm",
-        },
-    )
-    assert r.status_code == 200, f"Dev emit failed: {r.text}"
-    assert r.json()["message"] == "Event emitted"
+        )
+        assert r.status_code == 200, f"Dev emit failed: {r.text}"
+        assert r.json()["message"] == "Event emitted"
 
     # ── Step 4: Test agent replays to discover the component ──────────
-    r = await c.post(
-        "/coordination/replay",
-        json={"task_id": _TASK_ID},
-    )
-    assert r.status_code == 200
-    events = r.json()["data"]
-    assert len(events) == 1
-    assert events[0]["type"] == "component.created"
-    component_payload = events[0]["data"]["payload"]
-    assert component_payload["name"] == "CheckoutForm"
-    assert "checkout-form" in component_payload["test_ids"]
+    with as_agent(_TEST_AGENT_ID, _ORG_ID, "Test Agent", level=5):
+        r = await c.post(
+            "/coordination/replay",
+            json={"task_id": _TASK_ID},
+        )
+        assert r.status_code == 200
+        events = r.json()["data"]
+        assert len(events) == 1
+        assert events[0]["type"] == "component.created"
+        component_payload = events[0]["data"]["payload"]
+        assert component_payload["name"] == "CheckoutForm"
+        assert "checkout-form" in component_payload["test_ids"]
 
     # ── Step 5: Test agent emits test.written for CheckoutForm ────────
-    r = await c.post(
-        "/coordination/emit",
-        json={
-            "event_type": "test.written",
-            "payload": {
-                "covers_component": "CheckoutForm",
-                "test_file": "CheckoutForm.spec.tsx",
-                "test_ids_used": ["checkout-form", "checkout-submit-btn"],
-                "scenarios": [
-                    "renders form with cart items",
-                    "validates required fields",
-                    "submits form data",
-                    "displays total correctly",
-                ],
+    with as_agent(_TEST_AGENT_ID, _ORG_ID, "Test Agent", level=5):
+        r = await c.post(
+            "/coordination/emit",
+            json={
+                "event_type": "test.written",
+                "payload": {
+                    "covers_component": "CheckoutForm",
+                    "test_file": "CheckoutForm.spec.tsx",
+                    "test_ids_used": ["checkout-form", "checkout-submit-btn"],
+                    "scenarios": [
+                        "renders form with cart items",
+                        "validates required fields",
+                        "submits form data",
+                        "displays total correctly",
+                    ],
+                },
+                "task_id": _TASK_ID,
+                "entity_name": "checkout-form-tests",
             },
-            "task_id": _TASK_ID,
-            "entity_name": "checkout-form-tests",
-        },
-    )
-    assert r.status_code == 200, f"Test agent emit failed: {r.text}"
+        )
+        assert r.status_code == 200, f"Test agent emit failed: {r.text}"
 
     # ── Step 6: Test agent publishes TestWritten artifact ─────────────
-    r = await c.post(
-        "/artifacts",
-        json={
-            "artifact_type": "test_plan",
-            "name": "CheckoutForm-tests",
-            "content": {
-                "covers_component": "CheckoutForm",
-                "test_file": "CheckoutForm.spec.tsx",
-                "test_ids_used": ["checkout-form", "checkout-submit-btn"],
-                "scenarios": [
-                    "renders form with cart items",
-                    "validates required fields",
-                    "submits form data",
-                    "displays total correctly",
-                ],
-                "framework": "vitest",
+    with as_agent(_TEST_AGENT_ID, _ORG_ID, "Test Agent", level=5):
+        r = await c.post(
+            "/artifacts",
+            json={
+                "artifact_type": "test_plan",
+                "name": "CheckoutForm-tests",
+                "content": {
+                    "covers_component": "CheckoutForm",
+                    "test_file": "CheckoutForm.spec.tsx",
+                    "test_ids_used": ["checkout-form", "checkout-submit-btn"],
+                    "scenarios": [
+                        "renders form with cart items",
+                        "validates required fields",
+                        "submits form data",
+                        "displays total correctly",
+                    ],
+                    "framework": "vitest",
+                },
+                "task_id": _TASK_ID,
+                "metadata": {"generated_by": "test-agent", "confidence": 0.95},
             },
-            "task_id": _TASK_ID,
-            "metadata": {"generated_by": "test-agent", "confidence": 0.95},
-        },
-    )
-    assert r.status_code == 201, f"Test artifact publish failed: {r.text}"
-    test_artifact = r.json()["data"]
-    assert test_artifact["artifact_type"] == "test_plan"
-    assert test_artifact["version"] == 1
-    test_artifact_id = test_artifact["id"]
+        )
+        assert r.status_code == 201, f"Test artifact publish failed: {r.text}"
+        test_artifact = r.json()["data"]
+        assert test_artifact["artifact_type"] == "test_plan"
+        assert test_artifact["version"] == 1
+        test_artifact_id = test_artifact["id"]
 
     # ── Step 7: Docs agent emits doc.section.written ──────────────────
-    r = await c.post(
-        "/coordination/emit",
-        json={
-            "event_type": "doc.section.written",
-            "payload": {
-                "name": "CheckoutForm",
-                "section": "Components > CheckoutForm",
-                "content_md": "## CheckoutForm\n\nHandles the checkout flow...",
+    with as_agent(_DOCS_AGENT_ID, _ORG_ID, "Docs Agent", level=5):
+        r = await c.post(
+            "/coordination/emit",
+            json={
+                "event_type": "doc.section.written",
+                "payload": {
+                    "name": "CheckoutForm",
+                    "section": "Components > CheckoutForm",
+                    "content_md": "## CheckoutForm\n\nHandles the checkout flow...",
+                },
+                "task_id": _TASK_ID,
+                "entity_name": "CheckoutForm-docs",
             },
-            "task_id": _TASK_ID,
-            "entity_name": "CheckoutForm-docs",
-        },
-    )
-    assert r.status_code == 200, f"Docs agent event emit failed: {r.text}"
+        )
+        assert r.status_code == 200, f"Docs agent event emit failed: {r.text}"
 
     # ── Step 8: Docs agent publishes DocSection artifact ──────────────
-    r = await c.post(
-        "/artifacts",
-        json={
-            "artifact_type": "doc_section",
-            "name": "CheckoutForm-docs",
-            "content": {
-                "section": "Components > CheckoutForm",
-                "content_md": (
-                    "## CheckoutForm\n\n"
-                    "Handles the checkout flow with form validation.\n\n"
-                    "### Props\n"
-                    "- `onSubmit`: `(data: FormData) => Promise<void>`\n"
-                    "- `cartItems`: `CartItem[]`\n\n"
-                    "### Test IDs\n"
-                    "- `checkout-form` — root form element\n"
-                    "- `checkout-submit-btn` — submit button\n"
-                    "- `checkout-total` — total display\n"
-                ),
-                "screenshot_url": "screenshots/checkout-form.png",
+    with as_agent(_DOCS_AGENT_ID, _ORG_ID, "Docs Agent", level=5):
+        r = await c.post(
+            "/artifacts",
+            json={
+                "artifact_type": "doc_section",
+                "name": "CheckoutForm-docs",
+                "content": {
+                    "section": "Components > CheckoutForm",
+                    "content_md": (
+                        "## CheckoutForm\n\n"
+                        "Handles the checkout flow with form validation.\n\n"
+                        "### Props\n"
+                        "- `onSubmit`: `(data: FormData) => Promise<void>`\n"
+                        "- `cartItems`: `CartItem[]`\n\n"
+                        "### Test IDs\n"
+                        "- `checkout-form` — root form element\n"
+                        "- `checkout-submit-btn` — submit button\n"
+                        "- `checkout-total` — total display\n"
+                    ),
+                    "screenshot_url": "screenshots/checkout-form.png",
+                },
+                "task_id": _TASK_ID,
+                "source_artifact_ids": [test_artifact_id],
+                "metadata": {"generated_by": "docs-agent"},
             },
-            "task_id": _TASK_ID,
-            "source_artifact_ids": [test_artifact_id],
-            "metadata": {"generated_by": "docs-agent"},
-        },
-    )
-    assert r.status_code == 201, f"Docs artifact publish failed: {r.text}"
-    docs_artifact = r.json()["data"]
-    assert docs_artifact["artifact_type"] == "doc_section"
-    assert docs_artifact["version"] == 1
-    docs_artifact_id = docs_artifact["id"]
+        )
+        assert r.status_code == 201, f"Docs artifact publish failed: {r.text}"
+        docs_artifact = r.json()["data"]
+        assert docs_artifact["artifact_type"] == "doc_section"
+        assert docs_artifact["version"] == 1
+        docs_artifact_id = docs_artifact["id"]
 
     # ── Step 9: Dev agent publishes Component artifact ────────────────
-    r = await c.post(
-        "/artifacts",
-        json={
-            "artifact_type": "component",
-            "name": "CheckoutForm",
-            "content": {
-                "file_path": "src/components/CheckoutForm.tsx",
-                "test_ids": ["checkout-form", "checkout-submit-btn", "checkout-total"],
-                "props": [
-                    {"name": "onSubmit", "type": "(data: FormData) => Promise<void>"},
-                    {"name": "cartItems", "type": "CartItem[]"},
-                ],
-                "route": "/checkout",
-                "loc": 147,
+    with as_agent(_DEV_AGENT_ID, _ORG_ID, "Dev Agent", level=7):
+        r = await c.post(
+            "/artifacts",
+            json={
+                "artifact_type": "component",
+                "name": "CheckoutForm",
+                "content": {
+                    "file_path": "src/components/CheckoutForm.tsx",
+                    "test_ids": ["checkout-form", "checkout-submit-btn", "checkout-total"],
+                    "props": [
+                        {"name": "onSubmit", "type": "(data: FormData) => Promise<void>"},
+                        {"name": "cartItems", "type": "CartItem[]"},
+                    ],
+                    "route": "/checkout",
+                    "loc": 147,
+                },
+                "task_id": _TASK_ID,
+                "metadata": {"generated_by": "dev-agent"},
             },
-            "task_id": _TASK_ID,
-            "metadata": {"generated_by": "dev-agent"},
-        },
-    )
-    assert r.status_code == 201, f"Dev artifact publish failed: {r.text}"
-    dev_artifact = r.json()["data"]
-    assert dev_artifact["artifact_type"] == "component"
-    dev_artifact_id = dev_artifact["id"]
+        )
+        assert r.status_code == 201, f"Dev artifact publish failed: {r.text}"
+        dev_artifact = r.json()["data"]
+        assert dev_artifact["artifact_type"] == "component"
+        dev_artifact_id = dev_artifact["id"]
 
     # ═══════════════════════════════════════════════════════════════════
     # VERIFICATION: Projections
