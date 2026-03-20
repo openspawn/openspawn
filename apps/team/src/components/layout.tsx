@@ -73,16 +73,23 @@ function SidePanelOverlay() {
   if (!isOpen || !content) return null;
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
-      <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]">
-        <SidePanelShell
-          title={title}
-          onClose={closeSidePanel}
-          width={width}
-          onWidthChange={setWidth}
-        >
-          {content}
-        </SidePanelShell>
+      {/* Backdrop — only visible on desktop */}
+      <div className="fixed inset-0 z-40 bg-black/30 hidden md:block" onClick={closeSidePanel} />
+      {/* Panel container — full-screen on mobile, right sidebar on desktop */}
+      <div
+        className="fixed inset-0 z-50 bg-[hsl(var(--background))] md:inset-y-0 md:right-0 md:left-auto"
+        style={{ '--panel-width': `${width}px` } as React.CSSProperties}
+      >
+        <div className="h-full w-full md:w-[var(--panel-width)]">
+          <SidePanelShell
+            title={title}
+            onClose={closeSidePanel}
+            width={width}
+            onWidthChange={setWidth}
+          >
+            {content}
+          </SidePanelShell>
+        </div>
       </div>
     </>
   );

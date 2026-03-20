@@ -239,7 +239,7 @@ export function AgentDetailPanel({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6">
+      <div className="p-4 md:p-5 space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
           <div className="relative">
@@ -295,7 +295,7 @@ export function AgentDetailPanel({
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <StatBox
             icon={<Shield className="w-4 h-4 text-cyan-400" />}
             label="Trust"
@@ -321,9 +321,9 @@ export function AgentDetailPanel({
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className={cn("w-full grid bg-white/5 rounded-lg h-8", `grid-cols-${tabItems.length}`)}>
+          <TabsList className={cn("w-full grid bg-white/5 rounded-lg h-9 md:h-8 overflow-x-auto", `grid-cols-${tabItems.length}`)}>
             {tabItems.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="text-xs">
+              <TabsTrigger key={tab.value} value={tab.value} className="text-[11px] md:text-xs min-h-[36px] md:min-h-0 whitespace-nowrap">
                 {tab.label}
                 {tab.count != null && <span className="ml-1 text-white/40">({tab.count})</span>}
               </TabsTrigger>
@@ -405,7 +405,7 @@ export function AgentDetailPanel({
                   <button
                     key={task.id}
                     onClick={() => onTaskClick?.(task.id)}
-                    className="w-full flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] transition-colors text-left"
+                    className="w-full flex items-center gap-2 p-3 md:p-2 min-h-[44px] rounded-lg bg-white/[0.03] hover:bg-white/[0.06] transition-colors text-left"
                   >
                     {taskStatusIcon(task.status)}
                     <span className="text-xs text-white/80 truncate flex-1">{task.title}</span>
@@ -597,7 +597,7 @@ function TaskRow({ task, onClick }: { task: AgentPanelTask; onClick?: () => void
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-transparent hover:border-white/10 transition-all text-left group"
+      className="w-full flex items-center gap-2.5 p-3 md:p-2.5 min-h-[44px] rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-transparent hover:border-white/10 transition-all text-left group"
     >
       {taskStatusIcon(task.status)}
       <div className="flex-1 min-w-0">

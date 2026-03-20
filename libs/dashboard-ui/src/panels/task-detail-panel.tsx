@@ -224,7 +224,7 @@ export function TaskDetailPanel({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6">
+      <div className="p-4 md:p-5 space-y-6">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
@@ -262,7 +262,7 @@ export function TaskDetailPanel({
                 const isDestructive = DESTRUCTIVE_STATUSES.has(nextStatus);
                 return (
                   <Button key={nextStatus} variant={isDestructive ? "destructive" : "outline"} size="sm"
-                    className={cn("text-xs gap-1.5", !isDestructive && "hover:border-white/30")}
+                    className={cn("text-xs gap-1.5 min-h-[44px] md:min-h-0", !isDestructive && "hover:border-white/30")}
                     onClick={() => handleTransition(nextStatus)}>
                     <ChevronRight className="w-3 h-3" />{cfg.label}
                   </Button>
@@ -308,7 +308,7 @@ export function TaskDetailPanel({
             <p className="text-xs text-white/30">Unassigned</p>
           )}
           {agents && agents.length > 0 && onAssign && (
-            <select className="w-full text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white/70 focus:outline-none focus:border-cyan-500/50"
+            <select className="w-full text-sm md:text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 md:py-2 min-h-[44px] md:min-h-0 text-white/70 focus:outline-none focus:border-cyan-500/50"
               value={task.assigneeId ?? ""} onChange={(e) => { if (e.target.value) onAssign(e.target.value); }}>
               <option value="">Assign to agent…</option>
               {agents.map((agent) => (<option key={agent.id} value={agent.id}>{agent.name}</option>))}
@@ -343,12 +343,12 @@ export function TaskDetailPanel({
                     </div>
                     {onApproveApproval && onRejectApproval && (
                       <div className="space-y-2">
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="text-xs gap-1 text-emerald-400 hover:bg-emerald-500/10"
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" className="text-xs gap-1 min-h-[44px] md:min-h-0 text-emerald-400 hover:bg-emerald-500/10"
                             onClick={() => onApproveApproval(approval.id)}>
                             <ThumbsUp className="w-3 h-3" />Approve
                           </Button>
-                          <Button size="sm" variant="outline" className="text-xs gap-1 text-red-400 hover:bg-red-500/10"
+                          <Button size="sm" variant="outline" className="text-xs gap-1 min-h-[44px] md:min-h-0 text-red-400 hover:bg-red-500/10"
                             onClick={() => { const notes = rejectNotes[approval.id]; if (notes?.trim()) onRejectApproval(approval.id, notes.trim()); }}>
                             <ThumbsDown className="w-3 h-3" />Reject
                           </Button>
@@ -375,22 +375,22 @@ export function TaskDetailPanel({
           <div className="space-y-2">
             <h4 className="text-xs font-medium text-white/50 uppercase tracking-wider">Escalation</h4>
             {!showEscalate ? (
-              <Button size="sm" variant="outline" className="text-xs gap-1.5 text-amber-400 hover:bg-amber-500/10"
+              <Button size="sm" variant="outline" className="text-xs gap-1.5 min-h-[44px] md:min-h-0 w-full md:w-auto text-amber-400 hover:bg-amber-500/10"
                 onClick={() => setShowEscalate(true)}>
                 <ShieldAlert className="w-3 h-3" />Escalate Task
               </Button>
             ) : (
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 space-y-2">
-                <select className="w-full text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white/70 focus:outline-none"
+                <select className="w-full text-sm md:text-xs bg-white/5 border border-white/10 rounded px-2 py-2.5 md:py-1.5 min-h-[44px] md:min-h-0 text-white/70 focus:outline-none"
                   value={escalateReason} onChange={(e) => setEscalateReason(e.target.value)}>
                   {ESCALATION_REASONS.map((r) => (<option key={r} value={r}>{r.replace(/_/g, " ")}</option>))}
                 </select>
                 <input type="text" placeholder="Notes (optional)…"
-                  className="w-full text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 text-white/70 focus:outline-none"
+                  className="w-full text-sm md:text-xs bg-white/5 border border-white/10 rounded px-2 py-2.5 md:py-1.5 min-h-[44px] md:min-h-0 text-white/70 focus:outline-none"
                   value={escalateNotes} onChange={(e) => setEscalateNotes(e.target.value)} />
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="text-xs" onClick={handleEscalate}>Escalate</Button>
-                  <Button size="sm" variant="ghost" className="text-xs" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" className="text-xs min-h-[44px] md:min-h-0" onClick={handleEscalate}>Escalate</Button>
+                  <Button size="sm" variant="ghost" className="text-xs min-h-[44px] md:min-h-0" onClick={() => setShowEscalate(false)}>Cancel</Button>
                 </div>
               </div>
             )}
@@ -433,10 +433,10 @@ export function TaskDetailPanel({
           {onAddComment && (
             <div className="flex gap-2">
               <input type="text" placeholder="Add a comment…"
-                className="flex-1 text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white/70 focus:outline-none focus:border-cyan-500/50"
+                className="flex-1 text-sm md:text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 md:py-2 min-h-[44px] md:min-h-0 text-white/70 focus:outline-none focus:border-cyan-500/50"
                 value={commentText} onChange={(e) => setCommentText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAddComment(); } }} />
-              <Button size="sm" variant="outline" className="text-xs gap-1" onClick={handleAddComment} disabled={!commentText.trim()}>
+              <Button size="sm" variant="outline" className="text-xs gap-1 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0" onClick={handleAddComment} disabled={!commentText.trim()}>
                 <Send className="w-3 h-3" />
               </Button>
             </div>
