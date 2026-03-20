@@ -21,6 +21,7 @@ from app.memory.graph.router import router as graph_router
 from app.memory.router import router as memory_router
 from app.messages.router import router as messages_router
 from app.observability import setup_logfire
+from app.auth.router_agent_jwt import router as agent_jwt_router
 from app.routers.auth import router as auth_router
 from app.tasks.router import router as tasks_router
 
@@ -53,6 +54,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(agent_jwt_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)
 app.include_router(credits_router)
