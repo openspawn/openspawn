@@ -6,8 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.router import router as agents_router
+from app.apikeys.router import router as hosted_auth_router
+from app.apikeys.usage_middleware import UsageTrackingMiddleware
 from app.approvals.router import router as approvals_router
 from app.artifacts.router import router as artifacts_router
+from app.auth.router_agent_jwt import router as agent_jwt_router
 from app.config import settings
 from app.coordination.rest import router as coordination_router
 from app.credits.router import router as credits_router
@@ -21,7 +24,6 @@ from app.memory.graph.router import router as graph_router
 from app.memory.router import router as memory_router
 from app.messages.router import router as messages_router
 from app.observability import setup_logfire
-from app.auth.router_agent_jwt import router as agent_jwt_router
 from app.routers.auth import router as auth_router
 from app.tasks.router import router as tasks_router
 
@@ -54,6 +56,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(hosted_auth_router)
 app.include_router(agent_jwt_router)
 app.include_router(agents_router)
 app.include_router(tasks_router)
@@ -68,6 +71,11 @@ app.include_router(graph_router)
 app.include_router(coordination_router)
 app.include_router(approvals_router)
 app.include_router(ideation_router)
+
+
+# Usage tracking middleware (hosted mode only, no-ops when disabled)
+
+app.add_middleware(UsageTrackingMiddleware)
 
 
 @app.get("/health")

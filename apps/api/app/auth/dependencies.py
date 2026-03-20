@@ -32,7 +32,7 @@ def _try_agent_jwt(token: str) -> AuthenticatedAgent | None:
     Raises HTTPException only for *expired* agent tokens (clear signal).
     """
     try:
-        from app.auth.jwt_agent import decode_agent_token, authenticated_agent_from_jwt
+        from app.auth.jwt_agent import authenticated_agent_from_jwt, decode_agent_token
 
         payload = decode_agent_token(token)
         return authenticated_agent_from_jwt(payload)
@@ -137,11 +137,17 @@ async def _authenticate_api_key(
         if pendulum.now("UTC") > pendulum.instance(api_key.expires_at):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key expired")
 
+    # Fetch user to get email and name
+    user_result = await db.execute(select(User).where(User.id == api_key.user_id))
+    user = user_result.scalar_one_or_none()
+    email = user.email if user else ""
+    name = user.name if user else api_key.name
+
     return AuthenticatedUser(
         id=api_key.user_id,
         org_id=api_key.org_id,
-        email="",
-        name=api_key.name,
+        email=email,
+        name=name,
         role="api_key",
         scopes=[str(s) for s in api_key.scopes],
         is_api_key=True,

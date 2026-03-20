@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.dependencies import _authenticate_hmac
 from app.auth.jwt_agent import (
     AGENT_JWT_TTL_MINUTES,
-    authenticated_agent_from_jwt,
     create_agent_token,
     decode_agent_token,
     scopes_for_level,

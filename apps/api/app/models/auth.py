@@ -3,7 +3,11 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
+<<<<<<< HEAD
 from sqlalchemy import func, ForeignKey, Index, LargeBinary, String
+=======
+from sqlalchemy import ForeignKey, Index, LargeBinary, String, func
+>>>>>>> origin/main
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
