@@ -358,9 +358,7 @@ def upgrade() -> None:
     op.create_index(
         "ix_task_comments_task_id_created_at", "task_comments", ["task_id", "created_at"]
     )
-    op.create_index(
-        "ix_task_comments_parent_comment_id", "task_comments", ["parent_comment_id"]
-    )
+    op.create_index("ix_task_comments_parent_comment_id", "task_comments", ["parent_comment_id"])
 
     # ── 9. channels (→ organizations, tasks) ─────────────────────────────────
     op.create_table(
@@ -442,9 +440,7 @@ def upgrade() -> None:
             server_default=sa.func.now(),
         ),
     )
-    op.create_index(
-        "ix_messages_channel_id_created_at", "messages", ["channel_id", "created_at"]
-    )
+    op.create_index("ix_messages_channel_id_created_at", "messages", ["channel_id", "created_at"])
     op.create_index("ix_messages_org_id_sender_id", "messages", ["org_id", "sender_id"])
     op.create_index("ix_messages_org_id_recipient_id", "messages", ["org_id", "recipient_id"])
     op.create_index("ix_messages_parent_message_id", "messages", ["parent_message_id"])
@@ -740,9 +736,7 @@ def upgrade() -> None:
     op.create_index(
         "ix_escalations_org_id_from_agent_id", "escalations", ["org_id", "from_agent_id"]
     )
-    op.create_index(
-        "ix_escalations_org_id_to_agent_id", "escalations", ["org_id", "to_agent_id"]
-    )
+    op.create_index("ix_escalations_org_id_to_agent_id", "escalations", ["org_id", "to_agent_id"])
     op.create_index("ix_escalations_org_id_created_at", "escalations", ["org_id", "created_at"])
 
     # ── 19. reputation_events (→ organizations, agents x2, tasks) ────────────
@@ -792,9 +786,7 @@ def upgrade() -> None:
     op.create_index(
         "ix_reputation_events_org_id_created_at", "reputation_events", ["org_id", "created_at"]
     )
-    op.create_index(
-        "ix_reputation_events_agent_id_type", "reputation_events", ["agent_id", "type"]
-    )
+    op.create_index("ix_reputation_events_agent_id_type", "reputation_events", ["agent_id", "type"])
 
     # ── 20. consensus_requests (→ organizations, agents) ─────────────────────
     op.create_table(
@@ -842,9 +834,7 @@ def upgrade() -> None:
     op.create_index(
         "ix_consensus_requests_org_id_status", "consensus_requests", ["org_id", "status"]
     )
-    op.create_index(
-        "ix_consensus_requests_org_id_type", "consensus_requests", ["org_id", "type"]
-    )
+    op.create_index("ix_consensus_requests_org_id_type", "consensus_requests", ["org_id", "type"])
     op.create_index(
         "ix_consensus_requests_org_id_requester_id",
         "consensus_requests",

@@ -77,4 +77,79 @@ describe("org-parser", () => {
     expect(org2.name).toBe(org.name);
     expect(org2.agents.length).toBe(org.agents.length);
   });
+
+  it("parses defaultAutonomy from culture", () => {
+    const md = `# TestOrg
+
+## Culture
+
+- **Preset:** balanced
+- **Default Autonomy:** 5
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    expect(org.culture.defaultAutonomy).toBe(5);
+  });
+
+  it("parses risk overrides from policies", () => {
+    const md = `# TestOrg
+
+## Policies
+
+- **Per-Agent Limit:** $100
+
+### Risk Overrides
+
+- artifact_publish/migration: 9
+- artifact_publish/component: 4
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    expect(org.policies.riskOverrides).toEqual({
+      "artifact_publish/migration": 9,
+      "artifact_publish/component": 4,
+    });
+  });
+
+  it("roundtrips autonomy and risk overrides", () => {
+    const md = `# TestOrg
+
+## Culture
+
+- **Preset:** balanced
+- **Default Autonomy:** 7
+
+## Policies
+
+- **Per-Agent Limit:** $100
+
+### Risk Overrides
+
+- task_transition/done: 1
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    const generated = generateOrgMd(org);
+    const org2 = parseOrgMdContent(generated);
+    expect(org2.culture.defaultAutonomy).toBe(7);
+    expect(org2.policies.riskOverrides).toEqual({ "task_transition/done": 1 });
+  });
 });

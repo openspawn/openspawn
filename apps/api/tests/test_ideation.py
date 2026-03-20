@@ -403,10 +403,10 @@ async def test_full_3_round_flow(seeded_client: AsyncClient):
             )
             assert r.status_code == 201
 
-    # Verify moved to synthesis
+    # Verify moved to awaiting synthesis
     with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA"):
         r = await c.get(f"/ideation/sessions/{session_id}")
-        assert r.json()["data"]["status"] == "synthesized"
+        assert r.json()["data"]["status"] == "awaiting_synthesis"
 
     # 4. Synthesize
     with as_agent(_AGENT_A_ID, _OWNER_ORG_ID, "AgentA", level=7):

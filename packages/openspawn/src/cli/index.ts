@@ -17,6 +17,7 @@ Commands:
     --non-interactive            Same as --yes
     --dry-run                    Simulate after scaffold
     --deploy                     Generate Docker infra
+    --low-cost                   Use budget models (GPT-4o-mini)
     -p, --port <n>               Coordinator port (default: 8787)
   preview                        Preview org in local sandbox
     --port <n>                   Dashboard port (default: 3333)

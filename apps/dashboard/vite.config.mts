@@ -74,12 +74,16 @@ export default defineConfig(() => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    chunkSizeWarningLimit: 4200,
     rollupOptions: {
       output: {
         manualChunks: {
           "vendor-react": ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-query"],
           "vendor-motion": ["motion/react"],
           "vendor-xyflow": ["@xyflow/react", "elkjs"],
+          "vendor-recharts": ["recharts"],
+          "vendor-lucide": ["lucide-react"],
+          "vendor-base-ui": ["@base-ui/react"],
         },
       },
     },
