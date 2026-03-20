@@ -30,7 +30,7 @@ async def register_user(
     email: str,
     password: str,
     name: str,
-    db: "AsyncSession",
+    db: AsyncSession,
 ) -> tuple[User, Organization, str]:
     """Create user, default org, and API key. Returns (user, org, plaintext_key)."""
 
@@ -89,7 +89,7 @@ async def register_user(
 async def login_user(
     email: str,
     password: str,
-    db: "AsyncSession",
+    db: AsyncSession,
 ) -> tuple[User, str]:
     """Authenticate and return (or create) an API key. Returns (user, plaintext_key)."""
     from fastapi import HTTPException, status
@@ -114,7 +114,7 @@ async def login_user(
     api_key = ApiKey(
         org_id=user.org_id,
         user_id=user.id,
-        name=f"Login key",
+        name="Login key",
         key_prefix=prefix,
         key_hash=key_hash,
         scopes=["read", "write", "admin"],
@@ -125,7 +125,7 @@ async def login_user(
     return user, plaintext
 
 
-async def get_usage(user_id: uuid.UUID, db: "AsyncSession") -> dict:
+async def get_usage(user_id: uuid.UUID, db: AsyncSession) -> dict:
     """Return basic usage stats for a user."""
     from app.models.agent import Agent
 
@@ -159,7 +159,7 @@ async def get_usage(user_id: uuid.UUID, db: "AsyncSession") -> dict:
     }
 
 
-async def _get_api_call_count(user_id: uuid.UUID, db: "AsyncSession") -> int:
+async def _get_api_call_count(user_id: uuid.UUID, db: AsyncSession) -> int:
     """Get API call count from usage_tracking table."""
     try:
         from app.models.usage import UsageCounter

@@ -79,7 +79,6 @@ async def test_register_duplicate_email(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_register_disabled_in_selfhosted(client: AsyncClient):
     """Registration returns 404 when HOSTED_MODE=false."""
-    from unittest.mock import PropertyMock
 
     from app.config import settings
 

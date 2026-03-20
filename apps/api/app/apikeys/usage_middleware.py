@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import structlog
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
 
 from app.config import get_settings
+
+if TYPE_CHECKING:
+    from starlette.requests import Request
+    from starlette.responses import Response
 
 logger = structlog.stdlib.get_logger()
 
@@ -46,7 +50,7 @@ async def _increment_usage(api_key: str) -> None:
     import hashlib
 
     import pendulum
-    from sqlalchemy import select, update
+    from sqlalchemy import select
 
     from app.database import async_session
     from app.models.auth import ApiKey
