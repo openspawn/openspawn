@@ -18,7 +18,7 @@ export { useCreditHistory, useRestCredits } from "./use-credits";
 export { useEvents } from "./use-events";
 export { useChannels } from "./use-channels";
 export { useRestMessages } from "./use-messages";
-export { useRestMemories, useRestMemorySearch, useRestContradictions } from "./use-memory";
+export { useRestMemories, useRestMemorySearch, useRestContradictions, useMemoryList, useMemoryFeedback } from "./use-memory";
 export {
   useRestGraphEntities,
   useRestGraphRelationships,

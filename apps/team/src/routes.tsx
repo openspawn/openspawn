@@ -9,6 +9,7 @@ import { SettingsPage } from "./pages/settings";
 import { CreditsPage } from "./pages/credits";
 import { TaskBoardPage } from "./pages/task-board";
 import { NetworkPage } from "./pages/network";
+import { MemoryPage } from "./pages/memory";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -71,6 +72,12 @@ const networkRoute = createRoute({
   component: NetworkPage,
 });
 
+const memoryRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/memory",
+  component: MemoryPage,
+});
+
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
     indexRoute,
@@ -82,6 +89,7 @@ const routeTree = rootRoute.addChildren([
     creditsRoute,
     taskBoardRoute,
     networkRoute,
+    memoryRoute,
   ]),
 ]);
 
