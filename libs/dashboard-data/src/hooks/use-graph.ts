@@ -61,8 +61,11 @@ export function useGraphCytoscape() {
     };
   }
 
-  const nodes = rest.data && "nodes" in rest.data ? rest.data.nodes : [];
-  const edges = rest.data && "edges" in rest.data ? rest.data.edges : [];
+  // API returns { data: { nodes, edges } } — unwrap the outer data envelope
+  const raw = rest.data && "data" in rest.data ? (rest.data as Record<string, unknown>).data : rest.data;
+  const envelope = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const nodes = "nodes" in envelope ? envelope.nodes : [];
+  const edges = "edges" in envelope ? envelope.edges : [];
 
   return {
     nodes: Array.isArray(nodes) ? nodes : [],
