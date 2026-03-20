@@ -31,7 +31,7 @@ def _try_agent_jwt(token: str) -> AuthenticatedAgent | None:
     Raises HTTPException only for *expired* agent tokens (clear signal).
     """
     try:
-        from app.auth.jwt_agent import decode_agent_token, authenticated_agent_from_jwt
+        from app.auth.jwt_agent import authenticated_agent_from_jwt, decode_agent_token
 
         payload = decode_agent_token(token)
         return authenticated_agent_from_jwt(payload)

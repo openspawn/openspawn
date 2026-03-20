@@ -21,8 +21,8 @@ from app.auth.schemas import AuthenticatedAgent
 # ---------------------------------------------------------------------------
 
 _BASE_SCOPES = ["read:channels", "read:tasks"]
-_MID_SCOPES = _BASE_SCOPES + ["write:messages", "transition:task"]
-_HIGH_SCOPES = _MID_SCOPES + ["create:task", "spawn:agent", "manage:credits"]
+_MID_SCOPES = [*_BASE_SCOPES, "write:messages", "transition:task"]
+_HIGH_SCOPES = [*_MID_SCOPES, "create:task", "spawn:agent", "manage:credits"]
 _ALL_SCOPES = ["*"]
 
 AGENT_JWT_TTL_MINUTES = 15

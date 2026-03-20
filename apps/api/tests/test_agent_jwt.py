@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import jwt
 import pendulum
 import pytest
-from httpx import ASGITransport, AsyncClient
+from httpx import AsyncClient
 
 from app.auth.jwt_agent import (
     AGENT_JWT_ALGORITHM,
@@ -254,8 +254,8 @@ class TestRefreshEndpoint:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        from app.main import app
         from app.database import get_db
+        from app.main import app
 
         app.dependency_overrides[get_db] = lambda: mock_db
         try:
@@ -287,8 +287,8 @@ class TestRefreshEndpoint:
         mock_db = AsyncMock()
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        from app.main import app
         from app.database import get_db
+        from app.main import app
 
         app.dependency_overrides[get_db] = lambda: mock_db
         try:
@@ -372,8 +372,9 @@ class TestRequireAuthAcceptsAgentJWT:
 
     def test_try_agent_jwt_raises_for_expired_agent_token(self):
         """_try_agent_jwt should raise for expired agent tokens."""
-        from app.auth.dependencies import _try_agent_jwt
         from fastapi import HTTPException
+
+        from app.auth.dependencies import _try_agent_jwt
 
         agent = _make_agent()
         secret = TEST_JWT_SECRET

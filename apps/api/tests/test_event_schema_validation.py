@@ -22,7 +22,6 @@ from app.coordination.event_schemas import (
 from app.coordination.schemas import EmitEventDto
 from app.coordination.service import emit_coordination_event
 
-
 # ---------------------------------------------------------------------------
 # Unit tests: payload models
 # ---------------------------------------------------------------------------
