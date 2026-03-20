@@ -252,6 +252,22 @@ class WebhookHookType(enum.StrEnum):
     POST = "post"
 
 
+class IdeationStatus(enum.StrEnum):
+    PENDING = "pending"
+    ROUND1 = "round1"
+    ROUND2 = "round2"
+    AWAITING_SYNTHESIS = "awaiting_synthesis"
+    SYNTHESIZED = "synthesized"
+    APPROVED = "approved"
+    CANCELLED = "cancelled"
+
+
+class IdeationRole(enum.StrEnum):
+    PROPOSER = "proposer"
+    REVIEWER = "reviewer"
+    SYNTHESIZER = "synthesizer"
+
+
 class ApprovalStatus(enum.StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
@@ -292,6 +308,13 @@ class SSEEventType(enum.StrEnum):
     # Autonomy Dial (#668)
     APPROVAL_REQUESTED = "approval.requested"
     APPROVAL_RESOLVED = "approval.resolved"
+
+    # Cooperative Ideation (#669)
+    IDEATION_STARTED = "ideation.started"
+    IDEATION_BRIEF_SUBMITTED = "ideation.brief_submitted"
+    IDEATION_ROUND_ADVANCED = "ideation.round_advanced"
+    IDEATION_SYNTHESIZED = "ideation.synthesized"
+    IDEATION_APPROVED = "ideation.approved"
 
     # Coordination Event Mesh (#666)
     COMPONENT_CREATED = "component.created"

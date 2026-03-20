@@ -19,6 +19,8 @@ from app.models.enums import (
     EntityType,
     EscalationReason,
     EventSeverity,
+    IdeationRole,
+    IdeationStatus,
     IdleReason,
     MemorySource,
     MemoryType,
@@ -36,6 +38,7 @@ from app.models.escalation import Escalation
 from app.models.event import Event
 from app.models.event_subscription import EventSubscription
 from app.models.graph import GraphEntity, GraphRelationship, MemoryEntityLink
+from app.models.ideation import IdeationBrief, IdeationSession
 from app.models.integration import GitHubConnection, IntegrationLink, LinearConnection
 from app.models.memory import Memory
 from app.models.message import Channel, Message
@@ -75,6 +78,10 @@ __all__ = [
     "GitHubConnection",
     "GraphEntity",
     "GraphRelationship",
+    "IdeationBrief",
+    "IdeationRole",
+    "IdeationSession",
+    "IdeationStatus",
     "IdempotencyKey",
     "IdleReason",
     "InboundWebhookKey",

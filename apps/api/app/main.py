@@ -13,6 +13,7 @@ from app.coordination.rest import router as coordination_router
 from app.credits.router import router as credits_router
 from app.database import engine
 from app.events.router import router as events_router
+from app.ideation.router import router as ideation_router
 from app.events.sse_router import router as sse_router
 from app.integrations.router import router as integrations_router
 from app.logging import setup_logging
@@ -64,6 +65,7 @@ app.include_router(memory_router)
 app.include_router(graph_router)
 app.include_router(coordination_router)
 app.include_router(approvals_router)
+app.include_router(ideation_router)
 
 
 @app.get("/health")

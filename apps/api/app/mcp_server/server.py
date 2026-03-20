@@ -540,6 +540,66 @@ async def coordination_project(
 # ═══════════════════════════════════════════════
 
 
+# ═══════════════════════════════════════════════
+# Ideation Tools (#669)
+# ═══════════════════════════════════════════════
+
+
+@mcp.tool
+async def ideation_start(
+    task_id: str,
+    participant_agent_ids: str | None = None,
+    autonomy_level: int = 5,
+) -> str:
+    """Start a cooperative ideation session for a task. Optionally specify participant agent IDs as JSON array."""
+    body: dict[str, object] = {"task_id": task_id, "autonomy_level": autonomy_level}
+    if participant_agent_ids:
+        body["participant_agent_ids"] = json.loads(participant_agent_ids)
+    result = await _get_client().post("/ideation/sessions", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def ideation_propose(
+    session_id: str,
+    content_json: str,
+) -> str:
+    """Submit a proposal brief (round 1). Content should include proposed_approach, estimated_scope, risks, dependencies, parallel_streams, and artifacts_produced."""
+    body = {"content": json.loads(content_json)}
+    result = await _get_client().post(f"/ideation/sessions/{session_id}/briefs", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def ideation_review(
+    session_id: str,
+    reviewing_agent: str,
+    content_json: str,
+) -> str:
+    """Submit a review of another agent's proposal (round 2). Content should include concerns, suggestions, missing_streams, and dependencies_missed."""
+    body = {"content": {**json.loads(content_json), "reviewing": reviewing_agent}}
+    result = await _get_client().post(f"/ideation/sessions/{session_id}/briefs", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def ideation_synthesize(
+    session_id: str,
+    content_json: str,
+) -> str:
+    """Synthesize all briefs into a unified plan (round 3)."""
+    body = {"content": json.loads(content_json)}
+    result = await _get_client().post(f"/ideation/sessions/{session_id}/synthesize", json=body)
+    return _format(result)
+
+
+@mcp.tool
+async def ideation_status(session_id: str) -> str:
+    """Get the status and briefs for an ideation session."""
+    result = await _get_client().get(f"/ideation/sessions/{session_id}")
+    return _format(result)
+
+
 @mcp.tool
 async def approval_request(
     action_type: str,
