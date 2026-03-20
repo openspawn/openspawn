@@ -85,6 +85,8 @@ function MemoryFeed() {
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [agentFilter, setAgentFilter] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  // Track user's vote per memory: "up" | "down" | null (togglable)
+  const [votes, setVotes] = useState<Record<string, "up" | "down" | null>>({});
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -271,21 +273,42 @@ function MemoryFeed() {
                 )}
                 <div className="ml-auto flex items-center gap-1">
                   <button
-                    onClick={() =>
-                      feedbackMutation.mutate({ memoryId: memory.id, helpful: true })
-                    }
-                    className="flex items-center gap-1 rounded-md px-2 py-1 hover:bg-green-500/10 hover:text-green-400 transition-colors"
-                    title="Helpful"
+                    onClick={() => {
+                      const current = votes[memory.id];
+                      const next = current === "up" ? null : "up";
+                      setVotes((v) => ({ ...v, [memory.id]: next }));
+                      if (next === "up") {
+                        feedbackMutation.mutate({ memoryId: memory.id, helpful: true });
+                      }
+                      // null = undo vote (no API call for undo, just visual)
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md px-2 py-1 transition-colors",
+                      votes[memory.id] === "up"
+                        ? "bg-green-500/20 text-green-400"
+                        : "text-white/30 hover:bg-green-500/10 hover:text-green-400",
+                    )}
+                    title={votes[memory.id] === "up" ? "Remove vote" : "Helpful"}
                   >
                     <ThumbsUp className="h-3 w-3" />
                     {memory.helpful_count > 0 && <span>{memory.helpful_count}</span>}
                   </button>
                   <button
-                    onClick={() =>
-                      feedbackMutation.mutate({ memoryId: memory.id, helpful: false })
-                    }
-                    className="flex items-center gap-1 rounded-md px-2 py-1 hover:bg-red-500/10 hover:text-red-400 transition-colors"
-                    title="Not helpful"
+                    onClick={() => {
+                      const current = votes[memory.id];
+                      const next = current === "down" ? null : "down";
+                      setVotes((v) => ({ ...v, [memory.id]: next }));
+                      if (next === "down") {
+                        feedbackMutation.mutate({ memoryId: memory.id, helpful: false });
+                      }
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md px-2 py-1 transition-colors",
+                      votes[memory.id] === "down"
+                        ? "bg-red-500/20 text-red-400"
+                        : "text-white/30 hover:bg-red-500/10 hover:text-red-400",
+                    )}
+                    title={votes[memory.id] === "down" ? "Remove vote" : "Not helpful"}
                   >
                     <ThumbsDown className="h-3 w-3" />
                     {memory.unhelpful_count > 0 && <span>{memory.unhelpful_count}</span>}

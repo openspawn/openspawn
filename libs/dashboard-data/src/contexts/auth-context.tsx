@@ -40,12 +40,11 @@ const TOKEN_STORAGE_KEY = "openspawn_auth";
 const REFRESH_THRESHOLD_MS = 60 * 1000; // Refresh 1 minute before expiry
 
 function getApiUrl(): string {
-  // Use the same host as the dashboard, but different port for API
+  // Use /api on same origin (Caddy proxies to FastAPI)
   if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    return `http://${host}:3000`;
+    return `${window.location.origin}/api`;
   }
-  return "http://localhost:3000";
+  return "http://localhost:8000";
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
