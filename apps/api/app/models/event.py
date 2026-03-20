@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, String
+from sqlalchemy import func, ForeignKey, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDPrimaryKeyMixin
@@ -34,7 +34,7 @@ class Event(UUIDPrimaryKeyMixin, Base):
         String(10), nullable=False, server_default=EventSeverity.INFO.value
     )
     reasoning: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")
     actor: Mapped[Agent] = relationship("Agent")

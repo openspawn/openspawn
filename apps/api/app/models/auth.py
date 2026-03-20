@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, LargeBinary, String
+from sqlalchemy import func, ForeignKey, Index, LargeBinary, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -50,7 +50,7 @@ class RefreshToken(UUIDPrimaryKeyMixin, Base):
     revoked_at: Mapped[datetime | None] = mapped_column(nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     user: Mapped[User] = relationship("User", back_populates="refresh_tokens")
 
@@ -73,7 +73,7 @@ class ApiKey(UUIDPrimaryKeyMixin, Base):
     last_used_at: Mapped[datetime | None] = mapped_column(nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
     revoked_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")
     created_by: Mapped[User] = relationship("User")
@@ -86,7 +86,7 @@ class Nonce(Base):
     nonce: Mapped[str] = mapped_column(String(64), primary_key=True)
     agent_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
 
 class IdempotencyKey(UUIDPrimaryKeyMixin, Base):
@@ -105,7 +105,7 @@ class IdempotencyKey(UUIDPrimaryKeyMixin, Base):
     status_code: Mapped[int] = mapped_column(nullable=False)
     response_body: Mapped[dict] = mapped_column(CompatJSONB(), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")
     agent: Mapped[Agent] = relationship("Agent")
