@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from fastapi import HTTPException, status
+from pydantic import ValidationError
 from sqlalchemy import select
 
+from app.coordination.event_schemas import EVENT_PAYLOAD_SCHEMAS
 from app.coordination.projections import (
     project_artifact_view,
     project_component_registry,
@@ -39,6 +41,18 @@ async def emit_coordination_event(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown event type: {dto.event_type}",
         ) from exc
+
+    # Validate payload against schema if one is registered for this event type.
+    # Unknown event types pass through without validation (extensibility).
+    schema_cls = EVENT_PAYLOAD_SCHEMAS.get(dto.event_type)
+    if schema_cls is not None:
+        try:
+            schema_cls.model_validate(dto.payload)
+        except ValidationError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid payload for {dto.event_type}: {exc.errors()}",
+            ) from exc
 
     targets = await _resolve_event_subscribers(db, org_id, dto.event_type, dto.task_id)
 
