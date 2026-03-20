@@ -28,7 +28,7 @@ import type { ReactNode } from "react";
 // Check for demo/sandbox mode via URL param or env
 const urlParams = new URLSearchParams(window.location.search);
 const isDemoMode = urlParams.get("demo") === "true" || import.meta.env.VITE_DEMO_MODE === "true";
-const scenarioParam = urlParams.get("scenario") || "acmetech";
+const scenarioParam = urlParams.get("scenario") || (isBBTheme ? "krusty-krab" : "acmetech");
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -1,0 +1,956 @@
+// ── Krusty Krab Demo Scenario ─────────────────────────────────────────────────
+// SpongeBob-themed demo for the dashboard. Showcases task delegation, role-based
+// routing, escalation, cross-team coordination, adversarial events, and credits.
+// Designed for bikinibottom.ai.
+
+import {
+  AgentRole,
+  AgentStatus,
+  ReputationLevel,
+  TaskStatus,
+  TaskPriority,
+  CreditType,
+  EventSeverity,
+  DemoMessageCategory,
+} from "@openspawn/shared-types";
+import type {
+  DemoScenario,
+  DemoAgent,
+  DemoTask,
+  DemoMessage,
+  DemoCreditTransaction,
+  DemoEvent,
+} from "../types";
+import { demoWebhooks } from "../fixtures/webhooks";
+
+// =============================================================================
+// AGENT IDS
+// =============================================================================
+
+const AGENT_IDS = {
+  mrKrabs: "kk-krabs-001",
+  spongebob: "kk-spongebob-001",
+  squidward: "kk-squidward-001",
+  patrick: "kk-patrick-001",
+  sandy: "kk-sandy-001",
+  plankton: "kk-plankton-001",
+};
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+const baseDate = new Date();
+baseDate.setDate(baseDate.getDate() - 1); // Start yesterday
+
+function hoursAgo(hours: number): string {
+  const d = new Date();
+  d.setHours(d.getHours() - hours);
+  return d.toISOString();
+}
+
+function minutesAgo(minutes: number): string {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - minutes);
+  return d.toISOString();
+}
+
+// =============================================================================
+// AGENTS
+// =============================================================================
+
+const agents: DemoAgent[] = [
+  {
+    id: AGENT_IDS.mrKrabs,
+    agentId: "mr-krabs",
+    name: "Mr. Krabs",
+    role: AgentRole.MANAGER,
+    level: 10,
+    status: AgentStatus.ACTIVE,
+    model: "claude-sonnet-4-20250514",
+    currentBalance: 15000,
+    lifetimeEarnings: 250000,
+    createdAt: hoursAgo(24),
+    domain: "Executive",
+    trustScore: 95,
+    reputationLevel: ReputationLevel.ELITE,
+    tasksCompleted: 312,
+    tasksSuccessful: 308,
+  },
+  {
+    id: AGENT_IDS.spongebob,
+    agentId: "spongebob",
+    name: "SpongeBob SquarePants",
+    role: AgentRole.SENIOR,
+    level: 7,
+    status: AgentStatus.ACTIVE,
+    model: "claude-sonnet-4-20250514",
+    currentBalance: 5000,
+    lifetimeEarnings: 45000,
+    createdAt: hoursAgo(24),
+    parentId: AGENT_IDS.mrKrabs,
+    domain: "Operations",
+    trustScore: 92,
+    reputationLevel: ReputationLevel.ELITE,
+    tasksCompleted: 247,
+    tasksSuccessful: 244,
+  },
+  {
+    id: AGENT_IDS.squidward,
+    agentId: "squidward",
+    name: "Squidward Tentacles",
+    role: AgentRole.SENIOR,
+    level: 7,
+    status: AgentStatus.ACTIVE,
+    model: "claude-haiku-3.5-20241022",
+    currentBalance: 3000,
+    lifetimeEarnings: 28000,
+    createdAt: hoursAgo(24),
+    parentId: AGENT_IDS.mrKrabs,
+    domain: "Customer Service",
+    trustScore: 78,
+    reputationLevel: ReputationLevel.VETERAN,
+    tasksCompleted: 198,
+    tasksSuccessful: 185,
+  },
+  {
+    id: AGENT_IDS.patrick,
+    agentId: "patrick",
+    name: "Patrick Star",
+    role: AgentRole.WORKER,
+    level: 3,
+    status: AgentStatus.ACTIVE,
+    model: "claude-haiku-3.5-20241022",
+    currentBalance: 500,
+    lifetimeEarnings: 4200,
+    createdAt: hoursAgo(24),
+    parentId: AGENT_IDS.spongebob,
+    domain: "Operations",
+    trustScore: 35,
+    reputationLevel: ReputationLevel.NEWCOMER,
+    tasksCompleted: 42,
+    tasksSuccessful: 23,
+  },
+  {
+    id: AGENT_IDS.sandy,
+    agentId: "sandy",
+    name: "Sandy Cheeks",
+    role: AgentRole.SENIOR,
+    level: 8,
+    status: AgentStatus.ACTIVE,
+    model: "claude-sonnet-4-20250514",
+    currentBalance: 8000,
+    lifetimeEarnings: 52000,
+    createdAt: hoursAgo(24),
+    parentId: AGENT_IDS.mrKrabs,
+    domain: "Engineering",
+    trustScore: 96,
+    reputationLevel: ReputationLevel.ELITE,
+    tasksCompleted: 156,
+    tasksSuccessful: 154,
+  },
+  {
+    id: AGENT_IDS.plankton,
+    agentId: "plankton",
+    name: "Plankton",
+    role: AgentRole.WORKER,
+    level: 6,
+    status: AgentStatus.ACTIVE,
+    model: "claude-haiku-3.5-20241022",
+    currentBalance: 100,
+    lifetimeEarnings: 1200,
+    createdAt: hoursAgo(12),
+    domain: "Security",
+    trustScore: 15,
+    reputationLevel: ReputationLevel.NEWCOMER,
+    tasksCompleted: 8,
+    tasksSuccessful: 2,
+  },
+];
+
+// =============================================================================
+// TASKS — 5 Acts of the Krusty Krab Day
+// =============================================================================
+
+const tasks: DemoTask[] = [
+  // ── ACT 1: Morning Briefing ─────────────────────────────────────────────
+
+  {
+    id: "kk-task-001",
+    identifier: "KK-001",
+    title: "Set daily target: serve 1,000 customers",
+    description: "Mr. Krabs announces today's revenue goal and delegates to the crew.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(90),
+    updatedAt: minutesAgo(88),
+    completedAt: minutesAgo(88),
+  },
+  {
+    id: "kk-task-002",
+    identifier: "KK-002",
+    title: "Delegate roles: SpongeBob → grill, Squidward → orders, Patrick → restock",
+    description: "Mr. Krabs assigns crew stations for the day.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(88),
+    updatedAt: minutesAgo(85),
+    completedAt: minutesAgo(85),
+  },
+  {
+    id: "kk-task-003",
+    identifier: "KK-003",
+    title: "Fire up all 4 grill stations",
+    description: "SpongeBob preps the kitchen for maximum throughput.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(85),
+    updatedAt: minutesAgo(80),
+    completedAt: minutesAgo(80),
+  },
+  {
+    id: "kk-task-004",
+    identifier: "KK-004",
+    title: "Set up cash register and menu board",
+    description: "Squidward reluctantly opens front of house. Prices went up again.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.NORMAL,
+    assigneeId: AGENT_IDS.squidward,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(85),
+    updatedAt: minutesAgo(80),
+    completedAt: minutesAgo(80),
+  },
+
+  // ── ACT 2: The Lunch Rush ──────────────────────────────────────────────
+
+  {
+    id: "kk-task-005",
+    identifier: "KK-005",
+    title: "Batch 1: Grill Krabby Patties 1-250",
+    description: "SpongeBob starts the first major batch. \"I'm ready!\"",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(78),
+    updatedAt: minutesAgo(65),
+    completedAt: minutesAgo(65),
+  },
+  {
+    id: "kk-task-006",
+    identifier: "KK-006",
+    title: "Take orders: customers 1-200",
+    description: "\"Welcome to the Krusty Krab\" on repeat. Squidward's soul leaves his body.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.squidward,
+    creatorId: AGENT_IDS.squidward,
+    createdAt: minutesAgo(78),
+    updatedAt: minutesAgo(60),
+    completedAt: minutesAgo(60),
+  },
+  {
+    id: "kk-task-007",
+    identifier: "KK-007",
+    title: "Restock buns from storage",
+    description: "Patrick finds the storage room (after getting lost twice).",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.NORMAL,
+    assigneeId: AGENT_IDS.patrick,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(75),
+    updatedAt: minutesAgo(65),
+    completedAt: minutesAgo(65),
+  },
+  {
+    id: "kk-task-008",
+    identifier: "KK-008",
+    title: "Restock condiments",
+    description: "Patrick checks under his rock. The ketchup was in the fridge.",
+    status: TaskStatus.FAILED,
+    priority: TaskPriority.NORMAL,
+    assigneeId: AGENT_IDS.patrick,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(64),
+    updatedAt: minutesAgo(55),
+    metadata: {
+      rejectionFeedback: "Patrick put ketchup bottles upside-down and mustard in the pickle jar.",
+      rejectedAt: minutesAgo(55),
+      rejectedBy: AGENT_IDS.spongebob,
+      rejectionCount: 2,
+    },
+  },
+  {
+    id: "kk-task-009",
+    identifier: "KK-009",
+    title: "Batch 2: Grill Krabby Patties 251-500",
+    description: "SpongeBob hits his rhythm. \"I could do this all day!\"",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(64),
+    updatedAt: minutesAgo(50),
+    completedAt: minutesAgo(50),
+  },
+  {
+    id: "kk-task-010",
+    identifier: "KK-010",
+    title: "Take orders: customers 201-500",
+    description: "Squidward's eye starts twitching at customer 347.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.squidward,
+    creatorId: AGENT_IDS.squidward,
+    createdAt: minutesAgo(59),
+    updatedAt: minutesAgo(42),
+    completedAt: minutesAgo(42),
+  },
+
+  // ── ACT 3: Patrick's Disaster ──────────────────────────────────────────
+
+  {
+    id: "kk-task-011",
+    identifier: "KK-011",
+    title: "🚨 EMERGENCY: 50 customers got napkin sandwiches",
+    description: "Patrick mixed up napkin inventory with patty boxes. This is not a drill.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(48),
+    updatedAt: minutesAgo(38),
+    completedAt: minutesAgo(38),
+  },
+  {
+    id: "kk-task-012",
+    identifier: "KK-012",
+    title: "Emergency batch: remake 50 orders",
+    description: "SpongeBob fires up emergency grilling. \"Don't worry Patrick, we'll fix this!\"",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(47),
+    updatedAt: minutesAgo(38),
+    completedAt: minutesAgo(38),
+  },
+  {
+    id: "kk-task-013",
+    identifier: "KK-013",
+    title: "Re-deliver corrected orders + complimentary kelp shakes",
+    description: "Squidward delivers replacements with maximum reluctance.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.squidward,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(38),
+    updatedAt: minutesAgo(30),
+    completedAt: minutesAgo(30),
+  },
+  {
+    id: "kk-task-014",
+    identifier: "KK-014",
+    title: "Escalation: Report Patrick incident to Mr. Krabs",
+    description: "SpongeBob: \"Mr. Krabs, we had a little... incident.\" Cost: $47.50 in waste.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(37),
+    updatedAt: minutesAgo(33),
+    completedAt: minutesAgo(33),
+  },
+  {
+    id: "kk-task-015",
+    identifier: "KK-015",
+    title: "Mr. Krabs decision: reassign Patrick, dock waste costs",
+    description: "\"That's coming out of someone's paycheck!\" Patrick reassigned to simple tasks.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(33),
+    updatedAt: minutesAgo(30),
+    completedAt: minutesAgo(30),
+  },
+
+  // ── ACT 4: Sandy's Innovation + Plankton Heist ────────────────────────
+
+  {
+    id: "kk-task-016",
+    identifier: "KK-016",
+    title: "Sandy demos Turbo Fryer 3000",
+    description: "\"I've been working on this for weeks, y'all!\" Cooks 10 patties in 3 seconds.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.sandy,
+    creatorId: AGENT_IDS.sandy,
+    createdAt: minutesAgo(28),
+    updatedAt: minutesAgo(24),
+    completedAt: minutesAgo(24),
+  },
+  {
+    id: "kk-task-017",
+    identifier: "KK-017",
+    title: "Install and calibrate Turbo Fryer at Station 3",
+    description: "Sandy's innovation doubles SpongeBob's cooking speed.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.sandy,
+    creatorId: AGENT_IDS.sandy,
+    createdAt: minutesAgo(24),
+    updatedAt: minutesAgo(18),
+    completedAt: minutesAgo(18),
+  },
+  {
+    id: "kk-task-018",
+    identifier: "KK-018",
+    title: "Turbo batch: Grill patties 501-750 at double speed",
+    description: "SpongeBob + Turbo Fryer = \"This is the greatest day of my life!\"",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(18),
+    updatedAt: minutesAgo(12),
+    completedAt: minutesAgo(12),
+  },
+  {
+    id: "kk-task-019",
+    identifier: "KK-019",
+    title: "🚨 SECURITY ALERT: Plankton infiltrated kitchen as sesame seed",
+    description: "Plankton disguised himself as a sesame seed and reached the formula vault!",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(15),
+    updatedAt: minutesAgo(10),
+    completedAt: minutesAgo(10),
+  },
+  {
+    id: "kk-task-020",
+    identifier: "KK-020",
+    title: "Physically remove Plankton from premises",
+    description: "Mr. Krabs: \"PLANKTON! I should've known!\" Plankton: \"I'll be back!\"",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(10),
+    updatedAt: minutesAgo(8),
+    completedAt: minutesAgo(8),
+  },
+  {
+    id: "kk-task-021",
+    identifier: "KK-021",
+    title: "Secure formula vault: change combination + new alarm",
+    description: "Sandy installs upgraded security. Post-incident report filed.",
+    status: TaskStatus.DONE,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.sandy,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(8),
+    updatedAt: minutesAgo(5),
+    completedAt: minutesAgo(5),
+  },
+
+  // ── ACT 5: Closing Time ────────────────────────────────────────────────
+
+  {
+    id: "kk-task-022",
+    identifier: "KK-022",
+    title: "Final batch: Grill patties 751-1000 (Turbo Fryer)",
+    description: "The final push. SpongeBob: \"One THOUSAND Krabby Patties!\"",
+    status: TaskStatus.IN_PROGRESS,
+    priority: TaskPriority.CRITICAL,
+    assigneeId: AGENT_IDS.spongebob,
+    creatorId: AGENT_IDS.spongebob,
+    createdAt: minutesAgo(10),
+    updatedAt: minutesAgo(2),
+  },
+  {
+    id: "kk-task-023",
+    identifier: "KK-023",
+    title: "Squidward's final orders: customers 501-1000",
+    description: "\"It's almost over...\" Process last 500 orders on autopilot.",
+    status: TaskStatus.IN_PROGRESS,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.squidward,
+    creatorId: AGENT_IDS.squidward,
+    createdAt: minutesAgo(10),
+    updatedAt: minutesAgo(1),
+  },
+  {
+    id: "kk-task-024",
+    identifier: "KK-024",
+    title: "Count the register (every coin, twice)",
+    description: "Mr. Krabs' favorite activity. Revenue: $2,487.50. Net profit: $1,595.20.",
+    status: TaskStatus.TODO,
+    priority: TaskPriority.HIGH,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(5),
+    updatedAt: minutesAgo(5),
+  },
+  {
+    id: "kk-task-025",
+    identifier: "KK-025",
+    title: "Daily performance awards",
+    description:
+      "SpongeBob: Employee of the Day (100 credits). Sandy: Innovation Bonus (75). Squidward: 25 credits. Patrick: participation trophy (10).",
+    status: TaskStatus.TODO,
+    priority: TaskPriority.NORMAL,
+    assigneeId: AGENT_IDS.mrKrabs,
+    creatorId: AGENT_IDS.mrKrabs,
+    createdAt: minutesAgo(5),
+    updatedAt: minutesAgo(5),
+  },
+];
+
+// =============================================================================
+// CREDIT TRANSACTIONS
+// =============================================================================
+
+const credits: DemoCreditTransaction[] = [
+  // SpongeBob's earnings
+  {
+    id: "kk-credit-001",
+    agentId: AGENT_IDS.spongebob,
+    type: CreditType.TASK_REWARD,
+    amount: 50,
+    description: "Batch 1: 250 Krabby Patties grilled to perfection",
+    createdAt: minutesAgo(65),
+    taskId: "kk-task-005",
+  },
+  {
+    id: "kk-credit-002",
+    agentId: AGENT_IDS.spongebob,
+    type: CreditType.TASK_REWARD,
+    amount: 50,
+    description: "Batch 2: 250 more beautiful patties",
+    createdAt: minutesAgo(50),
+    taskId: "kk-task-009",
+  },
+  {
+    id: "kk-credit-003",
+    agentId: AGENT_IDS.spongebob,
+    type: CreditType.BONUS,
+    amount: 50,
+    description: "Emergency save: fixed Patrick's napkin sandwich disaster",
+    createdAt: minutesAgo(38),
+    taskId: "kk-task-012",
+  },
+  {
+    id: "kk-credit-004",
+    agentId: AGENT_IDS.spongebob,
+    type: CreditType.TASK_REWARD,
+    amount: 75,
+    description: "Turbo batch: 250 patties at double speed",
+    createdAt: minutesAgo(12),
+    taskId: "kk-task-018",
+  },
+
+  // Squidward's earnings
+  {
+    id: "kk-credit-005",
+    agentId: AGENT_IDS.squidward,
+    type: CreditType.TASK_REWARD,
+    amount: 30,
+    description: "Orders 1-200 processed (with minimal attitude)",
+    createdAt: minutesAgo(60),
+    taskId: "kk-task-006",
+  },
+  {
+    id: "kk-credit-006",
+    agentId: AGENT_IDS.squidward,
+    type: CreditType.TASK_REWARD,
+    amount: 35,
+    description: "Orders 201-500 processed despite eye twitch",
+    createdAt: minutesAgo(42),
+    taskId: "kk-task-010",
+  },
+  {
+    id: "kk-credit-007",
+    agentId: AGENT_IDS.squidward,
+    type: CreditType.TASK_REWARD,
+    amount: 20,
+    description: "Re-delivered corrected orders + complimentary kelp shakes",
+    createdAt: minutesAgo(30),
+    taskId: "kk-task-013",
+  },
+
+  // Sandy's earnings
+  {
+    id: "kk-credit-008",
+    agentId: AGENT_IDS.sandy,
+    type: CreditType.BONUS,
+    amount: 75,
+    description: "Innovation: Turbo Fryer 3000 doubles kitchen throughput",
+    createdAt: minutesAgo(18),
+    taskId: "kk-task-017",
+  },
+  {
+    id: "kk-credit-009",
+    agentId: AGENT_IDS.sandy,
+    type: CreditType.TASK_REWARD,
+    amount: 40,
+    description: "Security upgrade: new vault alarm system installed",
+    createdAt: minutesAgo(5),
+    taskId: "kk-task-021",
+  },
+
+  // Patrick's costs
+  {
+    id: "kk-credit-010",
+    agentId: AGENT_IDS.patrick,
+    type: CreditType.TASK_REWARD,
+    amount: 15,
+    description: "Successfully restocked buns (eventually)",
+    createdAt: minutesAgo(65),
+    taskId: "kk-task-007",
+  },
+  {
+    id: "kk-credit-011",
+    agentId: AGENT_IDS.patrick,
+    type: CreditType.PENALTY,
+    amount: -47,
+    description: "Napkin sandwich disaster: ingredient waste + redelivery costs",
+    createdAt: minutesAgo(48),
+    taskId: "kk-task-011",
+  },
+
+  // Mr. Krabs
+  {
+    id: "kk-credit-012",
+    agentId: AGENT_IDS.mrKrabs,
+    type: CreditType.TASK_REWARD,
+    amount: 100,
+    description: "Successfully handled Plankton security breach",
+    createdAt: minutesAgo(8),
+    taskId: "kk-task-020",
+  },
+];
+
+// =============================================================================
+// EVENTS
+// =============================================================================
+
+const events: DemoEvent[] = [
+  {
+    id: "kk-event-001",
+    type: "delegation",
+    severity: EventSeverity.INFO,
+    message: "🦀 Mr. Krabs: \"Listen up, crew! 1,000 customers today. That means 1,000 beautiful dollars!\"",
+    createdAt: minutesAgo(90),
+    agentId: AGENT_IDS.mrKrabs,
+  },
+  {
+    id: "kk-event-002",
+    type: "task_started",
+    severity: EventSeverity.INFO,
+    message: "🧽 SpongeBob: \"I'm ready! I'm ready! I'm ready!\" — All grills firing.",
+    createdAt: minutesAgo(80),
+    agentId: AGENT_IDS.spongebob,
+  },
+  {
+    id: "kk-event-003",
+    type: "task_started",
+    severity: EventSeverity.INFO,
+    message: "🐙 Squidward: \"*sigh* Another beautiful day at the Krusty Krab...\"",
+    createdAt: minutesAgo(80),
+    agentId: AGENT_IDS.squidward,
+  },
+  {
+    id: "kk-event-004",
+    type: "task_completed",
+    severity: EventSeverity.INFO,
+    message: "🧽 Batch 1 complete: 250 golden-brown Krabby Patties ready to serve!",
+    createdAt: minutesAgo(65),
+    agentId: AGENT_IDS.spongebob,
+    taskId: "kk-task-005",
+  },
+  {
+    id: "kk-event-005",
+    type: "task_failed",
+    severity: EventSeverity.WARNING,
+    message: "⭐ Patrick restocked the condiments... upside down. Mustard in the pickle jar.",
+    createdAt: minutesAgo(55),
+    agentId: AGENT_IDS.patrick,
+    taskId: "kk-task-008",
+  },
+  {
+    id: "kk-event-006",
+    type: "incident",
+    severity: EventSeverity.CRITICAL,
+    message: "🚨 DISASTER: Patrick mixed napkins with patty boxes! 50 customers got napkin sandwiches!",
+    createdAt: minutesAgo(48),
+    agentId: AGENT_IDS.patrick,
+    taskId: "kk-task-011",
+  },
+  {
+    id: "kk-event-007",
+    type: "escalation",
+    severity: EventSeverity.WARNING,
+    message: "📢 SpongeBob escalates Patrick incident to Mr. Krabs. Cost: $47.50 in waste.",
+    createdAt: minutesAgo(37),
+    agentId: AGENT_IDS.spongebob,
+    taskId: "kk-task-014",
+  },
+  {
+    id: "kk-event-008",
+    type: "decision",
+    severity: EventSeverity.INFO,
+    message: "🦀 Mr. Krabs: \"That's coming out of Patrick's paycheck!\" Patrick reassigned to simple tasks only.",
+    createdAt: minutesAgo(30),
+    agentId: AGENT_IDS.mrKrabs,
+    taskId: "kk-task-015",
+  },
+  {
+    id: "kk-event-009",
+    type: "innovation",
+    severity: EventSeverity.INFO,
+    message: "🐿️ Sandy unveils the Turbo Fryer 3000! \"Hold my acorns, y'all.\" Cooking speed DOUBLED.",
+    createdAt: minutesAgo(28),
+    agentId: AGENT_IDS.sandy,
+    taskId: "kk-task-016",
+  },
+  {
+    id: "kk-event-010",
+    type: "adoption",
+    severity: EventSeverity.INFO,
+    message: "🧽 SpongeBob adopts Turbo Fryer: \"This is the greatest day of my life!\" 250 patties in half the time.",
+    createdAt: minutesAgo(18),
+    agentId: AGENT_IDS.spongebob,
+    taskId: "kk-task-018",
+  },
+  {
+    id: "kk-event-011",
+    type: "security_alert",
+    severity: EventSeverity.CRITICAL,
+    message: "🧫🚨 SECURITY BREACH: Plankton infiltrated kitchen disguised as a sesame seed! Formula vault at risk!",
+    createdAt: minutesAgo(15),
+    agentId: AGENT_IDS.plankton,
+    taskId: "kk-task-019",
+  },
+  {
+    id: "kk-event-012",
+    type: "incident_resolved",
+    severity: EventSeverity.INFO,
+    message: "🦀 Mr. Krabs physically removes Plankton. \"I'll be back!\" → \"No, you won't.\"",
+    createdAt: minutesAgo(8),
+    agentId: AGENT_IDS.mrKrabs,
+    taskId: "kk-task-020",
+  },
+  {
+    id: "kk-event-013",
+    type: "security_upgrade",
+    severity: EventSeverity.INFO,
+    message: "🐿️ Sandy upgrades vault security: new combination + alarm system. Formula is safe.",
+    createdAt: minutesAgo(5),
+    agentId: AGENT_IDS.sandy,
+    taskId: "kk-task-021",
+  },
+];
+
+// =============================================================================
+// MESSAGES — Inter-agent Communication
+// =============================================================================
+
+const messages: DemoMessage[] = [
+  // Morning briefing
+  {
+    id: "kk-msg-001",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.spongebob,
+    content: "SpongeBob! You're on the grill today. Don't stop flipping until we hit 1,000!",
+    type: DemoMessageCategory.COMMAND,
+    read: true,
+    createdAt: minutesAgo(88),
+  },
+  {
+    id: "kk-msg-002",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.squidward,
+    content: "Squidward, take orders. Try to smile. Actually, don't. Just take the orders.",
+    type: DemoMessageCategory.COMMAND,
+    read: true,
+    createdAt: minutesAgo(88),
+  },
+  {
+    id: "kk-msg-003",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.patrick,
+    content: "Patrick, restock supplies. And Patrick? Don't. Eat. The inventory.",
+    type: DemoMessageCategory.COMMAND,
+    read: true,
+    createdAt: minutesAgo(87),
+  },
+  {
+    id: "kk-msg-004",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "Aye aye, Mr. Krabs! I'm ready! I'm ready! I'm ready!",
+    type: DemoMessageCategory.ACK,
+    read: true,
+    createdAt: minutesAgo(87),
+  },
+  {
+    id: "kk-msg-005",
+    fromAgentId: AGENT_IDS.squidward,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "*sigh* Fine. Another beautiful day at the Krusty Krab.",
+    type: DemoMessageCategory.ACK,
+    read: true,
+    createdAt: minutesAgo(87),
+  },
+
+  // Lunch rush progress
+  {
+    id: "kk-msg-006",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "Batch 1 complete! 250 golden-brown Krabby Patties. Quality: PERFECT.",
+    type: DemoMessageCategory.STATUS,
+    read: true,
+    createdAt: minutesAgo(65),
+    taskRef: "kk-task-005",
+  },
+  {
+    id: "kk-msg-007",
+    fromAgentId: AGENT_IDS.patrick,
+    toAgentId: AGENT_IDS.spongebob,
+    content: "SpongeBob, is mayonnaise an instrument?",
+    type: DemoMessageCategory.QUESTION,
+    read: true,
+    createdAt: minutesAgo(60),
+  },
+  {
+    id: "kk-msg-008",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.patrick,
+    content: "No Patrick, mayonnaise is not an instrument. Please focus on restocking.",
+    type: DemoMessageCategory.RESPONSE,
+    read: true,
+    createdAt: minutesAgo(59),
+  },
+
+  // Patrick disaster escalation
+  {
+    id: "kk-msg-009",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "Mr. Krabs, we had a little... incident. Patrick mixed the napkins with the patty boxes. 50 customers got napkin sandwiches. I'm handling the remakes now!",
+    type: DemoMessageCategory.ESCALATION,
+    read: true,
+    createdAt: minutesAgo(37),
+    taskRef: "kk-task-014",
+  },
+  {
+    id: "kk-msg-010",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.spongebob,
+    content: "WHAT?! That's $47.50 in wasted ingredients! Good work on the save, SpongeBob. Here's a 50-credit bonus. Patrick is on simple tasks only from now on.",
+    type: DemoMessageCategory.RESPONSE,
+    read: true,
+    createdAt: minutesAgo(33),
+    taskRef: "kk-task-015",
+  },
+  {
+    id: "kk-msg-011",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.patrick,
+    content: "Patrick, that's coming out of your paycheck. You're on dish duty for the rest of the day.",
+    type: DemoMessageCategory.COMMAND,
+    read: true,
+    createdAt: minutesAgo(30),
+  },
+  {
+    id: "kk-msg-012",
+    fromAgentId: AGENT_IDS.patrick,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "Is this the Krusty Krab?",
+    type: DemoMessageCategory.QUESTION,
+    read: true,
+    createdAt: minutesAgo(29),
+  },
+
+  // Sandy's innovation
+  {
+    id: "kk-msg-013",
+    fromAgentId: AGENT_IDS.sandy,
+    toAgentId: AGENT_IDS.spongebob,
+    content: "SpongeBob, I've been working on something in my lab. Meet me at Station 3 — I'm about to double your cooking speed.",
+    type: DemoMessageCategory.STATUS,
+    read: true,
+    createdAt: minutesAgo(28),
+    taskRef: "kk-task-016",
+  },
+  {
+    id: "kk-msg-014",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.sandy,
+    content: "Sandy! The Turbo Fryer 3000 is... it's BEAUTIFUL! This is the greatest day of my life!",
+    type: DemoMessageCategory.ACK,
+    read: true,
+    createdAt: minutesAgo(24),
+  },
+
+  // Security alert
+  {
+    id: "kk-msg-015",
+    fromAgentId: AGENT_IDS.spongebob,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "MR. KRABS! That sesame seed on the bun is MOVING! It's PLANKTON! He's heading for the formula vault!",
+    type: DemoMessageCategory.ESCALATION,
+    read: true,
+    createdAt: minutesAgo(15),
+    taskRef: "kk-task-019",
+  },
+  {
+    id: "kk-msg-016",
+    fromAgentId: AGENT_IDS.mrKrabs,
+    toAgentId: AGENT_IDS.sandy,
+    content: "Sandy, after I deal with this little pest, I need you to upgrade the vault security. New combination, new alarms, the works.",
+    type: DemoMessageCategory.COMMAND,
+    read: true,
+    createdAt: minutesAgo(9),
+  },
+  {
+    id: "kk-msg-017",
+    fromAgentId: AGENT_IDS.sandy,
+    toAgentId: AGENT_IDS.mrKrabs,
+    content: "On it, Mr. Krabs! I'll have that vault tighter than a jar of barnacles. No tiny villain is getting through my security system.",
+    type: DemoMessageCategory.ACK,
+    read: true,
+    createdAt: minutesAgo(8),
+  },
+];
+
+// =============================================================================
+// EXPORT
+// =============================================================================
+
+export const krustyKrabScenario: DemoScenario = {
+  name: "krusty-krab",
+  description:
+    "The Krusty Krab: A day in Bikini Bottom — 6 agents, task delegation, escalation, innovation, and a Plankton heist",
+  agents,
+  tasks,
+  credits,
+  events,
+  messages,
+  webhooks: demoWebhooks,
+};
+
+export { AGENT_IDS as KRUSTY_KRAB_AGENTS };
+
+export default krustyKrabScenario;

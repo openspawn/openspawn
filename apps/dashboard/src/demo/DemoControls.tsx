@@ -1,4 +1,4 @@
-import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory } from "lucide-react";
+import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory, Fish } from "lucide-react";
 import { useDemo } from "./DemoProvider";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
@@ -33,6 +33,13 @@ const SCENARIO_OPTIONS = [
     icon: Building2,
     agents: 50,
     description: "Full org",
+  },
+  {
+    value: "krusty-krab" as const,
+    label: "Krusty Krab",
+    icon: Fish,
+    agents: 6,
+    description: "SpongeBob universe",
   },
   {
     value: "fresh" as const,
