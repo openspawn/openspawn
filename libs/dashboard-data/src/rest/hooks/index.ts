@@ -12,7 +12,7 @@ export {
   useRejectApproval,
   useUpdateTaskAutonomy,
 } from "./use-approvals";
-export { useTasks, useTask } from "./use-tasks";
+export { useTasks, useTask, useTaskComments, useTaskEscalations } from "./use-tasks";
 export {
   useCreateTask,
   useTransitionTask,
@@ -23,8 +23,15 @@ export {
 } from "./use-task-mutations";
 export { useCreditHistory, useRestCredits } from "./use-credits";
 export { useEvents, useEventStream, type EventStreamItem } from "./use-events";
-export { useChannels } from "./use-channels";
-export { useRestMessages } from "./use-messages";
+export { useChannels, useCreateChannel } from "./use-channels";
+export {
+  useRestMessages,
+  useChannelMessages,
+  useSendMessage,
+  useMessageThread,
+  useSendDM,
+  useDMHistory,
+} from "./use-messages";
 export { useRestMemories, useRestMemorySearch, useRestContradictions, useMemoryList, useMemoryFeedback } from "./use-memory";
 export {
   useRestGraphEntities,

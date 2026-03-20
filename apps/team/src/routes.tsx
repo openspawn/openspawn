@@ -61,6 +61,11 @@ const messagesRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/messages",
   component: MessagesPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    channel: (search.channel as string) || undefined,
+    dm: (search.dm as string) || undefined,
+    thread: (search.thread as string) || undefined,
+  }),
 });
 const settingsRoute = createRoute({
   getParentRoute: () => layoutRoute,
