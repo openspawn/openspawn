@@ -4,8 +4,9 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException, status
 from pydantic import ValidationError
-from sqlalchemy import select
+from sqlalchemy import func, select
 
+from app.coordination.cache import projection_cache
 from app.coordination.event_schemas import EVENT_PAYLOAD_SCHEMAS
 from app.coordination.projections import (
     project_artifact_view,
@@ -71,6 +72,9 @@ async def emit_coordination_event(
         target_agents=targets if targets else None,
     )
 
+    # Invalidate cached projections so the next read recomputes.
+    projection_cache.invalidate(str(dto.task_id))
+
 
 async def subscribe_to_events(
     db: AsyncSession, org_id: uuid.UUID, agent_id: uuid.UUID, dto: SubscribeDto
@@ -128,14 +132,31 @@ async def get_projection(
             detail=f"Unknown projection: {projection_type}. Valid: {valid}",
         )
 
-    # On-demand rebuild — no caching. Fine for <1000 events per task.
+    task_id_str = str(task_id)
+
+    # Fast path: check event count and return cached projection if unchanged.
+    count_result = await db.execute(
+        select(func.count())
+        .select_from(Event)
+        .where(Event.org_id == org_id, Event.entity_id == task_id)
+    )
+    event_count = count_result.scalar_one()
+
+    cached = projection_cache.get(task_id_str, projection_type, event_count)
+    if cached is not None:
+        return cached
+
+    # Cache miss — rebuild projection from events.
     events = await db.execute(
         select(Event)
         .where(Event.org_id == org_id, Event.entity_id == task_id)
         .order_by(Event.created_at.asc())
     )
     event_list = list(events.scalars().all())
-    return PROJECTION_REGISTRY[projection_type](event_list)
+    result = PROJECTION_REGISTRY[projection_type](event_list)
+
+    projection_cache.set(task_id_str, projection_type, result, event_count)
+    return result
 
 
 async def _resolve_event_subscribers(

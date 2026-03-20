@@ -23,6 +23,26 @@ from app.models.enums import AgentStatus
 
 type AuthContext = AuthenticatedAgent | AuthenticatedUser
 
+def _try_agent_jwt(token: str) -> AuthenticatedAgent | None:
+    """Attempt to decode *token* as an agent JWT.
+
+    Returns AuthenticatedAgent on success, None if the token is not
+    an agent JWT (so the caller can fall through to user JWT logic).
+    Raises HTTPException only for *expired* agent tokens (clear signal).
+    """
+    try:
+        from app.auth.jwt_agent import decode_agent_token, authenticated_agent_from_jwt
+
+        payload = decode_agent_token(token)
+        return authenticated_agent_from_jwt(payload)
+    except HTTPException as exc:
+        # If it is an expired agent token, surface immediately
+        if "expired" in str(exc.detail).lower():
+            raise
+        # Otherwise it is not an agent token -- fall through
+        return None
+
+
 
 async def _authenticate_hmac(
     request: Request,
@@ -183,12 +203,18 @@ async def require_auth(
     if request.headers.get("x-agent-id") or request.headers.get("x-signature"):
         return await _authenticate_hmac(request, db)
 
-    # JWT bearer token (full mode user auth from dashboard)
+    # Bearer token -- try agent JWT first, then user JWT / local token
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header[7:]
+
+        # Attempt agent JWT (token_type=agent claim distinguishes it)
+        agent_ctx = _try_agent_jwt(token)
+        if agent_ctx is not None:
+            return agent_ctx
+
         if cfg.auth.mode == AuthMode.FULL:
             return await _authenticate_jwt(token, db)
-        # local mode — accept any valid local token via middleware
+        # local mode -- accept any valid local token via middleware
         from app.auth.middleware import _authenticate_local
 
         return await _authenticate_local(token)
