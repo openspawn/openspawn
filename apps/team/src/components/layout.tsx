@@ -12,6 +12,7 @@ import {
   MessageSquare,
   ClipboardList,
   PanelLeft,
+  Brain,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import type { ReactNode } from "react";
@@ -37,6 +38,7 @@ const navigation = [
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Credits", href: "/credits", icon: Coins },
   { name: "Events", href: "/events", icon: Activity },
+  { name: "Memory", href: "/memory", icon: Brain },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

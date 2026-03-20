@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timedelta
 
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
@@ -95,7 +96,7 @@ async def _authenticate_hmac(
     nonce_obj = Nonce(
         nonce=nonce_val,
         agent_id=agent.id,
-        expires_at=None,  # type: ignore[arg-type]
+        expires_at=datetime.utcnow() + timedelta(hours=1),
     )
     try:
         db.add(nonce_obj)
