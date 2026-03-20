@@ -5,11 +5,12 @@ Revises: 0007_add_approvals_autonomy
 Create Date: 2026-03-20
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
+from app.models.compat import CompatUUID
 
 revision = "0008"
-down_revision = "0007_add_approvals_autonomy"
+down_revision = "0007"
 branch_labels = None
 depends_on = None
 
@@ -17,8 +18,8 @@ depends_on = None
 def upgrade() -> None:
     op.create_table(
         "usage_counters",
-        sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("user_id", sa.Uuid(), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("id", CompatUUID(), nullable=False),
+        sa.Column("user_id", CompatUUID(), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("call_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("last_call_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
