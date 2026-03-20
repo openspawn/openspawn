@@ -1,16 +1,24 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { PageHeader } from "@openspawn/dashboard-ui";
+import {
+  useTransitionTask as useTransitionTaskFactory,
+  useAssignTask as useAssignTaskFactory,
+  useAddComment as useAddCommentFactory,
+  useEscalateTask as useEscalateTaskFactory,
+  useApproveApproval as useApproveApprovalFactory,
+  useRejectApproval as useRejectApprovalFactory,
+  useTaskComments,
+  useTaskEscalations,
+  useApprovals,
+  TaskStatus,
+  TaskPriority,
+} from "@openspawn/dashboard-data";
 import { useTasks, useAgents, useDashboardPanels } from "../hooks";
-import { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 
 const COLUMNS: { id: string; label: string; color: string }[] = [
   { id: TaskStatus.TODO, label: "To Do", color: "border-white/10      bg-white/[0.02]" },
-  {
-    id: TaskStatus.IN_PROGRESS,
-    label: "In Progress",
-    color: "border-cyan-500/30   bg-cyan-500/[0.04]",
-  },
+  { id: TaskStatus.IN_PROGRESS, label: "In Progress", color: "border-cyan-500/30   bg-cyan-500/[0.04]" },
   { id: TaskStatus.REVIEW, label: "In Review", color: "border-violet-500/30 bg-violet-500/[0.04]" },
   { id: TaskStatus.BLOCKED, label: "Blocked", color: "border-red-500/30    bg-red-500/[0.04]" },
   { id: TaskStatus.DONE, label: "Done", color: "border-emerald-500/30 bg-emerald-500/[0.04]" },
@@ -20,6 +28,7 @@ function priorityColor(p: string): string {
   const lp = p.toLowerCase();
   switch (lp) {
     case TaskPriority.URGENT:
+    case TaskPriority.CRITICAL:
       return "bg-red-500/20 text-red-400";
     case TaskPriority.HIGH:
       return "bg-amber-500/20 text-amber-400";
@@ -33,11 +42,71 @@ function priorityColor(p: string): string {
 export function TaskBoardPage() {
   const { tasks, loading } = useTasks();
   const { agents } = useAgents();
-  const { openTaskPanel } = useDashboardPanels({ agents, tasks });
   const searchParams = useSearch({ strict: false });
   const navigate = useNavigate();
 
   const panelId = (searchParams as Record<string, unknown>).panel as string || "";
+
+  const transition = useTransitionTaskFactory(panelId || "___");
+  const assign = useAssignTaskFactory(panelId || "___");
+  const comment = useAddCommentFactory(panelId || "___");
+  const escalate = useEscalateTaskFactory(panelId || "___");
+  const approveApproval = useApproveApprovalFactory(panelId || "___");
+  const rejectApproval = useRejectApprovalFactory(panelId || "___");
+
+  const commentsQuery = useTaskComments(panelId || "");
+  const escalationsQuery = useTaskEscalations(panelId || "");
+  const approvalsQuery = useApprovals("pending");
+
+  const taskCallbacks = useMemo(
+    () => ({
+      onTransition: (_taskId: string, status: string) => {
+        transition.mutate({
+          status: status as "backlog" | "todo" | "pending" | "assigned" | "in_progress" | "review" | "done" | "blocked" | "cancelled" | "rejected",
+        });
+      },
+      onAssign: (_taskId: string, assigneeId: string) => {
+        assign.mutate({ assignee_id: assigneeId });
+      },
+      onAddComment: (_taskId: string, body: string) => {
+        comment.mutate({ body });
+      },
+      onEscalate: (_taskId: string, reason: string, notes?: string) => {
+        escalate.mutate({
+          reason: reason as "BLOCKED_TIMEOUT" | "STALE_TASK" | "SLA_BREACH" | "ASSIGNEE_INACTIVE" | "QUALITY_ISSUES" | "MANUAL" | "CAPACITY_OVERFLOW",
+          notes,
+        });
+      },
+      onApproveApproval: (_approvalId: string) => {
+        approveApproval.mutate(undefined);
+      },
+      onRejectApproval: (_approvalId: string, notes: string) => {
+        rejectApproval.mutate(notes);
+      },
+    }),
+    [transition, assign, comment, escalate, approveApproval, rejectApproval],
+  );
+
+  const taskExtras = useCallback(
+    (_taskId: string) => ({
+      agents: agents.map((a: { id: string; name: string }) => ({ id: a.id, name: a.name })),
+      comments: Array.isArray(commentsQuery.data?.data) ? commentsQuery.data.data : [],
+      escalations: Array.isArray(escalationsQuery.data?.data) ? escalationsQuery.data.data : [],
+      approvals: Array.isArray(approvalsQuery.data?.data)
+        ? (approvalsQuery.data.data as Array<Record<string, unknown>>).filter(
+            (a: Record<string, unknown>) => a.entity_id === _taskId,
+          )
+        : [],
+    }),
+    [agents, commentsQuery.data, escalationsQuery.data, approvalsQuery.data],
+  );
+
+  const { openTaskPanel } = useDashboardPanels({
+    agents,
+    tasks,
+    taskCallbacks,
+    taskExtras,
+  });
 
   const handleOpenTaskPanel = useCallback(
     (taskId: string) => {
@@ -47,7 +116,6 @@ export function TaskBoardPage() {
     [navigate, openTaskPanel],
   );
 
-  // Auto-open panel from URL on mount
   useEffect(() => {
     if (panelId && tasks.length > 0) {
       openTaskPanel(panelId);
@@ -96,13 +164,16 @@ export function TaskBoardPage() {
                       {task.title}
                     </p>
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${priorityColor(task.priority)}`}
-                      >
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${priorityColor(task.priority)}`}>
                         {task.priority}
                       </span>
                       {task.assignee && (
-                        <span className="text-[10px] text-white/40">{task.assignee.name}</span>
+                        <span className="flex items-center gap-1 text-[10px] text-white/40">
+                          <span className="w-4 h-4 rounded-full bg-gradient-to-br from-cyan-500/30 to-violet-500/30 border border-white/10 flex items-center justify-center text-[8px] font-bold text-white/80">
+                            {task.assignee.name.charAt(0).toUpperCase()}
+                          </span>
+                          {task.assignee.name}
+                        </span>
                       )}
                     </div>
                   </button>

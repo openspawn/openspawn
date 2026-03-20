@@ -1,16 +1,8 @@
 /**
  * useDashboardPanels — typed helpers to open agent/task detail panels.
- *
- * This is the DRY glue between the data layer (agents, tasks) and the
- * shared UI panels. Import this hook in any dashboard page and call
- * openAgentPanel(id) or openTaskPanel(id).
  */
 import { createElement, useCallback } from "react";
 import { useSidePanel } from "../contexts/side-panel-context";
-
-/* ── Lazy panel imports ────────────────────────────────────────── */
-// We use string-based type to avoid hard dependency on dashboard-ui at
-// the data layer. Consumers must pass the panel components once at app root.
 
 interface AgentPanelData {
   id: string;
@@ -30,6 +22,22 @@ interface TaskPanelData {
   [key: string]: unknown;
 }
 
+interface TaskPanelCallbacks {
+  onTransition?: (taskId: string, status: string) => void;
+  onAssign?: (taskId: string, assigneeId: string) => void;
+  onAddComment?: (taskId: string, body: string) => void;
+  onEscalate?: (taskId: string, reason: string, notes?: string) => void;
+  onApproveApproval?: (approvalId: string) => void;
+  onRejectApproval?: (approvalId: string, notes: string) => void;
+}
+
+interface TaskPanelExtras {
+  agents?: Array<{ id: string; name: string }>;
+  comments?: Array<Record<string, unknown>>;
+  escalations?: Array<Record<string, unknown>>;
+  approvals?: Array<Record<string, unknown>>;
+}
+
 interface PanelComponents {
   AgentDetailPanel: React.ComponentType<{
     agent: AgentPanelData;
@@ -45,7 +53,17 @@ interface PanelComponents {
   }>;
   TaskDetailPanel: React.ComponentType<{
     task: TaskPanelData;
+    agents?: Array<{ id: string; name: string }>;
+    comments?: Array<Record<string, unknown>>;
+    escalations?: Array<Record<string, unknown>>;
+    approvals?: Array<Record<string, unknown>>;
     onAgentClick?: (agentId: string) => void;
+    onTransition?: (status: string) => void;
+    onAssign?: (assigneeId: string) => void;
+    onAddComment?: (body: string) => void;
+    onEscalate?: (reason: string, notes?: string) => void;
+    onApproveApproval?: (approvalId: string) => void;
+    onRejectApproval?: (approvalId: string, notes: string) => void;
   }>;
 }
 
@@ -56,14 +74,14 @@ export function registerPanelComponents(panels: PanelComponents) {
   _panels = panels;
 }
 
-/* ── Hook ──────────────────────────────────────────────────────── */
-
 interface DashboardPanelsOptions {
   agents: AgentPanelData[];
   tasks: TaskPanelData[];
+  taskCallbacks?: TaskPanelCallbacks;
+  taskExtras?: (taskId: string) => TaskPanelExtras;
 }
 
-export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
+export function useDashboardPanels({ agents, tasks, taskCallbacks, taskExtras }: DashboardPanelsOptions) {
   const { openSidePanel, closeSidePanel } = useSidePanel();
 
   const openAgentPanel = useCallback(
@@ -102,15 +120,35 @@ export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
       const task = tasks.find((t) => t.id === taskId);
       if (!task) return;
 
+      const extras = taskExtras?.(taskId) ?? {};
+
       openSidePanel(
         createElement(_panels.TaskDetailPanel, {
           task,
+          agents: extras.agents,
+          comments: extras.comments,
+          escalations: extras.escalations,
+          approvals: extras.approvals,
           onAgentClick: (agentId: string) => openAgentPanel(agentId),
+          onTransition: taskCallbacks?.onTransition
+            ? (status: string) => taskCallbacks.onTransition!(taskId, status)
+            : undefined,
+          onAssign: taskCallbacks?.onAssign
+            ? (assigneeId: string) => taskCallbacks.onAssign!(taskId, assigneeId)
+            : undefined,
+          onAddComment: taskCallbacks?.onAddComment
+            ? (body: string) => taskCallbacks.onAddComment!(taskId, body)
+            : undefined,
+          onEscalate: taskCallbacks?.onEscalate
+            ? (reason: string, notes?: string) => taskCallbacks.onEscalate!(taskId, reason, notes)
+            : undefined,
+          onApproveApproval: taskCallbacks?.onApproveApproval,
+          onRejectApproval: taskCallbacks?.onRejectApproval,
         }),
         { title: task.identifier + ": " + task.title, width: 480 },
       );
     },
-    [agents, tasks, openSidePanel],
+    [agents, tasks, openSidePanel, taskCallbacks, taskExtras],
   );
 
   return { openAgentPanel, openTaskPanel, closeSidePanel };

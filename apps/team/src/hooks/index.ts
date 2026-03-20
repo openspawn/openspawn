@@ -8,7 +8,15 @@ export {
   useAgentCapabilities,
   type Agent,
 } from "@openspawn/dashboard-data";
-export { useCredits, type CreditTransaction } from "@openspawn/dashboard-data";
+export {
+  useCredits,
+  useCreditStats,
+  useCreditsByAgent,
+  useTopSpenders,
+  useSpendingTrends,
+  useCreditBalance,
+  type CreditTransaction,
+} from "@openspawn/dashboard-data";
 export { useEvents, useEventStream, type Event, type EventStreamItem } from "@openspawn/dashboard-data";
 export {
   useMessages,
@@ -21,3 +29,14 @@ export { usePresence, type AgentPresence, type PresenceStatus } from "@openspawn
 export { useAgentHealth, type AgentHealth } from "@openspawn/dashboard-data";
 export { useTouchDevice } from "@openspawn/dashboard-data";
 export { useDashboardPanels, registerPanelComponents } from "@openspawn/dashboard-data";
+export {
+  useTaskComments,
+  useTaskEscalations,
+  useApprovals,
+  useTransitionTask,
+  useAssignTask,
+  useAddComment,
+  useEscalateTask,
+  useApproveApproval,
+  useRejectApproval,
+} from "@openspawn/dashboard-data";
