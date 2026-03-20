@@ -246,10 +246,12 @@ async def synthesize(
     synthesis_content: dict[str, object],
 ) -> IdeationBrief:
     """Coordinator produces unified plan from all briefs (Round 3 / synthesis)."""
+    from app.auth.schemas import AuthenticatedAgent
+
     session = await _get_session(db, auth.org_id, session_id)
 
     # Only the session owner / manager (level >= 7) can synthesize
-    if auth.level < 7:
+    if not isinstance(auth, AuthenticatedAgent) or auth.level < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only manager agents (level >= 7) can synthesize ideation plans",
@@ -320,10 +322,12 @@ async def approve_plan(
     session_id: uuid.UUID,
 ) -> IdeationSession:
     """Human approves the synthesized plan."""
+    from app.auth.schemas import AuthenticatedAgent
+
     session = await _get_session(db, auth.org_id, session_id)
 
     # Only manager agents (level >= 7) can approve plans
-    if auth.level < 7:
+    if not isinstance(auth, AuthenticatedAgent) or auth.level < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only manager agents (level >= 7) can approve ideation plans",
