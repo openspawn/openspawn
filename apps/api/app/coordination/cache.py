@@ -31,9 +31,7 @@ class ProjectionCache:
     def _key(self, task_id: str, projection_type: str) -> str:
         return f"{task_id}:{projection_type}"
 
-    def get(
-        self, task_id: str, projection_type: str, current_event_count: int
-    ) -> dict | None:
+    def get(self, task_id: str, projection_type: str, current_event_count: int) -> dict | None:
         """Return cached projection if event count hasn't changed."""
         cached = self._cache.get(self._key(task_id, projection_type))
         if cached and cached.event_count == current_event_count:

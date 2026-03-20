@@ -22,7 +22,6 @@ from app.coordination.event_schemas import (
 from app.coordination.schemas import EmitEventDto
 from app.coordination.service import emit_coordination_event
 
-
 # ---------------------------------------------------------------------------
 # Unit tests: payload models
 # ---------------------------------------------------------------------------
@@ -40,9 +39,7 @@ class TestPayloadModels:
 
     def test_component_created_extra_fields_allowed(self):
         """Pydantic v2 ignores extra fields by default."""
-        p = ComponentCreatedPayload(
-            name="Button", file_path="src/Button.tsx", extra_field="ok"
-        )
+        p = ComponentCreatedPayload(name="Button", file_path="src/Button.tsx", extra_field="ok")
         assert p.name == "Button"
 
     def test_component_updated_inherits(self):
@@ -117,7 +114,11 @@ class TestEmitValidation:
         return uuid.uuid4(), uuid.uuid4()
 
     @pytest.mark.asyncio
-    @patch("app.coordination.service._resolve_event_subscribers", new_callable=AsyncMock, return_value=[])
+    @patch(
+        "app.coordination.service._resolve_event_subscribers",
+        new_callable=AsyncMock,
+        return_value=[],
+    )
     @patch("app.coordination.service.emit", new_callable=AsyncMock)
     async def test_valid_payload_passes(self, mock_emit, mock_subs, db, ids):
         org_id, actor_id = ids
@@ -144,7 +145,11 @@ class TestEmitValidation:
         assert "file_path" in str(exc_info.value.detail)
 
     @pytest.mark.asyncio
-    @patch("app.coordination.service._resolve_event_subscribers", new_callable=AsyncMock, return_value=[])
+    @patch(
+        "app.coordination.service._resolve_event_subscribers",
+        new_callable=AsyncMock,
+        return_value=[],
+    )
     @patch("app.coordination.service.emit", new_callable=AsyncMock)
     async def test_unknown_event_type_passes_through(self, mock_emit, mock_subs, db, ids):
         """Event types in SSEEventType without a payload schema pass through."""
@@ -159,7 +164,11 @@ class TestEmitValidation:
         mock_emit.assert_awaited_once()
 
     @pytest.mark.asyncio
-    @patch("app.coordination.service._resolve_event_subscribers", new_callable=AsyncMock, return_value=[])
+    @patch(
+        "app.coordination.service._resolve_event_subscribers",
+        new_callable=AsyncMock,
+        return_value=[],
+    )
     @patch("app.coordination.service.emit", new_callable=AsyncMock)
     async def test_extra_fields_allowed(self, mock_emit, mock_subs, db, ids):
         org_id, actor_id = ids

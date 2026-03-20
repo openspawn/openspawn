@@ -22,6 +22,10 @@ services:
     image: ghcr.io/openspawn/openspawn-api:latest
     restart: unless-stopped
     env_file: .env.production
+    environment:
+      # Set HOSTED_MODE=true to enable registration endpoints
+      - HOSTED_MODE=${HOSTED_MODE:-false}
+      - AUTH_MODE=${AUTH_MODE:-none}
     expose:
       - "8000"
     networks:

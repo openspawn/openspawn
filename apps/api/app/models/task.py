@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Index, SmallInteger, String, Text
+from sqlalchemy import ForeignKey, Index, SmallInteger, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -98,7 +98,7 @@ class TaskDependency(UUIDPrimaryKeyMixin, Base):
         CompatUUID(), ForeignKey("tasks.id"), nullable=False
     )
     blocking: Mapped[bool] = mapped_column(nullable=False, server_default="true")
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")
     task: Mapped[Task] = relationship("Task", foreign_keys=[task_id], back_populates="dependencies")
@@ -119,7 +119,7 @@ class TaskTag(UUIDPrimaryKeyMixin, Base):
     )
     task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     tag: Mapped[str] = mapped_column(String(100), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(server_default="now()", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
     organization: Mapped[Organization] = relationship("Organization")
     task: Mapped[Task] = relationship("Task", back_populates="tags")

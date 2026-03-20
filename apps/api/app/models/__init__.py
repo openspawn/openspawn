@@ -45,6 +45,7 @@ from app.models.message import Channel, Message
 from app.models.organization import Organization
 from app.models.reputation import ReputationEvent
 from app.models.task import Task, TaskComment, TaskDependency, TaskTag
+from app.models.usage import UsageCounter
 from app.models.webhook import InboundWebhookKey, Webhook
 
 __all__ = [
@@ -107,6 +108,7 @@ __all__ = [
     "TaskPriority",
     "TaskStatus",
     "TaskTag",
+    "UsageCounter",
     "User",
     "UserRole",
     "VoteValue",
