@@ -48,7 +48,7 @@ function timeAgo(date: string | null | undefined): string {
 /* ── main component ───────────────────────────────────── */
 
 export function MemoryPage() {
-  const search = useSearch({ from: "/memory" });
+  const search = useSearch({ strict: false });
   const navigate = useNavigate();
   const tab = (search.tab === "graph" ? "graph" : "feed") as TabId;
 
@@ -88,7 +88,7 @@ export function MemoryPage() {
 /* ── Memory Feed ──────────────────────────────────────── */
 
 function MemoryFeed() {
-  const searchParams = useSearch({ from: "/memory" });
+  const searchParams = useSearch({ strict: false });
   const navigate = useNavigate();
 
   const typeFilter = searchParams.type ?? null;
