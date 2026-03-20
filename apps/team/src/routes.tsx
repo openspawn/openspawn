@@ -49,6 +49,9 @@ const tasksRoute = createRoute({
   path: "/tasks",
   component: TasksPage,
   validateSearch: (search: Record<string, unknown>) => ({
+    status: (search.status as string) || undefined,
+    priority: (search.priority as string) || undefined,
+    assignee: (search.assignee as string) || undefined,
     panel: (search.panel as string) || undefined,
   }),
 });
@@ -76,6 +79,11 @@ const creditsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/credits",
   component: CreditsPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    agent: (search.agent as string) || undefined,
+    type: (search.type as string) || undefined,
+    page: Number(search.page) || 0,
+  }),
 });
 const taskBoardRoute = createRoute({
   getParentRoute: () => layoutRoute,

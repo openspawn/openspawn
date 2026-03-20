@@ -11,7 +11,15 @@ export {
   type Agent,
 } from "./hooks/use-agents";
 export { useContainerSize } from "./hooks/use-container-size";
-export { useCredits, type CreditTransaction } from "./hooks/use-credits";
+export {
+  useCredits,
+  useCreditStats,
+  useCreditsByAgent,
+  useTopSpenders,
+  useSpendingTrends,
+  useCreditBalance,
+  type CreditTransaction,
+} from "./hooks/use-credits";
 export { useEvents, useEventStream, type Event, type EventStreamItem } from "./hooks/use-events";
 export { useMcpTasks, type KanbanTask } from "./hooks/use-mcp-tasks";
 export {

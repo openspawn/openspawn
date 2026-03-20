@@ -21,7 +21,15 @@ export {
   useAddComment,
   useEscalateTask,
 } from "./use-task-mutations";
-export { useCreditHistory, useRestCredits } from "./use-credits";
+export {
+  useCreditHistory,
+  useRestCredits,
+  useCreditStats,
+  useCreditsByAgent,
+  useTopSpenders,
+  useSpendingTrends,
+  useCreditBalance,
+} from "./use-credits";
 export { useEvents, useEventStream, type EventStreamItem } from "./use-events";
 export { useChannels, useCreateChannel } from "./use-channels";
 export {

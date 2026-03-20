@@ -7,4 +7,11 @@ export {
   type AgentPanelBudget,
   type AgentPanelReputation,
 } from "./agent-detail-panel";
-export { TaskDetailPanel, type TaskPanelTask } from "./task-detail-panel";
+export {
+  TaskDetailPanel,
+  type TaskPanelTask,
+  type TaskComment,
+  type TaskEscalation,
+  type TaskApproval,
+  type TaskPanelAgent,
+} from "./task-detail-panel";

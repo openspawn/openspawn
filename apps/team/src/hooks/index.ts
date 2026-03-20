@@ -8,7 +8,15 @@ export {
   useAgentCapabilities,
   type Agent,
 } from "@openspawn/dashboard-data";
-export { useCredits, type CreditTransaction } from "@openspawn/dashboard-data";
+export {
+  useCredits,
+  useCreditStats,
+  useCreditsByAgent,
+  useTopSpenders,
+  useSpendingTrends,
+  useCreditBalance,
+  type CreditTransaction,
+} from "@openspawn/dashboard-data";
 export { useEvents, useEventStream, type Event, type EventStreamItem } from "@openspawn/dashboard-data";
 export {
   useMessages,
