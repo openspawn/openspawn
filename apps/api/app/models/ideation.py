@@ -22,17 +22,11 @@ class IdeationSession(UUIDPrimaryKeyMixin, Base):
     org_id: Mapped[uuid.UUID] = mapped_column(
         CompatUUID(), ForeignKey("organizations.id"), nullable=False
     )
-    task_id: Mapped[uuid.UUID] = mapped_column(
-        CompatUUID(), ForeignKey("tasks.id"), nullable=False
-    )
+    task_id: Mapped[uuid.UUID] = mapped_column(CompatUUID(), ForeignKey("tasks.id"), nullable=False)
     participants: Mapped[list[str]] = mapped_column(CompatJSONB(), nullable=False, default=list)
     current_round: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=1)
-    status: Mapped[str] = mapped_column(
-        String(30), nullable=False, server_default="pending"
-    )
-    autonomy_level: Mapped[int] = mapped_column(
-        SmallInteger, nullable=False, server_default="5"
-    )
+    status: Mapped[str] = mapped_column(String(30), nullable=False, server_default="pending")
+    autonomy_level: Mapped[int] = mapped_column(SmallInteger, nullable=False, server_default="5")
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now(), nullable=False

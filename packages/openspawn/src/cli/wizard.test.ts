@@ -36,4 +36,23 @@ describe("wizard", () => {
     const answers = buildAnswersFromFlags({ template: "nonexistent" });
     expect(answers.culturePreset).toBe(CulturePreset.Agency);
   });
+
+  it("applies low-cost model overrides", () => {
+    const answers = buildAnswersFromFlags({ lowCost: true });
+    expect(answers.llmProvider).toBe("openai");
+    expect(answers.defaultModel).toBe("gpt-4o-mini");
+    expect(answers.seniorModel).toBe("gpt-4o-mini");
+  });
+
+  it("combines low-cost with other flags", () => {
+    const answers = buildAnswersFromFlags({
+      lowCost: true,
+      template: "dev-shop",
+      port: 9000,
+    });
+    expect(answers.llmProvider).toBe("openai");
+    expect(answers.defaultModel).toBe("gpt-4o-mini");
+    expect(answers.templateName).toBe("dev-shop");
+    expect(answers.port).toBe(9000);
+  });
 });

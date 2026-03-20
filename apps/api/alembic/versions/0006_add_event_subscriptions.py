@@ -25,7 +25,9 @@ def upgrade() -> None:
         sa.Column("task_id", sa.Text(), sa.ForeignKey("tasks.id"), nullable=True),
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
-        sa.UniqueConstraint("org_id", "agent_id", "event_pattern", name="uq_event_sub_agent_pattern"),
+        sa.UniqueConstraint(
+            "org_id", "agent_id", "event_pattern", name="uq_event_sub_agent_pattern"
+        ),
     )
 
 
