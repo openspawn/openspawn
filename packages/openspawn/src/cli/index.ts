@@ -3,6 +3,7 @@
 
 import { initCommand } from "./commands/init.js";
 import { previewCommand } from "./commands/preview.js";
+import { regenerateCommand } from "./commands/regenerate.js";
 import { startCommand } from "./commands/start.js";
 
 const HELP = `
@@ -19,6 +20,8 @@ Commands:
     --deploy                     Generate Docker infra
     --low-cost                   Use budget models (GPT-4o-mini)
     -p, --port <n>               Coordinator port (default: 8787)
+  regenerate                      Regenerate workspaces from ORG.md
+    --dry-run                    Show what would change without writing
   preview                        Preview org in local sandbox
     --port <n>                   Dashboard port (default: 3333)
     --no-open                    Don't auto-open browser
@@ -74,6 +77,8 @@ async function main() {
   switch (command) {
     case "init":
       return initCommand(rest, ctx);
+    case "regenerate":
+      return regenerateCommand(rest, ctx);
     case "preview":
       return previewCommand(rest, ctx);
     case "start":
