@@ -17,6 +17,7 @@
     "screenshots": "node scripts/capture-screenshots.mjs",
     "dev": "nx run-many -t serve --projects=api,dashboard --parallel",
     "dev:dashboard": "nx serve dashboard",
+    "cli": "tsx packages/openspawn/src/cli/index.ts",
     "dev:sandbox": "nx run sandbox:dev",
     "dev:sandbox:full": "nx run sandbox:dev:full",
     "dev:sandbox:cofounder": "nx run sandbox:dev:cofounder",
