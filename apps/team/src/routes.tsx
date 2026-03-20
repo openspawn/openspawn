@@ -76,6 +76,13 @@ const memoryRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/memory",
   component: MemoryPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string) || "feed",
+    type: (search.type as string) || undefined,
+    agent: (search.agent as string) || undefined,
+    q: (search.q as string) || undefined,
+    page: Number(search.page) || 0,
+  }),
 });
 
 const routeTree = rootRoute.addChildren([

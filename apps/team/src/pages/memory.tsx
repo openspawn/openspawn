@@ -9,6 +9,7 @@ import {
 } from "@openspawn/dashboard-data";
 import { useMemoryList, useMemoryFeedback } from "@openspawn/dashboard-data";
 import { cn } from "../lib/utils";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import CytoscapeComponent from "react-cytoscapejs";
 
 /* ── constants ────────────────────────────────────────── */
@@ -47,7 +48,14 @@ function timeAgo(date: string | null | undefined): string {
 /* ── main component ───────────────────────────────────── */
 
 export function MemoryPage() {
-  const [tab, setTab] = useState<TabId>("feed");
+  const search = useSearch({ from: "/memory" });
+  const navigate = useNavigate();
+  const tab = (search.tab === "graph" ? "graph" : "feed") as TabId;
+
+  const setTab = useCallback(
+    (t: TabId) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: t }), replace: true }),
+    [navigate],
+  );
 
   return (
     <div className="space-y-6">
@@ -80,24 +88,40 @@ export function MemoryPage() {
 /* ── Memory Feed ──────────────────────────────────────── */
 
 function MemoryFeed() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<string | null>(null);
-  const [agentFilter, setAgentFilter] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
+  const searchParams = useSearch({ from: "/memory" });
+  const navigate = useNavigate();
+
+  const typeFilter = searchParams.type ?? null;
+  const agentFilter = searchParams.agent ?? null;
+  const page = searchParams.page ?? 0;
+  const debouncedSearch = searchParams.q ?? "";
+
+  // Local search input tracks typing; URL updates on debounce
+  const [search, setSearchLocal] = useState(debouncedSearch);
   // Track user's vote per memory: "up" | "down" | null (togglable)
   const [votes, setVotes] = useState<Record<string, "up" | "down" | null>>({});
+
+  const setParam = useCallback(
+    (updates: Record<string, unknown>) =>
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, ...updates }), replace: true }),
+    [navigate],
+  );
+  const setTypeFilter = useCallback((t: string | null) => setParam({ type: t || undefined, page: 0 }), [setParam]);
+  const setAgentFilter = useCallback((a: string | null) => setParam({ agent: a || undefined, page: 0 }), [setParam]);
+  const setPage = useCallback((p: number | ((prev: number) => number)) => {
+    const next = typeof p === "function" ? p(page) : p;
+    setParam({ page: next || undefined });
+  }, [setParam, page]);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
+    setSearchLocal(value);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(value.trim());
-      setPage(0);
+      setParam({ q: value.trim() || undefined, page: 0 });
     }, 300);
-  }, []);
+  }, [setParam]);
 
   // Fetch agents for filter chips
   const { agents } = useAgents();
