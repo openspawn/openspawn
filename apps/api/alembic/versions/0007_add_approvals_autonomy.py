@@ -36,12 +36,8 @@ def upgrade() -> None:
     op.create_table(
         "approval_requests",
         sa.Column("id", sa.Text(), primary_key=True),
-        sa.Column(
-            "org_id", sa.Text(), sa.ForeignKey("organizations.id"), nullable=False
-        ),
-        sa.Column(
-            "requested_by", sa.Text(), sa.ForeignKey("agents.id"), nullable=False
-        ),
+        sa.Column("org_id", sa.Text(), sa.ForeignKey("organizations.id"), nullable=False),
+        sa.Column("requested_by", sa.Text(), sa.ForeignKey("agents.id"), nullable=False),
         sa.Column("action_type", sa.String(50), nullable=False),
         sa.Column("entity_type", sa.String(50), nullable=False),
         sa.Column("entity_id", sa.Text(), nullable=False),
@@ -53,15 +49,9 @@ def upgrade() -> None:
         sa.Column("resolved_at", sa.DateTime(), nullable=True),
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("expires_at", sa.DateTime(), nullable=True),
-        sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
-        ),
-        sa.Column(
-            "updated_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
-        ),
-        sa.CheckConstraint(
-            "risk_level >= 0 AND risk_level <= 10", name="chk_approval_risk_level"
-        ),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
+        sa.CheckConstraint("risk_level >= 0 AND risk_level <= 10", name="chk_approval_risk_level"),
         sa.CheckConstraint(
             "autonomy_level >= 0 AND autonomy_level <= 10",
             name="chk_approval_autonomy_level",

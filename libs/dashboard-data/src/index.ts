@@ -89,6 +89,7 @@ export interface AgentFields {
   lastActivityAt?: string | null;
   lastPromotionAt?: string | null;
   lifetimeEarnings: number;
+  defaultAutonomyLevel: number;
   domain?: string | null;
   teamId?: string | null;
   avatar?: string | null;

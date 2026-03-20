@@ -118,6 +118,9 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
     maxEscalationDepth: cultureMeta["hierarchy_depth"]
       ? parseInt(cultureMeta["hierarchy_depth"].replace(/\D/g, "")) || undefined
       : undefined,
+    defaultAutonomy: cultureMeta["default_autonomy"]
+      ? parseInt(cultureMeta["default_autonomy"].replace(/\D/g, "")) || undefined
+      : undefined,
   };
 
   // ── Policies ──
@@ -146,6 +149,20 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
       }
     }
     if (Object.keys(caps).length > 0) policies.departmentCaps = caps;
+
+    // Risk overrides subsection
+    const riskOverrides: Record<string, number> = {};
+    for (const child of policiesSection.children) {
+      if (child.heading.toLowerCase().includes("risk override")) {
+        for (const line of child.lines) {
+          const overrideMatch = line.match(/^[-*]\s+([\w/]+):\s*(\d+)/);
+          if (overrideMatch) {
+            riskOverrides[overrideMatch[1].trim()] = parseInt(overrideMatch[2]);
+          }
+        }
+      }
+    }
+    if (Object.keys(riskOverrides).length > 0) policies.riskOverrides = riskOverrides;
   }
 
   // ── Structure ──
@@ -256,6 +273,8 @@ export function generateOrgMd(org: ParsedOrg): string {
       lines.push(`- **Progress Updates:** ${org.culture.progressFrequency}`);
     if (org.culture.ackRequired !== undefined)
       lines.push(`- **Ack Required:** ${org.culture.ackRequired ? "yes" : "no"}`);
+    if (org.culture.defaultAutonomy !== undefined)
+      lines.push(`- **Default Autonomy:** ${org.culture.defaultAutonomy}`);
     lines.push("");
   }
 
@@ -265,6 +284,12 @@ export function generateOrgMd(org: ParsedOrg): string {
       lines.push(`- **Per-Agent Limit:** $${org.policies.perAgentBudget}`);
     if (org.policies.alertThreshold)
       lines.push(`- **Alert Threshold:** ${org.policies.alertThreshold}%`);
+    if (org.policies.riskOverrides) {
+      lines.push("", "### Risk Overrides", "");
+      for (const [key, val] of Object.entries(org.policies.riskOverrides)) {
+        lines.push(`- ${key}: ${val}`);
+      }
+    }
     lines.push("");
   }
 

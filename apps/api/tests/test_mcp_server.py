@@ -72,6 +72,12 @@ async def test_all_tools_registered() -> None:
         "approval_request",
         "approval_respond",
         "approval_list",
+        # Ideation (5)
+        "ideation_start",
+        "ideation_propose",
+        "ideation_review",
+        "ideation_synthesize",
+        "ideation_status",
     }
     tools = await mcp.list_tools()
     registered = {tool.name for tool in tools}

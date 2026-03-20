@@ -29,6 +29,17 @@ def get_risk_level(action_type: str, subtype: str) -> int:
     return RISK_REGISTRY.get((action_type, subtype), DEFAULT_RISK)
 
 
+def get_risk_level_with_overrides(
+    action_type: str, subtype: str, overrides: dict[str, int] | None = None
+) -> int:
+    """Check org-level risk overrides first, then fall back to static registry."""
+    if overrides:
+        key = f"{action_type}/{subtype}"
+        if key in overrides:
+            return overrides[key]
+    return RISK_REGISTRY.get((action_type, subtype), DEFAULT_RISK)
+
+
 def is_gated(effective_autonomy: int, risk_level: int) -> bool:
     """Returns True if the action requires approval.
 

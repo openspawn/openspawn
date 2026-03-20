@@ -122,6 +122,16 @@ def as_agent(agent_id: str, org_id: str, name: str, level: int, agent_id_str: st
             app.dependency_overrides.pop(require_auth, None)
 
 
+async def _get_db_session(client: AsyncClient):
+    """Helper to get a DB session from the dependency override."""
+    from app.database import get_db
+    from app.main import app
+
+    override_fn = app.dependency_overrides[get_db]
+    db_gen = override_fn()
+    return await db_gen.__anext__(), db_gen
+
+
 @pytest.fixture
 async def seeded_client(client: AsyncClient) -> AsyncClient:
     from app.database import get_db
@@ -377,3 +387,63 @@ async def test_rejection_requires_notes(seeded_client: AsyncClient):
         )
         assert r.status_code == 200
         assert r.json()["data"]["status"] == "rejected"
+
+
+_LEVEL5_ID = "00000000-0000-0000-0000-000000000022"
+
+
+@pytest.mark.asyncio
+async def test_configurable_level_delta(seeded_client: AsyncClient):
+    """Org settings level_delta=1 allows closer-level agents to approve."""
+    c = seeded_client
+
+    db, db_gen = await _get_db_session(c)
+    # Set level_delta=1 on org
+    from sqlalchemy import select
+
+    from app.models.agent import Agent
+    from app.models.organization import Organization
+
+    result = await db.execute(
+        select(Organization).where(Organization.id == uuid.UUID(_OWNER_ORG_ID))
+    )
+    org = result.scalar_one()
+    org.settings = {**(org.settings or {}), "approver_authority": {"level_delta": 1}}
+
+    # Create a level-5 agent (worker level + 2 away from worker's level 3 normally)
+    level5 = Agent(
+        id=uuid.UUID(_LEVEL5_ID),
+        org_id=org.id,
+        agent_id="agent-level5",
+        name="Level5",
+        level=4,
+        default_autonomy_level=5,
+        model="sonnet",
+        status="active",
+        role="worker",
+        mode="worker",
+        hmac_secret_enc=b"\x00" * 32,
+    )
+    db.add(level5)
+    await db.commit()
+
+    with contextlib.suppress(StopAsyncIteration):
+        await db_gen.__anext__()
+
+    # Worker creates a gated action (cancel task => risk 5, autonomy 3)
+    with as_agent(_WORKER_ID, _OWNER_ORG_ID, "Worker", 3, "agent-worker"):
+        r = await c.post(
+            f"/tasks/{_TASK_ID}/transition",
+            json={"status": "cancelled"},
+        )
+        assert r.status_code == 403
+        approval_id = r.json()["detail"]["approval_id"]
+
+    # Level5 agent (level=4) can approve because level_delta=1 (need >= 3+1=4)
+    with as_agent(_LEVEL5_ID, _OWNER_ORG_ID, "Level5", 4, "agent-level5"):
+        r = await c.post(
+            f"/approvals/{approval_id}/approve",
+            json={"notes": "LGTM"},
+        )
+        assert r.status_code == 200
+        assert r.json()["data"]["status"] == "approved"
