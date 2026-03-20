@@ -32,9 +32,6 @@ def sqlite_env():
 async def db_session(tmp_path) -> AsyncSession:
     from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
-    import app.models.approval
-    import app.models.artifact
-    import app.models.event_subscription
     from app.models.base import Base
     from app.models.compat import CompatUUID
 
@@ -79,12 +76,11 @@ async def db_session(tmp_path) -> AsyncSession:
 async def test_expire_approvals(db_session: AsyncSession, monkeypatch):
     from sqlalchemy import select
 
+    # Monkeypatch async_session to return our test session
+    import app.workers.approval_expiry as expiry_mod
     from app.models.approval import ApprovalRequest
     from app.models.enums import ApprovalStatus
     from app.models.organization import Organization
-
-    # Monkeypatch async_session to return our test session
-    import app.workers.approval_expiry as expiry_mod
 
     org_id = uuid.uuid4()
     agent_id = uuid.uuid4()
@@ -156,8 +152,9 @@ async def test_expire_approvals(db_session: AsyncSession, monkeypatch):
 @pytest.mark.asyncio
 async def test_expire_approvals_no_pending(db_session: AsyncSession, monkeypatch):
     """No pending approvals — worker returns 0."""
-    import app.workers.approval_expiry as expiry_mod
     from contextlib import asynccontextmanager
+
+    import app.workers.approval_expiry as expiry_mod
 
     @asynccontextmanager
     async def mock_session():

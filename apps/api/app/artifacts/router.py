@@ -89,7 +89,11 @@ async def _publish_one(
     effective_autonomy = 10
 
     if isinstance(auth, _AuthAgent):
-        from app.autonomy.gate import get_risk_level_with_overrides, is_gated, resolve_effective_autonomy
+        from app.autonomy.gate import (
+            get_risk_level_with_overrides,
+            is_gated,
+            resolve_effective_autonomy,
+        )
         from app.models.agent import Agent
         from app.models.organization import Organization
         from app.models.task import Task

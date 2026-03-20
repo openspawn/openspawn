@@ -410,7 +410,7 @@ async def seed_from_org(org_path: str, session: AsyncSession | None = None) -> i
     """
     from app.database import async_session
 
-    text = Path(org_path).read_text(encoding="utf-8")
+    text = Path(org_path).read_text(encoding="utf-8")  # noqa: ASYNC240
     agents = parse_org_md_content(text)
     if not agents:
         logger.warning("No agents found in %s", org_path)

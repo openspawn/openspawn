@@ -398,12 +398,11 @@ async def test_configurable_level_delta(seeded_client: AsyncClient):
     c = seeded_client
 
     db, db_gen = await _get_db_session(c)
-    from app.models.agent import Agent
-    from app.models.organization import Organization
-    from app.models.task import Task
-
     # Set level_delta=1 on org
     from sqlalchemy import select
+
+    from app.models.agent import Agent
+    from app.models.organization import Organization
 
     result = await db.execute(select(Organization).where(Organization.id == uuid.UUID(_OWNER_ORG_ID)))
     org = result.scalar_one()

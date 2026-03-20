@@ -159,7 +159,11 @@ async def transition_task(
 
     # Autonomy dial gate — skip for human operators
     if isinstance(auth, AuthenticatedAgent):
-        from app.autonomy.gate import get_risk_level_with_overrides, is_gated, resolve_effective_autonomy
+        from app.autonomy.gate import (
+            get_risk_level_with_overrides,
+            is_gated,
+            resolve_effective_autonomy,
+        )
 
         agent = await db.get(Agent, auth.id)
         effective_autonomy = resolve_effective_autonomy(

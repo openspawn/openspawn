@@ -96,8 +96,8 @@ async def client(tmp_path) -> AsyncGenerator[AsyncClient]:
     from sqlalchemy.pool import StaticPool
 
     # Ensure all models are imported so Base.metadata has all tables
-    import app.models.artifact  # noqa: F401
-    import app.models.event_subscription  # noqa: F401
+    import app.models.artifact
+    import app.models.event_subscription
     from app.database import get_db
     from app.models.base import Base
 
@@ -383,7 +383,7 @@ async def test_e2e_coordination_three_agents(seeded: AsyncClient):
         docs_artifact = r.json()["data"]
         assert docs_artifact["artifact_type"] == "doc_section"
         assert docs_artifact["version"] == 1
-        docs_artifact_id = docs_artifact["id"]
+        assert docs_artifact["id"]
 
     # ── Step 9: Dev agent publishes Component artifact ────────────────
     with as_agent(_DEV_AGENT_ID, _ORG_ID, "Dev Agent", level=7):
@@ -409,7 +409,7 @@ async def test_e2e_coordination_three_agents(seeded: AsyncClient):
         assert r.status_code == 201, f"Dev artifact publish failed: {r.text}"
         dev_artifact = r.json()["data"]
         assert dev_artifact["artifact_type"] == "component"
-        dev_artifact_id = dev_artifact["id"]
+        assert dev_artifact["id"]
 
     # ═══════════════════════════════════════════════════════════════════
     # VERIFICATION: Projections (must use as_agent to match org_id)
