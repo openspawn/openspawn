@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi import HTTPException
+from pydantic import ValidationError
 
 from app.coordination.event_schemas import (
     EVENT_PAYLOAD_SCHEMAS,
@@ -34,7 +35,7 @@ class TestPayloadModels:
         assert p.test_ids == []
 
     def test_component_created_missing_required(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             ComponentCreatedPayload(name="Button")  # missing file_path
 
     def test_component_created_extra_fields_allowed(self):
@@ -70,7 +71,7 @@ class TestPayloadModels:
         assert p.duration_ms is None
 
     def test_build_failed_requires_error(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             BuildFailedPayload(duration_ms=100)  # missing error
 
     def test_build_failed_valid(self):
