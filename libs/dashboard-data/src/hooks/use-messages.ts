@@ -35,7 +35,7 @@ export function useMessages() {
   const rest = useRestMessages();
 
   return {
-    messages: Array.isArray(rest.data) ? rest.data : [],
+    messages: Array.isArray(rest.data?.data) ? rest.data.data : Array.isArray(rest.data) ? rest.data : [],
     loading: rest.isLoading,
     error: rest.error?.message,
     refetch: rest.refetch,

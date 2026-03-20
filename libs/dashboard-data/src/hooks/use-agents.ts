@@ -7,7 +7,7 @@ export function useAgents() {
   const rest = useRestAgents();
 
   return {
-    agents: Array.isArray(rest.data) ? rest.data : [],
+    agents: Array.isArray(rest.data?.data) ? rest.data.data : Array.isArray(rest.data) ? rest.data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
