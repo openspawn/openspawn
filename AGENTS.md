@@ -110,8 +110,10 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 - **PRs**: All changes go through pull requests — never push directly to `main`
 - **Commits**: Scoped conventional commits (`feat(scope):`, `fix(scope):`)
 - **Imports**: No barrel files, explicit paths
-- **Formatting**: oxfmt (Rust-based)
-- **Linting**: oxlint (type-aware) — fix all warnings, not just errors. Zero warnings policy.
+- **Formatting (TS)**: oxfmt (Rust-based)
+- **Formatting (Python)**: `ruff format` — always run before committing Python changes
+- **Linting (TS)**: oxlint (type-aware) — fix all warnings, not just errors. Zero warnings policy.
+- **Linting (Python)**: `ruff check` — must pass with 0 errors. Auto-fix import sorting with `ruff check --fix`.
 - **Components**: shadcn/ui patterns, Tailwind
 - **TypeScript**: No `any`, no `as` casts, no non-null assertions (`!`), prefer string enums. If a type doesn't fit, fix the type — don't cast around it. Use type guards, generics, or narrow via conditionals instead.
 - **Documentation**: Every PR must update relevant internal docs (`ARCHITECTURE.md`, `AGENTS.md`, `SCHEMA.md`) and public-facing docs (`apps/website/content/docs/`) to reflect changes
@@ -133,8 +135,9 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 Always run before finishing and before opening a PR:
 
 ```bash
-pnpm exec oxfmt --write .                                              # Format
-pnpm exec nx run-many -t lint                                          # Lint (must pass with 0 errors AND 0 warnings)
+pnpm exec oxfmt --write .                                              # Format (TS)
+cd apps/api && uv run ruff format . && uv run ruff check --fix .       # Format + lint (Python)
+pnpm exec nx run-many -t lint                                          # Lint (TS — must pass with 0 errors AND 0 warnings)
 pnpm exec nx run-many -t build                                         # Build
 pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
 cd apps/api && uv run pytest tests/ -v                                 # Test (Python)
