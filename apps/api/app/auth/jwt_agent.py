@@ -75,9 +75,7 @@ def decode_agent_token(token: str) -> dict[str, Any]:
     secret = _get_agent_jwt_secret()
 
     try:
-        payload: dict[str, Any] = jwt.decode(
-            token, secret, algorithms=[AGENT_JWT_ALGORITHM]
-        )
+        payload: dict[str, Any] = jwt.decode(token, secret, algorithms=[AGENT_JWT_ALGORITHM])
     except jwt.ExpiredSignatureError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

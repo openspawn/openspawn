@@ -23,6 +23,7 @@ from app.models.enums import AgentStatus
 
 type AuthContext = AuthenticatedAgent | AuthenticatedUser
 
+
 def _try_agent_jwt(token: str) -> AuthenticatedAgent | None:
     """Attempt to decode *token* as an agent JWT.
 
@@ -41,7 +42,6 @@ def _try_agent_jwt(token: str) -> AuthenticatedAgent | None:
             raise
         # Otherwise it is not an agent token -- fall through
         return None
-
 
 
 async def _authenticate_hmac(
