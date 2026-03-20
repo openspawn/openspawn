@@ -3,12 +3,14 @@ export { startupScenario } from "./startup";
 export { growthScenario } from "./growth";
 export { enterpriseScenario } from "./enterprise";
 export { acmetechScenario, PROJECT_PHASES, acmetechTasks, ACMETECH_AGENTS } from "./acmetech";
+export { krustyKrabScenario, KRUSTY_KRAB_AGENTS } from "./krusty-krab";
 
 import { freshScenario } from "./fresh";
 import { startupScenario } from "./startup";
 import { growthScenario } from "./growth";
 import { enterpriseScenario } from "./enterprise";
 import { acmetechScenario } from "./acmetech";
+import { krustyKrabScenario } from "./krusty-krab";
 import type { DemoScenario } from "../types";
 
 export const scenarios: Record<string, DemoScenario> = {
@@ -17,6 +19,7 @@ export const scenarios: Record<string, DemoScenario> = {
   startup: startupScenario,
   growth: growthScenario,
   enterprise: enterpriseScenario,
+  "krusty-krab": krustyKrabScenario, // SpongeBob themed - for bikinibottom.ai
 };
 
 // Default scenario for demos

@@ -16,6 +16,7 @@ import {
   startupScenario,
   enterpriseScenario,
   acmetechScenario,
+  krustyKrabScenario,
   PROJECT_PHASES,
   type SimulationEvent,
   type DemoScenario,
@@ -30,6 +31,7 @@ export enum ScenarioName {
   Startup = "startup",
   Growth = "growth",
   Enterprise = "enterprise",
+  KrustyKrab = "krusty-krab",
   Sandbox = "sandbox",
 }
 
@@ -97,6 +99,7 @@ const SCENARIOS: Record<ScenarioName, DemoScenario> = {
   [ScenarioName.Startup]: startupScenario,
   [ScenarioName.Growth]: growthScenario,
   [ScenarioName.Enterprise]: enterpriseScenario,
+  [ScenarioName.KrustyKrab]: krustyKrabScenario, // SpongeBob themed - bikinibottom.ai
   [ScenarioName.Sandbox]: freshScenario, // Sandbox reuses fresh scenario as base
 };
 
