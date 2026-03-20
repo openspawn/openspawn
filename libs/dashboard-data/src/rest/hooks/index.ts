@@ -5,7 +5,7 @@ export {
   useRejectApproval,
   useUpdateTaskAutonomy,
 } from "./use-approvals";
-export { useTasks, useTask } from "./use-tasks";
+export { useTasks, useTask, useTaskComments, useTaskEscalations } from "./use-tasks";
 export {
   useCreateTask,
   useTransitionTask,

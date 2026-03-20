@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useCallback } from "react";
 import { Link, useSearch, useNavigate } from "@tanstack/react-router";
-import { useDashboardPanels } from "@openspawn/dashboard-data";
+import { useDashboardPanels, useApprovals } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import {
   PageHeader,
@@ -230,6 +230,7 @@ export function DashboardPage() {
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
   const { events } = useEvents();
+  const pendingApprovalsQuery = useApprovals("pending");
   const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
   const searchParams = useSearch({ strict: false });
   const navigate = useNavigate();
@@ -400,6 +401,38 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Pending Approvals */}
+      {(() => {
+        const pa = Array.isArray(pendingApprovalsQuery.data?.data) ? pendingApprovalsQuery.data.data : [];
+        if (pa.length === 0) return null;
+        return (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Shield className="h-4 w-4 text-amber-400" />
+                Pending Approvals
+                <Badge variant="warning" className="text-[10px] px-1.5 py-0">{pa.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="divide-y divide-white/5">
+                {pa.slice(0, 5).map((a: Record<string, unknown>) => (
+                  <div key={a.id as string} className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                    onClick={() => { const eid = a.entity_id as string; if (eid) handleOpenTaskPanel(eid); }}>
+                    <Clock className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-white/70 truncate block">{(a.action_type as string)?.replace(/_/g, ' ') ?? 'Approval'}</span>
+                      <span className="text-[11px] text-muted-foreground">{new Date(a.created_at as string).toLocaleDateString()}</span>
+                    </div>
+                    <Badge variant="warning" className="text-[10px] px-1.5 py-0">Pending</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* ── Two-Column: Team + Tasks ──────────────────────── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
