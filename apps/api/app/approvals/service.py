@@ -161,18 +161,29 @@ async def respond_to_approval(
             detail="Cannot approve your own request",
         )
 
-    # Agent authority check: level >= requester.level + 2, or parent
+    # Agent authority check: level >= requester.level + level_delta, or parent
     if isinstance(auth, AuthenticatedAgent):
         from app.models.agent import Agent
+        from app.models.organization import Organization
 
         requester = await db.get(Agent, approval.requested_by)
         is_parent = requester is not None and requester.parent_id == auth.id
         requester_level = requester.level if requester else 0
-        has_level = auth.level >= requester_level + 2
+
+        # Load configurable level_delta from org settings (default: 2)
+        org = await db.get(Organization, auth.org_id)
+        org_settings = (org.settings if org else None) or {}
+        approver_cfg = org_settings.get("approver_authority", {})
+        level_delta: int = (
+            approver_cfg.get("level_delta", 2) if isinstance(approver_cfg, dict) else 2
+        )
+        required_level = requester_level + level_delta
+
+        has_level = auth.level >= required_level
         if not (is_parent or has_level):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient level to approve (need level >= {requester_level + 2} or be parent agent)",
+                detail=f"Insufficient level to approve (need level >= {required_level} or be parent agent)",
             )
 
     now = pendulum.now("UTC")

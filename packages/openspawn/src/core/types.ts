@@ -25,11 +25,13 @@ export interface ParsedOrg {
     progressFrequency?: string;
     ackRequired?: boolean;
     maxEscalationDepth?: number;
+    defaultAutonomy?: number;
   };
   policies: {
     perAgentBudget?: number;
     alertThreshold?: number;
     departmentCaps?: Record<string, number>;
+    riskOverrides?: Record<string, number>;
   };
 }
 

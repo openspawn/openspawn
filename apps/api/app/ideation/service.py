@@ -53,10 +53,13 @@ async def start_ideation(
         from app.models.agent import Agent
 
         result = await db.execute(
-            select(Agent.id).where(
+            select(Agent.id)
+            .where(
                 Agent.org_id == auth.org_id,
                 Agent.status == "active",
-            ).order_by(Agent.level.desc(), Agent.name).limit(5)
+            )
+            .order_by(Agent.level.desc(), Agent.name)
+            .limit(5)
         )
         agent_ids = list(result.scalars().all())
         if not agent_ids:
@@ -204,7 +207,7 @@ async def _advance_round(
         return
 
     session.current_round = next_round
-    new_status = _ROUND_STATUS.get(next_round, IdeationStatus.SYNTHESIS.value)
+    new_status = _ROUND_STATUS.get(next_round, IdeationStatus.AWAITING_SYNTHESIS.value)
     session.status = new_status
 
     await emit(
@@ -243,26 +246,18 @@ async def synthesize(
     synthesis_content: dict[str, object],
 ) -> IdeationBrief:
     """Coordinator produces unified plan from all briefs (Round 3 / synthesis)."""
+    from app.auth.schemas import AuthenticatedAgent
+
     session = await _get_session(db, auth.org_id, session_id)
 
     # Only the session owner / manager (level >= 7) can synthesize
-    if auth.level < 7:
+    if not isinstance(auth, AuthenticatedAgent) or auth.level < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only manager agents (level >= 7) can synthesize ideation plans",
         )
 
-    # Allow synthesis when all round 2 reviews are in
-    if session.status not in (
-        IdeationStatus.ROUND2.value,
-        IdeationStatus.AWAITING_SYNTHESIS.value,
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Session is {session.status}, cannot synthesize yet",
-        )
-
-    # Check if synthesis brief already exists
+    # Check if synthesis brief already exists (before status check for clearer error)
     existing = await db.execute(
         select(IdeationBrief).where(
             IdeationBrief.session_id == session_id,
@@ -273,6 +268,16 @@ async def synthesize(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Synthesis has already been submitted",
+        )
+
+    # Allow synthesis when all round 2 reviews are in
+    if session.status not in (
+        IdeationStatus.ROUND2.value,
+        IdeationStatus.AWAITING_SYNTHESIS.value,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session is {session.status}, cannot synthesize yet",
         )
 
     brief = IdeationBrief(
@@ -317,10 +322,12 @@ async def approve_plan(
     session_id: uuid.UUID,
 ) -> IdeationSession:
     """Human approves the synthesized plan."""
+    from app.auth.schemas import AuthenticatedAgent
+
     session = await _get_session(db, auth.org_id, session_id)
 
     # Only manager agents (level >= 7) can approve plans
-    if auth.level < 7:
+    if not isinstance(auth, AuthenticatedAgent) or auth.level < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only manager agents (level >= 7) can approve ideation plans",

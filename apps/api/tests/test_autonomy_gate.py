@@ -1,6 +1,11 @@
 """Unit tests for autonomy gate logic (no DB, pure functions)."""
 
-from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
+from app.autonomy.gate import (
+    get_risk_level,
+    get_risk_level_with_overrides,
+    is_gated,
+    resolve_effective_autonomy,
+)
 
 
 class TestIsGated:
@@ -44,3 +49,26 @@ class TestGetRiskLevel:
     def test_zero_risk_transitions(self):
         assert get_risk_level("task_transition", "in_progress") == 0
         assert get_risk_level("task_transition", "backlog") == 0
+
+
+class TestGetRiskLevelWithOverrides:
+    def test_no_overrides_falls_back(self):
+        assert get_risk_level_with_overrides("task_transition", "done") == 3
+
+    def test_none_overrides_falls_back(self):
+        assert get_risk_level_with_overrides("artifact_publish", "migration", None) == 9
+
+    def test_empty_overrides_falls_back(self):
+        assert get_risk_level_with_overrides("task_transition", "done", {}) == 3
+
+    def test_override_replaces_registry(self):
+        overrides = {"artifact_publish/migration": 4}
+        assert get_risk_level_with_overrides("artifact_publish", "migration", overrides) == 4
+
+    def test_override_missing_key_falls_back(self):
+        overrides = {"artifact_publish/migration": 4}
+        assert get_risk_level_with_overrides("task_transition", "done", overrides) == 3
+
+    def test_override_unknown_action(self):
+        overrides = {"custom/action": 7}
+        assert get_risk_level_with_overrides("custom", "action", overrides) == 7

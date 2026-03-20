@@ -48,6 +48,7 @@ export interface InitFlags {
   template?: string;
   port?: number;
   deploy?: boolean;
+  lowCost?: boolean;
 }
 
 // ── Defaults ─────────────────────────────────────────────────────────────────
@@ -75,6 +76,13 @@ export function defaultAnswers(): WizardAnswers {
 
 // ── Non-interactive from CLI flags ───────────────────────────────────────────
 
+export const LOW_COST_DEFAULTS = {
+  llmProvider: LlmProvider.OpenAI,
+  defaultModel: "gpt-4o-mini",
+  seniorModel: "gpt-4o-mini",
+  strategicModel: "claude-sonnet-4-20250514",
+} as const;
+
 export function buildAnswersFromFlags(flags: InitFlags): WizardAnswers {
   const answers = defaultAnswers();
 
@@ -92,6 +100,12 @@ export function buildAnswersFromFlags(flags: InitFlags): WizardAnswers {
 
   if (flags.deploy !== undefined) {
     answers.deploy = flags.deploy;
+  }
+
+  if (flags.lowCost) {
+    answers.llmProvider = LOW_COST_DEFAULTS.llmProvider;
+    answers.defaultModel = LOW_COST_DEFAULTS.defaultModel;
+    answers.seniorModel = LOW_COST_DEFAULTS.seniorModel;
   }
 
   return answers;

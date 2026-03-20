@@ -50,6 +50,7 @@ export async function initCommand(args: string[], ctx: { dir: string }) {
   const nonInteractive = hasFlag(args, "--yes", "-y", "--non-interactive");
   const dryRun = hasFlag(args, "--dry-run");
   const deploy = hasFlag(args, "--deploy");
+  const lowCost = hasFlag(args, "--low-cost");
 
   const templateFlag = extractFlag(args, "--template", "-t");
   const portFlag = extractFlag(args, "--port", "-p");
@@ -61,14 +62,21 @@ export async function initCommand(args: string[], ctx: { dir: string }) {
     if (templateFlag !== undefined) flags.template = templateFlag;
     if (portFlag !== undefined) flags.port = Number(portFlag);
     if (deploy) flags.deploy = true;
+    if (lowCost) flags.lowCost = true;
     answers = buildAnswersFromFlags(flags);
   } else {
     answers = await runWizard();
   }
 
-  // Override deploy/port from CLI flags even in interactive mode
+  // Override deploy/port/low-cost from CLI flags even in interactive mode
   if (deploy) answers.deploy = true;
   if (portFlag !== undefined) answers.port = Number(portFlag);
+  if (lowCost) {
+    const { LOW_COST_DEFAULTS } = await import("../wizard.js");
+    answers.llmProvider = LOW_COST_DEFAULTS.llmProvider;
+    answers.defaultModel = LOW_COST_DEFAULTS.defaultModel;
+    answers.seniorModel = LOW_COST_DEFAULTS.seniorModel;
+  }
 
   const result = scaffold(ctx.dir, answers);
 

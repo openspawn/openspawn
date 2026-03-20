@@ -122,6 +122,12 @@ async def start_local(project_dir: str) -> None:
     except ImportError:
         logger.warning("enrichment workers not available, skipping scheduler")
     try:
+        from app.workers.approval_expiry import expire_approvals
+
+        scheduler.add_job(expire_approvals, interval_seconds=300, name="expire_approvals")
+    except ImportError:
+        logger.warning("approval_expiry worker not available, skipping")
+    try:
         from app.coordination.sla_monitor import monitor_sla
 
         scheduler.add_job(monitor_sla, interval_seconds=60, name="monitor_sla")
