@@ -208,7 +208,9 @@ class TestTokenEndpoint:
         """Valid HMAC headers -> JWT returned."""
         agent = _make_agent(level=6)
 
-        with patch("app.auth.router_agent_jwt._authenticate_hmac", new_callable=AsyncMock) as mock_hmac:
+        with patch(
+            "app.auth.router_agent_jwt._authenticate_hmac", new_callable=AsyncMock
+        ) as mock_hmac:
             mock_hmac.return_value = agent
             resp = await client.post(
                 "/auth/agent/token",

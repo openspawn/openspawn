@@ -70,9 +70,7 @@ async def _increment_usage(api_key: str) -> None:
         user_id = row[0]
 
         # Upsert usage counter
-        existing = await db.execute(
-            select(UsageCounter).where(UsageCounter.user_id == user_id)
-        )
+        existing = await db.execute(select(UsageCounter).where(UsageCounter.user_id == user_id))
         counter = existing.scalar_one_or_none()
 
         if counter:
