@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     # Auth configuration
     auth: AuthSettings = AuthSettings()
 
+    # Hosted mode (multi-tenant SaaS)
+    hosted_mode: bool = False
+
     # Observability (all optional)
     logfire_token: str | None = None
     langfuse_public_key: str | None = None

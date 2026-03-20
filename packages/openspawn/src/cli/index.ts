@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // ── OpenSpawn CLI ────────────────────────────────────────────────────────────
 
+import { authCommand } from "./commands/auth.js";
 import { initCommand } from "./commands/init.js";
 import { previewCommand } from "./commands/preview.js";
 import { regenerateCommand } from "./commands/regenerate.js";
@@ -12,6 +13,7 @@ openspawn - Multi-agent organization CLI
 Usage: openspawn <command> [options]
 
 Commands:
+  auth <subcommand>              Manage API authentication
   init [directory]               Create agent organization
     -t, --template <name>        Template to use
     -y, --yes                    Skip wizard, use defaults
@@ -75,6 +77,8 @@ async function main() {
   const ctx = { dir, orgFile };
 
   switch (command) {
+    case "auth":
+      return authCommand(rest);
     case "init":
       return initCommand(rest, ctx);
     case "regenerate":
