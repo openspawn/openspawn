@@ -68,7 +68,7 @@ async def test_register_returns_api_key(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_register_duplicate_email(client: AsyncClient):
     """Duplicate email returns 409."""
-    payload = {"email": "bob@example.com", "password": "pass123", "name": "Bob"}
+    payload = {"email": "bob@example.com", "password": "password123", "name": "Bob"}
     r1 = await client.post("/auth/register", json=payload)
     assert r1.status_code == 200
 
@@ -87,7 +87,7 @@ async def test_register_disabled_in_selfhosted(client: AsyncClient):
     try:
         r = await client.post(
             "/auth/register",
-            json={"email": "x@x.com", "password": "pass", "name": "X"},
+            json={"email": "x@x.com", "password": "password123", "name": "X"},
         )
         assert r.status_code == 404
     finally:
@@ -105,13 +105,13 @@ async def test_hosted_login_returns_api_key(client: AsyncClient):
     # Register first
     await client.post(
         "/auth/register",
-        json={"email": "carol@example.com", "password": "mypass", "name": "Carol"},
+        json={"email": "carol@example.com", "password": "mypassword", "name": "Carol"},
     )
 
     # Login
     r = await client.post(
         "/auth/hosted-login",
-        json={"email": "carol@example.com", "password": "mypass"},
+        json={"email": "carol@example.com", "password": "mypassword"},
     )
     assert r.status_code == 200
     data = r.json()
@@ -123,12 +123,12 @@ async def test_hosted_login_wrong_password(client: AsyncClient):
     """Wrong password returns 401."""
     await client.post(
         "/auth/register",
-        json={"email": "dan@example.com", "password": "correct", "name": "Dan"},
+        json={"email": "dan@example.com", "password": "correctpassword", "name": "Dan"},
     )
 
     r = await client.post(
         "/auth/hosted-login",
-        json={"email": "dan@example.com", "password": "wrong"},
+        json={"email": "dan@example.com", "password": "wrongpassword"},
     )
     assert r.status_code == 401
 
@@ -143,7 +143,7 @@ async def test_whoami_with_api_key(client: AsyncClient):
     """GET /auth/whoami returns user info when authenticated with API key."""
     reg = await client.post(
         "/auth/register",
-        json={"email": "eve@example.com", "password": "pass", "name": "Eve"},
+        json={"email": "eve@example.com", "password": "password123", "name": "Eve"},
     )
     api_key = reg.json()["api_key"]
 
@@ -174,7 +174,7 @@ async def test_usage_returns_counts(client: AsyncClient):
     """GET /auth/usage returns usage stats."""
     reg = await client.post(
         "/auth/register",
-        json={"email": "frank@example.com", "password": "pass", "name": "Frank"},
+        json={"email": "frank@example.com", "password": "password123", "name": "Frank"},
     )
     api_key = reg.json()["api_key"]
 
@@ -199,11 +199,11 @@ async def test_multitenant_org_isolation(client: AsyncClient):
     """Two users get separate orgs."""
     r1 = await client.post(
         "/auth/register",
-        json={"email": "tenant1@example.com", "password": "pass", "name": "Tenant 1"},
+        json={"email": "tenant1@example.com", "password": "password123", "name": "Tenant 1"},
     )
     r2 = await client.post(
         "/auth/register",
-        json={"email": "tenant2@example.com", "password": "pass", "name": "Tenant 2"},
+        json={"email": "tenant2@example.com", "password": "password123", "name": "Tenant 2"},
     )
 
     key1 = r1.json()["api_key"]
