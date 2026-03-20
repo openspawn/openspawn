@@ -53,10 +53,13 @@ async def start_ideation(
         from app.models.agent import Agent
 
         result = await db.execute(
-            select(Agent.id).where(
+            select(Agent.id)
+            .where(
                 Agent.org_id == auth.org_id,
                 Agent.status == "active",
-            ).order_by(Agent.level.desc(), Agent.name).limit(5)
+            )
+            .order_by(Agent.level.desc(), Agent.name)
+            .limit(5)
         )
         agent_ids = list(result.scalars().all())
         if not agent_ids:

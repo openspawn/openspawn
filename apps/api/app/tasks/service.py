@@ -173,7 +173,9 @@ async def transition_task(
         # Load org-level risk overrides
         org = await db.get(Organization, auth.org_id)
         org_settings = (org.settings if org else None) or {}
-        risk_overrides = org_settings.get("risk_overrides") if isinstance(org_settings, dict) else None
+        risk_overrides = (
+            org_settings.get("risk_overrides") if isinstance(org_settings, dict) else None
+        )
         risk = get_risk_level_with_overrides("task_transition", dto.status.value, risk_overrides)
 
         if is_gated(effective_autonomy, risk):

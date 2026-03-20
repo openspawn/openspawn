@@ -19,13 +19,10 @@ async def expire_approvals(ctx: dict) -> int:
 
     async with async_session() as session:
         # Find pending approvals that have expired
-        expired_q = (
-            select(ApprovalRequest)
-            .where(
-                ApprovalRequest.status == ApprovalStatus.PENDING.value,
-                ApprovalRequest.expires_at.is_not(None),
-                ApprovalRequest.expires_at < func.now(),
-            )
+        expired_q = select(ApprovalRequest).where(
+            ApprovalRequest.status == ApprovalStatus.PENDING.value,
+            ApprovalRequest.expires_at.is_not(None),
+            ApprovalRequest.expires_at < func.now(),
         )
         result = await session.execute(expired_q)
         expired_rows = list(result.scalars().all())

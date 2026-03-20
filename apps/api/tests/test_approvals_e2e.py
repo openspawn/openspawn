@@ -404,7 +404,9 @@ async def test_configurable_level_delta(seeded_client: AsyncClient):
     from app.models.agent import Agent
     from app.models.organization import Organization
 
-    result = await db.execute(select(Organization).where(Organization.id == uuid.UUID(_OWNER_ORG_ID)))
+    result = await db.execute(
+        select(Organization).where(Organization.id == uuid.UUID(_OWNER_ORG_ID))
+    )
     org = result.scalar_one()
     org.settings = {**(org.settings or {}), "approver_authority": {"level_delta": 1}}
 

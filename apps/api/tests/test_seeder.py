@@ -195,6 +195,7 @@ class TestSectionParser:
         assert agents[0]["name"] == "Runner 1"
         assert agents[2]["agent_id"] == "runner-3"
 
+
 class TestParseOrgSettings:
     """Tests for parse_org_settings extraction."""
 
@@ -254,7 +255,6 @@ class TestParseOrgSettings:
         settings = parse_org_settings(md)
         assert settings["default_autonomy"] == 3
         assert settings["risk_overrides"] == {"task_transition/done": 1}
-
 
     def test_empty_org(self) -> None:
         md = textwrap.dedent("""\

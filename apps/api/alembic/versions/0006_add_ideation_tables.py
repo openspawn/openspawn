@@ -85,7 +85,9 @@ def upgrade() -> None:
             server_default=sa.func.now(),
         ),
         sa.UniqueConstraint(
-            "session_id", "agent_id", "round",
+            "session_id",
+            "agent_id",
+            "round",
             name="uq_brief_session_agent_round",
         ),
     )

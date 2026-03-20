@@ -174,7 +174,9 @@ async def respond_to_approval(
         org = await db.get(Organization, auth.org_id)
         org_settings = (org.settings if org else None) or {}
         approver_cfg = org_settings.get("approver_authority", {})
-        level_delta: int = approver_cfg.get("level_delta", 2) if isinstance(approver_cfg, dict) else 2
+        level_delta: int = (
+            approver_cfg.get("level_delta", 2) if isinstance(approver_cfg, dict) else 2
+        )
         required_level = requester_level + level_delta
 
         has_level = auth.level >= required_level
