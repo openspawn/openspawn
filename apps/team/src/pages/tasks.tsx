@@ -1,7 +1,9 @@
+import { useEffect, useCallback } from "react";
 import { PageHeader, Badge } from "@openspawn/dashboard-ui";
 import { useDashboardPanels } from "@openspawn/dashboard-data";
 import { useAgents, useTasks } from "../hooks";
 import { cn } from "../lib/utils";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 
 function priorityColor(p: string): string {
   switch (p) {
@@ -40,6 +42,25 @@ export function TasksPage() {
   const { tasks, loading } = useTasks();
   const { agents } = useAgents();
   const { openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+
+  const panelId = (searchParams as Record<string, unknown>).panel as string || "";
+
+  const handleOpenTaskPanel = useCallback(
+    (taskId: string) => {
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, panel: taskId }), replace: true });
+      openTaskPanel(taskId);
+    },
+    [navigate, openTaskPanel],
+  );
+
+  // Auto-open panel from URL on mount
+  useEffect(() => {
+    if (panelId && tasks.length > 0) {
+      openTaskPanel(panelId);
+    }
+  }, [panelId, tasks.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sort: active first (in_progress, review, todo, blocked, backlog), then done/cancelled
   const sorted = [...tasks].sort((a, b) => {
@@ -73,7 +94,7 @@ export function TasksPage() {
             return (
               <button
                 key={task.id}
-                onClick={() => openTaskPanel(task.id)}
+                onClick={() => handleOpenTaskPanel(task.id)}
                 className="w-full flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-all text-left cursor-pointer group"
               >
                 <div className="flex-1 min-w-0">

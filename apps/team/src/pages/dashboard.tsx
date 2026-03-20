@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Link } from "@tanstack/react-router";
+import { useMemo, useEffect, useCallback } from "react";
+import { Link, useSearch, useNavigate } from "@tanstack/react-router";
 import { useDashboardPanels } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import {
@@ -231,6 +231,37 @@ export function DashboardPage() {
   const { tasks, loading: tasksLoading } = useTasks();
   const { events } = useEvents();
   const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+
+  const panelType = (searchParams as Record<string, unknown>).panel as string || "";
+  const panelId = (searchParams as Record<string, unknown>).panelId as string || "";
+
+  const handleOpenAgentPanel = useCallback(
+    (agentId: string) => {
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, panel: "agent", panelId: agentId }), replace: true });
+      openAgentPanel(agentId);
+    },
+    [navigate, openAgentPanel],
+  );
+
+  const handleOpenTaskPanel = useCallback(
+    (taskId: string) => {
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, panel: "task", panelId: taskId }), replace: true });
+      openTaskPanel(taskId);
+    },
+    [navigate, openTaskPanel],
+  );
+
+  // Auto-open panel from URL on mount
+  useEffect(() => {
+    if (!panelType || !panelId) return;
+    if (panelType === "agent" && agents.length > 0) {
+      openAgentPanel(panelId);
+    } else if (panelType === "task" && tasks.length > 0) {
+      openTaskPanel(panelId);
+    }
+  }, [panelType, panelId, agents.length, tasks.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stats = useMemo(() => {
     const norm = (s: string) => s.toLowerCase();
@@ -394,7 +425,7 @@ export function DashboardPage() {
                 key={a.id}
                 agent={a}
                 taskCount={tasksByAgent[a.id] || 0}
-                onClick={() => openAgentPanel(a.id)}
+                onClick={() => handleOpenAgentPanel(a.id)}
               />
             ))}
             {!agentsLoading && agents.length === 0 && (
@@ -424,7 +455,7 @@ export function DashboardPage() {
             )}
             <div className="divide-y divide-white/5">
               {sortedTasks.slice(0, 8).map((t, i) => (
-                <TaskRow key={t.id} task={t} index={i} onClick={() => openTaskPanel(t.id)} />
+                <TaskRow key={t.id} task={t} index={i} onClick={() => handleOpenTaskPanel(t.id)} />
               ))}
             </div>
             {!tasksLoading && tasks.length === 0 && (

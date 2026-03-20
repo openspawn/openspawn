@@ -438,6 +438,9 @@ function KnowledgeGraph() {
   const { nodes, edges, loading } = useGraphCytoscape();
   const [selectedNode, setSelectedNode] = useState<Record<string, unknown> | null>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+  const urlNodeId = (searchParams as Record<string, unknown>).node as string || "";
 
   const elements = useMemo(() => {
     if (!nodes.length && !edges.length) return [];
@@ -463,11 +466,29 @@ function KnowledgeGraph() {
     cy.on("tap", "node", (evt) => {
       const data = evt.target.data();
       setSelectedNode(data);
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, node: data.id || undefined }), replace: true });
     });
     cy.on("tap", (evt) => {
-      if (evt.target === cy) setSelectedNode(null);
+      if (evt.target === cy) {
+        setSelectedNode(null);
+        navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, node: undefined }), replace: true });
+      }
     });
-  }, []);
+  }, [navigate]);
+
+  // Auto-select node from URL on mount
+  useEffect(() => {
+    if (urlNodeId && nodes.length > 0) {
+      const node = nodes.find((n: { data: Record<string, unknown> }) => n.data.id === urlNodeId);
+      if (node) {
+        setSelectedNode({
+          ...node.data,
+          label: (node.data.label as string) ?? (node.data.name as string) ?? (node.data.id as string) ?? "?",
+          type: (node.data.type as string) ?? "entity",
+        });
+      }
+    }
+  }, [urlNodeId, nodes.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return <div className="text-white/40 text-sm">Loading knowledge graph...</div>;

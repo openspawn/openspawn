@@ -29,17 +29,28 @@ const indexRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/",
   component: DashboardPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    panel: (search.panel as string) || undefined,
+    panelId: (search.panelId as string) || undefined,
+  }),
 });
 
 const agentsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/agents",
   component: AgentsPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: (search.q as string) || undefined,
+    panel: (search.panel as string) || undefined,
+  }),
 });
 const tasksRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/tasks",
   component: TasksPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    panel: (search.panel as string) || undefined,
+  }),
 });
 const eventsRoute = createRoute({
   getParentRoute: () => layoutRoute,
@@ -65,6 +76,9 @@ const taskBoardRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/task-board",
   component: TaskBoardPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    panel: (search.panel as string) || undefined,
+  }),
 });
 const networkRoute = createRoute({
   getParentRoute: () => layoutRoute,
@@ -82,6 +96,7 @@ const memoryRoute = createRoute({
     agent: (search.agent as string) || undefined,
     q: (search.q as string) || undefined,
     page: Number(search.page) || 0,
+    node: (search.node as string) || undefined,
   }),
 });
 

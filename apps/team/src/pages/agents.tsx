@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Search, Shield, Clock, TrendingUp } from "lucide-react";
 import { PageHeader, Badge, EmptyState } from "@openspawn/dashboard-ui";
 import { AgentStatus, useDashboardPanels } from "@openspawn/dashboard-data";
 import { cn } from "../lib/utils";
 import { useAgents, useTasks } from "../hooks";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 
 function timeAgo(date: string | null | undefined): string {
   if (!date) return "Never";
@@ -44,8 +45,41 @@ const ROLE_COLORS: Record<string, string> = {
 export function AgentsPage() {
   const { agents, loading } = useAgents();
   const { tasks } = useTasks();
-  const { openAgentPanel } = useDashboardPanels({ agents, tasks });
-  const [search, setSearch] = useState("");
+  const { openAgentPanel, closeSidePanel } = useDashboardPanels({ agents, tasks });
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+
+  const urlQuery = (searchParams as Record<string, unknown>).q as string || "";
+  const panelId = (searchParams as Record<string, unknown>).panel as string || "";
+
+  const [search, setSearchLocal] = useState(urlQuery);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const setSearch = useCallback(
+    (value: string) => {
+      setSearchLocal(value);
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, q: value.trim() || undefined }), replace: true });
+      }, 300);
+    },
+    [navigate],
+  );
+
+  const handleOpenAgentPanel = useCallback(
+    (agentId: string) => {
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, panel: agentId }), replace: true });
+      openAgentPanel(agentId);
+    },
+    [navigate, openAgentPanel],
+  );
+
+  // Auto-open panel from URL on mount
+  useEffect(() => {
+    if (panelId && agents.length > 0) {
+      openAgentPanel(panelId);
+    }
+  }, [panelId, agents.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     if (!search) return agents;
@@ -69,7 +103,9 @@ export function AgentsPage() {
             type="text"
             placeholder="Search agents..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
             className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder:text-white/30 focus:border-white/20 focus:outline-none"
           />
         </div>
@@ -90,7 +126,7 @@ export function AgentsPage() {
             return (
               <button
                 key={agent.id}
-                onClick={() => openAgentPanel(agent.id)}
+                onClick={() => handleOpenAgentPanel(agent.id)}
                 className={cn(
                   "rounded-xl border bg-white/[0.02] p-4 space-y-4 transition-all text-left hover:bg-white/[0.04] hover:border-white/20 cursor-pointer group",
                   isActive ? "border-cyan-500/20" : "border-white/5",

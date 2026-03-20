@@ -1,6 +1,8 @@
+import { useEffect, useCallback } from "react";
 import { PageHeader } from "@openspawn/dashboard-ui";
 import { useTasks, useAgents, useDashboardPanels } from "../hooks";
 import { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 
 const COLUMNS: { id: string; label: string; color: string }[] = [
   { id: TaskStatus.TODO, label: "To Do", color: "border-white/10      bg-white/[0.02]" },
@@ -32,6 +34,25 @@ export function TaskBoardPage() {
   const { tasks, loading } = useTasks();
   const { agents } = useAgents();
   const { openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const searchParams = useSearch({ strict: false });
+  const navigate = useNavigate();
+
+  const panelId = (searchParams as Record<string, unknown>).panel as string || "";
+
+  const handleOpenTaskPanel = useCallback(
+    (taskId: string) => {
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, panel: taskId }), replace: true });
+      openTaskPanel(taskId);
+    },
+    [navigate, openTaskPanel],
+  );
+
+  // Auto-open panel from URL on mount
+  useEffect(() => {
+    if (panelId && tasks.length > 0) {
+      openTaskPanel(panelId);
+    }
+  }, [panelId, tasks.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const byColumn = COLUMNS.reduce<Record<string, typeof tasks>>((acc, col) => {
     acc[col.id] = [];
@@ -68,7 +89,7 @@ export function TaskBoardPage() {
                 byColumn[col.id].map((task) => (
                   <button
                     key={task.id}
-                    onClick={() => openTaskPanel(task.id)}
+                    onClick={() => handleOpenTaskPanel(task.id)}
                     className="w-full rounded-lg border border-white/10 bg-[hsl(var(--card))] p-3 space-y-2 text-left hover:border-white/20 hover:bg-white/[0.04] transition-all cursor-pointer group"
                   >
                     <p className="text-sm font-medium text-white leading-snug group-hover:text-white">
