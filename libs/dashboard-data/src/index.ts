@@ -3,7 +3,15 @@ export { useACPMetrics, type ACPMetrics } from "./hooks/use-acp-metrics";
 export { useAgentHealth, type AgentHealth } from "./hooks/use-agent-health";
 export { useAgents, type Agent } from "./hooks/use-agents";
 export { useContainerSize } from "./hooks/use-container-size";
-export { useCredits, type CreditTransaction } from "./hooks/use-credits";
+export {
+  useCredits,
+  useCreditStats,
+  useCreditsByAgent,
+  useTopSpenders,
+  useSpendingTrends,
+  useCreditBalance,
+  type CreditTransaction,
+} from "./hooks/use-credits";
 export { useEvents, type Event } from "./hooks/use-events";
 export { useMcpTasks, type KanbanTask } from "./hooks/use-mcp-tasks";
 export {
