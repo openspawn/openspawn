@@ -621,7 +621,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-011",
     agentId: AGENT_IDS.patrick,
-    type: CreditType.PENALTY,
+    type: CreditType.DEBIT,
     amount: -47,
     description: "Napkin sandwich disaster: ingredient waste + redelivery costs",
     createdAt: minutesAgo(48),
