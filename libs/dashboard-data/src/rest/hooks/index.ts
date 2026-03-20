@@ -1,4 +1,11 @@
-export { useAgents } from "./use-agents";
+export {
+  useAgents,
+  useAgent,
+  useAgentReputation,
+  useAgentReputationHistory,
+  useAgentBudget,
+  useAgentCapabilities,
+} from "./use-agents";
 export {
   useApprovals,
   useApproveApproval,
@@ -15,7 +22,7 @@ export {
   useEscalateTask,
 } from "./use-task-mutations";
 export { useCreditHistory, useRestCredits } from "./use-credits";
-export { useEvents } from "./use-events";
+export { useEvents, useEventStream, type EventStreamItem } from "./use-events";
 export { useChannels } from "./use-channels";
 export { useRestMessages } from "./use-messages";
 export { useRestMemories, useRestMemorySearch, useRestContradictions, useMemoryList, useMemoryFeedback } from "./use-memory";

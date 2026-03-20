@@ -21,5 +21,6 @@ export * from "./ui/logo";
 export * from "./ui/side-panel";
 export * from "./ui/chart-gradients";
 export * from "./ui/chart-tooltip";
+export * from "./ui/activity-stream";
 export { cn } from "./lib/utils";
 export * from "./panels";

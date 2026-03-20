@@ -13,6 +13,7 @@ import {
   StatusRing,
   Avatar,
   AvatarFallback,
+  ActivityStream,
 } from "@openspawn/dashboard-ui";
 import {
   Users,
@@ -24,7 +25,7 @@ import {
   Shield,
   CircleDot,
 } from "lucide-react";
-import { useAgents, useTasks, useEvents, type Agent, type Task } from "../hooks";
+import { useAgents, useTasks, useEvents, useEventStream, type Agent, type Task } from "../hooks";
 import { AgentStatus, TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -230,6 +231,7 @@ export function DashboardPage() {
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
   const { events } = useEvents();
+  const { events: streamEvents, connected: streamConnected } = useEventStream({ maxEvents: 50 });
   const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
   const searchParams = useSearch({ strict: false });
   const navigate = useNavigate();
@@ -466,6 +468,37 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ── Activity Stream ───────────────────────────────── */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+            <Link
+              to="/events"
+              className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ActivityStream
+            events={streamEvents.length > 0 ? streamEvents : events.map((e: Record<string, unknown>) => ({
+              id: (e.id as string) ?? String(Math.random()),
+              type: (e.type as string) ?? "unknown",
+              actor_id: (e.actor_id as string) ?? (e.agentId as string) ?? null,
+              entity_type: (e.entity_type as string) ?? null,
+              entity_id: (e.entity_id as string) ?? (e.taskId as string) ?? null,
+              data: (e.data as Record<string, unknown>) ?? null,
+              severity: (e.severity as string) ?? "info",
+              created_at: (e.created_at as string) ?? (e.createdAt as string) ?? new Date().toISOString(),
+            }))}
+            agents={agents.map((a) => ({ id: a.id, agentId: a.agentId, name: a.name }))}
+            connected={streamConnected}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

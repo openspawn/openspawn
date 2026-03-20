@@ -17,6 +17,12 @@ function timeAgo(date: string | null | undefined): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+function isOnline(lastActivityAt: string | null | undefined): boolean {
+  if (!lastActivityAt) return false;
+  const diff = Date.now() - new Date(lastActivityAt).getTime();
+  return diff < 5 * 60 * 1000; // 5 minutes
+}
+
 function levelLabel(level: number): string {
   if (level >= 10) return "CEO";
   if (level >= 9) return "VP";
@@ -118,6 +124,7 @@ export function AgentsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((agent) => {
             const isActive = agent.status.toLowerCase() === AgentStatus.ACTIVE;
+            const online = isOnline(agent.lastActivityAt);
             const taskCount = tasksByAgent[agent.id] || 0;
             const completion =
               agent.tasksCompleted > 0
@@ -133,14 +140,22 @@ export function AgentsPage() {
                 )}
               >
                 <div className="flex items-start gap-3">
-                  <div
-                    className={cn(
-                      "h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
-                      ROLE_COLORS[agent.role?.toLowerCase() ?? ""] ??
-                        "bg-slate-500/20 text-slate-400",
-                    )}
-                  >
-                    {initials(agent.name)}
+                  <div className="relative">
+                    <div
+                      className={cn(
+                        "h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+                        ROLE_COLORS[agent.role?.toLowerCase() ?? ""] ??
+                          "bg-slate-500/20 text-slate-400",
+                      )}
+                    >
+                      {initials(agent.name)}
+                    </div>
+                    <div
+                      className={cn(
+                        "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[hsl(var(--background))]",
+                        online ? "bg-emerald-400" : "bg-gray-500",
+                      )}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">

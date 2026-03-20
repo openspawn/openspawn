@@ -1,7 +1,15 @@
 export { useTasks, type Task } from "@openspawn/dashboard-data";
-export { useAgents, type Agent } from "@openspawn/dashboard-data";
+export {
+  useAgents,
+  useAgent,
+  useAgentReputation,
+  useAgentReputationHistory,
+  useAgentBudget,
+  useAgentCapabilities,
+  type Agent,
+} from "@openspawn/dashboard-data";
 export { useCredits, type CreditTransaction } from "@openspawn/dashboard-data";
-export { useEvents, type Event } from "@openspawn/dashboard-data";
+export { useEvents, useEventStream, type Event, type EventStreamItem } from "@openspawn/dashboard-data";
 export {
   useMessages,
   useConversations,
