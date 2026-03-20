@@ -137,6 +137,7 @@ Always run before finishing and before opening a PR:
 ```bash
 pnpm exec oxfmt --write .                                              # Format (TS)
 cd apps/api && uv run ruff format . && uv run ruff check --fix .       # Format + lint (Python)
+cd apps/api && uv run pyright app/                                     # Type check (Python — must pass with 0 errors)
 pnpm exec nx run-many -t lint                                          # Lint (TS — must pass with 0 errors AND 0 warnings)
 pnpm exec nx run-many -t build                                         # Build
 pnpm exec nx run-many -t test --exclude=openspawn                      # Test (TS)
