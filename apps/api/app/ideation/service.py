@@ -204,7 +204,7 @@ async def _advance_round(
         return
 
     session.current_round = next_round
-    new_status = _ROUND_STATUS.get(next_round, IdeationStatus.SYNTHESIS.value)
+    new_status = _ROUND_STATUS.get(next_round, IdeationStatus.AWAITING_SYNTHESIS.value)
     session.status = new_status
 
     await emit(
@@ -252,17 +252,7 @@ async def synthesize(
             detail="Only manager agents (level >= 7) can synthesize ideation plans",
         )
 
-    # Allow synthesis when all round 2 reviews are in
-    if session.status not in (
-        IdeationStatus.ROUND2.value,
-        IdeationStatus.AWAITING_SYNTHESIS.value,
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Session is {session.status}, cannot synthesize yet",
-        )
-
-    # Check if synthesis brief already exists
+    # Check if synthesis brief already exists (before status check for clearer error)
     existing = await db.execute(
         select(IdeationBrief).where(
             IdeationBrief.session_id == session_id,
@@ -273,6 +263,16 @@ async def synthesize(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Synthesis has already been submitted",
+        )
+
+    # Allow synthesis when all round 2 reviews are in
+    if session.status not in (
+        IdeationStatus.ROUND2.value,
+        IdeationStatus.AWAITING_SYNTHESIS.value,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session is {session.status}, cannot synthesize yet",
         )
 
     brief = IdeationBrief(

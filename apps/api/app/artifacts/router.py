@@ -89,8 +89,9 @@ async def _publish_one(
     effective_autonomy = 10
 
     if isinstance(auth, _AuthAgent):
-        from app.autonomy.gate import get_risk_level, is_gated, resolve_effective_autonomy
+        from app.autonomy.gate import get_risk_level_with_overrides, is_gated, resolve_effective_autonomy
         from app.models.agent import Agent
+        from app.models.organization import Organization
         from app.models.task import Task
 
         agent = await db.get(Agent, auth.id)
@@ -99,7 +100,12 @@ async def _publish_one(
             task.autonomy_level if task else None,
             agent.default_autonomy_level if agent else 5,
         )
-        risk = get_risk_level("artifact_publish", dto.artifact_type.value)
+
+        # Load org-level risk overrides
+        org = await db.get(Organization, org_id)
+        org_settings = (org.settings if org else None) or {}
+        risk_overrides = org_settings.get("risk_overrides") if isinstance(org_settings, dict) else None
+        risk = get_risk_level_with_overrides("artifact_publish", dto.artifact_type.value, risk_overrides)
 
         if is_gated(effective_autonomy, risk):
             artifact_status = ArtifactStatus.DRAFT.value

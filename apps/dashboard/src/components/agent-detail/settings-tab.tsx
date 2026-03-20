@@ -1,32 +1,49 @@
 import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
+import { useUpdateAgent } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { Slider } from "../ui/slider";
 
 type Agent = AgentFieldsFragment;
+
+const AUTONOMY_LABELS: Record<number, string> = {
+  0: "Full oversight",
+  5: "Balanced",
+  10: "Full autonomy",
+};
+
+function autonomyLabel(level: number): string {
+  return AUTONOMY_LABELS[level] ?? `Level ${level}`;
+}
 
 export function SettingsTab({ agent }: { agent: Agent }) {
   const [name, setName] = useState(agent.name);
   const [role, setRole] = useState<string>(agent.role);
   const [domain, setDomain] = useState(agent.domain || "");
+  const [autonomy, setAutonomy] = useState(agent.defaultAutonomyLevel ?? 5);
   const [hasChanges, setHasChanges] = useState(false);
+  const updateAgent = useUpdateAgent(agent.id);
 
   useEffect(() => {
-    const changed = name !== agent.name || role !== agent.role || domain !== (agent.domain || "");
+    const changed =
+      name !== agent.name ||
+      role !== agent.role ||
+      domain !== (agent.domain || "") ||
+      autonomy !== (agent.defaultAutonomyLevel ?? 5);
     setHasChanges(changed);
-  }, [name, role, domain, agent]);
+  }, [name, role, domain, autonomy, agent]);
 
   const handleSave = () => {
-    // DEFERRED: Agent profile edits are not yet persisted to the backend.
-    // Wire to the updateAgent GraphQL mutation when available:
-    //   updateAgent({ variables: { id: agent.id, name, role, domain } })
-    // and call refetch() or update the Apollo cache on success.
-    console.log("Saving changes (local only, not persisted):", {
-      name,
-      role,
-      domain,
-    });
+    updateAgent.mutate({ default_autonomy_level: autonomy });
     setHasChanges(false);
+  };
+
+  const handleReset = () => {
+    setName(agent.name);
+    setRole(agent.role);
+    setDomain(agent.domain || "");
+    setAutonomy(agent.defaultAutonomyLevel ?? 5);
   };
 
   return (
@@ -68,21 +85,27 @@ export function SettingsTab({ agent }: { agent: Agent }) {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Default Autonomy Level</label>
+            <span className="text-sm text-muted-foreground">
+              {autonomy} &mdash; {autonomyLabel(autonomy)}
+            </span>
+          </div>
+          <Slider value={autonomy} onValueChange={setAutonomy} min={0} max={10} step={1} />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Full oversight</span>
+            <span>Full autonomy</span>
+          </div>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
         <Button onClick={handleSave} disabled={!hasChanges} className="flex-1">
           Save Changes
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            setName(agent.name);
-            setRole(agent.role);
-            setDomain(agent.domain || "");
-          }}
-          disabled={!hasChanges}
-        >
+        <Button variant="outline" onClick={handleReset} disabled={!hasChanges}>
           Reset
         </Button>
       </div>

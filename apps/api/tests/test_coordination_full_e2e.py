@@ -412,79 +412,80 @@ async def test_e2e_coordination_three_agents(seeded: AsyncClient):
         dev_artifact_id = dev_artifact["id"]
 
     # ═══════════════════════════════════════════════════════════════════
-    # VERIFICATION: Projections
+    # VERIFICATION: Projections (must use as_agent to match org_id)
     # ═══════════════════════════════════════════════════════════════════
 
-    # ── Verify component_registry projection ──────────────────────────
-    r = await c.get(
-        "/coordination/project",
-        params={"task_id": _TASK_ID, "projection_type": "component_registry"},
-    )
-    assert r.status_code == 200
-    registry = r.json()["data"]
-    assert registry["count"] == 1
-    assert "CheckoutForm" in registry["components"]
-    component = registry["components"]["CheckoutForm"]
-    assert component["file_path"] == "src/components/CheckoutForm.tsx"
-    assert "checkout-form" in component["test_ids"]
-    assert "checkout-submit-btn" in component["test_ids"]
-    assert "checkout-total" in component["test_ids"]
+    with as_agent(_DEV_AGENT_ID, _ORG_ID, "Dev Agent", level=7):
+        # ── Verify component_registry projection ──────────────────────────
+        r = await c.get(
+            "/coordination/project",
+            params={"task_id": _TASK_ID, "projection_type": "component_registry"},
+        )
+        assert r.status_code == 200
+        registry = r.json()["data"]
+        assert registry["count"] == 1
+        assert "CheckoutForm" in registry["components"]
+        component = registry["components"]["CheckoutForm"]
+        assert component["file_path"] == "src/components/CheckoutForm.tsx"
+        assert "checkout-form" in component["test_ids"]
+        assert "checkout-submit-btn" in component["test_ids"]
+        assert "checkout-total" in component["test_ids"]
 
-    # ── Verify test_coverage projection ───────────────────────────────
-    r = await c.get(
-        "/coordination/project",
-        params={"task_id": _TASK_ID, "projection_type": "test_coverage"},
-    )
-    assert r.status_code == 200
-    coverage = r.json()["data"]
-    assert coverage["total_components"] == 1
-    assert coverage["covered_count"] == 1
-    assert coverage["coverage_ratio"] == 1.0
-    assert coverage["components"]["CheckoutForm"]["has_tests"] is True
+        # ── Verify test_coverage projection ───────────────────────────────
+        r = await c.get(
+            "/coordination/project",
+            params={"task_id": _TASK_ID, "projection_type": "test_coverage"},
+        )
+        assert r.status_code == 200
+        coverage = r.json()["data"]
+        assert coverage["total_components"] == 1
+        assert coverage["covered_count"] == 1
+        assert coverage["coverage_ratio"] == 1.0
+        assert coverage["components"]["CheckoutForm"]["has_tests"] is True
 
-    # ── Verify artifact_view projection ───────────────────────────────
-    r = await c.get(
-        "/coordination/project",
-        params={"task_id": _TASK_ID, "projection_type": "artifact_view"},
-    )
-    assert r.status_code == 200
-    artifact_view = r.json()["data"]
-    # Should have: component (CheckoutForm), test_plan, doc_section
-    assert artifact_view["count"] == 3
-    types_found = {a["artifact_type"] for a in artifact_view["artifacts"]}
-    assert types_found == {"component", "test_plan", "doc_section"}
+        # ── Verify artifact_view projection ───────────────────────────────
+        r = await c.get(
+            "/coordination/project",
+            params={"task_id": _TASK_ID, "projection_type": "artifact_view"},
+        )
+        assert r.status_code == 200
+        artifact_view = r.json()["data"]
+        # Should have: component (CheckoutForm), test_plan, doc_section
+        assert artifact_view["count"] == 3
+        types_found = {a["artifact_type"] for a in artifact_view["artifacts"]}
+        assert types_found == {"component", "test_plan", "doc_section"}
 
-    # ═══════════════════════════════════════════════════════════════════
-    # VERIFICATION: All 3 artifacts linked to parent task
-    # ═══════════════════════════════════════════════════════════════════
+        # ═══════════════════════════════════════════════════════════════════
+        # VERIFICATION: All 3 artifacts linked to parent task
+        # ═══════════════════════════════════════════════════════════════════
 
-    r = await c.get("/artifacts", params={"task_id": _TASK_ID})
-    assert r.status_code == 200
-    artifacts = r.json()["data"]
-    assert len(artifacts) == 3
+        r = await c.get("/artifacts", params={"task_id": _TASK_ID})
+        assert r.status_code == 200
+        artifacts = r.json()["data"]
+        assert len(artifacts) == 3
 
-    artifact_types = {a["artifact_type"] for a in artifacts}
-    assert artifact_types == {"component", "test_plan", "doc_section"}
+        artifact_types = {a["artifact_type"] for a in artifacts}
+        assert artifact_types == {"component", "test_plan", "doc_section"}
 
-    # All linked to the same parent task
-    for a in artifacts:
-        assert a["task_id"] == _TASK_ID
-        assert a["status"] == "published"
+        # All linked to the same parent task
+        for a in artifacts:
+            assert a["task_id"] == _TASK_ID
+            assert a["status"] == "published"
 
-    # Verify doc_section has source_artifact_ids linking to test artifact
-    doc = next(a for a in artifacts if a["artifact_type"] == "doc_section")
-    assert test_artifact_id in doc["source_artifact_ids"]
+        # Verify doc_section has source_artifact_ids linking to test artifact
+        doc = next(a for a in artifacts if a["artifact_type"] == "doc_section")
+        assert test_artifact_id in doc["source_artifact_ids"]
 
-    # ── Verify replay shows full event timeline ───────────────────────
-    r = await c.post(
-        "/coordination/replay",
-        json={"task_id": _TASK_ID},
-    )
-    assert r.status_code == 200
-    all_events = r.json()["data"]
-    assert len(all_events) == 3  # component.created, test.written, doc.section.written
-    event_types = [e["type"] for e in all_events]
-    assert event_types == ["component.created", "test.written", "doc.section.written"]
+        # ── Verify replay shows full event timeline ───────────────────────
+        r = await c.post(
+            "/coordination/replay",
+            json={"task_id": _TASK_ID},
+        )
+        assert r.status_code == 200
+        all_events = r.json()["data"]
+        assert len(all_events) == 3  # component.created, test.written, doc.section.written
+        event_types = [e["type"] for e in all_events]
+        assert event_types == ["component.created", "test.written", "doc.section.written"]
 
 
 @pytest.mark.asyncio

@@ -10,7 +10,7 @@ from unittest.mock import patch
 import pytest
 from sqlalchemy import select
 
-from app.seeder import parse_org_md_content
+from app.seeder import parse_org_md_content, parse_org_settings
 
 # ---------------------------------------------------------------------------
 # Pure parsing tests (no DB required)
@@ -195,6 +195,67 @@ class TestSectionParser:
         assert agents[0]["name"] == "Runner 1"
         assert agents[2]["agent_id"] == "runner-3"
 
+class TestParseOrgSettings:
+    """Tests for parse_org_settings extraction."""
+
+    def test_extracts_default_autonomy(self) -> None:
+        md = textwrap.dedent("""\
+            # Org
+
+            ## Culture
+
+            - **Default Autonomy:** 7
+        """)
+        settings = parse_org_settings(md)
+        assert settings["default_autonomy"] == 7
+
+    def test_extracts_risk_overrides(self) -> None:
+        md = textwrap.dedent("""\
+            # Org
+
+            ## Policies
+
+            ### Risk Overrides
+
+            - artifact_publish/migration: 9
+            - artifact_publish/component: 4
+        """)
+        settings = parse_org_settings(md)
+        assert settings["risk_overrides"] == {
+            "artifact_publish/migration": 9,
+            "artifact_publish/component": 4,
+        }
+
+    def test_empty_org_returns_empty(self) -> None:
+        md = textwrap.dedent("""\
+            # Org
+
+            ## Culture
+
+            - **Preset:** balanced
+        """)
+        settings = parse_org_settings(md)
+        assert settings == {}
+
+    def test_both_settings(self) -> None:
+        md = textwrap.dedent("""\
+            # Org
+
+            ## Culture
+
+            - **Default Autonomy:** 3
+
+            ## Policies
+
+            ### Risk Overrides
+
+            - task_transition/done: 1
+        """)
+        settings = parse_org_settings(md)
+        assert settings["default_autonomy"] == 3
+        assert settings["risk_overrides"] == {"task_transition/done": 1}
+
+
     def test_empty_org(self) -> None:
         md = textwrap.dedent("""\
             # Empty Org
@@ -366,3 +427,42 @@ async def test_seed_section_format(db_session, tmp_path) -> None:
     dev = next(a for a in agents if a.agent_id == "dev")
     assert boss.level == 10
     assert dev.parent_id == boss.id
+
+
+@pytest.mark.asyncio
+async def test_seed_persists_org_settings(db_session, tmp_path) -> None:
+    """Seeding writes parsed org settings (default_autonomy, risk_overrides) to org.settings."""
+    from app.models.organization import Organization
+    from app.seeder import seed_from_org
+
+    org_md = tmp_path / "ORG.md"
+    org_md.write_text(
+        textwrap.dedent("""\
+        # Settings Org
+
+        ## Culture
+
+        - **Default Autonomy:** 7
+
+        ## Policies
+
+        ### Risk Overrides
+
+        - artifact_publish/migration: 3
+
+        ## Agents
+
+        | Name | Role | Level | Domain | Reports To |
+        |------|------|-------|--------|------------|
+        | Alice | lead | 8 | eng | — |
+    """)
+    )
+
+    await seed_from_org(str(org_md), session=db_session)
+
+    result = await db_session.execute(
+        select(Organization).where(Organization.slug == "settings-org")
+    )
+    org = result.scalar_one()
+    assert org.settings["default_autonomy"] == 7
+    assert org.settings["risk_overrides"] == {"artifact_publish/migration": 3}

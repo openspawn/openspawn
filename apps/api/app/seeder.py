@@ -305,6 +305,41 @@ def _parse_sections(text: str) -> list[dict[str, object]]:
 
 
 # ---------------------------------------------------------------------------
+# Org settings parser
+# ---------------------------------------------------------------------------
+
+
+def parse_org_settings(text: str) -> dict[str, object]:
+    """Extract org-level settings (default_autonomy, risk_overrides) from ORG.md."""
+    settings: dict[str, object] = {}
+
+    # Default Autonomy from Culture section
+    # Handles: "- **Default Autonomy:** 7" or "- Default Autonomy: 7"
+    m = re.search(r"[-*]\s+\*{0,2}Default[_ ]Autonomy\*{0,2}:\*{0,2}\s*(\d+)", text, re.IGNORECASE)
+    if m:
+        settings["default_autonomy"] = int(m.group(1))
+
+    # Risk Overrides subsection under Policies
+    overrides: dict[str, int] = {}
+    in_risk_section = False
+    for line in text.split("\n"):
+        if re.match(r"^#{2,4}\s+Risk\s+Override", line, re.IGNORECASE):
+            in_risk_section = True
+            continue
+        if in_risk_section and re.match(r"^#{1,4}\s+", line):
+            break
+        if in_risk_section:
+            om = re.match(r"^[-*]\s+([\w/]+):\s*(\d+)", line)
+            if om:
+                overrides[om.group(1).strip()] = int(om.group(2))
+
+    if overrides:
+        settings["risk_overrides"] = overrides
+
+    return settings
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -375,13 +410,15 @@ async def seed_from_org(org_path: str, session: AsyncSession | None = None) -> i
     """
     from app.database import async_session
 
-    agents = parse_org_md(org_path)
+    text = Path(org_path).read_text(encoding="utf-8")
+    agents = parse_org_md_content(text)
     if not agents:
         logger.warning("No agents found in %s", org_path)
         return 0
 
     org_name = extract_org_name(org_path)
     org_slug = _make_id(org_name)
+    org_settings = parse_org_settings(text)
 
     own_session = session is None
     if own_session:
@@ -396,6 +433,11 @@ async def seed_from_org(org_path: str, session: AsyncSession | None = None) -> i
             session.add(org)
             await session.flush()
             logger.info("Created organization %s (%s)", org_name, org.id)
+
+        # Merge org-level settings from ORG.md into existing settings
+        if org_settings:
+            merged = {**(org.settings or {}), **org_settings}
+            org.settings = merged
 
         org_id: uuid.UUID = org.id  # type: ignore[assignment]
 
