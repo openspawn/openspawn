@@ -127,7 +127,7 @@ const agents: DemoAgent[] = [
     parentId: AGENT_IDS.spongebob,
     domain: "Operations",
     trustScore: 35,
-    reputationLevel: ReputationLevel.NEWCOMER,
+    reputationLevel: ReputationLevel.NEW,
     tasksCompleted: 42,
     tasksSuccessful: 23,
   },
@@ -162,7 +162,7 @@ const agents: DemoAgent[] = [
     createdAt: hoursAgo(12),
     domain: "Security",
     trustScore: 15,
-    reputationLevel: ReputationLevel.NEWCOMER,
+    reputationLevel: ReputationLevel.NEW,
     tasksCompleted: 8,
     tasksSuccessful: 2,
   },
@@ -274,7 +274,7 @@ const tasks: DemoTask[] = [
     identifier: "KK-008",
     title: "Restock condiments",
     description: "Patrick checks under his rock. The ketchup was in the fridge.",
-    status: TaskStatus.FAILED,
+    status: TaskStatus.CANCELLED,
     priority: TaskPriority.NORMAL,
     assigneeId: AGENT_IDS.patrick,
     creatorId: AGENT_IDS.spongebob,
@@ -525,7 +525,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-001",
     agentId: AGENT_IDS.spongebob,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 50,
     description: "Batch 1: 250 Krabby Patties grilled to perfection",
     createdAt: minutesAgo(65),
@@ -534,7 +534,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-002",
     agentId: AGENT_IDS.spongebob,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 50,
     description: "Batch 2: 250 more beautiful patties",
     createdAt: minutesAgo(50),
@@ -543,7 +543,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-003",
     agentId: AGENT_IDS.spongebob,
-    type: CreditType.BONUS,
+    type: CreditType.CREDIT,
     amount: 50,
     description: "Emergency save: fixed Patrick's napkin sandwich disaster",
     createdAt: minutesAgo(38),
@@ -552,7 +552,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-004",
     agentId: AGENT_IDS.spongebob,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 75,
     description: "Turbo batch: 250 patties at double speed",
     createdAt: minutesAgo(12),
@@ -563,7 +563,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-005",
     agentId: AGENT_IDS.squidward,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 30,
     description: "Orders 1-200 processed (with minimal attitude)",
     createdAt: minutesAgo(60),
@@ -572,7 +572,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-006",
     agentId: AGENT_IDS.squidward,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 35,
     description: "Orders 201-500 processed despite eye twitch",
     createdAt: minutesAgo(42),
@@ -581,7 +581,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-007",
     agentId: AGENT_IDS.squidward,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 20,
     description: "Re-delivered corrected orders + complimentary kelp shakes",
     createdAt: minutesAgo(30),
@@ -592,7 +592,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-008",
     agentId: AGENT_IDS.sandy,
-    type: CreditType.BONUS,
+    type: CreditType.CREDIT,
     amount: 75,
     description: "Innovation: Turbo Fryer 3000 doubles kitchen throughput",
     createdAt: minutesAgo(18),
@@ -601,7 +601,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-009",
     agentId: AGENT_IDS.sandy,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 40,
     description: "Security upgrade: new vault alarm system installed",
     createdAt: minutesAgo(5),
@@ -612,7 +612,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-010",
     agentId: AGENT_IDS.patrick,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 15,
     description: "Successfully restocked buns (eventually)",
     createdAt: minutesAgo(65),
@@ -632,7 +632,7 @@ const credits: DemoCreditTransaction[] = [
   {
     id: "kk-credit-012",
     agentId: AGENT_IDS.mrKrabs,
-    type: CreditType.TASK_REWARD,
+    type: CreditType.CREDIT,
     amount: 100,
     description: "Successfully handled Plankton security breach",
     createdAt: minutesAgo(8),
