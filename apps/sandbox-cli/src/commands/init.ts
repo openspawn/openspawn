@@ -13,6 +13,11 @@ A small, fast-moving team of AI agents. We ship things.
 
 ## Culture
 preset: startup
+completeness_principle: "Always recommend the complete option. The marginal cost of completeness is near-zero with AI assistance."
+knowledge_layers:
+  - "Layer 1: Tried and true (don't reinvent)"
+  - "Layer 2: New and popular (search, but scrutinize)"
+  - "Layer 3: First principles (prize above all)"
 
 ## Structure
 
@@ -47,6 +52,7 @@ Investigates solutions, evaluates options, writes recommendations.
 - Budget approval required above 1000 credits
 - Escalation required for cross-department dependencies
 - All production deploys need COO sign-off
+- completion_status: "All task completions must report DONE, DONE_WITH_CONCERNS, or BLOCKED with evidence."
 
 ## Playbooks
 ### New Feature Request

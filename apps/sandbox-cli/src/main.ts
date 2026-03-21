@@ -11,6 +11,8 @@ import {
   createPreviewCommand,
   createMessagesCommand,
   createTasksCommand,
+  createOfficeHoursCommand,
+  createSkillsCommand,
 } from "./commands/index.js";
 import { setJsonOutput, icons, setDemoMode } from "./lib/output.js";
 
@@ -31,17 +33,21 @@ program
   .description(`${pc.bold("OpenSpawn CLI")} - Coordination layer for AI agent organizations
 
 ${pc.dim("Commands:")}
-  ${pc.cyan("init")}       Scaffold a new organization (ORG.md)
-  ${pc.cyan("agents")}     Manage AI agents
-  ${pc.cyan("tasks")}      Create and track tasks
-  ${pc.cyan("credits")}    View and transfer credits
-  ${pc.cyan("messages")}   Send messages between agents
+  ${pc.cyan("init")}           Scaffold a new organization (ORG.md)
+  ${pc.cyan("agents")}         Manage AI agents
+  ${pc.cyan("tasks")}          Create and track tasks
+  ${pc.cyan("credits")}        View and transfer credits
+  ${pc.cyan("messages")}       Send messages between agents
+  ${pc.cyan("office-hours")}   Scope challenge interview before building
+  ${pc.cyan("skills")}         Import, export, and manage agent skills
 
 ${pc.dim("Examples:")}
   $ ${pc.green("openspawn init my-org")}
   $ ${pc.green("openspawn init my-agency --template agency")}
   $ ${pc.green("openspawn agents list")}
   $ ${pc.green('openspawn tasks create --title "Build feature"')}
+  $ ${pc.green("openspawn office-hours")}
+  $ ${pc.green("openspawn skills import https://github.com/user/skill.git")}
 
 ${pc.dim("Documentation:")}
   ${pc.cyan("https://openspawn.ai/docs/getting-started")}`)
@@ -68,6 +74,8 @@ program.addCommand(createAgentsCommand());
 program.addCommand(createTasksCommand());
 program.addCommand(createCreditsCommand());
 program.addCommand(createMessagesCommand());
+program.addCommand(createOfficeHoursCommand());
+program.addCommand(createSkillsCommand());
 
 // Show banner on --help or no args
 if (process.argv.length <= 2) {

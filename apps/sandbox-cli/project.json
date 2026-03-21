@@ -17,6 +17,12 @@
       "options": {
         "command": "tsx apps/sandbox-cli/src/main.ts"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config apps/sandbox-cli/vitest.config.ts"
+      }
     }
   }
 }
