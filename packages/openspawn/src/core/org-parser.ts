@@ -4,7 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { AgentStatus } from "./types.js";
-import type { Agent, ParsedOrg } from "./types.js";
+import type { Agent, Guardrail, GuardrailAction, ParsedOrg } from "./types.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -256,7 +256,71 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
     }
   }
 
-  return { name: orgName, agents, culture, policies };
+  // ── Guardrails ──
+  const guardrailsSection = findSection(h2Sections, "Guardrails");
+  const guardrails: Guardrail[] = [];
+
+  if (guardrailsSection) {
+    // Each H3 child is a guardrail definition
+    for (const child of guardrailsSection.children) {
+      if (child.level !== 3) continue;
+      const gMeta = extractMeta(child.lines);
+      const validActions: GuardrailAction[] = ["block", "escalate", "require_approval", "warn", "log"];
+      const rawAction = (gMeta["action"] ?? "log").toLowerCase() as GuardrailAction;
+      const action: GuardrailAction = validActions.includes(rawAction) ? rawAction : "log";
+      guardrails.push({
+        name: makeId(child.heading),
+        trigger: gMeta["trigger"] ?? "",
+        condition: gMeta["condition"],
+        match: gMeta["match"],
+        action,
+        escalate_to: gMeta["escalate_to"],
+        message: gMeta["message"] ?? child.heading,
+      });
+    }
+
+    // Also parse flat list-based guardrails (name/trigger/action in list items under H2)
+    if (guardrails.length === 0) {
+      // Try parsing as a series of bold-key entries grouped by name
+      let current: Partial<Guardrail> = {};
+      for (const line of guardrailsSection.lines) {
+        const m = line.match(/^[-*]\s+\*{0,2}([^*]+?)\*{0,2}:\*{0,2}\s*(.+)$/);
+        if (m) {
+          const key = m[1].trim().toLowerCase().replace(/[\s-]+/g, "_");
+          const val = m[2].trim();
+          if (key === "name") {
+            if (current.name && current.trigger) {
+              guardrails.push({
+                name: current.name,
+                trigger: current.trigger,
+                condition: current.condition,
+                match: current.match,
+                action: (current.action as GuardrailAction) ?? "log",
+                escalate_to: current.escalate_to,
+                message: current.message ?? current.name,
+              });
+            }
+            current = { name: val };
+          } else {
+            (current as Record<string, string>)[key] = val;
+          }
+        }
+      }
+      if (current.name && current.trigger) {
+        guardrails.push({
+          name: current.name as string,
+          trigger: current.trigger as string,
+          condition: current.condition,
+          match: current.match,
+          action: (current.action as GuardrailAction) ?? "log",
+          escalate_to: current.escalate_to,
+          message: (current.message as string) ?? (current.name as string),
+        });
+      }
+    }
+  }
+
+  return { name: orgName, agents, culture, policies, guardrails: guardrails.length > 0 ? guardrails : undefined };
 }
 
 // ── ORG.md Generator ─────────────────────────────────────────────────────────
@@ -301,6 +365,20 @@ export function generateOrgMd(org: ParsedOrg): string {
       lines.push(`- **Domain:** ${agent.domain}`);
       if (agent.parentId) lines.push(`- **Reports To:** ${agent.parentId}`);
       if (agent.model) lines.push(`- **Model:** ${agent.model}`);
+      lines.push("");
+    }
+  }
+
+  if (org.guardrails && org.guardrails.length > 0) {
+    lines.push("## Guardrails", "");
+    for (const g of org.guardrails) {
+      lines.push(`### ${g.name}`, "");
+      lines.push(`- **Trigger:** ${g.trigger}`);
+      if (g.condition) lines.push(`- **Condition:** ${g.condition}`);
+      if (g.match) lines.push(`- **Match:** ${g.match}`);
+      lines.push(`- **Action:** ${g.action}`);
+      if (g.escalate_to) lines.push(`- **Escalate To:** ${g.escalate_to}`);
+      lines.push(`- **Message:** ${g.message}`);
       lines.push("");
     }
   }

@@ -181,6 +181,7 @@ class MemoryType(enum.StrEnum):
     SEMANTIC = "semantic"
     GRAPH = "graph"
     EUREKA = "eureka"
+    DECISION = "decision"
 
 
 class MemoryVisibility(enum.StrEnum):

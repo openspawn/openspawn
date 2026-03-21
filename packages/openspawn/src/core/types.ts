@@ -16,6 +16,18 @@ export interface Agent {
   status: AgentStatus;
 }
 
+export type GuardrailAction = "block" | "escalate" | "require_approval" | "warn" | "log";
+
+export interface Guardrail {
+  name: string;
+  trigger: string;
+  condition?: string;
+  match?: string;
+  action: GuardrailAction;
+  escalate_to?: string;
+  message: string;
+}
+
 export interface ParsedOrg {
   name: string;
   agents: Agent[];
@@ -33,6 +45,7 @@ export interface ParsedOrg {
     departmentCaps?: Record<string, number>;
     riskOverrides?: Record<string, number>;
   };
+  guardrails?: Guardrail[];
 }
 
 export enum TaskStatus {

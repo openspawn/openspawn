@@ -58,6 +58,18 @@ function nameToAvatarUrl(name: string): string | undefined {
   return undefined;
 }
 
+export type GuardrailAction = "block" | "escalate" | "require_approval" | "warn" | "log";
+
+export interface Guardrail {
+  name: string;
+  trigger: string;
+  condition?: string;
+  match?: string;
+  action: GuardrailAction;
+  escalate_to?: string;
+  message: string;
+}
+
 export interface ParsedOrg {
   name: string;
   agents: SandboxAgent[];
@@ -76,6 +88,7 @@ export interface ParsedOrg {
     departmentCaps?: Record<string, number>;
     completionStatus?: string;
   };
+  guardrails?: Guardrail[];
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -549,5 +562,28 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
     }
   }
 
-  return { name: orgName, agents, culture, policies };
+  // ── Guardrails ──────────────────────────────────────────────────────────
+  const guardrailsSection = findSection("Guardrails");
+  const guardrails: Guardrail[] = [];
+
+  if (guardrailsSection) {
+    for (const child of guardrailsSection.children) {
+      if (child.level !== 3) continue;
+      const gMeta = extractMetaFromNodes(child.content);
+      const validActions: GuardrailAction[] = ["block", "escalate", "require_approval", "warn", "log"];
+      const rawAction = (gMeta["action"] ?? "log").toLowerCase() as GuardrailAction;
+      const action: GuardrailAction = validActions.includes(rawAction) ? rawAction : "log";
+      guardrails.push({
+        name: child.heading.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "").replace(/^-+/, ""),
+        trigger: gMeta["trigger"] ?? "",
+        condition: gMeta["condition"],
+        match: gMeta["match"],
+        action,
+        escalate_to: gMeta["escalate_to"],
+        message: gMeta["message"] ?? child.heading,
+      });
+    }
+  }
+
+  return { name: orgName, agents, culture, policies, guardrails: guardrails.length > 0 ? guardrails : undefined };
 }

@@ -3,3 +3,4 @@
 export * from "./core/types.js";
 export * from "./core/org-parser.js";
 export * from "./core/config.js";
+export type { Guardrail, GuardrailAction } from "./core/types.js";

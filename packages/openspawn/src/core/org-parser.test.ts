@@ -123,6 +123,86 @@ describe("org-parser", () => {
     });
   });
 
+  it("parses guardrails section", () => {
+    const md = `# TestOrg
+
+## Guardrails
+
+### no-friday-deploys
+
+- **Trigger:** task.transition
+- **Condition:** day_of_week != friday
+- **Action:** block
+- **Message:** Deploys are not allowed on Fridays.
+
+### billing-escalation
+
+- **Trigger:** task.created
+- **Match:** billing|invoice|pricing
+- **Action:** escalate
+- **Escalate To:** cfo
+- **Message:** Billing-related tasks require CFO review.
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    expect(org.guardrails).toBeDefined();
+    expect(org.guardrails!.length).toBe(2);
+    expect(org.guardrails![0].name).toBe("no-friday-deploys");
+    expect(org.guardrails![0].action).toBe("block");
+    expect(org.guardrails![0].condition).toBe("day_of_week != friday");
+    expect(org.guardrails![1].name).toBe("billing-escalation");
+    expect(org.guardrails![1].action).toBe("escalate");
+    expect(org.guardrails![1].escalate_to).toBe("cfo");
+    expect(org.guardrails![1].match).toBe("billing|invoice|pricing");
+  });
+
+  it("roundtrips guardrails via generateOrgMd", () => {
+    const md = `# TestOrg
+
+## Guardrails
+
+### deploy-block
+
+- **Trigger:** task.transition
+- **Action:** block
+- **Message:** No deploys allowed.
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    const generated = generateOrgMd(org);
+    const org2 = parseOrgMdContent(generated);
+    expect(org2.guardrails).toBeDefined();
+    expect(org2.guardrails!.length).toBe(1);
+    expect(org2.guardrails![0].name).toBe("deploy-block");
+    expect(org2.guardrails![0].action).toBe("block");
+  });
+
+  it("returns undefined guardrails when section is absent", () => {
+    const md = `# TestOrg
+
+## Structure
+
+### Worker — worker
+
+- **Level:** 4
+- **Domain:** ops
+`;
+    const org = parseOrgMdContent(md);
+    expect(org.guardrails).toBeUndefined();
+  });
+
   it("roundtrips autonomy and risk overrides", () => {
     const md = `# TestOrg
 
