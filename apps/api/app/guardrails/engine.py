@@ -113,7 +113,7 @@ def evaluate_guardrail(
 
     # Check condition — note: condition controls when the guardrail PASSES (doesn't fire).
     # If condition is "day_of_week != friday", the guardrail fires when it IS friday.
-    condition_met = _check_condition(guardrail.condition, event)
+    condition_met = _check_condition(guardrail.condition or "always", event)
 
     # For "!=" conditions: if condition is met, the guardrail does NOT fire
     # For "always" or None: guardrail always fires

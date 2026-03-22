@@ -192,7 +192,7 @@ async def list_memories(
     visibility: str | None = None,
     limit: int = 50,
     offset: int = 0,
-) -> tuple[list[object], int]:
+) -> "tuple[list[Memory], int]":
     """List memories with filters. Returns (memories, total_count)."""
     from app.models.memory import Memory
 
