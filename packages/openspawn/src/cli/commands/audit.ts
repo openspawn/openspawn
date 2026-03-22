@@ -8,7 +8,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
 import { parseOrgMdContent, generateOrgMd } from "../../core/org-parser.js";
-import type { Guardrail, ParsedOrg } from "../../core/types.js";
+import type { Guardrail } from "../../core/types.js";
 
 interface AuditAnswers {
   unwrittenRules: string;
@@ -318,7 +318,7 @@ export async function auditCommand(
     s.stop(
       `✅ Valid ORG.md: ${parsed.agents.length} agents, ${(parsed.guardrails ?? []).length} guardrails`,
     );
-  } catch (e) {
+  } catch {
     s.stop("⚠️  ORG.md generated but has parse warnings");
   }
 
