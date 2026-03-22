@@ -152,14 +152,14 @@ describe("org-parser", () => {
 `;
     const org = parseOrgMdContent(md);
     expect(org.guardrails).toBeDefined();
-    expect(org.guardrails!.length).toBe(2);
-    expect(org.guardrails![0].name).toBe("no-friday-deploys");
-    expect(org.guardrails![0].action).toBe("block");
-    expect(org.guardrails![0].condition).toBe("day_of_week != friday");
-    expect(org.guardrails![1].name).toBe("billing-escalation");
-    expect(org.guardrails![1].action).toBe("escalate");
-    expect(org.guardrails![1].escalate_to).toBe("cfo");
-    expect(org.guardrails![1].match).toBe("billing|invoice|pricing");
+    expect(org.guardrails?.length).toBe(2);
+    expect(org.guardrails?.[0].name).toBe("no-friday-deploys");
+    expect(org.guardrails?.[0].action).toBe("block");
+    expect(org.guardrails?.[0].condition).toBe("day_of_week != friday");
+    expect(org.guardrails?.[1].name).toBe("billing-escalation");
+    expect(org.guardrails?.[1].action).toBe("escalate");
+    expect(org.guardrails?.[1].escalate_to).toBe("cfo");
+    expect(org.guardrails?.[1].match).toBe("billing|invoice|pricing");
   });
 
   it("roundtrips guardrails via generateOrgMd", () => {
@@ -184,9 +184,9 @@ describe("org-parser", () => {
     const generated = generateOrgMd(org);
     const org2 = parseOrgMdContent(generated);
     expect(org2.guardrails).toBeDefined();
-    expect(org2.guardrails!.length).toBe(1);
-    expect(org2.guardrails![0].name).toBe("deploy-block");
-    expect(org2.guardrails![0].action).toBe("block");
+    expect(org2.guardrails?.length).toBe(1);
+    expect(org2.guardrails?.[0].name).toBe("deploy-block");
+    expect(org2.guardrails?.[0].action).toBe("block");
   });
 
   it("returns undefined guardrails when section is absent", () => {
