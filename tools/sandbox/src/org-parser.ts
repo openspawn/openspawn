@@ -67,11 +67,14 @@ export interface ParsedOrg {
     progressFrequency?: string;
     ackRequired?: boolean;
     maxEscalationDepth?: number;
+    completenessPrinciple?: string;
+    knowledgeLayers?: string[];
   };
   policies: {
     perAgentBudget?: number;
     alertThreshold?: number;
     departmentCaps?: Record<string, number>;
+    completionStatus?: string;
   };
 }
 
@@ -368,6 +371,9 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
     ? cultureSection.content.map((n) => nodeToText(n)).join("\n")
     : "";
   const presetMatch = cultureText.match(/preset:\s*(\w+)/i);
+  // Extract completeness_principle and knowledge_layers from culture text
+  const completenessMatch = cultureText.match(/completeness_principle:\s*"([^"]+)"/i);
+  const knowledgeLayerMatches = [...cultureText.matchAll(/^\s*-\s*"(Layer \d+:.+)"/gm)];
   const culture: ParsedOrg["culture"] = {
     preset: presetMatch?.[1] ?? cultureMeta["preset"],
     escalationVelocity: cultureMeta["escalation"],
@@ -377,6 +383,10 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
       : undefined,
     maxEscalationDepth: cultureMeta["hierarchy_depth"]
       ? parseInt(cultureMeta["hierarchy_depth"].replace(/\D/g, "")) || undefined
+      : undefined,
+    completenessPrinciple: completenessMatch?.[1],
+    knowledgeLayers: knowledgeLayerMatches.length > 0
+      ? knowledgeLayerMatches.map((m) => m[1])
       : undefined,
   };
 
@@ -417,6 +427,13 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
       }
     }
     if (Object.keys(caps).length > 0) policies.departmentCaps = caps;
+
+    // Extract completion_status policy
+    const policyText = allPolicyContent.map((n) => nodeToText(n)).join("\n");
+    const completionMatch = policyText.match(/completion_status:\s*"([^"]+)"/i);
+    if (completionMatch) {
+      policies.completionStatus = completionMatch[1];
+    }
   }
 
   // ── Structure ──────────────────────────────────────────────────────────

@@ -5,3 +5,5 @@ export { createCreditsCommand } from "./credits.js";
 export { createMessagesCommand } from "./messages.js";
 export { createInitCommand } from "./init.js";
 export { createPreviewCommand } from "./preview.js";
+export { createOfficeHoursCommand } from "./office-hours.js";
+export { createSkillsCommand } from "./skills.js";

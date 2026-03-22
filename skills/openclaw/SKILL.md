@@ -1,3 +1,17 @@
+---
+name: openclaw
+version: 1.0.0
+description: |
+  Manage OpenSpawn agents, tasks, and metrics from OpenClaw.
+  Create and manage dedicated agent inboxes, orchestrate tasks,
+  and monitor system health.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+benefits-from: []
+---
+
 # OpenSpawn Agent Skill
 
 Manage BikiniBottom/OpenSpawn agents, tasks, and metrics from OpenClaw.

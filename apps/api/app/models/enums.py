@@ -180,6 +180,7 @@ class MemoryType(enum.StrEnum):
     EPISODIC = "episodic"
     SEMANTIC = "semantic"
     GRAPH = "graph"
+    EUREKA = "eureka"
 
 
 class MemoryVisibility(enum.StrEnum):
