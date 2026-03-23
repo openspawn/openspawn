@@ -9,6 +9,7 @@ from app.auth.dependencies import AuthContext, require_auth
 from app.database import get_db
 from app.memory.schemas import (
     ContradictionPairResponse,
+    DecisionResponse,
     MemoryFeedbackDto,
     MemoryResponse,
     ResolveContradictionDto,
@@ -35,6 +36,19 @@ async def store(
 
             expires_at = pendulum.now("UTC").add(seconds=dto.ttl_seconds)
 
+        # Merge decision-specific fields into metadata
+        metadata = dict(dto.metadata)
+        if dto.alternatives is not None:
+            metadata["alternatives"] = [a.model_dump() for a in dto.alternatives]
+        if dto.constraints is not None:
+            metadata["constraints"] = dto.constraints
+        if dto.decided_by is not None:
+            metadata["decided_by"] = dto.decided_by
+        if dto.what_outsider_would_miss is not None:
+            metadata["what_outsider_would_miss"] = dto.what_outsider_would_miss
+        if dto.review_by is not None:
+            metadata["review_by"] = dto.review_by.isoformat()
+
         memory_id = await store_memory(
             session=db,
             org_id=auth.org_id,
@@ -46,7 +60,7 @@ async def store(
             target_agent_ids=dto.target_agent_ids,
             occurred_at=dto.occurred_at.isoformat() if dto.occurred_at else None,
             expires_at=expires_at.isoformat() if expires_at else None,
-            metadata=dto.metadata,
+            metadata=metadata,
         )
         await db.commit()
         return DataMessageResponse(
@@ -110,6 +124,62 @@ async def list_all(
     )
     return PaginatedResponse(
         data=[MemoryResponse.model_validate(m) for m in memories],
+        meta=PaginationMeta(total=total, page=(offset // limit) + 1, limit=limit),
+    )
+
+
+@router.get("/decisions")
+async def list_decisions(
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_auth),
+) -> PaginatedResponse[DecisionResponse]:
+    """List decision records with structured fields extracted from metadata."""
+    memories, total = await list_memories(
+        session=db,
+        org_id=auth.org_id,
+        memory_type="decision",
+        limit=limit,
+        offset=offset,
+    )
+
+    decisions = []
+    for m in memories:
+        meta = getattr(m, "metadata_", {}) or {}
+        decisions.append(
+            DecisionResponse(
+                id=m.id,
+                org_id=m.org_id,
+                agent_id=m.agent_id,
+                content=m.content,
+                source=m.source,
+                confidence=m.confidence,
+                strength=m.strength,
+                created_at=m.created_at,
+                occurred_at=m.occurred_at,
+                alternatives=meta.get("alternatives", []),
+                constraints=meta.get("constraints", []),
+                decided_by=meta.get("decided_by"),
+                what_outsider_would_miss=meta.get("what_outsider_would_miss"),
+                review_by=meta.get("review_by"),
+                metadata={
+                    k: v
+                    for k, v in meta.items()
+                    if k
+                    not in {
+                        "alternatives",
+                        "constraints",
+                        "decided_by",
+                        "what_outsider_would_miss",
+                        "review_by",
+                    }
+                },
+            )
+        )
+
+    return PaginatedResponse(
+        data=decisions,
         meta=PaginationMeta(total=total, page=(offset // limit) + 1, limit=limit),
     )
 

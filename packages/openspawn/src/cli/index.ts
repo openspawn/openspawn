@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // ── OpenSpawn CLI ────────────────────────────────────────────────────────────
 
+import { auditCommand } from "./commands/audit.js";
 import { authCommand } from "./commands/auth.js";
 import { initCommand } from "./commands/init.js";
 import { previewCommand } from "./commands/preview.js";
@@ -14,6 +15,7 @@ Usage: openspawn <command> [options]
 
 Commands:
   auth <subcommand>              Manage API authentication
+  audit                          Context gap audit for ORG.md
   init [directory]               Create agent organization
     -t, --template <name>        Template to use
     -y, --yes                    Skip wizard, use defaults
@@ -77,6 +79,8 @@ async function main() {
   const ctx = { dir, orgFile };
 
   switch (command) {
+    case "audit":
+      return auditCommand(rest, ctx);
     case "auth":
       return authCommand(rest);
     case "init":
