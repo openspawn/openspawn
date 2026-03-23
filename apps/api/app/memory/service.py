@@ -6,7 +6,7 @@ import hashlib
 import time
 import uuid
 from collections import defaultdict
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 import pendulum
 import structlog
@@ -192,7 +192,7 @@ async def list_memories(
     visibility: str | None = None,
     limit: int = 50,
     offset: int = 0,
-) -> "tuple[list[Memory], int]":
+) -> tuple[list[Any], int]:
     """List memories with filters. Returns (memories, total_count)."""
     from app.models.memory import Memory
 
