@@ -14,6 +14,7 @@ export interface Agent {
   parentId?: string;
   model?: string;
   status: AgentStatus;
+  repos?: AgentRepo[];
 }
 
 export type GuardrailAction = "block" | "escalate" | "require_approval" | "warn" | "log";
@@ -78,6 +79,24 @@ export interface TaskStore {
   version: number;
   tasks: Task[];
   budgets: Record<string, BudgetEntry>;
+}
+
+// ── Repo & Worktree Types ───────────────────────────────────────────────────
+
+export interface AgentRepo {
+  org: string;
+  repo: string;
+  access: "read" | "write";
+  branch?: string;
+}
+
+export interface WorktreeInfo {
+  agentId: string;
+  org: string;
+  repo: string;
+  branch: string;
+  path: string;
+  exists: boolean;
 }
 
 // ── Config Enums & Types ────────────────────────────────────────────────────
