@@ -6,7 +6,7 @@ import hashlib
 import time
 import uuid
 from collections import defaultdict
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pendulum
 import structlog
