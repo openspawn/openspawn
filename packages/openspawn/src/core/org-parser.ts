@@ -4,7 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { AgentStatus } from "./types.js";
-import type { Agent, Guardrail, GuardrailAction, ParsedOrg } from "./types.js";
+import type { Agent, AgentRepo, Guardrail, GuardrailAction, ParsedOrg } from "./types.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -82,6 +82,62 @@ function extractMeta(lines: string[]): Record<string, string> {
     }
   }
   return meta;
+}
+
+/**
+ * Parse a repos string like "openspawn/openspawn (write, branch: dennis-workspace), other/repo (read)"
+ * into an array of AgentRepo objects.
+ */
+export function parseReposString(raw: string): AgentRepo[] {
+  if (!raw) return [];
+  const repos: AgentRepo[] = [];
+
+  // Split on comma that is NOT inside parentheses
+  const entries: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of raw) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === "," && depth === 0) {
+      entries.push(current.trim());
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) entries.push(current.trim());
+
+  for (const entry of entries) {
+    // Match "org/repo" optionally followed by "(access, branch: name)"
+    const m = entry.match(/^([a-z0-9_.-]+\/[a-z0-9_.-]+)\s*(?:\(([^)]*)\))?$/i);
+    if (!m) continue;
+
+    const [, repoPath, modifiers] = m;
+    const parts = repoPath.split("/");
+    if (parts.length !== 2) continue;
+
+    const agentRepo: AgentRepo = {
+      org: parts[0],
+      repo: parts[1],
+      access: "read",
+    };
+
+    if (modifiers) {
+      const mods = modifiers.split(",").map((s) => s.trim());
+      for (const mod of mods) {
+        if (mod === "write") agentRepo.access = "write";
+        else if (mod === "read") agentRepo.access = "read";
+        else if (mod.startsWith("branch:")) {
+          agentRepo.branch = mod.slice("branch:".length).trim();
+        }
+      }
+    }
+
+    repos.push(agentRepo);
+  }
+
+  return repos;
 }
 
 function findSection(sections: Section[], name: string): Section | undefined {
@@ -194,6 +250,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
           const displayName = nameFromHeading(dept.heading);
           const agentName = count > 1 ? `${displayName} ${i + 1}` : displayName;
           const agentId = count > 1 ? `${id}-${i + 1}` : id;
+          const repos = deptMeta["repos"] ? parseReposString(deptMeta["repos"]) : undefined;
           agents.push({
             id: agentId,
             name: agentName,
@@ -203,6 +260,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
             parentId,
             model: deptMeta["model"],
             status: AgentStatus.Active,
+            repos: repos && repos.length > 0 ? repos : undefined,
           });
           if (isCLevel) topLevelId = agentId;
         }
@@ -241,6 +299,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
           const displayName = nameFromHeading(sub.heading);
           const agentName = count > 1 ? `${displayName} ${i + 1}` : displayName;
           const agentId = count > 1 ? `${id}-${i + 1}` : id;
+          const subRepos = subMeta["repos"] ? parseReposString(subMeta["repos"]) : undefined;
           agents.push({
             id: agentId,
             name: agentName,
@@ -250,6 +309,7 @@ export function parseOrgMdContent(raw: string): ParsedOrg {
             parentId,
             model: subMeta["model"],
             status: AgentStatus.Active,
+            repos: subRepos && subRepos.length > 0 ? subRepos : undefined,
           });
         }
       }
@@ -365,6 +425,14 @@ export function generateOrgMd(org: ParsedOrg): string {
       lines.push(`- **Domain:** ${agent.domain}`);
       if (agent.parentId) lines.push(`- **Reports To:** ${agent.parentId}`);
       if (agent.model) lines.push(`- **Model:** ${agent.model}`);
+      if (agent.repos && agent.repos.length > 0) {
+        const repoStrs = agent.repos.map((r) => {
+          const mods: string[] = [r.access];
+          if (r.branch) mods.push(`branch: ${r.branch}`);
+          return `${r.org}/${r.repo} (${mods.join(", ")})`;
+        });
+        lines.push(`- **Repos:** ${repoStrs.join(", ")}`);
+      }
       lines.push("");
     }
   }

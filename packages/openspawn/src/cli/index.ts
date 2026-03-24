@@ -7,6 +7,7 @@ import { initCommand } from "./commands/init.js";
 import { previewCommand } from "./commands/preview.js";
 import { regenerateCommand } from "./commands/regenerate.js";
 import { startCommand } from "./commands/start.js";
+import { worktreeCommand } from "./commands/worktree.js";
 
 const HELP = `
 openspawn - Multi-agent organization CLI
@@ -26,6 +27,7 @@ Commands:
     -p, --port <n>               Coordinator port (default: 8787)
   regenerate                      Regenerate workspaces from ORG.md
     --dry-run                    Show what would change without writing
+  worktree <subcommand>           Manage git worktrees for agents
   preview                        Preview org in local sandbox
     --port <n>                   Dashboard port (default: 3333)
     --no-open                    Don't auto-open browser
@@ -91,6 +93,8 @@ async function main() {
       return previewCommand(rest, ctx);
     case "start":
       return startCommand(rest, ctx);
+    case "worktree":
+      return worktreeCommand(rest);
     default:
       console.error(`Unknown command: ${command}`);
       console.log(HELP);
