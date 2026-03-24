@@ -311,9 +311,7 @@ class TestWebhookIssueUpdated:
         create_result = await handle_webhook_event(db, conn, create_payload)
 
         # Update
-        update_payload = _issue_payload(
-            action="update", issue_id=issue_id, title="Updated Title"
-        )
+        update_payload = _issue_payload(action="update", issue_id=issue_id, title="Updated Title")
         update_result = await handle_webhook_event(db, conn, update_payload)
 
         assert update_result["handled"] is True
@@ -330,9 +328,7 @@ class TestWebhookIssueUpdated:
         create_payload = _issue_payload(action="create", issue_id=issue_id)
         create_result = await handle_webhook_event(db, conn, create_payload)
 
-        update_payload = _issue_payload(
-            action="update", issue_id=issue_id, state_name="Done"
-        )
+        update_payload = _issue_payload(action="update", issue_id=issue_id, state_name="Done")
         await handle_webhook_event(db, conn, update_payload)
 
         task = await db.get(Task, uuid.UUID(create_result["task_id"]))
@@ -451,10 +447,10 @@ class TestWebhookCommentCreated:
         from sqlalchemy import select
 
         comments = (
-            await db.execute(
-                select(TaskComment).where(TaskComment.task_id == uuid.UUID(task_id))
-            )
-        ).scalars().all()
+            (await db.execute(select(TaskComment).where(TaskComment.task_id == uuid.UUID(task_id))))
+            .scalars()
+            .all()
+        )
         assert len(comments) == 1
         assert "[Linear] Great work!" in comments[0].body
 
@@ -464,9 +460,7 @@ class TestWebhookCommentCreated:
         issue_id = str(uuid.uuid4())
         comment_id = str(uuid.uuid4())
 
-        await handle_webhook_event(
-            db, conn, _issue_payload(action="create", issue_id=issue_id)
-        )
+        await handle_webhook_event(db, conn, _issue_payload(action="create", issue_id=issue_id))
 
         payload = _comment_payload(issue_id=issue_id, comment_id=comment_id)
         result1 = await handle_webhook_event(db, conn, payload)
