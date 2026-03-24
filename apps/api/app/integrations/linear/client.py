@@ -141,9 +141,7 @@ class LinearClient:
             }
         }
         """
-        data = await self._request(
-            mutation, {"input": {"issueId": issue_id, "body": body}}
-        )
+        data = await self._request(mutation, {"input": {"issueId": issue_id, "body": body}})
         result = data.get("commentCreate", {})
         if not result.get("success"):
             raise LinearAPIError(f"commentCreate failed: {result}")

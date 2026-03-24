@@ -1,6 +1,6 @@
 // ── Linear.app Integration CLI ───────────────────────────────────────────────
 
-import chalk from "chalk";
+
 
 const HELP = `
 openspawn linear - Manage Linear.app integration
@@ -37,7 +37,7 @@ export async function linearCommand(args: string[]) {
     case "disconnect":
       return disconnectCmd(rest);
     default:
-      console.error(chalk.red(`Unknown subcommand: ${sub}`));
+      console.error(`Unknown subcommand: ${sub}`);
       console.log(HELP);
       process.exit(1);
   }
@@ -58,7 +58,7 @@ function hasFlag(args: string[], name: string): boolean {
 function requireFlag(args: string[], name: string, label: string): string {
   const val = flag(args, name);
   if (!val) {
-    console.error(chalk.red(`Missing required flag: ${name} (${label})`));
+    console.error(`Missing required flag: ${name} (${label}`));
     process.exit(1);
   }
   return val;
@@ -112,30 +112,28 @@ async function connectCmd(args: string[]) {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     console.error(
-      chalk.red("✗ Failed to create connection:"),
+      "✗ Failed to create connection:",
       body.detail ?? res.statusText
     );
     process.exit(1);
   }
 
   const { data: conn } = await res.json();
-  console.log(chalk.green("✓ Linear connection created"));
+  console.log("✓ Linear connection created");
   console.log();
-  console.log(`  ${chalk.bold("Connection ID:")} ${conn.id}`);
-  console.log(`  ${chalk.bold("Team ID:")}       ${conn.team_id}`);
-  console.log(`  ${chalk.bold("Name:")}          ${conn.name}`);
-  console.log(`  ${chalk.bold("Sync:")}          ${direction}`);
+  console.log(`  ${"Connection ID:"} ${conn.id}`);
+  console.log(`  ${"Team ID:"}       ${conn.team_id}`);
+  console.log(`  ${"Name:"}          ${conn.name}`);
+  console.log(`  ${"Sync:"}          ${direction}`);
   console.log();
-  console.log(chalk.yellow("Webhook Setup:"));
+  console.log("Webhook Setup:");
   console.log(
-    `  URL:    ${chalk.cyan("<your-api-url>/integrations/linear/webhook")}`
+    `  URL:    ${"<your-api-url>/integrations/linear/webhook"}`
   );
-  console.log(`  Secret: ${chalk.cyan(webhookSecret)}`);
+  console.log(`  Secret: ${webhookSecret}`);
   console.log();
   console.log(
-    chalk.dim(
-      "Configure this webhook URL in Linear → Settings → API → Webhooks"
-    )
+    "Configure this webhook URL in Linear → Settings → API → Webhooks"
   );
 }
 
@@ -144,7 +142,7 @@ async function syncCmd(args: string[]) {
   const direction = flag(args, "--direction");
 
   if (!direction) {
-    console.error(chalk.red("Must specify --direction (both | from-linear | to-linear)"));
+    console.error("Must specify --direction (both | from-linear | to-linear"));
     process.exit(1);
   }
 
@@ -156,13 +154,13 @@ async function syncCmd(args: string[]) {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     console.error(
-      chalk.red("✗ Failed to update sync config:"),
+      "✗ Failed to update sync config:",
       body.detail ?? res.statusText
     );
     process.exit(1);
   }
 
-  console.log(chalk.green("✓ Sync configuration updated"));
+  console.log("✓ Sync configuration updated");
   console.log(`  Direction: ${direction}`);
 }
 
@@ -172,7 +170,7 @@ async function statusCmd() {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     console.error(
-      chalk.red("✗ Failed to fetch status:"),
+      "✗ Failed to fetch status:",
       body.detail ?? res.statusText
     );
     process.exit(1);
@@ -181,25 +179,25 @@ async function statusCmd() {
   const { data: connections } = await res.json();
 
   if (!connections || connections.length === 0) {
-    console.log(chalk.yellow("No Linear connections configured."));
-    console.log(chalk.dim("Run `openspawn linear connect` to get started."));
+    console.log("No Linear connections configured.");
+    console.log("Run `openspawn linear connect` to get started.");
     return;
   }
 
-  console.log(chalk.bold("Linear Connections:"));
+  console.log("Linear Connections:");
   console.log();
 
   for (const conn of connections) {
     const icon = conn.enabled ? "🟢" : "🔴";
     const direction = conn.sync_config?.direction ?? "both";
 
-    console.log(`${icon} ${chalk.bold(conn.name)} (${chalk.dim(conn.id)})`);
+    console.log(`${icon} ${conn.name} (${conn.id})`);
     console.log(`   Team:       ${conn.team_id}`);
     console.log(`   Sync:       ${direction}`);
     console.log(`   Enabled:    ${conn.enabled}`);
-    console.log(`   Last sync:  ${conn.last_sync_at ?? chalk.dim("never")}`);
+    console.log(`   Last sync:  ${conn.last_sync_at ?? "never"}`);
     if (conn.last_error) {
-      console.log(`   Last error: ${chalk.red(conn.last_error)}`);
+      console.log(`   Last error: ${conn.last_error}`);
     }
     console.log();
   }
@@ -217,9 +215,7 @@ async function disconnectCmd(args: string[]) {
     });
     const answer = await new Promise<string>((resolve) =>
       rl.question(
-        chalk.yellow(
-          "This will remove the connection and stop syncing. Continue? (y/N) "
-        ),
+        "This will remove the connection and stop syncing. Continue? (y/N) ",
         resolve
       )
     );
@@ -238,11 +234,11 @@ async function disconnectCmd(args: string[]) {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     console.error(
-      chalk.red("✗ Failed to remove connection:"),
+      "✗ Failed to remove connection:",
       body.detail ?? res.statusText
     );
     process.exit(1);
   }
 
-  console.log(chalk.green("✓ Linear connection removed"));
+  console.log("✓ Linear connection removed");
 }

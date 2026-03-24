@@ -240,7 +240,9 @@ async def _handle_issue_removed(
         task.metadata_ = meta
         await db.commit()
 
-    await logger.ainfo("linear_issue_removed_task_cancelled", issue_id=issue_id, task_id=str(task.id))
+    await logger.ainfo(
+        "linear_issue_removed_task_cancelled", issue_id=issue_id, task_id=str(task.id)
+    )
     return {"handled": True, "action": "task_cancelled"}
 
 
@@ -445,9 +447,7 @@ async def push_task_assignee(
     # Try to resolve OpenSpawn agent → Linear user
     linear_user_id = None
     if task.assignee_id:
-        linear_user_id = await _resolve_agent_to_linear_user(
-            db, task.org_id, task.assignee_id
-        )
+        linear_user_id = await _resolve_agent_to_linear_user(db, task.org_id, task.assignee_id)
 
     client = LinearClient(connection.api_key)
     issue = await client.update_issue(
@@ -547,9 +547,7 @@ async def _resolve_linear_user_to_agent(
     # Fallback: check agent metadata for linear_user_id
     from app.models.agent import Agent
 
-    result = await db.execute(
-        select(Agent).where(Agent.org_id == org_id)
-    )
+    result = await db.execute(select(Agent).where(Agent.org_id == org_id))
     for agent in result.scalars().all():
         meta = agent.metadata_ or {}
         if meta.get("linear_user_id") == linear_user_id:
