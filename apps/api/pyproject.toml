@@ -38,6 +38,14 @@ dependencies = [
 openspawn-server = "app.local:main"
 
 [project.optional-dependencies]
+otel = [
+  "opentelemetry-api>=1.20",
+  "opentelemetry-sdk>=1.20",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.20",
+  "opentelemetry-instrumentation-fastapi>=0.41b0",
+  "opentelemetry-instrumentation-httpx>=0.41b0",
+  "opentelemetry-instrumentation-sqlalchemy>=0.41b0",
+]
 dev = [
   "pytest>=8.3",
   "pytest-asyncio>=0.24",
@@ -47,6 +55,12 @@ dev = [
   "respx>=0.22",
   "factory-boy>=3.3",
   "hypothesis>=6.0",
+  "opentelemetry-api>=1.20",
+  "opentelemetry-sdk>=1.20",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.20",
+  "opentelemetry-instrumentation-fastapi>=0.41b0",
+  "opentelemetry-instrumentation-httpx>=0.41b0",
+  "opentelemetry-instrumentation-sqlalchemy>=0.41b0",
 ]
 
 [build-system]
