@@ -58,7 +58,7 @@ function hasFlag(args: string[], name: string): boolean {
 function requireFlag(args: string[], name: string, label: string): string {
   const val = flag(args, name);
   if (!val) {
-    console.error(`Missing required flag: ${name} (${label}`));
+    console.error(`Missing required flag: ${name} (${label})`);
     process.exit(1);
   }
   return val;
@@ -142,7 +142,7 @@ async function syncCmd(args: string[]) {
   const direction = flag(args, "--direction");
 
   if (!direction) {
-    console.error("Must specify --direction (both | from-linear | to-linear"));
+    console.error("Must specify --direction (both | from-linear | to-linear)");
     process.exit(1);
   }
 
