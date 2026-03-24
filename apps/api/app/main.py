@@ -24,7 +24,7 @@ from app.logging import setup_logging
 from app.memory.graph.router import router as graph_router
 from app.memory.router import router as memory_router
 from app.messages.router import router as messages_router
-from app.observability import setup_logfire
+from app.observability import setup_logfire, setup_telemetry
 from app.routers.auth import router as auth_router
 from app.tasks.router import router as tasks_router
 
@@ -35,6 +35,7 @@ logger = structlog.stdlib.get_logger()
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     setup_logging(log_level=settings.log_level, log_format=settings.log_format)
     setup_logfire(app)
+    setup_telemetry(app)
     await logger.ainfo("starting", app=settings.app_name)
     yield
     await engine.dispose()

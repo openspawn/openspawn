@@ -1,4 +1,7 @@
-"""Optional observability setup — no-op when tokens not configured."""
+"""Legacy observability helpers — Logfire + Langfuse.
+
+Preserved from the original observability.py for backward compatibility.
+"""
 
 from __future__ import annotations
 

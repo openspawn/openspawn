@@ -41,7 +41,12 @@ async def create_task(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[TaskResponse]:
-    task = await service.create_task(db, auth, dto)
+    from app.observability.metrics import tasks_created_counter
+    from app.observability.spans import task_create_span
+
+    with task_create_span(org_id=auth.org_id, agent_id=auth.id):
+        task = await service.create_task(db, auth, dto)
+        tasks_created_counter().add(1, {"openspawn.agent_id": str(auth.id)})
     return DataResponse(data=TaskResponse.model_validate(task))
 
 
@@ -85,7 +90,17 @@ async def transition_task(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[TaskResponse]:
-    task = await service.transition_task(db, auth, task_id, dto)
+    from app.observability.metrics import tasks_completed_counter
+    from app.observability.spans import task_complete_span, task_transition_span
+
+    with task_transition_span(
+        org_id=auth.org_id, agent_id=auth.id, task_id=task_id, new_status=dto.status
+    ):
+        task = await service.transition_task(db, auth, task_id, dto)
+        # Track completion metric
+        if str(dto.status).lower() in ("done", "completed"):
+            with task_complete_span(org_id=auth.org_id, agent_id=auth.id, task_id=task_id):
+                tasks_completed_counter().add(1, {"openspawn.agent_id": str(auth.id)})
     return DataResponse(data=TaskResponse.model_validate(task))
 
 
@@ -117,7 +132,10 @@ async def assign_task(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[TaskResponse]:
-    task = await service.assign_task(db, auth, task_id, dto)
+    from app.observability.spans import task_assign_span
+
+    with task_assign_span(org_id=auth.org_id, agent_id=auth.id, task_id=task_id):
+        task = await service.assign_task(db, auth, task_id, dto)
     return DataResponse(data=TaskResponse.model_validate(task))
 
 
@@ -179,7 +197,12 @@ async def escalate_task(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[EscalationResponse]:
-    escalation = await service.escalate_task(db, auth, task_id, dto)
+    from app.observability.metrics import tasks_escalated_counter
+    from app.observability.spans import task_escalate_span
+
+    with task_escalate_span(org_id=auth.org_id, agent_id=auth.id, task_id=task_id):
+        escalation = await service.escalate_task(db, auth, task_id, dto)
+        tasks_escalated_counter().add(1, {"openspawn.agent_id": str(auth.id)})
     return DataResponse(data=EscalationResponse.model_validate(escalation))
 
 

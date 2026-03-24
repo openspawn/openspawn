@@ -28,8 +28,11 @@ async def emit_event(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataMessageResponse[dict]:
-    await service.emit_coordination_event(db, auth.org_id, auth.id, dto)
-    await db.commit()
+    from app.observability.spans import coordination_emit_span
+
+    with coordination_emit_span(org_id=auth.org_id, agent_id=auth.id, event_type=dto.event_type):
+        await service.emit_coordination_event(db, auth.org_id, auth.id, dto)
+        await db.commit()
     return DataMessageResponse(
         data={"event_type": dto.event_type, "task_id": str(dto.task_id)},
         message="Event emitted",

@@ -28,50 +28,57 @@ async def store(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataMessageResponse[dict]:
-    try:
-        # Compute expires_at from ttl_seconds if provided
-        expires_at = dto.expires_at
-        if expires_at is None and dto.ttl_seconds is not None:
-            import pendulum
+    from app.observability.metrics import memory_stored_counter
+    from app.observability.spans import memory_store_span
 
-            expires_at = pendulum.now("UTC").add(seconds=dto.ttl_seconds)
+    with memory_store_span(org_id=auth.org_id, agent_id=auth.id, memory_type=dto.type):
+        try:
+            # Compute expires_at from ttl_seconds if provided
+            expires_at = dto.expires_at
+            if expires_at is None and dto.ttl_seconds is not None:
+                import pendulum
 
-        # Merge decision-specific fields into metadata
-        metadata = dict(dto.metadata)
-        if dto.alternatives is not None:
-            metadata["alternatives"] = [a.model_dump() for a in dto.alternatives]
-        if dto.constraints is not None:
-            metadata["constraints"] = dto.constraints
-        if dto.decided_by is not None:
-            metadata["decided_by"] = dto.decided_by
-        if dto.what_outsider_would_miss is not None:
-            metadata["what_outsider_would_miss"] = dto.what_outsider_would_miss
-        if dto.review_by is not None:
-            metadata["review_by"] = dto.review_by.isoformat()
+                expires_at = pendulum.now("UTC").add(seconds=dto.ttl_seconds)
 
-        memory_id = await store_memory(
-            session=db,
-            org_id=auth.org_id,
-            agent_id=auth.id,
-            content=dto.content,
-            source=dto.source,
-            memory_type=dto.type,
-            visibility=dto.visibility,
-            target_agent_ids=dto.target_agent_ids,
-            occurred_at=dto.occurred_at.isoformat() if dto.occurred_at else None,
-            expires_at=expires_at.isoformat() if expires_at else None,
-            metadata=metadata,
-        )
-        await db.commit()
-        return DataMessageResponse(
-            data={"memory_id": str(memory_id)},
-            message="Memory stored",
-        )
-    except RateLimitExceededError as e:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=e.detail,
-        ) from e
+            # Merge decision-specific fields into metadata
+            metadata = dict(dto.metadata)
+            if dto.alternatives is not None:
+                metadata["alternatives"] = [a.model_dump() for a in dto.alternatives]
+            if dto.constraints is not None:
+                metadata["constraints"] = dto.constraints
+            if dto.decided_by is not None:
+                metadata["decided_by"] = dto.decided_by
+            if dto.what_outsider_would_miss is not None:
+                metadata["what_outsider_would_miss"] = dto.what_outsider_would_miss
+            if dto.review_by is not None:
+                metadata["review_by"] = dto.review_by.isoformat()
+
+            memory_id = await store_memory(
+                session=db,
+                org_id=auth.org_id,
+                agent_id=auth.id,
+                content=dto.content,
+                source=dto.source,
+                memory_type=dto.type,
+                visibility=dto.visibility,
+                target_agent_ids=dto.target_agent_ids,
+                occurred_at=dto.occurred_at.isoformat() if dto.occurred_at else None,
+                expires_at=expires_at.isoformat() if expires_at else None,
+                metadata=metadata,
+            )
+            await db.commit()
+            memory_stored_counter().add(
+                1, {"openspawn.agent_id": str(auth.id), "openspawn.memory_type": dto.type or ""}
+            )
+            return DataMessageResponse(
+                data={"memory_id": str(memory_id)},
+                message="Memory stored",
+            )
+        except RateLimitExceededError as e:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=e.detail,
+            ) from e
 
 
 @router.get("/search")
@@ -83,24 +90,32 @@ async def search(
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[list[SearchResultResponse]]:
-    # Import here to avoid circular deps until all branches merge
-    try:
-        from app.memory.search import hybrid_search
+    import time as _time
 
-        results = await hybrid_search(
-            session=db,
-            org_id=auth.org_id,
-            query_text=query,
-            requesting_agent_id=auth.id,
-            limit=limit,
-            similarity_threshold=similarity_threshold,
-            memory_type=type,
-        )
-        return DataResponse(
-            data=[SearchResultResponse.model_validate(r.model_dump()) for r in results]
-        )
-    except ImportError:
-        return DataResponse(data=[])
+    from app.observability.metrics import memory_search_duration_histogram
+    from app.observability.spans import memory_search_span
+
+    with memory_search_span(org_id=auth.org_id, agent_id=auth.id):
+        _t0 = _time.perf_counter()
+        # Import here to avoid circular deps until all branches merge
+        try:
+            from app.memory.search import hybrid_search
+
+            results = await hybrid_search(
+                session=db,
+                org_id=auth.org_id,
+                query_text=query,
+                requesting_agent_id=auth.id,
+                limit=limit,
+                similarity_threshold=similarity_threshold,
+                memory_type=type,
+            )
+            memory_search_duration_histogram().record(_time.perf_counter() - _t0)
+            return DataResponse(
+                data=[SearchResultResponse.model_validate(r.model_dump()) for r in results]
+            )
+        except ImportError:
+            return DataResponse(data=[])
 
 
 @router.get("")

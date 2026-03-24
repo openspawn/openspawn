@@ -44,10 +44,19 @@ async def issue_agent_token(
     db: AsyncSession = Depends(get_db),
 ) -> AgentTokenResponse:
     """Exchange valid HMAC credentials for a short-lived agent JWT."""
-    agent_ctx = await _authenticate_hmac(request, db)
+    from app.observability.metrics import auth_token_failed_counter, auth_token_issued_counter
+    from app.observability.spans import agent_authenticate_span
 
-    token = create_agent_token(agent_ctx)
-    scopes = scopes_for_level(agent_ctx.level)
+    try:
+        agent_ctx = await _authenticate_hmac(request, db)
+    except Exception:
+        auth_token_failed_counter().add(1)
+        raise
+
+    with agent_authenticate_span(agent_id=agent_ctx.agent_id):
+        token = create_agent_token(agent_ctx)
+        scopes = scopes_for_level(agent_ctx.level)
+        auth_token_issued_counter().add(1)
 
     return AgentTokenResponse(
         access_token=token,

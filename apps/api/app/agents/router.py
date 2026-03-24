@@ -42,9 +42,11 @@ async def register_agent(
     auth: AuthContext = Depends(require_auth),
 ) -> DataMessageResponse[AgentRegistrationResponse]:
     from app.agents.schemas import CreateAgentDto
+    from app.observability.spans import agent_register_span
 
     body = CreateAgentDto.model_validate(dto)
-    agent, hmac_secret = await service.register_agent(db, auth, body)
+    with agent_register_span(org_id=auth.org_id):
+        agent, hmac_secret = await service.register_agent(db, auth, body)
     return DataMessageResponse(
         data=AgentRegistrationResponse(
             agent=AgentResponse.model_validate(agent),
