@@ -328,8 +328,18 @@ async def linear_webhook(
         connection=str(matched_conn.id),
     )
 
+    # Dispatch to two-way sync handler
+    from app.integrations.linear.sync import handle_webhook_event
+
+    sync_result = await handle_webhook_event(db, matched_conn, payload)
+
     return DataMessageResponse(
-        data={"type": event_type, "action": action, "connection_id": str(matched_conn.id)},
+        data={
+            "type": event_type,
+            "action": action,
+            "connection_id": str(matched_conn.id),
+            **sync_result,
+        },
         message=f"Processed {event_type}.{action} event",
     )
 
