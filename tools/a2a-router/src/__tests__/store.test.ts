@@ -133,7 +133,7 @@ describe("Store", () => {
       const task = store.createTask("sender", "target", "test");
       const updated = store.updateTaskStatus(task.id, "working");
 
-      expect(updated!.status).toBe("working");
+      expect(updated?.status).toBe("working");
     });
 
     it("completes a task", () => {
@@ -144,8 +144,8 @@ describe("Store", () => {
         result: "All done!",
       });
 
-      expect(completed!.status).toBe("completed");
-      expect(completed!.result).toBe("All done!");
+      expect(completed?.status).toBe("completed");
+      expect(completed?.result).toBe("All done!");
     });
 
     it("rejects completion from wrong agent", () => {

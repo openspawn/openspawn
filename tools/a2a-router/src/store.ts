@@ -62,7 +62,9 @@ export class Store {
     `);
     const skills = JSON.stringify(agent.skills ?? []);
     stmt.run(agent.agent_id, agent.name, skills, agent.gateway_url, agent.gateway_token ?? null, agent.hook_path ?? "/hooks/ingest");
-    return this.getAgent(agent.agent_id)!;
+    const result = this.getAgent(agent.agent_id);
+    if (!result) throw new Error(`Failed to upsert agent ${agent.agent_id}`);
+    return result;
   }
 
   getAgent(agentId: string): AgentCard | null {
@@ -96,7 +98,9 @@ export class Store {
       INSERT INTO tasks (id, sender_id, target_id, message, status)
       VALUES (?, ?, ?, ?, 'submitted')
     `).run(id, senderId, targetId, message);
-    return this.getTask(id)!;
+    const task = this.getTask(id);
+    if (!task) throw new Error(`Failed to create task ${id}`);
+    return task;
   }
 
   getTask(taskId: string): Task | null {
