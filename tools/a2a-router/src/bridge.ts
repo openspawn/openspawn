@@ -6,6 +6,8 @@ import type { AgentCard, Task } from "./types.js";
 export interface HookPayload {
   message: string;
   agentId: string;
+  deliver: boolean;
+  timeoutSeconds: number;
 }
 
 /**
@@ -15,6 +17,8 @@ export function buildTaskPayload(task: Task): HookPayload {
   return {
     message: `[a2a:task:${task.id}]\n\n${task.message}`,
     agentId: "main",
+    deliver: false,
+    timeoutSeconds: 300,
   };
 }
 
@@ -29,6 +33,8 @@ export function buildResultPayload(task: Task, targetName: string): HookPayload 
   return {
     message: `[a2a:result:${task.id}]\n\n${statusLine}${resultText}`,
     agentId: "main",
+    deliver: false,
+    timeoutSeconds: 120,
   };
 }
 

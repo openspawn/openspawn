@@ -28,7 +28,7 @@ export class Store {
         skills TEXT,
         gateway_url TEXT NOT NULL,
         gateway_token TEXT,
-        hook_path TEXT DEFAULT '/hooks/ingest',
+        hook_path TEXT DEFAULT '/hooks/agent',
         registered_at TEXT DEFAULT (datetime('now'))
       );
 
@@ -61,7 +61,7 @@ export class Store {
         hook_path = excluded.hook_path
     `);
     const skills = JSON.stringify(agent.skills ?? []);
-    stmt.run(agent.agent_id, agent.name, skills, agent.gateway_url, agent.gateway_token ?? null, agent.hook_path ?? "/hooks/ingest");
+    stmt.run(agent.agent_id, agent.name, skills, agent.gateway_url, agent.gateway_token ?? null, agent.hook_path ?? "/hooks/agent");
     const result = this.getAgent(agent.agent_id);
     if (!result) throw new Error(`Failed to upsert agent ${agent.agent_id}`);
     return result;
