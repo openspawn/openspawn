@@ -6,6 +6,7 @@ import { agentRoutes } from "./routes/agents.js";
 import { messageRoutes } from "./routes/messages.js";
 import { taskRoutes } from "./routes/tasks.js";
 import { jsonrpcRoutes } from "./routes/jsonrpc.js";
+import { streamRoutes } from "./routes/stream.js";
 import { discoveryRoutes } from "./routes/discovery.js";
 
 const PORT = parseInt(process.env.A2A_PORT ?? "3380", 10);
@@ -37,6 +38,9 @@ export function createApp(store?: Store) {
   // ── A2A v1.0 JSON-RPC endpoint ────────────────────────────────────────
   app.use("/a2a/jsonrpc", jsonrpcRoutes(s));
 
+  // ── SSE Streaming endpoint ────────────────────────────────────────────
+  app.use("/a2a/stream", streamRoutes(s));
+
   return { app, store: s };
 }
 
@@ -49,6 +53,7 @@ if (isDirectRun && !isVitest) {
     console.log(`🔄 A2A Router listening on http://127.0.0.1:${PORT}`);
     console.log(`   Health: http://127.0.0.1:${PORT}/health`);
     console.log(`   JSON-RPC: http://127.0.0.1:${PORT}/a2a/jsonrpc`);
+    console.log(`   Stream:   http://127.0.0.1:${PORT}/a2a/stream`);
     console.log(`   Discovery: http://127.0.0.1:${PORT}/.well-known/agent.json`);
     console.log(`   DB: ${DB_PATH}`);
   });
