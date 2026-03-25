@@ -45,6 +45,26 @@ export interface CompleteTaskRequest {
   result: string;
 }
 
+export interface PushConfig {
+  id: string;
+  task_id: string;
+  agent_id: string;
+  webhook_url: string;
+  auth_token: string | null;
+  created_at: string;
+}
+
+export interface NotificationLogEntry {
+  id?: number;
+  task_id: string;
+  target_agent_id: string;
+  status: "delivered" | "failed" | "retrying";
+  attempt: number;
+  response_status?: number | null;
+  error?: string | null;
+  created_at?: string;
+}
+
 export interface RegisterAgentRequest {
   agentId: string;
   name: string;

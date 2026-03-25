@@ -4,7 +4,7 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { v4 as uuidv4 } from "uuid";
-import type { AgentCard, AgentRow, CompleteTaskRequest, Task, TaskStatus } from "./types.js";
+import type { AgentCard, AgentRow, CompleteTaskRequest, NotificationLogEntry, PushConfig, Task, TaskStatus } from "./types.js";
 
 const DEFAULT_DB_PATH = `${process.env.HOME}/.openspawn/a2a/tasks.db`;
 
@@ -43,6 +43,27 @@ export class Store {
         updated_at TEXT DEFAULT (datetime('now')),
         FOREIGN KEY (sender_id) REFERENCES agents(agent_id),
         FOREIGN KEY (target_id) REFERENCES agents(agent_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS push_configs (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL,
+        agent_id TEXT NOT NULL,
+        webhook_url TEXT NOT NULL,
+        auth_token TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (task_id) REFERENCES tasks(id)
+      );
+
+      CREATE TABLE IF NOT EXISTS notification_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id TEXT NOT NULL,
+        target_agent_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        attempt INTEGER DEFAULT 1,
+        response_status INTEGER,
+        error TEXT,
+        created_at TEXT DEFAULT (datetime('now'))
       );
     `);
   }
@@ -129,6 +150,36 @@ export class Store {
     if (!task) return null;
     if (task.target_id !== req.agentId) return null;
     return this.updateTaskStatus(taskId, req.status, req.result);
+  }
+
+  // ── Push Configs ──────────────────────────────────────────────────────────
+
+  setPushConfig(taskId: string, agentId: string, webhookUrl: string, authToken?: string): PushConfig {
+    const id = uuidv4();
+    this.db.prepare(`
+      INSERT INTO push_configs (id, task_id, agent_id, webhook_url, auth_token)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(id, taskId, agentId, webhookUrl, authToken ?? null);
+    return { id, task_id: taskId, agent_id: agentId, webhook_url: webhookUrl, auth_token: authToken ?? null, created_at: new Date().toISOString() };
+  }
+
+  getPushConfig(taskId: string): PushConfig | null {
+    return this.db.prepare("SELECT * FROM push_configs WHERE task_id = ?").get(taskId) as PushConfig | null ?? null;
+  }
+
+  // ── Notification Log ─────────────────────────────────────────────────────
+
+  logNotification(entry: Omit<NotificationLogEntry, "id" | "created_at">): void {
+    this.db.prepare(`
+      INSERT INTO notification_log (task_id, target_agent_id, status, attempt, response_status, error)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(entry.task_id, entry.target_agent_id, entry.status, entry.attempt, entry.response_status ?? null, entry.error ?? null);
+  }
+
+  getNotificationLogs(taskId: string): NotificationLogEntry[] {
+    return this.db.prepare(
+      "SELECT * FROM notification_log WHERE task_id = ? ORDER BY created_at ASC"
+    ).all(taskId) as NotificationLogEntry[];
   }
 
   close(): void {
