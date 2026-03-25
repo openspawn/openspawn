@@ -18,6 +18,7 @@ import type {
   TasksListParams,
   TasksListResult,
 } from "./a2a-types.js";
+import { TaskEventBus } from "./events.js";
 
 const DEFAULT_DB_PATH = `${process.env.HOME}/.openspawn/a2a/tasks.db`;
 
@@ -40,8 +41,10 @@ interface TaskRow {
 
 export class Store {
   private db: Database.Database;
+  public readonly events: TaskEventBus;
 
   constructor(dbPath: string = DEFAULT_DB_PATH) {
+    this.events = new TaskEventBus();
     // Auto-create directory
     mkdirSync(dirname(dbPath), { recursive: true });
     this.db = new Database(dbPath);
@@ -246,6 +249,11 @@ export class Store {
       UPDATE tasks SET status = ?, result = ?, updated_at = datetime('now')
       WHERE id = ?
     `).run(status, result ?? null, taskId);
+    this.events.emitTaskUpdate({
+      taskId,
+      kind: "status-update",
+      status: { state: status, message: result, timestamp: new Date().toISOString() },
+    });
     return this.getTask(taskId);
   }
 
@@ -348,6 +356,12 @@ export class Store {
     if (statusMessage !== undefined) {
       this.db.prepare(`UPDATE tasks SET result = ? WHERE id = ?`).run(statusMessage, taskId);
     }
+
+    this.events.emitTaskUpdate({
+      taskId,
+      kind: "status-update",
+      status: { state, message: statusMessage, timestamp: new Date().toISOString() },
+    });
 
     return this.getA2ATask(taskId);
   }
