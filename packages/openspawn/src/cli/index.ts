@@ -10,6 +10,7 @@ import { startCommand } from "./commands/start.js";
 import { worktreeCommand } from "./commands/worktree.js";
 import { linearCommand } from "./commands/linear.js";
 import { a2aCommand } from "./commands/a2a.js";
+import { agentCommand } from "./commands/agent.js";
 
 const HELP = `
 openspawn - Multi-agent organization CLI
@@ -31,6 +32,7 @@ Commands:
     --dry-run                    Show what would change without writing
   worktree <subcommand>           Manage git worktrees for agents
   linear <subcommand>             Manage Linear.app integration
+  agent <subcommand>               Manage agent workspaces
   a2a <subcommand>                Agent-to-Agent communication
   preview                        Preview org in local sandbox
     --port <n>                   Dashboard port (default: 3333)
@@ -101,6 +103,8 @@ async function main() {
       return linearCommand(rest);
     case "worktree":
       return worktreeCommand(rest);
+    case "agent":
+      return agentCommand(rest);
     case "a2a":
       return a2aCommand(rest);
     default:
