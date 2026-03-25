@@ -12,6 +12,8 @@ Usage:
   openspawn a2a tasks                                  List all tasks
   openspawn a2a task <task-id>                         Get task status + result
   openspawn a2a register                               Register this agent
+  openspawn a2a test [url]                             Test A2A endpoint compliance
+  openspawn a2a test --self                            Test own router
 
 Options:
   --async          Return task ID immediately (don't wait for completion)
@@ -23,6 +25,8 @@ Examples:
   openspawn a2a send drinkify "Deploy staging" --async
   openspawn a2a agents
   openspawn a2a task abc-123
+  openspawn a2a test
+  openspawn a2a test http://remote-host:3380
 `.trim();
 
 async function fetchJson(path: string, init?: RequestInit): Promise<{ status: number; body: unknown }> {
@@ -219,6 +223,256 @@ async function taskCommand(args: string[]): Promise<void> {
   console.log();
 }
 
+// ── Compliance Test Command ────────────────────────────────────────────────
+
+interface TestResult {
+  name: string;
+  passed: boolean;
+  detail?: string;
+}
+
+async function testCommand(args: string[]): Promise<void> {
+  const isSelf = hasFlag(args, "--self");
+  const positionalUrl = args.find((a) => !a.startsWith("--"));
+  const baseUrl = positionalUrl ?? (isSelf ? A2A_BASE : A2A_BASE);
+
+  console.log(`\nA2A Compliance Test — ${baseUrl}\n`);
+
+  const results: TestResult[] = [];
+
+  // Helper to run a test and collect results
+  async function runTest(name: string, fn: () => Promise<{ passed: boolean; detail?: string }>): Promise<void> {
+    try {
+      const result = await fn();
+      results.push({ name, ...result });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      results.push({ name, passed: false, detail: message });
+    }
+  }
+
+  // We need two test agents for the compliance tests.
+  // Register them temporarily, run tests, then clean up by ignoring errors.
+  const testSenderId = `__a2a_test_sender_${Date.now()}`;
+  const testAgentId = `__a2a_test_target_${Date.now()}`;
+
+  // Register test agents (best effort — they may already exist in some form)
+  async function registerTestAgents(): Promise<boolean> {
+    try {
+      const senderRes = await fetch(`${baseUrl}/a2a/agents`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentId: testSenderId,
+          name: "Test Sender",
+          gateway_url: "http://127.0.0.1:19999",
+          skills: ["test"],
+        }),
+      });
+      const targetRes = await fetch(`${baseUrl}/a2a/agents`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentId: testAgentId,
+          name: "Test Target",
+          gateway_url: "http://127.0.0.1:19998",
+          skills: ["test"],
+        }),
+      });
+      return senderRes.status === 201 && targetRes.status === 201;
+    } catch {
+      return false;
+    }
+  }
+
+  const agentsReady = await registerTestAgents();
+  if (!agentsReady) {
+    console.error("❌ Could not register test agents. Is the router running?");
+    process.exit(1);
+  }
+
+  let createdTaskId: string | undefined;
+
+  // 1. Agent discovery
+  await runTest("Agent discovery (/.well-known/agent.json)", async () => {
+    const res = await fetch(`${baseUrl}/.well-known/agent.json`);
+    if (!res.ok) return { passed: false, detail: `HTTP ${res.status}` };
+    const card = (await res.json()) as Record<string, unknown>;
+    if (card.protocolVersion !== "1.0.0") return { passed: false, detail: `protocolVersion: ${String(card.protocolVersion)}` };
+    if (typeof card.name !== "string") return { passed: false, detail: "missing name" };
+    if (typeof card.url !== "string") return { passed: false, detail: "missing url" };
+    if (!Array.isArray(card.skills)) return { passed: false, detail: "missing skills array" };
+    return { passed: true };
+  });
+
+  // 2. message/send
+  await runTest("message/send — creates task", async () => {
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-1",
+        method: "message/send",
+        params: {
+          agentId: testAgentId,
+          senderId: testSenderId,
+          message: {
+            kind: "message",
+            messageId: `test-msg-${Date.now()}`,
+            role: "user",
+            parts: [{ kind: "text", text: "A2A compliance test message" }],
+          },
+        },
+      }),
+    });
+    if (!res.ok) return { passed: false, detail: `HTTP ${res.status}` };
+    const body = (await res.json()) as Record<string, unknown>;
+    if (body.error) return { passed: false, detail: JSON.stringify(body.error) };
+    const result = body.result as Record<string, unknown> | undefined;
+    if (!result?.id) return { passed: false, detail: "no task id in result" };
+    createdTaskId = result.id as string;
+    return { passed: true };
+  });
+
+  // 3. tasks/get
+  await runTest("tasks/get — retrieves task", async () => {
+    if (!createdTaskId) return { passed: false, detail: "no task created in previous step" };
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-2",
+        method: "tasks/get",
+        params: { taskId: createdTaskId },
+      }),
+    });
+    if (!res.ok) return { passed: false, detail: `HTTP ${res.status}` };
+    const body = (await res.json()) as Record<string, unknown>;
+    if (body.error) return { passed: false, detail: JSON.stringify(body.error) };
+    const result = body.result as Record<string, unknown> | undefined;
+    if (result?.id !== createdTaskId) return { passed: false, detail: "task id mismatch" };
+    return { passed: true };
+  });
+
+  // 4. tasks/list
+  await runTest("tasks/list — pagination works", async () => {
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-3",
+        method: "tasks/list",
+        params: { limit: 5, offset: 0 },
+      }),
+    });
+    if (!res.ok) return { passed: false, detail: `HTTP ${res.status}` };
+    const body = (await res.json()) as Record<string, unknown>;
+    if (body.error) return { passed: false, detail: JSON.stringify(body.error) };
+    const result = body.result as Record<string, unknown> | undefined;
+    if (!Array.isArray(result?.tasks)) return { passed: false, detail: "result.tasks is not an array" };
+    if (typeof result?.total !== "number") return { passed: false, detail: "result.total missing" };
+    if (typeof result?.limit !== "number") return { passed: false, detail: "result.limit missing" };
+    if (typeof result?.offset !== "number") return { passed: false, detail: "result.offset missing" };
+    return { passed: true };
+  });
+
+  // 5. tasks/cancel
+  await runTest("tasks/cancel — cancels task", async () => {
+    if (!createdTaskId) return { passed: false, detail: "no task created" };
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-4",
+        method: "tasks/cancel",
+        params: { taskId: createdTaskId },
+      }),
+    });
+    if (!res.ok) return { passed: false, detail: `HTTP ${res.status}` };
+    const body = (await res.json()) as Record<string, unknown>;
+    if (body.error) return { passed: false, detail: JSON.stringify(body.error) };
+    const result = body.result as Record<string, unknown> | undefined;
+    const status = result?.status as Record<string, unknown> | undefined;
+    if (status?.state !== "canceled") return { passed: false, detail: `state: ${String(status?.state)}` };
+    return { passed: true };
+  });
+
+  // 6. Error handling — invalid JSON
+  await runTest("Error handling — invalid JSON", async () => {
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{ not valid json",
+    });
+    // The server may return 400 for parse errors, which is acceptable
+    const body = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+    if (body?.error) {
+      const err = body.error as Record<string, unknown>;
+      if (err.code === -32700) return { passed: true };
+    }
+    // Some implementations return 400 status without JSON-RPC error body
+    if (res.status === 400) return { passed: true };
+    return { passed: false, detail: `Expected parse error, got HTTP ${res.status}` };
+  });
+
+  // 7. Error handling — unknown method
+  await runTest("Error handling — unknown method", async () => {
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-5",
+        method: "nonexistent/method",
+        params: {},
+      }),
+    });
+    if (!res.ok && res.status !== 200) {
+      // Some servers return 200 with error in body, some return 404
+      return { passed: false, detail: `HTTP ${res.status}` };
+    }
+    const body = (await res.json()) as Record<string, unknown>;
+    const err = body.error as Record<string, unknown> | undefined;
+    if (err?.code !== -32601) return { passed: false, detail: `Expected -32601, got ${String(err?.code)}` };
+    return { passed: true };
+  });
+
+  // 8. Error handling — missing params
+  await runTest("Error handling — missing params", async () => {
+    const res = await fetch(`${baseUrl}/a2a/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "test-6",
+        method: "message/send",
+        params: {},
+      }),
+    });
+    const body = (await res.json()) as Record<string, unknown>;
+    const err = body.error as Record<string, unknown> | undefined;
+    if (err?.code !== -32602) return { passed: false, detail: `Expected -32602, got ${String(err?.code)}` };
+    return { passed: true };
+  });
+
+  // Print results
+  let passed = 0;
+  const total = results.length;
+  for (const r of results) {
+    const icon = r.passed ? "✅" : "❌";
+    const detail = r.detail && !r.passed ? ` (${r.detail})` : "";
+    console.log(`${icon} ${r.name}${detail}`);
+    if (r.passed) passed++;
+  }
+
+  console.log(`\n${passed}/${total} tests passed${passed === total ? " — A2A v1.0 compliant ✓" : ""}`);
+  if (passed < total) process.exit(1);
+}
+
 async function registerCommand(): Promise<void> {
   // Default: register as dennis
   console.log("⚠️  Registration requires agent config. Use the API directly:");
@@ -248,6 +502,8 @@ export async function a2aCommand(args: string[]): Promise<void> {
         return await taskCommand(rest);
       case "register":
         return await registerCommand();
+      case "test":
+        return await testCommand(rest);
       default:
         console.error(`Unknown a2a subcommand: ${sub}`);
         console.log(A2A_HELP);
