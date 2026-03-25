@@ -1,8 +1,7 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { Search, Brain, ThumbsUp, ThumbsDown, Network } from "lucide-react";
 import { PageHeader, EmptyState } from "@openspawn/dashboard-ui";
 import {
-  useMemories,
   useMemorySearch,
   useGraphCytoscape,
   useAgents,
