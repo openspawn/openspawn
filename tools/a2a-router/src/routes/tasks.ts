@@ -1,7 +1,7 @@
 // ── Task Routes ──────────────────────────────────────────────────────────────
 
 import { Router, type Request, type Response } from "express";
-import { buildResultPayload, deliverHook } from "../bridge.js";
+import { notifySender } from "../notify.js";
 import type { Store } from "../store.js";
 import type { CompleteTaskRequest } from "../types.js";
 
@@ -73,16 +73,10 @@ export function taskRoutes(store: Store): Router {
       return;
     }
 
-    // Notify the sender agent (best-effort)
-    const sender = store.getAgent(task.sender_id);
-    const target = store.getAgent(task.target_id);
-    if (sender && target) {
-      const payload = buildResultPayload(updated, target.name);
-      // Fire and forget — don't fail the completion if notification fails
-      deliverHook(sender, payload).catch(() => {
-        // Notification delivery failure is non-fatal
-      });
-    }
+    // Notify the sender agent (fire-and-forget with retry + logging)
+    notifySender(store, updated).catch(() => {
+      // Notification delivery failure is non-fatal
+    });
 
     res.json(updated);
   });

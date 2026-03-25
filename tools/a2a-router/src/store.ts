@@ -95,6 +95,58 @@ export class Store {
     if (!colNames.has("metadata_json")) {
       this.db.exec("ALTER TABLE tasks ADD COLUMN metadata_json TEXT");
     }
+
+    // Notification log table
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS notification_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id TEXT NOT NULL,
+        target_agent_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        attempt INTEGER DEFAULT 1,
+        response_status INTEGER,
+        error TEXT,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+    `);
+  }
+
+  // ── Notification Log ─────────────────────────────────────────────────────
+
+  logNotification(entry: {
+    task_id: string;
+    target_agent_id: string;
+    status: "delivered" | "failed" | "retrying";
+    attempt: number;
+    response_status?: number | null;
+    error?: string | null;
+  }): void {
+    this.db.prepare(`
+      INSERT INTO notification_log (task_id, target_agent_id, status, attempt, response_status, error)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(entry.task_id, entry.target_agent_id, entry.status, entry.attempt, entry.response_status ?? null, entry.error ?? null);
+  }
+
+  getNotificationLogs(taskId: string): Array<{
+    id: number;
+    task_id: string;
+    target_agent_id: string;
+    status: string;
+    attempt: number;
+    response_status: number | null;
+    error: string | null;
+    created_at: string;
+  }> {
+    return this.db.prepare("SELECT * FROM notification_log WHERE task_id = ? ORDER BY id").all(taskId) as Array<{
+      id: number;
+      task_id: string;
+      target_agent_id: string;
+      status: string;
+      attempt: number;
+      response_status: number | null;
+      error: string | null;
+      created_at: string;
+    }>;
   }
 
   // ── Agents ───────────────────────────────────────────────────────────────
