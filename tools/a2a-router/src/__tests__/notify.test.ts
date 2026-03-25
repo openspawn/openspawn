@@ -237,9 +237,10 @@ describe("notify", () => {
       store.registerAgent(target);
 
       const task = store.createTask("dennis", "drinkify", "Deploy staging");
-      const completed = store.completeTask(task.id, { agentId: "drinkify", status: "completed", result: "Done" })!;
+      const completed = store.completeTask(task.id, { agentId: "drinkify", status: "completed", result: "Done" });
+      expect(completed).toBeTruthy();
 
-      await notifySender(store, completed, { fetchFn, delays: [0, 0, 0] });
+      await notifySender(store, completed as NonNullable<typeof completed>, { fetchFn, delays: [0, 0, 0] });
 
       expect(fetchFn).toHaveBeenCalledTimes(1);
       const call = (fetchFn as ReturnType<typeof vi.fn>).mock.calls[0];
@@ -258,9 +259,10 @@ describe("notify", () => {
       store.registerAgent(target);
 
       const task = store.createTask("dennis", "drinkify", "Deploy staging");
-      const failed = store.completeTask(task.id, { agentId: "drinkify", status: "failed", result: "Build error" })!;
+      const failed = store.completeTask(task.id, { agentId: "drinkify", status: "failed", result: "Build error" });
+      expect(failed).toBeTruthy();
 
-      await notifySender(store, failed, { fetchFn, delays: [0, 0, 0] });
+      await notifySender(store, failed as NonNullable<typeof failed>, { fetchFn, delays: [0, 0, 0] });
 
       expect(fetchFn).toHaveBeenCalledTimes(1);
       const call = (fetchFn as ReturnType<typeof vi.fn>).mock.calls[0];
