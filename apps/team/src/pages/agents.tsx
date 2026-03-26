@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Shield, Clock, TrendingUp } from "lucide-react";
 import { PageHeader, Badge, EmptyState } from "@openspawn/dashboard-ui";
 import { AgentStatus, useDashboardPanels } from "@openspawn/dashboard-data";
 import { cn } from "../lib/utils";
 import { useAgents, useTasks } from "../hooks";
+import { useParams, useNavigate } from "@tanstack/react-router";
 
 function timeAgo(date: string | null | undefined): string {
   if (!date) return "Never";
@@ -46,6 +47,16 @@ export function AgentsPage() {
   const { tasks } = useTasks();
   const { openAgentPanel } = useDashboardPanels({ agents, tasks });
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  // Auto-open agent panel from URL param
+  const params = (() => { try { return useParams({ from: "/agents/$agentId" }); } catch { return { agentId: undefined }; } })() as { agentId?: string };
+  useEffect(() => {
+    if (params.agentId && agents.length > 0) {
+      const agent = agents.find((a) => a.agentId === params.agentId || a.id === params.agentId);
+      if (agent) openAgentPanel(agent.id);
+    }
+  }, [params.agentId, agents, openAgentPanel]);
 
   const filtered = useMemo(() => {
     if (!search) return agents;
@@ -90,7 +101,7 @@ export function AgentsPage() {
             return (
               <button
                 key={agent.id}
-                onClick={() => openAgentPanel(agent.id)}
+                onClick={() => { openAgentPanel(agent.id); navigate({ to: "/agents/$agentId", params: { agentId: agent.agentId ?? agent.id } }); }}
                 className={cn(
                   "rounded-xl border bg-white/[0.02] p-4 space-y-4 transition-all text-left hover:bg-white/[0.04] hover:border-white/20 cursor-pointer group",
                   isActive ? "border-cyan-500/20" : "border-white/5",

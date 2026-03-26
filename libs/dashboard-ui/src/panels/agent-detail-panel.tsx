@@ -216,7 +216,7 @@ export function AgentDetailPanel({
           <StatBox
             icon={<Coins className="w-4 h-4 text-emerald-400" />}
             label="Balance"
-            value={`${agent.currentBalance.toLocaleString()}c`}
+            value={`${(agent.currentBalance ?? 0).toLocaleString()}c`}
           />
         </div>
 
@@ -342,7 +342,7 @@ export function AgentDetailPanel({
             <InfoRow label="Level" value={`L${agent.level} — ${getLevelLabel(agent.level)}`} />
             <InfoRow
               label="Lifetime Earnings"
-              value={`${agent.lifetimeEarnings.toLocaleString()}c`}
+              value={`${(agent.lifetimeEarnings ?? 0).toLocaleString()}c`}
             />
             <InfoRow
               label="Created"
