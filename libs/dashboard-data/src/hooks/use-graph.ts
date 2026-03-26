@@ -21,7 +21,7 @@ export function useGraphEntities() {
   }
 
   return {
-    entities: Array.isArray(rest.data) ? rest.data : [],
+    entities: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
@@ -41,7 +41,7 @@ export function useGraphRelationships() {
   }
 
   return {
-    relationships: Array.isArray(rest.data) ? rest.data : [],
+    relationships: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
