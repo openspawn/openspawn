@@ -21,7 +21,7 @@ export function useMemories() {
   }
 
   return {
-    memories: Array.isArray(rest.data) ? rest.data : [],
+    memories: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
@@ -40,7 +40,7 @@ export function useMemorySearch(query: string) {
   }
 
   return {
-    memories: Array.isArray(rest.data) ? rest.data : [],
+    memories: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
   };
@@ -60,7 +60,7 @@ export function useContradictions() {
   }
 
   return {
-    contradictions: Array.isArray(rest.data) ? rest.data : [],
+    contradictions: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,

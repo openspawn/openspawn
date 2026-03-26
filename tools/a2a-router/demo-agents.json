@@ -1,0 +1,39 @@
+{
+  "agents": [
+    {
+      "name": "PM",
+      "role": "project-manager",
+      "level": 7,
+      "skills": ["planning", "decomposition", "tracking", "coordination"],
+      "model": "anthropic/claude-sonnet-4-5"
+    },
+    {
+      "name": "Writer",
+      "role": "writer",
+      "level": 5,
+      "skills": ["docs", "markdown", "tutorials", "technical-writing"],
+      "model": "anthropic/claude-haiku-3-5"
+    },
+    {
+      "name": "Reviewer",
+      "role": "editor",
+      "level": 5,
+      "skills": ["review", "quality", "accuracy", "editing"],
+      "model": "anthropic/claude-haiku-3-5"
+    },
+    {
+      "name": "Engineer",
+      "role": "developer",
+      "level": 5,
+      "skills": ["code", "typescript", "astro", "tooling"],
+      "model": "anthropic/claude-haiku-3-5"
+    },
+    {
+      "name": "Designer",
+      "role": "ux-designer",
+      "level": 5,
+      "skills": ["design", "information-architecture", "sitemap", "navigation"],
+      "model": "anthropic/claude-haiku-3-5"
+    }
+  ]
+}

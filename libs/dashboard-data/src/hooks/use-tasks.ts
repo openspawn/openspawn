@@ -31,7 +31,7 @@ export function useTasks() {
   const rest = useRestTasks();
 
   return {
-    tasks: Array.isArray(rest.data) ? rest.data : [],
+    tasks: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,

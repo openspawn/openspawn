@@ -14,7 +14,7 @@ export function useEvents() {
   const rest = useRestEvents();
 
   return {
-    events: Array.isArray(rest.data) ? rest.data : [],
+    events: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
