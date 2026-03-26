@@ -6,9 +6,5 @@
     "composite": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "references": [
-    {
-      "path": "../dashboard-ui"
-    }
-  ]
+  "references": []
 }
