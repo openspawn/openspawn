@@ -1,12 +1,9 @@
+import type { CreditTransactionFields } from "@openspawn/shared-types";
 import { useRestCredits } from "../rest/hooks/use-credits";
 
-export type CreditTransaction = {
-  id: string;
-  agentId: string;
-  amount: number;
+// Derived from shared-types, widening enum field to string for API compat
+export type CreditTransaction = Omit<CreditTransactionFields, "type"> & {
   type: string;
-  description?: string | null;
-  createdAt: string;
 };
 
 export function useCredits(_orgId?: string, _agentId?: string, limit = 50) {

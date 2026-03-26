@@ -65,37 +65,15 @@ export {
   TaskStatus,
 } from "@openspawn/shared-types";
 
-// Agent type for components — mirrors the GraphQL AgentFieldsFragment shape
-export interface AgentFields {
-  id: string;
-  agentId: string;
-  name: string;
+// Agent type — derived from shared-types, widening enum fields to string for API compat
+import type { AgentFields as _SharedAgentFields } from "@openspawn/shared-types";
+
+export type AgentFields = Omit<_SharedAgentFields, "role" | "mode" | "status" | "reputationLevel"> & {
   role: string;
   mode: string;
   status: string;
-  level: number;
-  model: string;
-  currentBalance: number;
-  budgetPeriodLimit?: number | null;
-  budgetPeriodSpent: number;
-  managementFeePct: number;
-  parentId?: string | null;
-  createdAt: string;
-  updatedAt: string;
-  trustScore: number;
   reputationLevel: string;
-  tasksCompleted: number;
-  tasksSuccessful: number;
-  lastActivityAt?: string | null;
-  lastPromotionAt?: string | null;
-  lifetimeEarnings: number;
-  defaultAutonomyLevel: number;
-  domain?: string | null;
-  teamId?: string | null;
-  avatar?: string | null;
-  avatarColor?: string | null;
-  avatarUrl?: string | null;
-}
+};
 
 /** @deprecated Use AgentFields instead */
 export type AgentFieldsFragment = AgentFields;

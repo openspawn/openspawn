@@ -1,30 +1,12 @@
+import type { TaskFields as _SharedTaskFields } from "@openspawn/shared-types";
 import { useTasks as useRestTasks } from "../rest/hooks/use-tasks";
 
-export type TaskRejection = {
-  feedback: string;
-  rejectedBy?: string;
-  rejectedAt?: string;
-  rejectionCount: number;
-};
+export type { TaskRejection } from "@openspawn/shared-types";
 
-export type Task = {
-  id: string;
-  identifier: string;
-  title: string;
-  description?: string | null;
+// Derived from shared-types, widening enum fields to string for API compat
+export type Task = Omit<_SharedTaskFields, "status" | "priority"> & {
   status: string;
   priority: string;
-  assigneeId?: string | null;
-  assignee?: { id: string; name: string; level: number } | null;
-  creatorId?: string | null;
-  createdAt: string;
-  updatedAt: string;
-  dueDate?: string | null;
-  completedAt?: string | null;
-  source?: string | null;
-  approvalRequired?: boolean;
-  autonomyLevel?: number | null;
-  rejection?: TaskRejection | null;
 };
 
 export function useTasks() {
