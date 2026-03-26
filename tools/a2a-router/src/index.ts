@@ -8,6 +8,7 @@ import { taskRoutes } from "./routes/tasks.js";
 import { jsonrpcRoutes } from "./routes/jsonrpc.js";
 import { streamRoutes } from "./routes/stream.js";
 import { discoveryRoutes } from "./routes/discovery.js";
+import { initSync } from "./sync.js";
 
 const PORT = parseInt(process.env.A2A_PORT ?? "3380", 10);
 const DB_PATH = process.env.A2A_DB_PATH ?? `${process.env.HOME}/.openspawn/a2a/tasks.db`;
@@ -40,6 +41,9 @@ export function createApp(store?: Store) {
 
   // ── SSE Streaming endpoint ────────────────────────────────────────────
   app.use("/a2a/stream", streamRoutes(s));
+
+  // ── API Sync (fire-and-forget) ────────────────────────────────────────
+  initSync(s);
 
   return { app, store: s };
 }
