@@ -143,11 +143,11 @@ function TaskDetail({ task, onClose }: { task: KanbanTask; onClose: () => void }
       onClick={onClose}
     >
       <div
-        className="bg-[var(--card)] border border-white/10 rounded-xl max-w-lg w-full p-6 shadow-2xl"
+        className="bg-card border border-border rounded-xl max-w-lg w-full p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
-          <h3 className="text-lg font-semibold text-[var(--foreground)]">{task.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{task.title}</h3>
           <button onClick={onClose} className="p-1 rounded hover:bg-white/10 transition-colors">
             <X className="w-4 h-4" />
           </button>
