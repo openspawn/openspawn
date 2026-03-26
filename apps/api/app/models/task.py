@@ -59,6 +59,11 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sla_warning_sent_at: Mapped[datetime | None] = mapped_column(nullable=True)
     needs_attention: Mapped[bool] = mapped_column(nullable=False, server_default="false")
 
+    # A2A fields
+    source: Mapped[str] = mapped_column(String(20), nullable=False, server_default="manual")
+    a2a_context_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    a2a_messages: Mapped[dict | None] = mapped_column(CompatJSONB(), nullable=True)
+
     organization: Mapped[Organization] = relationship("Organization", back_populates="tasks")
     assignee: Mapped[Agent | None] = relationship(
         "Agent", foreign_keys=[assignee_id], back_populates="assigned_tasks"

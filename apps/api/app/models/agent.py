@@ -74,6 +74,11 @@ class Agent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     avatar_color: Mapped[str | None] = mapped_column(String(20), nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
+    # A2A fields
+    a2a_callback_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    a2a_skills: Mapped[dict | None] = mapped_column(CompatJSONB(), nullable=True)
+    last_heartbeat: Mapped[datetime | None] = mapped_column(nullable=True)
+
     organization: Mapped[Organization] = relationship("Organization", back_populates="agents")
     parent: Mapped[Agent | None] = relationship(
         "Agent", remote_side="Agent.id", back_populates="children"
