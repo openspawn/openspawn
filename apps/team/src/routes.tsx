@@ -36,6 +36,11 @@ const agentsRoute = createRoute({
   path: "/agents",
   component: AgentsPage,
 });
+const agentDetailRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/agents/$agentId",
+  component: AgentsPage,
+});
 const tasksRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/tasks",
@@ -89,6 +94,7 @@ const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
     indexRoute,
     agentsRoute,
+    agentDetailRoute,
     tasksRoute,
     eventsRoute,
     messagesRoute,
