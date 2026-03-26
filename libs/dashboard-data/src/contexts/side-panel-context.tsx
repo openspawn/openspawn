@@ -19,7 +19,7 @@ interface SidePanelContextValue {
 
 const SidePanelContext = createContext<SidePanelContextValue | null>(null);
 
-const DEFAULT_WIDTH = 480;
+const DEFAULT_WIDTH = 540;
 
 export function SidePanelProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<SidePanelState>({

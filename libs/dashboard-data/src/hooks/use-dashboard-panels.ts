@@ -90,7 +90,7 @@ export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
           parentName: parent?.name,
           onTaskClick: (taskId: string) => openTaskPanel(taskId),
         }),
-        { title: agent.name, width: 480 },
+        { title: agent.name, width: 540 },
       );
     },
     [agents, tasks, openSidePanel],
@@ -107,7 +107,7 @@ export function useDashboardPanels({ agents, tasks }: DashboardPanelsOptions) {
           task,
           onAgentClick: (agentId: string) => openAgentPanel(agentId),
         }),
-        { title: task.identifier + ": " + task.title, width: 480 },
+        { title: task.identifier + ": " + task.title, width: 540 },
       );
     },
     [agents, tasks, openSidePanel],

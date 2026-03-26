@@ -149,7 +149,7 @@ export function AgentDetailPanel({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6">
+      <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
           <div className="relative">
@@ -201,7 +201,7 @@ export function AgentDetailPanel({
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem" }}>
           <StatBox
             icon={<Shield className="w-4 h-4 text-cyan-400" />}
             label="Trust"
@@ -386,12 +386,12 @@ function StatBox({
   sparkline?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1.5">
-      <div className="flex items-center gap-1.5">
+    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5 space-y-1">
+      <div className="flex items-center gap-1">
         {icon}
-        <span className="text-[10px] text-white/40 uppercase tracking-wider">{label}</span>
+        <span className="text-[9px] text-white/40 uppercase tracking-wider">{label}</span>
       </div>
-      <div className="text-lg font-semibold text-white">{value}</div>
+      <div className="text-base font-semibold text-white">{value}</div>
       {sub && <div className="text-[10px] text-white/40">{sub}</div>}
       {sparkline && <div className="mt-1">{sparkline}</div>}
     </div>
