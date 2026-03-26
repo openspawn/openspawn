@@ -12,4 +12,4 @@ export {
 export { usePresence, type AgentPresence, type PresenceStatus } from "@openspawn/dashboard-data";
 export { useAgentHealth, type AgentHealth } from "@openspawn/dashboard-data";
 export { useTouchDevice } from "@openspawn/dashboard-data";
-export { useDashboardPanels, registerPanelComponents } from "@openspawn/dashboard-data";
+export { useSidePanel } from "@openspawn/dashboard-data";

@@ -1,6 +1,6 @@
-import { PageHeader } from "@openspawn/dashboard-ui";
-import { useTasks, useAgents, useDashboardPanels } from "../hooks";
-import { TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
+import { PageHeader, TaskDetailPanel } from "@openspawn/dashboard-ui";
+import { useTasks } from "../hooks";
+import { TaskStatus, TaskPriority, useSidePanel } from "@openspawn/dashboard-data";
 
 const COLUMNS: { id: string; label: string; color: string }[] = [
   { id: TaskStatus.TODO, label: "To Do", color: "border-white/10      bg-white/[0.02]" },
@@ -30,8 +30,11 @@ function priorityColor(p: string): string {
 
 export function TaskBoardPage() {
   const { tasks, loading } = useTasks();
-  const { agents } = useAgents();
-  const { openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const { openSidePanel } = useSidePanel();
+  const openTaskPanel = (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) openSidePanel(<TaskDetailPanel task={task} />, { width: 480, title: task.title });
+  };
 
   const byColumn = COLUMNS.reduce<Record<string, typeof tasks>>((acc, col) => {
     acc[col.id] = [];

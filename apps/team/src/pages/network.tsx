@@ -1,8 +1,9 @@
 import { useMemo, useState, useCallback } from "react";
 import { PageHeader } from "@openspawn/dashboard-ui";
-import { useAgents, useTasks, useDashboardPanels } from "../hooks";
+import { useAgents } from "../hooks";
 import type { Agent } from "../hooks";
-import { getStatusVariant, getLevelColor } from "@openspawn/dashboard-data";
+import { getStatusVariant, getLevelColor, useSidePanel } from "@openspawn/dashboard-data";
+import { ConnectedAgentDetailPanel } from "../components/agent-panel-connected";
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
@@ -36,10 +37,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 
 /* ── Layout ────────────────────────────────────────────────────── */
 
-function layoutAgents(
-  agents: Agent[],
-  viewWidth: number,
-): { nodes: LayoutNode[]; edges: Edge[] } {
+function layoutAgents(agents: Agent[], viewWidth: number): { nodes: LayoutNode[]; edges: Edge[] } {
   if (agents.length === 0) return { nodes: [], edges: [] };
 
   // Group into tiers by level
@@ -277,20 +275,18 @@ function NetworkNode({
 
 export function NetworkPage() {
   const { agents, loading, error } = useAgents();
-  const { tasks } = useTasks();
-  const { openAgentPanel } = useDashboardPanels({
-    agents: agents as Parameters<typeof useDashboardPanels>[0]["agents"],
-    tasks: (tasks ?? []) as Parameters<typeof useDashboardPanels>[0]["tasks"],
-  });
+  const { openSidePanel, closeSidePanel } = useSidePanel();
+  const openAgentPanel = (id: string) => {
+    openSidePanel(<ConnectedAgentDetailPanel agentId={id} onClose={closeSidePanel} />, {
+      width: 540,
+    });
+  };
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const viewWidth = 900;
 
-  const { nodes, edges } = useMemo(
-    () => layoutAgents(agents, viewWidth),
-    [agents, viewWidth],
-  );
+  const { nodes, edges } = useMemo(() => layoutAgents(agents, viewWidth), [agents, viewWidth]);
 
   // Compute total SVG height from node positions
   const svgHeight = useMemo(() => {
@@ -352,9 +348,7 @@ export function NetworkPage() {
           )}
 
           {!loading && !error && agents.length === 0 && (
-            <p className="text-sm text-white/40 py-8 text-center">
-              No agents found.
-            </p>
+            <p className="text-sm text-white/40 py-8 text-center">No agents found.</p>
           )}
 
           {!loading && !error && agents.length > 0 && (
