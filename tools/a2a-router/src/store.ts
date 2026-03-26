@@ -169,6 +169,7 @@ export class Store {
     stmt.run(agent.agent_id, agent.name, skills, agent.gateway_url, agent.gateway_token ?? null, agent.hook_path ?? "/hooks/agent");
     const result = this.getAgent(agent.agent_id);
     if (!result) throw new Error(`Failed to upsert agent ${agent.agent_id}`);
+    this.events.emit("agent-registered", { agent: result });
     return result;
   }
 
@@ -205,6 +206,7 @@ export class Store {
     `).run(id, senderId, targetId, message);
     const task = this.getTask(id);
     if (!task) throw new Error(`Failed to create task ${id}`);
+    this.events.emit("task-created", { task });
     return task;
   }
 
@@ -254,6 +256,7 @@ export class Store {
       kind: "status-update",
       status: { state: status, message: result, timestamp: new Date().toISOString() },
     });
+    this.events.emit("task-status", { taskId, status, result: result ?? null });
     return this.getTask(taskId);
   }
 
@@ -302,6 +305,11 @@ export class Store {
 
     const task = this.getA2ATask(id);
     if (!task) throw new Error(`Failed to create A2A task ${id}`);
+    // Emit for sync — use internal format
+    const internalTask = this.getTask(id);
+    if (internalTask) {
+      this.events.emit("task-created", { task: internalTask });
+    }
     return task;
   }
 
@@ -362,6 +370,7 @@ export class Store {
       kind: "status-update",
       status: { state, message: statusMessage, timestamp: new Date().toISOString() },
     });
+    this.events.emit("task-status", { taskId, status: state, result: statusMessage ?? null });
 
     return this.getA2ATask(taskId);
   }
