@@ -19,7 +19,7 @@ This document evaluates whether OpenSpawn needs a three-layer communication stac
 
 OpenSpawn's SSE push (`apps/api/app/events/sse_router.py`) already delivers real-time artifact and event notifications to subscribed agents. An agent publishing a `ComponentArtifact` triggers `artifact.published` SSE events to all subscribers. This covers the "something happened" case well.
 
-What SSE notifications *don't* cover is **continuous status** — the peripheral awareness signals that let agents (and humans) know what's happening *between* discrete events:
+What SSE notifications _don't_ cover is **continuous status** — the peripheral awareness signals that let agents (and humans) know what's happening _between_ discrete events:
 
 - "I'm 60% through writing tests for UserForm"
 - "I'm blocked waiting on the API contract"
@@ -46,11 +46,11 @@ The coordinator broadcasts this to all agents in the same task tree via SSE. No 
 
 ### Implementation options
 
-| Option | Complexity | Latency | Scalability |
-|--------|-----------|---------|-------------|
-| **SSE broadcast** (extend existing `EventBus`) | Trivial — add a `status.update` event type, skip DB persistence | ~10ms | Single-process; sufficient for v1 |
-| **Redis pub/sub** | Low — swap `InMemoryBackend` for Redis (bus.py already has `BusBackend` protocol) | ~5ms | Multi-process ready |
-| **In-memory dict + polling** | Trivial — agents poll `/agents/status` | 1-5s (polling interval) | Scales poorly |
+| Option                                         | Complexity                                                                        | Latency                 | Scalability                       |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------- | --------------------------------- |
+| **SSE broadcast** (extend existing `EventBus`) | Trivial — add a `status.update` event type, skip DB persistence                   | ~10ms                   | Single-process; sufficient for v1 |
+| **Redis pub/sub**                              | Low — swap `InMemoryBackend` for Redis (bus.py already has `BusBackend` protocol) | ~5ms                    | Multi-process ready               |
+| **In-memory dict + polling**                   | Trivial — agents poll `/agents/status`                                            | 1-5s (polling interval) | Scales poorly                     |
 
 **Recommendation:** SSE broadcast. The `EventBus` already supports a `BusBackend` protocol abstraction (`apps/api/app/events/bus.py`). Adding a non-persisted `status.update` SSE event type is ~50 lines of code. The architecture is already designed for this.
 
@@ -78,13 +78,13 @@ This layer is **already implemented** across three subsystems:
 
 ### What gaps remain?
 
-| Gap | Impact | Severity |
-|-----|--------|----------|
-| **No cross-task-tree artifact references** | Agent in Task A can't reference artifacts from Task B | Medium — matters when multiple features share components |
-| **No artifact dependency graph** | Can't express "this TestPlan depends on this Component" formally | Low — `source_artifact_ids` exists but isn't enforced |
-| **No event schema validation** | Event payloads are arbitrary dicts; no runtime validation of `ComponentCreated` shape | Low — works fine now, tech debt later |
-| **No causal ordering** | Events use sequence numbers, not vector clocks; concurrent events from two agents have arbitrary ordering | Low — single coordinator serializes writes today |
-| **Projection rebuild cost** | `project_component_registry()` replays all events on every call; no caching | Low — fine at current scale (<1K events per task) |
+| Gap                                        | Impact                                                                                                    | Severity                                                 |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **No cross-task-tree artifact references** | Agent in Task A can't reference artifacts from Task B                                                     | Medium — matters when multiple features share components |
+| **No artifact dependency graph**           | Can't express "this TestPlan depends on this Component" formally                                          | Low — `source_artifact_ids` exists but isn't enforced    |
+| **No event schema validation**             | Event payloads are arbitrary dicts; no runtime validation of `ComponentCreated` shape                     | Low — works fine now, tech debt later                    |
+| **No causal ordering**                     | Events use sequence numbers, not vector clocks; concurrent events from two agents have arbitrary ordering | Low — single coordinator serializes writes today         |
+| **Projection rebuild cost**                | `project_component_registry()` replays all events on every call; no caching                               | Low — fine at current scale (<1K events per task)        |
 
 ### How well do artifacts + events cover structured coordination?
 
@@ -106,12 +106,12 @@ The main unsupported pattern is **concurrent editing of the same artifact by mul
 
 In OpenSpawn's current architecture, agents work on **separate subtasks** within a task tree. The coordination model is publish/subscribe, not concurrent editing. Conflicts would arise in:
 
-| Scenario | Likelihood | Current Mitigation |
-|----------|-----------|-------------------|
-| Two agents update the same component artifact | Low — task decomposition assigns components to specific agents | Artifact versioning (monotonic version counter) |
-| Two agents add entries to a shared registry | Medium — component registry is a projection, not a mutable document | Event replay rebuilds projection from scratch |
-| Two agents update a shared test plan | Low — test agents own their test files | Separate artifacts per agent |
-| Progress counters (5 agents reporting % done) | High if gossip exists | Last-write-wins on per-agent status |
+| Scenario                                      | Likelihood                                                          | Current Mitigation                              |
+| --------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------- |
+| Two agents update the same component artifact | Low — task decomposition assigns components to specific agents      | Artifact versioning (monotonic version counter) |
+| Two agents add entries to a shared registry   | Medium — component registry is a projection, not a mutable document | Event replay rebuilds projection from scratch   |
+| Two agents update a shared test plan          | Low — test agents own their test files                              | Separate artifacts per agent                    |
+| Progress counters (5 agents reporting % done) | High if gossip exists                                               | Last-write-wins on per-agent status             |
 
 **Key insight:** OpenSpawn's task decomposition model inherently reduces concurrent writes. Agents don't share mutable documents — they publish artifacts and emit events. The coordination pattern is closer to a message bus than Google Docs.
 
@@ -123,13 +123,13 @@ The only scenario where LWW would lose data: two agents simultaneously publishin
 
 ### What's the smallest useful CRDT?
 
-| CRDT | Use Case in OpenSpawn | Complexity | Value |
-|------|----------------------|------------|-------|
-| **G-Counter** | Aggregate progress across agents ("3 of 5 agents done") | Trivial (~20 lines) | Low — can be computed from task statuses |
-| **LWW-Register** | Per-agent status (last heartbeat wins) | Trivial (~15 lines) | Low — in-memory dict does the same thing |
-| **OR-Set** (Observed-Remove Set) | Shared component registry (agents add/remove entries concurrently) | Moderate (~100 lines + merge logic) | Low — event projections already solve this |
-| **LWW-Element-Set** | Shared key-value store with concurrent updates | Moderate | Low — artifact bus covers this |
-| **RGA** (Replicated Growable Array) | Collaborative text editing | High (~500+ lines) | None — agents don't co-edit text |
+| CRDT                                | Use Case in OpenSpawn                                              | Complexity                          | Value                                      |
+| ----------------------------------- | ------------------------------------------------------------------ | ----------------------------------- | ------------------------------------------ |
+| **G-Counter**                       | Aggregate progress across agents ("3 of 5 agents done")            | Trivial (~20 lines)                 | Low — can be computed from task statuses   |
+| **LWW-Register**                    | Per-agent status (last heartbeat wins)                             | Trivial (~15 lines)                 | Low — in-memory dict does the same thing   |
+| **OR-Set** (Observed-Remove Set)    | Shared component registry (agents add/remove entries concurrently) | Moderate (~100 lines + merge logic) | Low — event projections already solve this |
+| **LWW-Element-Set**                 | Shared key-value store with concurrent updates                     | Moderate                            | Low — artifact bus covers this             |
+| **RGA** (Replicated Growable Array) | Collaborative text editing                                         | High (~500+ lines)                  | None — agents don't co-edit text           |
 
 **The smallest useful CRDT is a G-Counter for progress tracking**, but it provides negligible value over computing progress from existing task status fields (`compute_parent_status` in `status_sync.py` already aggregates child statuses).
 
@@ -169,7 +169,7 @@ Contrast with the current approach: artifact version conflicts are explicit (ver
 
 The closest analogy is **MetaGPT's shared message pool**, which is essentially an append-only event log (similar to our Event Mesh) — not a CRDT.
 
-**Real-world CRDT users** (Figma, Google Docs, Linear) solve a fundamentally different problem: multiple *humans* editing the same document with sub-second latency requirements. Agent coordination is batch-oriented, not interactive.
+**Real-world CRDT users** (Figma, Google Docs, Linear) solve a fundamentally different problem: multiple _humans_ editing the same document with sub-second latency requirements. Agent coordination is batch-oriented, not interactive.
 
 ### Would this be a meaningful differentiator or over-engineering?
 
@@ -182,11 +182,13 @@ OpenSpawn's current positioning is task orchestration, not real-time collaborati
 ### Under what conditions should we add each layer?
 
 **Layer 1 (Gossip) — Add when:**
+
 - Dashboard needs real-time agent progress visualization
 - Agents need to make decisions based on other agents' current state (e.g., "Agent B is blocked on what I'm producing, I should reprioritize")
 - Users report confusion about what agents are doing during long-running tasks
 
 **Layer 3 (CRDTs) — Add when:**
+
 - Multiple agents demonstrably need to concurrently edit the same mutable document
 - Artifact version conflicts become frequent (monitor: HTTP 409 rates on artifact publish)
 - OpenSpawn pivots toward real-time collaborative agent workspaces
@@ -196,11 +198,11 @@ OpenSpawn's current positioning is task orchestration, not real-time collaborati
 
 ## Decision Matrix
 
-| Layer | Verdict | Trigger Signal | Estimated Effort | Risk of Not Building |
-|-------|---------|---------------|-----------------|---------------------|
-| **Layer 1: Gossip** | **Build after MVP launch** | Dashboard UX feedback requesting real-time progress; agent idle/blocked detection needs | 1-2 days (SSE broadcast extension) | Low — agents coordinate fine without ambient awareness |
-| **Layer 2: Structured** | **Already built** ✅ | N/A — Artifact Bus + Event Mesh + SSE Push are implemented | Done | N/A |
-| **Layer 3: CRDTs** | **Don't build** (revisit if triggers fire) | Frequent artifact version conflicts (>5% of publishes); multi-node deployment; pivot to collaborative workspaces | 1-2 weeks (basic), 4-6 weeks (production) | Very low — LWW + event projections handle all current scenarios |
+| Layer                   | Verdict                                    | Trigger Signal                                                                                                   | Estimated Effort                          | Risk of Not Building                                            |
+| ----------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| **Layer 1: Gossip**     | **Build after MVP launch**                 | Dashboard UX feedback requesting real-time progress; agent idle/blocked detection needs                          | 1-2 days (SSE broadcast extension)        | Low — agents coordinate fine without ambient awareness          |
+| **Layer 2: Structured** | **Already built** ✅                       | N/A — Artifact Bus + Event Mesh + SSE Push are implemented                                                       | Done                                      | N/A                                                             |
+| **Layer 3: CRDTs**      | **Don't build** (revisit if triggers fire) | Frequent artifact version conflicts (>5% of publishes); multi-node deployment; pivot to collaborative workspaces | 1-2 weeks (basic), 4-6 weeks (production) | Very low — LWW + event projections handle all current scenarios |
 
 ---
 
@@ -229,4 +231,4 @@ OpenSpawn's current positioning is task orchestration, not real-time collaborati
 
 ---
 
-*This document is research only — no code changes are implied. Reference from #664 epic for architectural decisions.*
+_This document is research only — no code changes are implied. Reference from #664 epic for architectural decisions._
