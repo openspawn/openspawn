@@ -134,13 +134,15 @@ async def send_message(
 
 @router.get("/messages")
 async def list_messages(
-    channel_id: uuid.UUID = Query(),
+    channel_id: uuid.UUID | None = Query(default=None),
     limit: int = Query(default=50, le=200),
     before: uuid.UUID | None = None,
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(require_auth),
 ) -> DataResponse[list[MessageResponse]]:
-    q = select(Message).where(Message.channel_id == channel_id, Message.org_id == auth.org_id)
+    q = select(Message).where(Message.org_id == auth.org_id)
+    if channel_id is not None:
+        q = q.where(Message.channel_id == channel_id)
     if before:
         # Get the created_at of the "before" message for cursor pagination
         ref = await db.execute(select(Message.created_at).where(Message.id == before))
