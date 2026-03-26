@@ -68,7 +68,10 @@ export {
 // Agent type — derived from shared-types, widening enum fields to string for API compat
 import type { AgentFields as _SharedAgentFields } from "@openspawn/shared-types";
 
-export type AgentFields = Omit<_SharedAgentFields, "role" | "mode" | "status" | "reputationLevel"> & {
+export type AgentFields = Omit<
+  _SharedAgentFields,
+  "role" | "mode" | "status" | "reputationLevel"
+> & {
   role: string;
   mode: string;
   status: string;
@@ -93,5 +96,3 @@ export * from "./lib/toast";
 // REST hooks + client
 export { api } from "./rest/client";
 export * from "./rest/hooks";
-
-export { useDashboardPanels, registerPanelComponents } from "./hooks/use-dashboard-panels";
