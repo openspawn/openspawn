@@ -125,7 +125,7 @@ function SidePanelOverlay() {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
-      <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]">
+      <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]" style={{ width: `${width}px` }}>
         <SidePanelShell
           title={title}
           onClose={closeSidePanel}
