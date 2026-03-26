@@ -12,7 +12,7 @@ import { useTeams } from "../../hooks";
 import { useSidePanel } from "../../contexts";
 import { TeamFilterDropdown } from "../../components/team-badge";
 import { TaskTimeline } from "../../components/task-timeline";
-import { AgentDetailPanel } from "../../components/agent-detail-panel";
+import { ConnectedAgentDetailPanel } from "../../components/agent-panel-connected";
 import { SortDirection, TaskSortField } from "../../lib/enums";
 import { PRIORITY_ORDER, STATUS_ORDER } from "./task-helpers";
 import { TaskDetailSidebar } from "./task-detail-sidebar";
@@ -141,7 +141,9 @@ export function TasksPage() {
   }
 
   function handleAgentClick(agentId: string) {
-    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
+    openSidePanel(<ConnectedAgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, {
+      width: 540,
+    });
   }
 
   if (loading) {

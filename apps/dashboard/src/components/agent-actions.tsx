@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSidePanel } from "../contexts";
-import { AgentDetailPanel } from "./agent-detail-panel";
+import { ConnectedAgentDetailPanel } from "./agent-panel-connected";
 
 interface AgentActionsProps {
   agentId: string;
@@ -25,7 +25,9 @@ export function AgentActions({ agentId, agentStatus, agentName }: AgentActionsPr
   const revoke = useRevokeAgent(agentId);
 
   const handleViewDetails = () => {
-    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
+    openSidePanel(<ConnectedAgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, {
+      width: 540,
+    });
   };
 
   const handleActivate = async () => {

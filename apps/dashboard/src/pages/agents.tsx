@@ -34,7 +34,7 @@ import { BudgetManager } from "../components/budget-manager";
 import { CapabilityManager } from "../components/capability-manager";
 import { TeamView } from "../components/team-view";
 import { EmptyState } from "../components/ui/empty-state";
-import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { ConnectedAgentDetailPanel } from "../components/agent-panel-connected";
 import { TeamDetailPanel } from "../components/team-detail-panel";
 import { TeamDialog } from "../components/team-management";
 import { getParentTeams } from "../demo/teams";
@@ -66,7 +66,9 @@ export function AgentsPage() {
   const [spawnModalOpen, setSpawnModalOpen] = useState(false);
 
   const openAgentDetail = (agentId: string) => {
-    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
+    openSidePanel(<ConnectedAgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, {
+      width: 540,
+    });
   };
 
   const openTeamDetail = (teamId: string) => {

@@ -9,7 +9,7 @@ import { useAgents } from "../hooks/use-agents";
 import { useTasks } from "../hooks/use-tasks";
 import { useSidePanel } from "../contexts";
 import { AgentAvatar } from "./agent-avatar";
-import { AgentDetailPanel } from "./agent-detail-panel";
+import { ConnectedAgentDetailPanel } from "./agent-panel-connected";
 
 interface ComputedEfficiency {
   id: string;
@@ -84,7 +84,9 @@ export function AgentEfficiencyLeaderboard() {
   }, [agents, tasks]);
 
   const handleRowClick = (agentId: string) => {
-    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
+    openSidePanel(<ConnectedAgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, {
+      width: 540,
+    });
   };
 
   const loading = agentsLoading || tasksLoading;
