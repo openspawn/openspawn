@@ -9,7 +9,7 @@
 
 import { motion } from "motion/react";
 import { cn } from "../lib/utils";
-import type { PresenceStatus } from "../hooks/use-presence";
+import { PresenceStatus } from "../hooks/use-presence";
 
 /* ------------------------------------------------------------------ */
 /*  Color mappings                                                     */
@@ -161,7 +161,7 @@ export function ActiveAgentsBadge({ count, className }: ActiveAgentsBadgeProps) 
         className,
       )}
     >
-      <StatusDot status="active" size="sm" />
+      <StatusDot status={PresenceStatus.Active} size="sm" />
       <span>
         {count} agent{count !== 1 ? "s" : ""} active
       </span>

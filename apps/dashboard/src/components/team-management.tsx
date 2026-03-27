@@ -22,6 +22,7 @@ import {
   Wrench,
   Headphones,
   Palette,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";

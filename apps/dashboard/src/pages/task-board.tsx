@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useRepoTasks, type RepoTask, type RepoTaskStatus } from "../hooks/use-repo-tasks";
+import { useRepoTasks, RepoTaskStatus, type RepoTask } from "../hooks/use-repo-tasks";
 import { PageHeader } from "../components/ui/page-header";
 import { Clock, User, ExternalLink, Wifi, WifiOff, RefreshCw, AlertTriangle } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -9,21 +9,21 @@ type Column = { key: RepoTaskStatus[]; label: string; color: string; bg: string;
 
 const COLUMNS: Column[] = [
   {
-    key: ["open", "blocked"],
+    key: [RepoTaskStatus.Open, RepoTaskStatus.Blocked],
     label: "Open",
     color: "text-slate-400",
     bg: "bg-slate-500/5",
     border: "border-slate-500/20",
   },
   {
-    key: ["claimed", "in-progress"],
+    key: [RepoTaskStatus.Claimed, RepoTaskStatus.InProgress],
     label: "In Progress",
     color: "text-cyan-400",
     bg: "bg-cyan-500/5",
     border: "border-cyan-500/20",
   },
   {
-    key: ["done"],
+    key: [RepoTaskStatus.Done],
     label: "Done",
     color: "text-emerald-400",
     bg: "bg-emerald-500/5",

@@ -1,6 +1,6 @@
-import { PageHeader, Badge } from "@openspawn/dashboard-ui";
-import { useDashboardPanels } from "@openspawn/dashboard-data";
-import { useAgents, useTasks } from "../hooks";
+import { PageHeader, Badge, TaskDetailPanel } from "@openspawn/dashboard-ui";
+import { useSidePanel } from "@openspawn/dashboard-data";
+import { useTasks } from "../hooks";
 import { cn } from "../lib/utils";
 
 function priorityColor(p: string): string {
@@ -38,8 +38,11 @@ function statusBadge(s: string): {
 
 export function TasksPage() {
   const { tasks, loading } = useTasks();
-  const { agents } = useAgents();
-  const { openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const { openSidePanel } = useSidePanel();
+  const openTaskPanel = (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) openSidePanel(<TaskDetailPanel task={task} />, { width: 480, title: task.title });
+  };
 
   // Sort: active first (in_progress, review, todo, blocked, backlog), then done/cancelled
   const sorted = [...tasks].sort((a, b) => {

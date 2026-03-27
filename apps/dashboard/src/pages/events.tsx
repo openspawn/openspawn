@@ -127,9 +127,9 @@ function EventVirtualList({
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm">
-                    <span className="font-medium">{event.actor?.name || "System"}</span>{" "}
+                    <span className="font-medium">{event.actor || "System"}</span>{" "}
                     <span className="text-muted-foreground">
-                      {event.entityType} → {event.entityId.slice(0, 8)}...
+                      {event.entityType} → {event.entityId?.slice(0, 8) ?? ""}...
                     </span>
                   </p>
                   {event.reasoning && (

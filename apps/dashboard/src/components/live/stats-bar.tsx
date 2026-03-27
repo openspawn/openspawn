@@ -69,6 +69,7 @@ function StatValue({
       const t = setTimeout(() => setAnimating(false), 650);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, [value]);
 
   return (

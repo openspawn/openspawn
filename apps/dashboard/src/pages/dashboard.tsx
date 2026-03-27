@@ -391,9 +391,7 @@ export function DashboardPage() {
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="shrink-0">{getEventIcon(event.type)}</div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {event.actor?.name || "System"}
-                      </p>
+                      <p className="text-sm font-medium truncate">{event.actor || "System"}</p>
                       <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-[300px]">
                         {event.reasoning || event.type.replace(/\./g, " → ")}
                       </p>

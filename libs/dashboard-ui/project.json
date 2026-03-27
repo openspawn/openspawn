@@ -6,7 +6,21 @@
   "targets": {
     "lint": {
       "command": "oxlint libs/dashboard-ui/"
+    },
+    "typecheck": {
+      "command": "tsc --noEmit -p libs/dashboard-ui/tsconfig.json",
+      "dependsOn": ["^typecheck"],
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/package.json",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{projectRoot}/tsconfig.json",
+        "{projectRoot}/src/**/*.ts",
+        "{projectRoot}/src/**/*.tsx",
+        "^default"
+      ]
     }
   },
-  "tags": []
+  "tags": [],
+  "implicitDependencies": ["shared-types"]
 }

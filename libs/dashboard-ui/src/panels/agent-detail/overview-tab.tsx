@@ -1,23 +1,19 @@
-import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 import { Activity, Award, Coins, Zap } from "lucide-react";
 import { motion } from "motion/react";
-import { useMemo } from "react";
-import { useAgents } from "../../hooks/use-agents";
-import { Progress } from "../ui/progress";
-import { Sparkline, generateSparklineData } from "../ui/sparkline";
+import { Progress } from "../../ui/progress";
+import { Sparkline, generateSparklineData } from "../../ui/sparkline";
+import type { AgentDetailAgent } from "./types";
 
-type Agent = AgentFieldsFragment;
+interface OverviewTabProps {
+  agent: AgentDetailAgent;
+  parentAgentName?: string;
+  teamName?: string;
+}
 
-export function OverviewTab({ agent }: { agent: Agent }) {
-  const { agents } = useAgents();
-  const parentAgent = useMemo(
-    () => agents.find((a) => a.id === agent.parentId),
-    [agents, agent.parentId],
-  );
-
+export function OverviewTab({ agent, parentAgentName, teamName }: OverviewTabProps) {
   const trustScore = agent.trustScore ?? 50;
   const successRate =
-    agent.tasksCompleted && agent.tasksCompleted > 0
+    agent.tasksCompleted > 0
       ? Math.round(((agent.tasksSuccessful ?? 0) / agent.tasksCompleted) * 100)
       : 0;
 
@@ -36,7 +32,7 @@ export function OverviewTab({ agent }: { agent: Agent }) {
             <Activity className="h-4 w-4" />
             <span className="text-sm">Status</span>
           </div>
-          <p className="text-2xl font-bold">{agent.status}</p>
+          <p className="text-2xl font-bold capitalize">{agent.status}</p>
         </div>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -88,12 +84,18 @@ export function OverviewTab({ agent }: { agent: Agent }) {
       <div className="space-y-3">
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Domain</span>
-          <span className="text-sm font-medium">{agent.domain || "—"}</span>
+          <span className="text-sm font-medium">{agent.domain || "---"}</span>
         </div>
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Parent Agent</span>
-          <span className="text-sm font-medium">{parentAgent?.name || "—"}</span>
+          <span className="text-sm font-medium">{parentAgentName || "---"}</span>
         </div>
+        {teamName && (
+          <div className="flex justify-between py-2 border-b border-border">
+            <span className="text-sm text-muted-foreground">Team</span>
+            <span className="text-sm font-medium">{teamName}</span>
+          </div>
+        )}
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Model</span>
           <span className="text-sm font-medium">{agent.model}</span>
@@ -111,7 +113,7 @@ export function OverviewTab({ agent }: { agent: Agent }) {
         <div className="flex justify-between py-2 border-b border-border">
           <span className="text-sm text-muted-foreground">Last Activity</span>
           <span className="text-sm font-medium">
-            {agent.lastActivityAt ? new Date(agent.lastActivityAt).toLocaleString() : "—"}
+            {agent.lastActivityAt ? new Date(agent.lastActivityAt).toLocaleString() : "---"}
           </span>
         </div>
         <div className="flex justify-between py-2 border-b border-border">

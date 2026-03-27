@@ -125,7 +125,10 @@ function SidePanelOverlay() {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={closeSidePanel} />
-      <div className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]" style={{ width: `${width}px` }}>
+      <div
+        className="fixed inset-y-0 right-0 z-50 bg-[hsl(var(--background))]"
+        style={{ width: `${width}px` }}
+      >
         <SidePanelShell
           title={title}
           onClose={closeSidePanel}
@@ -194,9 +197,7 @@ export function Layout({ children }: LayoutProps) {
                 <div
                   className={cn(
                     "mb-2",
-                    collapsed
-                      ? "md:border-t md:border-white/5 md:mx-2 md:pt-0 md:mb-3"
-                      : "",
+                    collapsed ? "md:border-t md:border-white/5 md:mx-2 md:pt-0 md:mb-3" : "",
                   )}
                 >
                   <span
@@ -270,10 +271,7 @@ export function Layout({ children }: LayoutProps) {
             {onlineAgents.map((a) => (
               <div
                 key={a.id}
-                className={cn(
-                  "flex items-center gap-1.5",
-                  collapsed && "md:justify-center",
-                )}
+                className={cn("flex items-center gap-1.5", collapsed && "md:justify-center")}
                 title={collapsed ? `${a.name} — ${a.status}` : undefined}
               >
                 <div

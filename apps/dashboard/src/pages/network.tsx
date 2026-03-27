@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AgentNetwork } from "../components/agent-network";
 import { OrgChart } from "../components/org-chart";
-import { AgentDetailPanel } from "../components/agent-detail-panel";
+import { ConnectedAgentDetailPanel } from "../components/agent-panel-connected";
 import { TeamDetailPanel } from "../components/team-detail-panel";
 import { useAgents } from "../hooks";
 import { useSidePanel } from "../contexts";
@@ -20,7 +20,9 @@ export function NetworkPage() {
   const [view, setView] = useState<NetworkView>(NetworkView.Network);
   const { openSidePanel, closeSidePanel } = useSidePanel();
   const openAgentDetail = (agentId: string) => {
-    openSidePanel(<AgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, { width: 520 });
+    openSidePanel(<ConnectedAgentDetailPanel agentId={agentId} onClose={closeSidePanel} />, {
+      width: 540,
+    });
   };
 
   const openTeamDetail = (teamId: string) => {

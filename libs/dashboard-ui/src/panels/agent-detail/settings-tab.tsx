@@ -1,11 +1,8 @@
-import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
-import { useUpdateAgent } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import { Slider } from "../ui/slider";
-
-type Agent = AgentFieldsFragment;
+import { Button } from "../../ui/button";
+import { Slider } from "../../ui/slider";
+import type { AgentDetailAgent } from "./types";
 
 const AUTONOMY_LABELS: Record<number, string> = {
   0: "Full oversight",
@@ -17,13 +14,17 @@ function autonomyLabel(level: number): string {
   return AUTONOMY_LABELS[level] ?? `Level ${level}`;
 }
 
-export function SettingsTab({ agent }: { agent: Agent }) {
+interface SettingsTabProps {
+  agent: AgentDetailAgent;
+  onSaveSettings?: (payload: { default_autonomy_level: number }) => void;
+}
+
+export function SettingsTab({ agent, onSaveSettings }: SettingsTabProps) {
   const [name, setName] = useState(agent.name);
   const [role, setRole] = useState<string>(agent.role);
   const [domain, setDomain] = useState(agent.domain || "");
   const [autonomy, setAutonomy] = useState(agent.defaultAutonomyLevel ?? 5);
   const [hasChanges, setHasChanges] = useState(false);
-  const updateAgent = useUpdateAgent(agent.id);
 
   useEffect(() => {
     const changed =
@@ -34,17 +35,17 @@ export function SettingsTab({ agent }: { agent: Agent }) {
     setHasChanges(changed);
   }, [name, role, domain, autonomy, agent]);
 
-  const handleSave = () => {
-    updateAgent.mutate({ default_autonomy_level: autonomy });
+  function handleSave() {
+    onSaveSettings?.({ default_autonomy_level: autonomy });
     setHasChanges(false);
-  };
+  }
 
-  const handleReset = () => {
+  function handleReset() {
     setName(agent.name);
     setRole(agent.role);
     setDomain(agent.domain || "");
     setAutonomy(agent.defaultAutonomyLevel ?? 5);
-  };
+  }
 
   return (
     <motion.div

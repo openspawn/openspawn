@@ -309,7 +309,7 @@ function AgentNetworkInner({ className, onAgentClick }: AgentNetworkProps) {
   const demo = useDemo();
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
-  const { messages } = useMessages(100);
+  const { messages } = useMessages();
   const { conversations } = useConversations();
   const { fitView, setCenter } = useReactFlow();
   const { isMobileOrTouch, isMobile } = useTouchDevice();

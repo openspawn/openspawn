@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAgents, usePresence, useAgentHealth, useTasks } from "../hooks";
-import type { PresenceStatus } from "../hooks";
+import { PresenceStatus } from "../hooks";
 import { AgentAvatar } from "../components/agent-avatar";
 import { StatusDot } from "../components/presence";
 import { Sparkline, generateSparklineData } from "../components/ui/sparkline";
@@ -319,7 +319,7 @@ export function MobileStatusPage() {
     const groups: Map<PresenceStatus, AgentFieldsFragment[]> = new Map();
 
     for (const agent of agents) {
-      const presence = presenceMap.get(agent.id)?.status ?? "idle";
+      const presence = presenceMap.get(agent.id)?.status ?? PresenceStatus.Idle;
       const existing = groups.get(presence);
       if (existing) {
         existing.push(agent);
@@ -341,7 +341,10 @@ export function MobileStatusPage() {
 
   // Compute summary stats
   const inProgressTasks = useMemo(
-    () => (tasks ?? []).filter((t) => t.status === "in_progress" || t.status === "assigned").length,
+    () =>
+      (tasks ?? []).filter(
+        (t: { status: string }) => t.status === "in_progress" || t.status === "assigned",
+      ).length,
     [tasks],
   );
 
@@ -438,7 +441,7 @@ export function MobileStatusPage() {
                   <AgentRow
                     key={agent.id}
                     agent={agent}
-                    presence={presence?.status ?? "idle"}
+                    presence={presence?.status ?? PresenceStatus.Idle}
                     currentTask={presence?.currentTask}
                     health={health}
                     expanded={expandedId === agent.id}

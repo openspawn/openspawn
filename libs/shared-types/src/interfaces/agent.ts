@@ -27,4 +27,6 @@ export interface AgentFields {
   teamId?: string | null;
   avatar?: string | null;
   avatarColor?: string | null;
+  avatarUrl?: string | null;
+  defaultAutonomyLevel: number;
 }

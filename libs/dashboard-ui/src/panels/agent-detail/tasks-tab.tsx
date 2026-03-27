@@ -1,14 +1,11 @@
-import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 import { TaskStatus } from "@openspawn/shared-types";
 import { Calendar } from "lucide-react";
 import { motion } from "motion/react";
 import { useMemo } from "react";
-import { useTasks } from "../../hooks/use-tasks";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
+import type { AgentDetailAgent, AgentDetailTask } from "./types";
 
-type Agent = AgentFieldsFragment;
-
-function getTaskStatusBadge(status: TaskStatus): {
+function getTaskStatusBadge(status: string): {
   variant: "success" | "warning" | "destructive" | "secondary";
   label: string;
 } {
@@ -28,29 +25,27 @@ function getTaskStatusBadge(status: TaskStatus): {
   }
 }
 
-export function TasksTab({ agent }: { agent: Agent }) {
-  const { tasks, loading } = useTasks();
+interface TasksTabProps {
+  agent: AgentDetailAgent;
+  tasks: AgentDetailTask[];
+  tasksLoading?: boolean;
+  onTaskClick?: (taskId: string) => void;
+}
 
-  const agentTasks = useMemo(
-    () => tasks.filter((t) => t.assigneeId === agent.id),
-    [tasks, agent.id],
-  );
-
+export function TasksTab({ tasks, tasksLoading, onTaskClick }: TasksTabProps) {
   const tasksByStatus = useMemo(
     () => ({
-      completed: agentTasks.filter((t) => t.status === TaskStatus.DONE),
-      inProgress: agentTasks.filter((t) => t.status === TaskStatus.IN_PROGRESS),
-      pending: agentTasks.filter(
-        (t) => t.status === TaskStatus.BACKLOG || t.status === TaskStatus.TODO,
-      ),
-      failed: agentTasks.filter(
+      completed: tasks.filter((t) => t.status === TaskStatus.DONE),
+      inProgress: tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS),
+      pending: tasks.filter((t) => t.status === TaskStatus.BACKLOG || t.status === TaskStatus.TODO),
+      failed: tasks.filter(
         (t) => t.status === TaskStatus.CANCELLED || t.status === TaskStatus.BLOCKED,
       ),
     }),
-    [agentTasks],
+    [tasks],
   );
 
-  if (loading) {
+  if (tasksLoading) {
     return <div className="text-center text-muted-foreground py-8">Loading tasks...</div>;
   }
 
@@ -86,20 +81,21 @@ export function TasksTab({ agent }: { agent: Agent }) {
 
       {/* Task List */}
       <div className="space-y-2">
-        {agentTasks.length === 0 ? (
+        {tasks.length === 0 ? (
           <div className="text-center text-muted-foreground py-12 border border-dashed border-border rounded-lg">
             No tasks assigned to this agent yet
           </div>
         ) : (
-          agentTasks.map((task, index) => {
+          tasks.map((task, index) => {
             const statusInfo = getTaskStatusBadge(task.status);
             return (
-              <motion.div
+              <motion.button
                 key={task.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                className="w-full text-left p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                onClick={() => onTaskClick?.(task.id)}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -126,7 +122,7 @@ export function TasksTab({ agent }: { agent: Agent }) {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </motion.button>
             );
           })
         )}

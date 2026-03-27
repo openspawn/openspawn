@@ -1,15 +1,16 @@
-import type { AgentFieldsFragment } from "@openspawn/dashboard-data";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import { useMemo } from "react";
-import { useCredits } from "../../hooks/use-credits";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
+import type { AgentDetailAgent, AgentDetailTransaction } from "./types";
 
-type Agent = AgentFieldsFragment;
+interface CreditsTabProps {
+  agent: AgentDetailAgent;
+  transactions: AgentDetailTransaction[];
+  transactionsLoading?: boolean;
+}
 
-export function CreditsTab({ agent }: { agent: Agent }) {
-  const { transactions: creditHistory, loading } = useCredits(undefined, agent.id, 20);
-
+export function CreditsTab({ agent, transactions, transactionsLoading }: CreditsTabProps) {
   const chartData = useMemo(() => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
@@ -18,7 +19,7 @@ export function CreditsTab({ agent }: { agent: Agent }) {
     });
 
     return last7Days.map((date) => {
-      const dayTransactions = creditHistory.filter((h) => h.createdAt.startsWith(date));
+      const dayTransactions = transactions.filter((h) => h.createdAt.startsWith(date));
       const earned = dayTransactions
         .filter((h) => h.amount > 0)
         .reduce((sum, h) => sum + h.amount, 0);
@@ -32,13 +33,13 @@ export function CreditsTab({ agent }: { agent: Agent }) {
         spent,
       };
     });
-  }, [creditHistory]);
+  }, [transactions]);
 
-  const totalEarned = creditHistory
+  const totalEarned = transactions
     .filter((h) => h.amount > 0)
     .reduce((sum, h) => sum + h.amount, 0);
   const totalSpent = Math.abs(
-    creditHistory.filter((h) => h.amount < 0).reduce((sum, h) => sum + h.amount, 0),
+    transactions.filter((h) => h.amount < 0).reduce((sum, h) => sum + h.amount, 0),
   );
 
   return (
@@ -111,14 +112,14 @@ export function CreditsTab({ agent }: { agent: Agent }) {
       <div>
         <h3 className="text-sm font-medium mb-3">Recent Transactions</h3>
         <div className="space-y-2">
-          {loading ? (
+          {transactionsLoading ? (
             <div className="text-center text-muted-foreground py-8">Loading transactions...</div>
-          ) : creditHistory.length === 0 ? (
+          ) : transactions.length === 0 ? (
             <div className="text-center text-muted-foreground py-12 border border-dashed border-border rounded-lg">
               No transaction history yet
             </div>
           ) : (
-            creditHistory.map((transaction, index) => (
+            transactions.map((transaction, index) => (
               <motion.div
                 key={transaction.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -143,9 +144,11 @@ export function CreditsTab({ agent }: { agent: Agent }) {
                   <p className="text-xs text-muted-foreground mt-1">
                     {transaction.reason || "No description"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Balance: {transaction.balanceAfter.toLocaleString()}
-                  </p>
+                  {transaction.balanceAfter != null && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Balance: {transaction.balanceAfter.toLocaleString()}
+                    </p>
+                  )}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date(transaction.createdAt).toLocaleDateString()}

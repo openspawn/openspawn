@@ -1,11 +1,7 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { Search, Brain, ThumbsUp, ThumbsDown, Network } from "lucide-react";
 import { PageHeader, EmptyState } from "@openspawn/dashboard-ui";
-import {
-  useMemorySearch,
-  useGraphCytoscape,
-  useAgents,
-} from "@openspawn/dashboard-data";
+import { useMemorySearch, useGraphCytoscape, useAgents } from "@openspawn/dashboard-data";
 import { useMemoryList, useMemoryFeedback } from "@openspawn/dashboard-data";
 import { cn } from "../lib/utils";
 import { useSearch, useNavigate } from "@tanstack/react-router";
@@ -52,7 +48,8 @@ export function MemoryPage() {
   const tab = (search.tab === "graph" ? "graph" : "feed") as TabId;
 
   const setTab = useCallback(
-    (t: TabId) => navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: t }), replace: true }),
+    (t: TabId) =>
+      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, tab: t }), replace: true }),
     [navigate],
   );
 
@@ -102,25 +99,40 @@ function MemoryFeed() {
 
   const setParam = useCallback(
     (updates: Record<string, unknown>) =>
-      navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, ...updates }), replace: true }),
+      navigate({
+        search: (prev: Record<string, unknown>) => ({ ...prev, ...updates }),
+        replace: true,
+      }),
     [navigate],
   );
-  const setTypeFilter = useCallback((t: string | null) => setParam({ type: t || undefined, page: 0 }), [setParam]);
-  const setAgentFilter = useCallback((a: string | null) => setParam({ agent: a || undefined, page: 0 }), [setParam]);
-  const setPage = useCallback((p: number | ((prev: number) => number)) => {
-    const next = typeof p === "function" ? p(page) : p;
-    setParam({ page: next || undefined });
-  }, [setParam, page]);
+  const setTypeFilter = useCallback(
+    (t: string | null) => setParam({ type: t || undefined, page: 0 }),
+    [setParam],
+  );
+  const setAgentFilter = useCallback(
+    (a: string | null) => setParam({ agent: a || undefined, page: 0 }),
+    [setParam],
+  );
+  const setPage = useCallback(
+    (p: number | ((prev: number) => number)) => {
+      const next = typeof p === "function" ? p(page) : p;
+      setParam({ page: next || undefined });
+    },
+    [setParam, page],
+  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchLocal(value);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setParam({ q: value.trim() || undefined, page: 0 });
-    }, 300);
-  }, [setParam]);
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchLocal(value);
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        setParam({ q: value.trim() || undefined, page: 0 });
+      }, 300);
+    },
+    [setParam],
+  );
 
   // Fetch agents for filter chips
   const { agents } = useAgents();
@@ -145,11 +157,15 @@ function MemoryFeed() {
       return items.map((m: Record<string, unknown>) => ({
         id: (m as { memory_id?: string }).memory_id ?? (m as { id?: string }).id ?? "",
         content: (m as { content?: string }).content ?? "",
-        type: (m as { memory_type?: string }).memory_type ?? (m as { type?: string }).type ?? "fact",
+        type:
+          (m as { memory_type?: string }).memory_type ?? (m as { type?: string }).type ?? "fact",
         agent_id: (m as { agent_id?: string }).agent_id ?? "",
         confidence: (m as { confidence?: number }).confidence ?? 0,
         created_at: (m as { created_at?: string }).created_at ?? "",
-        occurred_at: (m as { occurred_at?: string }).occurred_at ?? (m as { created_at?: string }).created_at ?? "",
+        occurred_at:
+          (m as { occurred_at?: string }).occurred_at ??
+          (m as { created_at?: string }).created_at ??
+          "",
         helpful_count: (m as { helpful_count?: number }).helpful_count ?? 0,
         unhelpful_count: (m as { unhelpful_count?: number }).unhelpful_count ?? 0,
         score: (m as { score?: number }).score,
@@ -167,7 +183,10 @@ function MemoryFeed() {
       agent_id: (m as { agent_id?: string }).agent_id ?? "",
       confidence: (m as { confidence?: number }).confidence ?? 0,
       created_at: (m as { created_at?: string }).created_at ?? "",
-      occurred_at: (m as { occurred_at?: string }).occurred_at ?? (m as { created_at?: string }).created_at ?? "",
+      occurred_at:
+        (m as { occurred_at?: string }).occurred_at ??
+        (m as { created_at?: string }).created_at ??
+        "",
       helpful_count: (m as { helpful_count?: number }).helpful_count ?? 0,
       unhelpful_count: (m as { unhelpful_count?: number }).unhelpful_count ?? 0,
       score: undefined as number | undefined,
@@ -270,7 +289,8 @@ function MemoryFeed() {
                 <span
                   className={cn(
                     "rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-                    TYPE_COLORS[memory.type] ?? "bg-slate-500/20 text-slate-400 border-slate-500/30",
+                    TYPE_COLORS[memory.type] ??
+                      "bg-slate-500/20 text-slate-400 border-slate-500/30",
                   )}
                 >
                   {memory.type}
@@ -291,9 +311,7 @@ function MemoryFeed() {
               {/* Bottom row: confidence + search score + feedback */}
               <div className="flex items-center gap-4 text-xs text-white/30">
                 <span>Confidence: {Math.round(memory.confidence * 100)}%</span>
-                {memory.score != null && (
-                  <span>Relevance: {Math.round(memory.score * 100)}%</span>
-                )}
+                {memory.score != null && <span>Relevance: {Math.round(memory.score * 100)}%</span>}
                 <div className="ml-auto flex items-center gap-1">
                   <button
                     onClick={() => {
@@ -444,7 +462,8 @@ function KnowledgeGraph() {
       ...nodes.map((n: { data: Record<string, unknown> }) => ({
         data: {
           ...n.data,
-          label: (n.data.label as string) ?? (n.data.name as string) ?? (n.data.id as string) ?? "?",
+          label:
+            (n.data.label as string) ?? (n.data.name as string) ?? (n.data.id as string) ?? "?",
           type: (n.data.type as string) ?? "entity",
         },
       })),
@@ -496,7 +515,10 @@ function KnowledgeGraph() {
       </div>
 
       {/* Graph container */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden relative" style={{ height: 500 }}>
+      <div
+        className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden relative"
+        style={{ height: 500 }}
+      >
         <CytoscapeComponent
           elements={elements}
           stylesheet={CYTOSCAPE_STYLESHEET}
@@ -521,7 +543,9 @@ function KnowledgeGraph() {
               {(selectedNode.type as string) ?? "node"}
             </span>
             <span className="text-sm font-medium text-white">
-              {(selectedNode.label as string) ?? (selectedNode.name as string) ?? (selectedNode.id as string)}
+              {(selectedNode.label as string) ??
+                (selectedNode.name as string) ??
+                (selectedNode.id as string)}
             </span>
           </div>
           {selectedNode.entity_type && (

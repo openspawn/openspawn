@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { useDashboardPanels } from "@openspawn/dashboard-data";
+import { useSidePanel } from "@openspawn/dashboard-data";
 import { motion } from "motion/react";
 import {
   PageHeader,
@@ -25,6 +25,8 @@ import {
   CircleDot,
 } from "lucide-react";
 import { useAgents, useTasks, useEvents, type Agent, type Task } from "../hooks";
+import { ConnectedAgentDetailPanel } from "../components/agent-panel-connected";
+import { TaskDetailPanel } from "@openspawn/dashboard-ui";
 import { AgentStatus, TaskStatus, TaskPriority } from "@openspawn/dashboard-data";
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -230,7 +232,16 @@ export function DashboardPage() {
   const { agents, loading: agentsLoading } = useAgents();
   const { tasks, loading: tasksLoading } = useTasks();
   const { events } = useEvents();
-  const { openAgentPanel, openTaskPanel } = useDashboardPanels({ agents, tasks });
+  const { openSidePanel, closeSidePanel } = useSidePanel();
+  const openAgentPanel = (id: string) => {
+    openSidePanel(<ConnectedAgentDetailPanel agentId={id} onClose={closeSidePanel} />, {
+      width: 540,
+    });
+  };
+  const openTaskPanel = (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) openSidePanel(<TaskDetailPanel task={task} />, { width: 480, title: task.title });
+  };
 
   const stats = useMemo(() => {
     const norm = (s: string) => s.toLowerCase();

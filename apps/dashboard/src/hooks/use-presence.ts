@@ -1,1 +1,1 @@
-export { usePresence, type AgentPresence, type PresenceStatus } from "@openspawn/dashboard-data";
+export { usePresence, PresenceStatus, type AgentPresence } from "@openspawn/dashboard-data";

@@ -148,7 +148,7 @@ export interface ReplayEvent {
     text?: string;
     act?: number;
     agent?: string;
-    status?: NodeStatus;
+    status?: `${NodeStatus}`;
     stats?: Partial<Stats>;
     pattiesProduced?: number;
     pattiesDelivered?: number;
@@ -1138,17 +1138,25 @@ export const TIMELINE: ReplayEvent[] = [
     data: { from: "plankton", text: "Hmm... next time I'll order 20,000. HAHAHAHA!" },
   },
   // Final — all nodes green
-  { tick: 148, type: "node_status", data: { agent: "mr-krabs", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "spongebob-squarepants", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "squilliam-fancyson", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "sandy-cheeks", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "karen", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "patrick-star", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "gary", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "pearl-krabs", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "perch-perkins", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "barnacle-boy", status: "idle" } },
-  { tick: 148, type: "node_status", data: { agent: "fred-1", status: "idle" } },
+  { tick: 148, type: "node_status", data: { agent: "mr-krabs", status: NodeStatus.Idle } },
+  {
+    tick: 148,
+    type: "node_status",
+    data: { agent: "spongebob-squarepants", status: NodeStatus.Idle },
+  },
+  {
+    tick: 148,
+    type: "node_status",
+    data: { agent: "squilliam-fancyson", status: NodeStatus.Idle },
+  },
+  { tick: 148, type: "node_status", data: { agent: "sandy-cheeks", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "karen", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "patrick-star", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "gary", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "pearl-krabs", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "perch-perkins", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "barnacle-boy", status: NodeStatus.Idle } },
+  { tick: 148, type: "node_status", data: { agent: "fred-1", status: NodeStatus.Idle } },
   {
     tick: 150,
     type: "completion",
