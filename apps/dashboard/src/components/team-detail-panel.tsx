@@ -299,7 +299,7 @@ export function TeamDetailPanel({ teamId, onAgentClick, onTeamClick }: TeamDetai
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="sm" />
+                  <AgentModeBadge mode={(agent.mode as AgentMode) ?? AgentMode.WORKER} size="sm" />
                   <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">
                     {agent.status}
                   </Badge>

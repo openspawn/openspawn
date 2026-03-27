@@ -26,7 +26,7 @@ import { ConversationCards } from "./message-conversation-cards";
 import { ContextLinkedMessages } from "./message-context-filter";
 
 export function MessagesPage() {
-  const { messages, loading: messagesLoading } = useMessages(100);
+  const { messages, loading: messagesLoading } = useMessages();
   const { agents, loading: agentsLoading } = useAgents();
   const { currentPhase } = useCurrentPhase();
   const [threadConvoKey, setThreadConvoKey] = useState<string | null>(null);

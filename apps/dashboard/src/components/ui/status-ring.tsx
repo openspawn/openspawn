@@ -24,7 +24,7 @@ interface StatusRingProps {
   /** Credit usage 0-1 */
   creditUsage: number;
   /** Agent status */
-  status: RingStatus;
+  status: `${RingStatus}`;
   /** Ring size */
   size?: "sm" | "md" | "lg";
   /** Avatar content */

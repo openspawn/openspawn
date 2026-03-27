@@ -1,1 +1,1 @@
-export { useRepoTasks, type RepoTask, type RepoTaskStatus } from "@openspawn/dashboard-data";
+export { useRepoTasks, RepoTaskStatus, type RepoTask } from "@openspawn/dashboard-data";

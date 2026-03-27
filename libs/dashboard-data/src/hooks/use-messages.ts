@@ -31,11 +31,18 @@ export interface Conversation {
   createdAt: string;
 }
 
-export function useMessages() {
-  const rest = useRestMessages();
+export function useMessages(channelId?: string) {
+  const rest = useRestMessages(channelId ?? "", { enabled: !!channelId });
+
+  const raw = rest.data;
+  const messages: Message[] = Array.isArray(raw)
+    ? raw
+    : Array.isArray((raw as Record<string, unknown> | undefined)?.data)
+      ? ((raw as Record<string, unknown>).data as Message[])
+      : [];
 
   return {
-    messages: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
+    messages,
     loading: rest.isLoading,
     error: rest.error?.message,
     refetch: rest.refetch,

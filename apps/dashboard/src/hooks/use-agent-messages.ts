@@ -1,4 +1,4 @@
-import type { AgentFields } from "@openspawn/shared-types";
+import type { AgentFields } from "@openspawn/dashboard-data";
 import { isSandboxMode, SANDBOX_URL } from "@openspawn/dashboard-data";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";

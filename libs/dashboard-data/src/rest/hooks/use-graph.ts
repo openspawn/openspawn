@@ -13,15 +13,22 @@ export function useRestGraphEntities(options?: { enabled?: boolean }) {
   });
 }
 
-export function useRestGraphRelationships(options?: { enabled?: boolean }) {
+export function useRestGraphRelationships(
+  entityId: string,
+  options?: { enabled?: boolean; direction?: string },
+) {
   return useQuery({
-    queryKey: ["graph", "relationships"],
+    queryKey: ["graph", "relationships", entityId, options?.direction],
     queryFn: async () => {
-      const { data, error } = await api.GET("/memory/graph/relationships");
+      const { data, error } = await api.GET("/memory/graph/relationships", {
+        params: {
+          query: { entity_id: entityId, direction: options?.direction },
+        },
+      });
       if (error) throw error;
       return data;
     },
-    enabled: options?.enabled ?? true,
+    enabled: (options?.enabled ?? true) && !!entityId,
   });
 }
 

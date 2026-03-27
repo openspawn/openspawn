@@ -142,7 +142,10 @@ export function AgentVirtualGrid({ filteredAgents, onCardClick }: AgentVirtualGr
                         <CardContent>
                           <div className="flex flex-wrap gap-2 mb-4">
                             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
-                            <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="sm" />
+                            <AgentModeBadge
+                              mode={(agent.mode as AgentMode) ?? AgentMode.WORKER}
+                              size="sm"
+                            />
                             <TeamBadge teamId={agent.teamId} />
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">

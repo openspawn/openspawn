@@ -4,7 +4,13 @@ import {
   useRestGraphRelationships,
   useRestGraphCytoscape,
 } from "../rest/hooks/use-graph";
-import { demoEntities, demoRelationships, getCytoscapeData } from "@openspawn/demo-data";
+import {
+  demoEntities,
+  demoRelationships,
+  getCytoscapeData,
+  type DemoRelationship,
+  type DemoEntity,
+} from "@openspawn/demo-data";
 
 const isLiveMode = !isDemoMode && !isSandboxMode;
 
@@ -20,16 +26,25 @@ export function useGraphEntities() {
     };
   }
 
+  const raw = rest.data;
+  const entities: DemoEntity[] = Array.isArray(raw)
+    ? raw
+    : Array.isArray((raw as Record<string, unknown> | undefined)?.data)
+      ? ((raw as Record<string, unknown>).data as DemoEntity[])
+      : [];
+
   return {
-    entities: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
+    entities,
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
   };
 }
 
-export function useGraphRelationships() {
-  const rest = useRestGraphRelationships({ enabled: isLiveMode });
+export function useGraphRelationships(entityId?: string) {
+  const rest = useRestGraphRelationships(entityId ?? "", {
+    enabled: isLiveMode && !!entityId,
+  });
 
   if (!isLiveMode) {
     return {
@@ -40,8 +55,15 @@ export function useGraphRelationships() {
     };
   }
 
+  const raw = rest.data;
+  const relationships: DemoRelationship[] = Array.isArray(raw)
+    ? raw
+    : Array.isArray((raw as Record<string, unknown> | undefined)?.data)
+      ? ((raw as Record<string, unknown>).data as DemoRelationship[])
+      : [];
+
   return {
-    relationships: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
+    relationships,
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,
@@ -62,7 +84,8 @@ export function useGraphCytoscape() {
   }
 
   // API returns { data: { nodes, edges } } — unwrap the outer data envelope
-  const raw = rest.data && "data" in rest.data ? (rest.data as Record<string, unknown>).data : rest.data;
+  const raw =
+    rest.data && "data" in rest.data ? (rest.data as Record<string, unknown>).data : rest.data;
   const envelope = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   const nodes = "nodes" in envelope ? envelope.nodes : [];
   const edges = "edges" in envelope ? envelope.edges : [];

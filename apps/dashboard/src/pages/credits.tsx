@@ -103,7 +103,7 @@ function TransactionVirtualList({
                   {tx.amount.toLocaleString()}
                 </motion.p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground tabular-nums">
-                  Bal: {tx.balanceAfter.toLocaleString()}
+                  Bal: {tx.balanceAfter?.toLocaleString() ?? "—"}
                 </p>
               </div>
             </div>

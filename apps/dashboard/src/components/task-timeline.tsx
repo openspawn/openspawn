@@ -65,8 +65,8 @@ function buildTimelineEvents(
     timestamp: task.createdAt,
     label: "Task Created",
     detail: task.title,
-    agentId: task.creatorId,
-    agentName: agentMap.get(task.creatorId)?.name || "System",
+    agentId: task.creatorId ?? undefined,
+    agentName: agentMap.get(task.creatorId ?? "")?.name || "System",
     icon: Plus,
     color: "#06b6d4",
   });
@@ -405,7 +405,7 @@ function TaskTimelineRow({
 
 export function TaskTimeline({ onAgentClick }: { onAgentClick?: (id: string) => void }) {
   const { tasks } = useTasks();
-  const { messages } = useMessages(200);
+  const { messages } = useMessages();
   const { agents } = useAgents();
   const [filter, setFilter] = useState<string>("all");
   const [limit, setLimit] = useState(10);

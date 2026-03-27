@@ -538,6 +538,7 @@ function OrgChartInner({
   useEffect(() => {
     if (loading) return;
 
+    const prevIds = previousAgentIdsRef.current;
     const currentIds = new Set(agents.map((a) => a.id));
     previousAgentIdsRef.current = currentIds;
 

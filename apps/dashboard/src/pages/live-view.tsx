@@ -142,7 +142,7 @@ function useReplay() {
               ...nodeStatesRef.current,
               [d.agent]: {
                 ...(nodeStatesRef.current[d.agent] || { status: NodeStatus.Idle }),
-                status: d.status || NodeStatus.Idle,
+                status: (d.status as NodeStatus) || NodeStatus.Idle,
               },
             };
           }

@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import {
   useMcpTasks,
+  TaskStatus,
   type KanbanTask,
-  type TaskStatus,
   type TaskPriority,
 } from "../../hooks/use-mcp-tasks";
 import { Badge } from "../ui/badge";
@@ -11,35 +11,35 @@ import { Clock, X, ChevronDown, ChevronUp, Wifi, WifiOff } from "lucide-react";
 
 const COLUMNS: { key: TaskStatus; label: string; color: string; bg: string; border: string }[] = [
   {
-    key: "open",
+    key: TaskStatus.Open,
     label: "Open",
     color: "text-slate-400",
     bg: "bg-slate-500/5",
     border: "border-slate-500/20",
   },
   {
-    key: "claimed",
+    key: TaskStatus.Claimed,
     label: "Claimed",
     color: "text-violet-400",
     bg: "bg-violet-500/5",
     border: "border-violet-500/20",
   },
   {
-    key: "in_progress",
+    key: TaskStatus.InProgress,
     label: "In Progress",
     color: "text-cyan-400",
     bg: "bg-cyan-500/5",
     border: "border-cyan-500/20",
   },
   {
-    key: "review",
+    key: TaskStatus.Review,
     label: "Review",
     color: "text-amber-400",
     bg: "bg-amber-500/5",
     border: "border-amber-500/20",
   },
   {
-    key: "done",
+    key: TaskStatus.Done,
     label: "Done",
     color: "text-emerald-400",
     bg: "bg-emerald-500/5",

@@ -10,8 +10,9 @@ export function useCredits(_orgId?: string, _agentId?: string, limit = 50) {
   const rest = useRestCredits({ limit });
 
   const items = rest.data && "items" in rest.data ? rest.data.items : [];
+  const transactions: CreditTransaction[] = Array.isArray(items) ? items : [];
   return {
-    transactions: Array.isArray(items) ? items : [],
+    transactions,
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,

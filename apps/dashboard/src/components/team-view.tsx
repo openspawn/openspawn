@@ -118,7 +118,7 @@ function TeamAgentCard({
         <Badge variant={getStatusVariant(agent.status)} className="text-[10px]">
           {agent.status}
         </Badge>
-        <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="sm" />
+        <AgentModeBadge mode={(agent.mode as AgentMode) ?? AgentMode.WORKER} size="sm" />
       </div>
     </motion.div>
   );

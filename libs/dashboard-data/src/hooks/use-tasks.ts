@@ -12,8 +12,15 @@ export type Task = Omit<_SharedTaskFields, "status" | "priority"> & {
 export function useTasks() {
   const rest = useRestTasks();
 
+  const raw = rest.data;
+  const tasks: Task[] = Array.isArray(raw)
+    ? raw
+    : Array.isArray((raw as Record<string, unknown> | undefined)?.data)
+      ? ((raw as Record<string, unknown>).data as Task[])
+      : [];
+
   return {
-    tasks: Array.isArray(rest.data) ? rest.data : Array.isArray((rest.data as any)?.data) ? (rest.data as any).data : [],
+    tasks,
     loading: rest.isLoading,
     error: rest.error ?? null,
     refetch: rest.refetch,

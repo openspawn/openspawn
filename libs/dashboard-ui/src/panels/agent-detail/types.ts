@@ -1,38 +1,54 @@
 import type { ReactNode } from "react";
 import type { AgentFields, TaskFields, CreditTransactionFields } from "@openspawn/shared-types";
 
-export type AgentDetailAgent = Pick<
-  AgentFields,
-  | "id"
-  | "agentId"
-  | "name"
-  | "role"
-  | "mode"
-  | "status"
-  | "level"
-  | "model"
-  | "currentBalance"
-  | "trustScore"
-  | "tasksCompleted"
-  | "tasksSuccessful"
-  | "lifetimeEarnings"
-  | "defaultAutonomyLevel"
-  | "domain"
-  | "teamId"
-  | "parentId"
-  | "avatar"
-  | "avatarColor"
-  | "avatarUrl"
-  | "createdAt"
-  | "lastActivityAt"
->;
+// Widen enum fields to string for compatibility with dashboard-data's intentionally widened types
+export type AgentDetailAgent = Omit<
+  Pick<
+    AgentFields,
+    | "id"
+    | "agentId"
+    | "name"
+    | "role"
+    | "mode"
+    | "status"
+    | "level"
+    | "model"
+    | "currentBalance"
+    | "trustScore"
+    | "tasksCompleted"
+    | "tasksSuccessful"
+    | "lifetimeEarnings"
+    | "defaultAutonomyLevel"
+    | "domain"
+    | "teamId"
+    | "parentId"
+    | "avatar"
+    | "avatarColor"
+    | "avatarUrl"
+    | "createdAt"
+    | "lastActivityAt"
+  >,
+  "role" | "mode" | "status"
+> & {
+  role: string;
+  mode: string;
+  status: string;
+};
 
-export type AgentDetailTask = Pick<
-  TaskFields,
-  "id" | "identifier" | "title" | "description" | "status" | "priority" | "completedAt"
->;
+export type AgentDetailTask = Omit<
+  Pick<
+    TaskFields,
+    "id" | "identifier" | "title" | "description" | "status" | "priority" | "completedAt"
+  >,
+  "status" | "priority"
+> & {
+  status: string;
+  priority: string;
+};
 
-export type AgentDetailTransaction = CreditTransactionFields;
+export type AgentDetailTransaction = Omit<CreditTransactionFields, "type"> & {
+  type: string;
+};
 
 export interface AgentDetailMessage {
   id: string;

@@ -1,5 +1,5 @@
 import { Play, Pause, RotateCcw, Zap, Users, Building2, Rocket, Factory, Fish } from "lucide-react";
-import { useDemo } from "./DemoProvider";
+import { useDemo, ScenarioName } from "./DemoProvider";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
 
@@ -13,36 +13,42 @@ const SPEED_OPTIONS = [
 
 const SCENARIO_OPTIONS = [
   {
-    value: "acmetech" as const,
+    value: ScenarioName.Acmetech,
     label: "AcmeTech",
     icon: Factory,
     agents: 22,
     description: "Product launch lifecycle",
   },
   {
-    value: "startup" as const,
+    value: ScenarioName.Startup,
     label: "Startup",
     icon: Rocket,
     agents: 5,
     description: "Small team",
   },
-  { value: "growth" as const, label: "Growth", icon: Users, agents: 14, description: "Scaling up" },
   {
-    value: "enterprise" as const,
+    value: ScenarioName.Growth,
+    label: "Growth",
+    icon: Users,
+    agents: 14,
+    description: "Scaling up",
+  },
+  {
+    value: ScenarioName.Enterprise,
     label: "Enterprise",
     icon: Building2,
     agents: 50,
     description: "Full org",
   },
   {
-    value: "krusty-krab" as const,
+    value: ScenarioName.KrustyKrab,
     label: "Krusty Krab",
     icon: Fish,
     agents: 6,
     description: "SpongeBob universe",
   },
   {
-    value: "fresh" as const,
+    value: ScenarioName.Fresh,
     label: "Fresh",
     icon: Zap,
     agents: 1,

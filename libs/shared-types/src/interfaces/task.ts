@@ -23,6 +23,7 @@ export interface TaskFields {
   completedAt?: string | null;
   source?: string | null;
   approvalRequired?: boolean;
+  approvedAt?: string | null;
   autonomyLevel?: number | null;
   rejection?: TaskRejection | null;
 }

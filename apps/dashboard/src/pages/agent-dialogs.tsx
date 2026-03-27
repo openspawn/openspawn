@@ -59,7 +59,7 @@ export function AgentDetailsDialog({ agent, onClose }: { agent: Agent; onClose: 
           <div className="flex flex-wrap gap-2">
             <Badge variant={getStatusVariant(agent.status)}>{agent.status}</Badge>
             <Badge variant="outline">{agent.role}</Badge>
-            <AgentModeBadge mode={agent.mode ?? AgentMode.WORKER} size="md" />
+            <AgentModeBadge mode={(agent.mode as AgentMode) ?? AgentMode.WORKER} size="md" />
             <Badge variant="secondary">Level {agent.level}</Badge>
             <Badge className={REPUTATION_COLORS[repLevel] || "bg-blue-500"}>
               {REPUTATION_EMOJI[repLevel] || "✅"} {repLevel}
@@ -131,7 +131,7 @@ export function EditAgentDialog({ agent, onClose }: { agent: Agent; onClose: () 
   const [name, setName] = useState(agent.name);
   const [model, setModel] = useState(agent.model);
   const [status, setStatus] = useState(agent.status);
-  const [mode, setMode] = useState<AgentMode>(agent.mode ?? AgentMode.WORKER);
+  const [mode, setMode] = useState<AgentMode>((agent.mode as AgentMode) ?? AgentMode.WORKER);
 
   function handleSave() {
     // DEFERRED: Agent edits are not yet persisted to the backend.

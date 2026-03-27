@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Badge } from "../../ui/badge";
 import type { AgentDetailAgent, AgentDetailTask } from "./types";
 
-function getTaskStatusBadge(status: TaskStatus): {
+function getTaskStatusBadge(status: string): {
   variant: "success" | "warning" | "destructive" | "secondary";
   label: string;
 } {

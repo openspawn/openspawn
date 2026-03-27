@@ -26,7 +26,7 @@ export function ConversationCards({ messages, agents, onViewThread }: Conversati
   const agentMap = useMemo(() => {
     const map = new Map<string, { id: string; name: string; level: number; teamId?: string }>();
     agents.forEach((a) =>
-      map.set(a.id, { id: a.id, name: a.name, level: a.level, teamId: a.teamId }),
+      map.set(a.id, { id: a.id, name: a.name, level: a.level, teamId: a.teamId ?? undefined }),
     );
     return map;
   }, [agents]);
