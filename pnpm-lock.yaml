@@ -358,7 +358,11 @@ importers:
 
   libs/dashboard-data: {}
 
-  libs/dashboard-ui: {}
+  libs/dashboard-ui:
+    dependencies:
+      '@openspawn/shared-types':
+        specifier: workspace:*
+        version: link:../shared-types
 
   libs/design-tokens:
     devDependencies:
