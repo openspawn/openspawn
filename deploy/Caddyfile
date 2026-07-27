@@ -38,6 +38,15 @@ openspawn.ai {
 	import security_headers
 }
 
+# ── api.openspawn.ai — Core API (FastAPI REST + OpenAPI + MCP) ──────────────
+# Dedicated hostname serves FastAPI at the root, so no path prefix is stripped
+# (/health, /docs, /mcp). The openspawn.ai/api/* route above is the same
+# upstream reached via handle_path, which strips the /api prefix.
+api.openspawn.ai {
+	reverse_proxy localhost:8000
+	import security_headers
+}
+
 # ── team.openspawn.ai — Internal team dashboard (basic auth) ────────────────
 team.openspawn.ai {
 	basicauth {
