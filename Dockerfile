@@ -7,7 +7,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json tsconfig.json .npmrc ./
 COPY apps/ ./apps/
 COPY libs/ ./libs/
 COPY tools/sandbox/package.json tools/sandbox/tsconfig.json tools/sandbox/
@@ -23,6 +23,7 @@ ARG VITE_DASHBOARD_THEME=openspawn
 ENV VITE_SANDBOX_MODE=true
 ENV VITE_DASHBOARD_THEME=${VITE_DASHBOARD_THEME}
 RUN pnpm nx build shared-types
+RUN pnpm nx sync
 RUN pnpm nx run dashboard:build --configuration=production
 RUN VITE_BASE_PATH="/" pnpm nx run team:build --configuration=production
 RUN pnpm nx run website:build
@@ -37,8 +38,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy deployed sandbox (includes resolved node_modules with shared-types)
 COPY --from=build /app/sandbox-deploy ./
-# Overwrite TS-only shared-types with compiled JS from build
-COPY --from=build /app/dist/libs/shared-types ./node_modules/@openspawn/shared-types
+
+# Remove CJS build artifacts from shared-types so tsx resolves .ts → ESM
+RUN find node_modules/@openspawn/shared-types -name '*.js' ! -name 'vite.config*' -delete 2>/dev/null; \
+    find node_modules/.pnpm -path '*@openspawn+shared-types*/src/*.js' -delete 2>/dev/null; \
+    find node_modules/.pnpm -path '*@openspawn+shared-types*/src/**/*.js' -delete 2>/dev/null; \
+    true
 
 # Copy built apps
 COPY --from=build /app/dist/apps/dashboard ./dashboard-dist
