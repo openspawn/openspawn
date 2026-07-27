@@ -29,9 +29,7 @@ class A2AMessage(BaseModel):
 
 
 # A2A task states
-A2ATaskState = Literal[
-    "submitted", "working", "input-required", "completed", "failed", "canceled"
-]
+A2ATaskState = Literal["submitted", "working", "input-required", "completed", "failed", "canceled"]
 
 
 class A2ATaskStatus(BaseModel):

@@ -117,9 +117,7 @@ async def claim_task(
 ) -> A2ATask:
     """Claim an unassigned A2A task."""
     agent_id = _get_agent_id(auth)
-    return await service.claim_task(
-        db=db, task_id=task_id, agent_id=agent_id, org_id=auth.org_id
-    )
+    return await service.claim_task(db=db, task_id=task_id, agent_id=agent_id, org_id=auth.org_id)
 
 
 # --- Heartbeat ---

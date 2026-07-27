@@ -112,9 +112,7 @@ async def a2a_websocket(
             return
 
         # Resolve agent to get org_id
-        result = await db.execute(
-            select(Agent).where(Agent.agent_id == agent_id)
-        )
+        result = await db.execute(select(Agent).where(Agent.agent_id == agent_id))
         agent = result.scalar_one_or_none()
         if not agent:
             await websocket.close(code=4004, reason="Agent not found")
@@ -136,10 +134,12 @@ async def a2a_websocket(
                 org_id=org_id,
             )
             for task in pending_tasks:
-                await websocket.send_json({
-                    "type": "task.assigned",
-                    "task": task.model_dump(),
-                })
+                await websocket.send_json(
+                    {
+                        "type": "task.assigned",
+                        "task": task.model_dump(),
+                    }
+                )
 
         # Keep-alive loop
         while True:
@@ -162,15 +162,19 @@ async def a2a_websocket(
                                 result=result,
                                 org_id=org_id,
                             )
-                            await websocket.send_json({
-                                "type": "task.completed",
-                                "task": completed.model_dump(),
-                            })
+                            await websocket.send_json(
+                                {
+                                    "type": "task.completed",
+                                    "task": completed.model_dump(),
+                                }
+                            )
                         except Exception as e:
-                            await websocket.send_json({
-                                "type": "error",
-                                "message": str(e),
-                            })
+                            await websocket.send_json(
+                                {
+                                    "type": "error",
+                                    "message": str(e),
+                                }
+                            )
 
             elif data.get("type") == "ping":
                 await websocket.send_json({"type": "pong"})
@@ -185,7 +189,10 @@ async def a2a_websocket(
 
 async def notify_agent(agent_id: str, task: Any) -> bool:
     """Push a task to an agent via WebSocket if connected."""
-    return await manager.send_to_agent(agent_id, {
-        "type": "task.assigned",
-        "task": task.model_dump(),
-    })
+    return await manager.send_to_agent(
+        agent_id,
+        {
+            "type": "task.assigned",
+            "task": task.model_dump(),
+        },
+    )

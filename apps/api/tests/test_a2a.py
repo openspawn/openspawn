@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-import pytest
 from httpx import AsyncClient
-
 
 # ---------------------------------------------------------------------------
 # Auth gate tests — verify routes exist and require auth
