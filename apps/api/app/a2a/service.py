@@ -14,7 +14,7 @@ from app.models.enums import TaskStatus
 from app.models.organization import Organization
 from app.models.task import Task
 
-from .types import A2AMessage, A2ATask, A2ATaskStatus
+from .types import A2AMessage, A2ATask, A2ATaskState, A2ATaskStatus
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 # State mapping helpers
 # ---------------------------------------------------------------------------
 
-_OPENSPAWN_TO_A2A: dict[str, str] = {
+_OPENSPAWN_TO_A2A: dict[str, A2ATaskState] = {
     TaskStatus.BACKLOG.value: "submitted",
     TaskStatus.TODO.value: "submitted",
     TaskStatus.IN_PROGRESS.value: "working",
@@ -35,7 +35,7 @@ _OPENSPAWN_TO_A2A: dict[str, str] = {
 }
 
 
-def _to_a2a_state(openspawn_status: str) -> str:
+def _to_a2a_state(openspawn_status: str) -> A2ATaskState:
     return _OPENSPAWN_TO_A2A.get(openspawn_status, "submitted")
 
 
@@ -56,7 +56,9 @@ def _task_to_a2a(task: Task) -> A2ATask:
         status=A2ATaskStatus(
             state=_to_a2a_state(task.status),
             message=task.title,
-            timestamp=task.updated_at.isoformat() if task.updated_at else pendulum.now("UTC").isoformat(),
+            timestamp=task.updated_at.isoformat()
+            if task.updated_at
+            else pendulum.now("UTC").isoformat(),
         ),
         messages=messages,
     )
@@ -101,9 +103,7 @@ async def send_message(
     # Get org for task identifier
     org = await db.get(Organization, org_id)
     if not org:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
     identifier = f"{org.task_prefix}-{org.next_task_number}"
     org.next_task_number += 1
@@ -161,7 +161,9 @@ async def complete_task(
         )
 
     # Transition state
-    new_status = TaskStatus.DONE.value if completion_status == "completed" else TaskStatus.CANCELLED.value
+    new_status = (
+        TaskStatus.DONE.value if completion_status == "completed" else TaskStatus.CANCELLED.value
+    )
     task.status = new_status
     if new_status == TaskStatus.DONE.value:
         task.completed_at = pendulum.now("UTC")

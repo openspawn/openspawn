@@ -62,7 +62,7 @@ class Task(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # A2A fields
     source: Mapped[str] = mapped_column(String(20), nullable=False, server_default="manual")
     a2a_context_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    a2a_messages: Mapped[dict | None] = mapped_column(CompatJSONB(), nullable=True)
+    a2a_messages: Mapped[list[dict] | None] = mapped_column(CompatJSONB(), nullable=True)
 
     organization: Mapped[Organization] = relationship("Organization", back_populates="tasks")
     assignee: Mapped[Agent | None] = relationship(

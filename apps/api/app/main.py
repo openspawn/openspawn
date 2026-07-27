@@ -5,6 +5,9 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.a2a.router import get_agent_card_router
+from app.a2a.router import router as a2a_router
+from app.a2a.websocket import router as a2a_ws_router
 from app.agents.router import router as agents_router
 from app.apikeys.router import router as hosted_auth_router
 from app.apikeys.usage_middleware import UsageTrackingMiddleware
@@ -26,8 +29,6 @@ from app.memory.router import router as memory_router
 from app.messages.router import router as messages_router
 from app.observability import setup_logfire, setup_telemetry
 from app.routers.auth import router as auth_router
-from app.a2a.router import get_agent_card_router, router as a2a_router
-from app.a2a.websocket import router as a2a_ws_router
 from app.tasks.router import router as tasks_router
 
 logger = structlog.stdlib.get_logger()
