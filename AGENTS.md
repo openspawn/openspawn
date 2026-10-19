@@ -12,35 +12,6 @@ Multi-agent coordination platform. Agents get tasks, earn credits, communicate. 
 
 ---
 
-## Project Structure
-
-```
-apps/
-  dashboard/       -> React dashboard (openspawn.ai + bikinibottom.ai via env vars)
-  team/            -> Internal team dashboard
-  website/         -> openspawn.ai marketing site + docs (MDX)
-  platform/        -> openspawn.ai landing page
-  api/             -> FastAPI backend (REST + OpenAPI + MCP) — Python, uv
-  sandbox-cli/     -> CLI entry point for sandbox
-libs/
-  dashboard-data/  -> Shared hooks, auth, utilities
-  dashboard-ui/    -> Shared React UI components
-  docs-ui/         -> Shared doc components (layout, callout, MDX, search)
-  design-tokens/   -> Design system (colors, spacing, typography)
-  demo-data/       -> Simulation engine, scenarios, fixtures
-  shared-types/    -> Shared TypeScript types and enums
-  test-utils/      -> Shared test utilities
-
-tools/
-  sandbox/         -> Coordination sandbox server (SSE + MCP + A2A)
-
-packages/
-  openspawn/       -> npm CLI package (init + preview + start), published to npmjs.com
-  coordinator/     -> Coordination server package
-```
-
----
-
 ## Commands
 
 ```bash
@@ -87,27 +58,12 @@ Full details: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ---
 
-## Database Entities
-
-| Entity              | Purpose                                                                      |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `Agent`             | AI agents with levels (L1-L10), parent hierarchy, balance, autonomy level    |
-| `AgentCapability`   | Skills per agent with proficiency level                                      |
-| `Task`              | Work items with Kanban status flow, optional per-task autonomy override      |
-| `TaskDependency`    | Blocking relationships between tasks                                         |
-| `CreditTransaction` | Debits/credits with audit trail                                              |
-| `Channel`           | Communication channels (task, DM, broadcast)                                 |
-| `Message`           | Messages in channels                                                         |
-| `Event`             | Append-only system audit log                                                 |
-| `EventSubscription` | Agent subscriptions to typed coordination events (wildcard pattern matching) |
-| `ApprovalRequest`   | Gated actions awaiting human/manager approval (risk vs autonomy)             |
-| `Artifact`          | Versioned work products (components, tests, schemas) with approval workflow  |
-
----
-
 ## Conventions
 
-- **PRs**: All changes go through pull requests — never push directly to `main`
+- **PRs**: All changes go through pull requests — never push directly to `main`. Squash merge, delete branch after.
+- **AI-assisted PRs**: Mark as AI-assisted in the PR title or description and note the testing level (untested / lightly tested / fully tested)
+- **Tests in PRs**: New utility functions need unit tests; new pages need a "renders without error" E2E test; bug fixes should include a regression test
+- **CLI version**: Bump `packages/openspawn/package.json` (`YYYY.M.D`) in any PR that changes CLI behavior
 - **Commits**: Scoped conventional commits (`feat(scope):`, `fix(scope):`)
 - **Imports**: No barrel files, explicit paths
 - **Formatting (TS)**: oxfmt (Rust-based)
@@ -146,36 +102,13 @@ cd apps/api && uv run pytest tests/ -v                                 # Test (P
 
 ---
 
-## Publishing the CLI to npm
-
-The `openspawn` package is published to npm via GitHub Actions (`publish-cli.yml`).
-
-**Two triggers:**
-
-```bash
-# Option 1: Tag push (automatic)
-git tag openspawn@2026.3.18
-git push --tags
-
-# Option 2: Manual dispatch (Actions → "Publish CLI" → Run workflow)
-# Supports dry-run and version override
-```
-
-**Workflow steps:** install → lint → test → build → verify CLI runs → publish with provenance.
-
-**Requirements:** `NPM_TOKEN` secret must be set in repo settings. Version in `packages/openspawn/package.json` must be bumped before tagging.
-
-**Version scheme:** `YYYY.M.D` (e.g. `2026.3.18`). Bump the version in `packages/openspawn/package.json` as part of any PR that changes CLI behavior.
-
----
-
 ## Deeper Docs
 
-| Topic                          | Document                                                                                                           |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| Architecture & deployment      | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                 |
-| Testing, PRs, dev guide        | [CONTRIBUTING.md](CONTRIBUTING.md)                                                                                 |
-| Product requirements           | [docs/openspawn/PRD.md](docs/openspawn/PRD.md)                                                                     |
-| API reference (100+ endpoints) | [docs/openspawn/API.md](docs/openspawn/API.md)                                                                     |
-| Database schema                | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md)                                                               |
-| Event mesh spike findings      | [docs/openspawn/spikes/2026-03-14-event-mesh-findings.md](docs/openspawn/spikes/2026-03-14-event-mesh-findings.md) |
+| Topic                                   | Document                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Architecture & deployment               | [ARCHITECTURE.md](ARCHITECTURE.md)                                                                                 |
+| Deploy, testing, profiling, CLI publish | [CONTRIBUTING.md](CONTRIBUTING.md)                                                                                 |
+| Product requirements                    | [docs/openspawn/PRD.md](docs/openspawn/PRD.md)                                                                     |
+| API reference (100+ endpoints)          | [docs/openspawn/API.md](docs/openspawn/API.md)                                                                     |
+| Database schema                         | [docs/openspawn/SCHEMA.md](docs/openspawn/SCHEMA.md)                                                               |
+| Event mesh spike findings               | [docs/openspawn/spikes/2026-03-14-event-mesh-findings.md](docs/openspawn/spikes/2026-03-14-event-mesh-findings.md) |
