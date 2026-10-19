@@ -144,6 +144,27 @@ The manual script profiles health checks, agent/task CRUD, routing, transitions,
 5. No `localhost` URLs in network requests (checked by E2E)
 6. PR approved and squash-merged
 
+## Publishing the CLI to npm
+
+The `openspawn` package is published to npm via GitHub Actions (`publish-cli.yml`).
+
+**Two triggers:**
+
+```bash
+# Option 1: Tag push (automatic)
+git tag openspawn@2026.3.18
+git push --tags
+
+# Option 2: Manual dispatch (Actions → "Publish CLI" → Run workflow)
+# Supports dry-run and version override
+```
+
+**Workflow steps:** install → lint → test → build → verify CLI runs → publish with provenance.
+
+**Requirements:** `NPM_TOKEN` secret must be set in repo settings. Version in `packages/openspawn/package.json` must be bumped before tagging.
+
+**Version scheme:** `YYYY.M.D` (e.g. `2026.3.18`). Bump the version in `packages/openspawn/package.json` as part of any PR that changes CLI behavior.
+
 ## PR Conventions
 
 - Branch from `main`
